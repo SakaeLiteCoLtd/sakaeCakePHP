@@ -76,8 +76,6 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
             </td>
           </tr>
         </table>
-              <hr size="5">
-        
         		<?php echo $this->element('SubHeader');?>
         
             <?= $this->Flash->render() ?>

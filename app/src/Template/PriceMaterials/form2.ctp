@@ -11,6 +11,7 @@
             header('Cache-Control:');
             header('Pragma:');
         ?>
+<hr size="5">
 
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
 

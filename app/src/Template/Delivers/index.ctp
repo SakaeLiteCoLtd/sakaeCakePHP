@@ -25,6 +25,7 @@ $this->Customers = TableRegistry::get('customers');//productsテーブルを使�
     <?= $this->fetch('script') ?>
 </head>
 <body>
+<hr size="5">
 <table width="1500" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>
           <tr>

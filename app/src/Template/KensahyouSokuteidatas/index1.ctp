@@ -12,6 +12,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Cache-Control:');
           header('Pragma:');
         ?>
+<br>
+<br>
 
 <?=$this->Form->create($entity, ['url' => ['action' => 'form']]) ?>
 <div align="center" style="margin:0rem;padding:0rem">

@@ -11,6 +11,7 @@
             echo $this->Form->hidden('name' ,['value'=>$_POST['name'] ]) ;
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
         ?>
+<hr size="5">
 
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
 

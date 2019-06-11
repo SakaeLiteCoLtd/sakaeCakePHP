@@ -1,2 +1,0 @@
-php-book-appフォルダ
-github：SakaeKaihatsu

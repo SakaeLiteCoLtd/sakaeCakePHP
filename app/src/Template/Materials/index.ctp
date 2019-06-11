@@ -24,7 +24,10 @@
     <?= $this->fetch('script') ?>
 </head>
 <body>
+<<<<<<< HEAD
 <hr size="5">
+=======
+>>>>>>> origin/master
 <table width="1500" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>
           <tr>

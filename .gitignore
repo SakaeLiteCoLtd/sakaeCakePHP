@@ -1,2 +1,7 @@
 /Docker/mysql/data/*
+<<<<<<< HEAD
 !/Docker/mysql/data/.gitkeep
+=======
+!/Docker/mysql/data/.gitkeep
+//test
+>>>>>>> origin/master

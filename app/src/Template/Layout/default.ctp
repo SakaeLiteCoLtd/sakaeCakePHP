@@ -53,6 +53,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
             <td bgcolor="#E6FFFF">
               <div style="float:right"><?php echo $user; ?></div>
               <p><?php echo $this->Html->image('logo.gif',array('width'=>'157','height'=>'22'));?></p>
+<<<<<<< HEAD
               <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
                         <tr style="border-style: none; background-color: #E6FFFF">
                           <td style="padding: 0.1rem 0.1rem;"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'user','action'=>'index')));?></td>
@@ -71,11 +72,36 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
                           <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
                           <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
                           <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'Shinkies', 'action'=>'index', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_shinki.gif',array('width'=>'105','height'=>'36'));?></a></td>
+=======
+              <table style="margin-bottom:0px" width="800" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+                        <tr style="border-style: none; background-color: #E6FFFF">
+                          <td><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'user','action'=>'index')));?></td>
+                          <td><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td><a href=<?php echo $this->Url->build(['controller'=>'SyukkaKensas', 'action'=>'index', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_setubi.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                        </tr>
+                        <tr style="border-style: none;background-color: #E6FFFF">
+                          <td><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'user','action'=>'index')));?></td>
+                          <td><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td><a href=<?php echo $this->Url->build(['controller'=>'Shinkies', 'action'=>'index', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_shinki.gif',array('width'=>'105','height'=>'36'));?></a></td>
+>>>>>>> origin/master
                         </tr>
               </table>
             </td>
           </tr>
         </table>
+<<<<<<< HEAD
+=======
+              <hr size="5">
+        
+>>>>>>> origin/master
         		<?php echo $this->element('SubHeader');?>
         
             <?= $this->Flash->render() ?>

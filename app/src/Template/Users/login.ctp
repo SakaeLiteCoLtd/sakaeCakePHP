@@ -23,7 +23,7 @@
     <?= $this->fetch('script') ?>
 </head>
 </html>
-
+<br>
     <?= $this->Flash->render() ?>
     <?= $this->Form->create() ?>
     <fieldset>
@@ -39,4 +39,5 @@
 </table>
     </fieldset>
     <center><?= $this->Form->button(__('login')) ?></center>
+<br>
     <?= $this->Form->end() ?>

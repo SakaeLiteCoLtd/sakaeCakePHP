@@ -19,7 +19,7 @@ class CustomersController extends AppController
 
 	public $paginate = [//ページネーション※この設定にするには39行目も必要
 	        'limit' => 20,//データを1ページに20個ずつ表示する
-			'conditions' => ['delete_flag' => '0']//'delete_flag' => '0'を満たすものだけ表示する
+		'conditions' => ['delete_flag' => '0']//'delete_flag' => '0'を満たすものだけ表示する
 			];
     
      public function initialize()
@@ -41,26 +41,26 @@ class CustomersController extends AppController
 
     public function login()//login画面
     {
-        if ($this->request->is('post')) {
-            $user = $this->Auth->identify();
-            if ($user) {
-                $this->Auth->setUser($user);
-                return $this->redirect($this->Auth->redirectUrl());
-            }
-            $this->Flash->error(__('Invalid username or password, try again'));
-        }
+	if ($this->request->is('post')) {
+		$user = $this->Auth->identify();
+		if ($user) {
+			$this->Auth->setUser($user);
+			return $this->redirect($this->Auth->redirectUrl());
+		}
+		$this->Flash->error(__('Invalid username or password, try again'));
+	}
     }
 
     public function logout()
     {
-        $this->request->session()->destroy(); //セッションの破棄
-        return $this->redirect($this->Auth->logout()); // ログアウト処理
+	$this->request->session()->destroy(); //セッションの破棄
+	return $this->redirect($this->Auth->logout()); // ログアウト処理
     }
 
     public function form()
     {
 	$customer = $this->Customers->newEntity();//newentityに$customerという名前を付ける
-    $this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
+	$this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
 
 	$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 	$customer['created_staff'] = $staff_id;//$customerのcreated_staffを$staff_idにする
@@ -69,13 +69,13 @@ class CustomersController extends AppController
      public function confirm()
     {
 	$customer = $this->Customers->newEntity();//newEntityを作成
-    $this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
+	$this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
     }
 
      public function do()
     {
 	$customer = $this->Customers->newEntity();//newEntityを作成
-    $this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
+	$this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
@@ -104,55 +104,55 @@ class CustomersController extends AppController
 
      public function confirmcsv()//「出荷検査表登録」確認画面
     {
-	$customer = $this->Customers->newEntity();//newentityに$supplierという名前を付ける
-	$this->set('customer',$customer);//1行上の$supplierをctpで使えるようにセット
+	$customer = $this->Customers->newEntity();//newentityに$customerという名前を付ける
+	$this->set('customer',$customer);//1行上の$customerをctpで使えるようにセット
 	
-    $staff_id = $this->Auth->user('staff_id');
-	$this->set('staff_id',$staff_id);//1行上の$supplierをctpで使えるようにセット
+	$staff_id = $this->Auth->user('staff_id');
+	$this->set('staff_id',$staff_id);//1行上の$staff_idをctpで使えるようにセット
 
-    $fp = fopen("customer.csv", "r");//csvファイルはwebrootに入れる
-    $this->set('fp',$fp);
-                    
-    $fpcount = fopen("customer.csv", 'r' );
-    for( $count = 0; fgets( $fpcount ); $count++ );
-        $this->set('count',$count);
-        
-        $arrFp = array();//空の配列を作る
-//        $line = fgets($fp);//ファイル$fpの上の１行を取る（１行目）
-        for ($k=1; $k<=$count; $k++) {//行数分
-            $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
-            $sample = explode(',',$line);//$lineを","毎に配列に入れる
-                       
-            $keys=array_keys($sample);
-            $keys[array_search('0',$keys)]='customer_code';//名前の変更
-            $keys[array_search('1',$keys)]='name';
-            $keys[array_search('2',$keys)]='yuubin';
-            $keys[array_search('3',$keys)]='address';
-            $keys[array_search('4',$keys)]='tel';
-            $keys[array_search('5',$keys)]='fax';
-            $keys[array_search('7',$keys)]='delete_flag';
-            $sample = array_combine( $keys, $sample );
-                        
-            unset($sample['6']);//削除
+	$fp = fopen("customer.csv", "r");//csvファイルはwebrootに入れる
+	$this->set('fp',$fp);
 
-            $arrFp[] = $sample;//配列に追加する
-        }
-        $this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
-//            	    echo "<pre>";
-//                    print_r($arrFp);
-//                    echo "<br>";
+	$fpcount = fopen("customer.csv", 'r' );
+	for( $count = 0; fgets( $fpcount ); $count++ );//csvファイルが何行あるかカウントする
+	$this->set('count',$count);
+
+	$arrFp = array();//空の配列を作る
+//	$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目）
+	for ($k=1; $k<=$count; $k++) {//行数分
+		$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+		$sample = explode(',',$line);//$lineを","毎に配列に入れる
+
+		$keys=array_keys($sample);
+		$keys[array_search('0',$keys)]='customer_code';//名前の変更
+		$keys[array_search('1',$keys)]='name';
+		$keys[array_search('2',$keys)]='yuubin';
+		$keys[array_search('3',$keys)]='address';
+		$keys[array_search('4',$keys)]='tel';
+		$keys[array_search('5',$keys)]='fax';
+		$keys[array_search('7',$keys)]='delete_flag';
+		$sample = array_combine( $keys, $sample );
+
+		unset($sample['6']);//削除
+
+		$arrFp[] = $sample;//配列に追加する
+	}
+	$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
+//	echo "<pre>";
+//	print_r($arrFp);
+//	echo "<br>";
     }
 
      public function docsv()
     {
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-//            	    echo "<pre>";
-//                    print_r($data);
-//                    var_dump($data);
-//                    echo "<br>";
+//	echo "<pre>";
+//	print_r($data);
+//	var_dump($data);
+//	echo "<br>";
 
-	$customer = $this->Customers->newEntity();//newentityに$userという名前を付ける
-	$this->set('customer',$customer);//1行上の$userをctpで使えるようにセット
+	$customer = $this->Customers->newEntity();//newentityに$customerという名前を付ける
+	$this->set('customer',$customer);//1行上の$customerをctpで使えるようにセット
 
 			if ($this->request->is('post')) {//postなら登録
 				$customer = $this->Customers->patchEntities($customer, $this->request->getData('customerdata'));//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
@@ -183,7 +183,7 @@ class CustomersController extends AppController
     public function edit($id = null)
     {
 	$customer = $this->Customers->get($id);//選んだidに関するCustomersテーブルのデータに$customerと名前を付ける
-    $this->set('customer', $customer);//114行の$customerをctpで使えるようにセット
+	$this->set('customer', $customer);//$customerをctpで使えるようにセット
 
 	$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 	$customer['updated_staff'] = $staff_id;//$customerのupdated_staffを$staff_idにする

@@ -200,7 +200,7 @@ class KensahyouSokuteidatasController  extends AppController
 
 	$Kensahyou_inspec_date = $this->KensahyouSokuteidatas->find()->where(['product_code' => $product_code,'manu_date' => $KensahyouHead_manu_date])->toArray();//KensahyouSokuteidatasテーブルの'product_code' => $product_code,'manu_date' => $KensahyouHead_manu_dateとなるものを配列で取り出す（object型ででてくる）
 	$Kensahyou_inspec_date = (array)$Kensahyou_inspec_date[0]['inspec_date'];//1行下でsubstrを使うため、objectをarrayに変換
-	$KensahyouHead_inspec_date = substr($Kensahyou_inspec_date['date'],0,10);//配列の10文字だけ抜き取りセット（inspec_dateの表示のため）	
+	$KensahyouHead_inspec_date = substr($Kensahyou_inspec_date['date'],0,10);//配列の10文字だけ抜き取りセット（inspec_dateの表示のため）
 	$this->set('KensahyouHead_inspec_date',$KensahyouHead_inspec_date);//セット
 /*
 	echo "<pre>";
@@ -282,23 +282,24 @@ class KensahyouSokuteidatasController  extends AppController
 			$product_code = $product[0]->product_code;//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
 			$arrProductcode[] = $product_code;//$product_codeを配列に追加
 		}
-		sort($arrProductcode);//配列$arrProductcodeのデータを昇順に並び替え
-		$product_code = $arrProductcode[$product_code_num];
+	sort($arrProductcode);//配列$arrProductcodeのデータを昇順に並び替え
 
-		$this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
-		
-		$staff_id = $this->Auth->user('staff_id');//created_staffの登録用
-		$this->set('staff_id',$staff_id);//セット
+	$product_code = $arrProductcode[$product_code_num];
+	$this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
 
-		$this->set('kensahyouSokuteidata',$this->KensahyouSokuteidatas->newEntity());//空のカラムに$KensahyouSokuteidataと名前を付け、ctpで使えるようにセット
+	$staff_id = $this->Auth->user('staff_id');//created_staffの登録用
+	$this->set('staff_id',$staff_id);//セット
+
+	$this->set('kensahyouSokuteidata',$this->KensahyouSokuteidatas->newEntity());//空のカラムに$KensahyouSokuteidataと名前を付け、ctpで使えるようにセット
 
 	$Products = $this->Products->find('all',[
 		'conditions' => ['product_code =' => $product_code]//Productsテーブルの'product_code' = $product_codeとなるものを$Productsとする
 	]);
-	 	foreach ($Products as $value) {//$Productsそれぞれに対し
-			$product_id= $value->id;//idに$product_idと名前を付ける
-		}
-		$this->set('product_id',$product_id);//セット
+
+	 foreach ($Products as $value) {//$Productsそれぞれに対し
+		$product_id= $value->id;//idに$product_idと名前を付ける
+	}
+	$this->set('product_id',$product_id);//セット
 
 	$htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
 	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
@@ -332,7 +333,7 @@ class KensahyouSokuteidatasController  extends AppController
 
      public function confirm()//「出荷検査表登録」確認画面
     {
-    	$data = $this->request->getData();//postデータを$dataに
+	$data = $this->request->getData();//postデータを$dataに
 
 	$product_code = $data['product_code'];//$dataの'product_code'を$product_codeに
 	$this->set('product_code',$product_code);//セット
@@ -340,7 +341,7 @@ class KensahyouSokuteidatasController  extends AppController
 	$Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
 		'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
 	]);
-	foreach ($Products as $value) {//$Productsのそれぞれに対して
+	foreach ($Products as $value) {//上で見つけた$Productsに対して
 		$product_id= $value->id;//$Productsのidに$product_idと名前を付ける
 	}
 	$this->set('product_id',$product_id);//セット
@@ -420,7 +421,7 @@ class KensahyouSokuteidatasController  extends AppController
 		'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
 	]);
 
-	foreach ($Products as $value) {//$Productsのそれぞれに対して
+	foreach ($Products as $value) {//上で見つけた$Productsに対して
 		$product_id= $value->id;//$Productsのidに$product_idと名前を付ける
 	}
 	$this->set('product_id',$product_id);//セット

@@ -22,7 +22,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             <th scope="row"><?= __('product') ?></th>
     		<td style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("product_code_num", ["type"=>"select", "options"=>$arrProductcode, 'label'=>false]); ?></td>
     	</tr>
-  	
+
 </table>
 </div>
 <br>

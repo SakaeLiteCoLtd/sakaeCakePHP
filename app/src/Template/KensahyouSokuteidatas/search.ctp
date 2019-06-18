@@ -18,12 +18,13 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <div align="center">
      <?=$this->Form->create() ?>
      <fieldset>
+<div align="center"><strong><font color="blue"><?php echo "製造年月日";?></font></strong></div>
             <?=$this->Form->create('TimeSearch', ['url' => ['action' => 'search', 'type' => 'post']])?>
             <?=$this->Form->input("start", array('type' => 'date')); ?>
             <?=$this->Form->input("end", array('type' => 'date')); ?>
             <?=$this->Form->hidden("product_code", array('type' => 'value', 'value' => $product_code)); ?>
 <br>
-     <?= $this->Form->button(__('検索')) ?>
+     <?= $this->Form->button(__('絞り込み')) ?>
      </fieldset>
 
 <div align="center"><strong><font color="blue"><?php echo $mes;?></font></strong></div>

@@ -21,7 +21,7 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
                 <?php
 /*//実験１csvファイルを配列として表示
                     $file = fopen("employee.csv", "r");
-                     
+
                     //CSVファイルを配列へ
                     if( $file ){
                       while( !feof($file) ){
@@ -29,7 +29,7 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
                         print_r( fgetcsv($file) );
                       }
                     }
-                     
+
                     //ファイルポインタをクローズ
                     fclose($file);
 *///実験１ここまで
@@ -41,7 +41,7 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
                     print_r($sample);
 //                    print_r($sample[0]);
                     echo "<br>";
-            	    
+
                     $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目になる）
                     $sample=explode(',',$line);//$lineを","毎に配列に入れる
                     print_r($sample);
@@ -53,7 +53,7 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
                     $keys=array_keys($arrFp);
                     $keys[array_search('0',$keys)]='staff_code';
                     $arrFp = array_combine( $keys, $arrFp );
-                    
+
             	    echo "<pre>";
                     print_r($arrFp);
                     echo "<br>";
@@ -74,7 +74,7 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
                     for ($k=1; $k<=$count-1; $k++) {//行数分
                     $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
                     $sample = explode(',',$line);//$lineを","毎に配列に入れる
-                    
+
                     $keys=array_keys($sample);
                     $keys[array_search('0',$keys)]='staff_code';//名前の変更
                     $keys[array_search('1',$keys)]='f_name';
@@ -82,9 +82,9 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
                     $keys[array_search('3',$keys)]='mail';
                     $keys[array_search('5',$keys)]='status';
                     $sample = array_combine( $keys, $sample );
-                    
+
                     unset($sample['4']);//status_leaderを削除
-                    
+
                     $arrFp[] = $sample;//配列に追加する
                     }
             	    echo "<pre>";
@@ -109,8 +109,6 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
               }
 */
 //実験外部ファイルをwobrootに保存
-    
-    
-    
+
                 ?>
 <?=$this->Form->end() ?>

@@ -37,10 +37,10 @@ class KensahyouSokuteidatasController  extends AppController
     {
 	$this->set('kensahyouSokuteidata',$this->KensahyouSokuteidatas->newEntity());//空のカラムに$KensahyouSokuteidataと名前を付け、ctpで使えるようにセット
 
-	$fp = fopen("employee.csv", "r");//csvファイルはwebrootに入れる
-	$this->set('fp',$fp);
+//	$fp = fopen("employee.csv", "r");//csvファイルはwebrootに入れる
+//	$this->set('fp',$fp);
 
-	$fpcount = fopen("employee.csv", 'r' );
+//	$fpcount = fopen("employee.csv", 'r' );
 //	for( $count = 0; fgets( $fpcount ); $count++ );
 /*	echo "<pre>";
 	print_r($count);
@@ -70,9 +70,9 @@ class KensahyouSokuteidatasController  extends AppController
 	print_r($arrFp);
 	echo "<br>";
 */
-	echo "<pre>";
-	print_r('csv_test');
-	echo "</pre>";
+//	echo "<pre>";
+//	print_r('csv_test');
+//	echo "</pre>";
     }
 
     public function indexcsvconfilm()//csvテスト用

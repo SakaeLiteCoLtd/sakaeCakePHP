@@ -18,39 +18,39 @@ class RolesController extends AppController
 {
 	
 	public $paginate = [//ページネーションを定義（indexで使う）
-	        'limit' => 20,//データを1ページに20個ずつ表示する
-			'conditions' => ['delete_flag' => '0'],//'delete_flag' => '0'を満たすものだけ表示する
-			'order' => ['role_code' => 'asc']
-	    ];
+		'limit' => 20,//データを1ページに20個ずつ表示する
+		'conditions' => ['delete_flag' => '0'],//'delete_flag' => '0'を満たすものだけ表示する
+		'order' => ['role_code' => 'asc']//role_code順に並べる
+	];
 
      public function initialize()
      {
-        parent::initialize();
-         $this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
+	parent::initialize();
+	$this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
      }
 
     public function index()
     {
-    $this->set('roles', $this->Roles->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
+	$this->set('roles', $this->Roles->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
 	$this->set('roles', $this->paginate());//定義したページネーションを使用
     }
 
     public function login()
     {
-        if ($this->request->is('post')) {
-            $user = $this->Auth->identify();
-            if ($user) {
-                $this->Auth->setUser($user);
-                return $this->redirect($this->Auth->redirectUrl());
-            }
-            $this->Flash->error(__('Invalid username or password, try again'));
-        }
+	if ($this->request->is('post')) {
+		$user = $this->Auth->identify();
+		if ($user) {
+			$this->Auth->setUser($user);
+			return $this->redirect($this->Auth->redirectUrl());
+		}
+		$this->Flash->error(__('Invalid username or password, try again'));
+	}
     }
 
     public function logout()
     {
-    $this->request->session()->destroy(); // セッションの破棄
-    return $this->redirect($this->Auth->logout()); // ログアウト処理
+	$this->request->session()->destroy(); // セッションの破棄
+	return $this->redirect($this->Auth->logout()); // ログアウト処理
     }
 
     public function form()
@@ -78,51 +78,51 @@ class RolesController extends AppController
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
 	$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
-		if ($this->request->is('post')) {//postの場合
-			$role = $this->Roles->patchEntity($role, $this->request->getData());//$roleデータ（空の行）を$this->request->getData()に更新する
-			$connection = ConnectionManager::get('default');//トランザクション1
-			// トランザクション開始2
-			$connection->begin();//トランザクション3
-			try {//トランザクション4
-				if ($this->Roles->save($role)) {
-					$connection->commit();// コミット5
-				} else {
-					$this->Flash->error(__('The role could not be saved. Please, try again.'));
-					throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-				}
-			} catch (Exception $e) {//トランザクション7
-			//ロールバック8
-				$connection->rollback();//トランザクション9
-			}//トランザクション10
-		}
+	if ($this->request->is('post')) {//postの場合
+		$role = $this->Roles->patchEntity($role, $this->request->getData());//$roleデータ（空の行）を$this->request->getData()に更新する
+		$connection = ConnectionManager::get('default');//トランザクション1
+		// トランザクション開始2
+		$connection->begin();//トランザクション3
+		try {//トランザクション4
+			if ($this->Roles->save($role)) {
+				$connection->commit();// コミット5
+			} else {
+				$this->Flash->error(__('The role could not be saved. Please, try again.'));
+				throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+			}
+		} catch (Exception $e) {//トランザクション7
+		//ロールバック8
+			$connection->rollback();//トランザクション9
+		}//トランザクション10
+	}
     }
 
     public function edit($id = null)
     {
-    $role = $this->Roles->get($id);//選んだidに関するRolesテーブルのデータに$roleと名前を付ける
+	$role = $this->Roles->get($id);//選んだidに関するRolesテーブルのデータに$roleと名前を付ける
 	$this->set('role',$role);//1行上の$roleをctpで使えるようにセット
 	$updated_staff = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 	$role['updated_staff'] = $updated_staff;//$roleのupdated_staffを$staff_idにする
 
-		if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
-			$role = $this->Roles->patchEntity($role, $this->request->getData());//106行目でとったもともとの$roleデータを$this->request->getData()に更新する
-			$connection = ConnectionManager::get('default');//トランザクション1
-				// トランザクション開始2
-			$connection->begin();//トランザクション3
-			try {//トランザクション4
-				if ($this->Roles->save($role)) {
-					$this->Flash->success(__('The role has been updated.'));
-					$connection->commit();// コミット5
-					return $this->redirect(['action' => 'index']);
-				} else {
-					$this->Flash->error(__('The role could not be updated. Please, try again.'));
-					throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-				}
-			} catch (Exception $e) {//トランザクション7
-			//ロールバック8
-				$connection->rollback();//トランザクション9
-			}//トランザクション10
-		}
+	if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
+		$role = $this->Roles->patchEntity($role, $this->request->getData());//106行目でとったもともとの$roleデータを$this->request->getData()に更新する
+		$connection = ConnectionManager::get('default');//トランザクション1
+			// トランザクション開始2
+		$connection->begin();//トランザクション3
+		try {//トランザクション4
+			if ($this->Roles->save($role)) {
+				$this->Flash->success(__('The role has been updated.'));
+				$connection->commit();// コミット5
+				return $this->redirect(['action' => 'index']);
+			} else {
+				$this->Flash->error(__('The role could not be updated. Please, try again.'));
+				throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+			}
+		} catch (Exception $e) {//トランザクション7
+		//ロールバック8
+			$connection->rollback();//トランザクション9
+		}//トランザクション10
+	}
     }
 
 }

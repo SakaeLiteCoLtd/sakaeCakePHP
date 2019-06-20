@@ -33,11 +33,11 @@
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('role_id') ?></th>
-            <td><?= h($this->request->getData('role_id')) ?></td>
+            <td><?= h($Role) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('staff_id') ?></th>
-            <td><?= h($this->request->getData('staff_id')) ?></td>
+            <td><?= h($Staff) ?></td>
     </table>
 <br>
 <br>

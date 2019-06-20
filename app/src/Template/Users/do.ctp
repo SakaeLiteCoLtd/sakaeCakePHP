@@ -28,12 +28,12 @@
             <td><?= h('------------') ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('ロールID') ?></th>
-            <td><?= h($this->request->getData('role_id')) ?></td>
+            <th scope="row"><?= __('ロール') ?></th>
+            <td><?= h($Role) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('スタッフID') ?></th>
-            <td><?= h($this->request->getData('staff_id')) ?></td>
+            <th scope="row"><?= __('スタッフ') ?></th>
+            <td><?= h($Staff) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
             <th scope="row"><?= __('登録日時') ?></th>

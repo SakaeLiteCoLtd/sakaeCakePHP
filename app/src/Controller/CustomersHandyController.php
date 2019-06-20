@@ -87,6 +87,23 @@ class CustomersHandyController extends AppController
     {
 	$customersHandy = $this->CustomersHandy->newEntity();//newentityに$customersHandyという名前を付ける
 	$this->set('customersHandy',$customersHandy);//1行上の$customersHandyをctpで使えるようにセット
+
+	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$customer_id = $data['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+	$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+	$Customer = $customerData[0]->customer_code.':'.$customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
+	$this->set('Customer',$Customer);//登録者の表示のため1行上の$Customerをctpで使えるようにセット
+
+	$place_deliver_id = $data['place_deliver_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+	$place_deliver_idData = $this->Delivers->find()->where(['id' => $place_deliver_id])->toArray();//'id' => $place_deliver_idとなるデータをDeliversテーブルから配列で取得
+	$Deliver = $place_deliver_idData[0]->place_deliver_id.':'.$place_deliver_idData[0]->name;//配列の0番目（0番目しかない）のnameに$Deliverと名前を付ける
+	$this->set('Deliver',$Deliver);//登録者の表示のため1行上の$Deliverをctpで使えるようにセット
+
+	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+	$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
     }
 
      public function do()
@@ -95,6 +112,22 @@ class CustomersHandyController extends AppController
 	$this->set('customersHandy',$customersHandy);//1行上の$customersHandyをctpで使えるようにセット
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$customer_id = $data['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+	$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+	$Customer = $customerData[0]->customer_code.':'.$customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
+	$this->set('Customer',$Customer);//登録者の表示のため1行上の$Customerをctpで使えるようにセット
+
+	$place_deliver_id = $data['place_deliver_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+	$place_deliver_idData = $this->Delivers->find()->where(['id' => $place_deliver_id])->toArray();//'id' => $place_deliver_idとなるデータをDeliversテーブルから配列で取得
+	$Deliver = $place_deliver_idData[0]->place_deliver_id.':'.$place_deliver_idData[0]->name;//配列の0番目（0番目しかない）のnameに$Deliverと名前を付ける
+	$this->set('Deliver',$Deliver);//登録者の表示のため1行上の$Deliverをctpで使えるようにセット
+
+	$customer_id = $data['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+	$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+	$Customer = $customerData[0]->customer_code.':'.$customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
+	$this->set('Customer',$Customer);//登録者の表示のため1行上の$Customerをctpで使えるようにセット
+
 	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける

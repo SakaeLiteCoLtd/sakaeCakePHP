@@ -73,6 +73,13 @@ class DeliversController extends AppController
     {
 	$deliver = $this->Delivers->newEntity();//newentityに$deliverという名前を付ける
 	$this->set('deliver',$deliver);//1行上の$deliverをctpで使えるようにセット
+
+	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$customer_id = $data['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+	$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $customer_idとなるデータをCustomersテーブルから配列で取得
+	$Customer = $customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
+	$this->set('Customer',$Customer);//登録者の表示のため1行上の$Customerをctpで使えるようにセット
     }
 
      public function do()
@@ -81,10 +88,16 @@ class DeliversController extends AppController
 	$this->set('deliver',$deliver);//1行上の$deliverをctpで使えるようにセット
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
 	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
 	$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+
+	$customer_id = $data['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+	$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $customer_idとなるデータをCustomersテーブルから配列で取得
+	$Customer = $customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
+	$this->set('Customer',$Customer);//登録者の表示のため1行上の$Customerをctpで使えるようにセット
 
 		if ($this->request->is('post')) {//postの場合
 			$deliver = $this->Delivers->patchEntity($deliver, $this->request->getData());//$deliverデータ（空の行）を$this->request->getData()に更新する

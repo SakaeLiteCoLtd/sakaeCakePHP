@@ -21,7 +21,7 @@
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('顧客コード') ?></th>
-            <td><?= h($this->request->getData('customer_id')) ?></td>
+            <td><?= h($Customer) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('place_deliver_id') ?></th>

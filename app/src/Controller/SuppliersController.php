@@ -77,20 +77,27 @@ class SuppliersController extends AppController
     {
 	$supplier = $this->Suppliers->newEntity();//newentityに$supplierという名前を付ける
 	$this->set('supplier',$supplier);//1行上の$supplierをctpで使えるようにセット
+
+	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$supplier_section_id = $data['supplier_section_id'];//$dataのsupplier_section_idに$supplier_section_idという名前を付ける
+	$supplier_section_idData = $this->SupplierSections->find()->where(['id' => $supplier_section_id])->toArray();//'id' => $created_staffとなるデータをSupplierSectionsテーブルから配列で取得
+	$SupplierSection = $supplier_section_idData[0]->account_code.':'.$supplier_section_idData[0]->name;//配列の0番目（0番目しかない）のaccount_codeとnameをつなげたものに$supplier_section_idDataと名前を付ける
+	$this->set('SupplierSection',$SupplierSection);//登録者の表示のため1行上の$SupplierSectionをctpで使えるようにセット
     }
 
      public function do()
     {
-//	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-//	echo "<pre>";
-//	print_r($data);
-//	var_dump($data);
-//	echo "<br>";
-
 	$supplier = $this->Suppliers->newEntity();//newentityに$supplierという名前を付ける
 	$this->set('supplier',$supplier);//1行上の$supplierをctpで使えるようにセット
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$supplier_section_id = $data['supplier_section_id'];//$dataのsupplier_section_idに$supplier_section_idという名前を付ける
+	$supplier_section_idData = $this->SupplierSections->find()->where(['id' => $supplier_section_id])->toArray();//'id' => $created_staffとなるデータをSupplierSectionsテーブルから配列で取得
+	$SupplierSection = $supplier_section_idData[0]->account_code.':'.$supplier_section_idData[0]->name;//配列の0番目（0番目しかない）のaccount_codeとnameをつなげたものに$supplier_section_idDataと名前を付ける
+	$this->set('SupplierSection',$SupplierSection);//登録者の表示のため1行上の$SupplierSectionをctpで使えるようにセット
+
 	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける

@@ -87,6 +87,7 @@ class PriceMaterialsController extends AppController
 	$this->set('priceMaterial',$priceMaterial);//1行上の$priceMaterialをctpで使えるようにセット
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
 	$material_id = $data['material_id'];//$dataのmaterial_idに$material_idという名前を付ける
 	$materialgrade1 = $this->Materials->find()->where(['id' => $material_id])->toArray();//'id' => $material_idとなるデータをMaterialsテーブルから配列で取得
 	$materialgrade2 = $materialgrade1[0]->grade;//配列の0番目（0番目しかない）のgradeに$materialgrade2と名前を付ける
@@ -114,6 +115,18 @@ class PriceMaterialsController extends AppController
     {
 	$priceMaterial = $this->PriceMaterials->newEntity();//newentityに$priceMaterialという名前を付ける
 	$this->set('priceMaterial',$priceMaterial);//1行上の$priceMaterialをctpで使えるようにセット
+
+	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$material_id = $data['material_id'];//$dataのmaterial_idに$material_idという名前を付ける
+	$materialgrade1 = $this->Materials->find()->where(['id' => $material_id])->toArray();//'id' => $material_idとなるデータをMaterialsテーブルから配列で取得
+	$materialgrade2 = $materialgrade1[0]->grade;//配列の0番目（0番目しかない）のgradeに$materialgrade2と名前を付ける
+	$this->set('materialgrade2',$materialgrade2);//1行上の$materialgrade2をctpで使えるようにセット
+
+	$supplier_id = $data['supplier_id'];//$dataのsupplier_idに$supplier_idという名前を付ける
+	$SupplierData = $this->Suppliers->find()->where(['id' => $supplier_id])->toArray();//'id' => $material_idとなるデータをMaterialsテーブルから配列で取得
+	$Supplier = $SupplierData[0]->name;//配列の0番目（0番目しかない）のgradeに$materialgrade2と名前を付ける
+	$this->set('Supplier',$Supplier);//1行上の$materialgrade2をctpで使えるようにセット
     }
 
      public function do()
@@ -122,6 +135,17 @@ class PriceMaterialsController extends AppController
 	$this->set('priceMaterial',$priceMaterial);//1行上の$priceMaterialをctpで使えるようにセット
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$material_id = $data['material_id'];//$dataのmaterial_idに$material_idという名前を付ける
+	$materialgrade1 = $this->Materials->find()->where(['id' => $material_id])->toArray();//'id' => $material_idとなるデータをMaterialsテーブルから配列で取得
+	$materialgrade2 = $materialgrade1[0]->grade;//配列の0番目（0番目しかない）のgradeに$materialgrade2と名前を付ける
+	$this->set('materialgrade2',$materialgrade2);//1行上の$materialgrade2をctpで使えるようにセット
+
+	$supplier_id = $data['supplier_id'];//$dataのsupplier_idに$supplier_idという名前を付ける
+	$SupplierData = $this->Suppliers->find()->where(['id' => $supplier_id])->toArray();//'id' => $material_idとなるデータをMaterialsテーブルから配列で取得
+	$Supplier = $SupplierData[0]->name;//配列の0番目（0番目しかない）のgradeに$materialgrade2と名前を付ける
+	$this->set('Supplier',$Supplier);//1行上の$materialgrade2をctpで使えるようにセット
+
 	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける

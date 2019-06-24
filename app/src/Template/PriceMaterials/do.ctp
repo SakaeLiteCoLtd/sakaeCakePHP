@@ -21,11 +21,11 @@
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('material_id') ?></th>
-            <td><?= h($this->request->getData('material_id')) ?></td>
+            <td><?= h($materialgrade2) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('supplier_id') ?></th>
-            <td><?= h($this->request->getData('supplier_id')) ?></td>
+            <td><?= h($Supplier) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('lot_low') ?></th>

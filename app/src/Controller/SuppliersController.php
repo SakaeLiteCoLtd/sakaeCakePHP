@@ -92,11 +92,11 @@ class SuppliersController extends AppController
 	$this->set('supplier',$supplier);//1行上の$supplierをctpで使えるようにセット
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+/*
 	echo "<pre>";
 	print_r($data);
 	echo "<br>";
-
+*/
 	$supplier_section_id = $data['supplier_section_id'];//$dataのsupplier_section_idに$supplier_section_idという名前を付ける
 	$supplier_section_idData = $this->SupplierSections->find()->where(['id' => $supplier_section_id])->toArray();//'id' => $created_staffとなるデータをSupplierSectionsテーブルから配列で取得
 	$SupplierSection = $supplier_section_idData[0]->account_code.':'.$supplier_section_idData[0]->name;//配列の0番目（0番目しかない）のaccount_codeとnameをつなげたものに$supplier_section_idDataと名前を付ける

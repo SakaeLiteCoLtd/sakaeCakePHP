@@ -40,7 +40,7 @@
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('customer_id') ?></th>
-            <td><?= h($this->request->getData('customer_id')) ?></td>
+            <td><?= h($Customer) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('multiple_cs') ?></th>
@@ -48,7 +48,7 @@
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('material_id') ?></th>
-            <td><?= h($this->request->getData('material_id')) ?></td>
+            <td><?= h($Material) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('weight') ?></th>

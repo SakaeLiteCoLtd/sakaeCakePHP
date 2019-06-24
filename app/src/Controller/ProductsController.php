@@ -86,6 +86,18 @@ class ProductsController extends AppController
     {
 	$product = $this->Products->newEntity();//newentityに$productという名前を付ける
 	$this->set('product',$product);//1行上の$productをctpで使えるようにセット
+
+	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$customer_id = $data['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+	$CustomerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $customer_idとなるデータをStaffsテーブルから配列で取得
+	$Customer = $CustomerData[0]->customer_code.":".$CustomerData[0]->name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+	$this->set('Customer',$Customer);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+
+	$material_id = $data['material_id'];//$dataのmaterial_idに$material_idという名前を付ける
+	$MaterialData = $this->Materials->find()->where(['id' => $material_id])->toArray();//'id' => $material_idとなるデータをMaterialsテーブルから配列で取得
+	$Material = $MaterialData[0]->grade.":".$MaterialData[0]->color;//配列の0番目（0番目しかない）のnameに$Materialと名前を付ける
+	$this->set('Material',$Material);//登録者の表示のため1行上の$Materialをctpで使えるようにセット
     }
 
      public function do()
@@ -94,6 +106,17 @@ class ProductsController extends AppController
 	$this->set('product',$product);//1行上の$productをctpで使えるようにセット
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$customer_id = $data['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+	$CustomerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $customer_idとなるデータをStaffsテーブルから配列で取得
+	$Customer = $CustomerData[0]->customer_code.":".$CustomerData[0]->name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+	$this->set('Customer',$Customer);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+
+	$material_id = $data['material_id'];//$dataのmaterial_idに$material_idという名前を付ける
+	$MaterialData = $this->Materials->find()->where(['id' => $material_id])->toArray();//'id' => $material_idとなるデータをMaterialsテーブルから配列で取得
+	$Material = $MaterialData[0]->grade.":".$MaterialData[0]->color;//配列の0番目（0番目しかない）のnameに$Materialと名前を付ける
+	$this->set('Material',$Material);//登録者の表示のため1行上の$Materialをctpで使えるようにセット
+
 	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける

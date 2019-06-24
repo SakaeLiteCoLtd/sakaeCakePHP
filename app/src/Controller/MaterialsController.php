@@ -104,7 +104,7 @@ class MaterialsController extends AppController
      public function do()
     {
 	$material = $this->Materials->newEntity();//newentityに$materialという名前を付ける
-	$this->set('material',$material);//1行上の$materialをctpで使えるようにセット
+	$this->set('material',$material);//1行上の$materialをctpで使えるようにセット 
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * AuthHelper: Authの変数にアクセスできる
+ * AuthHelper: Authの変数にアクセスできる 
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Material $material
  */

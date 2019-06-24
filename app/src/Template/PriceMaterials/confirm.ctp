@@ -14,11 +14,15 @@
             $startYMD = array($startY,$startM,$startD);
             $start = implode("-",$startYMD);
 
+            if($priceMaterial->finish == null){
+            $finish = '';
+            }else {
             $finishY = $_POST['finish']['year'];
             $finishM = $_POST['finish']['month'];
             $finishD = $_POST['finish']['day'];
             $finishYMD = array($finishY,$finishM,$finishD);
             $finish = implode("-",$finishYMD);
+            }
 
             echo $this->Form->hidden('material_id' ,['value'=>$_POST['material_id'] ]) ;
             echo $this->Form->hidden('supplier_id' ,['value'=>$_POST['supplier_id'] ]) ;

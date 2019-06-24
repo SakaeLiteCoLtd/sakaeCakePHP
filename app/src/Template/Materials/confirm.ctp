@@ -35,7 +35,7 @@
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('material_type_id') ?></th>
-            <td><?= h($this->request->getData('material_type_id')) ?></td>
+            <td><?= h($MaterialType) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('tani') ?></th>

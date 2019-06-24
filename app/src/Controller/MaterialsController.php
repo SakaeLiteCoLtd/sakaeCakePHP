@@ -92,7 +92,14 @@ class MaterialsController extends AppController
     {
 	$material = $this->Materials->newEntity();//newentityに$materialという名前を付ける
 	$this->set('material',$material);//1行上の$materialをctpで使えるようにセット
-    }
+ 
+	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$material_type_id = $data['material_type_id'];//$dataのmaterial_type_idに$material_type_idという名前を付ける
+	$MaterialTypeData = $this->MaterialTypes->find()->where(['id' => $material_type_id])->toArray();//'id' => $material_type_idとなるデータをMaterialTypesテーブルから配列で取得
+	$MaterialType = $MaterialTypeData[0]->name;//配列の0番目（0番目しかない）のnameに$MaterialTypeと名前を付ける
+	$this->set('MaterialType',$MaterialType);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+   }
 
      public function do()
     {
@@ -100,6 +107,12 @@ class MaterialsController extends AppController
 	$this->set('material',$material);//1行上の$materialをctpで使えるようにセット
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$material_type_id = $data['material_type_id'];//$dataのmaterial_type_idに$material_type_idという名前を付ける
+	$MaterialTypeData = $this->MaterialTypes->find()->where(['id' => $material_type_id])->toArray();//'id' => $material_type_idとなるデータをMaterialTypesテーブルから配列で取得
+	$MaterialType = $MaterialTypeData[0]->name;//配列の0番目（0番目しかない）のnameに$MaterialTypeと名前を付ける
+	$this->set('MaterialType',$MaterialType);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+
 	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける

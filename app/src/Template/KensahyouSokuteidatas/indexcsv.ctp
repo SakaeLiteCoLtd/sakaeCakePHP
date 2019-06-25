@@ -14,7 +14,6 @@ define('MYSELF', basename($_SERVER['SCRIPT_NAME']));
 define('REFERENCE', 'http://www.pahoo.org/e-soul/webtech/php01/php09-01.shtm');
 
 //プログラム・タイトル
-define('TITLE', 'CSV形式ファイルを HTML TABLE に変換');
 
 $encode = INTERNAL_ENCODING;
 echo <<< EOD
@@ -23,12 +22,6 @@ echo <<< EOD
 <head>
 <meta charset="{$encode}">
 <title>CSV形式ファイルを HTML TABLE に変換する</title>
-<style type="text/css">
-table, td, th {
-	border-collapse: collapse;
-	border: 1px solid black;
-}
-</style>
 </head>
 <body>
 
@@ -38,18 +31,19 @@ $warning = '';						//警告文
 
 //【１】ファイル入力 =========================================================
 if (isset($_FILES['file']['tmp_name']) == FALSE) {
-	$title = TITLE;
-	$version = '<span style="font-size:small;">' . date('Y/m/d版', filemtime(__FILE__)) . '</span>';
-//	$myself = MYSELF;
 
 	echo <<< EOT
-<h2>{$title} {$version}</h2>
 <form method="post" action="indexcsv" enctype="multipart/form-data">
-ファイル選択：<input name="file" type="file" size="80" />
-<input type="submit" name="submit" value="変換" />
+<table align="center" cellpadding="0" cellspacing="0">
+<br>
+<td style="border:1px solid; bordercolor: #000000; background-color: #FFFFFF;"><input name="file" type="file" size="80" /></td>
+<td style="border:1px solid; bordercolor: #000000; background-color: #FFFFFF;"><input type="submit" name="submit" value="変換" /></td>
+</table>
 </form>
 
-<div style="border-style:solid; border-width:1px; margin:20px 0px 0px 0px; padding:5px; width:600px; font-size:small;">
+
+<table align="center">
+<div style="border-style:solid; background-color: #FFFFFF; border-width:1px; margin:20px 0px 0px 0px; padding:5px; width:700px; font-size:small;">
 <h3>使い方</h3>
 <ol>
 <li>[<span style="font-weight:bold;">参照</span>] をクリックするとファイルダイアログが表示されるので、目的のCSVファイル（カンマ区切り）を選択してください。</li>
@@ -57,6 +51,7 @@ if (isset($_FILES['file']['tmp_name']) == FALSE) {
 <li>表形式で表示されます。</li>
 </ol>
 </div>
+</table>
 
 EOT;
 //【２】変換・結果出力 =======================================================
@@ -84,13 +79,14 @@ EOT;
 	fseek($infp, 0);	//読み込みポインタを先頭へ戻す
 
 	//CSVファイルの読み込み
-	echo "<table style=\"border:1px solid;\">\n";
+	echo "<br>\n";
+	echo "<table style=\"border:1px solid; background-color: #FFFFFF; bordercolor: #000000;\">\n";
 	while (($csv = fgetcsv($infp, 1000, $delimiter)) !== FALSE) {
-		print "<tr>\n";
+		print "<tr style=\"bordercolor: #000000;\">\n";
 		foreach ($csv as $key=>$val) {
 			if ($val == '')		$val ='&nbsp';	//デリミタ間にデータが存在しない場合は空白出力
 			$val = mb_convert_encoding($val, INTERNAL_ENCODING, 'auto');	//コード変換
-			echo "<td>{$val}</td>\n";
+			echo "<td style=\"bordercolor: #000000;\">{$val}</td>\n";
 		}
 		echo "</tr>\n";
 	}
@@ -101,7 +97,7 @@ EOT;
 
 $version = phpversion();
 echo <<< EOT
-<div style="border-style:solid; border-width:1px; margin:20px 0px 0px 0px; padding:5px; width:600px; font-size:small;">
+<div style="border-style:solid; background-color: #FFFFFF; border-width:1px; margin:20px 0px 0px 0px; padding:5px; width:700px; font-size:small;">
 <h3>補足情報</h3>
 <ol>
 <li>PHPバージョン： {$version}</li>

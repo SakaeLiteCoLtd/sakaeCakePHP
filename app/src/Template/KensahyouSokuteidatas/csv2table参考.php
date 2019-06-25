@@ -40,11 +40,11 @@ $warning = '';						//警告文
 if (isset($_FILES['file']['tmp_name']) == FALSE) {
 	$title = TITLE;
 	$version = '<span style="font-size:small;">' . date('Y/m/d版', filemtime(__FILE__)) . '</span>';
-//	$myself = MYSELF;
+	$myself = MYSELF;
 
 	echo <<< EOT
 <h2>{$title} {$version}</h2>
-<form method="post" action="indexcsv" enctype="multipart/form-data">
+<form method="post" action="{$myself}" enctype="multipart/form-data">
 ファイル選択：<input name="file" type="file" size="80" />
 <input type="submit" name="submit" value="変換" />
 </form>
@@ -105,7 +105,7 @@ echo <<< EOT
 <h3>補足情報</h3>
 <ol>
 <li>PHPバージョン： {$version}</li>
-<li>CSVファイルのエンコード： {$encode}</li>
+<li>CSVファイルのエンコード： {$enc}</li>
 {$warning}
 </ol>
 </div>

@@ -36,7 +36,7 @@ if (isset($_FILES['file']['tmp_name']) == FALSE) {
 <form method="post" action="indexcsv" enctype="multipart/form-data">
 <table align="center" cellpadding="0" cellspacing="0">
 <br>
-<td style="border:1px solid; bordercolor: #000000; background-color: #FFFFFF;"><input name="file" type="file" size="80" /></td>
+<td style="border:1px solid; bordercolor: #000000; background-color: #FFFFFF; border-right: 0px;"><input name="file" type="file" size="80" /></td>
 <td style="border:1px solid; bordercolor: #000000; background-color: #FFFFFF;"><input type="submit" name="submit" value="変換" /></td>
 </table>
 </form>

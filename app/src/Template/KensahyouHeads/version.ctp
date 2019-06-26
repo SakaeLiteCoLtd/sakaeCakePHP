@@ -58,7 +58,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 <td class="actions">
                     <?= $this->Html->link(__('edit'), ['action' => 'edit', $kensahyouHead->id]) ?>
                 </td>
-　　</tr>
+    </tr>
     </table>
 */          ?>
 

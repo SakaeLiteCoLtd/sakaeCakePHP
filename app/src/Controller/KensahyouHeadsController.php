@@ -48,7 +48,7 @@ class KensahyouHeadsController  extends AppController
 	$kensahyouHead = $this->KensahyouHeads->newEntity();//newEntity・・・テーブルに空の行を作る
 	$this->set('kensahyouHead',$kensahyouHead);//セット
 
-	$KensaProduct = $this->KensahyouHeads->find()->where(['product_id' => $product_id])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
+	$KensaProduct = $this->KensahyouHeads->find()->where(['product_id' => $product_id, 'delete_flag' => '0'])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
 	$this->set('KensaProduct',$KensaProduct);//セット
 
 	$Product = $this->Products->find()->where(['id' => $product_id])->toArray();//'id' => $product_idを満たすものを$Productとする

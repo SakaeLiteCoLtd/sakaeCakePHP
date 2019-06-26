@@ -43,7 +43,7 @@ if (isset($_FILES['file']['tmp_name']) == FALSE) {
 
 
 <table align="center">
-<div style="border-style:solid; background-color: #FFFFFF; border-width:1px; margin:20px 0px 0px 0px; padding:5px; width:700px; font-size:small;">
+<div style="border-style:solid; background-color: #FFFFFF; border-width:1px; margin:20px 0px 0px 0px; padding:5px; width:1000px; font-size:small;">
 <h3>使い方</h3>
 <ol>
 <li>[<span style="font-weight:bold;">参照</span>] をクリックするとファイルダイアログが表示されるので、目的のCSVファイル（カンマ区切り）を選択してください。</li>
@@ -80,13 +80,13 @@ EOT;
 
 	//CSVファイルの読み込み
 	echo "<br>\n";
-	echo "<table style=\"border:1px solid; background-color: #FFFFFF; bordercolor: #000000;\">\n";
+	echo "<table cellspacing=0 style=\"border: 1px solid black; background-color: #FFFFFF;\">\n";
 	while (($csv = fgetcsv($infp, 1000, $delimiter)) !== FALSE) {
-		print "<tr style=\"bordercolor: #000000;\">\n";
+		print "<tr>\n";
 		foreach ($csv as $key=>$val) {
 			if ($val == '')		$val ='&nbsp';	//デリミタ間にデータが存在しない場合は空白出力
 			$val = mb_convert_encoding($val, INTERNAL_ENCODING, 'auto');	//コード変換
-			echo "<td style=\"bordercolor: #000000;\">{$val}</td>\n";
+			echo "<td style=\"border:0px solid; border-width:0.5px; bordercolor: #000000; background-color:#FFFFFF;\">{$val}</td>\n";
 		}
 		echo "</tr>\n";
 	}
@@ -97,7 +97,7 @@ EOT;
 
 $version = phpversion();
 echo <<< EOT
-<div style="border-style:solid; background-color: #FFFFFF; border-width:1px; margin:20px 0px 0px 0px; padding:5px; width:700px; font-size:small;">
+<div style="border-style:solid; background-color: #FFFFFF; border-width:1px; margin:20px 0px 0px 0px; padding:5px; width:1000px; font-size:small;">
 <h3>補足情報</h3>
 <ol>
 <li>PHPバージョン： {$version}</li>

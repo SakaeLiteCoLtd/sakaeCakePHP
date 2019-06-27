@@ -36,31 +36,30 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><strong><font color="blue">部品名</font></strong></div></td>
           <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= h($Productname) ?></td>
         </tr>
-　　</table>
+    </table>
     <table width="600" border="1" align="center" bordercolor="#000000" bgcolor="#FFDEAD">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
         <tr>
           <td colspan="9" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><strong><font color="blue">出荷検査運用中バージョン</font></strong></div></td>
           <td colspan="3" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= h($KensaProductV) ?></td>
         </tr>
-　　</table>
+    </table>
     <table width="600" border="1" align="center" bordercolor="#000000" bgcolor="#FFDEAD">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
         <tr>
           <td colspan="9" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><strong><font color="blue">新規登録バージョン</font></strong></div></td>
           <td colspan="3" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= h($newversion) ?></td>
         </tr>
-　　</table>
-
-          <?php
-/*    <table align="center">/*編集テスト用
-    <tr>
-                <td class="actions">
-                    <?= $this->Html->link(__('edit'), ['action' => 'edit', $kensahyouHead->id]) ?>
-                </td>
-    </tr>
     </table>
-*/          ?>
+<br>
+    <table align="center">
+        <tr>
+                <td class="actions">
+                    <a><?= $this->Html->link(__('編集'), ['action' => 'edit', $kensahyouHead->id]) ?></a>
+                </td>
+        </tr>
+    </table>
+
 
     <?php endforeach; ?>
 <?=$this->Form->end() ?>

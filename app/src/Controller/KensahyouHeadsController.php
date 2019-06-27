@@ -122,20 +122,28 @@ class KensahyouHeadsController  extends AppController
 	}
     }
 
-    public function edit($id = null)//edit未完成
+    public function edit($id = null)
     {
 	$kensahyouHead = $this->KensahyouHeads->get($id);
-	$this->set(compact('kensahyouHead'));
+	$this->set('kensahyouHead', $kensahyouHead);//$kensahyouHeadをctpで使えるようにセット
+
 	$staff_id = $this->Auth->user('staff_id');
 	$kensahyouHead['updated_staff'] = $staff_id;
 
-/*	$kensahyouHead = $this->KensahyouHeads->newEntity();
-	$data = $this->request->getData();
+	$product_id = $kensahyouHead['product_id'];//product_idという名前のデータに$product_idと名前を付ける
+	$this->set('product_id',$product_id);//セット
 
-	echo "<pre>";
-	print_r($data);
-	echo "</pre>";
-*/
+	$Product = $this->Products->find()->where(['id' => $product_id])->toArray();//'id' => $product_idを満たすものを$Product
+	$Productcode = $Product[0]->product_code;//$Productのproduct_codeに$Productcodeと名前を付ける
+	$this->set('Productcode',$Productcode);//セット
+
+	$Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+	$this->set('Productname',$Productname);//セット
+
+//	echo "<pre>";
+//	print_r(array($kensahyouHead));
+//	print_r($kensahyouHead['id']);
+//	echo "</pre>";
 
 	if ($this->request->is(['patch', 'post', 'put'])) {
 		$kensahyouHead = $this->KensahyouHeads->patchEntity($kensahyouHead, $this->request->getData());
@@ -146,7 +154,7 @@ class KensahyouHeadsController  extends AppController
 			if ($this->KensahyouHeads->save($kensahyouHead)) {
 				$this->Flash->success(__('The KensahyouHeads has been updated.'));
 				$connection->commit();// コミット5
-				return $this->redirect(['action' => 'index']);
+				return $this->redirect(['action' => 'index1']);
 			} else {
 				$this->Flash->error(__('The KensahyouHeads could not be updated. Please, try again.'));
 				throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6

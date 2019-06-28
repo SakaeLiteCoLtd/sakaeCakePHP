@@ -36,55 +36,6 @@ class KensahyouSokuteidatasController  extends AppController
     public function indexcsv()//csvテスト用
     {
 	$this->set('kensahyouSokuteidata',$this->KensahyouSokuteidatas->newEntity());//空のカラムに$KensahyouSokuteidataと名前を付け、ctpで使えるようにセット
-
-//	$fp = fopen("employee.csv", "r");//csvファイルはwebrootに入れる
-//	$this->set('fp',$fp);
-
-//	$fpcount = fopen("employee.csv", 'r' );
-//	for( $count = 0; fgets( $fpcount ); $count++ );
-/*	echo "<pre>";
-	print_r($count);
-	echo "<br>";
-*/
-/*	$arrFp = array();//空の配列を作る
-	$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目）
-	for ($k=1; $k<=$count-1; $k++) {//行数分
-	$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
-	$sample = explode(',',$line);//$lineを","毎に配列に入れる
-
-	$keys=array_keys($sample);
-	$keys[array_search('0',$keys)]='staff_code';//名前の変更
-	$keys[array_search('1',$keys)]='f_name';
-	$keys[array_search('2',$keys)]='l_name';
-	$keys[array_search('3',$keys)]='mail';
-	$keys[array_search('5',$keys)]='status';
-	$sample = array_combine( $keys, $sample );
-
-	unset($sample['4']);//status_leaderを削除
-
-	$arrFp[] = $sample;//配列に追加する
-	}
-	$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
-
-	echo "<pre>";
-	print_r($arrFp);
-	echo "<br>";
-*/
-//	echo "<pre>";
-//	print_r('csv_test');
-//	echo "</pre>";
-    }
-
-    public function indexcsvconfilm()//csvテスト用
-    {
-	$data = $this->request->getData();//postデータを$dataに
-	echo "<pre>";
-	print_r('indexcsvconfilm');
-	echo "</pre>";
-//	echo "<pre>";
-//	print_r($data);
-//	echo "</pre>";
-
     }
 
     public function search()//「出荷検査用呼出」の日付で絞り込むページ

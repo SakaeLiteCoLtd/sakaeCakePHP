@@ -39,10 +39,19 @@ if (isset($_FILES['file']['tmp_name']) == FALSE) {
 <td style="border:1px solid; bordercolor: #000000; background-color: #FFFFFF; border-right: 0px;"><input name="file" type="file" size="80" /></td>
 <td style="border:1px solid; bordercolor: #000000; background-color: #FFFFFF;"><input type="submit" name="submit" value="変換" /></td>
 </table>
-<br>
-<br>
 </form>
 
+
+<table align="center">
+<div style="border-style:solid; background-color: #FFFFFF; border-width:1px; margin:20px 0px 0px 0px; padding:5px; width:1000px; font-size:small;">
+<h3>使い方</h3>
+<ol>
+<li>[<span style="font-weight:bold;">参照</span>] をクリックするとファイルダイアログが表示されるので、目的のCSVファイル（カンマ区切り）を選択してください。</li>
+<li>[<span style="font-weight:bold;">変換</span>] をクリックしてください。
+<li>表形式で表示されます。</li>
+</ol>
+</div>
+</table>
 
 EOT;
 //【２】変換・結果出力 =======================================================
@@ -86,6 +95,20 @@ EOT;
 	fclose($infp);
 }
 
+$version = phpversion();
+echo <<< EOT
+<div style="border-style:solid; background-color: #FFFFFF; border-width:1px; margin:20px 0px 0px 0px; padding:5px; width:1000px; font-size:small;">
+<h3>補足情報</h3>
+<ol>
+<li>PHPバージョン： {$version}</li>
+<li>CSVファイルのエンコード： {$encode}</li>
+{$warning}
+</ol>
+</div>
+</body>
+</html>
+
+EOT;
 /*
 ** バージョンアップ履歴 ===================================================
  *

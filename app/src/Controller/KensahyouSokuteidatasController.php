@@ -428,7 +428,7 @@ class KensahyouSokuteidatasController  extends AppController
 	}
     }
 
-    public function edit($id = null)//edit未完成
+    public function edit($id = null)
     {
 	$kensahyouSokuteidata = $this->KensahyouSokuteidatas->get($id);
 	$this->set('kensahyouSokuteidata',$kensahyouSokuteidata);

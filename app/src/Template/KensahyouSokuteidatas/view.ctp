@@ -60,4 +60,6 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           </td>
         </tr>
     </table>
+<br>
+
 </fieldset>

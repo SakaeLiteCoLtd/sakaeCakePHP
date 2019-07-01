@@ -71,7 +71,7 @@ EOT;
 
 	//CSVファイルの読み込み
 	echo "<br>\n";
-	echo "<table cellspacing=0 style=\"border: 1px solid black; background-color: #FFFFFF;\">\n";
+	echo "<table width=1000 align=center cellspacing=0 style=\"border: 1px solid black; background-color: #FFFFFF;\">\n";
 	while (($csv = fgetcsv($infp, 1000, $delimiter)) !== FALSE) {
 		print "<tr>\n";
 		foreach ($csv as $key=>$val) {

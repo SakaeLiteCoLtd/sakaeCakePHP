@@ -22,7 +22,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 	if($username == null){
 	$user = 'logout now';
 	} else {
-	$user = 'login : '.$username ;
+	$user = 'login : '.$username;
 	}
         ?>
 
@@ -51,7 +51,20 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
         <table width="800" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
           <tr style="border-style: none; background-color: #E6FFFF">
             <td bgcolor="#E6FFFF">
-              <div style="float:right"><?php echo $user; ?></div>
+              <div style="float:right">
+                <?php echo $user; ?>
+                <?php
+                      if ($user == 'logout now') {
+                    // ログインしているとき
+                    // ログアウトへのリンクをだす
+                //    echo $this->Html->link('ログイン', array('controller'=>'users','action'=>'login'));
+                } else {
+                    // ログインしていないとき
+                    // ログインへのリンクをだす
+                    echo $this->Html->link('　ログアウト', array('controller'=>'users','action'=>'logout'));
+                }
+                ?>
+              </div>
               <p><?php echo $this->Html->image('logo.gif',array('width'=>'157','height'=>'22'));?></p>
               <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
                         <tr style="border-style: none; background-color: #E6FFFF">
@@ -76,16 +89,15 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
             </td>
           </tr>
         </table>
-        
         		<?php echo $this->element('SubHeader');?>
-        
+
             <?= $this->Flash->render() ?>
             <div class="container clearfix">
                 <?= $this->fetch('content') ?>
             </div>
             <footer>
             </footer>
-    </td> 
+    </td>
   </tr>
 </table>
 </body>

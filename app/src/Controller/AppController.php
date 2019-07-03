@@ -66,7 +66,7 @@ class AppController extends Controller
                         'password' => 'password' //パスワードに使うカラムを指定
 //                        'password' => 'delete_flag' //実験
                     ]
-//								'passwordHasher' => ['className' => 'None'],//190702エラー出る
+//								'passwordHasher' => ['className' => 'None'],//190702追加エラー出る
                 ]
             ],
 /*            'loginRedirect' => [ // ログイン後に遷移するアクションを指定

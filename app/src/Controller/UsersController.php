@@ -29,15 +29,28 @@ class UsersController extends AppController
 	$this->Roles = TableRegistry::get('roles');//rolesテーブルを使う
      }
 
+		 public function preadd()
+     {
+			 $user = $this->Users->newEntity();//newentityに$userという名前を付ける
+		 	$this->set('user',$user);//1行上の$userをctpで使えるようにセット
+     }
+
     public function login()
     {
 	if ($this->request->is('post')) {
+		$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+		$this->set('username', $data['username']);//定義したページネーションを使用
+		$username = $data['username'];//$dataのrole_idに$roleという名前を付ける
+		$Userdata = $this->Users->find()->where(['username' => $username])->toArray();//'id' => $roleとなるデータをRolesテーブルから配列で取得
+		$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+		$this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+
 		$user = $this->Auth->identify();
 		if ($user) {
 			$this->Auth->setUser($user);
 			return $this->redirect($this->Auth->redirectUrl());
 	}
-		$this->Flash->error(__('Invalid username or password, try again'));
+//		$this->Flash->error(__('Invalid username or password, try again'));
 	}
     }
 

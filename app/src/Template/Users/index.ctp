@@ -44,7 +44,7 @@ $this->Staffs = TableRegistry::get('staffs');//productsテーブルを使う
 
 <hr size="5">
 
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/sinnkitouroku.gif',array('url'=>array('controller'=>'users','action'=>'form')));?></p>
+              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/sinnkitouroku.gif',array('url'=>array('controller'=>'users','action'=>'preadd')));?></p>
 
 <hr size="5">
 
@@ -77,7 +77,7 @@ $this->Staffs = TableRegistry::get('staffs');//productsテーブルを使う
             	?>
 
                 <td><?= h($user_staff) ?></td>
-                
+
                 <td class="actions">
                     <?= $this->Html->link(__('edit'), ['action' => 'edit', $user->id]) ?>
                 </td>
@@ -95,4 +95,3 @@ $this->Staffs = TableRegistry::get('staffs');//productsテーブルを使う
         </ul>
         <p><?= $this->Paginator->counter(['format' => __('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')]) ?></p>
     </div>
-

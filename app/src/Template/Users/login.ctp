@@ -34,7 +34,7 @@
 	</tr>
         <tr>
 		<td bgcolor="#FFDEAD">password</td>
-		<td bgcolor="#FFDEAD"><?= $this->Form->control('password', array('label'=>false)) ?></td>
+		<td bgcolor="#FFDEAD"><?= $this->Form->control('delete_flag', array('label'=>false)) ?></td>
 	</tr>
 </table>
     </fieldset>

@@ -64,9 +64,8 @@ class AppController extends Controller
                     'fields' => [ // ユーザー名とパスワードに使うカラムの指定。省略した場合はusernameとpasswordになる
                         'username' => 'username', // ユーザー名のカラムを指定
 //                        'password' => 'password' //パスワードに使うカラムを指定
-                        'password' => 'delete_flag' //実験
+                        'password' => 'delete_flag' //パスワードとしてdelete_flagを使用する
                     ]
-//								'passwordHasher' => ['className' => 'None'],//190702追加エラー出る
                 ]
             ],
 /*            'loginRedirect' => [ // ログイン後に遷移するアクションを指定

@@ -44,7 +44,7 @@ $this->Staffs = TableRegistry::get('staffs');//productsテーブルを使う
 
 <hr size="5">
 
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/sinnkitouroku.gif',array('url'=>array('controller'=>'users','action'=>'preadd')));?></p>
+              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/sinnkitouroku.gif',array('url'=>array('controller'=>'users','action'=>'form')));?></p>
 
 <hr size="5">
 

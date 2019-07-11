@@ -25,17 +25,16 @@
 </html>
 <br>
     <?= $this->Flash->render() ?>
-    <?= $this->Form->create($user, ['url' => ['action' => 'login']]) ?>
-    <br>
-    <legend align="center"><font color="#00000"><?= __('＊ログイン') ?></font></legend>
+    <?= $this->Form->create() ?>
     <fieldset>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tr>
-		<td bgcolor="#FFDEAD" style="width: 100px">username</td>
-		<td bgcolor="#FFDEAD"><?= $this->Form->control('username', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFDEAD" ><?= h($username) ?>　でログインします</td>
 	</tr>
+  <?= $this->Form->control('username', array('value'=>$username,'type'=>'hidden', 'label'=>false)) ?>
+		<?= $this->Form->control('delete_flag', array('type'=>'hidden','value'=>$delete_flag,'label'=>false)) ?>
 </table>
     </fieldset>
-    <center><?= $this->Form->button(__('login')) ?></center>
+    <center><?= $this->Form->button(__('OK')) ?></center>
 <br>
     <?= $this->Form->end() ?>

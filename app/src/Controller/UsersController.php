@@ -45,9 +45,16 @@ class UsersController extends AppController
     {
 	if ($this->request->is('post')) {
 		$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-		$this->set('username', $data['username']);//定義したページネーションを使用
-		$username = $data['username'];//$dataのrole_idに$roleという名前を付ける
-		$Userdata = $this->Users->find()->where(['username' => $username])->toArray();//'id' => $roleとなるデータをRolesテーブルから配列で取得
+		$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+		$ary = explode(',', $str);//$strを配列に変換
+/*
+		echo "<pre>";
+		print_r($ary[1]);
+		echo "<br>";
+*/
+		$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+		$this->set('username', $username);
+		$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
 
 			if(empty($Userdata)){
 				$delete_flag = "";
@@ -68,7 +75,8 @@ class UsersController extends AppController
     public function logout()
     {
 	$this->request->session()->destroy(); // セッションの破棄
-	return $this->redirect($this->Auth->logout()); // ログアウト処理
+//	return $this->redirect($this->Auth->logout()); // ログアウト処理
+	return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
     }
 
     public function index()
@@ -148,6 +156,7 @@ class UsersController extends AppController
 		try {//トランザクション4
 			if ($this->Users->save($user)) {
 				$connection->commit();// コミット5
+//				return $this->redirect(['action' => 'logout']);//doのあとすぐにログアウト
 			} else {
 				$this->Flash->error(__('The user could not be saved. Please, try again.'));
 				throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6

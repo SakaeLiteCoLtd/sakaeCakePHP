@@ -53,6 +53,7 @@ class UsersController extends AppController
 		echo "<br>";
 */
 		$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+		//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
 		$this->set('username', $username);
 		$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
 

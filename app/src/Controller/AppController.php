@@ -43,7 +43,9 @@ class AppController extends Controller
 		$imgObj  = array();
 		$this->set('imgObj',$imgObj);
 
-		$this->Auth->allow(['index', 'view', 'display','page','search','preadd']);
+//		$this->Auth->allow(['index', 'view', 'display','page','search','preadd']);
+		$this->Auth->allow();
+		$this->Auth->deny('do');
    }
 
 

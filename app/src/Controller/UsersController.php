@@ -31,15 +31,20 @@ class UsersController extends AppController
 
 		 public function preadd()
      {
-			 $user = $this->Users->newEntity();//newentityに$userという名前を付ける
+			$user = $this->Users->newEntity();//newentityに$userという名前を付ける
 		 	$this->set('user',$user);//1行上の$userをctpで使えるようにセット
-     }
-
-		 public function prelogin()
-     {
-			 $user = $this->Users->newEntity();//newentityに$userという名前を付ける
-		 	$this->set('user',$user);//1行上の$userをctpで使えるようにセット
-     }
+/*
+			$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+			echo "<pre>";
+			print_r($data);
+			echo "<br>";
+*/
+/*			$session = $this->request->getSession();
+			$name1 = $session->read('userdata.role_id');
+			echo "<pre>";
+			print_r($name1);
+			echo "<br>";
+*/     }
 
     public function login()
     {
@@ -47,11 +52,7 @@ class UsersController extends AppController
 		$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 		$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
 		$ary = explode(',', $str);//$strを配列に変換
-/*
-		echo "<pre>";
-		print_r($ary[1]);
-		echo "<br>";
-*/
+
 		$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
 		//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
 		$this->set('username', $username);
@@ -66,8 +67,9 @@ class UsersController extends AppController
 		$user = $this->Auth->identify();
 		if ($user) {
 			$this->Auth->setUser($user);
-//			return $this->redirect($this->Auth->redirectUrl());
-			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
+//			return $this->redirect($this->Auth->redirectUrl());//
+//			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);]
+		return $this->redirect(['action' => 'do']);
 	}
 //		$this->Flash->error(__('Invalid username or password, try again'));
 	}
@@ -132,25 +134,37 @@ class UsersController extends AppController
 	$user = $this->Users->newEntity();//newentityに$userという名前を付ける
 	$this->set('user',$user);//1行上の$userをctpで使えるようにセット
 
-	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+//	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+	$session = $this->request->getSession();
+	$data = $session->read();//postデータ取得し、$dataと名前を付ける
 
-	$role = $data['role_id'];//$dataのrole_idに$roleという名前を付ける
+	$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+	$data['userdata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+/*
+	echo "<pre>";
+	print_r($data['userdata']);
+	echo "<br>";
+*/
+	$role = $data['userdata']['role_id'];//$dataのrole_idに$roleという名前を付ける
 	$roleData = $this->Roles->find()->where(['id' => $role])->toArray();//'id' => $roleとなるデータをRolesテーブルから配列で取得
 	$Role = $roleData[0]->name;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
 	$this->set('Role',$Role);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
 
-	$staff = $data['staff_id'];//
+	$staff = $data['userdata']['staff_id'];//
 	$staffData = $this->Staffs->find()->where(['id' => $staff])->toArray();//
 	$Staff = $staffData[0]->f_name.$staffData[0]->l_name;//
 	$this->set('Staff',$Staff);//
 
-	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+	$created_staff = $data['userdata']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
 	$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
-	if ($this->request->is('post')) {
-		$user = $this->Users->patchEntity($user, $this->request->getData());
+	if ($this->request->is('post')) {//postの場合（postではないため、elseへいく）
+		$this->Flash->error(__('The user could not be saved. Please, try again.'));
+		throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+	}else {
+		$user = $this->Users->patchEntity($user, $data['userdata']);
 		$connection = ConnectionManager::get('default');//トランザクション1
 		// トランザクション開始2
 		$connection->begin();//トランザクション3

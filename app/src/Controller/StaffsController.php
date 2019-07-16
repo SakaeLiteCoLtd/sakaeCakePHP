@@ -60,6 +60,11 @@ class StaffsController extends AppController
 	$this->set('staff',$staff);//1行上の$staffをctpで使えるようにセット
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	echo "<pre>";
+	print_r($data);
+	echo "<br>";
+
 	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける

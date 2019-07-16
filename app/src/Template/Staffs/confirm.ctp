@@ -20,20 +20,19 @@
             $date_startYMD = array($date_startY,$date_startM,$date_startD);
             $date_start = implode("-",$date_startYMD);
 
-
-            echo $this->Form->hidden('staff_code' ,['value'=>$_POST['staff_code'] ]) ;
-            echo $this->Form->hidden('f_name' ,['value'=>$_POST['f_name'] ]) ;
-            echo $this->Form->hidden('l_name' ,['value'=>$_POST['l_name'] ]) ;
-            echo $this->Form->hidden('sex' ,['value'=>$_POST['sex'] ]) ;
-            echo $this->Form->hidden('birth' ,['value'=>$birth ]) ;
-            echo $this->Form->hidden('mail' ,['value'=>$_POST['mail'] ]) ;
-            echo $this->Form->hidden('tel' ,['value'=>$_POST['tel'] ]) ;
-            echo $this->Form->hidden('address' ,['value'=>$_POST['address'] ]) ;
-            echo $this->Form->hidden('status' ,['value'=>$_POST['status'] ]) ;
-            echo $this->Form->hidden('date_start' ,['value'=>$date_start ]) ;
-            echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
-            echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
-            echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+              echo $this->Form->hidden('staff_code' ,['value'=>$_POST['staff_code'] ]) ;
+              echo $this->Form->hidden('f_name' ,['value'=>$_POST['f_name'] ]) ;
+              echo $this->Form->hidden('l_name' ,['value'=>$_POST['l_name'] ]) ;
+              echo $this->Form->hidden('sex' ,['value'=>$_POST['sex'] ]) ;
+              echo $this->Form->hidden('birth' ,['value'=>$birth ]) ;
+              echo $this->Form->hidden('mail' ,['value'=>$_POST['mail'] ]) ;
+              echo $this->Form->hidden('tel' ,['value'=>$_POST['tel'] ]) ;
+              echo $this->Form->hidden('address' ,['value'=>$_POST['address'] ]) ;
+              echo $this->Form->hidden('status' ,['value'=>$_POST['status'] ]) ;
+              echo $this->Form->hidden('date_start' ,['value'=>$date_start ]) ;
+              echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
+              echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
+              echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
 
             $session = $this->request->getSession();
             $session->write('staffdata.staff_code', $_POST['staff_code']);
@@ -49,8 +48,7 @@
             $session->write('staffdata.delete_flag', $_POST['delete_flag']);
             $session->write('staffdata.created_staff', $_POST['created_staff']);
             $session->write('staffdata.updated_staff', null);
-
-        ?>
+            ?>
 
 	<?php
 	if($this->request->getData('sex') == 0){

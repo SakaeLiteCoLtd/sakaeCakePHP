@@ -53,17 +53,17 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
             <td bgcolor="#E6FFFF">
               <div style="float:right">
                 <?php echo $user; ?>
-                <?php
-                      if ($user == 'logout now') {
+              <?php
+                if ($user == 'logout now') {
                     // ログインしているとき
                     // ログアウトへのリンクをだす
-                    echo $this->Html->link('　ログイン', array('controller'=>'users','action'=>'preadd'));
+//                    echo $this->Html->link('　ログイン', array('controller'=>'users','action'=>'preadd'));
                 } else {
                     // ログインしていないとき
                     // ログインへのリンクをだす
-                    echo $this->Html->link('　ログアウト', array('controller'=>'users','action'=>'logout'));
+//                    echo $this->Html->link('　ログアウト', array('controller'=>'users','action'=>'logout'));
                 }
-                ?>
+              ?>
               </div>
               <p><?php echo $this->Html->image('logo.gif',array('width'=>'157','height'=>'22'));?></p>
               <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
@@ -90,7 +90,6 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
           </tr>
         </table>
         		<?php echo $this->element('SubHeader');?>
-
             <?= $this->Flash->render() ?>
             <div class="container clearfix">
                 <?= $this->fetch('content') ?>

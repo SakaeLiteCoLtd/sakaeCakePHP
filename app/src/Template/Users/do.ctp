@@ -5,7 +5,7 @@
  * @var \App\Model\Entity\User $user
  */
 ?>
-<?= $this->Form->create($user, ['url' => ['action' => 'logout']]) ?>
+<?= $this->Form->create($user, ['url' => ['action' => 'index']]) ?>
 
 <?php
 	$username = $this->request->Session()->read('Auth.User.username');
@@ -47,5 +47,5 @@
     </table>
 <br>
 <br>
-        <p align="center"><?= $this->Form->button(__('ログアウト'), array('name' => 'top')) ?></p>
+        <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>

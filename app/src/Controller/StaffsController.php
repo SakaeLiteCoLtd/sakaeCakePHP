@@ -28,6 +28,8 @@ class StaffsController extends AppController
 
     public function index()
     {
+			$this->request->session()->destroy(); // セッションの破棄
+
 			if ($this->request->is('post')) {//postの場合
 				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 				$idSearch = $data['staff_code'];//$dataのstaff_codeに$idSearchという名前を付ける

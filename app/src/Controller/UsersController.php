@@ -69,6 +69,8 @@ class UsersController extends AppController
 
     public function index()
     {
+			$this->request->session()->destroy(); // セッションの破棄
+
 			$this->set('users', $this->Users->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
 			$this->set('users', $this->paginate());//定義したページネーションを使用
     }

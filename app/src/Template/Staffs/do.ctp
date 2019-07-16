@@ -5,7 +5,7 @@
  * @var \App\Model\Entity\Staff $staff
  */
 ?>
-<?= $this->Form->create($staff, ['url' => ['action' => 'logout']]) ?>
+<?= $this->Form->create($staff, ['url' => ['action' => 'index']]) ?>
 
 <?php
   $username = $this->request->Session()->read('Auth.User.username');

@@ -8,24 +8,14 @@
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
 
-            echo $this->Form->hidden('username' ,['value'=>$_POST['username'] ]) ;
-            echo $this->Form->hidden('password' ,['value'=>$_POST['password'] ]) ;
-            echo $this->Form->hidden('role_id' ,['value'=>$_POST['role_id'] ]) ;
-            echo $this->Form->hidden('staff_id' ,['value'=>$_POST['staff_id'] ]) ;
-            echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
-            echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
-            echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
-
-
-            	$session = $this->request->getSession();
-              $session->write('userdata.username', $_POST['username']);
-              $session->write('userdata.password', $_POST['password']);
-              $session->write('userdata.role_id', $_POST['role_id']);
-              $session->write('userdata.staff_id', $_POST['staff_id']);
-              $session->write('userdata.delete_flag', $_POST['delete_flag']);
-              $session->write('userdata.created_staff', $_POST['created_staff']);
-              $session->write('userdata.updated_staff', $_POST['updated_staff']);
-
+            $session = $this->request->getSession();
+            $session->write('userdata.username', $_POST['username']);
+            $session->write('userdata.password', $_POST['password']);
+            $session->write('userdata.role_id', $_POST['role_id']);
+            $session->write('userdata.staff_id', $_POST['staff_id']);
+            $session->write('userdata.delete_flag', $_POST['delete_flag']);
+            $session->write('userdata.created_staff', $_POST['created_staff']);
+            $session->write('userdata.updated_staff', $_POST['updated_staff']);
         ?>
 
 <hr size="5">

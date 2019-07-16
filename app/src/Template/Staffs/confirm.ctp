@@ -4,7 +4,7 @@
  * @var \App\Model\Entity\Staff $staff
  */
 ?>
-<?= $this->Form->create($staff, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($staff, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
 
@@ -34,6 +34,22 @@
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+
+            $session = $this->request->getSession();
+            $session->write('staffdata.staff_code', $_POST['staff_code']);
+            $session->write('staffdata.f_name', $_POST['f_name']);
+            $session->write('staffdata.l_name', $_POST['l_name']);
+            $session->write('staffdata.sex', $_POST['sex']);
+            $session->write('staffdata.birth', $birth);
+            $session->write('staffdata.mail', $_POST['mail']);
+            $session->write('staffdata.tel', $_POST['tel']);
+            $session->write('staffdata.address', $_POST['address']);
+            $session->write('staffdata.status', $_POST['status']);
+            $session->write('staffdata.date_start', $date_start);
+            $session->write('staffdata.delete_flag', $_POST['delete_flag']);
+            $session->write('staffdata.created_staff', $_POST['created_staff']);
+            $session->write('staffdata.updated_staff', null);
+
         ?>
 
 	<?php

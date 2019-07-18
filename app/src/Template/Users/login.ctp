@@ -3,13 +3,7 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\User $user
  */
- error_reporting(0);
-
-/*session_start();
-header('Expires:-1');
-header('Cache-Control:');
-header('Pragma:');
-*/
+error_reporting(0); 
 ?>
 
 <?php if ($username != "" && $delete_flag != ""): ?>

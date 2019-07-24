@@ -80,11 +80,11 @@ class SyukkaKensasController extends AppController {
 
                                     $name_heads = array('product_id', 'kind_kensa', 'inspec_date', 'lot_num', 'torikomi', 'delete_flag');
                                     $arrIm_heads = array_combine($name_heads, $arrIm_heads);
-/*
-                                    echo "<pre>";
-                                    print_r($arrIm_heads);
-                                    echo "<br>";
-*/
+
+//                                    echo "<pre>";
+//                                    print_r($arrIm_heads);
+//                                    echo "<br>";
+
                                     //ImSokuteidataHeadsデータベースに登録
                                     $imSokuteidataHeads = $this->ImSokuteidataHeads->newEntity();//newentityに$userという名前を付ける
 
@@ -93,7 +93,109 @@ class SyukkaKensasController extends AppController {
                                     // トランザクション開始2
                                     $connection->begin();//トランザクション3
                                     try {//トランザクション4
-                                      if ($this->ImSokuteidataHeads->save($imSokuteidataHeads)) {
+                                      if ($this->ImSokuteidataHeads->save($imSokuteidataHeads)) {//ImSokuteidataHeadsをsaveできた時
+
+                                          //ImKikakusの登録用データをセット
+                                          $cnt = count($arrFp[1]);
+                                          $arrImKikakus = array_slice($arrFp , 1, 3);
+                                          for ($k=7; $k<=$cnt-2; $k++) {//
+                                            $arrIm_kikaku_data = array();
+
+                                            $size_num = $k-6;
+                                            $size = $arrImKikakus[0][$k];
+                                            $upper = $arrImKikakus[1][$k];
+                                            $lower = $arrImKikakus[2][$k];
+
+                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                            $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+
+                                            $arrIm_kikaku_data[] = $im_sokuteidata_head_id;//配列に追加する
+                                            $arrIm_kikaku_data[] = $size_num;//配列に追加する
+                                            $arrIm_kikaku_data[] = $size;//配列に追加する
+                                            $arrIm_kikaku_data[] = $upper;//配列に追加する
+                                            $arrIm_kikaku_data[] = $lower;//配列に追加する
+                                            $name_kikaku = array('im_sokuteidata_head_id', 'size_num', 'size', 'upper', 'lower');
+                                            $arrIm_kikaku_data = array_combine($name_kikaku, $arrIm_kikaku_data);
+
+                                            $arrIm_kikaku[] = $arrIm_kikaku_data;
+                                         }
+
+//                                          echo "<pre>";
+//                                         print_r($arrIm_kikaku);
+//                                         echo "<br>";
+
+                                          //ImKikakusデータベースに登録
+                                          $imKikakus = $this->ImKikakus->newEntity();//newentityに$userという名前を付ける
+
+                                          $imKikakus = $this->ImKikakus->patchEntities($imKikakus, $arrIm_kikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+                                //          $connection = ConnectionManager::get('default');//トランザクション1
+                                //          // トランザクション開始2
+                                //          $connection->begin();//トランザクション3
+                                //          try {//トランザクション4
+                                            if ($this->ImKikakus->saveMany($imKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
+
+                                                //ImSokuteidataResultsの登録用データをセット
+                                                $inspec_datetime = substr($arrFp[4][1],0,4)."-".substr($arrFp[4][1],5,2)."-".substr($arrFp[4][1],8,mb_strlen($arrFp[4][1])-8);
+
+                                                 $arrImResults = array_slice($arrFp , 4, $count);
+                                                 for ($j=0; $j<=$count-5; $j++) {
+                                                    for ($k=7; $k<=$cnt-2; $k++) {
+                                                      $arrIm_Result_data = array();
+
+                                                      $serial = $arrImResults[$j][3];
+                                                      $size_num = $k-6;
+                                                      $result = $arrImResults[$j][$k];
+                                                      $status = $arrImResults[$j][4];
+
+                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                                      $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+
+                                                      $arrIm_Result_data[] = $im_sokuteidata_head_id;//配列に追加する
+                                                      $arrIm_Result_data[] = $inspec_datetime;//配列に追加する
+                                                      $arrIm_Result_data[] = $serial;//配列に追加する
+                                                      $arrIm_Result_data[] = $size_num;//配列に追加する
+                                                      $arrIm_Result_data[] = $result;//配列に追加する
+                                                      $arrIm_Result_data[] = $status;//配列に追加する
+                                                      $name_Result = array('im_sokuteidata_head_id', 'inspec_datetime', 'serial', 'size_num', 'result', 'status');
+                                                      $arrIm_Result_data = array_combine($name_Result, $arrIm_Result_data);
+
+                                                      $arrIm_Result[] = $arrIm_Result_data;
+                                                  }
+                                                 }
+
+  //                                             echo "<pre>";
+  //                                             print_r($arrIm_Result);
+  //                                             echo "<br>";
+
+                                                  //ImSokuteidataResultsデータベースに登録
+                                                  $imSokuteidataResults = $this->ImSokuteidataResults->newEntity();//newentityに$userという名前を付ける
+
+                                                  $imSokuteidataResults = $this->ImSokuteidataResults->patchEntities($imSokuteidataResults, $arrIm_Result);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+                                //                  $connection = ConnectionManager::get('default');//トランザクション1
+                                //                  // トランザクション開始2
+                                //                  $connection->begin();//トランザクション3
+                                //                  try {//トランザクション4
+                                                    if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
+                                //                      $connection->commit();// コミット5
+                                                    } else {
+                                                      $this->Flash->error(__('The Users could not be saved. Please, try again.'));
+                                                      throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                                                    }
+                                //                  } catch (Exception $e) {//トランザクション7
+                                //                  //ロールバック8
+                                //                    $connection->rollback();//トランザクション9
+                                //                  }//トランザクション10
+
+
+                                            } else {
+                                              $this->Flash->error(__('The Users could not be saved. Please, try again.'));
+                                              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                                            }
+                                  //        } catch (Exception $e) {//トランザクション7
+                                  //        //ロールバック8
+                                  //          $connection->rollback();//トランザクション9
+                                  //        }//トランザクション10
+
                                         $connection->commit();// コミット5
                                       } else {
                                         $this->Flash->error(__('The user could not be saved. Please, try again.'));
@@ -104,114 +206,12 @@ class SyukkaKensasController extends AppController {
                                       $connection->rollback();//トランザクション9
                                     }//トランザクション10
 
-                                    //ImKikakusの登録用データをセット
-                                    $cnt = count($arrFp[1]);
-                                    $arrImKikakus = array_slice($arrFp , 1, 3);
-                                    for ($k=7; $k<=$cnt-2; $k++) {//
-                                      $arrIm_kikaku_data = array();
-
-                                      $size_num = $k-6;
-                                      $size = $arrImKikakus[0][$k];
-                                      $upper = $arrImKikakus[1][$k];
-                                      $lower = $arrImKikakus[2][$k];
-
-                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                                      $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-
-                                      $arrIm_kikaku_data[] = $im_sokuteidata_head_id;//配列に追加する
-                                      $arrIm_kikaku_data[] = $size_num;//配列に追加する
-                                      $arrIm_kikaku_data[] = $size;//配列に追加する
-                                      $arrIm_kikaku_data[] = $upper;//配列に追加する
-                                      $arrIm_kikaku_data[] = $lower;//配列に追加する
-                                      $name_kikaku = array('im_sokuteidata_head_id', 'size_num', 'size', 'upper', 'lower');
-                                      $arrIm_kikaku_data = array_combine($name_kikaku, $arrIm_kikaku_data);
-
-                                      $arrIm_kikaku[] = $arrIm_kikaku_data;
-                                   }
 /*
-                                    echo "<pre>";
-                                   print_r($arrIm_kikaku);
-                                   echo "<br>";
-*/
-                                    //ImKikakusデータベースに登録
-                                    $imKikakus = $this->ImKikakus->newEntity();//newentityに$userという名前を付ける
-
-                                    $imKikakus = $this->ImKikakus->patchEntities($imKikakus, $arrIm_kikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-                                    $connection = ConnectionManager::get('default');//トランザクション1
-                                    // トランザクション開始2
-                                    $connection->begin();//トランザクション3
-                                    try {//トランザクション4
-                                      if ($this->ImKikakus->saveMany($imKikakus)) {//saveManyで一括登録
-                                        $connection->commit();// コミット5
-                                      } else {
-                                        $this->Flash->error(__('The Users could not be saved. Please, try again.'));
-                                        throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-                                      }
-                                    } catch (Exception $e) {//トランザクション7
-                                    //ロールバック8
-                                      $connection->rollback();//トランザクション9
-                                    }//トランザクション10
-
-
-                                    //ImSokuteidataResultsの登録用データをセット
-                                    $inspec_datetime = substr($arrFp[4][1],0,4)."-".substr($arrFp[4][1],5,2)."-".substr($arrFp[4][1],8,mb_strlen($arrFp[4][1])-8);
-
-                                     $arrImResults = array_slice($arrFp , 4, $count);
-                                     for ($j=0; $j<=$count-5; $j++) {
-                                        for ($k=7; $k<=$cnt-2; $k++) {
-                                          $arrIm_Result_data = array();
-
-                                          $serial = $arrImResults[$j][3];
-                                          $size_num = $k-6;
-                                          $result = $arrImResults[$j][$k];
-                                          $status = $arrImResults[$j][4];
-
-                                          $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                                          $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-
-                                          $arrIm_Result_data[] = $im_sokuteidata_head_id;//配列に追加する
-                                          $arrIm_Result_data[] = $inspec_datetime;//配列に追加する
-                                          $arrIm_Result_data[] = $serial;//配列に追加する
-                                          $arrIm_Result_data[] = $size_num;//配列に追加する
-                                          $arrIm_Result_data[] = $result;//配列に追加する
-                                          $arrIm_Result_data[] = $status;//配列に追加する
-                                          $name_Result = array('im_sokuteidata_head_id', 'inspec_datetime', 'serial', 'size_num', 'result', 'status');
-                                          $arrIm_Result_data = array_combine($name_Result, $arrIm_Result_data);
-
-                                          $arrIm_Result[] = $arrIm_Result_data;
-                                      }
-                                     }
-/*
-                                   echo "<pre>";
-                                   print_r($arrIm_Result);
-                                   echo "<br>";
-*/
-                                      //ImSokuteidataResultsデータベースに登録
-                                      $imSokuteidataResults = $this->ImSokuteidataResults->newEntity();//newentityに$userという名前を付ける
-
-                                      $imSokuteidataResults = $this->ImSokuteidataResults->patchEntities($imSokuteidataResults, $arrIm_Result);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-                                      $connection = ConnectionManager::get('default');//トランザクション1
-                                      // トランザクション開始2
-                                      $connection->begin();//トランザクション3
-                                      try {//トランザクション4
-                                        if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//saveManyで一括登録
-                                          $connection->commit();// コミット5
-                                        } else {
-                                          $this->Flash->error(__('The Users could not be saved. Please, try again.'));
-                                          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-                                        }
-                                      } catch (Exception $e) {//トランザクション7
-                                      //ロールバック8
-                                        $connection->rollback();//トランザクション9
-                                      }//トランザクション10
-
                                 $datefile = mb_substr($file,0,8);//8文字目までの文字列を$datefileと定義する
               									$toCopyFile = "sumi_".$file;//バックアップ用のファイル名
                                 rename($dirName.$folder.'/'.$file, $dirName.$folder.'/'.$toCopyFile);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
-
-                                print_r($toCopyFile);
-                          			echo "<br>";
-                              
+//                                print_r($toCopyFile);
+//                          			echo "<br>";
                                 $open_filename = $dirName.$folder;//$open_filenameを子ディレクトリ名として定義
                                 $toDirCopy =  $dirName.$folder;//$toDirCopyを子ディレクトリ名として定義
                                 $toCopyFile = $datefile."_".$product_code."_"."backup"."_".$countname;//フォルダ名の変更

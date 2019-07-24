@@ -199,9 +199,9 @@ class UsersController extends AppController
 				$arrFp[] = $sample;//配列に追加する
 			}
 			$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
-		//	echo "<pre>";
-		//	print_r($arrFp);
-		//	echo "<br>";
+			echo "<pre>";
+			print_r($arrFp);
+			echo "<br>";
     }
 
      public function docsv()

@@ -22,6 +22,7 @@ class SyukkaKensasController extends AppController {
      public function index()
     {
       $dirName = 'data_IM測定/';//webroot内にアクセスされる
+      $countname = 0;//ファイル名のかぶりを防ぐため
 
       if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
     	  if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）
@@ -36,12 +37,13 @@ class SyukkaKensasController extends AppController {
                 			}else{//$folderが'_'を含む時
                 				$num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
                 				$product_code = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
-                        $countname = 0;//ファイル名のかぶりを防ぐため
                           while(($file = readdir($child_dir)) !== false){//子while
-                            $countname += 1;//ファイル名がかぶらないようにカウントしておく
+//                            $countname += 1;//ファイル名がかぶらないようにカウントしておく
                               if($file != "." && $file != ".."){//ファイルなら
                                 if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
-                                  if(substr($file, 0, 5) <> "sumi_" ){//sumi_でないファイルだけOPEN
+                                  if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
+//                                  if(substr($file, 0, 5) <> "sumi_" ){//sumi_でないファイルだけOPEN
+                                    $countname += 1;//ファイル名がかぶらないようにカウントしておく
 
                                     $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
                               			$this->set('fp',$fp);
@@ -59,7 +61,7 @@ class SyukkaKensasController extends AppController {
                                         $ImData = array_combine( $keys, $ImData );
                                 				$arrFp[] = $ImData;//配列に追加する
                                     }
-
+/*
                                     //ImSokuteidataHeadsの登録用データをセット
                                     $arrIm_heads = array();//空の配列を作る
                                     $len = mb_strlen($folder);
@@ -171,61 +173,80 @@ class SyukkaKensasController extends AppController {
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->newEntity();//newentityに$userという名前を付ける
 
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->patchEntities($imSokuteidataResults, $arrIm_Result);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-                                //                  $connection = ConnectionManager::get('default');//トランザクション1
-                                //                  // トランザクション開始2
-                                //                  $connection->begin();//トランザクション3
-                                //                  try {//トランザクション4
-                                                    if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
-                                //                      $connection->commit();// コミット5
+                                                  if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
                                                     } else {
-                                                      $this->Flash->error(__('The Users could not be saved. Please, try again.'));
+                                                      $this->Flash->error(__('This data could not be saved. Please, try again.'));
                                                       throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-                                                    }
-                                //                  } catch (Exception $e) {//トランザクション7
-                                //                  //ロールバック8
-                                //                    $connection->rollback();//トランザクション9
-                                //                  }//トランザクション10
-
+                                                  }
 
                                             } else {
-                                              $this->Flash->error(__('The Users could not be saved. Please, try again.'));
+                                              $this->Flash->error(__('This data could not be saved. Please, try again.'));
                                               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
                                             }
-                                  //        } catch (Exception $e) {//トランザクション7
-                                  //        //ロールバック8
-                                  //          $connection->rollback();//トランザクション9
-                                  //        }//トランザクション10
-
-                                        $connection->commit();// コミット5
+                                            $connection->commit();// コミット5
                                       } else {
-                                        $this->Flash->error(__('The user could not be saved. Please, try again.'));
+                                        $this->Flash->error(__('This data could not be saved. Please, try again.'));
                                         throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
                                       }
                                     } catch (Exception $e) {//トランザクション7
                                     //ロールバック8
                                       $connection->rollback();//トランザクション9
                                     }//トランザクション10
+*/
 
-/*
-                                $datefile = mb_substr($file,0,8);//8文字目までの文字列を$datefileと定義する
-              									$toCopyFile = "sumi_".$file;//バックアップ用のファイル名
+
+
+                                }else{
+                          //        print_r('else ');
+                                  $datefile = mb_substr($file,5,8);//8文字目から8文字の文字列を$datefileと定義する
+                                  rename($dirName.$folder, 'backupData_IM測定/'.$folder);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
+                                }
+
+//                                print_r($countname);
+
+               									$toCopyFile = "sumi_".$countname."_".$file;//バックアップ用のファイル名
+//                                rename($dirName.$folder, 'backupData_IM測定/'.$toCopyFile);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
                                 rename($dirName.$folder.'/'.$file, $dirName.$folder.'/'.$toCopyFile);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
-//                                print_r($toCopyFile);
-//                          			echo "<br>";
+                  //              print_r($dirName.$folder.'/'.$file);
+                  //        			echo "<br>";
+
+    /*                            $open_filename = $dirName.$folder;//$open_filenameを子ディレクトリ名として定義
+                                $toDirCopy =  $dirName.$folder;//$toDirCopyを子ディレクトリ名として定義
+              //                         $datefilenum = mb_substr($toCopyFile,5,1);//8文字目までの文字列を$datefileと定義する
+                                $datefile = mb_substr($toCopyFile,8,8);//8文字目から8文字の文字列を$datefileと定義する
+                                $toCopyFile = $product_code."_"."backup"."_".$toCopyFile;//フォルダ名の変更
+                                rename($open_filename, 'backupData_IM測定/'.$toCopyFile);//backupData_IM測定の中にフォルダを作り、移動//エラーが出る
+/*
                                 $open_filename = $dirName.$folder;//$open_filenameを子ディレクトリ名として定義
                                 $toDirCopy =  $dirName.$folder;//$toDirCopyを子ディレクトリ名として定義
-                                $toCopyFile = $datefile."_".$product_code."_"."backup"."_".$countname;//フォルダ名の変更
+              //                         $datefilenum = mb_substr($toCopyFile,5,1);//8文字目までの文字列を$datefileと定義する
+                                $datefile = mb_substr($toCopyFile,8,8);//8文字目までの文字列を$datefileと定義する
+                                $toCopyFile = $product_code."_"."backup"."_".$toCopyFile;//フォルダ名の変更
                                 rename($open_filename, 'backupData_IM測定/'.$toCopyFile);//backupData_IM測定の中にフォルダを作り、移動//エラーが出る
+                                print_r($toCopyFile);
 */
-                                }
+//if($countname != "" ){
+//}else{
+//  print_r('else');
+//}
+
                               }
+                            //  print_r('a ');
+
                             }
+                        //    print_r('b ');
                          }
+                    //     print_r('c ');
                 			}
-    	            }
+                //      print_r('d ');
+      	            }
+              //      print_r('e ');
     	          }//if(ファイルでなくフォルダーであるなら)の終わり
+          //      print_r('f ');
     	        }//フォルダーであるなら
+      //        print_r('g ');
     	      }
+    //        print_r('h ');
     	    }//親whileの終わり
     	  }
     	}

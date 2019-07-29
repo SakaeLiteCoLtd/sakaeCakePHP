@@ -61,7 +61,7 @@ class SyukkaKensasController extends AppController {
                                         $ImData = array_combine( $keys, $ImData );
                                 				$arrFp[] = $ImData;//配列に追加する
                                     }
-/*
+
                                     //ImSokuteidataHeadsの登録用データをセット
                                     $arrIm_heads = array();//空の配列を作る
                                     $len = mb_strlen($folder);
@@ -191,32 +191,42 @@ class SyukkaKensasController extends AppController {
                                     } catch (Exception $e) {//トランザクション7
                                     //ロールバック8
                                       $connection->rollback();//トランザクション9
-                                    }//トランザクション10
-*/
+                                  }//トランザクション10
 
+                                  }else{
+                                    print_r('else ');
+//                                    $datefile = mb_substr($file,5,8);//8文字目から8文字の文字列を$datefileと定義する
+//                                    rename($dirName.$folder, 'backupData_IM測定/'.$folder);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
+                                  }
 
+                                //  if($countname != 100 ){
+                                //    print_r('test');
+                                //  }
 
-                                }else{
-                          //        print_r('else ');
-                                  $datefile = mb_substr($file,5,8);//8文字目から8文字の文字列を$datefileと定義する
-                                  rename($dirName.$folder, 'backupData_IM測定/'.$folder);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
-                                }
+                                  $output_dir = 'backupData_IM測定/'.$folder;
+                                  if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
+                                    if (mkdir($output_dir)) {
+//                                      $toCopyFile = "sumi_".$file;//バックアップ用のファイル名
+//                                      rename('backupData_IM測定/'.$folder, $toCopyFile);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
+                                      $Filebi2 = mb_substr($file,0,-4);
+                                      if (copy($dirName.$folder.'/'.$file, $output_dir.'/'.$file) && copy($dirName.$folder.'/'.$Filebi2."005.bi2", $output_dir.'/'.$Filebi2."005.bi2")) {
+                                        $toCopyFile = "sumi_".$file;
+                                          if (rename($output_dir.'/'.$file, $output_dir.'/'.$toCopyFile)) {//ファイル名変更
+                                            unlink($dirName.$folder.'/'.$file);
+                                            unlink($dirName.$folder.'/'.$Filebi2."005.bi2");
+                                          }
+                                      }
+                                  //  print_r($folder);
+                                    }
 
-//                                print_r($countname);
+                                  } else {//backupData_IM測定の中に$folderがあるとき
 
-               									$toCopyFile = "sumi_".$countname."_".$file;//バックアップ用のファイル名
-//                                rename($dirName.$folder, 'backupData_IM測定/'.$toCopyFile);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
-                                rename($dirName.$folder.'/'.$file, $dirName.$folder.'/'.$toCopyFile);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
-                  //              print_r($dirName.$folder.'/'.$file);
-                  //        			echo "<br>";
+                                  }
+//                                    $toCopyFile = "sumi_".$file;//バックアップ用のファイル名
+//                                    rename($dirName.$folder.'/'.$file, $dirName.$folder.'/'.$toCopyFile);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
+//                                    rename($dirName.$folder, 'backupData_IM測定/'.$folder);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
 
-    /*                            $open_filename = $dirName.$folder;//$open_filenameを子ディレクトリ名として定義
-                                $toDirCopy =  $dirName.$folder;//$toDirCopyを子ディレクトリ名として定義
-              //                         $datefilenum = mb_substr($toCopyFile,5,1);//8文字目までの文字列を$datefileと定義する
-                                $datefile = mb_substr($toCopyFile,8,8);//8文字目から8文字の文字列を$datefileと定義する
-                                $toCopyFile = $product_code."_"."backup"."_".$toCopyFile;//フォルダ名の変更
-                                rename($open_filename, 'backupData_IM測定/'.$toCopyFile);//backupData_IM測定の中にフォルダを作り、移動//エラーが出る
-/*
+ /*
                                 $open_filename = $dirName.$folder;//$open_filenameを子ディレクトリ名として定義
                                 $toDirCopy =  $dirName.$folder;//$toDirCopyを子ディレクトリ名として定義
               //                         $datefilenum = mb_substr($toCopyFile,5,1);//8文字目までの文字列を$datefileと定義する
@@ -225,14 +235,10 @@ class SyukkaKensasController extends AppController {
                                 rename($open_filename, 'backupData_IM測定/'.$toCopyFile);//backupData_IM測定の中にフォルダを作り、移動//エラーが出る
                                 print_r($toCopyFile);
 */
-//if($countname != "" ){
-//}else{
-//  print_r('else');
-//}
+
 
                               }
                             //  print_r('a ');
-
                             }
                         //    print_r('b ');
                          }

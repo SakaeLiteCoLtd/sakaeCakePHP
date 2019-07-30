@@ -65,7 +65,7 @@ $this->Customers = TableRegistry::get('customers');//productsテーブルを使�
             <?php foreach ($delivers as $deliver): ?>
             <tr>
             	<?php
-                    $customer_id = $deliver->customer_id;//$userのrole_idに$role_idと名前をつける
+                $customer_id = $deliver->customer_id;//$userのrole_idに$role_idと名前をつける
             		$Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $role_idとなるデータをRolesテーブルから配列で取得
             		$customer_name = $Customer[0]->name;//配列の0番目（0番目しかない）のnameに$user_roleと名前を付ける
             	?>
@@ -94,5 +94,3 @@ $this->Customers = TableRegistry::get('customers');//productsテーブルを使�
         </ul>
         <p><?= $this->Paginator->counter(['format' => __('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')]) ?></p>
     </div>
-
-

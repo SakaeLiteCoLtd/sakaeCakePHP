@@ -19,7 +19,18 @@ class SyukkaKensasController extends AppController {
      $this->Products = TableRegistry::get('products');//productsテーブルを使う
     }
 
-     public function index()
+    public function index()
+    {
+    }
+
+    public function index2()
+    {
+      $imKikakus = $this->ImKikakus->newEntity();
+      $this->set('imKikakus', $imKikakus);
+    }
+
+
+     public function torikomi()
     {
       $dirName = 'data_IM測定/';//webroot内にアクセスされる
       $countname = 0;//ファイル名のかぶりを防ぐため
@@ -263,6 +274,7 @@ class SyukkaKensasController extends AppController {
     	    }//親whileの終わり
     	  }
     	}
+      return $this->redirect(['action' => 'index']);
     }
 
 }

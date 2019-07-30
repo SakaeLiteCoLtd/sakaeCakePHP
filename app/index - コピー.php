@@ -44,12 +44,12 @@ if($_POST['yomikomi']){
 				while(($file = readdir($child_dir)) !== false){//子while
 
 					if($file != "." && $file != ".."){
-											
+
 
 						if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
 
 							if(substr($file, 0, 5) <> "sumi_" ){//sumi_でないファイルだけOPEN
-											
+
 								$inspec_date = substr($file,0,4)."-".substr($file,4,2)."-".substr($file,6,2);
 								$return_arr = array();
 
@@ -61,7 +61,7 @@ if($_POST['yomikomi']){
 								$count_column = sizeof(fgetcsv(fopen($open_filename, "r"), 1000, ","));//csvファイルの列数取得コマンド
 								$count = 0;//行の位置確認に使用
 								$arr_size_num = array();
-								$arr_size = array();				
+								$arr_size = array();
 								$arr_upper = array();
 								$arr_lower = array();
 								$arr_inspec_datetime = array();
@@ -72,16 +72,16 @@ if($_POST['yomikomi']){
 								while(!feof($fp)){
 
 									$return_arr = fgetcsv($fp, 4096);//ここの1行手前でreturn_arrを初期化した方がいい
-															
+
 									$arr_lot_num[]=array("lot_num"=>$return_arr[2],"count"=>$count);
 									$arr_status[]=array("status"=>$return_arr[4]);
 
 									for($i=7;$i<$count_column;$i++){
 
 										if($count == 0){
-														
+
 											//0のときは何もしない
-															
+
 										}elseif($count == 1){
 
 											$arr_size[$i] = $return_arr[$i];
@@ -126,7 +126,7 @@ if($_POST['yomikomi']){
 
 										if($i<$q && $box[$i]['lot_num']==$arr_lot_num[$j]['lot_num']){
 
-									
+
 
 										}else{
 
@@ -134,14 +134,14 @@ if($_POST['yomikomi']){
 											$arr[]=array("file"=>$arr_lot_num[$j]['count']);//ロットの切り替わりの行を取得
 											if($q != 0){$x++;}//ロットが同じでも間に別のロットを検査した場合は、別の検査表として登録
 											$q++;
-										
+
 										}
 
 								}
-													
+
 								$n=0;
 								for($i=0;$i<count($box);$i++){//kensahyou_headの数だけループ
-									
+
 									
 									$cycle_size_num = $count_column -7;
 									if($i==count($box)-1){
@@ -154,7 +154,7 @@ if($_POST['yomikomi']){
 										$n = $box[$i]['row'];
 										$last_row=($box[$i+1]['row']*$cycle_size_num)-1;
 									}
-									
+
 									if(count($arr_result) > 0){//万が一測定データが０の場合
 										//im_change_csvfilete
 										$mess = "　　　　　　　　　　　　　　　　　<strong>IMデータを取り込みました！</strong>";
@@ -163,18 +163,18 @@ if($_POST['yomikomi']){
 										$value_head = "'".$product_id."','".$folder."','".$inspec_date."','".$box[$i]['lot_num']."'";
 										$insert_head = "INSERT INTO im_sokuteidata_head (product_id,kind_kensa,inspec_date,lot_num) value (".$value_head.")";
 										$db->query($insert_head);
-															
+
 										$db->query("set names sjis");
 										$rs_id = $db->queryOne("SELECT id FROM im_sokuteidata_head order by id desc limit 1");
 										for($k=7;$k<$count_column;$k++){
 											$size_num = $k-6;
 											$insert_kikaku = "INSERT INTO im_kikaku (id,size_num,size,upper,lower) value (".$rs_id.",".$size_num.",".$arr_size[$k].",".$arr_upper[$k].",".$arr_lower[$k].")";
 											$db->query($insert_kikaku);
-																
+
 
 										}
 									}
-									
+
 									for($k=$n*$cycle_size_num;$k<$last_row;$k++){
 
 										if($k < $cycle_size_num){
@@ -204,14 +204,14 @@ if($_POST['yomikomi']){
 										}
 
 										if($arr_result[$k]<>""){
-											
+
 											$data_result = round($arr_result[$k],2);
 											$values .= "(".$rs_id.",'".$arr_inspec_datetime[$k]['inspec_datetime']."','".$arr_serial[$k]['serial']."',".$size_num.",".$data_result.",'".
 												  $status."'),";
 
 										}
-										
-									
+
+
 									}
 									$values = substr($values ,0, -1);
 									$db->query("set names sjis");
@@ -233,7 +233,7 @@ if($_POST['yomikomi']){
 										while($row_change_file=$rs_change_file->fetchRow(MDB2_FETCHMODE_ASSOC)){
 
 											$num = $row_change_file['num'];
-											
+
 										}
 
 									}
@@ -244,12 +244,12 @@ if($_POST['yomikomi']){
 									rename($open_filename, $toCopyFile);//DB登録後にファイル名を変更する。
 
 									unlink($open_filename);
-									
+
 									list($nameFile,$kakutyoushi) = explode(".",$file);
 									$bi2File = $nameFile."005.bi2";
 									$toCopyBi2File = $toDirCopy."/".$bi2File;
 									rename($dirName.$folder."/".$bi2File, $toCopyBi2File);//DB登録後にファイル名を変更する。
-									
+
 									unlink($dirName.$folder."/".$bi2File);
 
 
@@ -258,7 +258,7 @@ if($_POST['yomikomi']){
 									$db->query("set names sjis");
 									$update_change_file = "update im_change_csvfile_num set num = ".$num.",date = '".$today."' where kind_kensa = '".$folder."'" ;
 									$db->query($update_change_file);
-									
+
 								}//kensahyou_headの数だけループの終わり
 
 							}//sumi_でないファイルだけOPEN
@@ -295,14 +295,14 @@ while($row=$rs->fetchRow(MDB2_FETCHMODE_ASSOC)){
 	$starting_zenkai = 0;
 	$db->query("set names sjis");
 	$rs_zenkai=$db->query("SELECT starting_tm FROM kadou_seikei where pro_num = '".$row['pro_num']."' and seikeiki_id = '".$row['seikeiki_id']."' and starting_tm < '".$row['starting_tm']."' order by starting_tm desc limit 1");
-	
+
 	while($row_zenkai=$rs_zenkai->fetchRow(MDB2_FETCHMODE_ASSOC)){
 
 		$starting_zenkai = $row_zenkai['starting_tm'];
 
 	}
 
-		
+
 			$daytime1=$row['finishing_tm'];
 			$year1=mb_substr("$daytime1",0,10);
 			$time1=mb_substr("$daytime1",11,8);
@@ -384,14 +384,14 @@ while($row_kari_kadou=$rs_kari_kadou->fetchRow(MDB2_FETCHMODE_ASSOC)){
 	$starting_zenkai = 0;
 	$db->query("set names sjis");
 	$rs_zenkai=$db->query("SELECT starting_tm FROM kadou_seikei where pro_num = '".$row_kari_kadou['product_id']."' and seikeiki_id = '".$row_kari_kadou['seikeiki_id']."' order by starting_tm desc limit 1");
-	
+
 	while($row_zenkai=$rs_zenkai->fetchRow(MDB2_FETCHMODE_ASSOC)){
 
 		$starting_zenkai = $row_zenkai['starting_tm'];
 
 	}
 
-		
+
 			$daytime1=$row_kari_kadou['finishing_tm'];
 			$year1=mb_substr("$daytime1",0,10);
 			$time1=mb_substr("$daytime1",11,8);
@@ -467,7 +467,7 @@ while($row_schedule_koutei=$rs_schedule_koutei->fetchRow(MDB2_FETCHMODE_ASSOC)){
 	$seikeiki = $row_schedule_koutei['seikeiki']."号機";
 	$db->query("set names sjis");
 	$rs_seikeiki=$db->query("SELECT seikeiki_id FROM seikeiki where genjyou = '".$seikeiki."'  order by dounyuubi desc limit 1");
-	
+
 	while($row_seikeiki=$rs_seikeiki->fetchRow(MDB2_FETCHMODE_ASSOC)){
 
 		$seikeiki_id = $row_seikeiki['seikeiki_id'];
@@ -483,7 +483,7 @@ while($row_schedule_koutei=$rs_schedule_koutei->fetchRow(MDB2_FETCHMODE_ASSOC)){
 		$starting_zenkai = $row_zenkai['starting_tm'];
 
 	}
-		
+
 
 	$db->query("set names sjis");
 	$rs_zenkai=$db->query("SELECT datetime FROM schedule_koutei where seikeiki = '".$row_schedule_koutei['seikeiki']."' and datetime > '".$row_schedule_koutei['datetime']."' order by datetime asc limit 1");

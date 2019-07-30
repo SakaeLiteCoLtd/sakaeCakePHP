@@ -220,7 +220,14 @@ class SyukkaKensasController extends AppController {
                                     }
 
                                   } else {//backupData_IM測定の中に$folderがあるとき
-
+                                    $Filebi2 = mb_substr($file,0,-4);
+                                    if (copy($dirName.$folder.'/'.$file, $output_dir.'/'.$file) && copy($dirName.$folder.'/'.$Filebi2."005.bi2", $output_dir.'/'.$Filebi2."005.bi2")) {
+                                      $toCopyFile = "sumi_".$file;
+                                        if (rename($output_dir.'/'.$file, $output_dir.'/'.$toCopyFile)) {//ファイル名変更
+                                          unlink($dirName.$folder.'/'.$file);
+                                          unlink($dirName.$folder.'/'.$Filebi2."005.bi2");
+                                        }
+                                    }
                                   }
 //                                    $toCopyFile = "sumi_".$file;//バックアップ用のファイル名
 //                                    rename($dirName.$folder.'/'.$file, $dirName.$folder.'/'.$toCopyFile);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更

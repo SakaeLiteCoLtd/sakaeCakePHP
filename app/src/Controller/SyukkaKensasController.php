@@ -21,23 +21,16 @@ class SyukkaKensasController extends AppController {
 
     public function index()
     {
+      //メニュー画面
     }
 
-    public function index2()
+    public function index2()//取り込み画面
     {
       $imKikakus = $this->ImKikakus->newEntity();
       $this->set('imKikakus', $imKikakus);
 
-      $i = 0;
-//      $j = 2;
-
-      ${"test_".$i} = 1;
-//      ${"test_".$j} = 2;
-      $this->set('test_'.$i,${"test_".$i});//セット
-//      $this->set('test_'.$j,${"test_".$j});//セット
-
-      $dirName = 'data_IM測定/';//webroot内にアクセスされる
-      $countname = 0;
+        $dirName = 'data_IM測定/';//webroot内のフォルダ
+        $countname = 0;
 
       if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
     	  if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）
@@ -98,9 +91,9 @@ class SyukkaKensasController extends AppController {
     }
 
 
-     public function torikomi()
+     public function torikomi()//取り込み（画面なし自動で次のページへ）
     {
-      $dirName = 'data_IM測定/';//webroot内にアクセスされる
+      $dirName = 'data_IM測定/';//webroot内のフォルダ
       $countname = 0;//ファイル名のかぶりを防ぐため
 
       if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
@@ -289,7 +282,7 @@ class SyukkaKensasController extends AppController {
 //                                      rename('backupData_IM測定/'.$folder, $toCopyFile);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
                                       $Filebi2 = mb_substr($file,0,-4);
                                       if (copy($dirName.$folder.'/'.$file, $output_dir.'/'.$file) && copy($dirName.$folder.'/'.$Filebi2."005.bi2", $output_dir.'/'.$Filebi2."005.bi2")) {
-                                        $toCopyFile = "sumi_".$file;
+                                        $toCopyFile = "sumi_".$countname."_".$file;
                                           if (rename($output_dir.'/'.$file, $output_dir.'/'.$toCopyFile)) {//ファイル名変更
                                             unlink($dirName.$folder.'/'.$file);
                                             unlink($dirName.$folder.'/'.$Filebi2."005.bi2");

@@ -23,35 +23,38 @@
     </tr>
 </table>
 <br>
+<br>
+
+<div align="center"><strong><font color="red">＊下記の製品が未検査です</font></strong></div>
+
 <table width="600" border="1" align="center" bordercolor="#000000" bgcolor="#FFDEAD">
   <tr  border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
       <td width="200" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><font color="blue"><?= h('品番') ?></font></div></td>
       <td width="200" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><font color="blue"><?= h('品名') ?></font></div></td>
       <td width="200" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><font color="blue"><?= h('製造年月日') ?></font></div></td>
   </tr>
-
-  </table>
-  <br>
+</table>
 
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
       <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
       <tr>
-          <th width="200" ><div align="center"><font color="blue"><?= h('品番') ?></font></div></th>
-          <th width="200" ><div align="center"><font color="blue"><?= h('品名') ?></font></div></th>
-          <th width="200" ><div align="center"><font color="blue"><?= h('製造年月日') ?></font></div></th>
+          <td width="200" ><div align="center"><font color="blue" size="3"><?= h('品番') ?></font></div></td>
+          <td width="200" ><div align="center"><font color="blue" size="3"><?= h('品名') ?></font></div></td>
+          <td width="200" ><div align="center"><font color="blue" size="3"><?= h('製造年月日') ?></font></div></td>
       </tr>
+
+      <?php
+      for($i=1; $i<=$n; $i++){
+        echo '<td><div align="center">';
+        echo (${"test_".$i}) ;
+        echo '</div></td>';
+        echo '<td><div align="center">品番</div></td>';
+        echo '<td><div align="center">品番</div></td>';
+      }
+      ?>
+
       <tr>
-          <td><div align="center"><?= h('品番') ?></div></td>
-          <td><div align="center"><?= h('品番') ?></div></td>
-          <td><div align="center"><?= h('品番') ?></div></td>
-      </tr>
-      <tr>
-          <td><div align="center"><?= h('品番') ?></div></td>
-          <td><div align="center"><?= h('品番') ?></div></td>
-          <td><div align="center"><?= h('品番') ?></div></td>
-      </tr>
-      <tr>
-          <td><div align="center"><?= h('品番') ?></div></td>
+          <td><div align="center"><?= h(${"test_".$i}) ?></div></td>
           <td><div align="center"><?= h('品番') ?></div></td>
           <td><div align="center"><?= h('品番') ?></div></td>
       </tr>

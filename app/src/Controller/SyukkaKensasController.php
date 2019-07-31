@@ -27,6 +27,76 @@ class SyukkaKensasController extends AppController {
     {
       $imKikakus = $this->ImKikakus->newEntity();
       $this->set('imKikakus', $imKikakus);
+
+      $i = 1;
+      $j = 2;
+
+      ${"test_".$i} = 1;
+      ${"test_".$j} = 2;
+      $this->set('test_'.$i,${"test_".$i});//セット
+      $this->set('test_'.$j,${"test_".$j});//セット
+
+      if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
+    	  if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）
+    	    while(($folder = readdir($dir)) !== false){//親while（ディレクトリ内のファイル一覧を取得する）
+    	      if($folder != '.' && $folder != '..'){//フォルダーなら("."が無いならフォルダーという認識)
+    	        if(strpos($folder,'.',0)==''){//$folderが'.'を含まなかった時
+    	          if(is_dir($dirName.$folder)){//$dirName.$folderがディレクトリかどうかを調べる
+    	            if($child_dir = opendir($dirName.$folder)){//opendir で$dirName.$folderの子ディレクトリをオープン
+              			$folder_check = 0;//$folder_checkを定義
+                			if(strpos($folder,'_',0)==''){//$folderが'_'を含まなかった時
+                				$folder_check = 1;//$folder_check=1にする
+                			}else{//$folderが'_'を含む時
+                				$num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
+                				$product_code = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
+                          while(($file = readdir($child_dir)) !== false){//子while
+//                            $countname += 1;//ファイル名がかぶらないようにカウントしておく
+                              if($file != "." && $file != ".."){//ファイルなら
+                                if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
+                                  if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
+//                                  if(substr($file, 0, 5) <> "sumi_" ){//sumi_でないファイルだけOPEN
+                                    $countname += 1;//ファイル名がかぶらないようにカウントしておく
+
+                                    $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
+                              			$this->set('fp',$fp);
+
+                              			$fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
+                              			for( $count = 0; fgets( $fpcount ); $count++ );
+
+                              			$arrFp = array();//空の配列を作る
+
+                                    for ($k=1; $k<=$count; $k++) {
+                                        $line = fgets($fp);//ファイル$fpの上の１行を取る
+                                        $ImData = explode(',',$line);//$lineを","毎に配列に入れる
+
+                                        $keys=array_keys($ImData);
+                                        $ImData = array_combine( $keys, $ImData );
+                                				$arrFp[] = $ImData;//配列に追加する
+                                      }
+                                    }
+                              }
+                            //  print_r('a ');
+                            }
+                        //    print_r('b ');
+                         }
+                    //     print_r('c ');
+                			}
+                //      print_r('d ');
+      	            }
+              //      print_r('e ');
+    	          }//if(ファイルでなくフォルダーであるなら)の終わり
+          //      print_r('f ');
+    	        }//フォルダーであるなら
+      //        print_r('g ');
+    	      }
+    //        print_r('h ');
+    	    }//親whileの終わり
+    	  }
+      }
+
+
+      $n = 1;//データの個数-1
+      $this->set('n',$n);////データの個数-1セット
     }
 
 

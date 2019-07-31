@@ -46,11 +46,9 @@ class SyukkaKensasController extends AppController {
                 				$num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
                 				$product_code = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
                           while(($file = readdir($child_dir)) !== false){//子while
-//                            $countname += 1;//ファイル名がかぶらないようにカウントしておく
-                              if($file != "." && $file != ".."){//ファイルなら
+                               if($file != "." && $file != ".."){//ファイルなら
                                 if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
-                                  if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
-//                                  if(substr($file, 0, 5) <> "sumi_" ){//sumi_でないファイルだけOPEN
+                                   if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
                                     $countname += 1;//ファイル名がかぶらないようにカウントしておく
                                     $num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
                             				${"product_code".$countname} = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
@@ -63,31 +61,19 @@ class SyukkaKensasController extends AppController {
                                     $this->set('inspec_date'.$countname,${"inspec_date".$countname});//セット
                                     $this->set('countname',$countname);//セット
                                     }
-                              }
-                            //  print_r('a ');
-                            }else{
+                               }
+                             }else{
                               $this->set('countname',$countname);//セット
                             }
-                        //    print_r('b ');
-                         }
-                    //     print_r('c ');
-                			}
-                //      print_r('d ');
-      	            }
-              //      print_r('e ');
-    	          }//if(ファイルでなくフォルダーであるなら)の終わり
-          //      print_r('f ');
-    	        }//フォルダーであるなら
-      //        print_r('g ');
-    	      }
-    //        print_r('h ');
+                          }
+                 			}
+       	            }
+     	          }//if(ファイルでなくフォルダーであるなら)の終わり
+     	        }//フォルダーであるなら
+     	      }
     	    }//親whileの終わり
     	  }
-      }
-
-
-      $n = 1;//データの個数-1
-      $this->set('n',$n);////データの個数-1セット
+     }
     }
 
 
@@ -110,11 +96,9 @@ class SyukkaKensasController extends AppController {
                 				$num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
                 				$product_code = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
                           while(($file = readdir($child_dir)) !== false){//子while
-//                            $countname += 1;//ファイル名がかぶらないようにカウントしておく
-                              if($file != "." && $file != ".."){//ファイルなら
+                               if($file != "." && $file != ".."){//ファイルなら
                                 if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
-                                  if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
-//                                  if(substr($file, 0, 5) <> "sumi_" ){//sumi_でないファイルだけOPEN
+                                   if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
                                     $countname += 1;//ファイル名がかぶらないようにカウントしておく
 
                                     $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
@@ -155,11 +139,7 @@ class SyukkaKensasController extends AppController {
                                     $name_heads = array('product_id', 'kind_kensa', 'inspec_date', 'lot_num', 'torikomi', 'delete_flag');
                                     $arrIm_heads = array_combine($name_heads, $arrIm_heads);
 
-//                                    echo "<pre>";
-//                                    print_r($arrIm_heads);
-//                                    echo "<br>";
-
-                                    //ImSokuteidataHeadsデータベースに登録
+                                     //ImSokuteidataHeadsデータベースに登録
                                     $imSokuteidataHeads = $this->ImSokuteidataHeads->newEntity();//newentityに$userという名前を付ける
 
                                     $imSokuteidataHeads = $this->ImSokuteidataHeads->patchEntity($imSokuteidataHeads, $arrIm_heads);
@@ -194,19 +174,11 @@ class SyukkaKensasController extends AppController {
                                             $arrIm_kikaku[] = $arrIm_kikaku_data;
                                          }
 
-//                                          echo "<pre>";
-//                                         print_r($arrIm_kikaku);
-//                                         echo "<br>";
-
-                                          //ImKikakusデータベースに登録
+                                           //ImKikakusデータベースに登録
                                           $imKikakus = $this->ImKikakus->newEntity();//newentityに$userという名前を付ける
 
                                           $imKikakus = $this->ImKikakus->patchEntities($imKikakus, $arrIm_kikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-                                //          $connection = ConnectionManager::get('default');//トランザクション1
-                                //          // トランザクション開始2
-                                //          $connection->begin();//トランザクション3
-                                //          try {//トランザクション4
-                                            if ($this->ImKikakus->saveMany($imKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
+                                             if ($this->ImKikakus->saveMany($imKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
                                                 //ImSokuteidataResultsの登録用データをセット
                                                 $inspec_datetime = substr($arrFp[4][1],0,4)."-".substr($arrFp[4][1],5,2)."-".substr($arrFp[4][1],8,mb_strlen($arrFp[4][1])-8);
@@ -237,10 +209,6 @@ class SyukkaKensasController extends AppController {
                                                   }
                                                  }
 
-  //                                             echo "<pre>";
-  //                                             print_r($arrIm_Result);
-  //                                             echo "<br>";
-
                                                   //ImSokuteidataResultsデータベースに登録
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->newEntity();//newentityに$userという名前を付ける
 
@@ -266,20 +234,12 @@ class SyukkaKensasController extends AppController {
                                   }//トランザクション10
 
                                   }else{
-                                    print_r('else ');
-//                                    $datefile = mb_substr($file,5,8);//8文字目から8文字の文字列を$datefileと定義する
-//                                    rename($dirName.$folder, 'backupData_IM測定/'.$folder);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
+                                   print_r('else ');
                                   }
 
-                                //  if($countname != 100 ){
-                                //    print_r('test');
-                                //  }
-
-                                  $output_dir = 'backupData_IM測定/'.$folder;
+                                $output_dir = 'backupData_IM測定/'.$folder;
                                   if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
-                                    if (mkdir($output_dir)) {
-//                                      $toCopyFile = "sumi_".$file;//バックアップ用のファイル名
-//                                      rename('backupData_IM測定/'.$folder, $toCopyFile);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
+                                   if (mkdir($output_dir)) {
                                       $Filebi2 = mb_substr($file,0,-4);
                                       if (copy($dirName.$folder.'/'.$file, $output_dir.'/'.$file) && copy($dirName.$folder.'/'.$Filebi2."005.bi2", $output_dir.'/'.$Filebi2."005.bi2")) {
                                         $toCopyFile = "sumi_".$countname."_".$file;
@@ -288,7 +248,6 @@ class SyukkaKensasController extends AppController {
                                             unlink($dirName.$folder.'/'.$Filebi2."005.bi2");
                                           }
                                       }
-                                  //  print_r($folder);
                                     }
 
                                   } else {//backupData_IM測定の中に$folderがあるとき
@@ -301,38 +260,15 @@ class SyukkaKensasController extends AppController {
                                         }
                                     }
                                   }
-//                                    $toCopyFile = "sumi_".$file;//バックアップ用のファイル名
-//                                    rename($dirName.$folder.'/'.$file, $dirName.$folder.'/'.$toCopyFile);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
-//                                    rename($dirName.$folder, 'backupData_IM測定/'.$folder);//data_IM測定/$folder/$fileのファイル名を$toCopyFileに変更
-
- /*
-                                $open_filename = $dirName.$folder;//$open_filenameを子ディレクトリ名として定義
-                                $toDirCopy =  $dirName.$folder;//$toDirCopyを子ディレクトリ名として定義
-              //                         $datefilenum = mb_substr($toCopyFile,5,1);//8文字目までの文字列を$datefileと定義する
-                                $datefile = mb_substr($toCopyFile,8,8);//8文字目までの文字列を$datefileと定義する
-                                $toCopyFile = $product_code."_"."backup"."_".$toCopyFile;//フォルダ名の変更
-                                rename($open_filename, 'backupData_IM測定/'.$toCopyFile);//backupData_IM測定の中にフォルダを作り、移動//エラーが出る
-                                print_r($toCopyFile);
-*/
-
-
-                              }
-                            //  print_r('a ');
-                            }
-                        //    print_r('b ');
-                         }
-                    //     print_r('c ');
-                			}
-                //      print_r('d ');
-      	            }
-              //      print_r('e ');
-    	          }//if(ファイルでなくフォルダーであるなら)の終わり
-          //      print_r('f ');
+                               }
+                             }
+                          }
+                	 		}
+       	            }
+    	           }//if(ファイルでなくフォルダーであるなら)の終わり
     	        }//フォルダーであるなら
-      //        print_r('g ');
-    	      }
-    //        print_r('h ');
-    	    }//親whileの終わり
+     	      }
+     	    }//親whileの終わり
     	  }
     	}
       return $this->redirect(['action' => 'index']);

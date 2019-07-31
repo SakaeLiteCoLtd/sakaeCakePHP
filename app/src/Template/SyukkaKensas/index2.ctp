@@ -25,13 +25,14 @@
 <br>
 <br>
 
-<div align="center"><strong><font color="red">＊下記の製品が未検査です</font></strong></div>
+<div align="center"><font color="red" size="4">＊下記の製品が未検査です</font></div>
+<br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
       <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
       <tr>
-          <td width="200" ><div align="center"><font color="blue" size="3"><?= h('品番') ?></font></div></td>
-          <td width="300" ><div align="center"><font color="blue" size="3"><?= h('品名') ?></font></div></td>
-          <td width="200" ><div align="center"><font color="blue" size="3"><?= h('製造年月日') ?></font></div></td>
+          <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('品番') ?></font></strong></div></td>
+          <td width="300" ><div align="center"><strong><font color="blue" size="3"><?= h('品名') ?></font></strong></div></td>
+          <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('製造年月日') ?></font></strong></div></td>
       </tr>
 
       <?php
@@ -42,9 +43,9 @@
         echo '<td><div align="center">';
         echo (${"product_name".$i}) ;
         echo '</div></td>';
-        echo '<td><div align="center">';
+        echo '<td><div align="center"><font color="blue">';
         echo (${"inspec_date".$i}) ;
-        echo '</div></td></tr>';
+        echo '</div></font></td></tr>';
        }
       ?>
 

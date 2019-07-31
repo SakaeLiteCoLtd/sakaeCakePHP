@@ -72,6 +72,8 @@ class SyukkaKensasController extends AppController {
                                     }
                               }
                             //  print_r('a ');
+                            }else{
+                              $this->set('countname',$countname);//セット
                             }
                         //    print_r('b ');
                          }

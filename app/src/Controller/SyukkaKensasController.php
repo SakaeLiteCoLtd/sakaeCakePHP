@@ -28,13 +28,16 @@ class SyukkaKensasController extends AppController {
       $imKikakus = $this->ImKikakus->newEntity();
       $this->set('imKikakus', $imKikakus);
 
-      $i = 1;
-      $j = 2;
+      $i = 0;
+//      $j = 2;
 
       ${"test_".$i} = 1;
-      ${"test_".$j} = 2;
+//      ${"test_".$j} = 2;
       $this->set('test_'.$i,${"test_".$i});//セット
-      $this->set('test_'.$j,${"test_".$j});//セット
+//      $this->set('test_'.$j,${"test_".$j});//セット
+
+      $dirName = 'data_IM測定/';//webroot内にアクセスされる
+      $countname = 0;
 
       if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
     	  if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）
@@ -56,23 +59,16 @@ class SyukkaKensasController extends AppController {
                                   if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
 //                                  if(substr($file, 0, 5) <> "sumi_" ){//sumi_でないファイルだけOPEN
                                     $countname += 1;//ファイル名がかぶらないようにカウントしておく
+                                    $num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
+                            				${"product_code".$countname} = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
+                                    ${"ProductData".$countname} = $this->Products->find()->where(['product_code' => ${"product_code".$countname}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                  	${"product_name".$countname} = ${"ProductData".$countname}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                    ${"inspec_date".$countname} = substr($file,0,4)."-".substr($file,4,2)."-".substr($file,6,2);
 
-                                    $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
-                              			$this->set('fp',$fp);
-
-                              			$fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
-                              			for( $count = 0; fgets( $fpcount ); $count++ );
-
-                              			$arrFp = array();//空の配列を作る
-
-                                    for ($k=1; $k<=$count; $k++) {
-                                        $line = fgets($fp);//ファイル$fpの上の１行を取る
-                                        $ImData = explode(',',$line);//$lineを","毎に配列に入れる
-
-                                        $keys=array_keys($ImData);
-                                        $ImData = array_combine( $keys, $ImData );
-                                				$arrFp[] = $ImData;//配列に追加する
-                                      }
+                                    $this->set('product_code'.$countname,${"product_code".$countname});//セット
+                                    $this->set('product_name'.$countname,${"product_name".$countname});//セット
+                                    $this->set('inspec_date'.$countname,${"inspec_date".$countname});//セット
+                                    $this->set('countname',$countname);//セット
                                     }
                               }
                             //  print_r('a ');

@@ -14,7 +14,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          
+
           echo $this->Form->hidden('product_code' ,['value'=>$product_code ]) ;
           echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'confirm']]);
         ?>
@@ -41,8 +41,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td colspan="8"><?= $this->Form->input("inspec_date", array('type' => 'date', 'label'=>false)); ?></td>
         </tr>
 <?php
-     echo $htmlKensahyouHeader; 
+     echo $htmlKensahyouHeader;
 ?>
+
         <?php
             $lowerArraygyou = Array();
             for($j=1; $j<=8; $j++){
@@ -80,4 +81,3 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
     </fieldset>
     <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>
-

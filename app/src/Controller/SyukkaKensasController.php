@@ -266,7 +266,7 @@ class SyukkaKensasController extends AppController {
                                    print_r('else ');
                                   }
 
-                      /*          $output_dir = 'backupData_IM測定/'.$folder;
+                                $output_dir = 'backupData_IM測定/'.$folder;
                                   if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
                                    if (mkdir($output_dir)) {
                                       $Filebi2 = mb_substr($file,0,-4);
@@ -289,7 +289,7 @@ class SyukkaKensasController extends AppController {
                                         }
                                     }
                                   }
-                        */       }
+                               }
                              }
                           }
                 	 		}

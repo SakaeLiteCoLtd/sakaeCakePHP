@@ -112,18 +112,33 @@ class SyukkaKensasController extends AppController {
                                     for ($k=1; $k<=$count; $k++) {
                                         $line = fgets($fp);//ファイル$fpの上の１行を取る
                                         $ImData = explode(',',$line);//$lineを","毎に配列に入れる
-
                                         $keys=array_keys($ImData);
                                         $ImData = array_combine( $keys, $ImData );
                                 				$arrFp[] = $ImData;//配列に追加する
                                     }
 
-                                    //ImSokuteidataHeadsの登録用データをセット
+                                    $arrLot_nums = array();//lot_numの重複チェック
+                                    for ($k=4; $k<=$count-1; $k++) {
+                                      ${"arrLot_nums".$countname}[] = $arrFp[$k][2];
+                                    }
+                                    $arruniLot_num = array_unique(${"arrLot_nums".$countname});//lot_numの重複削除
+                                    ${"arruniLot_num".$countname} = array_values($arruniLot_num);//配列の添字を振り直し
+                                    $cntLot = count(${"arruniLot_num".$countname});//配列の要素数確認
+/*
+                                    echo "<pre>";
+                                    print_r($countname);
+                                    print_r(${"arruniLot_num".$countname});
+                                    echo "<br>";
+*/
+
+                                  //ImSokuteidataHeadsの登録用データをセット
+                                  $arrIm_head = array();//空の配列を作る
+                                  for ($k=1; $k<=$cntLot; $k++) {
                                     $arrIm_heads = array();//空の配列を作る
                                     $len = mb_strlen($folder);
                                     $product_code = mb_substr($folder,0,$num);
                                     $inspec_date = substr($file,0,4)."-".substr($file,4,2)."-".substr($file,6,2);
-                                    $lot_num = $arrFp[4][2];
+                              //      $lot_num = $arrFp[4][2];
                                     $kind_kensa = substr($folder,$num+1,$len);
 
                                   	$ProductData = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
@@ -132,22 +147,28 @@ class SyukkaKensasController extends AppController {
                                     $arrIm_heads[] = $product_id;
                                     $arrIm_heads[] = $kind_kensa;
                                     $arrIm_heads[] = $inspec_date;
-                                    $arrIm_heads[] = $lot_num;
+                                    $arrIm_heads[] = ${"arruniLot_num".$countname}[$k-1];
+                              //      $arrIm_heads[] = $lot_num;
                                     $arrIm_heads[] = 0;
                                     $arrIm_heads[] = 0;
 
                                     $name_heads = array('product_id', 'kind_kensa', 'inspec_date', 'lot_num', 'torikomi', 'delete_flag');
                                     $arrIm_heads = array_combine($name_heads, $arrIm_heads);
+                                    $arrIm_head[] = $arrIm_heads;
+                                  }
+                                  //  echo "<pre>";
+                                  //  print_r($arrIm_head);
+                                  //  echo "<br>";
 
                                      //ImSokuteidataHeadsデータベースに登録
                                     $imSokuteidataHeads = $this->ImSokuteidataHeads->newEntity();//newentityに$userという名前を付ける
 
-                                    $imSokuteidataHeads = $this->ImSokuteidataHeads->patchEntity($imSokuteidataHeads, $arrIm_heads);
+                                    $imSokuteidataHeads = $this->ImSokuteidataHeads->patchEntities($imSokuteidataHeads, $arrIm_head);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                     $connection = ConnectionManager::get('default');//トランザクション1
                                     // トランザクション開始2
                                     $connection->begin();//トランザクション3
                                     try {//トランザクション4
-                                      if ($this->ImSokuteidataHeads->save($imSokuteidataHeads)) {//ImSokuteidataHeadsをsaveできた時
+                                      if ($this->ImSokuteidataHeads->saveMany($imSokuteidataHeads)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
                                           //ImKikakusの登録用データをセット
                                           $cnt = count($arrFp[1]);

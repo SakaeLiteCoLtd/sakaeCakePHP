@@ -61,6 +61,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 echo "</td>\n";
             }
         ?>
+        
         </tr>
           <td height="120" colspan="24" style="border-bottom: solid;border-width: 1px">
 	      <strong>備考：</strong><br>

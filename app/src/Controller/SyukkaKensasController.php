@@ -108,7 +108,6 @@ class SyukkaKensasController extends AppController {
                               			for( $count = 0; fgets( $fpcount ); $count++ );
 
                               			$arrFp = array();//空の配列を作る
-
                                     for ($k=1; $k<=$count; $k++) {
                                         $line = fgets($fp);//ファイル$fpの上の１行を取る
                                         $ImData = explode(',',$line);//$lineを","毎に配列に入れる
@@ -117,6 +116,7 @@ class SyukkaKensasController extends AppController {
                                 				$arrFp[] = $ImData;//配列に追加する
                                     }
 
+
                                     $arrLot_nums = array();//lot_numの重複チェック
                                     for ($k=4; $k<=$count-1; $k++) {
                                       ${"arrLot_nums".$countname}[] = $arrFp[$k][2];
@@ -124,41 +124,34 @@ class SyukkaKensasController extends AppController {
                                     $arruniLot_num = array_unique(${"arrLot_nums".$countname});//lot_numの重複削除
                                     ${"arruniLot_num".$countname} = array_values($arruniLot_num);//配列の添字を振り直し
                                     $cntLot = count(${"arruniLot_num".$countname});//配列の要素数確認
-/*
-                                    echo "<pre>";
-                                    print_r($countname);
-                                    print_r(${"arruniLot_num".$countname});
-                                    echo "<br>";
-*/
 
-                                  //ImSokuteidataHeadsの登録用データをセット
-                                  $arrIm_head = array();//空の配列を作る
-                                  for ($k=1; $k<=$cntLot; $k++) {
-                                    $arrIm_heads = array();//空の配列を作る
-                                    $len = mb_strlen($folder);
-                                    $product_code = mb_substr($folder,0,$num);
-                                    $inspec_date = substr($file,0,4)."-".substr($file,4,2)."-".substr($file,6,2);
-                              //      $lot_num = $arrFp[4][2];
-                                    $kind_kensa = substr($folder,$num+1,$len);
 
-                                  	$ProductData = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                                  	$product_id = $ProductData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                    //ImSokuteidataHeadsの登録用データをセット
+                                    $arrIm_head = array();//空の配列を作る
+                                    for ($k=1; $k<=$cntLot; $k++) {
+                                      $arrIm_heads = array();//空の配列を作る
+                                      $len = mb_strlen($folder);
+                                      $product_code = mb_substr($folder,0,$num);
+                                      $inspec_date = substr($file,0,4)."-".substr($file,4,2)."-".substr($file,6,2);
+                                      $kind_kensa = substr($folder,$num+1,$len);
 
-                                    $arrIm_heads[] = $product_id;
-                                    $arrIm_heads[] = $kind_kensa;
-                                    $arrIm_heads[] = $inspec_date;
-                                    $arrIm_heads[] = ${"arruniLot_num".$countname}[$k-1];
-                              //      $arrIm_heads[] = $lot_num;
-                                    $arrIm_heads[] = 0;
-                                    $arrIm_heads[] = 0;
+                                    	$ProductData = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                    	$product_id = $ProductData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
 
-                                    $name_heads = array('product_id', 'kind_kensa', 'inspec_date', 'lot_num', 'torikomi', 'delete_flag');
-                                    $arrIm_heads = array_combine($name_heads, $arrIm_heads);
-                                    $arrIm_head[] = $arrIm_heads;
-                                  }
-                                  //  echo "<pre>";
-                                  //  print_r($arrIm_head);
-                                  //  echo "<br>";
+                                      $arrIm_heads[] = $product_id;
+                                      $arrIm_heads[] = $kind_kensa;
+                                      $arrIm_heads[] = $inspec_date;
+                                      $arrIm_heads[] = ${"arruniLot_num".$countname}[$k-1];
+                                      $arrIm_heads[] = 0;
+                                      $arrIm_heads[] = 0;
+
+                                      $name_heads = array('product_id', 'kind_kensa', 'inspec_date', 'lot_num', 'torikomi', 'delete_flag');
+                                      $arrIm_heads = array_combine($name_heads, $arrIm_heads);
+                                      $arrIm_head[] = $arrIm_heads;
+                                    }
+                              //      echo "<pre>";
+                              //      print_r($arrIm_head);
+                              //      echo "<br>";
 
                                      //ImSokuteidataHeadsデータベースに登録
                                     $imSokuteidataHeads = $this->ImSokuteidataHeads->newEntity();//newentityに$userという名前を付ける
@@ -173,7 +166,10 @@ class SyukkaKensasController extends AppController {
                                           //ImKikakusの登録用データをセット
                                           $cnt = count($arrFp[1]);
                                           $arrImKikakus = array_slice($arrFp , 1, 3);
+
+                                        for ($m=1; $m<=$cntLot; $m++) {
                                           for ($k=7; $k<=$cnt-2; $k++) {//
+
                                             $arrIm_kikaku_data = array();
 
                                             $size_num = $k-6;
@@ -181,7 +177,8 @@ class SyukkaKensasController extends AppController {
                                             $upper = $arrImKikakus[1][$k];
                                             $lower = $arrImKikakus[2][$k];
 
-                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+
+                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1]])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
                                             $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
 
                                             $arrIm_kikaku_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -193,7 +190,11 @@ class SyukkaKensasController extends AppController {
                                             $arrIm_kikaku_data = array_combine($name_kikaku, $arrIm_kikaku_data);
 
                                             $arrIm_kikaku[] = $arrIm_kikaku_data;
-                                         }
+                                          }
+                                        }
+                                  //      echo "<pre>";
+                                  //      print_r($arrIm_kikaku);
+                                  //      echo "<br>";
 
                                            //ImKikakusデータベースに登録
                                           $imKikakus = $this->ImKikakus->newEntity();//newentityに$userという名前を付ける
@@ -214,7 +215,11 @@ class SyukkaKensasController extends AppController {
                                                       $result = $arrImResults[$j][$k];
                                                       $status = $arrImResults[$j][4];
 
-                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                              //        echo "<pre>";
+                                              //        print_r($arrFp[$j+4][2]);
+                                              //        echo "<br>";
+
+                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2]])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
                                                       $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
 
                                                       $arrIm_Result_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -229,6 +234,9 @@ class SyukkaKensasController extends AppController {
                                                       $arrIm_Result[] = $arrIm_Result_data;
                                                   }
                                                  }
+                                              //   echo "<pre>";
+                                              //   print_r($arrIm_Result);
+                                              //   echo "<br>";
 
                                                   //ImSokuteidataResultsデータベースに登録
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->newEntity();//newentityに$userという名前を付ける
@@ -258,7 +266,7 @@ class SyukkaKensasController extends AppController {
                                    print_r('else ');
                                   }
 
-                                $output_dir = 'backupData_IM測定/'.$folder;
+                      /*          $output_dir = 'backupData_IM測定/'.$folder;
                                   if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
                                    if (mkdir($output_dir)) {
                                       $Filebi2 = mb_substr($file,0,-4);
@@ -281,7 +289,7 @@ class SyukkaKensasController extends AppController {
                                         }
                                     }
                                   }
-                               }
+                        */       }
                              }
                           }
                 	 		}

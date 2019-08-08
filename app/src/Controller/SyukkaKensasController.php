@@ -60,6 +60,7 @@ class SyukkaKensasController extends AppController {
                                     $this->set('product_name'.$countname,${"product_name".$countname});//セット
                                     $this->set('inspec_date'.$countname,${"inspec_date".$countname});//セット
                                     $this->set('countname',$countname);//セット
+
                                     }
                                }
                              }else{
@@ -72,6 +73,15 @@ class SyukkaKensasController extends AppController {
      	        }//フォルダーであるなら
      	      }
     	    }//親whileの終わり
+//          $dirNAS = 'test19080501/test.csv';//webroot内のフォルダ
+      //    $dirNAS = 'file://LS210D291/test190805/test.csv';
+          $dirNAS = 'Controller/supplier.csv';//ROOT
+      //    $dirNAS = '//192.168.1.250/LS210D291/test190805/test12.csv';
+
+          $fp = fopen($dirNAS, "r");
+          $line = fgets($fp);
+          print_r($line);
+
     	  }
      }
     }
@@ -282,7 +292,7 @@ class SyukkaKensasController extends AppController {
                                   } else {//backupData_IM測定の中に$folderがあるとき
                                     $Filebi2 = mb_substr($file,0,-4);
                                     if (copy($dirName.$folder.'/'.$file, $output_dir.'/'.$file) && copy($dirName.$folder.'/'.$Filebi2."005.bi2", $output_dir.'/'.$Filebi2."005.bi2")) {
-                                      $toCopyFile = "sumi_".$file;
+                                      $toCopyFile = "sumi_".$countname."_".$file;
                                         if (rename($output_dir.'/'.$file, $output_dir.'/'.$toCopyFile)) {//ファイル名変更
                                           unlink($dirName.$folder.'/'.$file);
                                           unlink($dirName.$folder.'/'.$Filebi2."005.bi2");

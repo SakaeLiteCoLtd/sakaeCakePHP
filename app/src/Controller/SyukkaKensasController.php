@@ -7,6 +7,8 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 use Cake\Datasource\ConnectionManager;//トランザクション
 use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
+use Cake\Filesystem\Folder;
+use Cake\Filesystem\File;
 
 class SyukkaKensasController extends AppController {
 
@@ -73,12 +75,35 @@ class SyukkaKensasController extends AppController {
      	        }//フォルダーであるなら
      	      }
     	    }//親whileの終わり
-//          $dirNAS = 'test19080501/test.csv';//webroot内のフォルダ
+          $dirNAS1 = 'test19080501/';//webroot内のフォルダ
       //    $dirNAS = 'file://LS210D291/test190805/test.csv';
-          $dirNAS = 'Controller/supplier.csv';//ROOT
-      //    $dirNAS = '//192.168.1.250/LS210D291/test190805/test12.csv';
+//          App::uses('Folder', 'Utility');
+          $dir1 = new Folder('test19080501/', true);
+          if($dir2 = opendir($dirNAS1)){
+            while(($folder1 = readdir($dir2)) !== false){
+              if($folder1 != '.' && $folder1 != '..'){
+                if(strpos($folder1,'.',0)==''){
+                  if(is_dir($dir1.$folder1)){
+                    if($child_dir1 = opendir($dir1.$folder1)){
+                      $folder_check = 0;
+                      if(strpos($folder1,'_',0)==''){
+                        $folder_check = 1;
+                      }else{
+                        $fp = fopen($dir, "r");
+                        $line = fgets($fp);
+                        print_r($line);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
 
-          $fp = fopen($dirNAS, "r");
+          $dirNAS = $dir1.'test12.csv';//webroot以外のファイルを見る実験
+      //    $dirNAS = '//192.168.1.250/LS210D291/test190805/test12.csv';
+//      $dirNAS = 'file://Users/info/sakaeCakePHP/app/webroot/test19080501/test12.csv';
+          $fp = fopen($dir, "r");
           $line = fgets($fp);
           print_r($line);
 

@@ -36,6 +36,8 @@
       </tr>
 
       <?php
+    //  echo $this->Url->build("/MLD-MD-20032_jigu");
+
       for($i=1; $i<=$countname; $i++){
         echo '<tr><td><div align="center">';
         echo (${"product_code".$i}) ;

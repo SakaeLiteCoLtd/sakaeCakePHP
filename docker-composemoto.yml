@@ -1,5 +1,4 @@
 version: '3'
-#version: '2'
 services:
   web:
     container_name: php-book-app-web
@@ -17,14 +16,6 @@ services:
       - DATABASE_NAME=sakaedb
     ports:
       - "5000:80"
-#    networks:
-#      default:
-#        ipv4_address: 172.22.0.5
-#        ipv4_address: 192.168.1.249
-    extra_hosts:
-      - "local_dev:192.168.1.144"
-#http://192.168.1.144:5000/
-
   db:
     container_name: php-book-app-db
     build:
@@ -37,16 +28,3 @@ services:
       - MYSQL_ROOT_PASSWORD=secret
     ports:
       - "13306:3306"
-#    networks:#dbはnetwork不要(自動で割り当てられる)
-#      default:
-#        ipv4_address: 192.168.1.248
-
-networks:
-  default:
-    driver: bridge
-    ipam:
-     config:
-#       - subnet: 192.168.1.0/24
-       - subnet: 172.22.0.0/16
-#         gateway: 192.168.1.1
-#         gateway: 172.22.0.1

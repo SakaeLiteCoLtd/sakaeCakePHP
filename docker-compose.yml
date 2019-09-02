@@ -23,7 +23,7 @@ services:
 #        ipv4_address: 192.168.1.249
     extra_hosts:
       - "local_dev:192.168.1.144"
-#http://192.168.1.144:5000/
+#http://192.168.1.144:5000でアクセスできる
 
   db:
     container_name: php-book-app-db

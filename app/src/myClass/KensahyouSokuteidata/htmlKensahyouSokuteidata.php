@@ -19,7 +19,7 @@ class htmlKensahyouSokuteidata extends AppController
 
 	public function htmlHeaderKensahyouSokuteidata($product_id)
 	{
-        $html = 
+        $html =
                 "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
                   "<td width='100' colspan='4'>&nbsp;</td>\n".
                   "<td width='50' colspan='2'><div align='center'><strong>A</strong></div></td>\n".
@@ -77,7 +77,7 @@ class htmlKensahyouSokuteidata extends AppController
                 $html = $html.$size;
                 $html = $html."</div></td>\n";
             }
-
+/*
         $html = $html.
         "</tr>\n".
         "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
@@ -93,7 +93,7 @@ class htmlKensahyouSokuteidata extends AppController
           "<td colspan='2'>&nbsp;</td>\n".
           "<td colspan='2'>&nbsp;</td>\n".
         "</tr>\n";
-
+*/
 		return $html;
 		$this->html = $html;
 		$this->data = $KensahyouHeads;

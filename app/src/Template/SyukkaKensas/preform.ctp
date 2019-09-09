@@ -86,10 +86,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
-    
+
     <fieldset>
     <?= $this->Form->control('product_code1', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
     <?= $this->Form->control('product_name1', array('type'=>'hidden', 'value'=>$Productname, 'label'=>false)) ?>
+    <?= $this->Form->control('kind_kensa', array('type'=>'hidden', 'value'=>$kind_kensa, 'label'=>false)) ?>
     </fieldset>
 
     <?= $this->Form->end() ?>

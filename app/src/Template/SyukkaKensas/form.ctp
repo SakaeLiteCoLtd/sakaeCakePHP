@@ -100,6 +100,27 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
      echo $htmlKensahyouHeader;
 ?>
 
+        <tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>
+          <td width='24' colspan='4'><div align='center'><strong>検査種類</strong></div></td>
+          <?php
+            for($i=1; $i<=8; $i++){
+              echo "<td colspan='2'><div align='center'>\n";
+              if(isset(${"ImSokuteidata_result_".$i."_1"})){//もしも
+                echo "<div align='center'><strong>\n";
+                echo $kind_kensa;
+                echo "</strong></div>\n";
+//                  echo "<input type='text' value='test' size='6'/>\n";
+                } else {
+                  echo "<div align='center'><strong>ノギス</strong></div>\n";
+                }
+                  echo "</div></td>\n";
+              }
+              echo "</td>\n";
+          ?>
+          <td colspan='2'>&nbsp;</td>
+          <td colspan='2'>&nbsp;</td>
+        </tr>
+
         <?php
             $lowerArraygyou = Array();
             for($j=1; $j<=8; $j++){

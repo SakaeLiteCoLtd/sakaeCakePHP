@@ -177,6 +177,9 @@ class SyukkaKensasController extends AppController {
                                       $inspec_date = substr($file,0,4)."-".substr($file,4,2)."-".substr($file,6,2);
                                       $kind_kensa = substr($folder,$num+1,$len);
 
+                                      $session = $this->request->session();
+                                      $session->write('kind_kensa', $kind_kensa);
+
                                     	$ProductData = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
                                     	$product_id = $ProductData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
 
@@ -359,6 +362,8 @@ class SyukkaKensasController extends AppController {
       $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
       $product_name = $session->read('product_name');
       $this->set('Productname',$product_name);//セット
+      $kind_kensa = $session->read('kind_kensa');
+      $this->set('kind_kensa',$kind_kensa);//セット
 
     	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
     	->select(['product_id','delete_flag' => '0'])
@@ -417,9 +422,12 @@ class SyukkaKensasController extends AppController {
       $this->set('Productname',$product_name);//セット
       $lot_num = $data['lot_num'];
       $this->set('lot_num',$lot_num);//セット
-/*
+      $kind_kensa = $data['kind_kensa'];
+      $this->set('kind_kensa',$kind_kensa);//セット
+      /*
+
       echo "<pre>";
-      print_r($lot_num);
+      print_r($kind_kensa);
       echo "</pre>";
 
       $session = $this->request->session();

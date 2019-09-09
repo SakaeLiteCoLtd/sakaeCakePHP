@@ -213,10 +213,7 @@ class KensahyouSokuteidatasController  extends AppController
     {
     	$data = $this->request->getData();//postデータを$dataに
     	$product_code_num = $data['product_code_num'];//$dataのproduct_code_num（ctpで選択した$arrProductcode）に$product_code_numという名前を付ける
-    /*	echo "<pre>";
-    	print_r($product_code_num);
-    	echo "</pre>";
-    */
+
     /*	$KensahyouHeads = $this->KensahyouHeads->find('all',[
     		'conditions' => ['delete_flag' => '0'],//条件'delete_flag' => '0'
     		'group' => array('product_id'),//product_idが同じものをまとめる
@@ -285,6 +282,11 @@ class KensahyouSokuteidatasController  extends AppController
      public function confirm()//「出荷検査表登録」確認画面
     {
     	$data = $this->request->getData();//postデータを$dataに
+
+/*      	echo "<pre>";
+      	print_r($data['lot_num']);
+      	echo "</pre>";
+*/
 
     	$product_code = $data['product_code'];//$dataの'product_code'を$product_codeに
     	$this->set('product_code',$product_code);//セット

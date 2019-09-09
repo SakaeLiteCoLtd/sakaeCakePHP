@@ -45,7 +45,8 @@ class AppController extends Controller
 
 //		$this->Auth->allow(['index', 'view', 'display','page','search','preadd']);
 		$this->Auth->allow();
-		$this->Auth->deny('do');
+//		$this->Auth->deny('do');
+		$this->Auth->deny('index3');
    }
 
 

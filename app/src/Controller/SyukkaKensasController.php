@@ -9,6 +9,7 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 use Cake\Filesystem\Folder;
 use Cake\Filesystem\File;
+use App\myClass\KensahyouSokuteidata\htmlKensahyouSokuteidata;//myClassフォルダに配置したクラスを使用
 
 class SyukkaKensasController extends AppController {
 
@@ -19,6 +20,7 @@ class SyukkaKensasController extends AppController {
      $this->ImKikakus = TableRegistry::get('imKikakus');//productsテーブルを使う
      $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//productsテーブルを使う
      $this->Products = TableRegistry::get('products');//productsテーブルを使う
+     $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
     }
 
     public function index()
@@ -63,7 +65,10 @@ class SyukkaKensasController extends AppController {
                                     $this->set('inspec_date'.$countname,${"inspec_date".$countname});//セット
                                     $this->set('countname',$countname);//セット
 
-                                    }
+                                    $session = $this->request->session();
+                                    $session->write('product_code', ${"product_code".$countname});
+                                    $session->write('product_name', ${"product_name".$countname});
+                                  }
                                }
                              }else{
                               $this->set('countname',$countname);//セット
@@ -75,7 +80,9 @@ class SyukkaKensasController extends AppController {
      	        }//フォルダーであるなら
      	      }
     	    }//親whileの終わり
-          $dirNAS1 = 'test19080501/';//webroot内のフォルダ
+
+//NASテスト
+/*          $dirNAS1 = 'test19080501/';//webroot内のフォルダ
       //    $dirNAS = 'file://LS210D291/test190805/test.csv';
 //          App::uses('Folder', 'Utility');
           $dir1 = new Folder('test19080501/', true);
@@ -100,13 +107,13 @@ class SyukkaKensasController extends AppController {
             }
           }
 
-          $dirNAS = $dir1.'test12.csv';//webroot以外のファイルを見る実験
+/*          $dirNAS = $dir1.'test12.csv';//webroot以外のファイルを見る実験
       //    $dirNAS = '//192.168.1.250/LS210D291/test190805/test12.csv';
 //      $dirNAS = 'file://Users/info/sakaeCakePHP/app/webroot/test19080501/test12.csv';
           $fp = fopen($dir, "r");
           $line = fgets($fp);
           print_r($line);
-
+*/
     	  }
      }
     }
@@ -300,7 +307,7 @@ class SyukkaKensasController extends AppController {
                                   }else{
                                    print_r('else ');
                                   }
-
+/*
                                 $output_dir = 'backupData_IM測定/'.$folder;
                                   if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
                                    if (mkdir($output_dir)) {
@@ -324,7 +331,7 @@ class SyukkaKensasController extends AppController {
                                         }
                                     }
                                   }
-                               }
+*/                               }
                              }
                           }
                 	 		}
@@ -335,7 +342,138 @@ class SyukkaKensasController extends AppController {
      	    }//親whileの終わり
     	  }
     	}
-      return $this->redirect(['action' => 'index']);
+/*      $session = $this->request->session();
+      $sampleData = $session->read('person1');
+    	echo "<pre>";
+    	print_r($sampleData);
+    	echo "</pre>";
+*/
+
+      return $this->redirect(['action' => 'preform']);
+    }
+
+    public function preform()//「出荷検査表登録」ページで検査結果を入力
+    {
+      $session = $this->request->session();
+      $product_code = $session->read('product_code');
+      $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
+      $product_name = $session->read('product_name');
+      $this->set('Productname',$product_name);//セット
+
+    	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
+    	->select(['product_id','delete_flag' => '0'])
+    	->group('product_id');
+
+    	$staff_id = $this->Auth->user('staff_id');//created_staffの登録用
+    	$this->set('staff_id',$staff_id);//セット
+
+      $this->loadModel("KensahyouSokuteidatas");
+      $kensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();//newentityに$userという名前を付ける
+    	$this->set('kensahyouSokuteidata',$kensahyouSokuteidatas);//空のカラムに$KensahyouSokuteidataと名前を付け、ctpで使えるようにセット
+
+    	$Products = $this->Products->find('all',[
+    		'conditions' => ['product_code =' => $product_code]//Productsテーブルの'product_code' = $product_codeとなるものを$Productsとする
+    	]);
+
+    	 foreach ($Products as $value) {//$Productsそれぞれに対し
+    		$product_id= $value->id;//idに$product_idと名前を付ける
+    	}
+    	$this->set('product_id',$product_id);//セット
+
+    	$htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+    	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
+    	$this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+
+    	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
+    	$Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+    	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_id' => $Productid])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
+    	$this->set('KensahyouHead',$KensahyouHead);//セット
+
+    	$KensahyouHeadver = $KensahyouHead[0]->version+1;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+    	$this->set('KensahyouHeadver',$KensahyouHeadver);//セット
+
+    	$KensahyouHeadid = $KensahyouHead[0]->id;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のidに$KensahyouHeadidと名前を付ける
+    	$this->set('KensahyouHeadid',$KensahyouHeadid);//セット
+
+    	for($i=1; $i<=9; $i++){//size_1～9までセット
+    		${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
+    		$this->set('size_'.$i,${"size_".$i});//セット
+    	}
+
+    	for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
+    		${"upper_".$j} = $KensahyouHead[0]->{"upper_{$j}"};//KensahyouHeadのupper_1～8まで
+    		$this->set('upper_'.$j,${"upper_".$j});//セット
+    		${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
+    		$this->set('lower_'.$j,${"lower_".$j});//セット
+    	}
+    }
+
+    public function form()//「出荷検査表登録」ページで検査結果を入力
+    {
+      $data = $this->request->getData();//postデータを$dataに
+      $product_code = $data['product_code1'];
+      $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
+      $product_name = $data['product_name1'];
+      $this->set('Productname',$product_name);//セット
+      $lot_num = $data['lot_num'];
+      $this->set('lot_num',$lot_num);//セット
+/*
+      echo "<pre>";
+      print_r($lot_num);
+      echo "</pre>";
+
+      $session = $this->request->session();
+      $product_code = $session->read('product_code');
+      $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
+      $product_name = $session->read('product_name');
+      $this->set('Productname',$product_name);//セット
+*/
+    	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
+    	->select(['product_id','delete_flag' => '0'])
+    	->group('product_id');
+
+    	$staff_id = $this->Auth->user('staff_id');//created_staffの登録用
+    	$this->set('staff_id',$staff_id);//セット
+
+      $this->loadModel("KensahyouSokuteidatas");
+      $kensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();//newentityに$userという名前を付ける
+    	$this->set('kensahyouSokuteidata',$kensahyouSokuteidatas);//空のカラムに$KensahyouSokuteidataと名前を付け、ctpで使えるようにセット
+
+    	$Products = $this->Products->find('all',[
+    		'conditions' => ['product_code =' => $product_code]//Productsテーブルの'product_code' = $product_codeとなるものを$Productsとする
+    	]);
+
+    	 foreach ($Products as $value) {//$Productsそれぞれに対し
+    		$product_id= $value->id;//idに$product_idと名前を付ける
+    	}
+    	$this->set('product_id',$product_id);//セット
+
+    	$htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+    	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
+    	$this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+
+    	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
+    	$Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+    	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_id' => $Productid])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
+    	$this->set('KensahyouHead',$KensahyouHead);//セット
+
+    	$KensahyouHeadver = $KensahyouHead[0]->version+1;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+    	$this->set('KensahyouHeadver',$KensahyouHeadver);//セット
+
+    	$KensahyouHeadid = $KensahyouHead[0]->id;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のidに$KensahyouHeadidと名前を付ける
+    	$this->set('KensahyouHeadid',$KensahyouHeadid);//セット
+
+    	for($i=1; $i<=9; $i++){//size_1～9までセット
+    		${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
+    		$this->set('size_'.$i,${"size_".$i});//セット
+    	}
+
+    	for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
+    		${"upper_".$j} = $KensahyouHead[0]->{"upper_{$j}"};//KensahyouHeadのupper_1～8まで
+    		$this->set('upper_'.$j,${"upper_".$j});//セット
+    		${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
+    		$this->set('lower_'.$j,${"lower_".$j});//セット
+    	}
     }
 
 }

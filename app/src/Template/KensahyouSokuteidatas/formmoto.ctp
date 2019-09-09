@@ -33,8 +33,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td colspan="4" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
           <td colspan="8"><?= h($KensahyouHeadver) ?></td>
           <td colspan="4" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
-          <td colspan="6"><?= $this->Form->input("lot_num", array('type' => 'text', 'label'=>false)); ?></td>
-          <td colspan="2" nowrap="nowrap"><div align="center"><?= $this->Form->submit(__('取り込み'), array('name' => 'top')); ?></div></td>
+          <td colspan="8"><?= $this->Form->input("lot_num", array('type' => 'text', 'label'=>false)); ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="4" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
@@ -82,4 +81,5 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
+    <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>

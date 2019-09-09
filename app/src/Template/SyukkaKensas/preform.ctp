@@ -16,8 +16,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Pragma:');
 
           echo $this->Form->hidden('product_code' ,['value'=>$product_code ]) ;
-          echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'confirm']]);
+          echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'form']]);
         ?>
+
 
     <fieldset>
 <div align="center"><strong><font color="red">＊入力してください</font></strong></div>
@@ -42,6 +43,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td colspan="4" nowrap="nowrap"><div align="center"><strong>検査年月日</strong></div></td>
           <td colspan="8"><?= $this->Form->input("inspec_date", array('type' => 'date', 'label'=>false)); ?></td>
         </tr>
+
 <?php
      echo $htmlKensahyouHeader;
 ?>
@@ -73,6 +75,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
        <tr>
 </table>
 <br>
+
+
 <strong>　　*備考の欄内にはソリ・フレ値・外観の検査基準を外観の規格欄内の値と関連付けてください。</strong>
         <?php
             echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
@@ -82,4 +86,10 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
+    
+    <fieldset>
+    <?= $this->Form->control('product_code1', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
+    <?= $this->Form->control('product_name1', array('type'=>'hidden', 'value'=>$Productname, 'label'=>false)) ?>
+    </fieldset>
+
     <?= $this->Form->end() ?>

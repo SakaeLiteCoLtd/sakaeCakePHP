@@ -56,50 +56,44 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
   $ImKikaku_id = $ImKikaku[0]->size;
 
   $KensahyouHead = $this->KensahyouHeads->find()->where(['id' => $KensahyouHeadid])->toArray();
-
-  $k = 0;
-  $l = 0;
-    for($j=0; $j<=10; $j++){
-      if(isset($ImKikaku[$j])){
-        $k = $k + 1;
-        ${"im_size_".$k} = $ImKikaku[$j]['size'];
-//        echo "<pre>";
-//        echo ${"im_size_".$k};
-//        echo "</pre>";
-    	} else {
-//        echo "<pre>";
-//        echo $k;
-//        echo "</pre>";
-        $ImKikaku_num = $k;
-        break;
-      }
-    }
+    $l = 0;
     for($m=1; $m<=10; $m++){
       if(isset($KensahyouHead[0]["size_".$m])){
         $l = $l + 1;
         ${"Kensahyou_size_".$m} = $KensahyouHead[0]["size_".$m];
+        $ImKikaku = $this->ImKikakus->find()->where(['size' => ${"Kensahyou_size_".$m}])->toArray();
+        ${"ImKikaku_size_num_".$m} = $ImKikaku[0]->size_num;
 //        echo "<pre>";
 //        echo ${"Kensahyou_size_".$m};
 //        echo "</pre>";
-    	} else {
-//        echo "<pre>";
-//        echo $l;
+//         echo "<pre>";
+//        echo ${"ImKikaku_size_num_".$m};
 //        echo "</pre>";
-        $KensahyouHead_num = $l;
-        break;
+    	 } else {
+         $KensahyouHead_num = $l;
+         break;
       }
     }
 
-    for($p=1; $p<=$ImKikaku_num; $p++){
-      echo "<pre>";
-      echo ${"im_size_".$p};
-      echo "</pre>";
-    }
-    for($q=1; $q<=$KensahyouHead_num; $q++){
-      echo "<pre>";
-      echo ${"Kensahyou_size_".$q};
-      echo "</pre>";
-    }
+     for($q=1; $q<=$KensahyouHead_num; $q++){
+       $ImSokuteidataResult = $this->ImSokuteidataResults->find()->where(['size_num' => ${"ImKikaku_size_num_".$q}])->toArray();
+       foreach ((array) $ImSokuteidataResult as $key => $value) {
+            $sort[$key] = $value['serial'];
+        }
+       array_multisort($sort, SORT_ASC, $ImSokuteidataResult);
+//       echo "<pre>";
+//       print_r ($ImSokuteidataResult);
+//       echo "</pre>";
+       $cnt = count($ImSokuteidataResult);
+       for($r=1; $r<=$cnt; $r++){
+         $r1 = $r-1;
+         ${"ImSokuteidata_result_".$q."_".$r} = $ImSokuteidataResult[$r1]->result;
+//             echo "<pre>";
+//             echo ${"ImSokuteidata_result_".$q."_".$r};
+//             echo "</pre>";
+         }
+      }
+
   ?>
 
 <?php
@@ -115,8 +109,8 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
                     $resultArray = Array();
                     for($i=1; $i<=9; $i++){
                         echo "<td colspan='2'><div align='center'>\n";
-                      if($i == 1){//もしも${"Kensahyou_size_".$m}=${"im_size_".$k}…size_num=$kのresultをserial=0001~0004まで表示
-                        echo "<input type='text' name=result_size_".$j."_".$i." value=$i size='6'/>\n";
+                      if(isset(${"ImSokuteidata_result_".$i."_".$j})){//もしも
+                        echo "<input type='text' name=result_size_".$j."_".$i." value=${"ImSokuteidata_result_".$i."_".$j} size='6'/>\n";
                       } else {
                         echo "<input type='text' name=result_size_".$j."_".$i." value='' size='6'/>\n";
                       }

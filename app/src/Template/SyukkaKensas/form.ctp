@@ -88,6 +88,7 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
        for($r=1; $r<=$cnt; $r++){
          $r1 = $r-1;
          ${"ImSokuteidata_result_".$q."_".$r} = $ImSokuteidataResult[$r1]->result;
+         ${"ImSokuteidata_result_".$q."_".$r} = round(${"ImSokuteidata_result_".$q."_".$r},2);
 //             echo "<pre>";
 //             echo ${"ImSokuteidata_result_".$q."_".$r};
 //             echo "</pre>";
@@ -154,11 +155,12 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
 <br>
 <strong>　　*備考の欄内にはソリ・フレ値・外観の検査基準を外観の規格欄内の値と関連付けてください。</strong>
         <?php
-            echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
-            echo $this->Form->hidden('product_code' ,['value'=>$product_code]) ;
-            echo $this->Form->hidden('delete_flag' ,['value'=>0]);
-            echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);
-            echo $this->Form->hidden('updated_staff');
+        echo $this->Form->hidden('inspec_date' ,['value'=>$inspec_date]);
+        echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
+        echo $this->Form->hidden('product_code' ,['value'=>$product_code]) ;
+        echo $this->Form->hidden('delete_flag' ,['value'=>0]);
+        echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);
+        echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
     <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>

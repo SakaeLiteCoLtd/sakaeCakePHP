@@ -57,13 +57,13 @@ class ImKikakuTaiousTable extends Table
 
         $validator
             ->maxLength('kind_kensa', 255)
-            ->requirePresence('kind_kensa', 'create')
-            ->notEmpty('kind_kensa');
+//            ->requirePresence('kind_kensa', 'create')
+            ->allowEmpty('kind_kensa');
 
         $validator
             ->integer('size_num')
-            ->requirePresence('size_num', 'create')
-            ->notEmpty('size_num');
+//            ->requirePresence('size_num', 'create')
+            ->allowEmpty('size_num');
 
         return $validator;
     }

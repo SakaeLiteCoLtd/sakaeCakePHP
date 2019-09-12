@@ -31,6 +31,8 @@ class htmlKensahyouSokuteidata extends AppController
                   "<td width='50' colspan='2'><div align='center'><strong>G</strong></div></td>\n".
                   "<td width='50' colspan='2'><div align='center'><strong>H</strong></div></td>\n".
                   "<td width='80' nowrap='nowrap' colspan='2'><div align='center'><font size='-3'><strong>ソリ・フレ</strong></font></div></td>\n".
+                  "<td width='80' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観１</strong></font></div></td>\n".
+                  "<td width='80' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観２</strong></font></div></td>\n".
                   "<td width='100' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>単重</strong></font></div></td>\n".
                 "</tr>\n".
                 "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
@@ -50,8 +52,10 @@ class htmlKensahyouSokuteidata extends AppController
             }
 
         $html = $html.
-          "<td colspan='2'><div align='center'></div></td>\n".
-          "<td rowspan='3' colspan='2'>&nbsp;</td>\n".
+        "<td colspan='2'><div align='center'></div></td>\n".
+        "<td colspan='2'><div align='center'></div></td>\n".
+        "<td colspan='2'><div align='center'></div></td>\n".
+        "<td rowspan='3' colspan='2'>&nbsp;</td>\n".
           "</tr>\n".
           "<tr>\n".
           "<td nowrap='nowrap' colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'><strong>下限</strong></div></td>\n";
@@ -59,12 +63,14 @@ class htmlKensahyouSokuteidata extends AppController
             for($l=1; $l<=8; $l++){
         		$lower= $value->{"lower_{$l}"};//
                 $html = $html.
-                        "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'>\n";
+                        "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'><font size='-1'>\n";
                 $html = $html.$lower;
-                $html = $html."</div></td>\n";
+                $html = $html."</font></div></td>\n";
             }
 
         $html = $html.
+          "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'></div></td>\n".
+          "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'></div></td>\n".
           "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'></div></td>\n".
           "</tr>\n".
           "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
@@ -77,6 +83,10 @@ class htmlKensahyouSokuteidata extends AppController
                 $html = $html.$size;
                 $html = $html."</div></td>\n";
             }
+            $html = $html.
+            "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'></div></td>\n".
+            "<td colspan='2'><div align='center'></div></td>\n";
+
 /*
         $html = $html.
         "</tr>\n".

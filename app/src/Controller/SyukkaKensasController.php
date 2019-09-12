@@ -29,11 +29,7 @@ class SyukkaKensasController extends AppController {
     public function index()
     {
       //メニュー画面
-      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-      echo "<pre>";
-  		print_r($data["product_code"]);
-//  		var_dump($data);
-  		echo "<br>";
+
 
     }
 
@@ -47,23 +43,36 @@ class SyukkaKensasController extends AppController {
     {
     	$this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-//      echo "<pre>";
-//  		print_r($data["product_code"]);
-//  		var_dump($data);
-//  		echo "<br>";
+
+/*      echo "<pre>";
+ 		  print_r($data["product_code"]);
+ 	  	echo "<br>";
+*/
       $product_code = $data["product_code"];
       $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-    	$product_name = $Product[0]->product_name;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
-      $this->set('Productname',$product_name);//セット
+    	$product_id = $Product[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+      $this->set('product_id',$product_id);//セット
+      $Productname = $Product[0]->product_name;
+      $this->set('Productname',$Productname);//セット
 
-    	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
-    	->select(['product_id','delete_flag' => '0'])
-    	->group('product_id');
+      $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()//KensahyouSokuteidatasテーブルの中で
+    	->where(['product_id' => $product_id])->toArray();
+      $kind_kensa = $ImSokuteidataHeads[0]->kind_kensa;
 
-    	$staff_id = $this->Auth->user('staff_id');//created_staffの登録用
-    	$this->set('staff_id',$staff_id);//セット
+      $arrKindKensa = array("","ノギス");//配列の初期化
+    	 	foreach ($ImSokuteidataHeads as $value) {//それぞれに対して
+    			$arrKindKensa[] = $value->kind_kensa;//配列に追加
+    		}
+        $arrKindKensa = array_unique($arrKindKensa);
+      $this->set('ImSokuteidataHeads',$ImSokuteidataHeads);//セット
+      $this->set('arrKindKensa',$arrKindKensa);//セット
 
+/*
+      echo "<pre>";
+ 		  print_r($arrKindKensa);
+ 	  	echo "<br>";
+*/
       $this->loadModel("KensahyouSokuteidatas");
       $kensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();//newentityに$userという名前を付ける
     	$this->set('kensahyouSokuteidata',$kensahyouSokuteidatas);//空のカラムに$KensahyouSokuteidataと名前を付け、ctpで使えるようにセット
@@ -108,26 +117,123 @@ class SyukkaKensasController extends AppController {
 
     public function imtaiouconfirm()//IMtaiou
     {
-    	$this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
-      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-      echo "<pre>";
-  		print_r($data);
-//  		var_dump($data);
-  		echo "<br>";
+      $session = $this->request->getSession();
+      $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
+      $data = $sessiondata['kikakudata'];
 
+//      echo "<pre>";
+//      print_r($data);
+//      echo "</pre>";
 
+     $product_id = $sessiondata['kikakudata'][1]['product_id'];//$dataの'product_code'を$product_codeに
+     $this->set('product_id',$product_id);//セット
+     $Product = $this->Products->find()->where(['id' => $product_id])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
+     $product_code = $Product[0]->product_code;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+     $this->set('product_code',$product_code);//セット
+     $Productname = $Product[0]->product_name;
+     $this->set('Productname',$Productname);//セット
+
+     $Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
+       'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
+     ]);
+     foreach ($Products as $value) {//上で見つけた$Productsに対して
+       $product_id= $value->id;//$Productsのidに$product_idと名前を付ける
+     }
+     $this->set('product_id',$product_id);//セット
+
+     $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//myClassフォルダに配置したクラスを使う
+     $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
+     $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+
+     $this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
     }
+
+    public function impreadd()
+    {
+      $this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
+
+     $session = $this->request->getSession();
+     $data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+     echo "<pre>";
+     print_r($data['kikakudata']);
+     echo "</pre>";
+    }
+
+   public function imlogin()
+   {
+     if ($this->request->is('post')) {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+       $ary = explode(',', $str);//$strを配列に変換
+
+       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+       $this->set('username', $username);
+       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+         if(empty($Userdata)){
+           $delete_flag = "";
+         }else{
+           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+           $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+         }
+           $user = $this->Auth->identify();
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'imtaioudo']);
+         }
+       }
+   }
+
 
     public function imtaioudo()//IMtaiou
     {
-    	$this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
-      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-      echo "<pre>";
-  		print_r($data);
-//  		var_dump($data);
-  		echo "<br>";
+   //   $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+   $session = $this->request->getSession();
+   $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
+   $data = $sessiondata['kikakudata'];
 
+   $product_id = $sessiondata['kikakudata'][1]['product_id'];//$dataの'product_code'を$product_codeに
+   $this->set('product_id',$product_id);//セット
+   $Product = $this->Products->find()->where(['id' => $product_id])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
+   $product_code = $Product[0]->product_code;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+   $this->set('product_code',$product_code);//セット
+   $Productname = $Product[0]->product_name;
+   $this->set('Productname',$Productname);//セット
 
+   $Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
+     'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
+   ]);
+   foreach ($Products as $value) {//上で見つけた$Productsに対して
+     $product_id= $value->id;//$Productsのidに$product_idと名前を付ける
+   }
+   $this->set('product_id',$product_id);//セット
+
+   $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//myClassフォルダに配置したクラスを使う
+   $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
+   $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+
+   $ImKikakuTaiou = $this->ImKikakuTaious->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
+   $this->set('ImKikakuTaiou',$ImKikakuTaiou);//セット
+
+      if ($this->request->is('get')) {//getなら登録
+        $ImKikakuTaiou = $this->ImKikakuTaious->patchEntities($ImKikakuTaiou, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+        $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+        $connection->begin();//トランザクション3
+        try {//トランザクション4
+            if ($this->ImKikakuTaious->saveMany($ImKikakuTaiou)) {//saveManyで一括登録
+              $connection->commit();// コミット5
+            } else {
+              $this->Flash->error(__('The KensahyouSokuteidatas could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            }
+        } catch (Exception $e) {//トランザクション7
+        //ロールバック8
+          $connection->rollback();//トランザクション9
+        }//トランザクション10
+      }
     }
 
     public function index2()//取り込み画面

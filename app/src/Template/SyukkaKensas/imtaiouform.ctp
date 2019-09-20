@@ -16,6 +16,16 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Pragma:');
 
           echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'imtaiouconfirm']]);
+/*
+          for($n=1; $n<=9; $n++){
+                  $resultArray = Array();
+                      $_SESSION['kikakudata'][$n] = array(
+                        'product_id' => $_POST['product_id'],
+                        "kind_kensa" => $_POST["kind_kensa_{$n}"],
+                        "size_num" => $_POST["size_num_{$n}"],
+                      );
+          }
+*/
         ?>
 
     <fieldset>

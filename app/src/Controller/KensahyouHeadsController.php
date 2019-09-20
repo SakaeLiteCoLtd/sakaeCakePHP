@@ -26,6 +26,7 @@ class KensahyouHeadsController  extends AppController
     public function index1()//検査表ヘッダー登録画面
     {
 	$this->set('entity',$this->KensahyouHeads->newEntity());//newEntity・テーブルに空の行を作る
+  //      $this->request->session()->destroy(); // セッションの破棄
 
 	$arrProducts = $this->Products->find('all', ['conditions' => ['delete_flag' => '0']])->order(['product_code' => 'ASC']);//Productsテーブルの、'delete_flag' => '0'となるデータをid順に並べる
 	$arrProduct = array();//配列の初期化

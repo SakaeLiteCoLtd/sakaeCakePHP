@@ -28,8 +28,9 @@ class ImKikakuTaious extends Entity
      * @var array
      */
     protected $_accessible = [
-        'product_id' => true,
-        'kind_kensa' => true,
-        'size_num' => true,
+      'product_id' => true,
+      'kensahyuo_num' => true,
+      'kind_kensa' => true,
+      'size_num' => true,
     ];
 }

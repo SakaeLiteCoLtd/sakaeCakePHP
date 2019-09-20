@@ -56,6 +56,7 @@ class KensahyouSokuteidata extends Entity
     protected $_accessible = [
         'kensahyou_heads_id' => true,
         'product_code' => true,
+        'lot_num' => true,
         'manu_date' => true,
         'inspec_date' => true,
         'cavi_num' => true,

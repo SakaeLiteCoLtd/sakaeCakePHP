@@ -19,36 +19,37 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
           header('Pragma:');
 
           echo $this->Form->hidden('product_code' ,['value'=>$product_code ]) ;
+//          echo $this->Form->hidden('lot_num', ['value'=>$lot_num]);
           echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'confirm']]);
         ?>
 
     <fieldset>
 <div align="center"><strong><font color="red">＊入力してください</font></strong></div>
 <br>
-    <table width="900" border="1" align="center" bordercolor="#000000" style="background-color: #FFFFFF">
+    <table width="1200" border="1" align="center" bordercolor="#000000" style="background-color: #FFFFFF">
         <tr style="border-bottom: solid;border-width: 1px">
-          <td colspan="4" nowrap="nowrap"><div align="center"><strong>部品番号</strong></div></td>
-          <td colspan="8" nowrap="nowrap"><?= h($product_code) ?></td>
-          <td colspan="4" nowrap="nowrap"><div align="center"><strong>部品名</strong></div></td>
-          <td colspan="8" nowrap="nowrap"><?= h($Productname) ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>部品番号</strong></div></td>
+          <td colspan="9" nowrap="nowrap"><?= h($product_code) ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>部品名</strong></div></td>
+          <td colspan="9" nowrap="nowrap"><?= h($Productname) ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
-          <td colspan="4" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
-          <td colspan="8"><?= h($KensahyouHeadver) ?></td>
-          <td colspan="4" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
-          <td colspan="8"><?= h($lot_num) ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
+          <td colspan="9"><?= h($KensahyouHeadver) ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
+          <td colspan="9"><?= h($lot_num) ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
-          <td colspan="4" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
-          <td colspan="8"><?= $this->Form->input("manu_date", array('type' => 'date', 'label'=>false)); ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
+          <td colspan="9"><?= $this->Form->input("manu_date", array('type' => 'date', 'label'=>false)); ?></td>
           <?php
             $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();
             $inspec_date = $ImSokuteidataHead[0]->inspec_date;
             $ImSokuteidataHead_id = $ImSokuteidataHead[0]->id;
 
           ?>
-          <td colspan="4" nowrap="nowrap"><div align="center"><strong>検査年月日</strong></div></td>
-          <td colspan="8"><?= h($inspec_date) ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>検査年月日</strong></div></td>
+          <td colspan="9"><?= h($inspec_date) ?></td>
         </tr>
 
   <?php
@@ -62,39 +63,36 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
         $l = $l + 1;
         ${"Kensahyou_size_".$m} = $KensahyouHead[0]["size_".$m];
         $ImKikaku = $this->ImKikakus->find()->where(['size' => ${"Kensahyou_size_".$m}])->toArray();
+        if(isset($ImKikaku[0])){
         ${"ImKikaku_size_num_".$m} = $ImKikaku[0]->size_num;
 //        echo "<pre>";
-//        echo ${"Kensahyou_size_".$m};
+//        echo $ImKikaku[0];
 //        echo "</pre>";
-//         echo "<pre>";
-//        echo ${"ImKikaku_size_num_".$m};
-//        echo "</pre>";
+      } else {
+        ${"ImKikaku_size_num_".$m} = 0;
+     }
     	 } else {
          $KensahyouHead_num = $l;
          break;
       }
     }
-
+/*
      for($q=1; $q<=$KensahyouHead_num; $q++){
-       $ImSokuteidataResult = $this->ImSokuteidataResults->find()->where(['size_num' => ${"ImKikaku_size_num_".$q}])->toArray();
-       foreach ((array) $ImSokuteidataResult as $key => $value) {
+       $ImSokuteidataResult = $this->ImSokuteidataResults->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHead_id , 'size_num' => ${"ImKikaku_size_num_".$q}])->toArray();
+       foreach ((array)$ImSokuteidataResult as $key => $value) {//serialで並び替え
             $sort[$key] = $value['serial'];
         }
-       array_multisort($sort, SORT_ASC, $ImSokuteidataResult);
-//       echo "<pre>";
-//       print_r ($ImSokuteidataResult);
-//       echo "</pre>";
-       $cnt = count($ImSokuteidataResult);
-       for($r=1; $r<=$cnt; $r++){
-         $r1 = $r-1;
-         ${"ImSokuteidata_result_".$q."_".$r} = $ImSokuteidataResult[$r1]->result;
-         ${"ImSokuteidata_result_".$q."_".$r} = round(${"ImSokuteidata_result_".$q."_".$r},2);
-//             echo "<pre>";
-//             echo ${"ImSokuteidata_result_".$q."_".$r};
-//             echo "</pre>";
-         }
+        if(isset($ImSokuteidataResult[0])){
+         array_multisort($sort, SORT_ASC, $ImSokuteidataResult);
+         $cnt = count($ImSokuteidataResult);
+         for($r=1; $r<=$cnt; $r++){
+           $r1 = $r-1;
+           ${"ImSokuteidata_result_".$q."_".$r} = $ImSokuteidataResult[$r1]->result;
+           ${"ImSokuteidata_result_".$q."_".$r} = round(${"ImSokuteidata_result_".$q."_".$r},2);
+          }
+        }
       }
-
+*/
   ?>
 
 <?php
@@ -106,16 +104,19 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
           <?php
             for($i=1; $i<=8; $i++){
               echo "<td colspan='2'><div align='center'>\n";
-              if(isset(${"ImSokuteidata_result_".$i."_1"})){//もしも
+      //        if(isset(${"ImSokuteidata_result_".$i."_1"})){//もしも
                 echo "<div align='center'><strong>\n";
-                echo $kind_kensa;
+                echo ${"kind_kensa".$i};
                 echo "</strong></div>\n";
-//                  echo "<input type='text' value='test' size='6'/>\n";
-                } else {
-                  echo "<div align='center'><strong>ノギス</strong></div>\n";
-                }
+      //        } else {
+      //            echo "<div align='center'><strong>ノギス</strong></div>\n";
+      //        }
                   echo "</div></td>\n";
               }
+              echo "</td>\n";
+              echo "<td colspan='2'>\n";
+              echo "</td>\n";
+              echo "<td colspan='2'>\n";
               echo "</td>\n";
           ?>
           <td colspan='2'>&nbsp;</td>
@@ -139,13 +140,17 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
                         echo "</div></td>\n";
                     }
                 echo "<td colspan='2'>\n";
+                echo "</td>\n";
+                echo "<td colspan='2'>\n";
+                echo "</td>\n";
+                echo "<td colspan='2'>\n";
                 echo "<input type='text' name=result_weight_".$j." value='' size='6'/>\n";
                 echo "</td>\n";
             }
         ?>
 
         </tr>
-          <td height="120" colspan="24" style="border-bottom: solid;border-width: 1px">
+          <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px">
 	      <strong>備考：</strong><br>
               <textarea name="bik"  cols="120" rows="10"></textarea>
           </td>
@@ -154,6 +159,7 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
 </table>
 <br>
 <strong>　　*備考の欄内にはソリ・フレ値・外観の検査基準を外観の規格欄内の値と関連付けてください。</strong>
+
         <?php
         echo $this->Form->hidden('inspec_date' ,['value'=>$inspec_date]);
         echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
@@ -164,4 +170,9 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
         ?>
     </fieldset>
     <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
+    <fieldset>
+      <?= $this->Form->control('lot_num', array('type'=>'hidden', 'value'=>$lot_num, 'label'=>false)) ?>
+      <?= $this->Form->control('kind_kensa', array('type'=>'hidden', 'value'=>$kind_kensa, 'label'=>false)) ?>
+    </fieldset>
+
     <?= $this->Form->end() ?>

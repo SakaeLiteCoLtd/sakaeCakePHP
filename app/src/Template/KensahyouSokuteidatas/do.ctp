@@ -41,7 +41,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         </tr>
 
 <?php
-     echo $htmlKensahyouHeader; 
+     echo $htmlKensahyouHeader;
 ?>
 
         <?php
@@ -77,4 +77,3 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <br>
         <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>
-

@@ -23,6 +23,7 @@ class KensahyouSokuteidatasController  extends AppController
     	$this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
     	$this->Products = TableRegistry::get('products');//productsテーブルを使う
     	$this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
+      $this->ImKikakuTaious = TableRegistry::get('imKikakuTaious');//ImKikakuTaiousテーブルを使う
      }
 
     public function index()//「出荷検査用呼出」ページトップ
@@ -183,6 +184,7 @@ class KensahyouSokuteidatasController  extends AppController
     public function index1()//「出荷検査表登録」ページトップ
     {
     	$this->set('entity',$this->KensahyouSokuteidatas->newEntity());//空のカラムにentityと名前を付け、ctpで使えるようにセット
+//      $this->request->session()->destroy(); // セッションの破棄
 
     /*	$KensahyouHeads = $this->KensahyouHeads->find('all',[
     		'conditions' => ['delete_flag' => '0'],//条件'delete_flag' => '0'
@@ -214,11 +216,7 @@ class KensahyouSokuteidatasController  extends AppController
     	$data = $this->request->getData();//postデータを$dataに
     	$product_code_num = $data['product_code_num'];//$dataのproduct_code_num（ctpで選択した$arrProductcode）に$product_code_numという名前を付ける
 
-    /*	$KensahyouHeads = $this->KensahyouHeads->find('all',[
-    		'conditions' => ['delete_flag' => '0'],//条件'delete_flag' => '0'
-    		'group' => array('product_id'),//product_idが同じものをまとめる
-    	]);
-    */
+
     	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
     	->select(['product_id','delete_flag' => '0'])
     	->group('product_id');
@@ -235,6 +233,75 @@ class KensahyouSokuteidatasController  extends AppController
     	$product_code = $arrProductcode[$product_code_num];
     	$this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
 
+      $product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $productId = $product[0]->id;
+      $this->set('productId',$productId);//セット
+
+      $ImKikakuid_1 = "ノギス";
+      $this->set('ImKikakuid_1',$ImKikakuid_1);
+      $ImKikakuid_2 = "ノギス";
+      $this->set('ImKikakuid_2',$ImKikakuid_2);
+      $ImKikakuid_3 = "ノギス";
+      $this->set('ImKikakuid_3',$ImKikakuid_3);
+      $ImKikakuid_4 = "ノギス";
+      $this->set('ImKikakuid_4',$ImKikakuid_4);
+      $ImKikakuid_5 = "ノギス";
+      $this->set('ImKikakuid_5',$ImKikakuid_5);
+      $ImKikakuid_6 = "ノギス";
+      $this->set('ImKikakuid_6',$ImKikakuid_6);
+      $ImKikakuid_7 = "ノギス";
+      $this->set('ImKikakuid_7',$ImKikakuid_7);
+      $ImKikakuid_8 = "ノギス";
+      $this->set('ImKikakuid_8',$ImKikakuid_8);
+      $ImKikakuid_9 = "ノギス";
+      $this->set('ImKikakuid_9',$ImKikakuid_9);
+
+      $ImKikakus = $this->ImKikakuTaious->find()->where(['product_id' => $productId])->toArray();//'id' => $product_code_idとなるデータをProductsテーブルから配列で取得（プルダウン）
+      foreach ((array)$ImKikakus as $key => $value) {
+           $sort[$key] = $value['kensahyuo_num'];
+       }
+       if(isset($ImKikakus[0])){
+        array_multisort($sort, SORT_ASC, $ImKikakus);
+      }
+/*
+      echo "<pre>";
+    	print_r($ImKikakus[1]['kind_kensa']);
+    	echo "</pre>";
+*/
+
+      for($i=0; $i<=8; $i++){
+        $j = $i + 1;
+        if(isset($ImKikakus[$i])) {
+          if($ImKikakus[$i]['kind_kensa'] != "") {
+            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+            $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+          }else{
+          }
+        }else{
+          ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+          $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+        }
+      }
+
+/*
+      for($i=0; $i<=8; $i++){
+        $j = $i + 1;
+        if(isset($ImKikakus[$i])) {
+          if($ImKikakus[$i]['kind_kensa'] != "") {
+        //      $ImKikakuid = $ImKikakus[1]->kind_kensa;//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+            $size_num = $ImKikakus[$i]['size_num'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+            ${"ImKikakuid_".$size_num} = $ImKikakus[$i]['kind_kensa'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+            $this->set('ImKikakuid_'.$size_num,${"ImKikakuid_".$size_num});//セット
+          }else{
+//            ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+//            $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+          }
+        }else{
+          ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+          $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+        }
+      }
+*/
     	$staff_id = $this->Auth->user('staff_id');//created_staffの登録用
     	$this->set('staff_id',$staff_id);//セット
 
@@ -306,8 +373,11 @@ class KensahyouSokuteidatasController  extends AppController
     	$kensahyouSokuteidata = $this->KensahyouSokuteidatas->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
     	$this->set('kensahyouSokuteidata',$kensahyouSokuteidata);//セット
 
-    	$KensahyouHeadid = $data['kensahyou_heads_id'];//$dataのkensahyou_heads_idに$kensahyou_heads_idと名前を付ける
+      $KensahyouHeadid = $data['kensahyou_heads_id'];//$dataのkensahyou_heads_idに$kensahyou_heads_idと名前を付ける
     	$this->set('KensahyouHeadid',$KensahyouHeadid);//セット
+
+      $lot_num = $data['lot_num'];//$dataのkensahyou_heads_idに$kensahyou_heads_idと名前を付ける
+    	$this->set('lot_num',$lot_num);//セット
 
     	$manu_dateY = $data['manu_date']['year'];//manu_dateのyearに$manu_dateYと名前を付ける
     	$manu_dateM = $data['manu_date']['month'];//manu_dateのmonthに$manu_dateMと名前を付ける
@@ -362,10 +432,10 @@ class KensahyouSokuteidatasController  extends AppController
     {
     	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
-    //	echo "<pre>";
-    //	print_r($data);
+    	echo "<pre>";
+    	print_r($data);
     //	var_dump($data);
-    //	echo "<br>";
+    	echo "<br>";
 
     	$product_code = $this->request->getData()['sokuteidata'][1]['product_code'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
     		$this->set('product_code',$product_code);//セット

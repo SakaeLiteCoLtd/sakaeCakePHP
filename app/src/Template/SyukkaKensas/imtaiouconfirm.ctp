@@ -18,6 +18,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               $resultArray = Array();
                   $_SESSION['kikakudata'][$n] = array(
                     'product_id' => $_POST['product_id'],
+                    'kensahyuo_num' => $n,
                     "kind_kensa" => $_POST["kind_kensa_{$n}"],
                     "size_num" => $_POST["size_num_{$n}"],
                   );

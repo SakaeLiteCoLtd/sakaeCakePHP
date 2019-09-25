@@ -27,6 +27,24 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           }
 */
         ?>
+<?php if(isset($ImKikakuex[0])): ?>
+  <fieldset>
+    <div align="center"><strong><font color="red">＊運用中</font></strong></div>
+    <br>
+    <table width="600" border="1" align="center" bordercolor="#000000" bgcolor="#FFDEAD">
+        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+        <tr>
+          <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><strong><font color="blue">部品番号</font></strong></div></td>
+          <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= h($product_code) ?></td>
+          <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><strong><font color="blue">部品名</font></strong></div></td>
+          <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= h($Productname) ?></td>
+        </tr>
+    </table>
+<br>
+</fieldset>
+<?php else: ?>
+
+
 
     <fieldset>
 <div align="center"><strong><font color="red">＊入力してください</font></strong></div>
@@ -88,3 +106,5 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
     </fieldset>
     <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>
+
+  <?php endif; ?>

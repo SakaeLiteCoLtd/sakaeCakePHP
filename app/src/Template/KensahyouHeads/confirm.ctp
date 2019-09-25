@@ -8,7 +8,7 @@ $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//productsテーブ
 $this->Products = TableRegistry::get('products');//productsテーブルを使う
 ?>
 
-<?= $this->Form->create($kensahyouHead, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($kensahyouHead, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
             header('Expires:-1');
@@ -33,6 +33,42 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+
+            $_SESSION['sokuteidata'] = array(
+              'product_id' => $_POST['product_id'],
+              'version' => $_POST['version'],
+              'type_im' => $_POST['type_im'],
+              'maisu' => $_POST['maisu'],
+              "upper_1" =>$_POST["upper_1"],
+              "upper_2" =>$_POST["upper_2"],
+              "upper_3" =>$_POST["upper_3"],
+              "upper_4" =>$_POST["upper_4"],
+              "upper_5" =>$_POST["upper_5"],
+              "upper_6" =>$_POST["upper_6"],
+              "upper_7" =>$_POST["upper_7"],
+              "upper_8" =>$_POST["upper_8"],
+              "lower_1" =>$_POST["lower_1"],
+              "lower_2" =>$_POST["lower_2"],
+              "lower_3" =>$_POST["lower_3"],
+              "lower_4" =>$_POST["lower_4"],
+              "lower_5" =>$_POST["lower_5"],
+              "lower_6" =>$_POST["lower_6"],
+              "lower_7" =>$_POST["lower_7"],
+              "lower_8" =>$_POST["lower_8"],
+              "size_1" =>$_POST["size_1"],
+              "size_2" =>$_POST["size_2"],
+              "size_3" =>$_POST["size_3"],
+              "size_4" =>$_POST["size_4"],
+              "size_5" =>$_POST["size_5"],
+              "size_6" =>$_POST["size_6"],
+              "size_7" =>$_POST["size_7"],
+              "size_8" =>$_POST["size_8"],
+              "size_9" =>$_POST["size_9"],
+              "bik" =>$_POST["bik"],
+              "status" =>$_POST["status"],
+              "delete_flag" =>$_POST["delete_flag"],
+            );
+
         ?>
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
 

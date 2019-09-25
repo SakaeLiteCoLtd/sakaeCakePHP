@@ -53,6 +53,20 @@ class SyukkaKensasController extends AppController {
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
     	$product_id = $Product[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
       $this->set('product_id',$product_id);//セット
+
+      $ImKikakuex = $this->ImKikakuTaious->find()->where(['product_id' => $product_id])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
+      $this->set('ImKikakuex',$ImKikakuex);//セット
+/*
+      if(isset($ImKikakuex[0])){
+        echo "<pre>";
+        print_r($ImKikakuex[0]['product_id']);
+        echo "<br>";
+      } else {
+        echo "<pre>";
+        print_r("else");
+        echo "<br>";
+     }
+*/
       $Productname = $Product[0]->product_name;
       $this->set('Productname',$Productname);//セット
 

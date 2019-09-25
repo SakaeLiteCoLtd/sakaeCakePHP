@@ -22,7 +22,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 <?php
                     $Productcode = $KensahyouSokuteidata->product_code;
                     $Product = $this->Products->find()->where(['product_code' => $Productcode])->toArray();
-        	        $Productname = $Product[0]->product_name;
+        	          $Productname = $Product[0]->product_name;
                 ?>
                 <td><button style="color:#0000ff;background-color:#E6FFFF;margin:0rem" type="hidden" name="<?php echo $Productname;?>" value="<?php echo $Productcode;?>"><?php echo $Productcode;?></button></td>
                 <td><?= h($Productname) ?></td>

@@ -43,7 +43,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 <?php
 //                    $Productcode = $KensahyouSokuteidata->product_code;
 //                    $Product = $this->Products->find()->where(['product_code' => $Productcode])->toArray();
-                    $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+                    $Product = $this->Products->find()->where(["product_code" => $product_code])->toArray();
               	    $Productname = $Product[0]->product_name;
                 ?>
                 <td><?php echo $this->Html->link($product_code, ['action'=>'view', 'name' => $product_code, 'value1' => $KensahyouSokuteidata->manu_date, 'value2' => $KensahyouSokuteidata->inspec_date]); ?></td>

@@ -31,11 +31,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td colspan="4" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
           <td colspan="8"><?= h("1") ?></td>
           <td colspan="4" nowrap="nowrap"><div align="center"><strong>type_im</strong></div></td>
-          <td colspan="8"><?= h($this->request->getData('type_im')) ?></td>
+          <td colspan="8"><?= h($_SESSION['sokuteidata']["type_im"]) ?></td>
         </tr>
         <tr>
           <td colspan="4" nowrap="nowrap"><div align="center"><strong>枚数</strong></div></td>
-          <td colspan="8"><?= h($this->request->getData('maisu')) ?></td>
+          <td colspan="8"><?= h($_SESSION['sokuteidata']["maisu"]) ?></td>
           <td colspan="12" nowrap="nowrap">&nbsp;<input type="hidden" name="version" value="0"/></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
@@ -59,7 +59,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             $Array = Array();
             for($i=1; $i<=8; $i++){
             echo '<td colspan="2"><div align="center">';
-            echo $this->request->getData("upper_$i") ;
+            echo $_SESSION['sokuteidata']["upper_{$i}"] ;
             echo '</div></td>';
             }
         ?>
@@ -74,7 +74,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             $Array = Array();
             for($j=1; $j<=8; $j++){
             echo '<td colspan="2"><div align="center">';
-            echo $this->request->getData("lower_$j") ;
+            echo $_SESSION['sokuteidata']["lower_{$j}"] ;
             echo '</div></td>';
             }
         ?>
@@ -88,7 +88,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             $Array = Array();
             for($k=1; $k<=9; $k++){
             echo '<td colspan="2"><div align="center">';
-            echo $this->request->getData("size_$k") ;
+            echo $_SESSION['sokuteidata']["size_{$k}"] ;
             echo '</div></td>';
             }
         ?>
@@ -97,7 +97,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
           <td height="120" colspan="24" style="border-bottom: solid;border-width: 1px">
 	      <strong>備考：</strong><br>
-              <div cols="120" rows="10"><?= h($this->request->getData('bik')) ?></div>
+              <div cols="120" rows="10"><?= h($_SESSION['sokuteidata']['bik']) ?></div>
           </td>
         </tr>
        <tr>
@@ -107,4 +107,3 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <br>
         <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>
-

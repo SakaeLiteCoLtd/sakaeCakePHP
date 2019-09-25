@@ -15,8 +15,37 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               header('Cache-Control:');
               header('Pragma:');
 
-              echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'do']]);
+              echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'preadd']]);
+              $session = $this->request->getSession();
 
+
+              for($n=1; $n<=8; $n++){
+                      $resultArray = Array();
+                        $result_weight = $_POST["result_weight_{$n}"];
+                        $_SESSION['sokuteidata'][$n] = array(
+                          'kensahyou_heads_id' => $KensahyouHeadid,
+                          'product_code' => $product_code,
+                          'lot_num' => $lot_num,
+                          'manu_date' => $manu_date,
+                          'inspec_date' => $inspec_date,
+                          'cavi_num' => $n,
+                          'delete_flag' => $delete_flag,
+                          'updated_staff' => $updated_staff,
+
+                          "result_size_1" => $_POST["result_size_{$n}_1"],
+                          "result_size_2" => $_POST["result_size_{$n}_2"],
+                          "result_size_3" => $_POST["result_size_{$n}_3"],
+                          "result_size_4" => $_POST["result_size_{$n}_4"],
+                          "result_size_5" => $_POST["result_size_{$n}_5"],
+                          "result_size_6" => $_POST["result_size_{$n}_6"],
+                          "result_size_7" => $_POST["result_size_{$n}_7"],
+                          "result_size_8" => $_POST["result_size_{$n}_8"],
+                          "result_size_9" => $_POST["result_size_{$n}_9"],
+
+                          'result_weight' => $_POST["result_weight_{$n}"],
+                        );
+              }
+/*
               for($n=1; $n<=8; $n++){
                       $resultArray = Array();
                       for($k=1; $k<=9; $k++){
@@ -27,7 +56,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                           echo "<input type='hidden' name=sokuteidata[$n][inspec_date] value='$inspec_date' size='6'/>\n";
                           echo "<input type='hidden' name=sokuteidata[$n][cavi_num] value='{$n}' size='6'/>\n";
                           echo "<input type='hidden' name=sokuteidata[$n][delete_flag] value='$delete_flag' size='6'/>\n";
-                          echo "<input type='hidden' name=sokuteidata[$n][created_staff] value='$created_staff' size='6'/>\n";
+                    //      echo "<input type='hidden' name=sokuteidata[$n][created_staff] value='$created_staff' size='6'/>\n";
                           echo "<input type='hidden' name=sokuteidata[$n][updated_staff] value='$updated_staff' size='6'/>\n";
 
                           $result_size = $_POST["result_size_{$n}_{$k}"];
@@ -39,6 +68,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                           echo "<input type='hidden' name=sokuteidata[$n][result_weight] value='$result_weight' size='6'/>\n";
                       }
               }
+*/
 ?>
 
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
@@ -93,12 +123,12 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 echo "<td colspan='2'><div align='center'>\n";
                 echo $this->request->getData("result_size_{$q}_9");
                 echo "</td>\n";
+                echo "<td colspan='2'>\n";
+                echo "</td>\n";
+                echo "<td colspan='2'>\n";
+                echo "</td>\n";
                 echo "<td colspan='2'><div align='center'>\n";
                 echo $this->request->getData("result_weight_{$q}");
-                echo "</td>\n";
-                echo "<td colspan='2'>\n";
-                echo "</td>\n";
-                echo "<td colspan='2'>\n";
                 echo "</td>\n";
             }
         ?>

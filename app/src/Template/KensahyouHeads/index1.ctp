@@ -21,11 +21,12 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <br>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('select_product') ?></th>
-		<td><?= $this->Form->input("product_id", ["type"=>"select", "options"=>$arrProduct, 'label'=>false]); ?></td>
+  <tr>
+		<td bgcolor="#FFDEAD" style="width: 50px">品番</td>
+		<td bgcolor="#FFDEAD"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
 	</tr>
 </table>
+
 <br>
     <center><?= $this->Form->button(__('select'), array('name' => 'kakunin')) ?></center>
 <br>

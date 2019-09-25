@@ -24,6 +24,7 @@ class KensahyouSokuteidatasController  extends AppController
     	$this->Products = TableRegistry::get('products');//productsテーブルを使う
     	$this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
       $this->ImKikakuTaious = TableRegistry::get('imKikakuTaious');//ImKikakuTaiousテーブルを使う
+      $this->Users = TableRegistry::get('users');//Usersテーブルを使う
      }
 
     public function index()//「出荷検査用呼出」ページトップ
@@ -43,6 +44,11 @@ class KensahyouSokuteidatasController  extends AppController
     {
     	$data = array_values($this->request->getData());//配列の値を取り出す
     	$product_code = $data[0];//0番目の値
+
+      echo "<pre>";
+    	print_r($product_code);
+    	echo "</pre>";
+
     	$this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
 
     	if ($this->request->is('post')) {//データがpostで送られたとき（日付を選んだ場合）
@@ -428,17 +434,73 @@ class KensahyouSokuteidatasController  extends AppController
     	}
     }
 
+    public function preadd()
+    {
+      $kensahyouSokuteidata = $this->KensahyouSokuteidatas->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
+      $this->set('kensahyouSokuteidata',$kensahyouSokuteidata);//セット
+
+     $session = $this->request->getSession();
+     $data = $session->read();//postデータ取得し、$dataと名前を付ける
+    }
+
+   public function login()
+   {
+     if ($this->request->is('post')) {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+       $ary = explode(',', $str);//$strを配列に変換
+
+       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+       $this->set('username', $username);
+       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+       $staff_id = $this->Auth->user('staff_id');//created_staffの登録用
+     	$this->set('staff_id',$staff_id);//セット
+
+         if(empty($Userdata)){
+           $delete_flag = "";
+         }else{
+           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+           $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+         }
+           $user = $this->Auth->identify();
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'do']);
+         }
+       }
+   }
+
+   public function logout()
+   {
+     $this->request->session()->destroy(); // セッションの破棄
+ //    return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
+   }
+
      public function do()//「出荷検査表登録」登録画面
     {
-    	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+      $session = $this->request->getSession();
+      $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
 
-    	echo "<pre>";
-    	print_r($data);
-    //	var_dump($data);
-    	echo "<br>";
+      for($n=1; $n<=8; $n++){
+        $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+        $_SESSION['sokuteidata'][$n] = array_merge($created_staff,$_SESSION['sokuteidata'][$n]);
+      }
+      $data = $_SESSION['sokuteidata'];
+
+        $product_code = $data[1]['product_code'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
+        $this->set('product_code',$product_code);//セット
+/*
+    	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+      for($n=1; $n<=8; $n++){
+        $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+        $data['sokuteidata'][$n] = array_merge($created_staff,$data['sokuteidata'][$n]);
+      }
 
     	$product_code = $this->request->getData()['sokuteidata'][1]['product_code'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
     		$this->set('product_code',$product_code);//セット
+*/
 
     	$Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
     		'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
@@ -481,8 +543,8 @@ class KensahyouSokuteidatasController  extends AppController
     		$this->set('lower_'.$j,${"lower_".$j});//セット
     	}
 
-    	if ($this->request->is('post')) {//postなら登録
-    		$kensahyouSokuteidata = $this->KensahyouSokuteidatas->patchEntities($kensahyouSokuteidata, $this->request->getData('sokuteidata'));//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+    	if ($this->request->is('get')) {//postなら登録
+    		$kensahyouSokuteidata = $this->KensahyouSokuteidatas->patchEntities($kensahyouSokuteidata, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
     		$connection = ConnectionManager::get('default');//トランザクション1
     		// トランザクション開始2
     		$connection->begin();//トランザクション3

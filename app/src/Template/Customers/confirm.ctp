@@ -4,10 +4,10 @@
  * @var \App\Model\Entity\Customer $customer
  */
 ?>
-<?= $this->Form->create($customer, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($customer, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-
+/*
             echo $this->Form->hidden('customer_code' ,['value'=>$_POST['customer_code'] ]) ;
             echo $this->Form->hidden('name' ,['value'=>$_POST['name'] ]) ;
             echo $this->Form->hidden('zip' ,['value'=>$_POST['zip'] ]) ;
@@ -18,7 +18,21 @@
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+*/
+            $session = $this->request->getSession();
+            $session->write('customerdata.customer_code', $_POST['customer_code']);
+            $session->write('customerdata.name', $_POST['name']);
+            $session->write('customerdata.zip', $_POST['zip']);
+            $session->write('customerdata.address', $_POST['address']);
+            $session->write('customerdata.tel', $_POST['tel']);
+            $session->write('customerdata.fax', $_POST['fax']);
+            $session->write('customerdata.status', $_POST['status']);
+            $session->write('customerdata.delete_flag', $_POST['delete_flag']);
+            $session->write('customerdata.created_staff', $_POST['created_staff']);
+            $session->write('customerdata.updated_staff', null);
+
         ?>
+
 <hr size="5">
 
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>

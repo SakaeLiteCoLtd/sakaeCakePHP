@@ -28,6 +28,7 @@ class MaterialsController extends AppController
 	$this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
 	$this->Suppliers = TableRegistry::get('suppliers');//suppliersテーブルを使う
 	$this->MaterialTypes = TableRegistry::get('materialTypes');//materialTypesテーブルを使う
+	$this->Users = TableRegistry::get('users');//staffsテーブルを使う
      }
 
     /**
@@ -46,14 +47,14 @@ class MaterialsController extends AppController
 		$this->set('materials',$this->Materials->find()//Materialsテーブルの中で次の条件を満たすものをmaterialsにセットする
 			->where(['delete_flag' => '0',//'delete_flag' => '0'である
 			'OR' => [['grade like' => '%'.$gradeSearch.'%'], ['color like' => '%'.$colorSearch.'%']]]));//gradeに$gradeSearchが含まれるまたはcolorに$colorSearchが含まれる
-	
+
 	} else {//postじゃなかったら
 		$this->set('materials', $this->Materials->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
 		$this->set('materials', $this->paginate());//定義したページネーションを使用
 	}
 	$materials = $this->paginate($this->Materials);//
     }
-
+/*
     public function login()
     {
 	if ($this->request->is('post')) {
@@ -71,7 +72,7 @@ class MaterialsController extends AppController
 	$this->request->session()->destroy(); // セッションの破棄
 	return $this->redirect($this->Auth->logout()); // ログアウト処理
     }
-
+*/
     public function form()
     {
 	$material = $this->Materials->newEntity();//newentityに$materialという名前を付ける
@@ -92,7 +93,7 @@ class MaterialsController extends AppController
     {
 	$material = $this->Materials->newEntity();//newentityに$materialという名前を付ける
 	$this->set('material',$material);//1行上の$materialをctpで使えるようにセット
- 
+
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
 	$material_type_id = $data['material_type_id'];//$dataのmaterial_type_idに$material_type_idという名前を付ける
@@ -101,25 +102,68 @@ class MaterialsController extends AppController
 	$this->set('MaterialType',$MaterialType);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
    }
 
+	 public function preadd()
+	 {
+		 $material = $this->Materials->newEntity();//newentityに$materialという名前を付ける
+	 	$this->set('material',$material);//1行上の$materialをctpで使えるようにセット
+	 }
+
+	public function login()
+	{
+		if ($this->request->is('post')) {
+			$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+			$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+			$ary = explode(',', $str);//$strを配列に変換
+
+			$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+			//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+			$this->set('username', $username);
+			$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+				if(empty($Userdata)){
+					$delete_flag = "";
+				}else{
+					$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+					$this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+				}
+					$user = $this->Auth->identify();
+				if ($user) {
+					$this->Auth->setUser($user);
+					return $this->redirect(['action' => 'do']);
+				}
+			}
+	}
+
+		 public function logout()
+		 {
+			 $this->request->session()->destroy(); // セッションの破棄
+			 return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
+		 }
+
      public function do()
     {
 	$material = $this->Materials->newEntity();//newentityに$materialという名前を付ける
-	$this->set('material',$material);//1行上の$materialをctpで使えるようにセット 
+	$this->set('material',$material);//1行上の$materialをctpで使えるようにセット
 
-	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+//	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+	$session = $this->request->getSession();
+	$data = $session->read();//postデータ取得し、$dataと名前を付ける
 
-	$material_type_id = $data['material_type_id'];//$dataのmaterial_type_idに$material_type_idという名前を付ける
+	$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+	$data['materialdata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+
+	$material_type_id = $data['materialdata']['material_type_id'];//$dataのmaterial_type_idに$material_type_idという名前を付ける
 	$MaterialTypeData = $this->MaterialTypes->find()->where(['id' => $material_type_id])->toArray();//'id' => $material_type_idとなるデータをMaterialTypesテーブルから配列で取得
 	$MaterialType = $MaterialTypeData[0]->name;//配列の0番目（0番目しかない）のnameに$MaterialTypeと名前を付ける
 	$this->set('MaterialType',$MaterialType);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
-	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+	$created_staff = $data['materialdata']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
 	$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
-		if ($this->request->is('post')) {//postの場合
-			$material = $this->Materials->patchEntity($material, $this->request->getData());//$materialデータ（空の行）を$this->request->getData()に更新する
+		if ($this->request->is('get')) {//postの場合
+			$material = $this->Materials->patchEntity($material, $data['materialdata']);//$materialデータ（空の行）を$this->request->getData()に更新する
 			$connection = ConnectionManager::get('default');//トランザクション1
 			// トランザクション開始2
 			$connection->begin();//トランザクション3

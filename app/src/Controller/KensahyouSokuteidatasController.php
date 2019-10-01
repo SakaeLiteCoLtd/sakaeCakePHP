@@ -350,14 +350,21 @@ class KensahyouSokuteidatasController  extends AppController
     		${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
     		$this->set('lower_'.$j,${"lower_".$j});//セット
     	}
+
+      $arrSituationDist = [''=>'','OK'=>'OK','NG'=>'NG'];
+      $this->set('arrSituationDist',$arrSituationDist);//セット
+
+      $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+      $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
+
     }
 
      public function confirm()//「出荷検査表登録」確認画面
     {
     	$data = $this->request->getData();//postデータを$dataに
-
-/*      	echo "<pre>";
-      	print_r($data['lot_num']);
+/*
+      	echo "<pre>";
+      	print_r($data);
       	echo "</pre>";
 */
 
@@ -432,6 +439,10 @@ class KensahyouSokuteidatasController  extends AppController
     		${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
     		$this->set('lower_'.$j,${"lower_".$j});//セット
     	}
+
+      $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+      $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
+
     }
 
     public function preadd()
@@ -488,7 +499,11 @@ class KensahyouSokuteidatasController  extends AppController
         $_SESSION['sokuteidata'][$n] = array_merge($created_staff,$_SESSION['sokuteidata'][$n]);
       }
       $data = $_SESSION['sokuteidata'];
-
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
         $product_code = $data[1]['product_code'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
         $this->set('product_code',$product_code);//セット
 /*
@@ -542,6 +557,9 @@ class KensahyouSokuteidatasController  extends AppController
     		${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
     		$this->set('lower_'.$j,${"lower_".$j});//セット
     	}
+
+      $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+      $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
 
     	if ($this->request->is('get')) {//postなら登録
     		$kensahyouSokuteidata = $this->KensahyouSokuteidatas->patchEntities($kensahyouSokuteidata, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a

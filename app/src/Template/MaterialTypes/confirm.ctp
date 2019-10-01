@@ -4,12 +4,16 @@
  * @var \App\Model\Entity\MaterialType $materialType
  */
 ?>
-<?= $this->Form->create($materialType, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($materialType, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-
+/*
             echo $this->Form->hidden('name' ,['value'=>$_POST['name'] ]) ;
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
+*/
+            $session = $this->request->getSession();
+            $session->write('materialTypedata.name', $_POST['name']);
+            $session->write('materialTypedata.delete_flag', $_POST['delete_flag']);
         ?>
 <hr size="5">
 

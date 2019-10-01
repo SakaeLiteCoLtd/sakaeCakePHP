@@ -151,9 +151,9 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
 
         </tr>
           <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px">
-	      <strong>備考：</strong><br>
-              <textarea name="bik"  cols="120" rows="10"></textarea>
-          </td>
+            <strong>備考：</strong><br>
+                  <?= h($KensahyouHeadbik) ?>
+              </td>
         </tr>
        <tr>
 </table>

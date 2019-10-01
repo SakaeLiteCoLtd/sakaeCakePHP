@@ -8,7 +8,10 @@
 <?= $this->Form->create($supplierSection, ['url' => ['action' => 'index']]) ?>
 
 <?php
-            $username = $this->request->Session()->read('Auth.User.username');
+  $username = $this->request->Session()->read('Auth.User.username');
+  $session = $this->request->getSession();
+  $name = $session->read('supplierSectiondata.name');
+  $account_code = $session->read('supplierSectiondata.account_code');
 ?>
 <hr size="5">
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
@@ -21,11 +24,11 @@
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('name') ?></th>
-            <td><?= h($this->request->getData('name')) ?></td>
+            <td><?= h($name) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('account_code') ?></th>
-            <td><?= h($this->request->getData('account_code')) ?></td>
+            <td><?= h($account_code) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
             <th scope="row"><?= __('登録日時') ?></th>

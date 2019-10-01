@@ -77,8 +77,15 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                         echo "<input type='text' name=result_size_".$j."_".$i." value='' size='6'/>\n";
                         echo "</div></td>\n";
                     }
-                    echo "<td colspan='2'>\n";
-                    echo "</td>\n";
+                    echo "<td colspan='2'><div align='center'><select name=situation_dist_".$j.">\n";
+      //              echo "<name=kind_kensa_".$i." options=$arrKindKensa size='6'/>\n";
+                    foreach ($arrSituationDist as $value){
+                    echo "<option value=$value>$value</option>";
+                    }
+                    echo "</select></div></td>\n";
+                //    echo "<td colspan='2'>\n";
+                //    echo "<input type='text' name=situation_dist_".$j." value='' size='6'/>\n";
+                //    echo "</td>\n";
                     echo "<td colspan='2'>\n";
                     echo "</td>\n";
                     echo "<td colspan='2'>\n";
@@ -90,12 +97,14 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         </tr>
           <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px">
 	      <strong>備考：</strong><br>
-              <textarea name="bik"  cols="120" rows="10"></textarea>
+              <?= h($KensahyouHeadbik) ?>
           </td>
         </tr>
        <tr>
 </table>
+
 <br>
+
 <strong>　　*備考の欄内にはソリ・フレ値・外観の検査基準を外観の規格欄内の値と関連付けてください。</strong>
         <?php
             echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);

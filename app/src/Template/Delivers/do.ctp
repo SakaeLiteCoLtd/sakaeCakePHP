@@ -9,6 +9,14 @@
 
 <?php
             $username = $this->request->Session()->read('Auth.User.username');
+            $session = $this->request->getSession();
+            $place_deliver_id = $session->read('deliverdata.place_deliver_id');
+            $name = $session->read('deliverdata.name');
+            $zip = $session->read('deliverdata.zip');
+            $address = $session->read('deliverdata.address');
+            $tel = $session->read('deliverdata.tel');
+            $fax = $session->read('deliverdata.fax');
+            $status = $session->read('deliverdata.status');
 ?>
 <hr size="5">
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
@@ -25,31 +33,31 @@
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('place_deliver_id') ?></th>
-            <td><?= h($this->request->getData('place_deliver_id')) ?></td>
+            <td><?= h($place_deliver_id) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('氏名') ?></th>
-            <td><?= h($this->request->getData('name')) ?></td>
+            <td><?= h($name) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('ZIP') ?></th>
-            <td><?= h($this->request->getData('zip')) ?></td>
+            <td><?= h($zip) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('住所') ?></th>
-            <td><?= h($this->request->getData('address')) ?></td>
+            <td><?= h($address) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('電話') ?></th>
-            <td><?= h($this->request->getData('tel')) ?></td>
+            <td><?= h($tel) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('FAX') ?></th>
-            <td><?= h($this->request->getData('fax')) ?></td>
+            <td><?= h($fax) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('Status') ?></th>
-            <td><?= h($this->request->getData('status')) ?></td>
+            <td><?= h($status) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
             <th scope="row"><?= __('登録日時') ?></th>

@@ -37,7 +37,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
           <td colspan="9"><?= h($KensahyouHeadver) ?></td>
-          <td colspan="14" nowrap="nowrap">&nbsp;</td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
+          <td colspan="9"><?= h($lot_num) ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
@@ -78,9 +79,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         </tr>
 
           <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px">
-	      <strong>備考：</strong><br>
-              <div cols="120" rows="10"><?= h($this->request->getData('bik')) ?></div>
-          </td>
+            <strong>備考：</strong><br>
+                  <?= h($KensahyouHeadbik) ?>
+              </td>
         </tr>
        <tr>
 </table>

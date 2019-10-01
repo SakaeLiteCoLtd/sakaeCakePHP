@@ -4,16 +4,25 @@
  * @var \App\Model\Entity\CustomersHandy $customersHandy
  */
 ?>
-<?= $this->Form->create($customersHandy, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($customersHandy, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-
+/*
             echo $this->Form->hidden('customer_id' ,['value'=>$_POST['customer_id'] ]) ;
             echo $this->Form->hidden('place_deliver_id' ,['value'=>$_POST['place_deliver_id'] ]) ;
             echo $this->Form->hidden('name' ,['value'=>$_POST['name'] ]) ;
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+*/
+            $session = $this->request->getSession();
+            $session->write('customershandydata.customer_id', $_POST['customer_id']);
+            $session->write('customershandydata.place_deliver_id', $_POST['place_deliver_id']);
+            $session->write('customershandydata.name', $_POST['name']);
+            $session->write('customershandydata.delete_flag', $_POST['delete_flag']);
+            $session->write('customershandydata.created_staff', $_POST['created_staff']);
+            $session->write('customershandydata.updated_staff', null);
+
         ?>
 <hr size="5">
 

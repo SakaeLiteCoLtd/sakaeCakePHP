@@ -78,7 +78,7 @@ class ImSokuteidataResultsTable extends Table
 
         $validator
             ->scalar('status')
-            ->maxLength('status', 2)
+            ->maxLength('status', 20)
             ->requirePresence('status', 'create')
             ->notEmpty('status');
 

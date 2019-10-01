@@ -4,15 +4,22 @@
  * @var \App\Model\Entity\SupplierSection $supplierSection
  */
 ?>
-<?= $this->Form->create($supplierSection, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($supplierSection, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-
+/*
             echo $this->Form->hidden('name' ,['value'=>$_POST['name'] ]) ;
             echo $this->Form->hidden('account_code' ,['value'=>$_POST['account_code'] ]) ;
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+*/
+            $session = $this->request->getSession();
+            $session->write('supplierSectiondata.name', $_POST['name']);
+            $session->write('supplierSectiondata.account_code', $_POST['account_code']);
+            $session->write('supplierSectiondata.delete_flag', $_POST['delete_flag']);
+            $session->write('supplierSectiondata.created_staff', $_POST['created_staff']);
+            $session->write('supplierSectiondata.updated_staff', null);
         ?>
 <hr size="5">
 

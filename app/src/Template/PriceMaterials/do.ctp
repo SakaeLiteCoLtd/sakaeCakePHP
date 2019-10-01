@@ -8,7 +8,14 @@
 <?= $this->Form->create($priceMaterial, ['url' => ['action' => 'index']]) ?>
 
 <?php
-            $username = $this->request->Session()->read('Auth.User.username');
+  $username = $this->request->Session()->read('Auth.User.username');
+  $session = $this->request->getSession();
+  $lot_low = $session->read('priceMaterialdata.lot_low');
+  $lot_upper = $session->read('priceMaterialdata.lot_upper');
+  $price = $session->read('priceMaterialdata.price');
+  $start = $session->read('priceMaterialdata.start');
+  $finish = $session->read('priceMaterialdata.finish');
+  $status = $session->read('priceMaterialdata.status');
 ?>
 <hr size="5">
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
@@ -29,27 +36,27 @@
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('lot_low') ?></th>
-            <td><?= h($this->request->getData('lot_low')) ?></td>
+            <td><?= h($lot_low) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('lot_upper') ?></th>
-            <td><?= h($this->request->getData('lot_upper')) ?></td>
+            <td><?= h($lot_upper) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('price') ?></th>
-            <td><?= h($this->request->getData('price')) ?></td>
+            <td><?= h($price) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('start') ?></th>
-            <td><?= h($this->request->getData('start')) ?></td>
+            <td><?= h($start) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('finish') ?></th>
-            <td><?= h($this->request->getData('finish')) ?></td>
+            <td><?= h($finish) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('status') ?></th>
-            <td><?= h($this->request->getData('status')) ?></td>
+            <td><?= h($status) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
             <th scope="row"><?= __('登録日時') ?></th>
@@ -63,4 +70,3 @@
 <br>
         <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>
-

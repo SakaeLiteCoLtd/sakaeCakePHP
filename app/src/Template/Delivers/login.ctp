@@ -3,21 +3,43 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\User $user
  */
+ error_reporting(0);
+
+/*session_start();
+header('Expires:-1');
+header('Cache-Control:');
+header('Pragma:');
+*/
 ?>
-<nav class="large-3 medium-4 columns" id="actions-sidebar">
-    <ul class="side-nav">
-        <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $this->Html->link(__('New User'), ['action' => 'add']) ?></li>
-    </ul>
-</nav>
-<div class="users form large-9 medium-8 columns content">
+
+<?php if ($username != "" && $delete_flag != ""): ?>
+<body oncontextmenu='return false' onload="document.all.OK.click();" >
     <?= $this->Flash->render() ?>
     <?= $this->Form->create() ?>
     <fieldset>
-        <legend><?= __('Please enter your username and password') ?></legend>
-        <?= $this->Form->control('username') ?>
-        <?= $this->Form->control('password') ?>
+  <?= $this->Form->control('username', array('type'=>'hidden', 'value'=>$username, 'label'=>false)) ?>
+	<?= $this->Form->control('delete_flag', array('type'=>'hidden', 'value'=>$delete_flag, 'label'=>false)) ?>
     </fieldset>
-    <?= $this->Form->button(__('Submit')) ?>
+    <center><input type="submit" value="登録しています…" name="OK" style="background-color:#E6FFFF; border-width: 0px"></center>
+    <br><br><br>
+</body>
     <?= $this->Form->end() ?>
-</div>
+
+<?php elseif ($username != "" && $delete_flag == "") : ?>
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+    <br><br><br><br><br>
+    <tr>
+      <td bgcolor="#FFDEAD" ><font color="red">※ユーザー名が登録されていません。</font></td>
+  	</tr>
+  </table>
+    <br><br><br><br><br><br><br>
+
+<?php else : ?>
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <br><br>
+    <tr>
+      <td bgcolor="#FFDEAD" ><font color="red">※ログインしてください</font></td>
+  	</tr>
+  </table>
+  <br><br>
+<?php endif; ?>

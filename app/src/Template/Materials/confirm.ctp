@@ -1,13 +1,13 @@
 <?php
 /**
- * @var \App\View\AppView $this 
+ * @var \App\View\AppView $this
  * @var \App\Model\Entity\Material $material
  */
 ?>
-<?= $this->Form->create($material, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($material, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-
+/*
             echo $this->Form->hidden('grade' ,['value'=>$_POST['grade'] ]) ;
             echo $this->Form->hidden('color' ,['value'=>$_POST['color'] ]) ;
             echo $this->Form->hidden('material_type_id' ,['value'=>$_POST['material_type_id'] ]) ;
@@ -17,6 +17,18 @@
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+            */
+            $session = $this->request->getSession();
+            $session->write('materialdata.grade', $_POST['grade']);
+            $session->write('materialdata.color', $_POST['color']);
+            $session->write('materialdata.material_type_id', $_POST['material_type_id']);
+            $session->write('materialdata.tani', $_POST['tani']);
+            $session->write('materialdata.multiple_sup', $_POST['multiple_sup']);
+            $session->write('materialdata.status', $_POST['status']);
+            $session->write('materialdata.delete_flag', $_POST['delete_flag']);
+            $session->write('materialdata.created_staff', $_POST['created_staff']);
+            $session->write('materialdata.updated_staff', null);
+
         ?>
 <hr size="5">
 

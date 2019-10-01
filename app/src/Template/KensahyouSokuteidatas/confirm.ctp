@@ -43,6 +43,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                           "result_size_9" => $_POST["result_size_{$n}_9"],
 
                           'result_weight' => $_POST["result_weight_{$n}"],
+                          'situation_dist' => $_POST["situation_dist_{$n}"],
                         );
               }
 /*
@@ -124,6 +125,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 echo $this->request->getData("result_size_{$q}_9");
                 echo "</td>\n";
                 echo "<td colspan='2'>\n";
+                echo $this->request->getData("situation_dist_{$q}");
                 echo "</td>\n";
                 echo "<td colspan='2'>\n";
                 echo "</td>\n";
@@ -134,9 +136,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         ?>
         </tr>
           <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px">
-	      <strong>備考：</strong><br>
-              <div cols="120" rows="10"><?= h($this->request->getData('bik')) ?></div>
-          </td>
+            <strong>備考：</strong><br>
+                  <?= h($KensahyouHeadbik) ?>
+              </td>
         </tr>
        <tr>
 </table>

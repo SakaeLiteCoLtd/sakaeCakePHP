@@ -16,7 +16,7 @@ use Cake\Core\Configure;//トランザクション
  */
 class CustomersHandyController extends AppController
 {
-    
+
 	public $paginate = [//ページネーション※この設定にするには41行目も必要
 		'limit' => 20,//データを1ページに20個ずつ表示する
 		'conditions' => ['delete_flag' => '0']//'delete_flag' => '0'を満たすものだけ表示する
@@ -24,10 +24,11 @@ class CustomersHandyController extends AppController
 
      public function initialize()
      {
-	parent::initialize();
-	$this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
-	$this->Customers = TableRegistry::get('customers');//customersテーブルを使う
-	$this->Delivers = TableRegistry::get('delivers');//deliversテーブルを使う
+       parent::initialize();
+     	$this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
+     	$this->Customers = TableRegistry::get('customers');//customersテーブルを使う
+     	$this->Delivers = TableRegistry::get('delivers');//deliversテーブルを使う
+       $this->Users = TableRegistry::get('users');//staffsテーブルを使う
      }
 
     /**
@@ -40,7 +41,7 @@ class CustomersHandyController extends AppController
 	$this->set('customersHandy', $this->CustomersHandy->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
 	$this->set('customersHandy', $this->paginate());//※ページネーションを使う
     }
-
+/*
     public function login()//login画面
     {
 	if ($this->request->is('post')) {
@@ -58,7 +59,7 @@ class CustomersHandyController extends AppController
 	$this->request->session()->destroy(); // セッションの破棄
 	return $this->redirect($this->Auth->logout()); // ログアウト処理
     }
-
+*/
     public function form()
     {
 //	$data = $this->request->getData();//postの全データを取得
@@ -89,7 +90,11 @@ class CustomersHandyController extends AppController
 	$this->set('customersHandy',$customersHandy);//1行上の$customersHandyをctpで使えるようにセット
 
 	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+/*
+  echo "<pre>";
+  print_r($data);
+  echo "<br>";
+*/
 	$customer_id = $data['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
 	$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$Customer = $customerData[0]->customer_code.':'.$customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
@@ -99,42 +104,86 @@ class CustomersHandyController extends AppController
 	$place_deliver_idData = $this->Delivers->find()->where(['id' => $place_deliver_id])->toArray();//'id' => $place_deliver_idとなるデータをDeliversテーブルから配列で取得
 	$Deliver = $place_deliver_idData[0]->place_deliver_id.':'.$place_deliver_idData[0]->name;//配列の0番目（0番目しかない）のnameに$Deliverと名前を付ける
 	$this->set('Deliver',$Deliver);//登録者の表示のため1行上の$Deliverをctpで使えるようにセット
-
+/*
 	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
 	$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
-    }
+*/    }
+
+    public function preadd()
+		{
+      $customersHandy = $this->CustomersHandy->newEntity();//newentityに$customersHandyという名前を付ける
+    	$this->set('customersHandy',$customersHandy);//1行上の$customersHandyをctpで使えるようにセット
+		}
+
+	 public function login()
+	 {
+		 if ($this->request->is('post')) {
+			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+			 $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+			 $ary = explode(',', $str);//$strを配列に変換
+
+			 $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+			 //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+			 $this->set('username', $username);
+			 $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+				 if(empty($Userdata)){
+					 $delete_flag = "";
+				 }else{
+					 $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+					 $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+				 }
+					 $user = $this->Auth->identify();
+				 if ($user) {
+					 $this->Auth->setUser($user);
+					 return $this->redirect(['action' => 'do']);
+				 }
+			 }
+	 }
+
+			 public function logout()
+			 {
+				 $this->request->session()->destroy(); // セッションの破棄
+				 return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
+			 }
 
      public function do()
     {
 	$customersHandy = $this->CustomersHandy->newEntity();//newentityに$customersHandyという名前を付ける
 	$this->set('customersHandy',$customersHandy);//1行上の$customersHandyをctpで使えるようにセット
 
-	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+  $session = $this->request->getSession();
+  $data = $session->read();//postデータ取得し、$dataと名前を付ける
 
-	$customer_id = $data['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+  $staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+  $data['customershandydata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+
+//	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+	$customer_id = $data['customershandydata']['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
 	$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$Customer = $customerData[0]->customer_code.':'.$customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
 	$this->set('Customer',$Customer);//登録者の表示のため1行上の$Customerをctpで使えるようにセット
 
-	$place_deliver_id = $data['place_deliver_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+	$place_deliver_id = $data['customershandydata']['place_deliver_id'];//$dataのcustomer_idに$customer_idという名前を付ける
 	$place_deliver_idData = $this->Delivers->find()->where(['id' => $place_deliver_id])->toArray();//'id' => $place_deliver_idとなるデータをDeliversテーブルから配列で取得
 	$Deliver = $place_deliver_idData[0]->place_deliver_id.':'.$place_deliver_idData[0]->name;//配列の0番目（0番目しかない）のnameに$Deliverと名前を付ける
 	$this->set('Deliver',$Deliver);//登録者の表示のため1行上の$Deliverをctpで使えるようにセット
 
-	$customer_id = $data['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+	$customer_id = $data['customershandydata']['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
 	$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$Customer = $customerData[0]->customer_code.':'.$customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
 	$this->set('Customer',$Customer);//登録者の表示のため1行上の$Customerをctpで使えるようにセット
 
-	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+	$created_staff = $data['customershandydata']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
 	$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
-	if ($this->request->is('post')) {//postの場合
-		$customersHandy = $this->CustomersHandy->patchEntity($customersHandy, $this->request->getData());//$customersHandyデータ（空の行）を$this->request->getData()に更新する
+	if ($this->request->is('get')) {//postの場合
+		$customersHandy = $this->CustomersHandy->patchEntity($customersHandy, $data['customershandydata']);//$customersHandyデータ（空の行）を$this->request->getData()に更新する
 		$connection = ConnectionManager::get('default');//トランザクション1
 		// トランザクション開始2
 		$connection->begin();//トランザクション3

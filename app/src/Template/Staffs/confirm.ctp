@@ -19,7 +19,7 @@
             $date_startD = $_POST['date_start']['day'];
             $date_startYMD = array($date_startY,$date_startM,$date_startD);
             $date_start = implode("-",$date_startYMD);
-
+/*
               echo $this->Form->hidden('staff_code' ,['value'=>$_POST['staff_code'] ]) ;
               echo $this->Form->hidden('f_name' ,['value'=>$_POST['f_name'] ]) ;
               echo $this->Form->hidden('l_name' ,['value'=>$_POST['l_name'] ]) ;
@@ -33,7 +33,7 @@
               echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
               echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
               echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
-
+*/
             $session = $this->request->getSession();
             $session->write('staffdata.staff_code', $_POST['staff_code']);
             $session->write('staffdata.f_name', $_POST['f_name']);

@@ -4,10 +4,10 @@
  * @var \App\Model\Entity\Deliver $product
  */
 ?>
-<?= $this->Form->create($product, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($product, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-
+/*
             echo $this->Form->hidden('product_code' ,['value'=>$_POST['product_code'] ]) ;
             echo $this->Form->hidden('product_name' ,['value'=>$_POST['product_name'] ]) ;
             echo $this->Form->hidden('customer_id' ,['value'=>$_POST['customer_id'] ]) ;
@@ -22,6 +22,22 @@
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+*/
+            $session = $this->request->getSession();
+            $session->write('productdata.product_code', $_POST['product_code']);
+            $session->write('productdata.product_name', $_POST['product_name']);
+            $session->write('productdata.customer_id', $_POST['customer_id']);
+            $session->write('productdata.multiple_cs', $_POST['multiple_cs']);
+            $session->write('productdata.material_id', $_POST['material_id']);
+            $session->write('productdata.weight', $_POST['weight']);
+            $session->write('productdata.torisu', $_POST['torisu']);
+            $session->write('productdata.cycle', $_POST['cycle']);
+            $session->write('productdata.primary_p', $_POST['primary_p']);
+            $session->write('productdata.gaityu', $_POST['gaityu']);
+            $session->write('productdata.status', $_POST['status']);
+            $session->write('productdata.delete_flag', $_POST['delete_flag']);
+            $session->write('productdata.created_staff', $_POST['created_staff']);
+            $session->write('productdata.updated_staff', null);
         ?>
 <hr size="5">
 

@@ -8,7 +8,11 @@
 <?= $this->Form->create($priceProduct, ['url' => ['action' => 'index']]) ?>
 
 <?php
-            $username = $this->request->Session()->read('Auth.User.username');
+  $username = $this->request->Session()->read('Auth.User.username');
+  $session = $this->request->getSession();
+  $price = $session->read('priceProductdata.price');
+  $start = $session->read('priceProductdata.start');
+  $status = $session->read('priceProductdata.status');
 ?>
 <hr size="5">
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
@@ -29,15 +33,15 @@
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('price') ?></th>
-            <td><?= h($this->request->getData('price')) ?></td>
+            <td><?= h($price) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('start') ?></th>
-            <td><?= h($this->request->getData('start')) ?></td>
+            <td><?= h($start) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('status') ?></th>
-            <td><?= h($this->request->getData('status')) ?></td>
+            <td><?= h($status) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
             <th scope="row"><?= __('登録日時') ?></th>
@@ -51,4 +55,3 @@
 <br>
         <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>
-

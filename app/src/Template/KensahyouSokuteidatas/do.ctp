@@ -60,6 +60,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               echo "<td colspan='2'>\n";
               echo "</td>\n";
               echo "<td colspan='2'>\n";
+              echo $_SESSION['sokuteidata']["{$q}"]["situation_dist"];
               echo "</td>\n";
                 echo "<td colspan='2'></td>\n";
                 echo "<td colspan='2'>\n";
@@ -70,9 +71,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         </tr>
 
           <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px">
-	      <strong>備考：</strong><br>
-              <div cols="120" rows="10"><?= h($_SESSION['sokuteidata'][1]["bik"]) ?></div>
-          </td>
+            <strong>備考：</strong><br>
+                  <?= h($KensahyouHeadbik) ?>
+              </td>
         </tr>
        <tr>
 </table>

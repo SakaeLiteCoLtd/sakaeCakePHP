@@ -4,7 +4,7 @@
  * @var \App\Model\Entity\Deliver $priceMaterial
  */
 ?>
-<?= $this->Form->create($priceMaterial, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($priceMaterial, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
 
@@ -23,7 +23,7 @@
             $finishYMD = array($finishY,$finishM,$finishD);
             $finish = implode("-",$finishYMD);
             }
-
+/*
             echo $this->Form->hidden('material_id' ,['value'=>$_POST['material_id'] ]) ;
             echo $this->Form->hidden('supplier_id' ,['value'=>$_POST['supplier_id'] ]) ;
             echo $this->Form->hidden('lot_low' ,['value'=>$_POST['lot_low'] ]) ;
@@ -35,6 +35,19 @@
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+*/
+            $session = $this->request->getSession();
+            $session->write('priceMaterialdata.material_id', $_POST['material_id']);
+            $session->write('priceMaterialdata.supplier_id', $_POST['supplier_id']);
+            $session->write('priceMaterialdata.lot_low', $_POST['lot_low']);
+            $session->write('priceMaterialdata.lot_upper', $_POST['lot_upper']);
+            $session->write('priceMaterialdata.price', $_POST['price']);
+            $session->write('priceMaterialdata.start', $start);
+            $session->write('priceMaterialdata.finish', $finish);
+            $session->write('priceMaterialdata.status', $_POST['status']);
+            $session->write('priceMaterialdata.delete_flag', $_POST['delete_flag']);
+            $session->write('priceMaterialdata.created_staff', $_POST['created_staff']);
+            $session->write('priceMaterialdata.updated_staff', null);
         ?>
 <hr size="5">
 

@@ -26,6 +26,7 @@ class SuppliersController extends AppController
 	parent::initialize();
 	$this->Staffs = TableRegistry::get('staffs');//Staffsテーブルを使う
 	$this->SupplierSections = TableRegistry::get('supplierSections');//SupplierSectionsテーブルを使う
+	$this->Users = TableRegistry::get('users');//staffsテーブルを使う
      }
 
     /**
@@ -38,7 +39,7 @@ class SuppliersController extends AppController
 	$this->set('suppliers', $this->Suppliers->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
 	$this->set('suppliers', $this->paginate());//定義したページネーションを使用
     }
-
+/*
     public function login()
     {
 	if ($this->request->is('post')) {
@@ -56,7 +57,7 @@ class SuppliersController extends AppController
 	$this->request->session()->destroy();
 	return $this->redirect($this->Auth->logout());
     }
-
+*/
     public function form()
     {
 	$supplier = $this->Suppliers->newEntity();//newentityに$supplierという名前を付ける
@@ -86,29 +87,74 @@ class SuppliersController extends AppController
 	$this->set('SupplierSection',$SupplierSection);//登録者の表示のため1行上の$SupplierSectionをctpで使えるようにセット
     }
 
+		public function preadd()
+		{
+			$supplier = $this->Suppliers->newEntity();//newentityに$supplierという名前を付ける
+			$this->set('supplier',$supplier);//1行上の$supplierをctpで使えるようにセット
+		}
+
+		public function login()
+		{
+			if ($this->request->is('post')) {
+				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+				$ary = explode(',', $str);//$strを配列に変換
+
+				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+				$this->set('username', $username);
+				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+					if(empty($Userdata)){
+						$delete_flag = "";
+					}else{
+						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+						$this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+					}
+						$user = $this->Auth->identify();
+					if ($user) {
+						$this->Auth->setUser($user);
+						return $this->redirect(['action' => 'do']);
+					}
+				}
+		}
+
+		public function logout()
+		{
+			$this->request->session()->destroy(); // セッションの破棄
+			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
+		}
+
      public function do()
     {
 	$supplier = $this->Suppliers->newEntity();//newentityに$supplierという名前を付ける
 	$this->set('supplier',$supplier);//1行上の$supplierをctpで使えるようにセット
 
-	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+//	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 /*
 	echo "<pre>";
 	print_r($data);
 	echo "<br>";
 */
-	$supplier_section_id = $data['supplier_section_id'];//$dataのsupplier_section_idに$supplier_section_idという名前を付ける
+	$session = $this->request->getSession();
+	$data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+	$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+	$data['supplierdata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+
+
+	$supplier_section_id = $data['supplierdata']['supplier_section_id'];//$dataのsupplier_section_idに$supplier_section_idという名前を付ける
 	$supplier_section_idData = $this->SupplierSections->find()->where(['id' => $supplier_section_id])->toArray();//'id' => $created_staffとなるデータをSupplierSectionsテーブルから配列で取得
 	$SupplierSection = $supplier_section_idData[0]->account_code.':'.$supplier_section_idData[0]->name;//配列の0番目（0番目しかない）のaccount_codeとnameをつなげたものに$supplier_section_idDataと名前を付ける
 	$this->set('SupplierSection',$SupplierSection);//登録者の表示のため1行上の$SupplierSectionをctpで使えるようにセット
 
-	$created_staff = $data['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+	$created_staff = $data['supplierdata']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
 	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
 	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
 	$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
-	if ($this->request->is('post')) {//postの場合
-		$supplier = $this->Suppliers->patchEntity($supplier, $this->request->getData());//$supplierデータ（空の行）を$this->request->getData()に更新する
+	if ($this->request->is('get')) {//postの場合
+		$supplier = $this->Suppliers->patchEntity($supplier, $data['supplierdata']);//$supplierデータ（空の行）を$this->request->getData()に更新する
 		$connection = ConnectionManager::get('default');//トランザクション1
 	// トランザクション開始2
 		$connection->begin();//トランザクション3

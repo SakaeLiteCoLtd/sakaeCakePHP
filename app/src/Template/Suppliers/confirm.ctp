@@ -4,10 +4,10 @@
  * @var \App\Model\Entity\Supplier $supplier
  */
 ?>
-<?= $this->Form->create($supplier, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($supplier, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-
+/*
             echo $this->Form->hidden('supplier_section_id' ,['value'=>$_POST['supplier_section_id'] ]) ;
             echo $this->Form->hidden('supplier_code' ,['value'=>$_POST['supplier_code'] ]) ;
             echo $this->Form->hidden('name' ,['value'=>$_POST['name'] ]) ;
@@ -20,6 +20,21 @@
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
 //            echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+*/
+
+            $session = $this->request->getSession();
+            $session->write('supplierdata.supplier_section_id', $_POST['supplier_section_id']);
+            $session->write('supplierdata.supplier_code', $_POST['supplier_code']);
+            $session->write('supplierdata.name', $_POST['name']);
+            $session->write('supplierdata.zip', $_POST['zip']);
+            $session->write('supplierdata.address', $_POST['address']);
+            $session->write('supplierdata.tel', $_POST['tel']);
+            $session->write('supplierdata.fax', $_POST['fax']);
+            $session->write('supplierdata.charge_p', $_POST['charge_p']);
+            $session->write('supplierdata.status', $_POST['status']);
+            $session->write('supplierdata.delete_flag', $_POST['delete_flag']);
+            $session->write('supplierdata.created_staff', $_POST['created_staff']);
+            $session->write('supplierdata.updated_staff', null);
         ?>
 <hr size="5">
 

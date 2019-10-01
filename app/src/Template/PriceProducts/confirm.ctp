@@ -4,7 +4,7 @@
  * @var \App\Model\Entity\PriceProduct $priceProduct
  */
 ?>
-<?= $this->Form->create($priceProduct, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($priceProduct, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
 
@@ -13,7 +13,7 @@
             $startD = $_POST['start']['day'];
             $startYMD = array($startY,$startM,$startD);
             $start = implode("-",$startYMD);
-
+/*
             echo $this->Form->hidden('product_id' ,['value'=>$_POST['product_id'] ]) ;
             echo $this->Form->hidden('customer_id' ,['value'=>$_POST['customer_id'] ]) ;
             echo $this->Form->hidden('price' ,['value'=>$_POST['price'] ]) ;
@@ -22,6 +22,16 @@
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+*/
+            $session = $this->request->getSession();
+            $session->write('priceProductdata.product_id', $_POST['product_id']);
+            $session->write('priceProductdata.customer_id', $_POST['customer_id']);
+            $session->write('priceProductdata.price', $_POST['price']);
+            $session->write('priceProductdata.start', $start);
+            $session->write('priceProductdata.status', $_POST['status']);
+            $session->write('priceProductdata.delete_flag', $_POST['delete_flag']);
+            $session->write('priceProductdata.created_staff', $_POST['created_staff']);
+            $session->write('priceProductdata.updated_staff', null);
         ?>
 <hr size="5">
 

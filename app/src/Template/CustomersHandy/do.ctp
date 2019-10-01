@@ -8,7 +8,9 @@
 <?= $this->Form->create($customersHandy, ['url' => ['action' => 'index']]) ?>
 
 <?php
-            $username = $this->request->Session()->read('Auth.User.username');
+  $username = $this->request->Session()->read('Auth.User.username');
+  $session = $this->request->getSession();
+  $name = $session->read('customershandydata.name');
 ?>
 <hr size="5">
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
@@ -28,7 +30,7 @@
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('氏名') ?></th>
-            <td><?= h($this->request->getData('name')) ?></td>
+            <td><?= h($name) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
             <th scope="row"><?= __('登録日時') ?></th>
@@ -42,4 +44,3 @@
 <br>
         <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>
-

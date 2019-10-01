@@ -4,10 +4,10 @@
  * @var \App\Model\Entity\Deliver $deliver
  */
 ?>
-<?= $this->Form->create($deliver, ['url' => ['action' => 'do']]) ?>
+<?= $this->Form->create($deliver, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-
+/*
             echo $this->Form->hidden('customer_id' ,['value'=>$_POST['customer_id'] ]) ;
             echo $this->Form->hidden('place_deliver_id' ,['value'=>$_POST['place_deliver_id'] ]) ;
             echo $this->Form->hidden('name' ,['value'=>$_POST['name'] ]) ;
@@ -19,6 +19,19 @@
             echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+*/
+            $session = $this->request->getSession();
+            $session->write('deliverdata.customer_id', $_POST['customer_id']);
+            $session->write('deliverdata.place_deliver_id', $_POST['place_deliver_id']);
+            $session->write('deliverdata.name', $_POST['name']);
+            $session->write('deliverdata.zip', $_POST['zip']);
+            $session->write('deliverdata.address', $_POST['address']);
+            $session->write('deliverdata.tel', $_POST['tel']);
+            $session->write('deliverdata.fax', $_POST['fax']);
+            $session->write('deliverdata.status', $_POST['status']);
+            $session->write('deliverdata.delete_flag', $_POST['delete_flag']);
+            $session->write('deliverdata.created_staff', $_POST['created_staff']);
+            $session->write('deliverdata.updated_staff', null);
         ?>
 <hr size="5">
 

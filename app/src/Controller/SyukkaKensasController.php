@@ -310,41 +310,58 @@ class SyukkaKensasController extends AppController {
      	      }
     	    }//親whileの終わり
 
-//NASテスト
-/*          $dirNAS1 = 'test19080501/';//webroot内のフォルダ
-      //    $dirNAS = 'file://LS210D291/test190805/test.csv';
-//          App::uses('Folder', 'Utility');
-          $dir1 = new Folder('test19080501/', true);
-          if($dir2 = opendir($dirNAS1)){
-            while(($folder1 = readdir($dir2)) !== false){
-              if($folder1 != '.' && $folder1 != '..'){
-                if(strpos($folder1,'.',0)==''){
-                  if(is_dir($dir1.$folder1)){
-                    if($child_dir1 = opendir($dir1.$folder1)){
-                      $folder_check = 0;
-                      if(strpos($folder1,'_',0)==''){
-                        $folder_check = 1;
-                      }else{
-                        $fp = fopen($dir, "r");
-                        $line = fgets($fp);
-                        print_r($line);
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-/*          $dirNAS = $dir1.'test12.csv';//webroot以外のファイルを見る実験
-      //    $dirNAS = '//192.168.1.250/LS210D291/test190805/test12.csv';
-//      $dirNAS = 'file://Users/info/sakaeCakePHP/app/webroot/test19080501/test12.csv';
-          $fp = fopen($dir, "r");
-          $line = fgets($fp);
-          print_r($line);
-*/
     	  }
      }
+
+     $dirName = 'backupData_IM測定/';//webroot内のフォルダ
+     $countnameb = 0;
+
+     if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
+      if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）
+        while(($folder = readdir($dir)) !== false){//親while（ディレクトリ内のファイル一覧を取得する）
+          if($folder != '.' && $folder != '..'){//フォルダーなら("."が無いならフォルダーという認識)
+            if(strpos($folder,'.',0)==''){//$folderが'.'を含まなかった時
+              if(is_dir($dirName.$folder)){//$dirName.$folderがディレクトリかどうかを調べる
+                if($child_dir = opendir($dirName.$folder)){//opendir で$dirName.$folderの子ディレクトリをオープン
+                  $folder_check = 0;//$folder_checkを定義
+                    if(strpos($folder,'_',0)==''){//$folderが'_'を含まなかった時
+                      $folder_check = 1;//$folder_check=1にする
+                    }else{//$folderが'_'を含む時
+                      $num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
+                      $product_code = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
+                         while(($file = readdir($child_dir)) !== false){//子while
+                              if($file != "." && $file != ".."){//ファイルなら
+                               if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
+                                  if(substr($file, 0, 5) == "sumi_" ){//sumi_ファイルだけOPEN
+                                   $countnameb += 1;//ファイル名がかぶらないようにカウントしておく
+                                   $num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
+                                  ${"product_codeb".$countnameb} = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
+                                   ${"ProductDatab".$countnameb} = $this->Products->find()->where(['product_code' => ${"product_codeb".$countnameb}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                  ${"product_nameb".$countnameb} = ${"ProductDatab".$countnameb}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                   ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
+
+                                   $this->set('product_codeb'.$countnameb,${"product_codeb".$countnameb});//セット
+                                   $this->set('product_nameb'.$countnameb,${"product_nameb".$countnameb});//セット
+                                   $this->set('inspec_dateb'.$countnameb,${"inspec_dateb".$countnameb});//セット
+                                   $this->set('countnameb',$countnameb);//セット
+
+                                   $session = $this->request->session();
+                                   $session->write('product_codeb', ${"product_codeb".$countnameb});
+                                   $session->write('product_nameb', ${"product_nameb".$countnameb});
+                                 }
+                              }
+                            }else{
+                             $this->set('countnameb',$countnameb);//セット
+                           }
+                         }
+                      }
+                    }
+                }//if(ファイルでなくフォルダーであるなら)の終わり
+              }//フォルダーであるなら
+            }
+        }//親whileの終わり
+      }
+    }
     }
 
 
@@ -540,7 +557,7 @@ class SyukkaKensasController extends AppController {
                                   }else{
                                    print_r('else ');
                                   }
-/*
+
                                 $output_dir = 'backupData_IM測定/'.$folder;
                                   if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
                                    if (mkdir($output_dir)) {
@@ -564,7 +581,7 @@ class SyukkaKensasController extends AppController {
                                         }
                                     }
                                   }
-*/                               }
+                               }
                              }
                           }
                 	 		}
@@ -575,25 +592,30 @@ class SyukkaKensasController extends AppController {
      	    }//親whileの終わり
     	  }
     	}
-/*      $session = $this->request->session();
-      $sampleData = $session->read('person1');
-    	echo "<pre>";
-    	print_r($sampleData);
-    	echo "</pre>";
-*/
-
-      return $this->redirect(['action' => 'preform']);
+      return $this->redirect(['action' => 'index2']);
     }
 
     public function preform()//「出荷検査表登録」ページで検査結果を入力
     {
-      $session = $this->request->session();
+/*      $session = $this->request->session();
+
       $product_code = $session->read('product_code');
       $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
       $product_name = $session->read('product_name');
       $this->set('Productname',$product_name);//セット
       $kind_kensa = $session->read('kind_kensa');
       $this->set('kind_kensa',$kind_kensa);//セット
+*/
+      $data = array_values($this->request->query);//getで取り出した配列の値を取り出す
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $product_code = $data[1];
+      $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
+      $product_name = $data[2];
+      $this->set('Productname',$product_name);//セット
 
     	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
     	->select(['product_id','delete_flag' => '0'])
@@ -661,8 +683,8 @@ class SyukkaKensasController extends AppController {
         $this->set('Productname',$product_name);//セット
         $lot_num = $data['lot_num'];
         $this->set('lot_num',$lot_num);//セット
-        $kind_kensa = $data['kind_kensa'];
-        $this->set('kind_kensa',$kind_kensa);//セット
+//        $kind_kensa = $data['kind_kensa'];
+//        $this->set('kind_kensa',$kind_kensa);//セット
 
       	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
       	->select(['product_id','delete_flag' => '0'])
@@ -713,17 +735,6 @@ class SyukkaKensasController extends AppController {
       $ImSokuteidataHeadId = $ImKikaku[0]->im_sokuteidata_head_id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
       $ImSokuteidataResult = $this->ImSokuteidataResults->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHeadId ])->toArray();
 
-  //    $ImSokuteidataResult_id = $ImSokuteidataResult[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
-//      echo "<pre>";
-//      print_r($ImSokuteidataResult);
-//      echo "</pre>";
-/*
-      echo "<pre>";
-    	print_r($ImKikaku);
-    	echo "</pre>";
-*/
-
-
     	for($i=1; $i<=9; $i++){//size_1～9までセット
         ${"kind_kensa".$i} = "ノギス";
         $this->set('kind_kensa'.$i,${"kind_kensa".$i});//セット
@@ -734,45 +745,27 @@ class SyukkaKensasController extends AppController {
             if(${"size_".$i} == $ImKikaku[$j]['size'] and ${"size_".$i} != 0){//KensahyouHeadのsize$iと$ImKikaku[$j]['size']が同じ場合
               $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['id' => $ImKikaku[$j]['im_sokuteidata_head_id']])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
               ${"kind_kensa".$i} = $ImSokuteidataHead[0]->kind_kensa;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
-/*
-             echo "<pre>";
-    //          print_r($ImKikaku);
-              print_r(${"kind_kensa".$i});
-              print_r("-");
-              print_r($ImKikaku[$j]['size']);
-              print_r("-");
-              print_r($ImKikaku[$j]['size_num']);
-              print_r("-");
-              print_r($i);
-            	echo "</pre>";
-*/      //        ${"size_num_".$j} = $ImKikaku[$j]['size_num'];
-          //    ${"kind_kensa".$i} = $kind_kensa;
+
               $this->set('kind_kensa'.$i,${"kind_kensa".$i});//セット
               $ImSokuteidataResult = $this->ImSokuteidataResults->find()->where(['im_sokuteidata_head_id' => $ImKikaku[$j]['im_sokuteidata_head_id'] , 'size_num' => $ImKikaku[$j]['size_num']])->toArray();
-/*
 
-              echo "<pre>";
-              print_r($ImSokuteidataResult[0]);
-              echo "</pre>";
+              $ImSokuteidataResultarry = array();//空の配列を作る
 
-*/
               foreach ((array)$ImSokuteidataResult as $key => $value) {//serialで並び替え
                    $sort[$key] = $value['serial'];
+                    array_push($ImSokuteidataResultarry, [$value['serial'], $value['result']]);
                }
-             if(isset($ImSokuteidataResult[0])){
-                array_multisort($sort, SORT_ASC, $ImSokuteidataResult);
-                $cnt = count($ImSokuteidataResult);
+             if(isset($ImSokuteidataResultarry[0])){
+                array_multisort($ImSokuteidataResultarry, SORT_ASC, $ImSokuteidataResultarry);
+                $cnt = count($ImSokuteidataResultarry);
 /*
                 echo "<pre>";
-                print_r($ImSokuteidataResult[0]);
-                echo "</pre>";
-                echo "<pre>";
-                print_r($cnt);
+                print_r($ImSokuteidataResultarry);
                 echo "</pre>";
 */
                 for($r=1; $r<=$cnt; $r++){
                   $r1 = $r-1;
-                  ${"ImSokuteidata_result_".$i."_".$r} = $ImSokuteidataResult[$r1]->result;
+                  ${"ImSokuteidata_result_".$i."_".$r} = $ImSokuteidataResultarry[$r1][1];
                   ${"ImSokuteidata_result_".$i."_".$r} = round(${"ImSokuteidata_result_".$i."_".$r},2);
                   $this->set('ImSokuteidata_result_'.$i.'_'.$r,${"ImSokuteidata_result_".$i."_".$r});//セット
                  }
@@ -942,6 +935,49 @@ class SyukkaKensasController extends AppController {
 
     $inspec_date = $data[1]['inspec_date'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
     $this->set('inspec_date',$inspec_date);//セット
+
+    $ImKikakuid_1 = "ノギス";
+    $this->set('ImKikakuid_1',$ImKikakuid_1);
+    $ImKikakuid_2 = "ノギス";
+    $this->set('ImKikakuid_2',$ImKikakuid_2);
+    $ImKikakuid_3 = "ノギス";
+    $this->set('ImKikakuid_3',$ImKikakuid_3);
+    $ImKikakuid_4 = "ノギス";
+    $this->set('ImKikakuid_4',$ImKikakuid_4);
+    $ImKikakuid_5 = "ノギス";
+    $this->set('ImKikakuid_5',$ImKikakuid_5);
+    $ImKikakuid_6 = "ノギス";
+    $this->set('ImKikakuid_6',$ImKikakuid_6);
+    $ImKikakuid_7 = "ノギス";
+    $this->set('ImKikakuid_7',$ImKikakuid_7);
+    $ImKikakuid_8 = "ノギス";
+    $this->set('ImKikakuid_8',$ImKikakuid_8);
+    $ImKikakuid_9 = "ノギス";
+    $this->set('ImKikakuid_9',$ImKikakuid_9);
+
+    $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
+    $Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+    $ImKikakus = $this->ImKikakuTaious->find()->where(['product_id' => $Productid])->toArray();//'id' => $product_code_idとなるデータをProductsテーブルから配列で取得（プルダウン）
+    foreach ((array)$ImKikakus as $key => $value) {
+         $sort[$key] = $value['kensahyuo_num'];
+     }
+     if(isset($ImKikakus[0])){
+      array_multisort($sort, SORT_ASC, $ImKikakus);
+    }
+
+    for($i=0; $i<=8; $i++){
+      $j = $i + 1;
+      if(isset($ImKikakus[$i])) {
+        if($ImKikakus[$i]['kind_kensa'] != "") {
+          ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+          $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+        }else{
+        }
+      }else{
+        ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+        $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+      }
+    }
 
     for($q=1; $q<=8; $q++){
       ${"result_weight_".$q} = $data["{$q}"]["result_weight"];

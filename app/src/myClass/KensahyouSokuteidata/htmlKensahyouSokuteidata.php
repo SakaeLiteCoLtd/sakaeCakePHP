@@ -84,8 +84,15 @@ class htmlKensahyouSokuteidata extends AppController
                 $html = $html."</div></td>\n";
             }
             $html = $html.
-            "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'></div></td>\n".
-            "<td colspan='2'><div align='center'></div></td>\n";
+  //          "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'></div></td>\n".
+  //          "<td colspan='2'><div align='center'></div></td>\n";
+            "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'>\n";
+            $html = $html.$value->text_10;
+            $html = $html."</div></td>\n";
+            $html = $html.
+            "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'>\n";
+            $html = $html.$value->text_11;
+            $html = $html."</div></td>\n";
 
 /*
         $html = $html.

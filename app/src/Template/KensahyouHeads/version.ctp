@@ -69,23 +69,23 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
     <fieldset>
 <div align="center"><strong><font color="red">＊登録してください</font></strong></div>
 <br>
-    <table width="900" border="1" align="center" bordercolor="#000000" bgcolor="#FFFFFF" style="background-color: #FFFFFF">
+    <table width="1200" border="1" align="center" bordercolor="#000000" bgcolor="#FFFFFF" style="background-color: #FFFFFF">
         <tr style="border-bottom: solid;border-width: 1px">
-          <td colspan="4" nowrap="nowrap"><div align="center"><strong>部品番号</strong></div></td>
-          <td colspan="8" nowrap="nowrap"><?= h($Productcode) ?></td>
-          <td colspan="4" nowrap="nowrap"><div align="center"><strong>部品名</strong></div></td>
-          <td colspan="8" nowrap="nowrap"><?= h($Productname) ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>部品番号</strong></div></td>
+          <td colspan="9" nowrap="nowrap"><?= h($Productcode) ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>部品名</strong></div></td>
+          <td colspan="9" nowrap="nowrap"><?= h($Productname) ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
-          <td colspan="4" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
-          <td colspan="8"><?= h("1") ?></td>
-          <td colspan="4" nowrap="nowrap"><div align="center"><strong>type_im</strong></div></td>
-          <td colspan="8"><?= $this->Form->input("type_im", array('type' => 'value', 'label'=>false)); ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
+          <td colspan="9"><?= h("1") ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>type_im</strong></div></td>
+          <td colspan="9"><?= $this->Form->input("type_im", array('type' => 'value', 'label'=>false)); ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
-          <td colspan="4" nowrap="nowrap"><div align="center"><strong>枚数</strong></div></td>
-          <td colspan="8"><?= $this->Form->input("maisu", array('type' => 'value', 'label'=>false)); ?></td>
-          <td colspan="12" nowrap="nowrap">&nbsp;<input type="hidden" name="version" value="0"/></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>枚数</strong></div></td>
+          <td colspan="9"><?= $this->Form->input("maisu", array('type' => 'value', 'label'=>false)); ?></td>
+          <td colspan="14" nowrap="nowrap">&nbsp;<input type="hidden" name="version" value="0"/></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="4">&nbsp;</td>
@@ -98,6 +98,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td width="38" colspan="2"><div align="center"><strong>G</strong></div></td>
           <td width="38" colspan="2"><div align="center"><strong>H</strong></div></td>
           <td width="60" nowrap="nowrap" colspan="2"><div align="center"><font size="-3"><strong>ソリ・フレ</strong></font></div></td>
+          <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観１</strong></font></div></td>
+          <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観２</strong></font></div></td>
           <td width="51" nowrap="nowrap" colspan="2"><div align="center"><font size="-1"><strong>単重</strong></font></div></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
@@ -111,6 +113,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo '<input name=" upper_' . $i . '" type="text"  value="" size="6"/>';
             echo '</div></td>';
             }
+            echo "<td colspan='2'>\n";
+            echo "</td>\n";
+            echo "<td colspan='2'>\n";
+            echo "</td>\n";
+
         ?>
 
           <td colspan="2"><div align="center"></div></td>
@@ -126,6 +133,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo '<input name=" lower_' . $i . '" type="text"  value="" size="6"/>';
             echo '</div></td>';
             }
+            echo "<td colspan='2'>\n";
+            echo "</td>\n";
+            echo "<td colspan='2'>\n";
+            echo "</td>\n";
+
         ?>
 
           <td colspan="2"><div align="center"></div></td>
@@ -140,11 +152,18 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo '<input name=" size_' . $i . '" type="text"  value="" size="6"/>';
             echo '</div></td>';
             }
+            echo '<td colspan="2"><div align="center">';
+            echo '<input name="text_10" type="text"  value="" size="6"/>';
+            echo '</div></td>';
+            echo '<td colspan="2"><div align="center">';
+            echo '<input name="text_11" type="text"  value="" size="6"/>';
+            echo '</div></td>';
+
         ?>
 
         </tr>
 
-          <td height="120" colspan="24" style="border-bottom: solid;border-width: 1px">
+          <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px">
 	      <strong>備考：</strong><br>
               <textarea name="bik"  cols="120" rows="10"></textarea>
           </td>
@@ -161,6 +180,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);
             echo $this->Form->hidden('updated_staff');
         ?>
+
     </fieldset>
     <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>

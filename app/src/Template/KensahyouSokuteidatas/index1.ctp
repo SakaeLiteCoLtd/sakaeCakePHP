@@ -15,15 +15,14 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <br>
 <br>
 
-<?=$this->Form->create($entity, ['url' => ['action' => 'form']]) ?>
+<?=$this->Form->create($entity, ['url' => ['action' => 'preform']]) ?>
 <div align="center" style="margin:0rem;padding:0rem">
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" height="100%">
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('product') ?></th>
-    		<td style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("product_code_num", ["type"=>"select", "options"=>$arrProductcode, 'label'=>false]); ?></td>
-    	</tr>
-
-</table>
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+    <tr>
+  		<td bgcolor="#FFDEAD" style="width: 50px">品番</td>
+  		<td bgcolor="#FFDEAD"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
+  	</tr>
+  </table>
 </div>
 <br>
     <center><?= $this->Form->button(__('select'), array('name' => 'kakunin')) ?></center>

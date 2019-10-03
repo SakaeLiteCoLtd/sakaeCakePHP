@@ -36,8 +36,8 @@ class CustomersController extends AppController
      */
     public function index()
     {
-	$this->set('customers', $this->Customers->find('all'));//Customersテーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
-	$this->set('customers', $this->paginate());//※ページネーションを使う
+			$this->set('customers', $this->Customers->find('all'));//Customersテーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
+			$this->set('customers', $this->paginate());//※ページネーションを使う
     }
 /*
     public function login()//login画面
@@ -60,17 +60,17 @@ class CustomersController extends AppController
 */
     public function form()
     {
-	$customer = $this->Customers->newEntity();//newentityに$customerという名前を付ける
-	$this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
+			$customer = $this->Customers->newEntity();//newentityに$customerという名前を付ける
+			$this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
 
-	$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-	$customer['created_staff'] = $staff_id;//$customerのcreated_staffを$staff_idにする
+			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+			$customer['created_staff'] = $staff_id;//$customerのcreated_staffを$staff_idにする
     }
 
      public function confirm()
     {
-	$customer = $this->Customers->newEntity();//newEntityを作成
-	$this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
+			$customer = $this->Customers->newEntity();//newEntityを作成
+			$this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
     }
 
 		public function preadd()
@@ -105,11 +105,11 @@ class CustomersController extends AppController
 			 }
 	 }
 
-			 public function logout()
-			 {
-				 $this->request->session()->destroy(); // セッションの破棄
-				 return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
-			 }
+	 public function logout()
+	 {
+		 $this->request->session()->destroy(); // セッションの破棄
+		 return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
+	 }
 
      public function do()
     {
@@ -149,73 +149,73 @@ class CustomersController extends AppController
 
      public function confirmcsv()//「出荷検査表登録」確認画面
     {
-	$customer = $this->Customers->newEntity();//newentityに$customerという名前を付ける
-	$this->set('customer',$customer);//1行上の$customerをctpで使えるようにセット
+			$customer = $this->Customers->newEntity();//newentityに$customerという名前を付ける
+			$this->set('customer',$customer);//1行上の$customerをctpで使えるようにセット
 
-	$staff_id = $this->Auth->user('staff_id');
-	$this->set('staff_id',$staff_id);//1行上の$staff_idをctpで使えるようにセット
+			$staff_id = $this->Auth->user('staff_id');
+			$this->set('staff_id',$staff_id);//1行上の$staff_idをctpで使えるようにセット
 
-	$fp = fopen("customer.csv", "r");//csvファイルはwebrootに入れる
-	$this->set('fp',$fp);
+			$fp = fopen("customer.csv", "r");//csvファイルはwebrootに入れる
+			$this->set('fp',$fp);
 
-	$fpcount = fopen("customer.csv", 'r' );
-	for( $count = 0; fgets( $fpcount ); $count++ );//csvファイルが何行あるかカウントする
-	$this->set('count',$count);
+			$fpcount = fopen("customer.csv", 'r' );
+			for( $count = 0; fgets( $fpcount ); $count++ );//csvファイルが何行あるかカウントする
+			$this->set('count',$count);
 
-	$arrFp = array();//空の配列を作る
-//	$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目）
-	for ($k=1; $k<=$count; $k++) {//行数分
-		$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
-		$sample = explode(',',$line);//$lineを","毎に配列に入れる
+			$arrFp = array();//空の配列を作る
+		//	$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目）
+			for ($k=1; $k<=$count; $k++) {//行数分
+				$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+				$sample = explode(',',$line);//$lineを","毎に配列に入れる
 
-		$keys=array_keys($sample);
-		$keys[array_search('0',$keys)]='customer_code';//名前の変更
-		$keys[array_search('1',$keys)]='name';
-		$keys[array_search('2',$keys)]='yuubin';
-		$keys[array_search('3',$keys)]='address';
-		$keys[array_search('4',$keys)]='tel';
-		$keys[array_search('5',$keys)]='fax';
-		$keys[array_search('7',$keys)]='delete_flag';
-		$sample = array_combine( $keys, $sample );
+				$keys=array_keys($sample);
+				$keys[array_search('0',$keys)]='customer_code';//名前の変更
+				$keys[array_search('1',$keys)]='name';
+				$keys[array_search('2',$keys)]='yuubin';
+				$keys[array_search('3',$keys)]='address';
+				$keys[array_search('4',$keys)]='tel';
+				$keys[array_search('5',$keys)]='fax';
+				$keys[array_search('7',$keys)]='delete_flag';
+				$sample = array_combine( $keys, $sample );
 
-		unset($sample['6']);//削除
+				unset($sample['6']);//削除
 
-		$arrFp[] = $sample;//配列に追加する
-	}
-	$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
-//	echo "<pre>";
-//	print_r($arrFp);
-//	echo "<br>";
+				$arrFp[] = $sample;//配列に追加する
+			}
+			$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
+		//	echo "<pre>";
+		//	print_r($arrFp);
+		//	echo "<br>";
     }
 
      public function docsv()
     {
-	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-//	echo "<pre>";
-//	print_r($data);
-//	var_dump($data);
-//	echo "<br>";
+			$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+		//	echo "<pre>";
+		//	print_r($data);
+		//	var_dump($data);
+		//	echo "<br>";
 
-	$customer = $this->Customers->newEntity();//newentityに$customerという名前を付ける
-	$this->set('customer',$customer);//1行上の$customerをctpで使えるようにセット
+			$customer = $this->Customers->newEntity();//newentityに$customerという名前を付ける
+			$this->set('customer',$customer);//1行上の$customerをctpで使えるようにセット
 
-			if ($this->request->is('post')) {//postなら登録
-				$customer = $this->Customers->patchEntities($customer, $this->request->getData('customerdata'));//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-				$connection = ConnectionManager::get('default');//トランザクション1
-				// トランザクション開始2
-				$connection->begin();//トランザクション3
-				try {//トランザクション4
-						if ($this->Customers->saveMany($customer)) {//saveManyで一括登録
-							$connection->commit();// コミット5
-						} else {
-							$this->Flash->error(__('The Customers could not be saved. Please, try again.'));
-							throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-						}
-				} catch (Exception $e) {//トランザクション7
-				//ロールバック8
-					$connection->rollback();//トランザクション9
-				}//トランザクション10
-			}
+					if ($this->request->is('post')) {//postなら登録
+						$customer = $this->Customers->patchEntities($customer, $this->request->getData('customerdata'));//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+						$connection = ConnectionManager::get('default');//トランザクション1
+						// トランザクション開始2
+						$connection->begin();//トランザクション3
+						try {//トランザクション4
+								if ($this->Customers->saveMany($customer)) {//saveManyで一括登録
+									$connection->commit();// コミット5
+								} else {
+									$this->Flash->error(__('The Customers could not be saved. Please, try again.'));
+									throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+								}
+						} catch (Exception $e) {//トランザクション7
+						//ロールバック8
+							$connection->rollback();//トランザクション9
+						}//トランザクション10
+					}
     }
 
     /**
@@ -227,31 +227,32 @@ class CustomersController extends AppController
      */
     public function edit($id = null)
     {
-	$customer = $this->Customers->get($id);//選んだidに関するCustomersテーブルのデータに$customerと名前を付ける
-	$this->set('customer', $customer);//$customerをctpで使えるようにセット
+			$customer = $this->Customers->get($id);//選んだidに関するCustomersテーブルのデータに$customerと名前を付ける
+			$this->set('customer', $customer);//$customerをctpで使えるようにセット
 
-	$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-	$customer['updated_staff'] = $staff_id;//$customerのupdated_staffを$staff_idにする
+			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+			$customer['updated_staff'] = $staff_id;//$customerのupdated_staffを$staff_idにする
 
-		if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
-			$customer = $this->Customers->patchEntity($customer, $this->request->getData());//3行上でとったもともとの$customerデータを$this->request->getData()に更新する
-			$connection = ConnectionManager::get('default');//トランザクション1
-				// トランザクション開始2
-			$connection->begin();//トランザクション3
-			try {//トランザクション4
-				if ($this->Customers->save($customer)) {//saveできた場合
-					$this->Flash->success(__('The customer has been updated.'));
-					$connection->commit();// コミット5
-					return $this->redirect(['action' => 'index']);//処理が終わったらindexへ移動
-				} else {//saveできなかった場合
-					$this->Flash->error(__('The customer could not be updated. Please, try again.'));
-					throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+				if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
+					$customer = $this->Customers->patchEntity($customer, $this->request->getData());//3行上でとったもともとの$customerデータを$this->request->getData()に更新する
+					$connection = ConnectionManager::get('default');//トランザクション1
+						// トランザクション開始2
+					$connection->begin();//トランザクション3
+					try {//トランザクション4
+						if ($this->Customers->save($customer)) {//saveできた場合
+							$this->Flash->success(__('The customer has been updated.'));
+							$connection->commit();// コミット5
+							return $this->redirect(['action' => 'index']);//処理が終わったらindexへ移動
+						} else {//saveできなかった場合
+							$this->Flash->error(__('The customer could not be updated. Please, try again.'));
+							throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+						}
+					} catch (Exception $e) {//トランザクション7
+					//ロールバック8
+						$connection->rollback();//トランザクション9
+					}//トランザクション10
 				}
-			} catch (Exception $e) {//トランザクション7
-			//ロールバック8
-				$connection->rollback();//トランザクション9
-			}//トランザクション10
-		}
+				
     }
 
 }

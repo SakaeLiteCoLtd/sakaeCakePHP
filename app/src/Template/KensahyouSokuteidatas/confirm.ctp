@@ -43,7 +43,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                           "result_size_9" => $_POST["result_size_{$n}_9"],
 
                           'result_weight' => $_POST["result_weight_{$n}"],
-                          'situation_dist' => $_POST["situation_dist_{$n}"],
+                          'situation_dist1' => $_POST["situation_dist1_{$n}"],
+                          'situation_dist2' => $_POST["situation_dist2_{$n}"],
                         );
               }
 /*
@@ -103,6 +104,27 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 ?>
 
         <?php
+        echo "<tr style='border-bottom: solid;border-width: 1px'><td nowrap='nowrap' colspan='4'><div align='center'><strong>\n";
+        echo "検査種類";
+        echo "</strong></div></td>\n";
+        $kensaArray = Array();
+        for($i=1; $i<=9; $i++){
+
+          echo "<td colspan='2'><div align='center'>\n";
+          echo ${"ImKikakuid_".$i};
+          echo "</div></td>\n";
+
+//        echo "<td colspan='2'><div align='center'>\n";
+//        echo "ノギス";
+//        echo "</strong></div></td>\n";
+        }
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
+
             $lowerArraygyou = Array();
             for($q=1; $q<=8; $q++){
               echo '<tr style="border-bottom: solid;border-width: 1px"><td nowrap="nowrap" colspan="4"><div align="center"><strong>';
@@ -111,7 +133,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
               $lowerArray = Array();
               for($r=1; $r<=8; $r++){
-                	if($this->request->getData("result_size_{$q}_{$r}") <= ${"size_".$r}+${"upper_".$r} && $this->request->getData("result_size_{$q}_{$r}") >= ${"size_".$r}-${"lower_".$r}){
+                	if($this->request->getData("result_size_{$q}_{$r}") <= ${"size_".$r}+${"upper_".$r} && $this->request->getData("result_size_{$q}_{$r}") >= ${"size_".$r}+${"lower_".$r}){
                   echo '<td colspan="2"><div align="center">';
                   echo $this->request->getData("result_size_{$q}_{$r}") ;
                   echo '</div></td>';
@@ -125,9 +147,10 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 echo $this->request->getData("result_size_{$q}_9");
                 echo "</td>\n";
                 echo "<td colspan='2'>\n";
-                echo $this->request->getData("situation_dist_{$q}");
+                echo $this->request->getData("situation_dist1_{$q}");
                 echo "</td>\n";
                 echo "<td colspan='2'>\n";
+                echo $this->request->getData("situation_dist2_{$q}");
                 echo "</td>\n";
                 echo "<td colspan='2'><div align='center'>\n";
                 echo $this->request->getData("result_weight_{$q}");

@@ -7,14 +7,7 @@
 <?= $this->Form->create($role, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-/*
-            echo $this->Form->hidden('role_code' ,['value'=>$_POST['role_code'] ]) ;
-            echo $this->Form->hidden('name' ,['value'=>$_POST['name'] ]) ;
-            echo $this->Form->hidden('status' ,['value'=>$_POST['status'] ]) ;
-            echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
-            echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
-            echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
-*/
+
             $session = $this->request->getSession();
             $session->write('roledata.role_code', $_POST['role_code']);
             $session->write('roledata.name', $_POST['name']);

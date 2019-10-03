@@ -31,7 +31,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
           <td colspan="9"><?= h($KensahyouHeadver) ?></td>
-          <td colspan="14" nowrap="nowrap">&nbsp;</td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
+          <td colspan="9"><?= h($lot_num) ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
@@ -45,6 +46,27 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 ?>
 
         <?php
+        echo "<tr style='border-bottom: solid;border-width: 1px'><td nowrap='nowrap' colspan='4'><div align='center'><strong>\n";
+        echo "検査種類";
+        echo "</strong></div></td>\n";
+        $kensaArray = Array();
+        for($i=1; $i<=9; $i++){
+
+          echo "<td colspan='2'><div align='center'>\n";
+          echo ${"ImKikakuid_".$i};
+          echo "</div></td>\n";
+
+//        echo "<td colspan='2'><div align='center'>\n";
+//        echo "ノギス";
+//        echo "</strong></div></td>\n";
+        }
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
+
             $lowerArraygyou = Array();
             for($q=1; $q<=8; $q++){
               echo '<tr style="border-bottom: solid;border-width: 1px"><td nowrap="nowrap" colspan="4"><div align="center"><strong>';
@@ -60,9 +82,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               echo "<td colspan='2'>\n";
               echo "</td>\n";
               echo "<td colspan='2'>\n";
-              echo $_SESSION['sokuteidata']["{$q}"]["situation_dist"];
+              echo $_SESSION['sokuteidata']["{$q}"]["situation_dist1"];
               echo "</td>\n";
-                echo "<td colspan='2'></td>\n";
+              echo "<td colspan='2'>\n";
+              echo $_SESSION['sokuteidata']["{$q}"]["situation_dist2"];
+              echo "</td>\n";
                 echo "<td colspan='2'>\n";
                 echo $_SESSION['sokuteidata']["{$q}"]["result_weight"];
                 echo "</td>\n";

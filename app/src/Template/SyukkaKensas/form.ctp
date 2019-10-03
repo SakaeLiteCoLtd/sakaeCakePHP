@@ -46,7 +46,6 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
             $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();
             $inspec_date = $ImSokuteidataHead[0]->inspec_date;
             $ImSokuteidataHead_id = $ImSokuteidataHead[0]->id;
-
           ?>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>検査年月日</strong></div></td>
           <td colspan="9"><?= h($inspec_date) ?></td>
@@ -172,7 +171,14 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
     <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
     <fieldset>
       <?= $this->Form->control('lot_num', array('type'=>'hidden', 'value'=>$lot_num, 'label'=>false)) ?>
-      <?= $this->Form->control('kind_kensa', array('type'=>'hidden', 'value'=>$kind_kensa, 'label'=>false)) ?>
+      <?= $this->Form->control('kind_kensa_1', array('type'=>'hidden', 'value'=>$kind_kensa1, 'label'=>false)) ?>
+      <?= $this->Form->control('kind_kensa_2', array('type'=>'hidden', 'value'=>$kind_kensa2, 'label'=>false)) ?>
+      <?= $this->Form->control('kind_kensa_3', array('type'=>'hidden', 'value'=>$kind_kensa3, 'label'=>false)) ?>
+      <?= $this->Form->control('kind_kensa_4', array('type'=>'hidden', 'value'=>$kind_kensa4, 'label'=>false)) ?>
+      <?= $this->Form->control('kind_kensa_5', array('type'=>'hidden', 'value'=>$kind_kensa5, 'label'=>false)) ?>
+      <?= $this->Form->control('kind_kensa_6', array('type'=>'hidden', 'value'=>$kind_kensa6, 'label'=>false)) ?>
+      <?= $this->Form->control('kind_kensa_7', array('type'=>'hidden', 'value'=>$kind_kensa7, 'label'=>false)) ?>
+      <?= $this->Form->control('kind_kensa_8', array('type'=>'hidden', 'value'=>$kind_kensa8, 'label'=>false)) ?>
     </fieldset>
 
     <?= $this->Form->end() ?>

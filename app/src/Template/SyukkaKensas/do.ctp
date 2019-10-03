@@ -52,6 +52,27 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 ?>
 
         <?php
+        echo "<tr style='border-bottom: solid;border-width: 1px'><td nowrap='nowrap' colspan='4'><div align='center'><strong>\n";
+        echo "検査種類";
+        echo "</strong></div></td>\n";
+        $kensaArray = Array();
+        for($i=1; $i<=9; $i++){
+
+          echo "<td colspan='2'><div align='center'>\n";
+          echo ${"ImKikakuid_".$i};
+          echo "</div></td>\n";
+
+//        echo "<td colspan='2'><div align='center'>\n";
+//        echo "ノギス";
+//        echo "</strong></div></td>\n";
+        }
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
+
             $lowerArraygyou = Array();
             for($q=1; $q<=8; $q++){
               echo '<tr style="border-bottom: solid;border-width: 1px"><td nowrap="nowrap" colspan="4"><div align="center"><strong>';

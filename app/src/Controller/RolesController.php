@@ -56,10 +56,10 @@ class RolesController extends AppController
 */
     public function form()
     {
-	$role = $this->Roles->newEntity();//newentityに$roleという名前を付ける
-	$this->set('role',$role);//1行上の$roleをctpで使えるようにセット
-	$created_staff = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$created_staffという名前を付ける
-	$role['created_staff'] = $created_staff;//$roleのcreated_staffを$staff_idにする
+			$role = $this->Roles->newEntity();//newentityに$roleという名前を付ける
+			$this->set('role',$role);//1行上の$roleをctpで使えるようにセット
+			$created_staff = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$created_staffという名前を付ける
+			$role['created_staff'] = $created_staff;//$roleのcreated_staffを$staff_idにする
     }
 
      public function confirm()
@@ -145,30 +145,31 @@ class RolesController extends AppController
 
     public function edit($id = null)
     {
-	$role = $this->Roles->get($id);//選んだidに関するRolesテーブルのデータに$roleと名前を付ける
-	$this->set('role',$role);//1行上の$roleをctpで使えるようにセット
-	$updated_staff = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-	$role['updated_staff'] = $updated_staff;//$roleのupdated_staffを$staff_idにする
+			$role = $this->Roles->get($id);//選んだidに関するRolesテーブルのデータに$roleと名前を付ける
+			$this->set('role',$role);//1行上の$roleをctpで使えるようにセット
+			$updated_staff = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+			$role['updated_staff'] = $updated_staff;//$roleのupdated_staffを$staff_idにする
 
-	if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
-		$role = $this->Roles->patchEntity($role, $this->request->getData());//106行目でとったもともとの$roleデータを$this->request->getData()に更新する
-		$connection = ConnectionManager::get('default');//トランザクション1
-			// トランザクション開始2
-		$connection->begin();//トランザクション3
-		try {//トランザクション4
-			if ($this->Roles->save($role)) {
-				$this->Flash->success(__('The role has been updated.'));
-				$connection->commit();// コミット5
-				return $this->redirect(['action' => 'index']);
-			} else {
-				$this->Flash->error(__('The role could not be updated. Please, try again.'));
-				throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+			if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
+				$role = $this->Roles->patchEntity($role, $this->request->getData());//106行目でとったもともとの$roleデータを$this->request->getData()に更新する
+				$connection = ConnectionManager::get('default');//トランザクション1
+					// トランザクション開始2
+				$connection->begin();//トランザクション3
+				try {//トランザクション4
+					if ($this->Roles->save($role)) {
+						$this->Flash->success(__('The role has been updated.'));
+						$connection->commit();// コミット5
+						return $this->redirect(['action' => 'index']);
+					} else {
+						$this->Flash->error(__('The role could not be updated. Please, try again.'));
+						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+					}
+				} catch (Exception $e) {//トランザクション7
+				//ロールバック8
+					$connection->rollback();//トランザクション9
+				}//トランザクション10
 			}
-		} catch (Exception $e) {//トランザクション7
-		//ロールバック8
-			$connection->rollback();//トランザクション9
-		}//トランザクション10
-	}
+			
     }
 
 }

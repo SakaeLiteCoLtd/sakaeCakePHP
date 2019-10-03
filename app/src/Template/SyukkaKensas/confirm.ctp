@@ -100,7 +100,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
       echo "<td colspan='2'><div align='center'>\n";
       if($sessiondata['sokuteidata'][1]["result_size_".$i] != ""){//もしも
         echo "<div align='center'><strong>\n";
-        echo $this->request->getData('kind_kensa');
+        echo $this->request->getData("kind_kensa_{$i}");
         echo "</strong></div>\n";
 //                  echo "<input type='text' value='test' size='6'/>\n";
         } else {

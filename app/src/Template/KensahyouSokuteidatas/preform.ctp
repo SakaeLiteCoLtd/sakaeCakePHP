@@ -54,16 +54,21 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         echo "</strong></div></td>\n";
         $kensaArray = Array();
         for($i=1; $i<=9; $i++){
+
           echo "<td colspan='2'><div align='center'>\n";
-          echo "ノギス";
-          echo "</strong></div></td>\n";
+          echo ${"ImKikakuid_".$i};
+          echo "</div></td>\n";
+
+//        echo "<td colspan='2'><div align='center'>\n";
+//        echo "ノギス";
+//        echo "</strong></div></td>\n";
         }
-          echo "<td colspan='2'>\n";
-          echo "</td>\n";
-          echo "<td colspan='2'>\n";
-          echo "</td>\n";
-          echo "<td colspan='2'>\n";
-          echo "</td>\n";
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
+        echo "<td colspan='2'>\n";
+        echo "</td>\n";
 
             $lowerArraygyou = Array();
             for($j=1; $j<=8; $j++){

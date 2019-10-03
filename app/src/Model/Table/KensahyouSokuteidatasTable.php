@@ -184,10 +184,15 @@ class KensahyouSokuteidatasTable extends Table
             ->numeric('result_weight')
             ->allowEmpty('result_weight');
 
-        $validator
-//            ->scalar('situation_dist')
-            ->maxLength('situation_dist', 20)
-            ->allowEmpty('situation_dist');
+            $validator
+    //            ->scalar('situation_dist')
+                ->maxLength('situation_dist1', 20)
+                ->allowEmpty('situation_dist1');
+
+                $validator
+        //            ->scalar('situation_dist')
+                    ->maxLength('situation_dist2', 20)
+                    ->allowEmpty('situation_dist2');
 
         $validator
             ->integer('delete_flag')

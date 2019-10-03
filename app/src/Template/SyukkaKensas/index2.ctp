@@ -68,15 +68,16 @@
       <?php
     //  echo $this->Url->build("/MLD-MD-20032_jigu");
 
-      for($i=1; $i<=$countname; $i++){
+      for($i=1; $i<=$countnameb; $i++){
         echo '<tr><td><div align="center">';
-        echo (${"product_code".$i}) ;
+        echo (${"product_codeb".$i}) ;
         echo '</div></td>';
         echo '<td><div align="center">';
-        echo (${"product_name".$i}) ;
+        echo (${"product_nameb".$i}) ;
         echo '</div></td>';
         echo '<td><div align="center"><font color="blue">';
-        echo (${"inspec_date".$i}) ;
+    //    echo (${"inspec_dateb".$i}) ;
+        echo $this->Html->link(${"inspec_dateb".$i}, ['action'=>'preform', 'name' => ${"inspec_dateb".$i}, 'value1' => ${"product_codeb".$i}, 'value2' => ${"product_nameb".$i}]) ;
         echo '</div></font></td></tr>';
        }
       ?>

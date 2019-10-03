@@ -5,6 +5,7 @@
  */
 use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 $this->Products = TableRegistry::get('products');//productsテーブルを使う
+$this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouHeadsテーブルを使う
 ?>
 <?php
           $username = $this->request->Session()->read('Auth.User.username');
@@ -13,6 +14,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Cache-Control:');
           header('Pragma:');
 //          echo $this->Form->create($kensahyouSokuteidatas, ['url' => ['action' => 'index']]);
+          $product_code = substr($product_code, 1, -1);
+//          $Sokutei_lot_num = $KensahyouSokuteidata->lot_num;
 ?>
 
 <div align="center">
@@ -35,20 +38,30 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 <th scope="col"><?= $this->Paginator->sort('product_code') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('product_name') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('manu_date') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('lot_num') ?></th>
             </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFFF">
             <?php foreach ($kensahyouSokuteidatas as $KensahyouSokuteidata): ?>
             <tr>
                 <?php
-//                    $Productcode = $KensahyouSokuteidata->product_code;
-//                    $Product = $this->Products->find()->where(['product_code' => $Productcode])->toArray();
-                    $Product = $this->Products->find()->where(["product_code" => $product_code])->toArray();
-              	    $Productname = $Product[0]->product_name;
+                $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+                $Productname = $Product[0]->product_name;
+                $Sokutei_lot_num = $KensahyouSokuteidata->lot_num;
+                $KensahyouSokutei = $this->KensahyouSokuteidatas->find()->where(['lot_num' => $Sokutei_lot_num, 'product_code' => $product_code])->toArray();
+                ?>
+            <?php if(isset($KensahyouSokutei[0])): ?>
+                <?php
+                $lot_num = $KensahyouSokutei[0]->lot_num;
+                $manu_date = $KensahyouSokutei[0]->manu_date;
                 ?>
                 <td><?php echo $this->Html->link($product_code, ['action'=>'view', 'name' => $product_code, 'value1' => $KensahyouSokuteidata->manu_date, 'value2' => $KensahyouSokuteidata->inspec_date]); ?></td>
                 <td><?= h($Productname) ?></td>
-                <td><?= h($KensahyouSokuteidata->manu_date) ?></td>
+                <td><?= h($manu_date) ?></td>
+                <td><?= h($lot_num) ?></td>
+              <?php else: ?>
+              <?php endif; ?>
+
             <?php endforeach; ?>
         </tbody>
     </table>

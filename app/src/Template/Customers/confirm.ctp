@@ -7,18 +7,7 @@
 <?= $this->Form->create($customer, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-/*
-            echo $this->Form->hidden('customer_code' ,['value'=>$_POST['customer_code'] ]) ;
-            echo $this->Form->hidden('name' ,['value'=>$_POST['name'] ]) ;
-            echo $this->Form->hidden('zip' ,['value'=>$_POST['zip'] ]) ;
-            echo $this->Form->hidden('address' ,['value'=>$_POST['address'] ]) ;
-            echo $this->Form->hidden('tel' ,['value'=>$_POST['tel'] ]) ;
-            echo $this->Form->hidden('fax' ,['value'=>$_POST['fax'] ]) ;
-            echo $this->Form->hidden('status' ,['value'=>$_POST['status'] ]) ;
-            echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
-            echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
-            echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
-*/
+
             $session = $this->request->getSession();
             $session->write('customerdata.customer_code', $_POST['customer_code']);
             $session->write('customerdata.name', $_POST['name']);

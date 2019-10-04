@@ -37,6 +37,23 @@ class KensahyouSokuteidatasController  extends AppController
     	->select(['product_code','delete_flag' => '0'])
     	->group('product_code')
     	);
+
+//実験
+      $Products = $this->KensahyouSokuteidatas->find()//KensahyouSokuteidatasテーブルの中で
+      ->select(['product_code','delete_flag' => '0'])
+      ->group('product_code');
+/*
+      $arrP = array();
+    	foreach ($Products as $value) {
+    		$product_id= $value->product_code;//$product_id
+        $arrP[] = [$product_id, $product_id, $product_id];
+  	}
+
+    echo "<pre>";
+    print_r($arrP);
+    echo "</pre>";
+*/
+
     }
 
     public function indexcsv()//csvテスト用
@@ -47,13 +64,10 @@ class KensahyouSokuteidatasController  extends AppController
     public function search()//「出荷検査用呼出」の日付で絞り込むページ
     {
     	$data = array_values($this->request->getData());//配列の値を取り出す
-    	$product_code = '"'.$data[0].'"';//0番目の値
+//      $product_code = '"'.$data[0].'"';//0番目の値
+      $product_code = $data[0];//0番目の値
   //    $productCode = substr($product_code, 1, -1);
-/*
-      echo "<pre>";
-    	print_r($product_code);
-    	echo "</pre>";
-*/
+
     	$this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
 
     	if ($this->request->is('post')) {//データがpostで送られたとき（日付を選んだ場合）
@@ -88,63 +102,95 @@ class KensahyouSokuteidatasController  extends AppController
     		'group' => array('manu_date'),//manu_dateが同じものをまとめる
     		'order' => array('manu_date DESC')//manu_dateを新しい順にまとめる
     		)));
-    	*/
+
     		$this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find()//KensahyouSokuteidatasテーブルの中で
     		->select(['all','manu_date >=' => $value_start, 'manu_date <=' => $value_end, 'delete_flag' => '0', 'product_code' => $product_code])
     		->group('manu_date')
     		->order('manu_date DESC')
     		);
+*/
+        $KensahyouSokuteidata = $this->KensahyouSokuteidatas->find()->where(['manu_date >=' => $value_start, 'manu_date <=' => $value_end, 'delete_flag' => '0', 'product_code' => $product_code])->toArray();//Productsテーブルの'product_code' = $product_codeとなるものを配列で取り出す
+
+      $arrP = array();//配列に追加$product_code, $lot_num, $manu_date
+    	foreach ($KensahyouSokuteidata as $value) {
+        $product_code= $value->product_code;
+        $lot_num = $value->lot_num;
+        $manu_date = $value->manu_date->format('Y-m-d H:i:s');
+        $manu_date = substr($manu_date,0,10);
+        $arrP[] = ['product_code' => $product_code, 'lot_num' => $lot_num, 'manu_date' => $manu_date];
+    	}
+
+      $tmp = [];//重複削除$lot_num
+      $uniquearrP = [];
+      foreach ($arrP as $arrP){
+         if (!in_array($arrP['lot_num'], $tmp)) {
+            $tmp[] = $arrP['lot_num'];
+            $uniquearrP[] = $arrP;
+         }
+      }
+
+      foreach ((array) $uniquearrP as $key => $value) {//並び替え$manu_date
+          $sort[$key] = $value['manu_date'];
+      }
+
+      array_multisort($sort, SORT_DESC, $uniquearrP);
+/*
+      echo "<pre>";
+      print_r($uniquearrP);
+      echo "</pre>";
+*/
+      $this->set('uniquearrP',$uniquearrP);//セット
 
     	} else {//post以外（get）でデータが送信された場合
 
     		$mes = '＊最新の上位３つの検査表です。';//$mesを「＊最新の上位３つの検査表です。」とする
     		$this->set('mes',$mes);//$mesをctpで使用できるようセット
-  /*
-    		$this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find('all', Array(//次の条件を満たすものをkensahyouSokuteidatasとしてctpで使用できるようセット
-    		    'conditions' => Array('delete_flag' => '0','product_code' => $product_code),//'delete_flag' = '0','product_code' = $product_code
-    		    'limit'=>'3',//上から３つのみ表示
-    		    'group' => array('manu_date'),//manu_dateが同じものをまとめる
-    		    'order' => array('manu_date DESC')//manu_dateを新しい順にまとめる
-    		)));
-        */
-        /*
 
-        $this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find()//KensahyouSokuteidatasテーブルの中で
-        ->select(['manu_date','delete_flag' => '0', 'product_code' => $product_code])
-        ->limit('3')//上から３つのみ表示
-        ->group('manu_date')//manu_dateが同じものをまとめる
-        ->order('manu_date DESC')//manu_dateを新しい順に並べる
-      );
-      */
+        $KensahyouSokuteidata = $this->KensahyouSokuteidatas->find()->where(['delete_flag' => '0', 'product_code' => $product_code])->toArray();//Productsテーブルの'product_code' = $product_codeとなるものを配列で取り出す
 
-      $this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find()//KensahyouSokuteidatasテーブルの中で
-    	->select(['lot_num','delete_flag' => '0' , 'product_code' => $product_code])
-    	->group('lot_num')
-  //    ->order('manu_date DESC')//manu_dateを新しい順に並べる
-    	);
+      $arrP = array();//配列に追加$product_code, $lot_num, $manu_date
+    	foreach ($KensahyouSokuteidata as $value) {
+        $product_code= $value->product_code;
+        $lot_num = $value->lot_num;
+        $manu_date = $value->manu_date->format('Y-m-d H:i:s');
+        $manu_date = substr($manu_date,0,10);
+        $arrP[] = ['product_code' => $product_code, 'lot_num' => $lot_num, 'manu_date' => $manu_date];
+    	}
 
-        /*
-        $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()//KensahyouSokuteidatasテーブルの中で
-        ->select(['all', 'delete_flag' => '0', 'product_code' => $product_code])
-        ->group('lot_num')
-        ->order('manu_date DESC');
+      $tmp = [];//重複削除$lot_num
+      $uniquearrP = [];
+      foreach ($arrP as $arrP){
+         if (!in_array($arrP['lot_num'], $tmp)) {
+            $tmp[] = $arrP['lot_num'];
+            $uniquearrP[] = $arrP;
+         }
+      }
+
+      foreach ((array) $uniquearrP as $key => $value) {//並び替え$manu_date
+          $sort[$key] = $value['manu_date'];
+      }
+
+      array_multisort($sort, SORT_DESC, $uniquearrP);
+      $uniquearrP = array_slice($uniquearrP , 0, 3);
+/*
+      echo "<pre>";
+      print_r($uniquearrP);
+      echo "</pre>";
 */
-  //      echo "<pre>";
-  //      print_r($KensahyouSokuteidatas);
-  //      echo "</pre>";
-
-  //      $this->set('kensahyouSokuteidatas',$KensahyouSokuteidatas);//セット
-
+      $this->set('uniquearrP',$uniquearrP);//セット
     	}
     }
 
     public function view()//「出荷検査用呼出」詳細表示用
     {
     	$data = array_values($this->request->query);//getで取り出した配列の値を取り出す
-
+/*
     	echo "<pre>";
-    	var_dump($data);
+    	print_r($data[1]);
     	echo "</pre>";
+*/
+      $lot_num = $data[1];//idをセット
+      $this->set('lot_num',$lot_num);//セット
 
     	$product_code = $data[0];//配列の0番目（product_code）に$product_codeと名前を付ける
     	$this->set('product_code',$product_code);//$product_codeをセット
@@ -173,7 +219,7 @@ class KensahyouSokuteidatasController  extends AppController
       $KensahyouHeadid = $KensahyouHead[0]->id;//idをセット
     	$this->set('KensahyouHeadid',$KensahyouHeadid);//セット
 
-    	$KensahyouHead_manu_date = substr($data[1]['date'],0,10);//配列の10文字だけ抜き取りセット（manu_dateの表示のため）
+    	$KensahyouHead_manu_date = $data[2];//配列の10文字だけ抜き取りセット（manu_dateの表示のため）
 
     	$this->set('KensahyouHead_manu_date',$KensahyouHead_manu_date);//セット
 
@@ -193,9 +239,11 @@ class KensahyouSokuteidatasController  extends AppController
     	echo "</pre>";
     */
 
+
     	$Productn = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルの'product_code' = $product_codeとなるものを配列で取り出す
-    	$Productname = $Productn[0]->product_name;//配列の0番目のproduct_nameに$Productnameと名前を付ける
+      $Productname = $Productn[0]->product_name;//配列の0番目のproduct_nameに$Productnameと名前を付ける
     	$this->set('Productname',$Productname);//セット
+      $Productid = $Productn[0]->id;//配列の0番目のproduct_nameに$Productnameと名前を付ける
 
     	for($i=1; $i<=9; $i++){//size_1～9までセット
     		${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
@@ -209,10 +257,56 @@ class KensahyouSokuteidatasController  extends AppController
     		$this->set('lower_'.$j,${"lower_".$j});//セット
     	}
 
+      $ImKikakuid_1 = "ノギス";
+      $this->set('ImKikakuid_1',$ImKikakuid_1);
+      $ImKikakuid_2 = "ノギス";
+      $this->set('ImKikakuid_2',$ImKikakuid_2);
+      $ImKikakuid_3 = "ノギス";
+      $this->set('ImKikakuid_3',$ImKikakuid_3);
+      $ImKikakuid_4 = "ノギス";
+      $this->set('ImKikakuid_4',$ImKikakuid_4);
+      $ImKikakuid_5 = "ノギス";
+      $this->set('ImKikakuid_5',$ImKikakuid_5);
+      $ImKikakuid_6 = "ノギス";
+      $this->set('ImKikakuid_6',$ImKikakuid_6);
+      $ImKikakuid_7 = "ノギス";
+      $this->set('ImKikakuid_7',$ImKikakuid_7);
+      $ImKikakuid_8 = "ノギス";
+      $this->set('ImKikakuid_8',$ImKikakuid_8);
+      $ImKikakuid_9 = "ノギス";
+      $this->set('ImKikakuid_9',$ImKikakuid_9);
+
+      $ImKikakus = $this->ImKikakuTaious->find()->where(['product_id' => $Productid])->toArray();//'id' => $product_code_idとなるデータをProductsテーブルから配列で取得（プルダウン）
+      foreach ((array)$ImKikakus as $key => $value) {
+           $sort[$key] = $value['kensahyuo_num'];
+       }
+       if(isset($ImKikakus[0])){
+        array_multisort($sort, SORT_ASC, $ImKikakus);
+      }
+
+      for($i=0; $i<=8; $i++){
+        $j = $i + 1;
+        if(isset($ImKikakus[$i])) {
+          if($ImKikakus[$i]['kind_kensa'] != "") {
+            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+            $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+          }else{
+          }
+        }else{
+          ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+          $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+        }
+      }
+
+      $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+      $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
+
     	$this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find('all', Array(//セット
-    	'conditions' => Array('product_code' => $product_code,'delete_flag' => '0','manu_date' => $data[1]['date']),//条件$data[1]['date']はgetで送られたmanu_date
+    	'conditions' => Array('product_code' => $product_code,'delete_flag' => '0','manu_date' => $data[2]),//条件$data[1]['date']はgetで送られたmanu_date
     	'order' => array('cavi_num ASC')//cavi_numの小さい順
     	)));
+
+
     }
 
     public function index1()//「出荷検査表登録」ページトップ

@@ -14,7 +14,8 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
           header('Cache-Control:');
           header('Pragma:');
 //          echo $this->Form->create($kensahyouSokuteidatas, ['url' => ['action' => 'index']]);
-          $i = 0;
+          $product_code = substr($product_code, 1, -1);
+//          $Sokutei_lot_num = $KensahyouSokuteidata->lot_num;
 ?>
 
 <div align="center">
@@ -34,30 +35,34 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <thead>
             <tr  border="2" bordercolor="#E6FFFF" bgcolor="#FFFFFF">
-              <th scope="col"><?= $this->Paginator->sort('ロット番号') ?></th>
-              <th scope="col"><?= $this->Paginator->sort('manu_date') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('product_code') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('product_name') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('manu_date') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('lot_num') ?></th>
             </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFFF">
-            <?php foreach ($uniquearrP as $uniquearrP): ?>
+            <?php foreach ($kensahyouSokuteidatas as $KensahyouSokuteidata): ?>
             <tr>
                 <?php
-                $Product = $this->Products->find()->where(['product_code' => $uniquearrP['product_code']])->toArray();
+                $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
                 $Productname = $Product[0]->product_name;
-                $i = $i + 1;
+                $Sokutei_lot_num = $KensahyouSokuteidata->lot_num;
+                $KensahyouSokutei = $this->KensahyouSokuteidatas->find()->where(['lot_num' => $Sokutei_lot_num, 'product_code' => $product_code])->toArray();
                 ?>
-                <?php if($i <= 6): ?>
-                <td><?php echo $this->Html->link($uniquearrP['lot_num'], ['action'=>'view', 'name' => $uniquearrP['product_code'], 'value1' => $uniquearrP['lot_num'], 'value2' => $uniquearrP['manu_date']]); ?></td>
-                <td><?= h($uniquearrP['manu_date']) ?></td>
-                <td><?= h($uniquearrP['product_code']) ?></td>
+            <?php if(isset($KensahyouSokutei[0])): ?>
+                <?php
+                $lot_num = $KensahyouSokutei[0]->lot_num;
+                $manu_date = $KensahyouSokutei[0]->manu_date;
+                ?>
+                <td><?php echo $this->Html->link($product_code, ['action'=>'view', 'name' => $product_code, 'value1' => $lot_num, 'value2' => $manu_date]); ?></td>
                 <td><?= h($Productname) ?></td>
-                <?php else: ?>
-                <?php endif; ?>
+                <td><?= h($manu_date) ?></td>
+                <td><?= h($lot_num) ?></td>
+              <?php else: ?>
+              <?php endif; ?>
 
             <?php endforeach; ?>
-
         </tbody>
     </table>
      <?= $this->Form->end() ?>

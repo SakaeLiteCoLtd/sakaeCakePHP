@@ -42,6 +42,28 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
 <?php
      echo $htmlKensahyouHeader;
 ?>
+            <?php
+            echo "<tr style='border-bottom: solid;border-width: 1px'><td nowrap='nowrap' colspan='4'><div align='center'><strong>\n";
+            echo "検査種類";
+            echo "</strong></div></td>\n";
+            $kensaArray = Array();
+            for($i=1; $i<=9; $i++){
+
+              echo "<td colspan='2'><div align='center'>\n";
+              echo ${"ImKikakuid_".$i};
+              echo "</div></td>\n";
+
+            //        echo "<td colspan='2'><div align='center'>\n";
+            //        echo "ノギス";
+            //        echo "</strong></div></td>\n";
+            }
+            echo "<td colspan='2'>\n";
+            echo "</td>\n";
+            echo "<td colspan='2'>\n";
+            echo "</td>\n";
+            echo "<td colspan='2'>\n";
+            echo "</td>\n";
+            ?>
 
             <?php foreach ($kensahyouSokuteidatas as $KensahyouSokuteidata): ?>
                 <tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><td nowrap="nowrap" colspan="4"><div align="center"><strong><?= h($KensahyouSokuteidata->cavi_num) ?></strong></div></td>
@@ -52,14 +74,14 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
                           echo '</div></td>';
                       }
                 ?>
-                <td colspan='2'><div align="center"><?= h($KensahyouSokuteidata->situation_dist) ?></div></td>
-                <td colspan='2'><div align="center"></div></td>
+                <td colspan='2'><div align="center"><?= h($KensahyouSokuteidata->situation_dist1) ?></div></td>
+                <td colspan='2'><div align="center"><?= h($KensahyouSokuteidata->situation_dist2) ?></div></td>
                 <td colspan='2'><div align="center"><?= h($KensahyouSokuteidata->result_weight) ?></div></td>
             <?php endforeach; ?>
         </tr>
           <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px">
 	      <strong>備考：</strong><br>
-              <div cols="120" rows="10"><?= h($this->request->getData('bik')) ?></div>
+              <div cols="120" rows="10"><?= h($KensahyouHeadbik) ?></div>
           </td>
         </tr>
     </table>

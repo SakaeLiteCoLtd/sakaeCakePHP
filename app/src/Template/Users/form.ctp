@@ -7,10 +7,6 @@
 ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-            $options = [
-	            '0' => 'M',
-	            '1' => 'F'
-                    ];
         ?>
 
 <hr size="5">
@@ -23,20 +19,20 @@
     <fieldset>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('username') ?></th>
+            <th scope="row"><?= __('ユーザー名') ?></th>
 		<td><?= $this->Form->input("username", array('type' => 'value', 'pattern' => '^[0-9A-Za-z]+$', 'label'=>false)) ?></td>
 	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('password') ?></th>
+            <th scope="row"><?= __('パスワード') ?></th>
 		<td><?= $this->Form->input("password", array('type' => 'password', 'label'=>false)); ?></td>
 	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('role') ?></th>
-		<td><?= $this->Form->input("role_id", ["type"=>"select","empty"=>"Please select", "options"=>$arrRole, 'label'=>false]); ?></td>
+            <th scope="row"><?= __('権限') ?></th>
+		<td><?= $this->Form->input("role_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrRole, 'label'=>false]); ?></td>
 	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('staff') ?></th>
-		<td><?= $this->Form->input("staff_id", ["type"=>"select","empty"=>"Please select", "options"=>$arrStaff, 'label'=>false]); ?></td>
+            <th scope="row"><?= __('スタッフ') ?></th>
+		<td><?= $this->Form->input("staff_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrStaff, 'label'=>false]); ?></td>
 	</p>
 </table>
 
@@ -46,6 +42,6 @@
             echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
-    <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
+    <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>
 <br>

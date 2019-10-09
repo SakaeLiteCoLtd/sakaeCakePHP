@@ -22,7 +22,7 @@
 <legend align="center"><font color="red"><?= __('＊下記のように登録されました。') ?></font></legend>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('ユーザーID') ?></th>
+            <th scope="row"><?= __('ユーザー名') ?></th>
             <td><?= h($name) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -30,7 +30,7 @@
             <td><?= h('------------') ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('ロール') ?></th>
+            <th scope="row"><?= __('権限') ?></th>
             <td><?= h($Role) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -47,5 +47,5 @@
     </table>
 <br>
 <br>
-        <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
+        <p align="center"><?= $this->Form->button(__('トップ'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>

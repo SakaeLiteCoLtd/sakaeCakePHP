@@ -42,11 +42,11 @@
 	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('start') ?></th>
-		<td><?= $this->Form->input("start", array('type' => 'date', 'label'=>false)); ?></td>
+		<td><?= $this->Form->input("start", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
 	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('finish') ?></th>
-		<td><?= $this->Form->input("finish", array('type' => 'date', 'label'=>false, 'empty' => true)); ?></td>
+		<td><?= $this->Form->input("finish", array('type' => 'date', 'monthNames' => false, 'label'=>false, 'empty' => true)); ?></td>
 	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('status') ?></th>

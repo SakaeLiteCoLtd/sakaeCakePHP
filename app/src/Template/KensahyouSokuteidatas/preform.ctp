@@ -39,9 +39,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
-          <td colspan="9"><?= $this->Form->input("manu_date", array('type' => 'date', 'label'=>false)); ?></td>
+          <td colspan="9"><?= $this->Form->input("manu_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>検査年月日</strong></div></td>
-          <td colspan="9"><?= $this->Form->input("inspec_date", array('type' => 'date', 'label'=>false)); ?></td>
+          <td colspan="9"><?= $this->Form->input("inspec_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
         </tr>
 
 <?php

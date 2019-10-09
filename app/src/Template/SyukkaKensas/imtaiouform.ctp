@@ -104,7 +104,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               echo $this->Form->hidden('product_id' ,['value'=>$product_id]);
         ?>
     </fieldset>
-    <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
+    <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>
+    <br>
 
   <?php endif; ?>

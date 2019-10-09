@@ -8,15 +8,15 @@
 $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//productsテーブルを使う
 $this->Products = TableRegistry::get('products');//productsテーブルを使う
 ?>
-<?= $this->Form->create($kensahyouHead, ['url' => ['action' => 'index1']]) ?>
+<?= $this->Form->create($kensahyouHead, ['url' => ['controller'=>'SyukkaKensas','action' => 'index2']]) ?>
 
 <?php
           $username = $this->request->Session()->read('Auth.User.username');
 ?>
+<br>
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
 
 <hr size="5">
-
 <div align="center"><strong><font color="red">＊下記のように登録されました</font></strong></div>
 <br>
 
@@ -124,5 +124,5 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
 <br>
 <br>
-        <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
+        <p align="center"><?= $this->Form->button(__('トップ'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>

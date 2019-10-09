@@ -49,13 +49,13 @@
 <fieldset align="center">
 
 <table border="2" bordercolor="#E6FFFF" align="center">
-		<td bgcolor="#E6FFFF" style="width: 100px;border-bottom: solid;border-width: 1px">staff_code</td>
+		<td bgcolor="#E6FFFF" style="width: 120px;border-bottom: solid;border-width: 1px">スタッフＩＤ</td>
 		<td bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("staff_code", array('type' => 'value', 'label'=>false)) ?></td>
-		<td  bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px">f_name</td>
+		<td  bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px">姓</td>
 		<td bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("f_name", array('type' => 'value', 'label'=>false)); ?></td>
-		<td  bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px">l_name</td>
+		<td  bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px">名</td>
 		<td bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("l_name", array('type' => 'value', 'label'=>false)); ?></td>
-        <td bgcolor="#E6FFFF" class="noborder" style="border-style: none;color: #E6FFFF"><?=$this->Form->button("search") ?></td>
+        <td bgcolor="#E6FFFF" class="noborder" style="border-style: none;color: #E6FFFF"><?=$this->Form->button("検索") ?></td>
 </table>
 </fieldset>
 <?=$this->Form->end() ?>
@@ -63,13 +63,13 @@
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <thead>
             <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFDEAD">
-                <th scope="col"><?= $this->Paginator->sort('staff_code') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('f_name') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('l_name') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('sex') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('birth') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('date_start') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('date_finish') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('スタッフＩＤ') ?></th>
+                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('姓') ?></th>
+                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('名') ?></th>
+                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('性別') ?></th>
+                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('誕生日') ?></th>
+                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('入社日') ?></th>
+                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('退社日') ?></th>
                 <th scope="col" style="background-color: #FFDEAD" class="actions"><?= __('') ?></th>
             </tr>
         </thead>
@@ -83,9 +83,9 @@
             	if($staff->sex == null){
             	$sex = '';
             	} elseif($staff->sex == 1) {
-            	$sex = 'F';
+            	$sex = '女';
             	} else {
-            	$sex = 'M';
+            	$sex = '男';
             	}
             ?>
                 <td><?= h($sex) ?></td>
@@ -93,7 +93,7 @@
                 <td><?= h($staff->date_start) ?></td>
                 <td><?= h($staff->date_finish) ?></td>
                 <td class="actions">
-                    <?= $this->Html->link(__('edit'), ['action' => 'edit', $staff->id]) ?>
+                    <?= $this->Html->link(__('編集'), ['action' => 'edit', $staff->id]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>

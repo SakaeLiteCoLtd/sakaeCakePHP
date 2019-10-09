@@ -33,7 +33,6 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <div align="center"><strong><font color="red">＊下記のように登録します</font></strong></div>
 <br>
 
-<br>
     <table width="1200" border="1" align="center" bordercolor="#000000" style="background-color: #FFFFFF">
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="28" nowrap="nowrap"><div align="center"><strong>検査表</strong></div></td>
@@ -89,7 +88,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
       echo $this->Form->hidden('product_id' ,['value'=>$product_id]);
 ?>
 </fieldset>
-        <p align="center"><?= $this->Form->button('back', ['onclick' => 'history.back()', 'type' => 'button']) ?>
-        <?= $this->Form->button(__('OK'), array('name' => 'touroku')) ?></p>
+        <p align="center"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
+        <?= $this->Form->button(__('登録'), array('name' => 'touroku')) ?></p>
 
         <?= $this->Form->end() ?>

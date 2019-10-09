@@ -50,12 +50,12 @@
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <thead>
             <tr  border="2" bordercolor="#E6FFFF" bgcolor="#FFDEAD">
-                <th scope="col"><?= $this->Paginator->sort('customer_code') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('name') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('顧客コード') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('社名') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('zip') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('address') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('tel') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('fax') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('住所') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('電話番号') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('ＦＡＸ') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('status') ?></th>
                 <th scope="col" class="actions"><?= __('') ?></th>
             </tr>
@@ -71,7 +71,7 @@
                 <td><?= h($customer->fax) ?></td>
                 <td><?= $this->Number->format($customer->status) ?></td>
                 <td class="actions">
-                    <?= $this->Html->link(__('edit'), ['action' => 'edit', $customer->id]) ?>
+                    <?= $this->Html->link(__('編集'), ['action' => 'edit', $customer->id]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -87,4 +87,3 @@
         </ul>
         <p><?= $this->Paginator->counter(['format' => __('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')]) ?></p>
     </div>
-

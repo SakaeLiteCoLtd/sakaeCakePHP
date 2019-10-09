@@ -74,7 +74,7 @@ $this->Delivers = TableRegistry::get('delivers');//productsテーブルを使う
                 <td><?= h($deliver_name) ?></td>
                 <td><?= h($customersHandy->name) ?></td>
                 <td class="actions">
-                    <?= $this->Html->link(__('edit'), ['action' => 'edit', $customersHandy->id]) ?>
+                    <?= $this->Html->link(__('編集'), ['action' => 'edit', $customersHandy->id]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -90,5 +90,3 @@ $this->Delivers = TableRegistry::get('delivers');//productsテーブルを使う
         </ul>
         <p><?= $this->Paginator->counter(['format' => __('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')]) ?></p>
     </div>
-
-

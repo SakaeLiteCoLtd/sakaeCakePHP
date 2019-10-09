@@ -315,6 +315,7 @@ class SyukkaKensasController extends AppController {
 
      $dirName = 'backupData_IM測定/';//webroot内のフォルダ
      $countnameb = 0;
+     $this->set('countnameb',$countnameb);//セット
 
      if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
       if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）

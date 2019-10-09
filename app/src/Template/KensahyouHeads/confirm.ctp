@@ -72,6 +72,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             );
 
         ?>
+        <br>
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
 
 <hr size="5">
@@ -182,6 +183,6 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
 <br>
 <br>
-        <p align="center"><?= $this->Form->button('back', ['onclick' => 'history.back()', 'type' => 'button']) ?>
-        <?= $this->Form->button(__('OK'), array('name' => 'touroku')) ?></p>
+        <p align="center"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
+        <?= $this->Form->button(__('登録'), array('name' => 'touroku')) ?></p>
         <?= $this->Form->end() ?>

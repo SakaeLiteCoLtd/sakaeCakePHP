@@ -22,8 +22,8 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
      <fieldset>
 <div align="center"><strong><font color="blue"><?php echo "製造年月日";?></font></strong></div>
             <?=$this->Form->create('TimeSearch', ['url' => ['action' => 'search', 'type' => 'post']])?>
-            <?=$this->Form->input("start", array('type' => 'date')); ?>
-            <?=$this->Form->input("end", array('type' => 'date')); ?>
+            <?=$this->Form->input("start", array('type' => 'date', 'monthNames' => false)); ?>
+            <?=$this->Form->input("end", array('type' => 'date', 'monthNames' => false)); ?>
             <?=$this->Form->hidden("product_code", array('type' => 'value', 'value' => $product_code)); ?>
 <br>
      <?= $this->Form->button(__('絞り込み')) ?>
@@ -46,18 +46,16 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
                 <?php
                 $Product = $this->Products->find()->where(['product_code' => $uniquearrP['product_code']])->toArray();
                 $Productname = $Product[0]->product_name;
-                $i = $i + 1;
+        //        $i = $i + 1;//表示する個数を調整できる
                 ?>
-                <?php if($i <= 6): ?>
+                <?php if($i <= 20): ?>
                 <td><?php echo $this->Html->link($uniquearrP['lot_num'], ['action'=>'view', 'name' => $uniquearrP['product_code'], 'value1' => $uniquearrP['lot_num'], 'value2' => $uniquearrP['manu_date']]); ?></td>
                 <td><?= h($uniquearrP['manu_date']) ?></td>
                 <td><?= h($uniquearrP['product_code']) ?></td>
                 <td><?= h($Productname) ?></td>
                 <?php else: ?>
                 <?php endif; ?>
-
             <?php endforeach; ?>
-
         </tbody>
     </table>
      <?= $this->Form->end() ?>

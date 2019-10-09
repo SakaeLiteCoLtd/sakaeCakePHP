@@ -30,7 +30,7 @@
             <td><?= h($customer_code) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('氏名') ?></th>
+            <th scope="row"><?= __('社名') ?></th>
             <td><?= h($name) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -42,11 +42,11 @@
             <td><?= h($address) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('電話') ?></th>
+            <th scope="row"><?= __('電話番号') ?></th>
             <td><?= h($tel) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('FAX') ?></th>
+            <th scope="row"><?= __('ＦＡＸ') ?></th>
             <td><?= h($fax) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -63,5 +63,5 @@
     </table>
 <br>
 <br>
-        <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
+        <p align="center"><?= $this->Form->button(__('トップ'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>

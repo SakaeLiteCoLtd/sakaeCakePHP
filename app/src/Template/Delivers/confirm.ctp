@@ -74,6 +74,6 @@
     </table>
 <br>
 <br>
-        <p align="center"><?= $this->Form->button('back', ['onclick' => 'history.back()', 'type' => 'button']) ?>
-        <?= $this->Form->button(__('add'), array('name' => 'touroku')) ?></p>
+        <p align="center"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
+        <?= $this->Form->button(__('登録'), array('name' => 'touroku')) ?></p>
         <?= $this->Form->end() ?>

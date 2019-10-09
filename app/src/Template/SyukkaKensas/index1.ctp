@@ -17,7 +17,6 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
 <?=$this->Form->create($entity, ['url' => ['action' => 'imtaiouform']]) ?>
 <br>
-<br>
     <fieldset>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>

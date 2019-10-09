@@ -42,5 +42,5 @@
     </table>
 <br>
 <br>
-        <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
+        <p align="center"><?= $this->Form->button(__('トップ'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>

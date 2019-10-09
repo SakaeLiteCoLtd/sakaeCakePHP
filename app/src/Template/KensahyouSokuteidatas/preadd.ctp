@@ -18,6 +18,6 @@
 	</tr>
 </table>
     </fieldset>
-    <center><?= $this->Form->button(__('login')) ?></center>
+    <center><?= $this->Form->button(__('ログイン')) ?></center>
 <br>
     <?= $this->Form->end() ?>

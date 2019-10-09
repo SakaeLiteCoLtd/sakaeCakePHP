@@ -52,9 +52,9 @@
 
 	<?php
 	if($this->request->getData('sex') == 0){
-	$sex = 'M';
+	$sex = '男';
 	} else {
-	$sex = 'F';
+	$sex = '女';
 	}
 
 	if($_POST['date_finish'] == null){
@@ -77,40 +77,40 @@
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('staff_code') ?></th>
+            <th scope="row"><?= __('スタッフＩＤ') ?></th>
             <td><?= h($this->request->getData('staff_code')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('f_name') ?></th>
+            <th scope="row"><?= __('姓') ?></th>
             <td><?= h($this->request->getData('f_name')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('l_name') ?></th>
+            <th scope="row"><?= __('名') ?></th>
             <td><?= h($this->request->getData('l_name')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('sex') ?></th>
+            <th scope="row"><?= __('性別') ?></th>
             <td><?= h($sex) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('birth') ?></th>
+            <th scope="row"><?= __('誕生日') ?></th>
             <td><?= h($birth) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('mail') ?></th>
+            <th scope="row"><?= __('メール') ?></th>
             <td><?= h($this->request->getData('mail')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('tel') ?></th>
+            <th scope="row"><?= __('電話番号') ?></th>
             <td><?= h($this->request->getData('tel')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('date_start') ?></th>
+            <th scope="row"><?= __('入社日') ?></th>
             <td><?= h($date_start) ?></td>
         </tr>
     </table>
 <br>
 <br>
-        <p align="center"><?= $this->Form->button('back', ['onclick' => 'history.back()', 'type' => 'button']) ?>
-        <?= $this->Form->button(__('add'), array('name' => 'touroku')) ?></p>
+        <p align="center"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
+        <?= $this->Form->button(__('登録'), array('name' => 'touroku')) ?></p>
         <?= $this->Form->end() ?>

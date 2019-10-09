@@ -51,9 +51,9 @@ $this->Staffs = TableRegistry::get('staffs');//productsテーブルを使う
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <thead>
             <tr  border="2" bordercolor="#E6FFFF" bgcolor="#FFDEAD">
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('username') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('role') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('staff_id') ?></th>
+                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('ユーザー名') ?></th>
+                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('権限') ?></th>
+                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('スタッフ') ?></th>
                 <th scope="col" class="actions" style="background-color: #FFDEAD"><?= __('') ?></th>
             </tr>
         </thead>
@@ -79,7 +79,7 @@ $this->Staffs = TableRegistry::get('staffs');//productsテーブルを使う
                 <td><?= h($user_staff) ?></td>
 
                 <td class="actions">
-                    <?= $this->Html->link(__('edit'), ['action' => 'edit', $user->id]) ?>
+                    <?= $this->Html->link(__('編集'), ['action' => 'edit', $user->id]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>

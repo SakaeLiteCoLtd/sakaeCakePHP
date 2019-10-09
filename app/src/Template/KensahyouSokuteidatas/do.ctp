@@ -11,8 +11,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
 <?php
           $username = $this->request->Session()->read('Auth.User.username');
-          echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'index1']]);
+          echo $this->Form->create($kensahyouSokuteidata, ['url' => ['controller'=>'SyukkaKensas','action' => 'index2']]);
 ?>
+<br>
 
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
 
@@ -104,5 +105,5 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
 <br>
 <br>
-        <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
+        <p align="center"><?= $this->Form->button(__('トップ'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>

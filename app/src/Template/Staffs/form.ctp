@@ -8,8 +8,8 @@
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
             $options = [
-	            '0' => 'M',
-	            '1' => 'F'
+	            '0' => '男',
+	            '1' => '女'
                     ];
         ?>
 <hr size="5">
@@ -22,40 +22,40 @@
     <fieldset>
 <table bgcolor="#FFFFCC" align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 	<tr bgcolor="#FFFFCC">
-            <th bgcolor="#FFFFCC" scope="row"><?= __('staff_code') ?></th>
+            <th bgcolor="#FFFFCC" scope="row"><?= __('スタッフＩＤ') ?></th>
 		<td bgcolor="#FFFFCC"><?= $this->Form->input("staff_code", array('type' => 'value', 'label'=>false)) ?></td>
 	</tr>
 	<tr bgcolor="#FFFFCC">
-            <th bgcolor="#FFFFCC" scope="row"><?= __('f_name') ?></th>
+            <th bgcolor="#FFFFCC" scope="row"><?= __('姓') ?></th>
 		<td bgcolor="#FFFFCC"><?= $this->Form->input("f_name", array('type' => 'value', 'label'=>false)); ?></td>
 	</tr>
 	<tr bgcolor="#FFFFCC">
-            <th scope="row"><?= __('l_name') ?></th>
+            <th scope="row"><?= __('名') ?></th>
 		<td><?= $this->Form->input("l_name", array('type' => 'value', 'label'=>false)); ?></td>
 	</tr>
 	<tr bgcolor="#FFFFCC">
-            <th scope="row" bgcolor="#FFFFCC"><?= __('sex') ?></th>
+            <th scope="row" bgcolor="#FFFFCC"><?= __('性別') ?></th>
 		<td bgcolor="#FFFFCC"><?= $this->Form->radio("sex", $options); ?></td>
 	</tr>
 	<tr bgcolor="#FFFFCC">
-            <th scope="row"><?= __('birth') ?></th>
-		<td><?= $this->Form->input("birth", array('type' => 'date', 'minYear' => date('Y') - 70, 'label'=>false)); ?></td>
+            <th scope="row"><?= __('誕生日') ?></th>
+		<td><?= $this->Form->input("birth", array('type' => 'date', 'monthNames' => false, 'minYear' => date('Y') - 70, 'label'=>false)); ?></td>
 	</tr>
 	<tr bgcolor="#FFFFCC">
-            <th scope="row" bgcolor="#FFFFCC"><?= __('mail') ?></th>
+            <th scope="row" bgcolor="#FFFFCC"><?= __('メール') ?></th>
 		<td bgcolor="#FFFFCC"><?= $this->Form->input("mail", array('type' => 'value', 'label'=>false)); ?></td>
 	</tr>
 	<tr bgcolor="#FFFFCC">
-            <th scope="row"><?= __('tel') ?></th>
+            <th scope="row"><?= __('電話番号') ?></th>
 		<td><?= $this->Form->input("tel", array('type' => 'value', 'label'=>false)); ?></td>
 	</tr>
 	<tr bgcolor="#FFFFCC">
-            <th scope="row" bgcolor="#FFFFCC"><?= __('address') ?></th>
+            <th scope="row" bgcolor="#FFFFCC"><?= __('住所') ?></th>
 		<td bgcolor="#FFFFCC"><?= $this->Form->input("address", array('type' => 'value', 'label'=>false)); ?></td>
 	</tr>
 	<tr bgcolor="#FFFFCC">
-            <th scope="row"><?= __('date_start') ?></th>
-		<td style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("date_start", array('type' => 'date', 'label'=>false)); ?></td>
+            <th scope="row"><?= __('入社日') ?></th>
+		<td style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("date_start", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
 	</tr>
 </table>
 
@@ -67,6 +67,6 @@
             echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
-    <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
+    <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>
 <br>

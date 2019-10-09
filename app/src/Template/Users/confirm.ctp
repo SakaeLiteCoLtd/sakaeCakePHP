@@ -26,23 +26,23 @@
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('username') ?></th>
+            <th scope="row"><?= __('ユーザー名') ?></th>
             <td><?= h($this->request->getData('username')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('password') ?></th>
+            <th scope="row"><?= __('パスワード') ?></th>
             <td><?= h('------------') ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('role_id') ?></th>
+            <th scope="row"><?= __('権限') ?></th>
             <td><?= h($Role) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('staff_id') ?></th>
+            <th scope="row"><?= __('スタッフ') ?></th>
             <td><?= h($Staff) ?></td>
     </table>
 <br>
 <br>
-        <p align="center"><?= $this->Form->button('back', ['onclick' => 'history.back()', 'type' => 'button']) ?>
-        <?= $this->Form->button(__('add'), array('name' => 'touroku')) ?></p>
+        <p align="center"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
+        <?= $this->Form->button(__('登録'), array('name' => 'touroku')) ?></p>
         <?= $this->Form->end() ?>

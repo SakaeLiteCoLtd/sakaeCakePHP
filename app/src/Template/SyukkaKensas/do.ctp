@@ -11,7 +11,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
 <?php
           $username = $this->request->Session()->read('Auth.User.username');
-          echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'index1']]);
+          echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'index']]);
 
 //          $session = $this->request->getSession();
 //          $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける

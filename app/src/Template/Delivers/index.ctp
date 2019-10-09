@@ -78,7 +78,7 @@ $this->Customers = TableRegistry::get('customers');//productsテーブルを使�
                 <td><?= h($deliver->fax) ?></td>
                 <td><?= $this->Number->format($deliver->status) ?></td>
                 <td class="actions">
-                    <?= $this->Html->link(__('edit'), ['action' => 'edit', $deliver->id]) ?>
+                    <?= $this->Html->link(__('編集'), ['action' => 'edit', $deliver->id]) ?>
                 </td>
             </tr>
             <?php endforeach; ?>

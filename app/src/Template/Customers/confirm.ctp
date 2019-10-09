@@ -30,11 +30,11 @@
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('customer_code') ?></th>
+            <th scope="row"><?= __('顧客コード') ?></th>
             <td><?= h($this->request->getData('customer_code')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('name') ?></th>
+            <th scope="row"><?= __('社名') ?></th>
             <td><?= h($this->request->getData('name')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -42,15 +42,15 @@
             <td><?= h($this->request->getData('zip')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('address') ?></th>
+            <th scope="row"><?= __('住所') ?></th>
             <td><?= h($this->request->getData('address')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('tel') ?></th>
+            <th scope="row"><?= __('電話番号') ?></th>
             <td><?= h($this->request->getData('tel')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('fax') ?></th>
+            <th scope="row"><?= __('ＦＡＸ') ?></th>
             <td><?= h($this->request->getData('fax')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -59,6 +59,6 @@
     </table>
 <br>
 <br>
-        <p align="center"><?= $this->Form->button('back', ['onclick' => 'history.back()', 'type' => 'button']) /*history.back()セッションの値を保持して戻る*/?>
-        <?= $this->Form->button(__('add'), array('name' => 'touroku')) ?></p>
+        <p align="center"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) /*history.back()セッションの値を保持して戻る*/?>
+        <?= $this->Form->button(__('登録'), array('name' => 'touroku')) ?></p>
         <?= $this->Form->end() ?>

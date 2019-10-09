@@ -41,7 +41,7 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
-          <td colspan="9"><?= $this->Form->input("manu_date", array('type' => 'date', 'label'=>false)); ?></td>
+          <td colspan="9"><?= $this->Form->input("manu_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
           <?php
             $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();
             $inspec_date = $ImSokuteidataHead[0]->inspec_date;
@@ -168,7 +168,7 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
         echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
-    <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
+    <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
     <fieldset>
       <?= $this->Form->control('lot_num', array('type'=>'hidden', 'value'=>$lot_num, 'label'=>false)) ?>
       <?= $this->Form->control('kind_kensa_1', array('type'=>'hidden', 'value'=>$kind_kensa1, 'label'=>false)) ?>

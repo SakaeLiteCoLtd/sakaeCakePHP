@@ -57,6 +57,6 @@
             echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
-    <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
+    <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>
 <br>

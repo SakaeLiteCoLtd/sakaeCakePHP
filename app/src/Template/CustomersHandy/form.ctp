@@ -19,11 +19,11 @@
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('customer_id') ?></th>
-		<td><?= $this->Form->input("customer_id", ["type"=>"select","empty"=>"Please select", "options"=>$arrCustomer, 'label'=>false]); ?></td>
+		<td><?= $this->Form->input("customer_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrCustomer, 'label'=>false]); ?></td>
 	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('place_deliver_id') ?></th>
-		<td><?= $this->Form->input("place_deliver_id", ["type"=>"select","empty"=>"Please select", "options"=>$arrDeliver, 'label'=>false]); ?></td>
+		<td><?= $this->Form->input("place_deliver_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrDeliver, 'label'=>false]); ?></td>
 	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('name') ?></th>
@@ -37,6 +37,6 @@
             echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
-    <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
+    <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>
 <br>

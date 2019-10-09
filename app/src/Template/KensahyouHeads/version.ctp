@@ -182,7 +182,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         ?>
 
     </fieldset>
-    <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
+    <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>
 
 <?php endif; ?>

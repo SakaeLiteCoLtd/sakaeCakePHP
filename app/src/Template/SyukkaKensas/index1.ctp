@@ -16,15 +16,16 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 ?>
 
 <?=$this->Form->create($entity, ['url' => ['action' => 'imtaiouform']]) ?>
-<br>
-    <fieldset>
+<fieldset>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
 		<td bgcolor="#FFDEAD" style="width: 50px">品番</td>
 		<td bgcolor="#FFDEAD"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
 	</tr>
 </table>
-    </fieldset>
+<br>
     <center><?= $this->Form->button(__('検索')) ?></center>
 <br>
+</fieldset>
+
     <?= $this->Form->end() ?>

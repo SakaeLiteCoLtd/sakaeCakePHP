@@ -31,13 +31,21 @@ class KensahyouSokuteidatasController  extends AppController
       $this->Users = TableRegistry::get('users');//Usersテーブルを使う
      }
 
-    public function index()//「出荷検査用呼出」ページトップ
-    {
-    	$this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find()//KensahyouSokuteidatasテーブルの中で
-    	->select(['product_code','delete_flag' => '0'])
-    	->group('product_code')
-    	);
-    }
+     public function index()//「出荷検査用呼出」ページトップ
+     {
+     	$this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find()//KensahyouSokuteidatasテーブルの中で
+     	->select(['product_code','delete_flag' => '0'])
+     	->group('product_code')
+     	);
+     }
+
+     public function yobidasi1()//Pから始まるものだけにする
+     {
+     	$this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find()//KensahyouSokuteidatasテーブルの中で
+     	->select(['product_code','delete_flag' => '0'])
+     	->group('product_code')
+     	);
+     }
 
     public function indexcsv()//csvテスト用
     {

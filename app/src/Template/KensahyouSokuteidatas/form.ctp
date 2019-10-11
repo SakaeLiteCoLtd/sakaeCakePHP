@@ -67,7 +67,6 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
         echo "</strong></div></td>\n";
         $kensaArray = Array();
         for($i=1; $i<=9; $i++){
-
           echo "<td colspan='2'><div align='center'>\n";
           echo ${"ImKikakuid_".$i};
           echo "</div></td>\n";

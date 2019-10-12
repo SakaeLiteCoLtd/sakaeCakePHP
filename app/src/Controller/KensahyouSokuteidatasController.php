@@ -823,7 +823,7 @@ class KensahyouSokuteidatasController  extends AppController
       $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
       $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
 
-    	if ($this->request->is('get')) {//postなら登録
+    	if ($this->request->is('get')) {
     		$kensahyouSokuteidata = $this->KensahyouSokuteidatas->patchEntities($kensahyouSokuteidata, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
     		$connection = ConnectionManager::get('default');//トランザクション1
     		// トランザクション開始2

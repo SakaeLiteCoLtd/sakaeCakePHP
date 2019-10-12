@@ -18,9 +18,9 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\FrozenTime $updated_at
  * @property string $updated_staff
  *
- * @property \App\Model\Entity\Product $product
+ * @property \App\Model\Entity\KadouSeikei $product
  */
-class ImSokuteidataHead extends Entity
+class KadouSeikei extends Entity
 {
 
     /**

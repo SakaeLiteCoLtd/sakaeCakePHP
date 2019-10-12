@@ -20,8 +20,9 @@ class KadouSeikeisController extends AppController
      public function initialize()
      {
 			 parent::initialize();
-		 	$this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
-		 	$this->Users = TableRegistry::get('users');//staffsテーブルを使う
+       $this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
+       $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');
+       $this->Users = TableRegistry::get('users');
      }
 
     public function index()
@@ -40,7 +41,8 @@ class KadouSeikeisController extends AppController
       print_r($data);
       echo "</pre>";
 */
-      if(empty($data['formset'])){//最初のフォーム画面
+      if(empty($data['formset']) && !isset($data['touroku'])){//最初のフォーム画面
+        session_start();
         $dayye = sprintf('%02d', (int)$data['manu_date']['day']-1);
         $dateYMD = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day'];
         $this->set('dateYMD',$dateYMD);
@@ -103,10 +105,29 @@ class KadouSeikeisController extends AppController
           $tuika2 = $data['tuika2'];
           $this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
 
-  			}else{
-      	}
+        }elseif(isset($data['confirm']) && !isset($data['touroku'])){
+          $this->set('confirm',$data['confirm']);//1行上の$roleをctpで使えるようにセット
+          $kadoujikan1_1 = ((strtotime($data['finishing_tm1_1']) - strtotime($data['starting_tm1_1']))/3600);//稼働時間
+          $this->set('kadoujikan1_1',$kadoujikan1_1);//1行上の$roleをctpで使えるようにセット
+/*
+          echo "<pre>";
+          print_r($data['confirm']);
+          echo "</pre>";
+*/
 
-        if (isset($data['tuika22']) && empty($data['sakujo22'])) {//データがpostで送られたとき
+          $starting_tm1_1 = substr($data['starting_tm1_1'], 0, 10)." ".substr($data['starting_tm1_1'], 11, 5);
+          $this->set('starting_tm1_1',$starting_tm1_1);//1行上の$roleをctpで使えるようにセット
+          $finishing_tm1_1 = substr($data['finishing_tm1_1'], 0, 10)." ".substr($data['finishing_tm1_1'], 11, 5);
+          $this->set('finishing_tm1_1',$finishing_tm1_1);//1行上の$roleをctpで使えるようにセット
+          $tuika1 = $data['tuika1'];
+          $this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
+          $tuika2 = $data['tuika2'];
+          $this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
+
+  //      }else{
+        }
+
+        elseif (isset($data['tuika22']) && empty($data['sakujo22'])) {//データがpostで送られたとき
           $dateye = $data['dateye'];
           $dateto = $data['dateto'];
           $this->set('dateye',$dateye);
@@ -138,14 +159,46 @@ class KadouSeikeisController extends AppController
   				$this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
           $tuika1 = $data['tuika1'];
   				$this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
-  			}
+
+  			}else{
+          return $this->redirect(['action' => 'comfirm']);
+      	}
+
 
       }
 
     }
 
-     public function confirm()
+     public function comfirm()
     {
+      $kadouSeikei = $this->KadouSeikeis->newEntity();
+			$this->set('kadouSeikei',$kadouSeikei);
+
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      echo "<pre>";
+      print_r($data['karikadouseikei']);
+      echo "</pre>";
+
+      if ($this->request->is('get')) {
+        $kadouSeikei = $this->KadouSeikeis->patchEntities($kadouSeikei, $data['karikadouseikei']);//$roleデータ（空の行）を$this->request->getData()に更新する
+				$connection = ConnectionManager::get('default');//トランザクション1
+				// トランザクション開始2
+				$connection->begin();//トランザクション3
+				try {//トランザクション4
+					if ($this->KadouSeikeis->saveMany($kadouSeikei)) {
+						$connection->commit();// コミット5
+					} else {
+						$this->Flash->error(__('The data could not be saved. Please, try again.'));
+						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+					}
+				} catch (Exception $e) {//トランザクション7
+				//ロールバック8
+					$connection->rollback();//トランザクション9
+				}//トランザクション10
+
+      }
     }
 
 		public function preadd()
@@ -192,7 +245,7 @@ class KadouSeikeisController extends AppController
 			$this->set('role',$role);//1行上の$roleをctpで使えるようにセット
 
 			$session = $this->request->getSession();
-			$data = $session->read();//postデータ取得し、$dataと名前を付ける
+			$data = $session->read();
 
 			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 			$data['roledata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする

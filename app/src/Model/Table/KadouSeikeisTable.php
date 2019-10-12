@@ -9,7 +9,7 @@ use Cake\Validation\Validator;
 /**
  * ImSokuteidataHeads Model
  *
- * @property \App\Model\Table\ProductsTable|\Cake\ORM\Association\BelongsTo $Products
+ * @property \App\Model\Table\KadouSeikeisTable|\Cake\ORM\Association\BelongsTo $Products
  *
  * @method \App\Model\Entity\ImSokuteidataHead get($primaryKey, $options = [])
  * @method \App\Model\Entity\ImSokuteidataHead newEntity($data = null, array $options = [])
@@ -67,7 +67,7 @@ class KadouSeikeisTable extends Table
             ->allowEmpty('id', 'create');
 
         $validator
-            ->maxLength('product_code', 30)
+            ->maxLength('product_code', 255)
             ->requirePresence('product_code', 'create')
             ->notEmpty('product_code');
 
@@ -81,17 +81,17 @@ class KadouSeikeisTable extends Table
             ->allowEmpty('seikeiki_code');
 
         $validator
-            ->date('starting_tm')
+            ->datetime('starting_tm')
             ->requirePresence('starting_tm', 'create')
             ->notEmpty('starting_tm');
 
         $validator
-            ->date('finishing_tm')
+            ->datetime('finishing_tm')
             ->requirePresence('finishing_tm', 'create')
             ->notEmpty('finishing_tm');
 
         $validator
-            ->decimal('cycle_shot')
+            ->numeric('cycle_shot')
             ->requirePresence('cycle_shot', 'create')
             ->notEmpty('cycle_shot');
 
@@ -101,7 +101,7 @@ class KadouSeikeisTable extends Table
             ->notEmpty('amount_shot');
 
         $validator
-            ->decimal('accomp_rate')
+            ->numeric('accomp_rate')
             ->requirePresence('accomp_rate', 'create')
             ->notEmpty('accomp_rate');
 

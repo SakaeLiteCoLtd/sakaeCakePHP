@@ -210,14 +210,14 @@ for($i=1; $i<=$tuika2; $i++){//２号機
                  $_SESSION['karikadouseikei'][$m] = array(
                    'product_code' => $_POST["product_code1_{$n}"],
                    'seikeiki' => $n,
-                   'seikeiki_code' => 2,
+                   'seikeiki_code' => "",
                    'starting_tm' => $starting_tm1_1,
                    'finishing_tm' => $finishing_tm1_1,
                    'cycle_shot' => $_POST["cycle_shot1_{$n}"],
                    'amount_shot' => $_POST["amount_shot1_{$n}"],
                    'accomp_rate' => ${"accomp_rate1_".$n},
                    "present_kensahyou" => 0,
-        //           'created_at' => $finishing_tm1_1,
+                   'created_at' => $finishing_tm1_1,
                    'created_staff' => "f606ea4c-3274-4db6-9c95-52304761b41d",
                  );
        }

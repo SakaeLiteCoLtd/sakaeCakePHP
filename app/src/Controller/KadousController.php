@@ -14,27 +14,30 @@ use Cake\Core\Configure;//トランザクション
  *
  * @method \App\Model\Entity\Role[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
-class KadouSeikeisController extends AppController
+class KadousController extends AppController
 {
 
      public function initialize()
      {
 			 parent::initialize();
        $this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
-       $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');
+       $this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
+//       $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');
        $this->Users = TableRegistry::get('users');
      }
 
-    public function index()
+    public function kariindex()
     {
-			$kadouSeikeis = $this->KadouSeikeis->newEntity();//newentityに$roleという名前を付ける
-			$this->set('kadouSeikeis',$kadouSeikeis);//1行上の$roleをctpで使えるようにセット
+      $this->request->session()->destroy(); // セッションの破棄
+
+			$KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();//newentityに$roleという名前を付ける
+			$this->set('KariKadouSeikeis',$KariKadouSeikeis);//1行上の$roleをctpで使えるようにセット
     }
 
-    public function form()
+    public function kariform()
     {
-			$kadouSeikeis = $this->KadouSeikeis->newEntity();//newentityに$roleという名前を付ける
-			$this->set('kadouSeikeis',$kadouSeikeis);//1行上の$roleをctpで使えるようにセット
+			$KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();//newentityに$roleという名前を付ける
+			$this->set('KariKadouSeikeis',$KariKadouSeikeis);//1行上の$roleをctpで使えるようにセット
 			$data = $this->request->getData();//postデータを$dataに
 /*
       echo "<pre>";
@@ -55,12 +58,14 @@ class KadouSeikeisController extends AppController
         $this->set('dateto',$dateto);
 
         $tuika1 = 1;
-        $this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
+        $this->set('tuika1',$tuika1);
         $tuika2 = 1;
-        $this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
+        $this->set('tuika2',$tuika2);
+        $tuika3 = 1;
+        $this->set('tuika3',$tuika3);
       }else{
 
-        if (isset($data['tuika11']) && empty($data['sakujo11'])) {//データがpostで送られたとき
+        if (isset($data['tuika11']) && empty($data['sakujo11'])) {//1goukituika
           $dateye = $data['dateye'];
           $dateto = $data['dateto'];
           $this->set('dateye',$dateye);
@@ -70,12 +75,14 @@ class KadouSeikeisController extends AppController
   				$this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
           $tuika2 = $data['tuika2'];
           $this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
+          $tuika3 = $data['tuika3'];
+          $this->set('tuika3',$tuika3);//1行上の$roleをctpで使えるようにセット
 /*
           echo "<pre>";
   				print_r($data['tuika1']);
   				echo "</pre>";
 */
-        }elseif(isset($data['sakujo11']) && $data['tuika1'] > 0){
+}elseif(isset($data['sakujo11']) && $data['tuika1'] > 0){//1goukisakujo
 /*  				echo "<pre>";
   				print_r("1-sa");
   				echo "</pre>";
@@ -89,8 +96,10 @@ class KadouSeikeisController extends AppController
   				$this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
           $tuika2 = $data['tuika2'];
           $this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
+          $tuika3 = $data['tuika3'];
+          $this->set('tuika3',$tuika3);//1行上の$roleをctpで使えるようにセット
 
-        }elseif(isset($data['sakujo11']) && $data['tuika1'] == 0){
+        }elseif(isset($data['sakujo11']) && $data['tuika1'] == 0){//1goukisakujo0
   /*				echo "<pre>";
   				print_r($data['sakujo1']);
   				echo "</pre>";
@@ -104,30 +113,29 @@ class KadouSeikeisController extends AppController
   				$this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
           $tuika2 = $data['tuika2'];
           $this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
+          $tuika3 = $data['tuika3'];
+          $this->set('tuika3',$tuika3);//1行上の$roleをctpで使えるようにセット
 
-        }elseif(isset($data['confirm']) && !isset($data['touroku'])){
+        }elseif(isset($data['confirm']) && !isset($data['touroku'])){//?これがないとエラーが出る
           $this->set('confirm',$data['confirm']);//1行上の$roleをctpで使えるようにセット
-          $kadoujikan1_1 = ((strtotime($data['finishing_tm1_1']) - strtotime($data['starting_tm1_1']))/3600);//稼働時間
-          $this->set('kadoujikan1_1',$kadoujikan1_1);//1行上の$roleをctpで使えるようにセット
+//          $kadoujikan1_1 = ((strtotime($data['finishing_tm1_1']) - strtotime($data['starting_tm1_1']))/3600);//稼働時間
+//          $this->set('kadoujikan1_1',$kadoujikan1_1);//1行上の$roleをctpで使えるようにセット
 /*
           echo "<pre>";
           print_r($data['confirm']);
           echo "</pre>";
 */
-
-          $starting_tm1_1 = substr($data['starting_tm1_1'], 0, 10)." ".substr($data['starting_tm1_1'], 11, 5);
-          $this->set('starting_tm1_1',$starting_tm1_1);//1行上の$roleをctpで使えるようにセット
-          $finishing_tm1_1 = substr($data['finishing_tm1_1'], 0, 10)." ".substr($data['finishing_tm1_1'], 11, 5);
-          $this->set('finishing_tm1_1',$finishing_tm1_1);//1行上の$roleをctpで使えるようにセット
           $tuika1 = $data['tuika1'];
           $this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
           $tuika2 = $data['tuika2'];
           $this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
+          $tuika3 = $data['tuika3'];
+          $this->set('tuika3',$tuika3);//1行上の$roleをctpで使えるようにセット
 
   //      }else{
         }
 
-        elseif (isset($data['tuika22']) && empty($data['sakujo22'])) {//データがpostで送られたとき
+        elseif (isset($data['tuika22']) && empty($data['sakujo22'])) {//2goukituika
           $dateye = $data['dateye'];
           $dateto = $data['dateto'];
           $this->set('dateye',$dateye);
@@ -137,8 +145,10 @@ class KadouSeikeisController extends AppController
   				$this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
           $tuika1 = $data['tuika1'];
   				$this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
+          $tuika3 = $data['tuika3'];
+          $this->set('tuika3',$tuika3);//1行上の$roleをctpで使えるようにセット
 
-        }elseif(isset($data['sakujo22']) && $data['tuika2'] > 0){
+        }elseif(isset($data['sakujo22']) && $data['tuika2'] > 0){//2goukisakujo
           $dateye = $data['dateye'];
           $dateto = $data['dateto'];
           $this->set('dateye',$dateye);
@@ -148,8 +158,10 @@ class KadouSeikeisController extends AppController
   				$this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
           $tuika1 = $data['tuika1'];
   				$this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
+          $tuika3 = $data['tuika3'];
+          $this->set('tuika3',$tuika3);//1行上の$roleをctpで使えるようにセット
 
-        }elseif(isset($data['sakujo22']) && $data['tuika2'] == 0){
+        }elseif(isset($data['sakujo22']) && $data['tuika2'] == 0){//2goukisakujo0
           $dateye = $data['dateye'];
           $dateto = $data['dateto'];
           $this->set('dateye',$dateye);
@@ -159,55 +171,65 @@ class KadouSeikeisController extends AppController
   				$this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
           $tuika1 = $data['tuika1'];
   				$this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
+          $tuika3 = $data['tuika3'];
+          $this->set('tuika3',$tuika3);//1行上の$roleをctpで使えるようにセット
+
+        }elseif (isset($data['tuika33']) && empty($data['sakujo33'])) {//3goukituika
+            $dateye = $data['dateye'];
+            $dateto = $data['dateto'];
+            $this->set('dateye',$dateye);
+            $this->set('dateto',$dateto);
+
+    				$tuika3 = $data['tuika3'] + 1;
+    				$this->set('tuika3',$tuika3);//1行上の$roleをctpで使えるようにセット
+            $tuika1 = $data['tuika1'];
+    				$this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
+            $tuika2 = $data['tuika2'];
+    				$this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
+
+          }elseif(isset($data['sakujo33']) && $data['tuika3'] > 0){//3goukisakujo
+            $dateye = $data['dateye'];
+            $dateto = $data['dateto'];
+            $this->set('dateye',$dateye);
+            $this->set('dateto',$dateto);
+
+    				$tuika3 = $data['tuika3'] - 1;
+    				$this->set('tuika3',$tuika3);//1行上の$roleをctpで使えるようにセット
+            $tuika1 = $data['tuika1'];
+    				$this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
+            $tuika2 = $data['tuika2'];
+    				$this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
+
+          }elseif(isset($data['sakujo33']) && $data['tuika3'] == 0){//3goukisakujo0
+            $dateye = $data['dateye'];
+            $dateto = $data['dateto'];
+            $this->set('dateye',$dateye);
+            $this->set('dateto',$dateto);
+
+            $tuika3 = $data['tuika3'];
+    				$this->set('tuika3',$tuika3);//1行上の$roleをctpで使えるようにセット
+            $tuika2 = $data['tuika2'];
+    				$this->set('tuika2',$tuika2);//1行上の$roleをctpで使えるようにセット
+            $tuika1 = $data['tuika1'];
+    				$this->set('tuika1',$tuika1);//1行上の$roleをctpで使えるようにセット
 
   			}else{
-          return $this->redirect(['action' => 'comfirm']);
+  //        echo "<pre>";
+  //        print_r("エラー");
+  //        echo "</pre>";
+          return $this->redirect(['action' => 'karipreadd']);
       	}
-
-
-      }
-
-    }
-
-     public function comfirm()
-    {
-      $kadouSeikei = $this->KadouSeikeis->newEntity();
-			$this->set('kadouSeikei',$kadouSeikei);
-
-      $session = $this->request->getSession();
-      $data = $session->read();
-
-      echo "<pre>";
-      print_r($data['karikadouseikei']);
-      echo "</pre>";
-
-      if ($this->request->is('get')) {
-        $kadouSeikei = $this->KadouSeikeis->patchEntities($kadouSeikei, $data['karikadouseikei']);//$roleデータ（空の行）を$this->request->getData()に更新する
-				$connection = ConnectionManager::get('default');//トランザクション1
-				// トランザクション開始2
-				$connection->begin();//トランザクション3
-				try {//トランザクション4
-					if ($this->KadouSeikeis->saveMany($kadouSeikei)) {
-						$connection->commit();// コミット5
-					} else {
-						$this->Flash->error(__('The data could not be saved. Please, try again.'));
-						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-					}
-				} catch (Exception $e) {//トランザクション7
-				//ロールバック8
-					$connection->rollback();//トランザクション9
-				}//トランザクション10
-
       }
     }
 
-		public function preadd()
+
+		public function karipreadd()
 		{
-			$role = $this->Roles->newEntity();//newentityに$roleという名前を付ける
-			$this->set('role',$role);//1行上の$roleをctpで使えるようにセット
+      $KariKadouSeikei = $this->KariKadouSeikeis->newEntity();
+      $this->set('KariKadouSeikei',$KariKadouSeikei);
 		}
 
-		public function login()
+		public function karilogin()
 		{
 			if ($this->request->is('post')) {
 				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
@@ -228,52 +250,57 @@ class KadouSeikeisController extends AppController
 						$user = $this->Auth->identify();
 					if ($user) {
 						$this->Auth->setUser($user);
-						return $this->redirect(['action' => 'do']);
+						return $this->redirect(['action' => 'karido']);
 					}
 				}
 		}
 
-		public function logout()
+		public function karilogout()
 		{
 			$this->request->session()->destroy(); // セッションの破棄
 			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
 		}
 
-     public function do()
-    {
-			$role = $this->Roles->newEntity();//newentityに$roleという名前を付ける
-			$this->set('role',$role);//1行上の$roleをctpで使えるようにセット
+    public function karido()
+   {
+     $KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
+     $this->set('KariKadouSeikei',$KariKadouSeikeis);
 
-			$session = $this->request->getSession();
-			$data = $session->read();
+     $session = $this->request->getSession();
+     $data = $session->read();
 
-			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-			$data['roledata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+     for($n=1; $n<=100; $n++){
+       if(isset($_SESSION['karikadouseikei'][$n])){
+         $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+         $_SESSION['karikadouseikei'][$n] = array_merge($_SESSION['karikadouseikei'][$n],$created_staff);
+       }else{
+         break;
+       }
+     }
+/*
+     echo "<pre>";
+     print_r($_SESSION['karikadouseikei']);
+     echo "</pre>";
+*/
+     if ($this->request->is('get')) {
+       $KariKadouSeikeis = $this->KariKadouSeikeis->patchEntities($KariKadouSeikeis, $_SESSION['karikadouseikei']);//$roleデータ（空の行）を$this->request->getData()に更新する
+       $connection = ConnectionManager::get('default');//トランザクション1
+       // トランザクション開始2
+       $connection->begin();//トランザクション3
+       try {//トランザクション4
+         if ($this->KariKadouSeikeis->saveMany($KariKadouSeikeis)) {
+           $connection->commit();// コミット5
+         } else {
+           $this->Flash->error(__('The data could not be saved. Please, try again.'));
+           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+         }
+       } catch (Exception $e) {//トランザクション7
+       //ロールバック8
+         $connection->rollback();//トランザクション9
+       }//トランザクション10
 
-			$created_staff = $data['roledata']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
-			$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
-			$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
-			$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
-
-			if ($this->request->is('get')) {//postの場合
-				$role = $this->Roles->patchEntity($role, $data['roledata']);//$roleデータ（空の行）を$this->request->getData()に更新する
-				$connection = ConnectionManager::get('default');//トランザクション1
-				// トランザクション開始2
-				$connection->begin();//トランザクション3
-				try {//トランザクション4
-					if ($this->Roles->save($role)) {
-						$connection->commit();// コミット5
-					} else {
-						$this->Flash->error(__('The role could not be saved. Please, try again.'));
-						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-					}
-				} catch (Exception $e) {//トランザクション7
-				//ロールバック8
-					$connection->rollback();//トランザクション9
-				}//トランザクション10
-			}
-
-    }
+     }
+   }
 
     public function edit($id = null)
     {

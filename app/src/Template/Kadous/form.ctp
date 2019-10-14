@@ -185,9 +185,40 @@ for($i=1; $i<=$tuika2; $i++){//２号機
        echo "</tr>\n";
    }
   ?>
-
  </table>
  <br>
+
+ <?php
+   $session = $this->request->getSession();
+   $username = $this->request->Session()->read('Auth.User.username');
+
+   $m = 0;
+   for($n=1; $n<=$tuika1; $n++){
+     $m = $m + 1;
+     ${"starting_tm1_".$n} = substr($_POST["starting_tm1_{$n}"], 0, 10)." ".substr($_POST["starting_tm1_{$n}"], 11, 5);
+     ${"finishing_tm1_".$n} = substr($_POST["finishing_tm1_{$n}"], 0, 10)." ".substr($_POST["finishing_tm1_{$n}"], 11, 5);
+           $resultArray = Array();
+             $_SESSION['karikadouseikei'][$m] = array(
+               'product_code' => $_POST["product_code1_{$n}"],
+               'seikeiki' => 1,
+               'seikeiki_code' => "",
+               'starting_tm' => ${"starting_tm1_".$n},
+               'finishing_tm' => ${"finishing_tm1_".$n},
+               'cycle_shot' => $_POST["cycle_shot1_{$n}"],
+               'amount_shot' => $_POST["amount_shot1_{$n}"],
+               'accomp_rate' => ${"accomp_rate1_".$n},
+               "present_kensahyou" => 0,
+             );
+   }
+   $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
+/*
+   echo "<pre>";
+   print_r($_SESSION['karikadouseikei']);
+   echo "</pre>";
+*/
+  ?>
+
+
  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
    <caption style="text-align: left">２号機</caption>
    <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
@@ -199,41 +230,14 @@ for($i=1; $i<=$tuika2; $i++){//２号機
        <td width="200" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">達成率</strong></div></td>
      </tr>
 
-     <?php
-     $session = $this->request->getSession();
-     $username = $this->request->Session()->read('Auth.User.username');
-
-     $m = 0;
-       for($n=1; $n<=$tuika1; $n++){
-         $m = $m + 1;
-               $resultArray = Array();
-                 $_SESSION['karikadouseikei'][$m] = array(
-                   'product_code' => $_POST["product_code1_{$n}"],
-                   'seikeiki' => $n,
-                   'seikeiki_code' => 2,
-                   'starting_tm' => $starting_tm1_1,
-                   'finishing_tm' => $finishing_tm1_1,
-                   'cycle_shot' => $_POST["cycle_shot1_{$n}"],
-                   'amount_shot' => $_POST["amount_shot1_{$n}"],
-                   'accomp_rate' => ${"accomp_rate1_".$n},
-                   "present_kensahyou" => 0,
-        //           'created_at' => $finishing_tm1_1,
-                   'created_staff' => "f606ea4c-3274-4db6-9c95-52304761b41d",
-                 );
-       }
-/*
-       echo "<pre>";
-       print_r($_SESSION['karikadouseikei']);
-       echo "</pre>";
-*/
-      ?>
 
  <?php
  for($i=1; $i<=$tuika2; $i++){//2号機
    ${"amount_shot2_".$i} = $this->request->getData("amount_shot2_{$i}");
    ${"cycle_shot2_".$i} = $this->request->getData("cycle_shot2_{$i}");
+   ${"starting_tm2_".$i} = strtotime($this->request->getData("starting_tm2_{$i}"));
    ${"kadoujikan2_".$i} = ((strtotime($this->request->getData("finishing_tm2_{$i}")) - strtotime($this->request->getData("starting_tm2_{$i}"))));
-   ${"riron_shot2_".$i} = ${"kadoujikan1_".$i}/${"cycle_shot1_".$i};
+   ${"riron_shot2_".$i} = ${"kadoujikan2_".$i}/${"cycle_shot2_".$i};
    ${"accomp_rate2_".$i} = round(100*${"amount_shot2_".$i}/${"riron_shot2_".$i}, 0);
        echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
        echo "<td rowspan='2'  height='10' colspan='10' nowrap='nowrap' style='font-size: 18pt'><div align='center'>\n";
@@ -257,6 +261,32 @@ for($i=1; $i<=$tuika2; $i++){//２号機
        echo "</tr>\n";
    }
   ?>
+
+  <?php
+  for($n=1; $n<=$tuika2; $n++){
+    $m = $m + 1;
+    ${"starting_tm2_".$n} = substr($_POST["starting_tm2_{$n}"], 0, 10)." ".substr($_POST["starting_tm2_{$n}"], 11, 5);
+    ${"finishing_tm2_".$n} = substr($_POST["finishing_tm2_{$n}"], 0, 10)." ".substr($_POST["finishing_tm2_{$n}"], 11, 5);
+          $resultArray = Array();
+            $_SESSION['karikadouseikei'][$m] = array(
+              'product_code' => $_POST["product_code2_{$n}"],
+              'seikeiki' => 1,
+              'seikeiki_code' => "",
+              'starting_tm' => ${"starting_tm2_".$n},
+              'finishing_tm' => ${"finishing_tm2_".$n},
+              'cycle_shot' => $_POST["cycle_shot2_{$n}"],
+              'amount_shot' => $_POST["amount_shot2_{$n}"],
+              'accomp_rate' => ${"accomp_rate2_".$n},
+              "present_kensahyou" => 0,
+            );
+  }
+  $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
+/*
+  echo "<pre>";
+  print_r($_SESSION['karikadouseikei']);
+  echo "</pre>";
+*/
+   ?>
 
  </table>
   <br>

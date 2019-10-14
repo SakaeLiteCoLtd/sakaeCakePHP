@@ -15,6 +15,9 @@ $this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
           header('Pragma:');
           echo $this->Form->create($KariKadouSeikei, ['url' => ['action' => 'index']]);
 ?>
+<br>
+<br>
+<br>
 
 <div align="center"><strong><font color="red">＊登録されました</font></strong></div>
 <br>

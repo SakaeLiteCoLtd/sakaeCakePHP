@@ -13,7 +13,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($kadouSeikeis, ['url' => ['action' => 'form']]);
+          echo $this->Form->create($KadouSeikeis, ['url' => ['action' => 'form']]);
 ?>
 <br>
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">

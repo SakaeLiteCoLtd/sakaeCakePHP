@@ -9,7 +9,7 @@ use Cake\Validation\Validator;
 /**
  * ImSokuteidataHeads Model
  *
- * @property \App\Model\Table\KadouSeikeisTable|\Cake\ORM\Association\BelongsTo $Products
+ * @property \App\Model\Table\KariKadouSeikeisTable|\Cake\ORM\Association\BelongsTo $Products
  *
  * @method \App\Model\Entity\ImSokuteidataHead get($primaryKey, $options = [])
  * @method \App\Model\Entity\ImSokuteidataHead newEntity($data = null, array $options = [])
@@ -20,7 +20,7 @@ use Cake\Validation\Validator;
  * @method \App\Model\Entity\ImSokuteidataHead[] patchEntities($entities, array $data, array $options = [])
  * @method \App\Model\Entity\ImSokuteidataHead findOrCreate($search, callable $callback = null, $options = [])
  */
-class KariKadouSeikeisTable extends Table
+class SeikeisTable extends Table
 {
   public function beforeFilter(Event $event)//
   {

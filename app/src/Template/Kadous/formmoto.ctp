@@ -15,7 +15,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Cache-Control:');
           header('Pragma:');
           echo $this->Form->create($kadouSeikeis, ['url' => ['action' => 'form']]);
-?>
+        ?>
 
 <?php if(!isset($confirm)): ?>
 

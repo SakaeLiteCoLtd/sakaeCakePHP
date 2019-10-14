@@ -5,7 +5,7 @@
  */
 use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 
-$this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
+//$this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
 $this->Products = TableRegistry::get('products');//productsテーブルを使う
 ?>
         <?php

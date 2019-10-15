@@ -102,9 +102,10 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
  <br>
  <?php   /*ここまで１号機*/    ?>
  <?php   /*ここから２号機*/    ?>
- <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+ <br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
    <caption style="text-align: left">２号機</caption>
-   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#ffc0cb" style="border-bottom: solid;border-width: 1px">
      <tr style="border-bottom: 0px;border-width: 0px">
        <td width="250" height="60" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 20pt; color:blue">品番</strong></div></td>
        <td width="200" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">成形時間</strong></div></td>
@@ -176,7 +177,8 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
   <br>
   <?php   /*ここまで２号機*/    ?>
   <?php   /*ここから３号機*/    ?>
-  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+  <br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <caption style="text-align: left">３号機</caption>
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
       <tr style="border-bottom: 0px;border-width: 0px">
@@ -250,9 +252,10 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
    <br>
    <?php   /*ここまで３号機*/    ?>
    <?php   /*ここから４号機*/    ?>
-   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+   <br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
      <caption style="text-align: left">４号機</caption>
-     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#ffc0cb" style="border-bottom: solid;border-width: 1px">
        <tr style="border-bottom: 0px;border-width: 0px">
          <td width="250" height="60" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 20pt; color:blue">品番</strong></div></td>
          <td width="200" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">成形時間</strong></div></td>
@@ -324,7 +327,8 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
     <br>
     <?php   /*ここまで４号機*/    ?>
     <?php   /*ここから５号機*/    ?>
-    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+    <br>
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
       <caption style="text-align: left">５号機</caption>
       <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
         <tr style="border-bottom: 0px;border-width: 0px">
@@ -398,9 +402,10 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
      <br>
      <?php   /*ここまで５号機*/    ?>
      <?php   /*ここから６号機*/    ?>
+     <br>
      <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
        <caption style="text-align: left">６号機</caption>
-       <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+       <tbody border="2" bordercolor="#E6FFFF" bgcolor="#ffc0cb" style="border-bottom: solid;border-width: 1px">
          <tr style="border-bottom: 0px;border-width: 0px">
            <td width="250" height="60" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 20pt; color:blue">品番</strong></div></td>
            <td width="200" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">成形時間</strong></div></td>
@@ -472,6 +477,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
       <br>
       <?php   /*ここまで６号機*/    ?>
      <?php   /*ここから７号機*/    ?>
+     <br>
      <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
        <caption style="text-align: left">７号機</caption>
        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
@@ -546,9 +552,10 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
       <br>
       <?php   /*ここまで７号機*/    ?>
    <?php   /*ここから８号機*/    ?>
+   <br>
    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
      <caption style="text-align: left">８号機</caption>
-     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#ffc0cb" style="border-bottom: solid;border-width: 1px">
        <tr style="border-bottom: 0px;border-width: 0px">
          <td width="250" height="60" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 20pt; color:blue">品番</strong></div></td>
          <td width="200" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">成形時間</strong></div></td>
@@ -620,6 +627,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
     <br>
     <?php   /*ここまで８号機*/    ?>
     <?php   /*ここから９号機*/    ?>
+    <br>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
       <caption style="text-align: left">９号機</caption>
       <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">

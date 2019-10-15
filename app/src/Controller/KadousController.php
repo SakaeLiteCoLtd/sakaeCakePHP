@@ -46,21 +46,22 @@ class KadousController extends AppController
 */
       if(empty($data['formset']) && !isset($data['touroku'])){//最初のフォーム画面
         session_start();
-        $dayye = sprintf('%02d', (int)$data['manu_date']['day']-1);//毎月1日がエラーになる
         $dateYMD = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day'];
+        $dateYMD1 = strtotime($dateYMD);
+        $dayye = date('Y-m-d', strtotime('-1 day', $dateYMD1));
         $this->set('dateYMD',$dateYMD);
-        $dateYMDye = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$dayye;
+        $dateYMDye = $dayye;
         $this->set('dateYMDye',$dateYMDye);
         $dateHI = date("08:00");
         $dateye = $dateYMDye."T".$dateHI;
         $dateto = $dateYMD."T".$dateHI;
         $this->set('dateye',$dateye);
         $this->set('dateto',$dateto);
-
-  //      echo "<pre>";
-  //      print_r(date('Y-m-d', strtotime('-1 day', $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day'])));
-  //      echo "</pre>";
-
+/*
+        echo "<pre>";
+        print_r($dayye);
+        echo "</pre>";
+*/
         for($i=1; $i<=9; $i++){
       		${"tuika".$i} = 0;
       		$this->set('tuika'.$i,${"tuika".$i});//セット

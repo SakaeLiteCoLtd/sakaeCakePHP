@@ -24,7 +24,7 @@ $this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
 
 
 
-<p align="center"><?= $this->Form->button(__('top'), array('name' => 'index')) ?></p>
+<p align="center"><?= $this->Form->button(__('最終登録'), array('name' => 'index')) ?></p>
 
 
 <br>

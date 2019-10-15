@@ -12,15 +12,18 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($kadouSeikei, ['url' => ['action' => 'index']]);
+          echo $this->Form->create($KadouSeikeis, ['url' => ['action' => 'kariindex']]);
 ?>
+<br>
+<br>
+<br>
 
 <div align="center"><strong><font color="red">＊登録されました</font></strong></div>
 <br>
 
 
 
-<p align="center"><?= $this->Form->button(__('top'), array('name' => 'index')) ?></p>
+<p align="center"><?= $this->Form->button(__('top'), array('name' => 'kariindex')) ?></p>
 
 
 <br>

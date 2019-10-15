@@ -1,24 +1,21 @@
 <?php
 namespace App\Model\Table;
-
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
 /**
- * ImSokuteidataHeads Model
+ * KariKadouSeikeis Model
  *
- * @property \App\Model\Table\KadouSeikeisTable|\Cake\ORM\Association\BelongsTo $Products
- *
- * @method \App\Model\Entity\ImSokuteidataHead get($primaryKey, $options = [])
- * @method \App\Model\Entity\ImSokuteidataHead newEntity($data = null, array $options = [])
- * @method \App\Model\Entity\ImSokuteidataHead[] newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\ImSokuteidataHead|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \App\Model\Entity\ImSokuteidataHead|bool saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \App\Model\Entity\ImSokuteidataHead patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \App\Model\Entity\ImSokuteidataHead[] patchEntities($entities, array $data, array $options = [])
- * @method \App\Model\Entity\ImSokuteidataHead findOrCreate($search, callable $callback = null, $options = [])
+ * @method \App\Model\Entity\KariKadouSeikei get($primaryKey, $options = [])
+ * @method \App\Model\Entity\KariKadouSeikei newEntity($data = null, array $options = [])
+ * @method \App\Model\Entity\KariKadouSeikei[] newEntities(array $data, array $options = [])
+ * @method \App\Model\Entity\KariKadouSeikei|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \App\Model\Entity\KariKadouSeikei|bool saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \App\Model\Entity\KariKadouSeikei patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method \App\Model\Entity\KariKadouSeikei[] patchEntities($entities, array $data, array $options = [])
+ * @method \App\Model\Entity\KariKadouSeikei findOrCreate($search, callable $callback = null, $options = [])
  */
 class KariKadouSeikeisTable extends Table
 {
@@ -36,10 +33,9 @@ class KariKadouSeikeisTable extends Table
      */
     public function initialize(array $config)
     {
-
         parent::initialize($config);
 
-        $this->setTable('kadou_seikeis');
+        $this->setTable('kari_kadou_seikeis');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
 
@@ -51,9 +47,7 @@ class KariKadouSeikeisTable extends Table
             ]
           ]
         ]);
-
     }
-
     /**
      * Default validation rules.
      *
@@ -65,51 +59,41 @@ class KariKadouSeikeisTable extends Table
         $validator
             ->uuid('id')
             ->allowEmpty('id', 'create');
-
         $validator
             ->maxLength('product_code', 255)
             ->requirePresence('product_code', 'create')
             ->notEmpty('product_code');
-
         $validator
             ->integer('seikeiki')
             ->requirePresence('seikeiki', 'create')
             ->notEmpty('seikeiki');
-
         $validator
             ->maxLength('seikeiki_code', 8)
             ->allowEmpty('seikeiki_code');
-
         $validator
             ->datetime('starting_tm')
             ->requirePresence('starting_tm', 'create')
             ->notEmpty('starting_tm');
-
         $validator
             ->datetime('finishing_tm')
             ->requirePresence('finishing_tm', 'create')
             ->notEmpty('finishing_tm');
-
         $validator
             ->numeric('cycle_shot')
             ->requirePresence('cycle_shot', 'create')
             ->notEmpty('cycle_shot');
-
         $validator
             ->maxLength('amount_shot', 11)
             ->requirePresence('amount_shot', 'create')
             ->notEmpty('amount_shot');
-
         $validator
             ->numeric('accomp_rate')
             ->requirePresence('accomp_rate', 'create')
             ->notEmpty('accomp_rate');
-
         $validator
             ->integer('present_kensahyou')
             ->requirePresence('present_kensahyou', 'create')
             ->notEmpty('present_kensahyou');
-
 /*
         $validator
             ->dateTime('created_at')
@@ -129,21 +113,6 @@ class KariKadouSeikeisTable extends Table
         $validator
             ->uuid('updated_staff')
             ->allowEmpty('updated_staff');
-
         return $validator;
     }
-
-    /**
-     * Returns a rules checker object that will be used for validating
-     * application integrity.
-     *
-     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
-     * @return \Cake\ORM\RulesChecker
-     */
-/*    public function buildRules(RulesChecker $rules)
-    {
-        $rules->add($rules->existsIn(['product_id'], 'Products'));
-
-        return $rules;
-    }*/
 }

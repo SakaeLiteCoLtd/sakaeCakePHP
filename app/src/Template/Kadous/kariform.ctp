@@ -569,7 +569,7 @@ for($i=1; $i<=$tuika9; $i++){//9号機
              $_SESSION['karikadouseikei'][$m] = array(
                'product_code' => $_POST["product_code1_{$n}"],
                'seikeiki' => 1,
-               'seikeiki_code' => $m,
+               'seikeiki_code' => "",
                'starting_tm' => ${"starting_tm1_".$n},
                'finishing_tm' => ${"finishing_tm1_".$n},
                'cycle_shot' => $_POST["cycle_shot1_{$n}"],
@@ -641,7 +641,7 @@ for($i=1; $i<=$tuika9; $i++){//9号機
             $_SESSION['karikadouseikei'][$m] = array(
               'product_code' => $_POST["product_code2_{$n}"],
               'seikeiki' => 2,
-              'seikeiki_code' => $m - $m1,
+              'seikeiki_code' => "",
               'starting_tm' => ${"starting_tm2_".$n},
               'finishing_tm' => ${"finishing_tm2_".$n},
               'cycle_shot' => $_POST["cycle_shot2_{$n}"],
@@ -712,7 +712,7 @@ for($i=1; $i<=$tuika9; $i++){//9号機
              $_SESSION['karikadouseikei'][$m] = array(
                'product_code' => $_POST["product_code3_{$n}"],
                'seikeiki' => 3,
-               'seikeiki_code' => $m - $m2,
+               'seikeiki_code' => "",
                'starting_tm' => ${"starting_tm3_".$n},
                'finishing_tm' => ${"finishing_tm3_".$n},
                'cycle_shot' => $_POST["cycle_shot3_{$n}"],
@@ -783,7 +783,7 @@ for($i=1; $i<=$tuika9; $i++){//9号機
              $_SESSION['karikadouseikei'][$m] = array(
                'product_code' => $_POST["product_code4_{$n}"],
                'seikeiki' => 4,
-               'seikeiki_code' => $m - $m3,
+               'seikeiki_code' => "",
                'starting_tm' => ${"starting_tm4_".$n},
                'finishing_tm' => ${"finishing_tm4_".$n},
                'cycle_shot' => $_POST["cycle_shot4_{$n}"],
@@ -853,7 +853,7 @@ for($i=1; $i<=$tuika9; $i++){//9号機
              $_SESSION['karikadouseikei'][$m] = array(
                'product_code' => $_POST["product_code5_{$n}"],
                'seikeiki' => 5,
-               'seikeiki_code' => $m - $m4,
+               'seikeiki_code' => "",
                'starting_tm' => ${"starting_tm5_".$n},
                'finishing_tm' => ${"finishing_tm5_".$n},
                'cycle_shot' => $_POST["cycle_shot5_{$n}"],
@@ -924,7 +924,7 @@ for($i=1; $i<=$tuika9; $i++){//9号機
              $_SESSION['karikadouseikei'][$m] = array(
                'product_code' => $_POST["product_code6_{$n}"],
                'seikeiki' => 6,
-               'seikeiki_code' => $m - $m5,
+               'seikeiki_code' => "",
                'starting_tm' => ${"starting_tm6_".$n},
                'finishing_tm' => ${"finishing_tm6_".$n},
                'cycle_shot' => $_POST["cycle_shot6_{$n}"],
@@ -995,7 +995,7 @@ for($i=1; $i<=$tuika9; $i++){//9号機
              $_SESSION['karikadouseikei'][$m] = array(
                'product_code' => $_POST["product_code7_{$n}"],
                'seikeiki' => 7,
-               'seikeiki_code' => $m - $m6,
+               'seikeiki_code' => "",
                'starting_tm' => ${"starting_tm7_".$n},
                'finishing_tm' => ${"finishing_tm7_".$n},
                'cycle_shot' => $_POST["cycle_shot7_{$n}"],
@@ -1065,7 +1065,7 @@ for($i=1; $i<=$tuika9; $i++){//9号機
              $_SESSION['karikadouseikei'][$m] = array(
                'product_code' => $_POST["product_code8_{$n}"],
                'seikeiki' => 8,
-               'seikeiki_code' => $m - $m7,
+               'seikeiki_code' => "",
                'starting_tm' => ${"starting_tm8_".$n},
                'finishing_tm' => ${"finishing_tm8_".$n},
                'cycle_shot' => $_POST["cycle_shot8_{$n}"],
@@ -1135,7 +1135,7 @@ for($i=1; $i<=$tuika9; $i++){//9号機
              $_SESSION['karikadouseikei'][$m] = array(
                'product_code' => $_POST["product_code9_{$n}"],
                'seikeiki' => 9,
-               'seikeiki_code' => $m - $m8,
+               'seikeiki_code' => "",
                'starting_tm' => ${"starting_tm9_".$n},
                'finishing_tm' => ${"finishing_tm9_".$n},
                'cycle_shot' => $_POST["cycle_shot9_{$n}"],

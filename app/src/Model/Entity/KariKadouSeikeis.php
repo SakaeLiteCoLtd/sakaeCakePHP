@@ -4,21 +4,22 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * ImSokuteidataHead Entity
+ * KariKadouSeikei Entity
  *
  * @property string $id
- * @property string $product_id
- * @property string $kind_kensa
- * @property \Cake\I18n\FrozenDate $inspec_date
- * @property string $lot_num
- * @property int $torikomi
- * @property int $delete_flag
+ * @property string $product_code
+ * @property int $seikeiki
+ * @property string $seikeiki_code
+ * @property \Cake\I18n\FrozenTime $starting_tm
+ * @property \Cake\I18n\FrozenTime $finishing_tm
+ * @property float $cycle_shot
+ * @property int $amount_shot
+ * @property float $accomp_rate
+ * @property string $present_kensahyou
  * @property \Cake\I18n\FrozenTime $created_at
  * @property string $created_staff
  * @property \Cake\I18n\FrozenTime $updated_at
  * @property string $updated_staff
- *
- * @property \App\Model\Entity\KadouSeikei $product
  */
 class KariKadouSeikei extends Entity
 {
@@ -45,6 +46,6 @@ class KariKadouSeikei extends Entity
         'created_at' => true,
         'created_staff' => true,
         'updated_at' => true,
-        'updated_staff' => true,
+        'updated_staff' => true
     ];
 }

@@ -7,7 +7,7 @@
 
 <br>
     <?= $this->Flash->render() ?>
-    <?= $this->Form->create($kadouSeikei, ['url' => ['action' => 'login']]) ?>
+    <?= $this->Form->create($KadouSeikei, ['url' => ['action' => 'login']]) ?>
     <br><br>
     <legend align="center"><font color="#00000"><?= __('＊ログインしてください') ?></font></legend>
     <fieldset>

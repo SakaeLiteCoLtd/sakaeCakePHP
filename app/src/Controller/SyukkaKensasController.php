@@ -262,8 +262,11 @@ class SyukkaKensasController extends AppController {
       $imKikakus = $this->ImKikakus->newEntity();
       $this->set('imKikakus', $imKikakus);
 
-        $dirName = 'data_IM測定/';//webroot内のフォルダ
-        $countname = 0;
+      $today = date("Y-m-d");
+/*
+      $dirName = 'data_IM測定/';//webroot内のフォルダ
+      $countname = 0;
+      $this->set('countname',$countname);//セット
 
       if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
     	  if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）
@@ -289,18 +292,23 @@ class SyukkaKensasController extends AppController {
                                   	${"product_name".$countname} = ${"ProductData".$countname}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
                                     ${"inspec_date".$countname} = substr($file,0,4)."-".substr($file,4,2)."-".substr($file,6,2);
 
-                                    $this->set('product_code'.$countname,${"product_code".$countname});//セット
-                                    $this->set('product_name'.$countname,${"product_name".$countname});//セット
-                                    $this->set('inspec_date'.$countname,${"inspec_date".$countname});//セット
-                                    $this->set('countname',$countname);//セット
+                                      if(substr(${"inspec_date".$countname},0,10) === substr($today,0,10)){
+                                  //      echo ${"inspec_date".$countname};
+                                  //      echo substr($today);
 
-                                    $session = $this->request->session();
-                                    $session->write('product_code', ${"product_code".$countname});
-                                    $session->write('product_name', ${"product_name".$countname});
+                                        $this->set('product_code'.$countname,${"product_code".$countname});//セット
+                                        $this->set('product_name'.$countname,${"product_name".$countname});//セット
+                                        $this->set('inspec_date'.$countname,${"inspec_date".$countname});//セット
+                                        $this->set('countname',$countname);//セット
+
+                                        $session = $this->request->session();
+                                        $session->write('product_code', ${"product_code".$countname});
+                                        $session->write('product_name', ${"product_name".$countname});
+                                      }
                                   }
                                }
                              }else{
-                              $this->set('countname',$countname);//セット
+//                              $this->set('countname',$countname);//セット
                             }
                           }
                  			}
@@ -312,8 +320,10 @@ class SyukkaKensasController extends AppController {
 
     	  }
      }
-
+*/
      $dirName = 'backupData_IM測定/';//webroot内のフォルダ
+     $countname = 0;
+     $this->set('countname',$countname);//セット
      $countnameb = 0;
      $this->set('countnameb',$countnameb);//セット
 
@@ -334,25 +344,48 @@ class SyukkaKensasController extends AppController {
                               if($file != "." && $file != ".."){//ファイルなら
                                if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
                                   if(substr($file, 0, 5) == "sumi_" ){//sumi_ファイルだけOPEN
-                                   $countnameb += 1;//ファイル名がかぶらないようにカウントしておく
                                    $num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
-                                  ${"product_codeb".$countnameb} = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
-                                   ${"ProductDatab".$countnameb} = $this->Products->find()->where(['product_code' => ${"product_codeb".$countnameb}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                                  ${"product_nameb".$countnameb} = ${"ProductDatab".$countnameb}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+
                                    ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
 
-                                   $this->set('product_codeb'.$countnameb,${"product_codeb".$countnameb});//セット
-                                   $this->set('product_nameb'.$countnameb,${"product_nameb".$countnameb});//セット
-                                   $this->set('inspec_dateb'.$countnameb,${"inspec_dateb".$countnameb});//セット
-                                   $this->set('countnameb',$countnameb);//セット
+                                     if(substr(${"inspec_dateb".$countnameb},0,10) === substr($today,0,10)){
+                                       $countnameb += 1;//ファイル名がかぶらないようにカウントしておく
 
-                                   $session = $this->request->session();
-                                   $session->write('product_codeb', ${"product_codeb".$countnameb});
-                                   $session->write('product_nameb', ${"product_nameb".$countnameb});
+                                       ${"product_codeb".$countnameb} = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
+                                       ${"ProductDatab".$countnameb} = $this->Products->find()->where(['product_code' => ${"product_codeb".$countnameb}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                       ${"product_nameb".$countnameb} = ${"ProductDatab".$countnameb}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                       ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
+
+                                       $this->set('product_codeb'.$countnameb,${"product_codeb".$countnameb});//セット
+                                       $this->set('product_nameb'.$countnameb,${"product_nameb".$countnameb});//セット
+                                       $this->set('inspec_dateb'.$countnameb,${"inspec_dateb".$countnameb});//セット
+                                       $this->set('countnameb',$countnameb);//セット
+
+                                       $session = $this->request->session();
+                                       $session->write('product_codeb', ${"product_codeb".$countnameb});
+                                       $session->write('product_nameb', ${"product_nameb".$countnameb});
+                                     }else{
+                                       $countname += 1;//ファイル名がかぶらないようにカウントしておく
+                                       $num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
+                                       ${"product_code".$countname} = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
+                                       ${"ProductData".$countname} = $this->Products->find()->where(['product_code' => ${"product_code".$countname}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                       ${"product_name".$countname} = ${"ProductData".$countname}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                       ${"inspec_date".$countname} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
+  //                                     ${"inspec_date".$countname} = substr($file,0,4)."-".substr($file,4,2)."-".substr($file,6,2);
+
+                                       $this->set('product_code'.$countname,${"product_code".$countname});//セット
+                                       $this->set('product_name'.$countname,${"product_name".$countname});//セット
+                                       $this->set('inspec_date'.$countname,${"inspec_date".$countname});//セット
+                                       $this->set('countname',$countname);//セット
+
+                                       $session = $this->request->session();
+                                       $session->write('product_code', ${"product_code".$countname});
+                                       $session->write('product_name', ${"product_name".$countname});
+                                     }
                                  }
                               }
                             }else{
-                             $this->set('countnameb',$countnameb);//セット
+  //                           $this->set('countnameb',$countnameb);//セット
                            }
                          }
                       }
@@ -363,6 +396,8 @@ class SyukkaKensasController extends AppController {
         }//親whileの終わり
       }
     }
+
+
     }
 
 
@@ -608,11 +643,11 @@ class SyukkaKensasController extends AppController {
       $this->set('kind_kensa',$kind_kensa);//セット
 */
       $data = array_values($this->request->query);//getで取り出した配列の値を取り出す
-/*
+
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-*/
+
       $product_code = $data[1];
       $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
       $product_name = $data[2];

@@ -47,7 +47,7 @@
         echo '</div></td>';
         echo '<td><div align="center"><font color="blue">';
   //      echo (${"inspec_date".$i}) ;
-        echo $this->Html->link(${"inspec_date".$i}, ['action'=>'preform', 'name' => ${"inspec_date".$i}, 'value1' => ${"product_code".$i}, 'value2' => ${"product_name".$i}]) ;
+        echo $this->Html->link(${"inspec_date".$i}, ['action'=>'preform', 'name' => ${"inspec_date".$i}, 'value1' => ${"product_code".$i}, 'value2' => ${"product_name".$i}, 'value3' => ${"KadouSeikeiid".$i}]) ;
         echo '</div></font></td></tr>';
       }
     }
@@ -79,7 +79,7 @@
         echo '</div></td>';
         echo '<td><div align="center"><font color="blue">';
     //    echo (${"inspec_dateb".$i}) ;
-        echo $this->Html->link(${"inspec_dateb".$i}, ['action'=>'preform', 'name' => ${"inspec_dateb".$i}, 'value1' => ${"product_codeb".$i}, 'value2' => ${"product_nameb".$i}]) ;
+        echo $this->Html->link(${"inspec_dateb".$i}, ['action'=>'preform', 'name' => ${"inspec_dateb".$i}, 'value1' => ${"product_codeb".$i}, 'value2' => ${"product_nameb".$i}, 'value3' => ${"KadouSeikeiid".$i}]) ;
         echo '</div></font></td></tr>';
        }
       ?>

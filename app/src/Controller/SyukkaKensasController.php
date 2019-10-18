@@ -17,12 +17,13 @@ class SyukkaKensasController extends AppController {
     {
      parent::initialize();
      $this->ImKikakuTaious = TableRegistry::get('imKikakuTaious');//ImKikakuTaiousテーブルを使う
-     $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//productsテーブルを使う
-     $this->ImKikakus = TableRegistry::get('imKikakus');//productsテーブルを使う
-     $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//productsテーブルを使う
+     $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//imSokuteidataHeadsテーブルを使う
+     $this->ImKikakus = TableRegistry::get('imKikakus');//imKikakusテーブルを使う
+     $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//imSokuteidataResultsテーブルを使う
      $this->Products = TableRegistry::get('products');//productsテーブルを使う
      $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
-     $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouHeadsテーブルを使う
+     $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouSokuteidatasテーブルを使う
+     $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');//KadouSeikeisテーブルを使う
      $this->Users = TableRegistry::get('users');//Usersテーブルを使う
     }
 
@@ -348,10 +349,30 @@ class SyukkaKensasController extends AppController {
 
                                    ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
 
-                                     if(substr(${"inspec_dateb".$countnameb},0,10) === substr($today,0,10)){
+                                     if(substr(${"inspec_dateb".$countnameb},0,10) === substr($today,0,10)){//今日のデータ
                                        $countnameb += 1;//ファイル名がかぶらないようにカウントしておく
 
-                                       ${"product_codeb".$countnameb} = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
+                                       ${"product_codeb".$countnameb} = mb_substr($folder,0,$num);
+                                       ${"KadouSeikeiDatab".$countnameb} = $this->KadouSeikeis->find()->where(['product_code' => ${"product_codeb".$countnameb} , 'present_kensahyou' => 0])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                       for($i=0; $i<=9; $i++){
+                                        if(isset(${"KadouSeikeiDatab".$countnameb}[$i])){
+                                          ${"KadouSeikeifinishing_tm".$countnameb} = ${"KadouSeikeiDatab".$countnameb}[$i]->finishing_tm;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                          ${"KadouSeikeifinishing_date".$countnameb} = substr(${"KadouSeikeifinishing_tm".$countnameb},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnameb},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnameb},8,2);
+                                          ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
+                                            if(substr(${"inspec_dateb".$countnameb},0,10) === substr(${"KadouSeikeifinishing_date".$countnameb},0,10)){
+                                              ${"KadouSeikeiid".$countnameb} = ${"KadouSeikeiDatab".$countnameb}[$i]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                              $this->set('KadouSeikeiid'.$countnameb,${"KadouSeikeiid".$countnameb});//セット
+                                              echo "<pre>";
+                                              echo ${"KadouSeikeifinishing_date".$countnameb};
+                                              echo "</pre>";
+                                              }
+                                        }else{
+
+                                            echo "<pre>";
+                                            echo "kyoujanai";
+                                            echo "</pre>";
+                                        }
+                                      }
                                        ${"ProductDatab".$countnameb} = $this->Products->find()->where(['product_code' => ${"product_codeb".$countnameb}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
                                        ${"product_nameb".$countnameb} = ${"ProductDatab".$countnameb}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
                                        ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
@@ -364,10 +385,31 @@ class SyukkaKensasController extends AppController {
                                        $session = $this->request->session();
                                        $session->write('product_codeb', ${"product_codeb".$countnameb});
                                        $session->write('product_nameb', ${"product_nameb".$countnameb});
+
                                      }else{
                                        $countname += 1;//ファイル名がかぶらないようにカウントしておく
+
+                                       ${"product_codeb".$countname} = mb_substr($folder,0,$num);
+                                       ${"KadouSeikeiDatab".$countname} = $this->KadouSeikeis->find()->where(['product_code' => ${"product_codeb".$countname} , 'present_kensahyou' => 0])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                        if(isset(${"KadouSeikeiDatab".$countname}[0])){
+                                          ${"KadouSeikeifinishing_tm".$countname} = ${"KadouSeikeiDatab".$countname}[0]->finishing_tm;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                          ${"KadouSeikeifinishing_date".$countname} = substr(${"KadouSeikeifinishing_tm".$countname},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countname},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countname},8,2);
+                                          ${"inspec_dateb".$countname} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
+                                            if(substr(${"inspec_dateb".$countname},0,10) === substr(${"KadouSeikeifinishing_date".$countname},0,10)){
+                                              ${"KadouSeikeiid".$countname} = ${"KadouSeikeiDatab".$countname}[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                              $this->set('KadouSeikeiid'.$countname,${"KadouSeikeiid".$countname});//セット
+                                              echo "<pre>";
+                                                echo ${"KadouSeikeifinishing_date".$countname};
+                                                echo "</pre>";
+                                              }
+                                        }else{
+                                          echo "<pre>";
+                                          echo $countnameb;
+                                          echo "</pre>";
+                                        }
+
                                        $num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
-                                       ${"product_code".$countname} = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
+                                       ${"product_code".$countname} = mb_substr($folder,0,$num);//'_'までの文字列をproduct_codeと定義する
                                        ${"ProductData".$countname} = $this->Products->find()->where(['product_code' => ${"product_code".$countname}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
                                        ${"product_name".$countname} = ${"ProductData".$countname}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
                                        ${"inspec_date".$countname} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);

@@ -445,6 +445,14 @@ class KadousController extends AppController
 		{
       $KariKadouSeikei = $this->KariKadouSeikeis->newEntity();
       $this->set('KariKadouSeikei',$KariKadouSeikei);
+
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      echo "<pre>";
+      print_r($_SESSION['karikadouseikei']);
+      echo "</pre>";
+
 		}
 
 		public function karilogin()

@@ -26,9 +26,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
     $inspec_date = implode("-",$inspec_dateYMD);//$inspec_dateY,$inspec_dateM,$inspec_dateDを「-」でつなぐ
     $this->set('inspec_date',$inspec_date);//セット
 
-    $username = $this->request->Session()->read('Auth.User.username');
     $session = $this->request->getSession();
-
+    $username = $this->request->Session()->read('Auth.User.username');
 
     for($n=1; $n<=8; $n++){
             $resultArray = Array();
@@ -57,6 +56,17 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 'result_weight' => $_POST["result_weight_{$n}"],
               );
     }
+/*
+    echo "<pre>";
+    print_r($_SESSION['sokuteidata']);
+    echo "</pre>";
+*/
+    $_SESSION['kadouseikeiId'] = $_POST['kadouseikeiId'];
+/*
+    echo "<pre>";
+    print_r($_SESSION['kadouseikeiId']);
+    echo "</pre>";
+*/
 ?>
 
 <br>

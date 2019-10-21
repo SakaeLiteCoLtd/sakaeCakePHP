@@ -179,6 +179,7 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
       <?= $this->Form->control('kind_kensa_6', array('type'=>'hidden', 'value'=>$kind_kensa6, 'label'=>false)) ?>
       <?= $this->Form->control('kind_kensa_7', array('type'=>'hidden', 'value'=>$kind_kensa7, 'label'=>false)) ?>
       <?= $this->Form->control('kind_kensa_8', array('type'=>'hidden', 'value'=>$kind_kensa8, 'label'=>false)) ?>
+      <?= $this->Form->control('kadouseikeiId', array('type'=>'hidden', 'value'=>$kadouseikeiId, 'label'=>false)) ?>
     </fieldset>
 
     <?= $this->Form->end() ?>

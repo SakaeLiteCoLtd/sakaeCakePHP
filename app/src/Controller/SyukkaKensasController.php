@@ -352,10 +352,11 @@ class SyukkaKensasController extends AppController {
                                    ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
 
                                      if(substr(${"inspec_dateb".$countnameb},0,10) === substr($today,0,10)){//今日のデータの場合
+                                       $countnamec = $countnameb;
                                        $countnameb += 1;
-                            //           echo "<pre>";
-                            //           echo $countnameb."b";
-                            //           echo "</pre>";
+                                       echo "<pre>";
+                                       echo $countnameb."b";
+                                       echo "</pre>";
 
                                        ${"product_codeb".$countnameb} = mb_substr($folder,0,$num);
                                        ${"KadouSeikeiDatab".$countnameb} = $this->KadouSeikeis->find()->where(['product_code' => ${"product_codeb".$countnameb} , 'present_kensahyou' => 0])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
@@ -365,51 +366,78 @@ class SyukkaKensasController extends AppController {
                                           ${"KadouSeikeifinishing_date".$countnameb} = substr(${"KadouSeikeifinishing_tm".$countnameb},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnameb},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnameb},8,2);
                                           ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
                                             if(substr(${"inspec_dateb".$countnameb},0,10) === substr(${"KadouSeikeifinishing_date".$countnameb},0,10)){
-                                              ${"KadouSeikeiid".$countnameb} = ${"KadouSeikeiDatab".$countnameb}[$i]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-                                              $this->set('KadouSeikeiid'.$countnameb,${"KadouSeikeiid".$countnameb});//セット
-                            //                  echo "<pre>";
-                            //                  echo ${"KadouSeikeiid".$countnameb}."---kyou";
-                            //                  echo "</pre>";
-                                              }
+                                        //      if($countnameb === 1){
+                                                  ${"KadouSeikeiid".$countnameb} = ${"KadouSeikeiDatab".$countnameb}[$i]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                                  $this->set('KadouSeikeiid'.$countnameb,${"KadouSeikeiid".$countnameb});//セット
+                                                  echo "<pre>";
+                                                  echo ${"KadouSeikeiDatab".$countnameb}[$i]->id."---kyou";
+                                                  echo "</pre>";
+
+                                                  ${"ProductDatab".$countnameb} = $this->Products->find()->where(['product_code' => ${"product_codeb".$countnameb}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                                  ${"product_nameb".$countnameb} = ${"ProductDatab".$countnameb}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                                  ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
+
+                                                  $this->set('product_codeb'.$countnameb,${"product_codeb".$countnameb});//セット
+                                                  $this->set('product_nameb'.$countnameb,${"product_nameb".$countnameb});//セット
+                                                  $this->set('inspec_dateb'.$countnameb,${"inspec_dateb".$countnameb});//セット
+                                                  $this->set('countnameb',$countnameb);//セット
+
+                                                  $session = $this->request->session();
+                                                  $session->write('product_codeb', ${"product_codeb".$countnameb});
+                                                  $session->write('product_nameb', ${"product_nameb".$countnameb});
+                                      /*          }elseif(${"KadouSeikeiid".$countnamec} === ${"KadouSeikeiDatab".$countnameb}[$i]->id){
+                                                  echo "<pre>";
+                                                  echo ${"KadouSeikeiDatab".$countnameb}[$i]->id."---onaji";
+                                                  echo "</pre>";
+                                                }else{
+                                                  ${"KadouSeikeiid".$countnameb} = ${"KadouSeikeiDatab".$countnameb}[$i]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                                  $this->set('KadouSeikeiid'.$countnameb,${"KadouSeikeiid".$countnameb});//セット
+                                                  echo "<pre>";
+                                                  echo ${"KadouSeikeiDatab".$countnameb}[$i]->id."---kyou";
+                                                  echo "</pre>";
+
+                                                  ${"ProductDatab".$countnameb} = $this->Products->find()->where(['product_code' => ${"product_codeb".$countnameb}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                                  ${"product_nameb".$countnameb} = ${"ProductDatab".$countnameb}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                                  ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
+
+                                                  $this->set('product_codeb'.$countnameb,${"product_codeb".$countnameb});//セット
+                                                  $this->set('product_nameb'.$countnameb,${"product_nameb".$countnameb});//セット
+                                                  $this->set('inspec_dateb'.$countnameb,${"inspec_dateb".$countnameb});//セット
+                                                  $this->set('countnameb',$countnameb);//セット
+
+                                                  $session = $this->request->session();
+                                                  $session->write('product_codeb', ${"product_codeb".$countnameb});
+                                                  $session->write('product_nameb', ${"product_nameb".$countnameb});
+                                        */        }
+                                        //      }
+
                                         }else{
                                           break;
                                         }
                                       }
-                                       ${"ProductDatab".$countnameb} = $this->Products->find()->where(['product_code' => ${"product_codeb".$countnameb}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                                       ${"product_nameb".$countnameb} = ${"ProductDatab".$countnameb}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-                                       ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
-
-                                       $this->set('product_codeb'.$countnameb,${"product_codeb".$countnameb});//セット
-                                       $this->set('product_nameb'.$countnameb,${"product_nameb".$countnameb});//セット
-                                       $this->set('inspec_dateb'.$countnameb,${"inspec_dateb".$countnameb});//セット
-                                       $this->set('countnameb',$countnameb);//セット
-
-                                       $session = $this->request->session();
-                                       $session->write('product_codeb', ${"product_codeb".$countnameb});
-                                       $session->write('product_nameb', ${"product_nameb".$countnameb});
 
                                      }else{//今日ではないデータの場合
                                        $countname += 1;//ファイル名がかぶらないようにカウントしておく
-                            //           echo "<pre>";
-                            //           echo $countname;
-                            //           echo "</pre>";
+                                       echo "<pre>";
+                                       echo $countname;
+                                       echo "</pre>";
 
-                                       ${"product_codeb".$countname} = mb_substr($folder,0,$num);
-                                       ${"KadouSeikeiDatab".$countname} = $this->KadouSeikeis->find()->where(['product_code' => ${"product_codeb".$countname} , 'present_kensahyou' => 0])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                       ${"product_code".$countname} = mb_substr($folder,0,$num);
+                                       ${"KadouSeikeiData".$countname} = $this->KadouSeikeis->find()->where(['product_code' => ${"product_code".$countname} , 'present_kensahyou' => 0])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
                                        for($i=0; $i<=9; $i++){
-                                        if(isset(${"KadouSeikeiDatab".$countname}[$i])){
-                                          ${"KadouSeikeifinishing_tm".$countname} = ${"KadouSeikeiDatab".$countname}[$i]->finishing_tm;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                        if(isset(${"KadouSeikeiData".$countname}[$i])){
+                                          ${"KadouSeikeifinishing_tm".$countname} = ${"KadouSeikeiData".$countname}[$i]->finishing_tm;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
                                           ${"KadouSeikeifinishing_date".$countname} = substr(${"KadouSeikeifinishing_tm".$countname},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countname},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countname},8,2);
-                                          ${"inspec_dateb".$countname} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
-                            //              echo "<pre>";
-                            //              echo ${"KadouSeikeifinishing_date".$countname}.${"inspec_dateb".$countname};
-                            //              echo "</pre>";
-                                            if(substr(${"inspec_dateb".$countname},0,10) === substr(${"KadouSeikeifinishing_date".$countname},0,10)){
-                                              ${"KadouSeikeiid".$countname} = ${"KadouSeikeiDatab".$countname}[$i]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                          ${"inspec_date".$countname} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
+                                          echo "<pre>";
+                                          echo ${"KadouSeikeifinishing_date".$countname}.${"inspec_date".$countname};
+                                          echo "</pre>";
+                                            if(substr(${"inspec_date".$countname},0,10) === substr(${"KadouSeikeifinishing_date".$countname},0,10)){
+                                              ${"KadouSeikeiid".$countname} = ${"KadouSeikeiData".$countname}[$i]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
                                               $this->set('KadouSeikeiid'.$countname,${"KadouSeikeiid".$countname});//セット
-                            //                    echo "<pre>";
-                            //                    echo ${"KadouSeikeiid".$countname};
-                            //                    echo "</pre>";
+                                                echo "<pre>";
+                                                echo ${"KadouSeikeiid".$countname};
+                                                echo "</pre>";
                                               }
                                         }else{
                                           break;
@@ -759,8 +787,7 @@ class SyukkaKensasController extends AppController {
 
     public function form()//「出荷検査表登録」ページで検査結果を入力
     {
-      $data = $this->request->getData();//postデータを$dataに
-//      session_start();
+        $data = $this->request->getData();//postデータを$dataに
 /*
       echo "<pre>";
     	print_r($data);
@@ -774,8 +801,6 @@ class SyukkaKensasController extends AppController {
         $this->set('lot_num',$lot_num);//セット
         $kadouseikeiId = $data['kadouseikeiId'];
         $this->set('kadouseikeiId',$kadouseikeiId);//セット
-//        $kind_kensa = $data['kind_kensa'];
-//        $this->set('kind_kensa',$kind_kensa);//セット
 
       	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
       	->select(['product_id','delete_flag' => '0'])
@@ -881,10 +906,6 @@ class SyukkaKensasController extends AppController {
 
     public function confirm()//「出荷検査表登録」確認画面
    {
-/*      $session = $this->request->getSession();
-      $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
-      $data = $sessiondata['sokuteidata'];
-*/
       $data = $this->request->getData();
       $product_code = $data['product_code'];
       session_start();//session_startは$this->request->getData();の後に入れないとエラーが出る
@@ -893,7 +914,6 @@ class SyukkaKensasController extends AppController {
       print_r($data);
       echo "</pre>";
 */
-//     $product_code = $sessiondata['sokuteidata'][1]['product_code'];//$dataの'product_code'を$product_codeに
      $this->set('product_code',$product_code);//セット
      $lot_num = $data['lot_num'];
      $this->set('lot_num',$lot_num);//セット
@@ -915,12 +935,6 @@ class SyukkaKensasController extends AppController {
 
      $KensahyouHeadid = $data['kensahyou_heads_id'];
      $this->set('KensahyouHeadid',$KensahyouHeadid);//セット
-//     $lot_num = $data[1]['lot_num'];
-//     $this->set('lot_num',$lot_num);//セット
-
-//     $datakind = $this->request->getData();
-//     $kind_kensa = $datakind['kind_kensa'];
-//     $this->set('kind_kensa',$kind_kensa);//セット
 
      $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
      $Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
@@ -957,10 +971,10 @@ class SyukkaKensasController extends AppController {
    {
      $kensahyouSokuteidata = $this->KensahyouSokuteidatas->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
      $this->set('kensahyouSokuteidata',$kensahyouSokuteidata);//セット
-
+/*
      $session = $this->request->getSession();
      $data = $session->read();
-/*
+
     echo "<pre>";
     print_r($_SESSION['kadouseikeiId']);
     echo "</pre>";
@@ -999,7 +1013,6 @@ class SyukkaKensasController extends AppController {
   public function logout()
   {
     $this->request->session()->destroy(); // セッションの破棄
-//    return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
   }
 
   public function do()//「出荷検査表登録」登録画面
@@ -1126,41 +1139,6 @@ class SyukkaKensasController extends AppController {
    $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
    $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
 
-/*
-   //KadouSeikeisの登録用データをセット(present_kensahyou=1に変更)
-   $KadouSeikei = $this->KadouSeikeis->find()->where(['id' => $_SESSION['kadouseikeiId']])->toArray();
-   $arrKadouSeikei = array();//配列の初期化
-   $KadouSeikei_id = $KadouSeikei[0]->id;
-   $arrKadouSeikei['id'] = $KadouSeikei_id;
-   $KadouSeikei_product_code = $KadouSeikei[0]->product_code;
-   $arrKadouSeikei['product_code'] = $KadouSeikei_product_code;
-   $KadouSeikei_seikeiki = $KadouSeikei[0]->seikeiki;
-   $arrKadouSeikei['seikeiki'] = $KadouSeikei_seikeiki;
-   $KadouSeikei_seikeiki_code = $KadouSeikei[0]->seikeiki_code;
-   $arrKadouSeikei['seikeiki_code'] = $KadouSeikei_seikeiki_code;
-   $KadouSeikei_starting_tm = $KadouSeikei[0]->starting_tm->format('Y-m-d H:i:s');
-   $arrKadouSeikei['starting_tm'] = $KadouSeikei_starting_tm;
-   $KadouSeikei_finishing_tm = $KadouSeikei[0]->finishing_tm->format('Y-m-d H:i:s');
-   $arrKadouSeikei['finishing_tm'] = $KadouSeikei_finishing_tm;
-   $KadouSeikei_cycle_shot = $KadouSeikei[0]->cycle_shot;
-   $arrKadouSeikei['cycle_shot'] = $KadouSeikei_cycle_shot;
-   $KadouSeikei_amount_shot = $KadouSeikei[0]->amount_shot;
-   $arrKadouSeikei['amount_shot'] = $KadouSeikei_amount_shot;
-   $KadouSeikei_accomp_rate = $KadouSeikei[0]->accomp_rate;
-   $arrKadouSeikei['accomp_rate'] = $KadouSeikei_accomp_rate;
-//     $KadouSeikei_present_kensahyou = $KadouSeikei[0]->present_kensahyou;
-   $arrKadouSeikei['present_kensahyou'] = 1;
-   $KadouSeikei_created_at = $KadouSeikei[0]->created_at->format('Y-m-d H:i:s');
-   $arrKadouSeikei['created_at'] = $KadouSeikei_created_at;
-   $KadouSeikei_created_staff = $KadouSeikei[0]->created_staff;
-   $arrKadouSeikei['created_staff'] = $KadouSeikei_created_staff;
-   $KadouSeikei_updated_staff = $this->Auth->user('staff_id');
-   $arrKadouSeikei['updated_staff'] = $KadouSeikei_updated_staff;
-
-   echo "<pre>";
-   print_r($arrKadouSeikei);
-   echo "</pre>";
-*/
    if ($this->request->is('get')) {//postなら登録
      $kensahyouSokuteidata = $this->KensahyouSokuteidatas->patchEntities($kensahyouSokuteidata, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
      $connection = ConnectionManager::get('default');//トランザクション1
@@ -1168,23 +1146,11 @@ class SyukkaKensasController extends AppController {
      $connection->begin();//トランザクション3
      try {//トランザクション4
          if ($this->KensahyouSokuteidatas->saveMany($kensahyouSokuteidata)) {//saveManyで一括登録
-//           $this->request->session()->destroy(); // セッションの破棄
-
-            $this->KadouSeikeis->updateAll(
-              ['present_kensahyou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],
+              $this->KadouSeikeis->updateAll(
+              ['present_kensahyou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
               ['id'   => $_SESSION['kadouseikeiId'] ]
-            );
-
-/*
-              $KadouSeikeis = $this->KadouSeikeis->newEntity();
-              $KadouSeikeis = $this->KadouSeikeis->patchEntities($KadouSeikeis, $arrKadouSeikei);
-                if ($this->KadouSeikeis->saveMany($KadouSeikeis)) {
-                } else {
-                  $this->Flash->error(__('This KadouSeikeis could not be saved. Please, try again.'));
-                  throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-                }
-*/
-           $connection->commit();// コミット5
+              );
+             $connection->commit();// コミット5
          } else {
            $this->Flash->error(__('The KensahyouSokuteidatasdo could not be saved. Please, try again.'));
            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
@@ -1196,103 +1162,4 @@ class SyukkaKensasController extends AppController {
    }
  }
 
-/*
- //
- $imSokuteidataHeads = $this->ImSokuteidataHeads->patchEntities($imSokuteidataHeads, $arrIm_head);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
- $connection = ConnectionManager::get('default');//トランザクション1
- // トランザクション開始2
- $connection->begin();//トランザクション3
- try {//トランザクション4
-   if ($this->ImSokuteidataHeads->saveMany($imSokuteidataHeads)) {//ImKikakusをsaveできた時（saveManyで一括登録）
-
-       //ImKikakusの登録用データをセット
-       $cnt = count($arrFp[1]);
-       $arrImKikakus = array_slice($arrFp , 1, 3);
-       $arrIm_kikaku = array();
-
-     for ($m=1; $m<=$cntLot; $m++) {
-       for ($k=7; $k<=$cnt-2; $k++) {//
-
-         $arrIm_kikaku_data = array();
-
-         $size_num = $k-6;
-         $size = $arrImKikakus[0][$k];
-         $upper = $arrImKikakus[1][$k];
-         $lower = $arrImKikakus[2][$k];
-
-         $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1]])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-         $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-
-         $arrIm_kikaku_data[] = $im_sokuteidata_head_id;//配列に追加する
-         $arrIm_kikaku_data[] = $size_num;//配列に追加する
-         $arrIm_kikaku_data[] = $size;//配列に追加する
-         $arrIm_kikaku_data[] = $upper;//配列に追加する
-         $arrIm_kikaku_data[] = $lower;//配列に追加する
-         $name_kikaku = array('im_sokuteidata_head_id', 'size_num', 'size', 'upper', 'lower');
-         $arrIm_kikaku_data = array_combine($name_kikaku, $arrIm_kikaku_data);
-         $arrIm_kikaku[] = $arrIm_kikaku_data;
-
-       }
-     }
-
-        //ImKikakusデータベースに登録
-       $imKikakus = $this->ImKikakus->newEntity();//newentityに$userという名前を付ける
-
-       $imKikakus = $this->ImKikakus->patchEntities($imKikakus, $arrIm_kikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-          if ($this->ImKikakus->saveMany($imKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
-
-             //ImSokuteidataResultsの登録用データをセット
-             $inspec_datetime = substr($arrFp[4][1],0,4)."-".substr($arrFp[4][1],5,2)."-".substr($arrFp[4][1],8,mb_strlen($arrFp[4][1])-8);
-             $arrIm_Result = array();
-
-              $arrImResults = array_slice($arrFp , 4, $count);
-              for ($j=0; $j<=$count-5; $j++) {
-                 for ($k=7; $k<=$cnt-2; $k++) {
-                   $arrIm_Result_data = array();
-
-                   $serial = $arrImResults[$j][3];
-                   $size_num = $k-6;
-                   $result = $arrImResults[$j][$k];
-                   $status = $arrImResults[$j][4];
-
-           //        echo "<pre>";
-           //        print_r($arrFp[$j+4][2]);
-           //        echo "<br>";
-
-                   $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2]])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                   $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-
-                   $arrIm_Result_data[] = $im_sokuteidata_head_id;//配列に追加する
-                   $arrIm_Result_data[] = $inspec_datetime;//配列に追加する
-                   $arrIm_Result_data[] = $serial;//配列に追加する
-                   $arrIm_Result_data[] = $size_num;//配列に追加する
-                   $arrIm_Result_data[] = $result;//配列に追加する
-                   $arrIm_Result_data[] = $status;//配列に追加する
-                   $name_Result = array('im_sokuteidata_head_id', 'inspec_datetime', 'serial', 'size_num', 'result', 'status');
-                   $arrIm_Result_data = array_combine($name_Result, $arrIm_Result_data);
-
-                   $arrIm_Result[] = $arrIm_Result_data;
-               }
-              }
-       //       echo "<pre>";
-       //       print_r($arrIm_Result);
-       //       echo "<br>";
-
-               //ImSokuteidataResultsデータベースに登録
-               $imSokuteidataResults = $this->ImSokuteidataResults->newEntity();//newentityに$userという名前を付ける
-
-               $imSokuteidataResults = $this->ImSokuteidataResults->patchEntities($imSokuteidataResults, $arrIm_Result);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-               if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
-                 } else {
-                   $this->Flash->error(__('This data1 could not be saved. Please, try again.'));
-                   throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-               }
-
-         } else {
-           $this->Flash->error(__('This data2 could not be saved. Please, try again.'));
-           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-         }
-         $connection->commit();// コミット5
-//
-*/
 }

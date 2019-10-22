@@ -138,13 +138,19 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
                       }
                         echo "</div></td>\n";
                     }
-                echo "<td colspan='2'>\n";
-                echo "</td>\n";
-                echo "<td colspan='2'>\n";
-                echo "</td>\n";
-                echo "<td colspan='2'>\n";
-                echo "<input type='text' name=result_weight_".$j." value='' size='6'/>\n";
-                echo "</td>\n";
+                    echo "<td colspan='2'><div align='center'><select name=situation_dist1_".$j.">\n";
+                    foreach ($arrhantei as $value){
+                    echo "<option value=$value>$value</option>";
+                    }
+                    echo "</select></div></td>\n";
+                    echo "<td colspan='2'><div align='center'><select name=situation_dist2_".$j.">\n";
+                    foreach ($arrhantei as $value){
+                    echo "<option value=$value>$value</option>";
+                    }
+                    echo "</select></div></td>\n";
+                    echo "<td colspan='2'>\n";
+                    echo "<input type='text' name=result_weight_".$j." value='' size='6'/>\n";
+                    echo "</td>\n";
             }
         ?>
 

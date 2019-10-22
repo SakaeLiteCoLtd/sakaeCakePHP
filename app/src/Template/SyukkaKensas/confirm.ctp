@@ -54,6 +54,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 "result_size_9" => $_POST["result_size_{$n}_9"],
 
                 'result_weight' => $_POST["result_weight_{$n}"],
+                'situation_dist1' => $_POST["situation_dist1_{$n}"],
+                'situation_dist2' => $_POST["situation_dist2_{$n}"],
               );
     }
 /*
@@ -150,8 +152,10 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 echo $this->request->getData("result_size_{$q}_9");
                 echo "</td>\n";
                 echo "<td colspan='2'>\n";
+                echo $this->request->getData("situation_dist1_{$q}");
                 echo "</td>\n";
                 echo "<td colspan='2'>\n";
+                echo $this->request->getData("situation_dist2_{$q}");
                 echo "</td>\n";
                 echo "<td colspan='2'><div align='center'>\n";
                 echo $this->request->getData("result_weight_{$q}");

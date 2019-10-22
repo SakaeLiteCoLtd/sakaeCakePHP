@@ -115,4 +115,12 @@ class KariKadouSeikeisTable extends Table
             ->allowEmpty('updated_staff');
         return $validator;
     }
+
+    public function buildRules(RulesChecker $rules)
+    {
+        $rules->add($rules->isUnique(['product_code','seikeiki','starting_tm']));
+
+        return $rules;
+    }
+
 }

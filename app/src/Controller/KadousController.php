@@ -448,11 +448,11 @@ class KadousController extends AppController
 
       $session = $this->request->getSession();
       $data = $session->read();
-
+/*
       echo "<pre>";
       print_r($_SESSION['karikadouseikei']);
       echo "</pre>";
-
+*/
 		}
 
 		public function karilogin()

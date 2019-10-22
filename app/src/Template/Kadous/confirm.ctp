@@ -88,6 +88,9 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
               'created_at' => $_POST["created_at{$j}_{$n}"],
               'created_staff' => $_POST["created_staff{$j}{$n}"],
 */            );
+
+          $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+
           }
 /*
   echo "<pre>";
@@ -169,6 +172,11 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
                "present_kensahyou" => 0,
              );
+
+
+                       $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+
+
            }
            $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
            ${"m".$j} = $m;
@@ -244,6 +252,10 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                 'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
                 "present_kensahyou" => 0,
               );
+
+                        $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+
+
             }
             $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
             ${"m".$j} = $m;
@@ -319,6 +331,10 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                  'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
                  "present_kensahyou" => 0,
                );
+
+                         $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+
+
              }
              $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
              ${"m".$j} = $m;
@@ -394,6 +410,10 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                   'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
                   "present_kensahyou" => 0,
                 );
+
+                          $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+
+
               }
               $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
               ${"m".$j} = $m;
@@ -469,6 +489,10 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                    'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
                    "present_kensahyou" => 0,
                  );
+
+                           $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+
+
                }
                $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
                ${"m".$j} = $m;
@@ -544,6 +568,10 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                    'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
                    "present_kensahyou" => 0,
                  );
+
+                           $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+
+
                }
                $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
                ${"m".$j} = $m;
@@ -619,6 +647,10 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                  'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
                  "present_kensahyou" => 0,
                );
+
+                         $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+
+
              }
              $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
              ${"m".$j} = $m;
@@ -694,6 +726,10 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                   'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
                   "present_kensahyou" => 0,
                 );
+
+                          $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+
+
               }
               $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
               ${"m".$j} = $m;

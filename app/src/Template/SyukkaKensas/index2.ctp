@@ -37,7 +37,7 @@
       <?php
     //  echo $this->Url->build("/MLD-MD-20032_jigu");
 
-    if($countname!=0){
+    if($countname!=1){
       for($i=1; $i<=$countname; $i++){
         echo '<tr><td><div align="center">';
         echo (${"product_code".$i}) ;
@@ -69,7 +69,7 @@
 
       <?php
     //  echo $this->Url->build("/MLD-MD-20032_jigu");
-
+    if($countnameb!=1){
       for($i=1; $i<=$countnameb; $i++){
         echo '<tr><td><div align="center">';
         echo (${"product_codeb".$i}) ;
@@ -81,7 +81,8 @@
     //    echo (${"inspec_dateb".$i}) ;
         echo $this->Html->link(${"inspec_dateb".$i}, ['action'=>'preform', 'name' => ${"inspec_dateb".$i}, 'value1' => ${"product_codeb".$i}, 'value2' => ${"product_nameb".$i}, 'value3' => ${"KadouSeikeiid".$i}]) ;
         echo '</div></font></td></tr>';
-       }
+      }
+    }
       ?>
 
 </table>

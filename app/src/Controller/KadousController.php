@@ -560,7 +560,7 @@ class KadousController extends AppController
 */
 
       for($j=1; $j<=9; $j++){
-      $KariKadouSeikei = $this->KariKadouSeikeis->find()->where(['finishing_tm >=' => $dateYMDs, 'finishing_tm <=' => $dateYMDf, 'seikeiki' => $j])->toArray();//Productsテーブルの'product_code' = $product_codeとなるものを配列で取り出す
+      $KariKadouSeikei = $this->KariKadouSeikeis->find()->where(['finishing_tm >=' => $dateYMDs, 'finishing_tm <=' => $dateYMDf, 'seikeiki' => $j, 'present_kensahyou' => 0])->toArray();//Productsテーブルの'product_code' = $product_codeとなるものを配列で取り出す
 /*      $seikeiki = $KariKadouSeikei[0]->seikeiki;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
 
       echo "<pre>";
@@ -612,13 +612,21 @@ class KadousController extends AppController
      echo "<pre>";
      print_r($data);
      echo "</pre>";
-*/   }
-
+*/
+   }
 
 		public function preadd()
 		{
       $KadouSeikei = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikei',$KadouSeikei);
+/*
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      echo "<pre>";
+      print_r($_SESSION['kadouseikeiId']);
+      echo "</pre>";
+*/
 		}
 
 		public function login()
@@ -676,6 +684,7 @@ class KadousController extends AppController
     echo "</pre>";
   }
 */
+
     if ($this->request->is('get')) {
       $KadouSeikeis = $this->KadouSeikeis->patchEntities($KadouSeikeis, $_SESSION['kadouseikei']);//$roleデータ（空の行）を$this->request->getData()に更新する
       $connection = ConnectionManager::get('default');//トランザクション1
@@ -683,6 +692,18 @@ class KadousController extends AppController
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->KadouSeikeis->saveMany($KadouSeikeis)) {
+
+          for($n=1; $n<=100; $n++){
+            if(isset($_SESSION['kadouseikei'][$n])){
+              $this->KariKadouSeikeis->updateAll(
+              ['present_kensahyou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
+              ['id'   => $_SESSION['kadouseikeiId'][$n] ]
+              );
+            }else{
+              break;
+            }
+          }
+
           $connection->commit();// コミット5
         } else {
           $this->Flash->error(__('The data could not be saved. Please, try again.'));

@@ -847,6 +847,11 @@ class SyukkaKensasController extends AppController {
         for($j=0; $j<=20; $j++){//size_1～9までセット
           if(isset($ImKikaku[$j])){//
             if(${"size_".$i} == $ImKikaku[$j]['size'] and ${"size_".$i} != 0){//KensahyouHeadのsize$iと$ImKikaku[$j]['size']が同じ場合
+/*
+              echo "<pre>";
+              print_r(${"size_".$i}."-".$ImKikaku[$j]['size']);
+              echo "</pre>";
+*/
               $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['id' => $ImKikaku[$j]['im_sokuteidata_head_id']])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
               ${"kind_kensa".$i} = $ImSokuteidataHead[0]->kind_kensa;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
 

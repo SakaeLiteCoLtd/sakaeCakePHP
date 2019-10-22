@@ -35,23 +35,21 @@
       </tr>
 
       <?php
-    //  echo $this->Url->build("/MLD-MD-20032_jigu");
-
-    if($countname!=1){
-      for($i=1; $i<=$countname; $i++){
-        echo '<tr><td><div align="center">';
-        echo (${"product_code".$i}) ;
-        echo '</div></td>';
-        echo '<td><div align="center">';
-        echo (${"product_name".$i}) ;
-        echo '</div></td>';
-        echo '<td><div align="center"><font color="blue">';
-  //      echo (${"inspec_date".$i}) ;
-        echo $this->Html->link(${"inspec_date".$i}, ['action'=>'preform', 'name' => ${"inspec_date".$i}, 'value1' => ${"product_code".$i}, 'value2' => ${"product_name".$i}, 'value3' => ${"KadouSeikeiid".$i}]) ;
-        echo '</div></font></td></tr>';
+      if($countname!=1){
+        for($i=1; $i<=$countname; $i++){
+          echo '<tr><td><div align="center">';
+          echo (${"product_code".$i}) ;
+          echo '</div></td>';
+          echo '<td><div align="center">';
+          echo (${"product_name".$i}) ;
+          echo '</div></td>';
+          echo '<td><div align="center"><font color="blue">';
+    //      echo (${"inspec_date".$i}) ;
+          echo $this->Html->link(${"inspec_date".$i}, ['action'=>'preform', 'name' => ${"inspec_date".$i}, 'value1' => ${"product_code".$i}, 'value2' => ${"product_name".$i}, 'value3' => ${"KadouSeikeiid".$i}]) ;
+          echo '</div></font></td></tr>';
+        }
       }
-    }
-      ?>
+    ?>
 
 </table>
 <br>

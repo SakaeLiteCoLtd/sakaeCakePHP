@@ -174,7 +174,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
              );
 
 
-                       $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+            $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
 
            }
@@ -253,7 +253,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                 "present_kensahyou" => 0,
               );
 
-                        $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+            $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
 
             }
@@ -332,7 +332,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                  "present_kensahyou" => 0,
                );
 
-                         $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+            $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
 
              }
@@ -411,7 +411,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                   "present_kensahyou" => 0,
                 );
 
-                          $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+              $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
 
               }
@@ -490,7 +490,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                    "present_kensahyou" => 0,
                  );
 
-                           $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+              $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
 
                }
@@ -569,7 +569,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                    "present_kensahyou" => 0,
                  );
 
-                           $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+              $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
 
                }
@@ -648,7 +648,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                  "present_kensahyou" => 0,
                );
 
-                         $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
+              $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
 
              }
@@ -727,8 +727,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                   "present_kensahyou" => 0,
                 );
 
-                          $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
-
+                $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
               }
               $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
@@ -740,6 +739,6 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
 
  <br>
 
- <p align="center"><?= $this->Form->button('back', ['onclick' => 'history.back()', 'type' => 'button']) ?>
- <?= $this->Form->button(__('add'), array('name' => 'touroku')) ?></p>
+ <p align="center"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
+ <?= $this->Form->button(__('登録'), array('name' => 'touroku')) ?></p>
  <?= $this->Form->end() ?>

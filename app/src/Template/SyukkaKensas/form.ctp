@@ -44,17 +44,25 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
           <td colspan="9"><?= $this->Form->input("manu_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
           <?php
             $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();
-            $inspec_date = $ImSokuteidataHead[0]->inspec_date;
-            $ImSokuteidataHead_id = $ImSokuteidataHead[0]->id;
+            if(isset($ImSokuteidataHead[0])){
+              $inspec_date = $ImSokuteidataHead[0]->inspec_date;
+              $ImSokuteidataHead_id = $ImSokuteidataHead[0]->id;
+            }
           ?>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>検査年月日</strong></div></td>
-          <td colspan="9"><?= h($inspec_date) ?></td>
+          <?php if(isset($ImSokuteidataHead[0])): ?>
+            <td colspan="9"><?= h($inspec_date) ?></td>
+        <?php else : ?>
+          <td colspan="9"><?= $this->Form->input("inspec_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
+        <?php endif; ?>
+
         </tr>
 
   <?php
-  $ImKikaku = $this->ImKikakus->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHead_id])->toArray();
-  $ImKikaku_id = $ImKikaku[0]->size;
-
+  if(isset($ImSokuteidataHead[0])){
+    $ImKikaku = $this->ImKikakus->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHead_id])->toArray();
+    $ImKikaku_id = $ImKikaku[0]->size;
+  }
   $KensahyouHead = $this->KensahyouHeads->find()->where(['id' => $KensahyouHeadid])->toArray();
     $l = 0;
     for($m=1; $m<=10; $m++){
@@ -166,12 +174,20 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
 <strong>　　*備考の欄内にはソリ・フレ値・外観の検査基準を外観の規格欄内の値と関連付けてください。</strong>
 
         <?php
+        if(isset($ImSokuteidataHead[0])){
         echo $this->Form->hidden('inspec_date' ,['value'=>$inspec_date]);
         echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
         echo $this->Form->hidden('product_code' ,['value'=>$product_code]) ;
         echo $this->Form->hidden('delete_flag' ,['value'=>0]);
         echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);
         echo $this->Form->hidden('updated_staff');
+      }else{
+        echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
+        echo $this->Form->hidden('product_code' ,['value'=>$product_code]) ;
+        echo $this->Form->hidden('delete_flag' ,['value'=>0]);
+        echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);
+        echo $this->Form->hidden('updated_staff');
+      }
         ?>
     </fieldset>
     <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>

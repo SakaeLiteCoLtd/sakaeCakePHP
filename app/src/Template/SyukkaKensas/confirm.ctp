@@ -12,6 +12,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
 <?php
     $data = $this->request->getData();
+/*
+    echo "<pre>";
+    print_r($data['inspec_date']);
+    echo "</pre>";
+*/
     $manu_dateY = $data['manu_date']['year'];//manu_dateのyearに$manu_dateYと名前を付ける
     $manu_dateM = $data['manu_date']['month'];//manu_dateのmonthに$manu_dateMと名前を付ける
     $manu_dateD = $data['manu_date']['day'];//manu_dateのdayに$manu_dateDと名前を付ける
@@ -19,12 +24,21 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
     $manu_date = implode("-",$manu_dateYMD);//$manu_dateY,$manu_dateM,$manu_dateDを「-」でつなぐ
     $this->set('manu_date',$manu_date);//セット
 
-    $inspec_dateY = substr($data['inspec_date'],0,4);//inspec_dateのyearに$inspec_dateYと名前を付けるsubstr($data['inspec_date'],0,4)
-    $inspec_dateM = substr($data['inspec_date'],5,2);//inspec_dateのmonthに$inspec_dateMと名前を付ける
-    $inspec_dateD = substr($data['inspec_date'],8,2);//inspec_dateのdayに$inspec_dateDと名前を付ける
-    $inspec_dateYMD = array($inspec_dateY,$inspec_dateM,$inspec_dateD);//$inspec_dateY,$inspec_dateM,$inspec_dateDの配列に$manu_dateYMD
-    $inspec_date = implode("-",$inspec_dateYMD);//$inspec_dateY,$inspec_dateM,$inspec_dateDを「-」でつなぐ
-    $this->set('inspec_date',$inspec_date);//セット
+    if(isset($data['inspec_date']['year'])){
+      $inspec_dateY = $data['inspec_date']['year'];//manu_dateのyearに$manu_dateYと名前を付ける
+      $inspec_dateM = $data['inspec_date']['month'];//manu_dateのmonthに$manu_dateMと名前を付ける
+      $inspec_dateD = $data['inspec_date']['day'];//manu_dateのdayに$manu_dateDと名前を付ける
+      $inspec_dateYMD = array($inspec_dateY,$inspec_dateM,$inspec_dateD);//$manu_dateY,$manu_dateM,$manu_dateDの配列に$manu_dateYMD
+      $inspec_date = implode("-",$inspec_dateYMD);//$manu_dateY,$manu_dateM,$manu_dateDを「-」でつなぐ
+      $this->set('inspec_date',$inspec_dateD);//セット
+    }else{
+      $inspec_dateY = substr($data['inspec_date'],0,4);//inspec_dateのyearに$inspec_dateYと名前を付けるsubstr($data['inspec_date'],0,4)
+      $inspec_dateM = substr($data['inspec_date'],5,2);//inspec_dateのmonthに$inspec_dateMと名前を付ける
+      $inspec_dateD = substr($data['inspec_date'],8,2);//inspec_dateのdayに$inspec_dateDと名前を付ける
+      $inspec_dateYMD = array($inspec_dateY,$inspec_dateM,$inspec_dateD);//$inspec_dateY,$inspec_dateM,$inspec_dateDの配列に$manu_dateYMD
+      $inspec_date = implode("-",$inspec_dateYMD);//$inspec_dateY,$inspec_dateM,$inspec_dateDを「-」でつなぐ
+      $this->set('inspec_date',$inspec_date);//セット
+    }
 
     $session = $this->request->getSession();
     $username = $this->request->Session()->read('Auth.User.username');

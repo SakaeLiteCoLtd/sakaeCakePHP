@@ -24,6 +24,69 @@
 <br>
 <br>
 
+<div align="center"><font color="red" size="4">＊下記の製品が未検査です</font></div>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+      <tr>
+          <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('品番') ?></font></strong></div></td>
+          <td width="300" ><div align="center"><strong><font color="blue" size="3"><?= h('品名') ?></font></strong></div></td>
+          <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('製造年月日') ?></font></strong></div></td>
+      </tr>
+
+      <?php
+      if($countname!=1){
+        for($i=1; $i<=$countname; $i++){
+          echo '<tr><td><div align="center">';
+          echo (${"product_code".$i}) ;
+          echo '</div></td>';
+          echo '<td><div align="center">';
+          echo (${"product_name".$i}) ;
+          echo '</div></td>';
+          echo '<td><div align="center"><font color="blue">';
+    //      echo (${"inspec_date".$i}) ;
+          echo $this->Html->link(${"inspec_date".$i}, ['action'=>'preform', 'name' => ${"inspec_date".$i}, 'value1' => ${"product_code".$i}, 'value2' => ${"product_name".$i}, 'value3' => ${"KadouSeikeiid".$i}]) ;
+          echo '</div></font></td></tr>';
+        }
+      }
+    ?>
+
+</table>
+<br>
+<br>
+
+<div align="center"><font color="blue" size="4">＊以下は、現在成形中の製品です。（成形品が違う場合は仮日報登録を修正してください。）</font></div>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+      <tr>
+          <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('品番') ?></font></strong></div></td>
+          <td width="300" ><div align="center"><strong><font color="blue" size="3"><?= h('品名') ?></font></strong></div></td>
+          <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('製造年月日') ?></font></strong></div></td>
+      </tr>
+
+      <?php
+    //  echo $this->Url->build("/MLD-MD-20032_jigu");
+    if($countnameb!=1){
+      for($i=1; $i<=$countnameb; $i++){
+        echo '<tr><td><div align="center">';
+        echo (${"product_codeb".$i}) ;
+        echo '</div></td>';
+        echo '<td><div align="center">';
+        echo (${"product_nameb".$i}) ;
+        echo '</div></td>';
+        echo '<td><div align="center"><font color="blue">';
+    //    echo (${"inspec_dateb".$i}) ;
+        echo $this->Html->link(${"inspec_dateb".$i}, ['action'=>'preform', 'name' => ${"inspec_dateb".$i}, 'value1' => ${"product_codeb".$i}, 'value2' => ${"product_nameb".$i}, 'value3' => ${"KadouSeikeiid".$i}]) ;
+        echo '</div></font></td></tr>';
+      }
+    }
+      ?>
+
+</table>
+
+<br>
+<br>
 
 <div align="center"><font color="red" size="4">＊下記の製品が未検査です</font></div>
 <br>

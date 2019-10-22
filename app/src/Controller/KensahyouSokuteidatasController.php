@@ -732,8 +732,8 @@ class KensahyouSokuteidatasController  extends AppController
       }
       $data = $_SESSION['sokuteidata'];
 
-        $product_code = $data[1]['product_code'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
-        $this->set('product_code',$product_code);//セット
+      $product_code = $data[1]['product_code'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
+      $this->set('product_code',$product_code);//セット
 
       $lot_num = $data[1]['lot_num'];//$dataのkensahyou_heads_idに$kensahyou_heads_idと名前を付ける
       $this->set('lot_num',$lot_num);//セット

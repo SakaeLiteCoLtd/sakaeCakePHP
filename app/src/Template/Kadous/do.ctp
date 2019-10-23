@@ -12,7 +12,7 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($KadouSeikeis, ['url' => ['action' => 'index']]);
+          echo $this->Form->create($KadouSeikeis, ['url' => ['action' => 'kariindex']]);
 ?>
 <br>
 <br>

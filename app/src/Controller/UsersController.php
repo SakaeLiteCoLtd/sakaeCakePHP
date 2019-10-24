@@ -50,8 +50,8 @@ class UsersController extends AppController
 					if(empty($Userdata)){
 						$delete_flag = "";
 					}else{
-						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-						$this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+						$delete_flag = $Userdata[0]->delete_flag;
+						$this->set('delete_flag',$delete_flag);
 					}
 						$user = $this->Auth->identify();
 					if ($user) {

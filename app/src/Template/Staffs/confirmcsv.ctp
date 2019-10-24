@@ -3,7 +3,7 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Staff $staff
  */
- 
+
 ///////////Model/Tableで、テーブルのnotemptyを変更
 
 use Cake\ORM\TableRegistry;//独立したテーブルを扱う
@@ -15,11 +15,11 @@ $this->Roles = TableRegistry::get('roles');//Rolesテーブルを使う
 <br>
             <?php
               $username = $this->request->Session()->read('Auth.User.username');
-                
+
               header('Expires:-1');
               header('Cache-Control:');
               header('Pragma:');
-
+/*
               echo $this->Form->create($staff, ['url' => ['action' => 'docsv']]);
 
               for($n=1; $n<=$count-1; $n++){
@@ -34,19 +34,36 @@ $this->Roles = TableRegistry::get('roles');//Rolesテーブルを使う
                           echo "<input type='hidden' name=staffdata[$n][mail] value='$sample3' size='6'/>\n";
                           $delete_flag = 0;
                           echo "<input type='hidden' name=staffdata[$n][delete_flag] value='$delete_flag' size='6'/>\n";
-                          
+
                           $samplestatus = $arrFp["{$n}"]['status'];//statusは行の最後のため、改行まで含まれてしまう
                           $sample5 = substr($samplestatus, 0, 1);//最初の1文字（statusの数値のみ）に$sample5と名前を付ける
                           echo "<input type='hidden' name=staffdata[$n][status] value='$sample5' size='6'/>\n";
-                          
+
                           //実験statusをrole_idにする（以下３行）
                             $Role = $this->Roles->find()->where(['role_code' => $sample5])->toArray();//'role_code' => $sample5となるデータをRolesテーブルから配列で取得
                             $role_id = $Role[0]->id;//配列の0番目（0番目しかない）のidに$role_idと名前を付ける
                             echo "<input type='hidden' name=staffdata[$n][created_staff] value='$role_id' size='6'/>\n";//sokuteidataに追加
-                          
               }
+*/
+    echo $this->Form->create($staff, ['url' => ['action' => 'docsv']]);
+    for($n=1; $n<=$count-2; $n++){
+            $resultArray = Array();
+                $sample0 = $arrFp["{$n}"]['datetime'];
+                echo "<input type='hidden' name=staffdata[$n][datetime] value='$sample0' />\n";
+                $sample1 = $arrFp["{$n}"]['seikeiki'];
+                echo "<input type='hidden' name=staffdata[$n][seikeiki] value='$sample1' />\n";
+                $sample2 = $arrFp["{$n}"]['product_code'];
+                echo "<input type='hidden' name=staffdata[$n][product_code] value='$sample2' size='6'/>\n";
+                $sample3 = $arrFp["{$n}"]['present_kensahyou'];
+                echo "<input type='hidden' name=staffdata[$n][present_kensahyou] value='$sample3' size='6'/>\n";
+                $sample3 = $arrFp["{$n}"]['product_name'];
+                echo "<input type='hidden' name=staffdata[$n][product_name] value='$sample3' size='6'/>\n";
+                $sample3 = $arrFp["{$n}"]['tantou'];
+                echo "<input type='hidden' name=staffdata[$n][tantou] value='$sample3' size='6'/>\n";
+    }
+
             ?>
-                
+
         <p align="center"><?= $this->Form->button('back', ['onclick' => 'history.back()', 'type' => 'button']) ?>
         <?= $this->Form->button(__('OK'), array('name' => 'touroku')) ?></p>
 

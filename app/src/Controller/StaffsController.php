@@ -24,6 +24,8 @@ class StaffsController extends AppController
 		{
 		 parent::initialize();
 		 $this->Users = TableRegistry::get('users');//staffsテーブルを使う
+		 $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');
+
 		}
 
     public function index()
@@ -147,56 +149,88 @@ class StaffsController extends AppController
 	$staff = $this->Staffs->newEntity();//newentityに$staffという名前を付ける
 	$this->set('staff',$staff);//1行上の$staffをctpで使えるようにセット
 
-	$fp = fopen("employee.csv", "r");//csvファイルはwebrootに入れる
-	$this->set('fp',$fp);
+/*
+$fp = fopen("employee.csv", "r");//csvファイルはwebrootに入れる
+$this->set('fp',$fp);
 
-	$fpcount = fopen("employee.csv", 'r' );
-	for( $count = 0; fgets( $fpcount ); $count++ );
-	$this->set('count',$count);
+$fpcount = fopen("employee.csv", 'r' );
+for( $count = 0; fgets( $fpcount ); $count++ );
+$this->set('count',$count);
 
-	$arrFp = array();//空の配列を作る
+$arrFp = array();//空の配列を作る
 //	$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目）
-	for ($k=1; $k<=$count; $k++) {//行数分
-		$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
-		$sample = explode(',',$line);//$lineを","毎に配列に入れる
+for ($k=1; $k<=$count; $k++) {//行数分
+	$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+	$sample = explode(',',$line);//$lineを","毎に配列に入れる
 
-		$keys=array_keys($sample);
-		$keys[array_search('0',$keys)]='staff_code';//名前の変更
-		$keys[array_search('1',$keys)]='f_name';
-		$keys[array_search('2',$keys)]='l_name';
-		$keys[array_search('3',$keys)]='mail';
-		$keys[array_search('5',$keys)]='status';
-		$sample = array_combine( $keys, $sample );
+	$keys=array_keys($sample);
+	$keys[array_search('0',$keys)]='staff_code';//名前の変更
+	$keys[array_search('1',$keys)]='f_name';
+	$keys[array_search('2',$keys)]='l_name';
+	$keys[array_search('3',$keys)]='mail';
+	$keys[array_search('5',$keys)]='status';
+	$sample = array_combine( $keys, $sample );
 
-		unset($sample['4']);//status_leaderを削除
+	unset($sample['4']);//status_leaderを削除
 
-		$arrFp[] = $sample;//配列に追加する
-	}
-	$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
-//	echo "<pre>";
-// 	print_r($arrFp);
-//	echo "<br>";
-
+	$arrFp[] = $sample;//配列に追加する
+}
+$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
+*/
     }
 
      public function docsv()
     {
-	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-	echo "<pre>";
-//	print_r($data);
-	var_dump($data);
-	echo "<br>";
+//	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+//	echo "<pre>";
+//	print_r($this->request->getData('staffdata'));
+//	var_dump($data);
+//	echo "<br>";
 
 	$staff = $this->Staffs->newEntity();//newentityに$staffという名前を付ける
 	$this->set('staff',$staff);//1行上の$staffをctpで使えるようにセット
 
+	$scheduleKoutei = $this->ScheduleKouteis->newEntity();//newentityに$staffという名前を付ける
+	$this->set('scheduleKoutei',$scheduleKoutei);//1行上の$staffをctpで使えるようにセット
+
+	$fp = fopen("scheduleKoutei.csv", "r");//csvファイルはwebrootに入れる
+	$this->set('fp',$fp);
+
+	$fpcount = fopen("scheduleKoutei.csv", 'r' );
+	for( $count = 0; fgets( $fpcount ); $count++ );
+	$this->set('count',$count);
+
+	$arrFp = array();//空の配列を作る
+	$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目）
+	for ($k=1; $k<=$count-1; $k++) {//行数分
+		$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+		$sample = explode(',',$line);//$lineを","毎に配列に入れる
+
+		$keys=array_keys($sample);
+		$keys[array_search('0',$keys)]='datetime';//名前の変更
+		$keys[array_search('1',$keys)]='seikeiki';
+		$keys[array_search('2',$keys)]='product_code';
+		$keys[array_search('3',$keys)]='present_kensahyou';
+		$keys[array_search('4',$keys)]='product_name';
+		$keys[array_search('5',$keys)]='tantou';
+		$sample = array_combine( $keys, $sample );
+
+		$arrFp[] = $sample;//配列に追加する
+	}
+	$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
+	echo "<pre>";
+ 	print_r($arrFp);
+	echo "<br>";
+
 	if ($this->request->is('post')) {//postなら登録
-		$staff = $this->Staffs->patchEntities($staff, $this->request->getData('staffdata'));//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+//		$staff = $this->Staffs->patchEntities($staff, $this->request->getData('staffdata'));//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+		$scheduleKoutei = $this->ScheduleKouteis->patchEntities($scheduleKoutei, $arrFp);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
 		$connection = ConnectionManager::get('default');//トランザクション1
 		// トランザクション開始2
 		$connection->begin();//トランザクション3
 		try {//トランザクション4
-			if ($this->Staffs->saveMany($staff)) {//saveManyで一括登録
+	//		if ($this->Staffs->saveMany($staff)) {//saveManyで一括登録
+				if ($this->ScheduleKouteis->saveMany($scheduleKoutei)) {//saveManyで一括登録
 				$connection->commit();// コミット5
 			} else {
 				$this->Flash->error(__('The Staffs could not be saved. Please, try again.'));

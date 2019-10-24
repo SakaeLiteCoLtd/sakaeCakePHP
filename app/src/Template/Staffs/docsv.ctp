@@ -10,10 +10,10 @@
 //          echo $this->Form->create($staff, ['url' => ['action' => 'index']]);
 ?>
                 <?php
-            	    echo "<pre>";
-                    print_r('以下のデータが登録されました。');
-                    echo "<br>";
-                    print_r($this->request->getData('staffdata'));
-                    echo "<br>";
+            //	    echo "<pre>";
+            //        print_r('以下のデータが登録されました。');
+            //        echo "<br>";
+            //        print_r($this->request->getData('staffdata'));
+            //        echo "<br>";
                 ?>
 <?= $this->Form->end() ?>

@@ -3,7 +3,7 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\User $user
  */
-error_reporting(0); 
+error_reporting(0);
 ?>
 
 <?php if ($username != "" && $delete_flag != ""): ?>

@@ -534,11 +534,25 @@ class LabelsController extends AppController
      session_start();
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);
-
+     
      $data = $this->request->getData();//postデータを$dataに
-     $dateYMDs = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day']." 00:00";
-     $dateYMDf = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day']." 23:59";
-
+/*
+     echo "<pre>";
+     print_r($data);
+     echo "</pre>";
+*/
+     if(empty($data['formset']) && !isset($data['touroku'])){//最初のフォーム画面
+       $data = $this->request->getData();//postデータを$dataに
+       $dateYMDs = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day']." 00:00";
+       $dateYMDf = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day']." 23:59";
+       $this->set('dateYMDs',$dateYMDs);
+       $this->set('dateYMDf',$dateYMDf);
+     }else{
+       $dateYMDs = $data['dateYMDs'];
+       $dateYMDf = $data['dateYMDf'];
+       $this->set('dateYMDs',$dateYMDs);
+       $this->set('dateYMDf',$dateYMDf);
+     }
      $ScheduleKoutei = $this->ScheduleKouteis->find()->where(['datetime >=' => $dateYMDs, 'datetime <=' => $dateYMDf, 'present_kensahyou' => 0])->toArray();
      $ScheduleKoutei_product_code = $ScheduleKoutei[0]->product_code;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
 
@@ -570,7 +584,6 @@ class LabelsController extends AppController
 
              ${"n".$j} = $i;
              $this->set('n'.$j,${"n".$j});//セット
-
            }
           }
 
@@ -622,12 +635,12 @@ class LabelsController extends AppController
    {
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);//
-/*
+
      $data = $this->request->getData();//postデータを$dataに
      echo "<pre>";
      print_r($data);
      echo "</pre>";
-*/
+
    }
 
 		public function preadd()

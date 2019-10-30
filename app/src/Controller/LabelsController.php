@@ -536,12 +536,44 @@ class LabelsController extends AppController
      $this->set('KadouSeikeis',$KadouSeikeis);
 
      $data = $this->request->getData();//postデータを$dataに
-
+/*
      echo "<pre>";
      print_r($data);
      echo "</pre>";
+*/
+      if(isset($data['touroku'])){//csv確認おしたとき
+        $this->set('touroku',$data['touroku']);
 
-     if(empty($data['formset']) && !isset($data['touroku'])){//最初のフォーム画面
+        $session = $this->request->getSession();
+/*        echo "<pre>";
+        print_r($_SESSION['labeljunbi']);
+        echo "</pre>";
+*/
+        $dateYMDs = $data['dateYMDs'];
+        $dateYMDf = $data['dateYMDf'];
+        $this->set('dateYMDs',$dateYMDs);
+        $this->set('dateYMDf',$dateYMDf);
+
+        $csv = $_SESSION['labeljunbi'];
+//        touch('labeljunbi2.csv');//不要
+        $fp = fopen('labels/labeljunbi.csv', 'w');
+        foreach ($csv as $line) {
+        	fputcsv($fp, $line);
+        }
+        fclose($fp);
+
+      }elseif(isset($data['confirm'])){//確認おしたとき
+       $this->set('confirm',$data['confirm']);
+       $dateYMDs = $data['dateYMDs'];
+       $dateYMDf = $data['dateYMDf'];
+       $this->set('dateYMDs',$dateYMDs);
+       $this->set('dateYMDf',$dateYMDf);
+/*
+        echo "<pre>";
+        print_r($data);
+        echo "</pre>";
+*/
+     }elseif(empty($data['formset']) && !isset($data['touroku'])){//最初のフォーム画面
        $data = $this->request->getData();//postデータを$dataに
        $dateYMDs = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day']." 00:00";
        $dateYMDf = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day']." 23:59";
@@ -552,8 +584,13 @@ class LabelsController extends AppController
         ${"tuika".$i} = 0;
         $this->set('tuika'.$i,${"tuika".$i});//セット
        }
+       for($i=1; $i<=9; $i++){
+        ${"ntuika".$i} = 0;
+        $this->set('ntuika'.$i,${"ntuika".$i});//セット
+       }
 
      }else{
+
        $dateYMDs = $data['dateYMDs'];
        $dateYMDf = $data['dateYMDf'];
        $this->set('dateYMDs',$dateYMDs);
@@ -563,6 +600,12 @@ class LabelsController extends AppController
          ${"tuika".$i} = $data["tuika".$i];
          $this->set('tuika'.$i,${"tuika".$i});//セット
        }
+       for($i=1; $i<=9; $i++){
+         if(isset($data["ntuika".$i])) {
+             ${"ntuika".$i} = $data["ntuika".$i];
+             $this->set('ntuika'.$i,${"ntuika".$i});//セット
+        }
+      }
      }
      $ScheduleKoutei = $this->ScheduleKouteis->find()->where(['datetime >=' => $dateYMDs, 'datetime <=' => $dateYMDf, 'present_kensahyou' => 0])->toArray();
      $ScheduleKoutei_product_code = $ScheduleKoutei[0]->product_code;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
@@ -600,7 +643,7 @@ class LabelsController extends AppController
 
           ${"ScheduleKouteisarry".$j} = array();//空の配列を作る
 
-          foreach ((array)${"arrP".$j} as $key => $value) {//serialで並び替え
+          foreach ((array)${"arrP".$j} as $key => $value) {//datetimeで並び替え
                $sort[$key] = $value['datetime'];
                 array_push(${"ScheduleKouteisarry".$j}, ['id' => $value['id'], 'starting_tm' => $value['datetime'],
                  'seikeiki' => $value['seikeiki'], 'product_code' => $value['product_code'],

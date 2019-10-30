@@ -29,11 +29,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
     <tr>
-      <td width="20" colspan="20" nowrap="nowrap"><div align="center"></div></td>
       <td width="350" colspan="20" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
       <td rowspan="2" width="150"  style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->submit(__('日程絞込'), array('name' => 'top')); ?></div></td>
     </tr>
-    <td width="20" colspan="20" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("check", array('type' => 'checkbox', 'label'=>false, )); ?></div></td>
       <td width="250" colspan="20" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("manu_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></div></td>
 </table>
 <br>

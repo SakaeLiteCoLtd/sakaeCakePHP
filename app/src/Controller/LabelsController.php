@@ -25,6 +25,9 @@ class LabelsController extends AppController
        $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');
        $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');
        $this->Users = TableRegistry::get('users');
+       $this->Products = TableRegistry::get('products');//productsテーブルを使う
+       $this->Customers = TableRegistry::get('customers');//customersテーブルを使う
+       $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
      }
 
     public function kariform()
@@ -546,7 +549,7 @@ class LabelsController extends AppController
 
         $session = $this->request->getSession();
 /*        echo "<pre>";
-        print_r($_SESSION['labeljunbi']);
+        print_r($_SESSION['labeljunbi'][$data['m']]);
         echo "</pre>";
 */
         $dateYMDs = $data['dateYMDs'];
@@ -554,13 +557,65 @@ class LabelsController extends AppController
         $this->set('dateYMDs',$dateYMDs);
         $this->set('dateYMDf',$dateYMDf);
 
-        $csv = $_SESSION['labeljunbi'];
-//        touch('labeljunbi2.csv');//不要
+        $arrCsv = array();
+        for($i=1; $i<=$data['m']; $i++){
+          $date = date('Y/m/d H:i:s');
+          $datetimeymd = substr($date,0,10);
+          $datetimehm = substr($date,11,5);
+          $lotnum = substr($date,2,2).substr($date,5,2).substr($date,8,2);
+          $Product = $this->Products->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+          if(isset($Product[0])){
+            $costomerId = $Product[0]->customer_id;
+          }else{
+            $costomerId = "";
+          }
+          $Konpou = $this->Konpous->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+          if(isset($Konpou[0])){
+            $irisu = $Konpou[0]->irisu;
+          }else{
+            $irisu = "";
+          }
+          $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
+          if(isset($Customer[0])){
+            $costomerName = $Customer[0]->name;
+          }else{
+            $costomerName = "";
+          }
+          if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ"){//mb_substrだと文字化けしない
+            $Layout = "B";
+          }else{
+            $Layout = "A";
+          }
+
+          $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
+           'lotnum' => $lotnum, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
+           'irisu' => $irisu];
+
+           $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
+           if(isset($Customer[0])){
+             $costomerName = $Customer[0]->name;
+/*             echo "<pre>";
+             print_r(mb_substr($costomerName, 0, 6));
+             echo "</pre>";
+*/
+           }else{
+             $costomerName = "";
+           }
+           if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ"){//mb_substrだと文字化けしない
+             $lotnumIN = "IN.".$lotnum;
+             $Layout = "B";
+             $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
+              'lotnum' => $lotnumIN, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
+              'irisu' => $irisu];
+           }
+
+        }
+
         $fp = fopen('labels/labeljunbi.csv', 'w');
-        foreach ($csv as $line) {
+        foreach ($arrCsv as $line) {
         	fputcsv($fp, $line);
         }
-        fclose($fp);
+          fclose($fp);
 
       }elseif(isset($data['confirm'])){//確認おしたとき
        $this->set('confirm',$data['confirm']);

@@ -5,7 +5,8 @@
  */
 use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 
-//$this->labeljunbis = TableRegistry::get('labeljunbis');
+$this->Products = TableRegistry::get('products');//productsテーブルを使う
+$this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
 
 ?>
         <?php
@@ -61,9 +62,22 @@ if(null == ($this->request->getData("11gouki")) && null == ($this->request->getD
    for($i=1; $i<=${"n".$j}; $i++){//１号機
     if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
+    $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+    $cycle = $Product[0]->cycle;
+    $torisu = $Product[0]->torisu;
+    $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+    $irisu = $Konpou[0]->irisu;
     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
-    ${"yoteimaisu".$i} = "確認中１";
+    if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
+      ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}));
+      ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+    }elseif((int)$cycle*$irisu > 0){
+      ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}) - 3600);
+      ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+    }else{
+      ${"yoteimaisu".$i} = "1";
+    }
     ${"id".$i} = ${"arrP".$j.$i}['id'];
     ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
     ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
@@ -180,11 +194,24 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
  && null == ($this->request->getData("4gouki")) && null == ($this->request->getData("5gouki")) && null == ($this->request->getData("6gouki"))
  && null == ($this->request->getData("7gouki")) && null == ($this->request->getData("8gouki")) && null == ($this->request->getData("9gouki"))) {//1gouki以外のやつが押されたら消えるようにする
   for($i=1; $i<=${"n".$j}; $i++){//２号機
-    if(null == ($this->request->getData('check'.$j.$i))){
+    if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
+    $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+    $cycle = $Product[0]->cycle;
+    $torisu = $Product[0]->torisu;
+    $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+    $irisu = $Konpou[0]->irisu;
     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
-    ${"yoteimaisu".$i} = "確認中１";
+    if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
+      ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}));
+      ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+    }elseif((int)$cycle*$irisu > 0){
+      ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}) - 3600);
+      ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+    }else{
+      ${"yoteimaisu".$i} = "1";
+    }
     ${"id".$i} = ${"arrP".$j.$i}['id'];
     ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
     ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
@@ -300,10 +327,24 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
  && null == ($this->request->getData("4gouki")) && null == ($this->request->getData("5gouki")) && null == ($this->request->getData("6gouki"))
  && null == ($this->request->getData("7gouki")) && null == ($this->request->getData("8gouki")) && null == ($this->request->getData("9gouki"))) {//1gouki以外のやつが押されたら消えるようにする
   for($i=1; $i<=${"n".$j}; $i++){
+    if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
+    $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+    $cycle = $Product[0]->cycle;
+    $torisu = $Product[0]->torisu;
+    $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+    $irisu = $Konpou[0]->irisu;
     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
-    ${"yoteimaisu".$i} = "確認中１";
+    if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
+      ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}));
+      ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+    }elseif((int)$cycle*$irisu > 0){
+      ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}) - 3600);
+      ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+    }else{
+      ${"yoteimaisu".$i} = "1";
+    }
     ${"id".$i} = ${"arrP".$j.$i}['id'];
     ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
     ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
@@ -342,6 +383,7 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
       echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
 
     }
+  }
   echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
 
   //以下追加または削除を押された場合
@@ -418,50 +460,65 @@ $j = 4;
 if(null == ($this->request->getData("1gouki")) && null == ($this->request->getData("2gouki")) && null == ($this->request->getData("3gouki"))//null == ($this->request->getData("1gouki")) && を削除する
  && null == ($this->request->getData("44gouki")) && null == ($this->request->getData("5gouki")) && null == ($this->request->getData("6gouki"))
  && null == ($this->request->getData("7gouki")) && null == ($this->request->getData("8gouki")) && null == ($this->request->getData("9gouki"))) {//1gouki以外のやつが押されたら消えるようにする
-  for($i=1; $i<=${"n".$j}; $i++){
-    ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
-    ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
-    ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
-    ${"yoteimaisu".$i} = "確認中１";
-    ${"id".$i} = ${"arrP".$j.$i}['id'];
-    ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
-    ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
+   for($i=1; $i<=${"n".$j}; $i++){
+     if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
+     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
+     $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $cycle = $Product[0]->cycle;
+     $torisu = $Product[0]->torisu;
+     $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $irisu = $Konpou[0]->irisu;
+     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
+     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
+     if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}));
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }elseif((int)$cycle*$irisu > 0){
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}) - 3600);
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }else{
+       ${"yoteimaisu".$i} = "1";
+     }
+     ${"id".$i} = ${"arrP".$j.$i}['id'];
+     ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
+     ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
 
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
-      echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "開始";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "</tr>\n";
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "終了";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
+       echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "開始";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "終了";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "</tr>\n";
 
-      echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
 
-    }
-  echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
+     }
+   }
+   echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
 
   //以下追加または削除を押された場合
     if(null !== ($this->request->getData('tuika'.$j.$j))){//追加の場合
@@ -537,50 +594,65 @@ $j = 5;
 if(null == ($this->request->getData("1gouki")) && null == ($this->request->getData("2gouki")) && null == ($this->request->getData("3gouki"))//null == ($this->request->getData("1gouki")) && を削除する
  && null == ($this->request->getData("4gouki")) && null == ($this->request->getData("55gouki")) && null == ($this->request->getData("6gouki"))
  && null == ($this->request->getData("7gouki")) && null == ($this->request->getData("8gouki")) && null == ($this->request->getData("9gouki"))) {//1gouki以外のやつが押されたら消えるようにする
-  for($i=1; $i<=${"n".$j}; $i++){
-    ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
-    ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
-    ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
-    ${"yoteimaisu".$i} = "確認中１";
-    ${"id".$i} = ${"arrP".$j.$i}['id'];
-    ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
-    ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
+   for($i=1; $i<=${"n".$j}; $i++){
+     if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
+     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
+     $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $cycle = $Product[0]->cycle;
+     $torisu = $Product[0]->torisu;
+     $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $irisu = $Konpou[0]->irisu;
+     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
+     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
+     if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}));
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }elseif((int)$cycle*$irisu > 0){
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}) - 3600);
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }else{
+       ${"yoteimaisu".$i} = "1";
+     }
+     ${"id".$i} = ${"arrP".$j.$i}['id'];
+     ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
+     ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
 
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
-      echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "開始";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "</tr>\n";
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "終了";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
+       echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "開始";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "終了";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "</tr>\n";
 
-      echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
 
-    }
-  echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
+     }
+   }
+   echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
 
   //以下追加または削除を押された場合
     if(null !== ($this->request->getData('tuika'.$j.$j))){//追加の場合
@@ -656,50 +728,65 @@ $j = 6;
 if(null == ($this->request->getData("1gouki")) && null == ($this->request->getData("2gouki")) && null == ($this->request->getData("3gouki"))//null == ($this->request->getData("1gouki")) && を削除する
  && null == ($this->request->getData("4gouki")) && null == ($this->request->getData("5gouki")) && null == ($this->request->getData("66gouki"))
  && null == ($this->request->getData("7gouki")) && null == ($this->request->getData("8gouki")) && null == ($this->request->getData("9gouki"))) {//1gouki以外のやつが押されたら消えるようにする
-  for($i=1; $i<=${"n".$j}; $i++){
-    ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
-    ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
-    ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
-    ${"yoteimaisu".$i} = "確認中１";
-    ${"id".$i} = ${"arrP".$j.$i}['id'];
-    ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
-    ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
+   for($i=1; $i<=${"n".$j}; $i++){
+     if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
+     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
+     $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $cycle = $Product[0]->cycle;
+     $torisu = $Product[0]->torisu;
+     $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $irisu = $Konpou[0]->irisu;
+     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
+     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
+     if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}));
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }elseif((int)$cycle*$irisu > 0){
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}) - 3600);
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }else{
+       ${"yoteimaisu".$i} = "1";
+     }
+     ${"id".$i} = ${"arrP".$j.$i}['id'];
+     ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
+     ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
 
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
-      echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "開始";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "</tr>\n";
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "終了";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
+       echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "開始";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "終了";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "</tr>\n";
 
-      echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
 
-    }
-  echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
+     }
+   }
+   echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
 
   //以下追加または削除を押された場合
     if(null !== ($this->request->getData('tuika'.$j.$j))){//追加の場合
@@ -775,50 +862,65 @@ $j = 7;
 if(null == ($this->request->getData("1gouki")) && null == ($this->request->getData("2gouki")) && null == ($this->request->getData("3gouki"))//null == ($this->request->getData("1gouki")) && を削除する
  && null == ($this->request->getData("4gouki")) && null == ($this->request->getData("5gouki")) && null == ($this->request->getData("6gouki"))
  && null == ($this->request->getData("77gouki")) && null == ($this->request->getData("8gouki")) && null == ($this->request->getData("9gouki"))) {//1gouki以外のやつが押されたら消えるようにする
-  for($i=1; $i<=${"n".$j}; $i++){
-    ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
-    ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
-    ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
-    ${"yoteimaisu".$i} = "確認中１";
-    ${"id".$i} = ${"arrP".$j.$i}['id'];
-    ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
-    ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
+   for($i=1; $i<=${"n".$j}; $i++){
+     if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
+     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
+     $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $cycle = $Product[0]->cycle;
+     $torisu = $Product[0]->torisu;
+     $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $irisu = $Konpou[0]->irisu;
+     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
+     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
+     if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}));
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }elseif((int)$cycle*$irisu > 0){
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}) - 3600);
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }else{
+       ${"yoteimaisu".$i} = "1";
+     }
+     ${"id".$i} = ${"arrP".$j.$i}['id'];
+     ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
+     ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
 
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
-      echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "開始";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "</tr>\n";
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "終了";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
+       echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "開始";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "終了";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "</tr>\n";
 
-      echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
 
-    }
-  echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
+     }
+   }
+   echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
 
   //以下追加または削除を押された場合
     if(null !== ($this->request->getData('tuika'.$j.$j))){//追加の場合
@@ -894,50 +996,65 @@ $j = 8;
 if(null == ($this->request->getData("1gouki")) && null == ($this->request->getData("2gouki")) && null == ($this->request->getData("3gouki"))//null == ($this->request->getData("1gouki")) && を削除する
  && null == ($this->request->getData("4gouki")) && null == ($this->request->getData("5gouki")) && null == ($this->request->getData("6gouki"))
  && null == ($this->request->getData("7gouki")) && null == ($this->request->getData("88gouki")) && null == ($this->request->getData("9gouki"))) {//1gouki以外のやつが押されたら消えるようにする
-  for($i=1; $i<=${"n".$j}; $i++){
-    ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
-    ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
-    ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
-    ${"yoteimaisu".$i} = "確認中１";
-    ${"id".$i} = ${"arrP".$j.$i}['id'];
-    ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
-    ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
+   for($i=1; $i<=${"n".$j}; $i++){
+     if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
+     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
+     $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $cycle = $Product[0]->cycle;
+     $torisu = $Product[0]->torisu;
+     $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $irisu = $Konpou[0]->irisu;
+     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
+     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
+     if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}));
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }elseif((int)$cycle*$irisu > 0){
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}) - 3600);
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }else{
+       ${"yoteimaisu".$i} = "1";
+     }
+     ${"id".$i} = ${"arrP".$j.$i}['id'];
+     ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
+     ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
 
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
-      echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "開始";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "</tr>\n";
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "終了";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
+       echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "開始";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "終了";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "</tr>\n";
 
-      echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
 
-    }
-  echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
+     }
+   }
+   echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
 
   //以下追加または削除を押された場合
     if(null !== ($this->request->getData('tuika'.$j.$j))){//追加の場合
@@ -1013,50 +1130,65 @@ $j = 9;
 if(null == ($this->request->getData("1gouki")) && null == ($this->request->getData("2gouki")) && null == ($this->request->getData("3gouki"))//null == ($this->request->getData("1gouki")) && を削除する
  && null == ($this->request->getData("4gouki")) && null == ($this->request->getData("5gouki")) && null == ($this->request->getData("6gouki"))
  && null == ($this->request->getData("7gouki")) && null == ($this->request->getData("8gouki")) && null == ($this->request->getData("99gouki"))) {//1gouki以外のやつが押されたら消えるようにする
-  for($i=1; $i<=${"n".$j}; $i++){
-    ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
-    ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
-    ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
-    ${"yoteimaisu".$i} = "確認中１";
-    ${"id".$i} = ${"arrP".$j.$i}['id'];
-    ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
-    ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
+   for($i=1; $i<=${"n".$j}; $i++){
+     if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
+     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
+     $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $cycle = $Product[0]->cycle;
+     $torisu = $Product[0]->torisu;
+     $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
+     $irisu = $Konpou[0]->irisu;
+     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
+     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
+     if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}));
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }elseif((int)$cycle*$irisu > 0){
+       ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$i}) - strtotime(${"hyoujistarting_tm".$i}) - 3600);
+       ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
+     }else{
+       ${"yoteimaisu".$i} = "1";
+     }
+     ${"id".$i} = ${"arrP".$j.$i}['id'];
+     ${"seikeiki".$i} = ${"arrP".$j.$i}['seikeiki'];
+     ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
 
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
-      echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "開始";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-      echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
-      echo "</td>\n";
-      echo "</tr>\n";
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "終了";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37'><div align='center'>\n";
-      echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
-      echo "</div></td>\n";
-      echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
+       echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "開始";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=${"yoteimaisu".$i}  name=yoteimaisu".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+       echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
+       echo "</td>\n";
+       echo "</tr>\n";
+       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+       echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+       echo "終了";
+       echo "</strong></div></td>\n";
+       echo "<td colspan='37'><div align='center'>\n";
+       echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
+       echo "</div></td>\n";
+       echo "</tr>\n";
 
-      echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
-      echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"id".$i}  name=id".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"seikeiki".$i}  name=seikeiki".$j.$i." size='6'/>\n";
+       echo "<input type='hidden' value=${"present_kensahyou".$i}  name=present_kensahyou".$j.$i." size='6'/>\n";
 
-    }
-  echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
+     }
+   }
+   echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
 
   //以下追加または削除を押された場合
     if(null !== ($this->request->getData('tuika'.$j.$j))){//追加の場合
@@ -1148,6 +1280,7 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
   <?= $this->Form->control('dateYMDf', array('type'=>'hidden', 'value'=>$dateYMDf, 'label'=>false)) ?>
 </fieldset>
 
+
 <?php elseif(isset($confirm)): //確認押したとき ?>
 
 <br><br><br>
@@ -1216,8 +1349,6 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
                    "present_kensahyou" => 0,
                  );
        $this->set('m',$m);
-//       ${"m".$j} = $m;
-//       $this->set('m'.$j,${"m".$j});
      }
    }
   ?>
@@ -1836,9 +1967,11 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
   </table>
   <fieldset>
     <?= $this->Form->control('formset', array('type'=>'hidden', 'value'=>"1", 'label'=>false)) ?>
+    <?= $this->Form->control('m', array('type'=>'hidden', 'value'=>$m, 'label'=>false)) ?>
     <?= $this->Form->control('dateYMDs', array('type'=>'hidden', 'value'=>$dateYMDs, 'label'=>false)) ?>
     <?= $this->Form->control('dateYMDf', array('type'=>'hidden', 'value'=>$dateYMDf, 'label'=>false)) ?>
   </fieldset>
+
 
 <?php else: //csv押したとき ?>
   <br><br>

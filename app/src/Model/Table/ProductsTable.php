@@ -102,8 +102,8 @@ class ProductsTable extends Table
             ->allowEmpty('multiple_cs');
 
         $validator
-//            ->scalar('weight')
-            ->maxLength('weight', 255)
+            ->integer('weight')
+      //      ->maxLength('weight', 255)
             ->requirePresence('weight', 'create')
             ->notEmpty('weight');
 

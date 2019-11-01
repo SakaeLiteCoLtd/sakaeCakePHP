@@ -27,504 +27,103 @@ class LabelsController extends AppController
        $this->Users = TableRegistry::get('users');
        $this->Products = TableRegistry::get('products');//productsテーブルを使う
        $this->Customers = TableRegistry::get('customers');//customersテーブルを使う
-       $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
+       $this->Konpous = TableRegistry::get('konpous');
+       $this->LabelElementPlaces = TableRegistry::get('labelElementPlaces');
      }
 
-    public function kariform()
-    {
-			$KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
-			$this->set('KariKadouSeikeis',$KariKadouSeikeis);//
-			$data = $this->request->getData();//postデータを$dataに
-/*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
-      if(empty($data['formset']) && !isset($data['touroku'])){//最初のフォーム画面
-        session_start();
-        $dateYMD = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day'];
-        $dateYMD1 = strtotime($dateYMD);
-        $dayye = date('Y-m-d', strtotime('-1 day', $dateYMD1));
-        $this->set('dateYMD',$dateYMD);
-        $dateYMDye = $dayye;
-        $this->set('dateYMDye',$dateYMDye);
-        $dateHI = date("08:00");
-        $dateye = $dateYMDye."T".$dateHI;
-        $dateto = $dateYMD."T".$dateHI;
-        $this->set('dateye',$dateye);
-        $this->set('dateto',$dateto);
-/*
-        echo "<pre>";
-        print_r($dayye);
-        echo "</pre>";
-*/
-        for($i=1; $i<=9; $i++){
-      		${"tuika".$i} = 0;
-      		$this->set('tuika'.$i,${"tuika".$i});//セット
-      	}
-
-      }else{
-
-        if (isset($data['tuika11']) && empty($data['sakujo11'])) {//1goukituika
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
-
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
-
-          $tuika1 = $data['tuika1'] + 1;
-  				$this->set('tuika1',$tuika1);//
-/*          $tuika2 = $data['tuika2'];
-          $this->set('tuika2',$tuika2);//
-          $tuika3 = $data['tuika3'];
-          $this->set('tuika3',$tuika3);//
-          $tuika4 = $data['tuika4'];
-          $this->set('tuika4',$tuika4);//
-*/
-
-}elseif(isset($data['sakujo11']) && $data['tuika1'] > 0){//1goukisakujo
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
-
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
-
-  				$tuika1 = $data['tuika1'] - 1;
-  				$this->set('tuika1',$tuika1);//
-
-        }elseif(isset($data['sakujo11']) && $data['tuika1'] == 0){//1goukisakujo0
-  /*				echo "<pre>";
-  				print_r($data['sakujo1']);
-  				echo "</pre>";
-  */
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
-
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
-
-        }elseif(isset($data['confirm']) && !isset($data['touroku'])){//?これがないとエラーが出る
-          $this->set('confirm',$data['confirm']);//
-/*
-          echo "<pre>";
-          print_r($data['confirm']);
-          echo "</pre>";
-*/
-
-          for($i=1; $i<=9; $i++){
-            ${"tuika".$i} = $data["tuika".$i];
-            $this->set('tuika'.$i,${"tuika".$i});//セット
-          }
-
-        }
-
-        elseif (isset($data['tuika22']) && empty($data['sakujo22'])) {//2goukituika
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
-
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
-
-  				$tuika2 = $data['tuika2'] + 1;
-  				$this->set('tuika2',$tuika2);//
-
-        }elseif(isset($data['sakujo22']) && $data['tuika2'] > 0){//2goukisakujo
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
-
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
-
-  				$tuika2 = $data['tuika2'] - 1;
-  				$this->set('tuika2',$tuika2);//
-
-        }elseif(isset($data['sakujo22']) && $data['tuika2'] == 0){//2goukisakujo0
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
-
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
-
-        }elseif (isset($data['tuika33']) && empty($data['sakujo33'])) {//3goukituika
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-          		${"tuika".$i} = $data["tuika".$i];
-          		$this->set('tuika'.$i,${"tuika".$i});//セット
-          	}
-    				$tuika3 = $data['tuika3'] + 1;
-    				$this->set('tuika3',$tuika3);//
-
-          }elseif(isset($data['sakujo33']) && $data['tuika3'] > 0){//3goukisakujo
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-          		${"tuika".$i} = $data["tuika".$i];
-          		$this->set('tuika'.$i,${"tuika".$i});//セット
-          	}
-    				$tuika3 = $data['tuika3'] - 1;
-    				$this->set('tuika3',$tuika3);//
-
-          }elseif(isset($data['sakujo33']) && $data['tuika3'] == 0){//3goukisakujo0
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-          		${"tuika".$i} = $data["tuika".$i];
-          		$this->set('tuika'.$i,${"tuika".$i});//セット
-          	}
-
-          }elseif (isset($data['tuika44']) && empty($data['sakujo44'])) {//4goukituika
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-            		${"tuika".$i} = $data["tuika".$i];
-            		$this->set('tuika'.$i,${"tuika".$i});//セット
-            	}
-      				$tuika4 = $data['tuika4'] + 1;
-      				$this->set('tuika4',$tuika4);//
-
-            }elseif(isset($data['sakujo44']) && $data['tuika4'] > 0){//4goukisakujo
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-            		${"tuika".$i} = $data["tuika".$i];
-            		$this->set('tuika'.$i,${"tuika".$i});//セット
-            	}
-      				$tuika4 = $data['tuika4'] - 1;
-      				$this->set('tuika4',$tuika4);//
-
-            }elseif(isset($data['sakujo44']) && $data['tuika4'] == 0){//4goukisakujo0
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-            		${"tuika".$i} = $data["tuika".$i];
-            		$this->set('tuika'.$i,${"tuika".$i});//セット
-            	}
-
-            }elseif (isset($data['tuika55']) && empty($data['sakujo55'])) {//5goukituika
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-                $tuika5 = $data['tuika5'] + 1;
-                $this->set('tuika5',$tuika5);//
-
-            }elseif(isset($data['sakujo55']) && $data['tuika5'] > 0){//5goukisakujo
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-                $tuika5 = $data['tuika5'] - 1;
-                $this->set('tuika5',$tuika5);//
-
-            }elseif(isset($data['sakujo55']) && $data['tuika5'] == 0){//5goukisakujo0
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-
-        }elseif (isset($data['tuika66']) && empty($data['sakujo66'])) {//6goukituika
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-              ${"tuika".$i} = $data["tuika".$i];
-              $this->set('tuika'.$i,${"tuika".$i});//セット
-            }
-            $tuika6 = $data['tuika6'] + 1;
-            $this->set('tuika6',$tuika6);//
-
-      }elseif(isset($data['sakujo66']) && $data['tuika6'] > 0){//6goukisakujo
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-              ${"tuika".$i} = $data["tuika".$i];
-              $this->set('tuika'.$i,${"tuika".$i});//セット
-            }
-            $tuika6 = $data['tuika6'] - 1;
-            $this->set('tuika6',$tuika6);//
-
-      }elseif(isset($data['sakujo66']) && $data['tuika6'] == 0){//6goukisakujo0
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-              ${"tuika".$i} = $data["tuika".$i];
-              $this->set('tuika'.$i,${"tuika".$i});//セット
-            }
-
-          }elseif (isset($data['tuika77']) && empty($data['sakujo77'])) {//7goukituika
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-                ${"tuika".$i} = $data["tuika".$i];
-                $this->set('tuika'.$i,${"tuika".$i});//セット
-              }
-              $tuika7 = $data['tuika7'] + 1;
-              $this->set('tuika7',$tuika7);//
-
-        }elseif(isset($data['sakujo77']) && $data['tuika7'] > 0){//7goukisakujo
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-                ${"tuika".$i} = $data["tuika".$i];
-                $this->set('tuika'.$i,${"tuika".$i});//セット
-              }
-              $tuika7 = $data['tuika7'] - 1;
-              $this->set('tuika7',$tuika7);//
-
-        }elseif(isset($data['sakujo77']) && $data['tuika7'] == 0){//7goukisakujo0
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-                ${"tuika".$i} = $data["tuika".$i];
-                $this->set('tuika'.$i,${"tuika".$i});//セット
-              }
-
-            }elseif (isset($data['tuika88']) && empty($data['sakujo88'])) {//8goukituika
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-                $tuika8 = $data['tuika8'] + 1;
-                $this->set('tuika8',$tuika8);//
-
-          }elseif(isset($data['sakujo88']) && $data['tuika8'] > 0){//8goukisakujo
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-                $tuika8 = $data['tuika8'] - 1;
-                $this->set('tuika8',$tuika8);//
-
-          }elseif(isset($data['sakujo88']) && $data['tuika8'] == 0){//8goukisakujo0
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-
-              }elseif (isset($data['tuika99']) && empty($data['sakujo99'])) {//9goukituika
-                  $dateye = $data['dateye'];
-                  $dateto = $data['dateto'];
-                  $this->set('dateye',$dateye);
-                  $this->set('dateto',$dateto);
-
-                  for($i=1; $i<=9; $i++){
-                    ${"tuika".$i} = $data["tuika".$i];
-                    $this->set('tuika'.$i,${"tuika".$i});//セット
-                  }
-                  $tuika9 = $data['tuika9'] + 1;
-                  $this->set('tuika9',$tuika9);//
-
-            }elseif(isset($data['sakujo99']) && $data['tuika9'] > 0){//9goukisakujo
-                  $dateye = $data['dateye'];
-                  $dateto = $data['dateto'];
-                  $this->set('dateye',$dateye);
-                  $this->set('dateto',$dateto);
-
-                  for($i=1; $i<=9; $i++){
-                    ${"tuika".$i} = $data["tuika".$i];
-                    $this->set('tuika'.$i,${"tuika".$i});//セット
-                  }
-                  $tuika9 = $data['tuika9'] - 1;
-                  $this->set('tuika9',$tuika9);//
-
-            }elseif(isset($data['sakujo99']) && $data['tuika9'] == 0){//9goukisakujo0
-                  $dateye = $data['dateye'];
-                  $dateto = $data['dateto'];
-                  $this->set('dateye',$dateye);
-                  $this->set('dateto',$dateto);
-
-                  for($i=1; $i<=9; $i++){
-                    ${"tuika".$i} = $data["tuika".$i];
-                    $this->set('tuika'.$i,${"tuika".$i});//セット
-                  }
-
-  			}else{
-          return $this->redirect(['action' => 'karipreadd']);
-      	}
-      }
-    }
-/*
-		public function karipreadd()
-		{
-      $KariKadouSeikei = $this->KariKadouSeikeis->newEntity();
-      $this->set('KariKadouSeikei',$KariKadouSeikei);
-
-      $session = $this->request->getSession();
-      $data = $session->read();
-		}
-
-		public function karilogin()
-		{
-			if ($this->request->is('post')) {
-				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-				$ary = explode(',', $str);//$strを配列に変換
-
-				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-				$this->set('username', $username);
-				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-
-					if(empty($Userdata)){
-						$delete_flag = "";
-					}else{
-						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-						$this->set('delete_flag',$delete_flag);//登録者の表示のため
-					}
-						$user = $this->Auth->identify();
-					if ($user) {
-						$this->Auth->setUser($user);
-						return $this->redirect(['action' => 'karido']);
-					}
-				}
-		}
-
-		public function karilogout()
-		{
-			$this->request->session()->destroy(); // セッションの破棄
-			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
-		}
-
-    public function karido()
+   public function index()
    {
-     $KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
-     $this->set('KariKadouSeikei',$KariKadouSeikeis);
+     $this->request->session()->destroy(); // セッションの破棄
+   }
+
+   public function placeform()//納品場所入力
+   {
+     $this->request->session()->destroy(); // セッションの破棄
+     $labelElementPlaces = $this->LabelElementPlaces->newEntity();
+     $this->set('labelElementPlaces',$labelElementPlaces);
+   }
+
+   public function placeconfirm()//納品場所確認
+   {
+     $labelElementPlaces = $this->LabelElementPlaces->newEntity();
+     $this->set('labelElementPlaces',$labelElementPlaces);
+   }
+
+   public function placepreadd()//納品場所ログイン
+   {
+     $labelElementPlaces = $this->LabelElementPlaces->newEntity();
+     $this->set('labelElementPlaces',$labelElementPlaces);
 
      $session = $this->request->getSession();
      $data = $session->read();
-
-     for($n=1; $n<=100; $n++){
-       if(isset($_SESSION['karikadouseikei'][$n])){
-         $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
-         $_SESSION['karikadouseikei'][$n] = array_merge($_SESSION['karikadouseikei'][$n],$created_staff);
-       }else{
-         break;
-       }
-     }
-
+/*
      echo "<pre>";
-     print_r($_SESSION['karikadouseikei']);
+     print_r($_SESSION['labelplaces']);
      echo "</pre>";
+*/
+   }
+
+   public function placelogin()//納品場所ログイン
+   {
+     if ($this->request->is('post')) {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+       $ary = explode(',', $str);//$strを配列に変換
+
+       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+       $this->set('username', $username);
+       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+         if(empty($Userdata)){
+           $delete_flag = "";
+         }else{
+           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+         }
+           $user = $this->Auth->identify();
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'placedo']);
+         }
+       }
+   }
+
+   public function placedo()//納品場所登録
+   {
+     $labelElementPlaces = $this->LabelElementPlaces->newEntity();
+     $this->set('labelElementPlaces',$labelElementPlaces);
+
+     $session = $this->request->getSession();
+
+     $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+     $_SESSION['labelplaces'] = array_merge($created_staff,$_SESSION['labelplaces']);
+
+     $created_staff = $_SESSION['labelplaces']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+     $Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+     $CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+     $this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
      if ($this->request->is('get')) {
-       $KariKadouSeikeis = $this->KariKadouSeikeis->patchEntities($KariKadouSeikeis, $_SESSION['karikadouseikei']);//$roleデータ（空の行）を$this->request->getData()に更新する
+       $product = $this->LabelElementPlaces->patchEntity($labelElementPlaces, $_SESSION['labelplaces']);//$productデータ（空の行）を$this->request->getData()に更新する
        $connection = ConnectionManager::get('default');//トランザクション1
        // トランザクション開始2
        $connection->begin();//トランザクション3
        try {//トランザクション4
-         if ($this->KariKadouSeikeis->saveMany($KariKadouSeikeis)) {
+         if ($this->LabelElementPlaces->save($labelElementPlaces)) {
            $connection->commit();// コミット5
          } else {
-           $this->Flash->error(__('The data could not be saved. Please, try again.'));
+           $this->Flash->error(__('The product could not be saved. Please, try again.'));
            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
          }
        } catch (Exception $e) {//トランザクション7
        //ロールバック8
          $connection->rollback();//トランザクション9
        }//トランザクション10
-
      }
    }
-*/
-   public function index()
-   {
-     $this->request->session()->destroy(); // セッションの破棄
 
-     $KadouSeikeis = $this->KadouSeikeis->newEntity();
-     $this->set('KadouSeikeis',$KadouSeikeis);
-   }
-
-   public function preform()
+   public function preform()//ラベル発行
    {
      $this->request->session()->destroy(); // セッションの破棄
 
@@ -532,7 +131,7 @@ class LabelsController extends AppController
      $this->set('scheduleKouteis',$scheduleKouteis);
    }
 
-   public function form()
+   public function form()//ラベル発行
    {
      session_start();
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
@@ -738,18 +337,6 @@ class LabelsController extends AppController
           }
         }
       }
-   }
-
-   public function confirm()
-   {
-     $KadouSeikeis = $this->KadouSeikeis->newEntity();
-     $this->set('KadouSeikeis',$KadouSeikeis);//
-
-     $data = $this->request->getData();//postデータを$dataに
-     echo "<pre>";
-     print_r($data);
-     echo "</pre>";
-
    }
 
 		public function preadd()

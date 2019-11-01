@@ -7,7 +7,7 @@
 
 <br>
     <?= $this->Flash->render() ?>
-    <?= $this->Form->create($labelElementPlaces, ['url' => ['action' => 'placelogin']]) ?>
+    <?= $this->Form->create($labelNashies, ['url' => ['action' => 'nashilogin']]) ?>
     <br><br>
     <legend align="center"><font color="#00000"><?= __('＊ログインしてください') ?></font></legend>
     <fieldset>

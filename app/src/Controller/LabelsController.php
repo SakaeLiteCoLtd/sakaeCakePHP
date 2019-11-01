@@ -111,12 +111,249 @@ class LabelsController extends AppController
      $this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
      if ($this->request->is('get')) {
-       $product = $this->LabelElementPlaces->patchEntity($labelElementPlaces, $_SESSION['labelplaces']);//$productデータ（空の行）を$this->request->getData()に更新する
+       $labelElementPlace = $this->LabelElementPlaces->patchEntity($labelElementPlaces, $_SESSION['labelplaces']);//$productデータ（空の行）を$this->request->getData()に更新する
        $connection = ConnectionManager::get('default');//トランザクション1
        // トランザクション開始2
        $connection->begin();//トランザクション3
        try {//トランザクション4
          if ($this->LabelElementPlaces->save($labelElementPlaces)) {
+           $connection->commit();// コミット5
+         } else {
+           $this->Flash->error(__('The product could not be saved. Please, try again.'));
+           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+         }
+       } catch (Exception $e) {//トランザクション7
+       //ロールバック8
+         $connection->rollback();//トランザクション9
+       }//トランザクション10
+     }
+   }
+
+   public function nashiform()//ラベル無し入力
+   {
+     $this->request->session()->destroy(); // セッションの破棄
+     $labelNashies = $this->LabelNashies->newEntity();
+     $this->set('labelNashies',$labelNashies);
+   }
+
+   public function nashiconfirm()//セット取り確認
+   {
+     $labelNashies = $this->LabelNashies->newEntity();
+     $this->set('labelNashies',$labelNashies);
+   }
+
+   public function nashipreadd()//ラベル無しログイン
+   {
+     $labelNashies = $this->LabelNashies->newEntity();
+     $this->set('labelNashies',$labelNashies);
+   }
+
+   public function nashilogin()//ラベル無しログイン
+   {
+     if ($this->request->is('post')) {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+       $ary = explode(',', $str);//$strを配列に変換
+
+       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+       $this->set('username', $username);
+       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+         if(empty($Userdata)){
+           $delete_flag = "";
+         }else{
+           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+         }
+           $user = $this->Auth->identify();
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'nashido']);
+         }
+       }
+   }
+
+   public function nashido()//ラベル無し登録
+   {
+     $labelNashies = $this->LabelNashies->newEntity();
+     $this->set('labelNashies',$labelNashies);
+
+     $session = $this->request->getSession();
+
+     $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+     $_SESSION['labelnashis'] = array_merge($created_staff,$_SESSION['labelnashis']);
+
+     $created_staff = $_SESSION['labelnashis']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+     $Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+     $CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+     $this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+
+     if ($this->request->is('get')) {
+       $labelNashie = $this->LabelNashies->patchEntity($labelNashies, $_SESSION['labelnashis']);
+       $connection = ConnectionManager::get('default');//トランザクション1
+       // トランザクション開始2
+       $connection->begin();//トランザクション3
+       try {//トランザクション4
+         if ($this->LabelNashies->save($labelNashies)) {
+           $connection->commit();// コミット5
+         } else {
+           $this->Flash->error(__('The product could not be saved. Please, try again.'));
+           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+         }
+       } catch (Exception $e) {//トランザクション7
+       //ロールバック8
+         $connection->rollback();//トランザクション9
+       }//トランザクション10
+     }
+   }
+
+   public function setikkatsuform()//セット取り入力
+   {
+     $this->request->session()->destroy(); // セッションの破棄
+     $labelSetikkatsues = $this->LabelSetikkatsues->newEntity();
+     $this->set('labelSetikkatsues',$labelSetikkatsues);
+   }
+
+   public function setikkatsuconfirm()//セット取り確認
+   {
+     $labelSetikkatsues = $this->LabelSetikkatsues->newEntity();
+     $this->set('labelSetikkatsues',$labelSetikkatsues);
+   }
+
+   public function setikkatsupreadd()//セット取りログイン
+   {
+     $labelSetikkatsues = $this->LabelSetikkatsues->newEntity();
+     $this->set('labelSetikkatsues',$labelSetikkatsues);
+   }
+
+   public function setikkatsulogin()//セット取りログイン
+   {
+     if ($this->request->is('post')) {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+       $ary = explode(',', $str);//$strを配列に変換
+
+       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+       $this->set('username', $username);
+       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+         if(empty($Userdata)){
+           $delete_flag = "";
+         }else{
+           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+         }
+           $user = $this->Auth->identify();
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'setikkatsudo']);
+         }
+       }
+   }
+
+   public function setikkatsudo()//セット取り登録
+   {
+     $labelSetikkatsues = $this->LabelSetikkatsues->newEntity();
+     $this->set('labelSetikkatsues',$labelSetikkatsues);
+
+     $session = $this->request->getSession();
+
+     $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+     $_SESSION['labelsetikkatsus'] = array_merge($created_staff,$_SESSION['labelsetikkatsus']);
+
+     $created_staff = $_SESSION['labelsetikkatsus']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+     $Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+     $CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+     $this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+
+     if ($this->request->is('get')) {
+       $labelSetikkatsue = $this->LabelSetikkatsues->patchEntity($labelSetikkatsues, $_SESSION['labelsetikkatsus']);
+       $connection = ConnectionManager::get('default');//トランザクション1
+       // トランザクション開始2
+       $connection->begin();//トランザクション3
+       try {//トランザクション4
+         if ($this->LabelSetikkatsues->save($labelSetikkatsues)) {
+           $connection->commit();// コミット5
+         } else {
+           $this->Flash->error(__('The product could not be saved. Please, try again.'));
+           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+         }
+       } catch (Exception $e) {//トランザクション7
+       //ロールバック8
+         $connection->rollback();//トランザクション9
+       }//トランザクション10
+     }
+   }
+
+   public function insideoutform()//外箱中身入力
+   {
+     $this->request->session()->destroy(); // セッションの破棄
+     $labelInsideouts = $this->LabelInsideouts->newEntity();
+     $this->set('labelInsideouts',$labelInsideouts);
+   }
+
+   public function insideoutconfirm()//外箱中身確認
+   {
+     $labelInsideouts = $this->LabelInsideouts->newEntity();
+     $this->set('labelInsideouts',$labelInsideouts);
+   }
+
+   public function insideoutpreadd()//外箱中身ログイン
+   {
+     $labelInsideouts = $this->LabelInsideouts->newEntity();
+     $this->set('labelInsideouts',$labelInsideouts);
+   }
+
+   public function insideoutlogin()//外箱中身ログイン
+   {
+     if ($this->request->is('post')) {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+       $ary = explode(',', $str);//$strを配列に変換
+
+       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+       $this->set('username', $username);
+       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+         if(empty($Userdata)){
+           $delete_flag = "";
+         }else{
+           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+         }
+           $user = $this->Auth->identify();
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'insideoutdo']);
+         }
+       }
+   }
+
+   public function insideoutdo()//外箱中身登録
+   {
+     $labelInsideouts = $this->LabelInsideouts->newEntity();
+     $this->set('labelInsideouts',$labelInsideouts);
+
+     $session = $this->request->getSession();
+
+     $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+     $_SESSION['labelinsideouts'] = array_merge($created_staff,$_SESSION['labelinsideouts']);
+
+     $created_staff = $_SESSION['labelinsideouts']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+     $Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+     $CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+     $this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+
+     if ($this->request->is('get')) {
+       $labelInsideout = $this->LabelInsideouts->patchEntity($labelInsideouts, $_SESSION['labelinsideouts']);
+       $connection = ConnectionManager::get('default');//トランザクション1
+       // トランザクション開始2
+       $connection->begin();//トランザクション3
+       try {//トランザクション4
+         if ($this->LabelInsideouts->save($labelInsideouts)) {
            $connection->commit();// コミット5
          } else {
            $this->Flash->error(__('The product could not be saved. Please, try again.'));
@@ -146,14 +383,6 @@ class LabelsController extends AppController
    {
      $labelElementUnits = $this->LabelElementUnits->newEntity();
      $this->set('labelElementUnits',$labelElementUnits);
-
-     $session = $this->request->getSession();
-     $data = $session->read();
-/*
-     echo "<pre>";
-     print_r($_SESSION['labelplaces']);
-     echo "</pre>";
-*/
    }
 
    public function unitlogin()//数量単位ログイン
@@ -198,7 +427,7 @@ class LabelsController extends AppController
      $this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
      if ($this->request->is('get')) {
-       $product = $this->LabelElementUnits->patchEntity($labelElementUnits, $_SESSION['labelunits']);//$productデータ（空の行）を$this->request->getData()に更新する
+       $labelElementUnit = $this->LabelElementUnits->patchEntity($labelElementUnits, $_SESSION['labelunits']);//$productデータ（空の行）を$this->request->getData()に更新する
        $connection = ConnectionManager::get('default');//トランザクション1
        // トランザクション開始2
        $connection->begin();//トランザクション3

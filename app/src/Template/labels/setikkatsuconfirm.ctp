@@ -4,16 +4,18 @@
  * @var \App\Model\Entity\Deliver $priceMaterial
  */
 ?>
-<?= $this->Form->create($labelElementPlaces, ['url' => ['action' => 'placepreadd']]) ?>
+<?= $this->Form->create($labelSetikkatsues, ['url' => ['action' => 'setikkatsupreadd']]) ?>
 
         <?php
+            $today = date("Y-m-d");
+
             $username = $this->request->Session()->read('Auth.User.username');
 
             $session = $this->request->getSession();
-            $session->write('labelplaces.place1', $_POST['place1']);
-            $session->write('labelplaces.place2', $_POST['place2']);
-            $session->write('labelplaces.genjyou', 0);
-            $session->write('labelplaces.delete_flag', 0);
+            $session->write('labelsetikkatsus.product_id1', $_POST['product_id1']);
+            $session->write('labelsetikkatsus.product_id2', $_POST['product_id2']);
+            $session->write('labelsetikkatsus.tourokubi', $today);
+            $session->write('labelsetikkatsus.delete_flag', 0);
         ?>
 
 <hr size="5">
@@ -32,17 +34,17 @@
 </table>
 <hr size="5">
 <br>
-<legend align="center"><strong style="font-size: 15pt; color:blue"><?= __('ラベル納品場所登録') ?></strong></legend>
+<legend align="center"><strong style="font-size: 15pt; color:blue"><?= __('セット取り登録') ?></strong></legend>
 <br><br>
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row" style="border-bottom: 0px"><?= __('納品場所１') ?></th>
-            <td><?= h($this->request->getData('place1')) ?></td>
+            <th scope="row" style="border-bottom: 0px"><?= __('品番１') ?></th>
+            <td><?= h($this->request->getData('product_id1')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row" style="border-bottom: 0px"><?= __('納品場所２') ?></th>
-            <td><?= h($this->request->getData('place2')) ?></td>
+            <th scope="row" style="border-bottom: 0px"><?= __('品番２') ?></th>
+            <td><?= h($this->request->getData('product_id2')) ?></td>
         </tr>
     </table>
 <br>

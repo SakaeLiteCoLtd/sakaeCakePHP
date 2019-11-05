@@ -13,7 +13,7 @@
 <hr size="5">
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
   <tr style="background-color: #E6FFFF">
-    <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_layout.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'Labels','action'=>'layoutform')));?></td>
+    <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_layout.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'Labels','action'=>'layoutform1')));?></td>
     <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_touroku_place.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'Labels','action'=>'placeform')));?></td>
     <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_touroku_unit.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'Labels','action'=>'unitform')));?></td>
     <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_insideout.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'Labels','action'=>'insideoutform')));?></td>

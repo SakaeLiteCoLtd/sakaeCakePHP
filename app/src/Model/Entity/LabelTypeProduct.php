@@ -35,9 +35,9 @@ class LabelTypeProduct extends Entity
      */
     protected $_accessible = [
         'product_code' => true,
-        'type_id' => true,
-        'place_id' => true,
-        'unit_id' => true,
+        'type' => true,
+        'place' => true,
+        'unit' => true,
         'delete_flag' => true,
         'created_at' => true,
         'created_staff' => true,

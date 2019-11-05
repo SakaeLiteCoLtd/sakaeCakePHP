@@ -12,7 +12,7 @@
           header('Pragma:');
 ?>
 
-<?=$this->Form->create($labelElementPlaces, ['url' => ['action' => 'placeconfirm']]) ?>
+<?=$this->Form->create($labelTypeProducts, ['url' => ['action' => 'layoutform2']]) ?>
 
 <hr size="5">
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
@@ -30,21 +30,18 @@
 </table>
 <hr size="5">
 <br>
-<legend align="center"><strong style="font-size: 15pt; color:blue"><?= __('ラベル納品場所登録') ?></strong></legend>
+<legend align="center"><strong style="font-size: 15pt; color:blue"><?= __('ラベル製品登録') ?></strong></legend>
 <br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-		<td bgcolor="#FFFFCC" style="width: 100px">納品場所１</td>
-		<td bgcolor="#FFFFCC" style="width: 700px"><?= $this->Form->control('place1', array('type'=>'text', 'label'=>false)) ?></td>
+		<td bgcolor="#FFFFCC" style="width: 130px">品番</td>
+		<td bgcolor="#FFFFCC" style="width: 300px"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
 	</tr>
   <tr>
-		<td bgcolor="#FFFFCC">納品場所２</td>
-		<td bgcolor="#FFFFCC"><?= $this->Form->control('place2', array('type'=>'text', 'label'=>false)) ?></td>
+		<td bgcolor="#FFFFCC">ラベルタイプ</td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input("type_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrLabelType, 'label'=>false]); ?></td>
 	</tr>
 </table>
-<br>
-<legend align="center"><strong style="font-size: 13pt; color:red"><?= __('１行しか必要ないときは、納入場所１の空欄のみに記入する。') ?></strong></legend>
-
 <br>
     <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
 <br>

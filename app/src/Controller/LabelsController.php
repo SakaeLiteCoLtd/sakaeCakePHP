@@ -42,6 +42,119 @@ class LabelsController extends AppController
      $this->request->session()->destroy(); // セッションの破棄
    }
 
+   public function layoutform1()//レイアウト入力
+   {
+     $this->request->session()->destroy(); // セッションの破棄
+     $labelTypeProducts = $this->LabelTypeProducts->newEntity();
+     $this->set('labelTypeProducts',$labelTypeProducts);
+
+      $arrLabelTypes = $this->LabelTypes->find('all', ['conditions' => ['delete_flag' => '0']])->order(['type_id' => 'ASC']);
+     	$arrLabelType = array();//配列の初期化
+     	foreach ($arrLabelTypes as $value) {
+     		$arrLabelType[] = array($value->type_id=>$value->type_id);
+     	}
+     	$this->set('arrLabelType',$arrLabelType);
+   }
+
+   public function layoutform2()//レイアウト入力
+   {
+     $labelTypeProducts = $this->LabelTypeProducts->newEntity();
+     $this->set('labelTypeProducts',$labelTypeProducts);
+
+     $arrLabelElementUnits = $this->LabelElementUnits->find('all', ['conditions' => ['delete_flag' => '0']])->order(['unit' => 'ASC']);
+     $arrLabelElementUnit = array();//配列の初期化
+     foreach ($arrLabelElementUnits as $value) {
+       $arrLabelElementUnit[] = array($value->unit=>$value->unit);
+     }
+     $this->set('arrLabelElementUnit',$arrLabelElementUnit);
+
+     $arrLabelElementPlaces = $this->LabelElementPlaces->find('all', ['conditions' => ['delete_flag' => '0']])->order(['place1' => 'ASC']);
+     $arrLabelElementPlace = array();//配列の初期化
+     foreach ($arrLabelElementPlaces as $value) {
+       $arrLabelElementPlace[] = array($value->place1=>$value->place1);
+     }
+     $this->set('arrLabelElementPlace',$arrLabelElementPlace);
+   }
+
+   public function layoutconfirm()//レイアウト確認
+   {
+     $labelTypeProducts = $this->LabelTypeProducts->newEntity();
+     $this->set('labelTypeProducts',$labelTypeProducts);
+   }
+
+   public function layoutpreadd()//レイアウトログイン
+   {
+     $labelTypeProducts = $this->LabelTypeProducts->newEntity();
+     $this->set('labelTypeProducts',$labelTypeProducts);
+/*
+     $session = $this->request->getSession();
+     $data = $session->read();
+     echo "<pre>";
+     print_r($_SESSION['labellayouts']);
+     echo "</pre>";
+*/
+   }
+
+   public function layoutlogin()//レイアウトログイン
+   {
+     if ($this->request->is('post')) {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+       $ary = explode(',', $str);//$strを配列に変換
+
+       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+       $this->set('username', $username);
+       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+         if(empty($Userdata)){
+           $delete_flag = "";
+         }else{
+           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+         }
+           $user = $this->Auth->identify();
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'layoutdo']);
+         }
+       }
+   }
+
+   public function layoutdo()//レイアウト登録
+   {
+     $labelTypeProducts = $this->LabelTypeProducts->newEntity();
+     $this->set('labelTypeProducts',$labelTypeProducts);
+
+     $session = $this->request->getSession();
+
+     $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+     $_SESSION['labellayouts'] = array_merge($created_staff,$_SESSION['labellayouts']);
+
+     $created_staff = $_SESSION['labellayouts']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+     $Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+     $CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+     $this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+
+     if ($this->request->is('get')) {
+       $labelTypeProducts = $this->LabelTypeProducts->patchEntity($labelTypeProducts, $_SESSION['labellayouts']);//$productデータ（空の行）を$this->request->getData()に更新する
+       $connection = ConnectionManager::get('default');//トランザクション1
+       // トランザクション開始2
+       $connection->begin();//トランザクション3
+       try {//トランザクション4
+         if ($this->LabelTypeProducts->save($labelTypeProducts)) {
+           $connection->commit();// コミット5
+         } else {
+           $this->Flash->error(__('The product could not be saved. Please, try again.'));
+           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+         }
+       } catch (Exception $e) {//トランザクション7
+       //ロールバック8
+         $connection->rollback();//トランザクション9
+       }//トランザクション10
+     }
+   }
+
    public function placeform()//納品場所入力
    {
      $this->request->session()->destroy(); // セッションの破棄

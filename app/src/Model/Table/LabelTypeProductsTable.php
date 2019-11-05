@@ -38,7 +38,7 @@ class LabelTypeProductsTable extends Table
         $this->setTable('label_type_products');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
-
+/*
         $this->belongsTo('Types', [
             'foreignKey' => 'type_id',
             'joinType' => 'INNER'
@@ -51,7 +51,7 @@ class LabelTypeProductsTable extends Table
             'foreignKey' => 'unit_id',
             'joinType' => 'INNER'
         ]);
-
+*/
         $this->addBehavior('Timestamp', [
           'events' => [
             'Model.beforeSave' => [
@@ -79,6 +79,24 @@ class LabelTypeProductsTable extends Table
             ->maxLength('product_code', 40)
             ->requirePresence('product_code', 'create')
             ->notEmpty('product_code');
+
+        $validator
+            ->scalar('type')
+            ->maxLength('type', 100)
+            ->requirePresence('type', 'create')
+            ->notEmpty('type');
+
+        $validator
+            ->scalar('place')
+            ->maxLength('place', 100)
+            ->requirePresence('place', 'create')
+            ->notEmpty('place');
+
+        $validator
+            ->scalar('unit')
+            ->maxLength('unit', 100)
+            ->requirePresence('unit', 'create')
+            ->notEmpty('unit');
 
         $validator
             ->integer('delete_flag')
@@ -115,10 +133,10 @@ class LabelTypeProductsTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->existsIn(['type_id'], 'Types'));
+/*        $rules->add($rules->existsIn(['type_id'], 'Types'));
         $rules->add($rules->existsIn(['place_id'], 'Places'));
         $rules->add($rules->existsIn(['unit_id'], 'Units'));
-
+*/
         return $rules;
     }
 }

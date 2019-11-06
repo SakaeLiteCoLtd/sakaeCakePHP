@@ -5,7 +5,6 @@
  */
  use Cake\ORM\TableRegistry;//独立したテーブルを扱う
  $this->LabelElementPlaces = TableRegistry::get('labelElementPlaces');
-
 ?>
 <?= $this->Form->create($labelTypeProducts, ['url' => ['action' => 'layoutpreadd']]) ?>
 

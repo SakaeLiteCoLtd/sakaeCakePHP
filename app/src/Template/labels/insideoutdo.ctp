@@ -23,19 +23,20 @@
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('品番') ?></th>
-            <td><?= h($product_code) ?></td>
+            <td colspan="3"><?= h($product_code) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('袋数') ?></th>
-            <td><?= h($num_inside) ?></td>
+            <td colspan="2" style="border-right-style: none"><?= h($num_inside) ?></td>
+            <td colspan="1" style="border-left-style: none"><?= __('（袋）') ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
             <th scope="row"><?= __('登録日時') ?></th>
-            <td><?= h($labelInsideouts->created_at) ?></td>
+            <td colspan="3"><?= h($labelInsideouts->created_at) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
             <th scope="row"><?= __('登録者') ?></th>
-            <td><?= h($CreatedStaff) ?></td>
+            <td colspan="3"><?= h($CreatedStaff) ?></td>
     </table>
 <br>
 <br>

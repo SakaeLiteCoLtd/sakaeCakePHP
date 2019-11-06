@@ -37,11 +37,12 @@
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row" style="border-bottom: 0px"><?= __('品番') ?></th>
-            <td><?= h($this->request->getData('product_code')) ?></td>
+            <td colspan="3"><?= h($this->request->getData('product_code')) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row" style="border-bottom: 0px"><?= __('袋数') ?></th>
-            <td><?= h($this->request->getData('num_inside')) ?></td>
+            <td colspan="1.5" style="border-right-style: none"><?= h($this->request->getData('num_inside')) ?></td>
+            <td colspan="1.5" style="border-left-style: none"><?= __('（袋）') ?></td>
         </tr>
     </table>
 <br>

@@ -44,6 +44,11 @@ class LabelsController extends AppController
      $this->request->session()->destroy(); // セッションの破棄
    }
 
+   public function index1()
+   {
+     $this->request->session()->destroy(); // セッションの破棄
+   }
+
    public function confirmcsv()
   {
 /*    $fp = fopen("label_element_place.csv", "r");//csvファイルはwebrootに入れる
@@ -102,7 +107,7 @@ class LabelsController extends AppController
   	}
 */
 
-/*      $fp = fopen("label_insideout.csv", "r");//csvファイルはwebrootに入れる
+/*    $fp = fopen("label_insideout.csv", "r");//csvファイルはwebrootに入れる
       $this->set('fp',$fp);
 
       $fpcount = fopen("label_insideout.csv", 'r' );
@@ -603,12 +608,11 @@ class LabelsController extends AppController
 
      $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
      $_SESSION['labellayouts'] = array_merge($created_staff,$_SESSION['labellayouts']);
-
+/*
      echo "<pre>";
      print_r($_SESSION['labellayouts']);
      echo "</pre>";
-
-
+*/
      $created_staff = $_SESSION['labellayouts']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
      $Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
      $CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
@@ -1382,33 +1386,124 @@ class LabelsController extends AppController
     }
   }
 
-    public function edit($id = null)
-    {
-			$role = $this->Roles->get($id);//選んだidに関するRolesテーブルのデータに$roleと名前を付ける
-			$this->set('role',$role);//
-			$updated_staff = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-			$role['updated_staff'] = $updated_staff;//$roleのupdated_staffを$staff_idにする
+     public function kobetupreform()//個別ラベル発行
+     {
+       $this->request->session()->destroy(); // セッションの破棄
 
-			if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
-				$role = $this->Roles->patchEntity($role, $this->request->getData());//106行目でとったもともとの$roleデータを$this->request->getData()に更新する
-				$connection = ConnectionManager::get('default');//トランザクション1
-					// トランザクション開始2
-				$connection->begin();//トランザクション3
-				try {//トランザクション4
-					if ($this->Roles->save($role)) {
-						$this->Flash->success(__('The role has been updated.'));
-						$connection->commit();// コミット5
-						return $this->redirect(['action' => 'index']);
-					} else {
-						$this->Flash->error(__('The role could not be updated. Please, try again.'));
-						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-					}
-				} catch (Exception $e) {//トランザクション7
-				//ロールバック8
-					$connection->rollback();//トランザクション9
-				}//トランザクション10
-			}
+       $scheduleKouteis = $this->ScheduleKouteis->newEntity();
+       $this->set('scheduleKouteis',$scheduleKouteis);
+     }
 
-    }
+     public function kobetuform()//個別ラベル発行
+     {
+       session_start();
+       $KadouSeikeis = $this->KadouSeikeis->newEntity();
+       $this->set('KadouSeikeis',$KadouSeikeis);
+
+       $data = $this->request->getData();//postデータを$dataに
+
+        if(isset($data['touroku'])){//csv確認おしたとき
+          $this->set('touroku',$data['touroku']);
+
+          $session = $this->request->getSession();
+
+          $arrCsv = array();
+          for($i=1; $i<=$data['m']; $i++){
+            $date = date('Y/m/d H:i:s');
+            $datetimeymd = substr($date,0,10);
+            $datetimehm = substr($date,11,5);
+            $lotnum = substr($date,2,2).substr($date,5,2).substr($date,8,2);
+            $Product = $this->Products->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+            if(isset($Product[0])){
+              $costomerId = $Product[0]->customer_id;
+            }else{
+              $costomerId = "";
+            }
+            $Konpou = $this->Konpous->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+            if(isset($Konpou[0])){
+              $irisu = $Konpou[0]->irisu;
+            }else{
+              $irisu = "";
+            }
+
+            $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
+            if(isset($Customer[0])){
+              $costomerName = $Customer[0]->name;
+            }else{
+              $costomerName = "";
+            }
+
+            $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+            if(isset($LabelTypeProduct[0])){
+              $Layout = $LabelTypeProduct[0]->type;
+            }else{
+              $Layout = "-";
+            }
+
+            $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
+             'lotnum' => $lotnum, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
+             'irisu' => $irisu];
+             //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
+
+             $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
+             if(isset($Customer[0])){
+               $costomerName = $Customer[0]->name;
+             }else{
+               $costomerName = "";
+             }
+             if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ"){//mb_substrだと文字化けしない
+               $lotnumIN = "IN.".$lotnum;
+               $Layout = "B";
+               $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
+                'lotnum' => $lotnumIN, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
+                'irisu' => $irisu];
+             }
+
+          }
+
+          $fp = fopen('labels/labeljunbi.csv', 'w');
+          foreach ($arrCsv as $line) {
+          	fputcsv($fp, $line);
+          }
+            fclose($fp);
+
+        }elseif(isset($data['confirm'])){//確認おしたとき
+         $this->set('confirm',$data['confirm']);
+         $dateto = $data['dateto'];
+         $this->set('dateto',$dateto);
+
+       }elseif(empty($data['formset']) && !isset($data['touroku'])){//最初のフォーム画面
+         $dateYMD = date('Y-m-d');
+         $dateYMD1 = strtotime($dateYMD);
+         $dateHI = date("09:00");
+         $dateto = $dateYMD."T".$dateHI;
+         $this->set('dateto',$dateto);
+
+         for($i=1; $i<=1; $i++){
+          ${"tuika".$i} = 0;
+          $this->set('tuika'.$i,${"tuika".$i});//セット
+         }
+         for($i=1; $i<=1; $i++){
+          ${"ntuika".$i} = 0;
+          $this->set('ntuika'.$i,${"ntuika".$i});//セット
+         }
+
+       }else{
+
+         $dateto = $data['dateto'];
+         $this->set('dateto',$dateto);
+
+         for($i=1; $i<=1; $i++){
+           ${"tuika".$i} = $data["tuika".$i];
+           $this->set('tuika'.$i,${"tuika".$i});//セット
+         }
+         for($i=1; $i<=1; $i++){
+           if(isset($data["ntuika".$i])) {
+               ${"ntuika".$i} = $data["ntuika".$i];
+               $this->set('ntuika'.$i,${"ntuika".$i});//セット
+          }
+        }
+       }
+     }
 
 }

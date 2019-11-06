@@ -34,12 +34,13 @@
 <br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-		<td bgcolor="#FFFFCC" style="width: 100px">品番</td>
-		<td bgcolor="#FFFFCC" style="width: 700px"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
+		<td bgcolor="#FFFFCC" style="width: 70px">品番</td>
+		<td bgcolor="#FFFFCC"  colspan="3" style="width: 300px"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
 	</tr>
   <tr>
 		<td bgcolor="#FFFFCC">袋数</td>
-		<td bgcolor="#FFFFCC"><?= $this->Form->control('num_inside', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC" colspan="2" style="border-right-style: none"><?= $this->Form->control('num_inside', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC" colspan="1" style="border-left-style: none">袋</td>
 	</tr>
 </table>
 <br>

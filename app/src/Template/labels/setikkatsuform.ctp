@@ -34,8 +34,8 @@
 <br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-		<td bgcolor="#FFFFCC" style="width: 100px">品番１</td>
-		<td bgcolor="#FFFFCC" style="width: 700px"><?= $this->Form->control('product_id1', array('type'=>'text', 'label'=>false)) ?></td>
+		<td bgcolor="#FFFFCC" style="width: 70px">品番１</td>
+		<td bgcolor="#FFFFCC" style="width: 300px"><?= $this->Form->control('product_id1', array('type'=>'text', 'label'=>false)) ?></td>
 	</tr>
   <tr>
 		<td bgcolor="#FFFFCC">品番２</td>

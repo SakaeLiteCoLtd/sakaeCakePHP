@@ -642,8 +642,17 @@ class LabelsController extends AppController
 
    public function placeconfirm()//納品場所確認
    {
+     $PlaceData = $this->LabelElementPlaces->find()->where(['delete_flag' => '0'])->toArray();
+     $arrPlaceData = array();//配列の初期化
+     foreach ($PlaceData as $value) {
+       $arrPlaceData[] = array($value->place_code=>$value->place_code);
+     }
+     $place_code = max(array_keys($arrPlaceData)) + 2;
+     $this->set('place_code',$place_code);
+
      $labelElementPlaces = $this->LabelElementPlaces->newEntity();
      $this->set('labelElementPlaces',$labelElementPlaces);
+
    }
 
    public function placepreadd()//納品場所ログイン
@@ -1087,21 +1096,32 @@ class LabelsController extends AppController
           }else{
             $irisu = "";
           }
+
           $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
           if(isset($Customer[0])){
             $costomerName = $Customer[0]->name;
           }else{
             $costomerName = "";
           }
-          if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ"){//mb_substrだと文字化けしない
+
+/*          if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ"){//mb_substrだと文字化けしない
             $Layout = "B";
           }else{
             $Layout = "A";
+          }
+*/
+
+          $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+          if(isset($LabelTypeProduct[0])){
+            $Layout = $LabelTypeProduct[0]->type;
+          }else{
+            $Layout = "-";
           }
 
           $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
            'lotnum' => $lotnum, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
            'irisu' => $irisu];
+           //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
 
            $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
            if(isset($Customer[0])){
@@ -1239,7 +1259,7 @@ class LabelsController extends AppController
                 print_r($j."henkou".$m);
                 print_r(${"arrP".$j.$m1});
                 echo "</pre>";
-                */
+*/
               }
 /*
             echo "<pre>";

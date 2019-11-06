@@ -10,10 +10,18 @@
             $username = $this->request->Session()->read('Auth.User.username');
 
             $session = $this->request->getSession();
+            $session->write('labelplaces.place_code', $place_code);
             $session->write('labelplaces.place1', $_POST['place1']);
             $session->write('labelplaces.place2', $_POST['place2']);
             $session->write('labelplaces.genjyou', 0);
             $session->write('labelplaces.delete_flag', 0);
+
+            $session = $this->request->getSession();
+            $data = $session->read();
+            echo "<pre>";
+            print_r($_SESSION['labelplaces']);
+            echo "</pre>";
+
         ?>
 
 <hr size="5">

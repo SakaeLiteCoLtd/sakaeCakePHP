@@ -10,6 +10,11 @@
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
+
+          $options = [
+            '0' => '印字なし',
+            '1' => 'セット'
+                  ];
 ?>
 
 <?=$this->Form->create($labelTypeProducts, ['url' => ['action' => 'layoutconfirm']]) ?>
@@ -43,7 +48,7 @@
 	</tr>
   <tr>
 		<td bgcolor="#FFFFCC">梱包単位</td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input("unit", ["type"=>"select","empty"=>"選択してください", "options"=>$arrLabelElementUnit, 'label'=>false]); ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input("unit", ["type"=>"select","empty"=>"選択してください", "options"=>$options, 'label'=>false]); ?></td>
 	</tr>
   <tr>
 		<td bgcolor="#FFFFCC">ラベルタイプ</td>

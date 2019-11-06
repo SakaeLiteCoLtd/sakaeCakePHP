@@ -21,6 +21,13 @@
 
             $LabelElementPlace = $this->LabelElementPlaces->find()->where(['place_code' => $_POST['place']])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
             $LabelPlace = $LabelElementPlace[0]->place1." ".$LabelElementPlace[0]->place2;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+
+            if($this->request->getData('unit') == 0){
+          	$unit = '印字なし';
+          	} else {
+          	$unit = 'セット';
+          	}
+
         ?>
 
 <hr size="5">
@@ -53,7 +60,7 @@
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row" style="border-bottom: 0px"><?= __('梱包単位') ?></th>
-            <td><?= h($this->request->getData('unit')) ?></td>
+            <td><?= h($unit) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row" style="border-bottom: 0px"><?= __('ラベルタイプ') ?></th>

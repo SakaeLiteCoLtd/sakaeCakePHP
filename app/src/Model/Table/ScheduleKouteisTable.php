@@ -34,6 +34,15 @@ class ScheduleKouteisTable extends Table
         $this->setTable('schedule_kouteis');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
+
+        $this->addBehavior('Timestamp', [
+          'events' => [
+            'Model.beforeSave' => [
+              'created_at' => 'new',
+              'updated_at' => 'existing'
+            ]
+          ]
+        ]);
     }
 
     /**
@@ -77,6 +86,29 @@ class ScheduleKouteisTable extends Table
             ->maxLength('tantou', 255)
             ->allowEmpty('tantou');
 
-        return $validator;
+            $validator
+                ->integer('delete_flag')
+                ->requirePresence('delete_flag', 'create')
+                ->notEmpty('delete_flag');
+                /*
+                        $validator
+                            ->dateTime('created_at')
+                            ->requirePresence('created_at', 'create')
+                            ->notEmpty('created_at');
+                */
+            $validator
+                ->uuid('created_staff')
+                ->requirePresence('created_staff', 'create')
+                ->notEmpty('created_staff');
+                /*
+                        $validator
+                            ->dateTime('updated_at')
+                            ->allowEmpty('updated_at');
+                */
+            $validator
+                ->uuid('updated_staff')
+                ->allowEmpty('updated_staff');
+
+            return $validator;
     }
 }

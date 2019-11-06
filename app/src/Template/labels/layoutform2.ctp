@@ -39,15 +39,15 @@
 	</tr>
   <tr>
 		<td bgcolor="#FFFFCC">納入先</td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input("place_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrLabelElementPlace, 'label'=>false]); ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input("place", ["type"=>"select","empty"=>"選択してください", "options"=>$arrLabelElementPlace, 'label'=>false]); ?></td>
 	</tr>
   <tr>
 		<td bgcolor="#FFFFCC">梱包単位</td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input("unit_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrLabelElementUnit, 'label'=>false]); ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input("unit", ["type"=>"select","empty"=>"選択してください", "options"=>$arrLabelElementUnit, 'label'=>false]); ?></td>
 	</tr>
   <tr>
 		<td bgcolor="#FFFFCC">ラベルタイプ</td>
-		<td bgcolor="#FFFFCC"><?= h($this->request->getData('type_id')) ?></td>
+		<td bgcolor="#FFFFCC"><?= h($this->request->getData('type')) ?></td>
 	</tr>
 </table>
 <br>
@@ -56,6 +56,6 @@
 </fieldset>
 
 <?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$this->request->getData('product_code'), 'label'=>false)) ?>
-<?= $this->Form->control('type_id', array('type'=>'hidden', 'value'=>$this->request->getData('type_id'), 'label'=>false)) ?>
+<?= $this->Form->control('type', array('type'=>'hidden', 'value'=>$this->request->getData('type'), 'label'=>false)) ?>
 
 <?=$this->Form->end() ?>

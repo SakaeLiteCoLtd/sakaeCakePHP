@@ -32,6 +32,11 @@ class ScheduleKoutei extends Entity
         'product_code' => true,
         'present_kensahyou' => true,
         'product_name' => true,
-        'tantou' => true
+        'tantou' => true,
+        'delete_flag' => true,
+        'created_at' => true,
+        'created_staff' => true,
+        'updated_at' => true,
+        'updated_staff' => true
     ];
 }

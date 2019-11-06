@@ -58,6 +58,10 @@ class LabelElementPlacesTable extends Table
             ->allowEmpty('id', 'create');
 
         $validator
+          ->integer('place_code')
+          ->allowEmpty('place_code');
+
+        $validator
             ->scalar('place1')
             ->maxLength('place1', 100)
             ->requirePresence('place1', 'create')

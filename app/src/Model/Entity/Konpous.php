@@ -28,6 +28,7 @@ class Konpous extends Entity
      * @var array
      */
     protected $_accessible = [
+        'product_code' => true,
         'irisu' => true,
         'id_box' => true,
         'delete_flag' => true,

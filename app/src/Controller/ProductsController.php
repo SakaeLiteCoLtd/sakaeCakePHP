@@ -229,7 +229,6 @@ class ProductsController extends AppController
 
 		$Customer = $this->Customers->find()->where(['customer_code' => $sample['customer_id']])->toArray();//'customer_code' => $sample['customer_id']となるデータをCustomersテーブルから配列で取得
 		$customer_id = $Customer[0]->id;//配列の0番目（0番目しかない）のidに$customer_idと名前を付ける
-
 		$replacements = array('customer_id' => $customer_id);//配列のデータの置き換え（customer_idを$customer_idに変更）
 		$sample = array_replace($sample, $replacements);//配列のデータの置き換え（customer_idを$customer_idに変更）
 

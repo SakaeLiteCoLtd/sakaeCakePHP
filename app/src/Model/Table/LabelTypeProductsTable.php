@@ -87,14 +87,12 @@ class LabelTypeProductsTable extends Table
             ->notEmpty('type');
 
         $validator
-            ->scalar('place')
-            ->maxLength('place', 100)
-            ->requirePresence('place', 'create')
-            ->notEmpty('place');
+            ->integer('place_code')
+            ->requirePresence('place_code', 'create')
+            ->notEmpty('place_code');
 
         $validator
-            ->scalar('unit')
-            ->maxLength('unit', 100)
+            ->integer('unit')
             ->requirePresence('unit', 'create')
             ->notEmpty('unit');
 

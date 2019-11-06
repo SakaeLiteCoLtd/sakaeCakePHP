@@ -4,24 +4,31 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * LabelTypeProduct Entity
+ * Product Entity
  *
  * @property string $id
  * @property string $product_code
- * @property string $type_id
- * @property int $place_id
- * @property int $unit_id
+ * @property string $product_name
+ * @property string $customer_id
+ * @property int $multiple_cs
+ * @property string $material_id
+ * @property string $weight
+ * @property string $torisu
+ * @property string $cycle
+ * @property int $primary_p
+ * @property int $gaityu
+ * @property int $status
  * @property int $delete_flag
  * @property \Cake\I18n\FrozenTime $created_at
  * @property string $created_staff
  * @property \Cake\I18n\FrozenTime $updated_at
  * @property string $updated_staff
  *
- * @property \App\Model\Entity\Type $type
- * @property \App\Model\Entity\Place $place
- * @property \App\Model\Entity\Unit $unit
+ * @property \App\Model\Entity\Staff $staff
+ * @property \App\Model\Entity\Customer $customer
+ * @property \App\Model\Entity\Material $material
  */
-class LabelTypeProduct extends Entity
+class Product extends Entity
 {
 
     /**
@@ -35,16 +42,23 @@ class LabelTypeProduct extends Entity
      */
     protected $_accessible = [
         'product_code' => true,
-        'type' => true,
-        'place_code' => true,
-        'unit' => true,
+        'product_name' => true,
+        'customer_id' => true,
+        'multiple_cs' => true,
+        'material_id' => true,
+        'weight' => true,
+        'torisu' => true,
+        'cycle' => true,
+        'primary_p' => true,
+        'gaityu' => true,
+        'status' => true,
         'delete_flag' => true,
         'created_at' => true,
         'created_staff' => true,
         'updated_at' => true,
         'updated_staff' => true,
-        'type' => true,
-        'place' => true,
-        'unit' => true
+        'staff' => true,
+        'customer' => true,
+        'material' => true
     ];
 }

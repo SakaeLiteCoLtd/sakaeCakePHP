@@ -28,6 +28,7 @@ class LabelElementPlace extends Entity
      * @var array
      */
     protected $_accessible = [
+        'place_code' => true,
         'place1' => true,
         'place2' => true,
         'genjyou' => true,

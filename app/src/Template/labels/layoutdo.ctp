@@ -4,6 +4,9 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Deliver $priceMaterial
  */
+ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
+ $this->LabelElementPlaces = TableRegistry::get('labelElementPlaces');
+
 ?>
 <?= $this->Form->create($labelTypeProducts, ['url' => ['action' => 'index']]) ?>
 
@@ -11,9 +14,13 @@
   $username = $this->request->Session()->read('Auth.User.username');
   $session = $this->request->getSession();
   $product_code = $session->read('labellayouts.product_code');
-  $place = $session->read('labellayouts.place');
+  $place = $session->read('labellayouts.place_code');
   $unit = $session->read('labellayouts.unit');
   $type = $session->read('labellayouts.type');
+
+  $LabelElementPlace = $this->LabelElementPlaces->find()->where(['place_code' => $place])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+  $LabelPlace = $LabelElementPlace[0]->place1." ".$LabelElementPlace[0]->place2;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+
 ?>
 <hr size="5">
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
@@ -29,7 +36,7 @@
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('納入先') ?></th>
-            <td><?= h($place) ?></td>
+            <td><?= h($LabelPlace) ?></td>
         </tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('梱包単位') ?></th>

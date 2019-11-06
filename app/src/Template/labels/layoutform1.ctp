@@ -39,7 +39,7 @@
 	</tr>
   <tr>
 		<td bgcolor="#FFFFCC">ラベルタイプ</td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input("type_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrLabelType, 'label'=>false]); ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input("type", ["type"=>"select","empty"=>"選択してください", "options"=>$arrLabelType, 'label'=>false]); ?></td>
 	</tr>
 </table>
 <br>

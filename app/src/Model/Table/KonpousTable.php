@@ -37,8 +37,8 @@ class KonpousTable extends Table
         parent::initialize($config);
 
         $this->setTable('konpous');
-        $this->setDisplayField('product_code');
-        $this->setPrimaryKey('product_code');
+        $this->setDisplayField('id');
+        $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp', [
           'events' => [
@@ -58,6 +58,10 @@ class KonpousTable extends Table
      */
     public function validationDefault(Validator $validator)
     {
+        $validator
+            ->uuid('id')
+            ->allowEmpty('id', 'create');
+
         $validator
             ->scalar('product_code')
             ->maxLength('product_code', 30)

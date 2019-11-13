@@ -46,7 +46,7 @@ class CustomersTable extends Table
             'joinType' => 'LEFT'//
         ]);
 
-        $this->addBehavior('Timestamp', [//����created_at�Ƃ�������,add,edit������
+        $this->addBehavior('Timestamp', [
           'events' => [
             'Model.beforeSave' => [
               'created_at' => 'new',

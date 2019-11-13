@@ -36,7 +36,7 @@ class LabelsController extends AppController
        $this->LabelTypeProducts = TableRegistry::get('labelTypeProducts');
        $this->LabelTypes = TableRegistry::get('labelTypes');
        $this->Products = TableRegistry::get('products');//productsテーブルを使う
-
+       $this->CheckLots = TableRegistry::get('checkLots');
      }
 
    public function index()
@@ -1505,5 +1505,60 @@ class LabelsController extends AppController
         }
        }
      }
+
+     public function torikomiselect()//発行履歴取り込み
+     {
+       $this->request->session()->destroy(); // セッションの破棄
+
+       $checkLots = $this->CheckLots->newEntity();
+       $this->set('checkLots',$checkLots);
+     }
+
+     public function torikomido()//発行履歴取り込み
+     {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $file = $data['file'];
+       $this->set('file',$file);
+/*
+       echo "<pre>";
+       print_r($data['file']);
+       echo "</pre>";
+*/
+//      $fp = fopen("labels/$file", 'w');
+//       $this->set('fp',$fp);
+        $fp = fopen("labels/$file", "r");//csvファイルはwebrootに入れる
+
+       $fpcount = fopen("labels/$file", 'r' );
+       for($count = 0; fgets( $fpcount ); $count++ );
+
+       $arrFp = array();//空の配列を作る
+//   	   $line = fgets($fp);//ファイル$fpの上の１行を取る（１行目）
+       for ($k=1; $k<=$count; $k++) {//最後の行まで
+         $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+         $sample = explode("\t",$line);//$lineを","毎に配列に入れる
+
+         $keys=array_keys($sample);
+         $keys[array_search('0',$keys)]='place_code';//名前の変更
+         $keys[array_search('1',$keys)]='place1';
+         $keys[array_search('2',$keys)]='place2';
+         $keys[array_search('3',$keys)]='genjyou';
+         $keys[array_search('4',$keys)]='delete_flag';
+         $keys[array_search('5',$keys)]='created_staff';
+         $sample = array_combine( $keys, $sample );
+
+  //       unset($sample['6']);//削除
+
+         $arrFp[] = $sample;//配列に追加する
+
+       }
+       $this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
+       echo "<pre>";
+       print_r($arrFp);
+       echo "<br>";
+
+       $checkLots = $this->CheckLots->newEntity();
+       $this->set('checkLots',$checkLots);
+     }
+
 
 }

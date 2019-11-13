@@ -10,7 +10,7 @@
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($checkLots, ['url' => ['action' => 'torikomido']]);
+          echo $this->Form->create($checkLots, ['url' => ['action' => 'torikomipreadd']]);
 ?>
 <br>
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">

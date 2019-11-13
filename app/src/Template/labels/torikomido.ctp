@@ -12,8 +12,6 @@
   header('Pragma:');
   echo $this->Form->create($checkLots, ['url' => ['action' => 'torikomido']]);
 ?>
-<?php
-echo "<pre>";
-print_r($file);
-echo "</pre>";
-?>
+<br><br>
+<legend align="center"><font color="red"><?= __('＊登録されました。') ?></font></legend>
+<br>

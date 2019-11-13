@@ -16,6 +16,7 @@
     <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/lot_rireki_torikomi.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'Labels','action'=>'torikomiselect')));?></td>
     <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_ikkatsu.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'Labels','action'=>'preform')));?></td>
     <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_kobetsu.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'Labels','action'=>'kobetuform')));?></td>
+    <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_kensaku_lot.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'Labels','action'=>'kensakuform')));?></td>
   </tr>
 </table>
 <br>

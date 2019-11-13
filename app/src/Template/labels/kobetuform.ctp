@@ -231,10 +231,11 @@ ${"n".$j} = 1;
        $this->set('m',$m);
      }
    }
+   /*
    echo "<pre>";
    print_r($_SESSION['labeljunbi']);
    echo "</pre>";
-
+*/
   ?>
  </table>
  <br><br>

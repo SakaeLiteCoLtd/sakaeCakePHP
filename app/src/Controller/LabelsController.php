@@ -1416,6 +1416,7 @@ class LabelsController extends AppController
             $Product = $this->Products->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
             if(isset($Product[0])){
               $costomerId = $Product[0]->customer_id;
+              $product_name = $Product[0]->product_name;
             }else{
               $costomerId = "";
             }
@@ -1440,9 +1441,14 @@ class LabelsController extends AppController
               $Layout = "-";
             }
 
-            $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
+/*            $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
              'lotnum' => $lotnum, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
              'irisu' => $irisu];
+*/
+             $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+              'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'costomer' => $costomerName, '?1' => "",
+               'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], '?2' => "", 'product_name' => $product_name,
+                '?3' => "", 'irisu' => $irisu, '?4' => "", '?5' => "", '?6' => "", '?7' => ""];
              //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
 
              $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
@@ -1468,10 +1474,14 @@ class LabelsController extends AppController
                }
                $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside;
                $irisu2 = $irisu/$num_inside;
-               $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $maisu,
+               $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
+                'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'costomer' => $costomerName, '?1' => "",
+                 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], '?2' => "", 'product_name' => $product_name,
+                  '?3' => "", 'irisu' => $irisu2, '?4' => "", '?5' => "", '?6' => "", '?7' => ""];
+/*               $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $maisu,
                 'lotnum' => $lotnumIN, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
                 'irisu' => $irisu2];
-             }
+  */           }
 
           }
 

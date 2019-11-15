@@ -40,7 +40,7 @@
       echo "開始";
       echo "</strong></div></td>\n";
       echo "<td width='350' colspan='37' style='border-bottom: 0px'><div align='center'>\n";
-      echo "<input type='date' value=$dayye name=date_sta empty=Please select size='6'/>\n";
+      echo "<input type='date' value=$dayye name=starting_tm size='6'/>\n";
       echo "</div></td>\n";
       echo "</tr>\n";
       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
@@ -48,15 +48,15 @@
       echo "終了";
       echo "</strong></div></td>\n";
       echo "<td colspan='37'><div align='center'>\n";
-      echo "<input type='date' value=$dateYMD name=date_fin size='6'/>\n";
+      echo "<input type='date' value=$dateYMD name=finishing_tm size='6'/>\n";
       echo "</div></td>\n";
       echo "</tr>\n";
  ?>
 <br>
   <tr bgcolor="#E6FFFF" >
-    <td width="100" colspan="30" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
-    <td width="100" colspan="30" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
-    <td align="right" rowspan="2"  colspan="20" width="250" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('検索'), array('name' => 'kensaku')); ?></div></td>
+    <td width="250" colspan="30" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
+    <td width="250" colspan="30" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
+    <td align="right" rowspan="2"  colspan="20" width="350" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('検索'), array('name' => 'kensaku')); ?></div></td>
   </tr>
 </table>
 </fieldset>

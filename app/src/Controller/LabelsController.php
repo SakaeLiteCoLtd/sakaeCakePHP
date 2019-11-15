@@ -1691,6 +1691,79 @@ class LabelsController extends AppController
        $this->set('checkLots',$checkLots);
      }
 
+     public function kensakuview()//発行履歴取り込み
+     {
+       $checkLots = $this->CheckLots->newEntity();
+       $this->set('checkLots',$checkLots);
 
+       $data = $this->request->getData();
+
+       $product_code = $data['product_code'];
+       $lot_num = $data['lot_num'];
+       $date_sta = $data['date_sta'];
+       $date_fin = $data['date_fin'];
+
+       if(empty($data['product_code'])){//product_codeの入力がないとき
+         $product_code = "no";
+         if(empty($data['lot_num'])){//lot_numの入力がないとき　product_code×　lot_num×　date〇
+           $lot_num = "no";
+           $arrLots = array();
+           echo "<pre>";
+           print_r("1");
+           echo "</pre>";
+         }else{//lot_numの入力があるとき　product_code×　lot_num〇　date〇
+           $arrLots = array();
+           echo "<pre>";
+           print_r("2");
+           echo "</pre>";
+         }
+       }else{//product_codeの入力があるとき
+         if(empty($data['lot_num'])){//lot_numの入力がないとき　product_code〇　lot_num×　date〇
+           $lot_num = "no";
+           $arrLots = array();
+           echo "<pre>";
+           print_r("3");
+           echo "</pre>";
+         }else{//lot_numの入力があるとき　product_code〇　lot_num〇　date〇
+           $arrLots = array();
+           echo "<pre>";
+           print_r("4");
+           echo "</pre>";
+         }
+       }
+       echo "<pre>";
+       print_r($product_code);
+       echo "</pre>";
+       echo "<pre>";
+       print_r($lot_num);
+       echo "</pre>";
+       echo "<pre>";
+       print_r($date_sta);
+       echo "</pre>";
+       echo "<pre>";
+       print_r($date_fin);
+       echo "</pre>";
+/*
+       $KensahyouSokuteidata = $this->KensahyouSokuteidatas->find()->where(['manu_date >=' => $value_start, 'manu_date <=' => $value_end, 'delete_flag' => '0', 'product_code' => $product_code])->toArray();
+
+       $arrP = array();
+       foreach ($KensahyouSokuteidata as $value) {
+          $product_code= $value->product_code;
+          $lot_num = $value->lot_num;
+          $manu_date = $value->manu_date->format('Y-m-d H:i:s');
+          $manu_date = substr($manu_date,0,10);
+          $arrP[] = ['product_code' => $product_code, 'lot_num' => $lot_num, 'manu_date' => $manu_date];
+        }
+
+        foreach ((array) $uniquearrP as $key => $value) {
+            $sort[$key] = $value['manu_date'];
+        }
+
+        array_multisort($sort, SORT_DESC, $uniquearrP);
+
+        $this->set('uniquearrP',$uniquearrP);//セット
+*/
+
+     }
 
 }

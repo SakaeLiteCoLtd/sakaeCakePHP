@@ -151,54 +151,58 @@ class CustomersHandyController extends AppController
 
      public function do()
     {
-	$customersHandy = $this->CustomersHandy->newEntity();//newentityに$customersHandyという名前を付ける
-	$this->set('customersHandy',$customersHandy);//1行上の$customersHandyをctpで使えるようにセット
+			$customersHandy = $this->CustomersHandy->newEntity();//newentityに$customersHandyという名前を付ける
+			$this->set('customersHandy',$customersHandy);//1行上の$customersHandyをctpで使えるようにセット
 
-  $session = $this->request->getSession();
-  $data = $session->read();//postデータ取得し、$dataと名前を付ける
+		  $session = $this->request->getSession();
+		  $data = $session->read();//postデータ取得し、$dataと名前を付ける
 
-  $staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-  $data['customershandydata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+		  $staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+		  $data['customershandydata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
 
-//	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+		//	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
-	$customer_id = $data['customershandydata']['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
-	$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
-	$Customer = $customerData[0]->customer_code.':'.$customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
-	$this->set('Customer',$Customer);//登録者の表示のため1行上の$Customerをctpで使えるようにセット
+			$customer_id = $data['customershandydata']['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+			$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+			$Customer = $customerData[0]->customer_code.':'.$customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
+			$this->set('Customer',$Customer);//登録者の表示のため1行上の$Customerをctpで使えるようにセット
 
-	$place_deliver_id = $data['customershandydata']['place_deliver_id'];//$dataのcustomer_idに$customer_idという名前を付ける
-	$place_deliver_idData = $this->Delivers->find()->where(['id' => $place_deliver_id])->toArray();//'id' => $place_deliver_idとなるデータをDeliversテーブルから配列で取得
-	$Deliver = $place_deliver_idData[0]->place_deliver_id.':'.$place_deliver_idData[0]->name;//配列の0番目（0番目しかない）のnameに$Deliverと名前を付ける
-	$this->set('Deliver',$Deliver);//登録者の表示のため1行上の$Deliverをctpで使えるようにセット
+			$place_deliver_id = $data['customershandydata']['place_deliver_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+			$place_deliver_idData = $this->Delivers->find()->where(['id' => $place_deliver_id])->toArray();//'id' => $place_deliver_idとなるデータをDeliversテーブルから配列で取得
+			$Deliver = $place_deliver_idData[0]->place_deliver_id.':'.$place_deliver_idData[0]->name;//配列の0番目（0番目しかない）のnameに$Deliverと名前を付ける
+			$this->set('Deliver',$Deliver);//登録者の表示のため1行上の$Deliverをctpで使えるようにセット
 
-	$customer_id = $data['customershandydata']['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
-	$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
-	$Customer = $customerData[0]->customer_code.':'.$customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
-	$this->set('Customer',$Customer);//登録者の表示のため1行上の$Customerをctpで使えるようにセット
+			$customer_id = $data['customershandydata']['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
+			$customerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+			$Customer = $customerData[0]->customer_code.':'.$customerData[0]->name;//配列の0番目（0番目しかない）のnameに$Customerと名前を付ける
+			$this->set('Customer',$Customer);//登録者の表示のため1行上の$Customerをctpで使えるようにセット
 
-	$created_staff = $data['customershandydata']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
-	$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
-	$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
-	$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+			$created_staff = $data['customershandydata']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+			$Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+			$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+			$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
-	if ($this->request->is('get')) {//postの場合
-		$customersHandy = $this->CustomersHandy->patchEntity($customersHandy, $data['customershandydata']);//$customersHandyデータ（空の行）を$this->request->getData()に更新する
-		$connection = ConnectionManager::get('default');//トランザクション1
-		// トランザクション開始2
-		$connection->begin();//トランザクション3
-		try {//トランザクション4
-			if ($this->CustomersHandy->save($customersHandy)) {
-				$connection->commit();// コミット5
-			} else {
-				$this->Flash->error(__('The deliver could not be saved. Please, try again.'));
-				throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+			if ($this->request->is('get')) {//postの場合
+				$customersHandy = $this->CustomersHandy->patchEntity($customersHandy, $data['customershandydata']);//$customersHandyデータ（空の行）を$this->request->getData()に更新する
+				$connection = ConnectionManager::get('default');//トランザクション1
+				// トランザクション開始2
+				$connection->begin();//トランザクション3
+				try {//トランザクション4
+					if ($this->CustomersHandy->save($customersHandy)) {
+						$mes = "※下記のように登録されました";
+						$this->set('mes',$mes);
+						$connection->commit();// コミット5
+					} else {
+						$mes = "※登録されませんでした";
+						$this->set('mes',$mes);
+						$this->Flash->error(__('The deliver could not be saved. Please, try again.'));
+						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+					}
+				} catch (Exception $e) {//トランザクション7
+				//ロールバック8
+					$connection->rollback();//トランザクション9
+				}//トランザクション10
 			}
-		} catch (Exception $e) {//トランザクション7
-		//ロールバック8
-			$connection->rollback();//トランザクション9
-		}//トランザクション10
-	}
     }
 
 

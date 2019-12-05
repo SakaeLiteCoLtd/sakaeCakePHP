@@ -7,8 +7,8 @@
         <?php
             $role_id = $user->role_id;
             $options = [
-	            '0' => 'edit this data　',
-	            '1' => 'delete this data' 
+	            '1' => 'edit this data　',
+	            '0' => 'delete this data' 
                     ];
         ?>
 

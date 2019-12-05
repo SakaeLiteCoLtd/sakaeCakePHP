@@ -456,13 +456,13 @@ class SyukkaKensasController extends AppController {
       $KadouSeikeiDatac = $this->KadouSeikeis->find()->where(['present_kensahyou' => 0])->toArray();//'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
       for($i=1; $i<=100; $i++){
         if(isset($KadouSeikeiDatac[$i-1])){
-          ${"KadouSeikeifinishing_tm".$i} = $KadouSeikeiDatac[$i-1]->finishing_tm;//配列の$i番目のfinishing_tm
+          ${"KadouSeikeifinishing_tm".$i} = $KadouSeikeiDatac[$i-1]->finishing_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
           ${"KadouSeikeifinishing_date".$i} = substr(${"KadouSeikeifinishing_tm".$i},0,4)."-".substr(${"KadouSeikeifinishing_tm".$i},5,2)."-".substr(${"KadouSeikeifinishing_tm".$i},8,2);//finishing_tmの年月日を取得
-  /*
+/*
           echo "<pre>";
-          print_r(substr(${"KadouSeikeifinishing_date".$i},0,10)."-".substr($today,0,10));
+          print_r(substr(${"KadouSeikeifinishing_date".$i},0,10)."----".substr($today,0,10)."----".${"KadouSeikeifinishing_tm".$i});
           echo "</pre>";
-  */
+*/
             if(substr(${"KadouSeikeifinishing_date".$i},0,10) === substr($today,0,10)){//今日のデータの場合
               ${"KadouSeikeiidc".$countnamec} = $KadouSeikeiDatac[$i-1]->id;//以下、index2に持っていくデータをセット
               $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});//セット
@@ -470,7 +470,7 @@ class SyukkaKensasController extends AppController {
               ${"product_codec".$countnamec} = $KadouSeikeiDatac[$i-1]->product_code;//以下、index2に持っていくデータをセット
               ${"ProductDatac".$countnamec} = $this->Products->find()->where(['product_code' => ${"product_codec".$countnamec}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
               ${"product_namec".$countnamec} = ${"ProductDatac".$countnamec}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-              ${"KadouSeikeifinishing_tm".$countnamec} = $KadouSeikeiDatac[$i-1]->finishing_tm;//配列の$i番目のfinishing_tm
+              ${"KadouSeikeifinishing_tm".$countnamec} = $KadouSeikeiDatac[$i-1]->finishing_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
               ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);//finishing_tmの年月日を取得
 
               $this->set('product_codec'.$countnamec,${"product_codec".$countnamec});//セット
@@ -491,7 +491,7 @@ class SyukkaKensasController extends AppController {
               ${"product_coded".$countnamed} = $KadouSeikeiDatac[$i-1]->product_code;//以下、index2に持っていくデータをセット
               ${"ProductDatad".$countnamed} = $this->Products->find()->where(['product_code' => ${"product_coded".$countnamed}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
               ${"product_named".$countnamed} = ${"ProductDatad".$countnamed}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-              ${"KadouSeikeifinishing_tm".$countnamed} = $KadouSeikeiDatac[$i-1]->finishing_tm;//配列の$i番目のfinishing_tm
+              ${"KadouSeikeifinishing_tm".$countnamed} = $KadouSeikeiDatac[$i-1]->finishing_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
               ${"KadouSeikeifinishing_dated".$countnamed} = substr(${"KadouSeikeifinishing_tm".$countnamed},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},8,2);//finishing_tmの年月日を取得
 
               $this->set('product_coded'.$countnamed,${"product_coded".$countnamed});//セット

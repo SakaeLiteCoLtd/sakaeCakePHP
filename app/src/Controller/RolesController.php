@@ -130,8 +130,12 @@ class RolesController extends AppController
 				$connection->begin();//トランザクション3
 				try {//トランザクション4
 					if ($this->Roles->save($role)) {
+						$mes = "※下記のように登録されました";
+						$this->set('mes',$mes);
 						$connection->commit();// コミット5
 					} else {
+						$mes = "※登録されませんでした";
+						$this->set('mes',$mes);
 						$this->Flash->error(__('The role could not be saved. Please, try again.'));
 						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
 					}
@@ -169,7 +173,7 @@ class RolesController extends AppController
 					$connection->rollback();//トランザクション9
 				}//トランザクション10
 			}
-			
+
     }
 
 }

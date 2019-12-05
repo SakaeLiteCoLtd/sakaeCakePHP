@@ -160,8 +160,12 @@ class SuppliersController extends AppController
 		$connection->begin();//トランザクション3
 		try {//トランザクション4
 			if ($this->Suppliers->save($supplier)) {
+				$mes = "※下記のように登録されました";
+				$this->set('mes',$mes);
 				$connection->commit();// コミット5
 			} else {
+				$mes = "※登録されませんでした";
+				$this->set('mes',$mes);
 				$this->Flash->error(__('The supplier could not be saved. Please, try again.'));
 				throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
 			}

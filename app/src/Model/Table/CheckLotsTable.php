@@ -5,6 +5,7 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\ORM\Rule\IsUnique;
 
 /**
  * CheckLots Model
@@ -145,7 +146,7 @@ class CheckLotsTable extends Table
     public function buildRules(RulesChecker $rules)
     {
 //        $rules->add($rules->existsIn(['place_deliver_id'], 'PlaceDelivers'));
-        $rules->add($rules->isUnique(['product_code','lot_num']));
+        $rules->add($rules->isUnique(['product_code','lot_num'], 'バリデーションエラー'));
 
         return $rules;
     }

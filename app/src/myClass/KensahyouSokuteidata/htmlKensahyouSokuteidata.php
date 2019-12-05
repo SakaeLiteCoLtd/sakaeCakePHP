@@ -20,7 +20,7 @@ class htmlKensahyouSokuteidata extends AppController
 	public function htmlHeaderKensahyouSokuteidata($product_id)
 	{
         $html =
-                "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
+                  "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
                   "<td width='100' colspan='4'>&nbsp;</td>\n".
                   "<td width='50' colspan='2'><div align='center'><strong>A</strong></div></td>\n".
                   "<td width='50' colspan='2'><div align='center'><strong>B</strong></div></td>\n".
@@ -34,21 +34,21 @@ class htmlKensahyouSokuteidata extends AppController
                   "<td width='80' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観１</strong></font></div></td>\n".
                   "<td width='80' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観２</strong></font></div></td>\n".
                   "<td width='100' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>単重</strong></font></div></td>\n".
-                "</tr>\n".
-                "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
+                  "</tr>\n".
+                  "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
                   "<td valign='middle' width='50' rowspan='3' nowrap='nowrap' colspan='2' style='valign: middle'><div align='center'><strong>規格</strong></div></td>\n".
                   "<td width='50' nowrap='nowrap' colspan='2'><div align='center'><strong>上限</strong></div></td>\n";
 
             $KensahyouHeads = $this->KensahyouHeads->find('all', ['conditions' => ['product_id' => $product_id]])->order(['id' => 'ASC']);//
-			foreach ($KensahyouHeads as $value) {
-			}
+      			foreach ($KensahyouHeads as $value) {
+      			}
 
             for($l=1; $l<=8; $l++){
         		$upper= $value->{"upper_{$l}"};//
-                $html = $html.
-                        "<td colspan='2'><div align='center'>\n";
-                $html = $html.$upper;
-                $html = $html."</div></td>\n";
+            $html = $html.
+                    "<td colspan='2'><div align='center'>\n";
+            $html = $html.$upper;
+            $html = $html."</div></td>\n";
             }
 
         $html = $html.

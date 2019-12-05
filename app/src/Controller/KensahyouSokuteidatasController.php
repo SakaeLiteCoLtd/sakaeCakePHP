@@ -267,7 +267,18 @@ class KensahyouSokuteidatasController  extends AppController
     	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
     	->select(['product_id','delete_flag' => '0'])
     	->group('product_id');
-
+/*
+      $KensahyouHeads = $KensahyouHeads->toArray();//データを配列に変更
+      if(isset($KensahyouHeads[0])){
+        echo "<pre>";
+        print_r($KensahyouHeads[0]['product_id']);
+        echo "</pre>";
+     }else{
+       echo "<pre>";
+       print_r("bbb");
+       echo "</pre>";
+     }
+*/
     	$arrProductcode = array();//配列の初期化
     		foreach ($KensahyouHeads as $value) {//$KensahyouHeadsのそれぞれに対して
     			$product_id = $value->product_id;//$KensahyouHeadsのproduct_idに$product_idと名前を付ける
@@ -286,7 +297,7 @@ class KensahyouSokuteidatasController  extends AppController
     echo "<pre>";
     print_r($data);
     echo "</pre>";
-*/
+    */
     $product_code = $data["product_code"];
     $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
     $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける

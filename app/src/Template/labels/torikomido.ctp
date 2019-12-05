@@ -13,5 +13,5 @@
   echo $this->Form->create($checkLots, ['url' => ['action' => 'torikomido']]);
 ?>
 <br><br>
-<legend align="center"><font color="red"><?= __('＊登録されました。') ?></font></legend>
+<legend align="center"><font color="red"><?= __($mes) ?></font></legend>
 <br>

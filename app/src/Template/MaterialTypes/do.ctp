@@ -17,7 +17,7 @@
 
 <hr size="5">
 
-<legend align="center"><font color="red"><?= __('＊下記のように登録されました。') ?></font></legend>
+<legend align="center"><font color="red"><?= __($mes) ?></font></legend>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('name') ?></th>

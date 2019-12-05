@@ -39,7 +39,7 @@ class LabelsController extends AppController
        $this->CheckLots = TableRegistry::get('checkLots');
      }
 
-   public function index()
+   public function index0()
    {
      $this->request->session()->destroy(); // セッションの破棄
    }
@@ -1610,9 +1610,12 @@ class LabelsController extends AppController
 
        for ($k=1; $k<=$count; $k++) {//最後の行まで
          $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
-         $sample = explode("\t",$line);//$lineを","毎に配列に入れる
+         $sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
          $arrFp[] = $sample;//配列に追加する
-         if(isset($arrFp[$k-1][10])){//product_codeが２つある時
+         if(isset($arrFp[$k-1][10]) && ($arrFp[$k-1][10] != "")){//product_codeが２つある時
+           echo "<pre>";
+           print_r("if");
+           echo "<br>";
            $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
              $renban = $arrFp[$k-1][5] + $m;
@@ -1626,6 +1629,9 @@ class LabelsController extends AppController
            }
 
          }else{//product_codeが１つの時
+           echo "<pre>";
+           print_r("else");
+           echo "<br>";
            $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
              $renban = $arrFp[$k-1][5] + $m;
@@ -1655,11 +1661,11 @@ class LabelsController extends AppController
 */
          }
        }
-/*
+
        echo "<pre>";
        print_r($arrLot);
        echo "<br>";
-*/
+
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
 
@@ -1670,9 +1676,13 @@ class LabelsController extends AppController
           $connection->begin();//トランザクション3
           try {//トランザクション4
               if ($this->CheckLots->saveMany($checkLots)) {//saveManyで一括登録
+                $mes = "※登録されました";
+                $this->set('mes',$mes);
                 $connection->commit();// コミット5
               } else {
-                $this->Flash->error(__('The Products could not be saved. Please, try again.'));
+                $mes = "※登録されませんでした";
+                $this->set('mes',$mes);
+                $this->Flash->error(__('The data could not be saved. Please, try again.'));
                 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
               }
           } catch (Exception $e) {//トランザクション7
@@ -1706,26 +1716,26 @@ class LabelsController extends AppController
        if(empty($data['product_code'])){//product_codeの入力がないとき
          $product_code = "no";
          if(empty($data['lot_num'])){//lot_numの入力がないとき　product_code×　lot_num×　date〇
-           $lot_num = "no";
+           $lot_num = "no";//日にちだけで絞り込み
            $arrLots = array();
            echo "<pre>";
            print_r("1");
            echo "</pre>";
          }else{//lot_numの入力があるとき　product_code×　lot_num〇　date〇
-           $arrLots = array();
+           $arrLots = array();//ロットと日にちで絞り込み
            echo "<pre>";
            print_r("2");
            echo "</pre>";
          }
        }else{//product_codeの入力があるとき
          if(empty($data['lot_num'])){//lot_numの入力がないとき　product_code〇　lot_num×　date〇
-           $lot_num = "no";
+           $lot_num = "no";//プロダクトコードと日にちで絞り込み
            $arrLots = array();
            echo "<pre>";
            print_r("3");
            echo "</pre>";
          }else{//lot_numの入力があるとき　product_code〇　lot_num〇　date〇
-           $arrLots = array();
+           $arrLots = array();//プロダクトコードとロットナンバーと日にちで絞り込み
            echo "<pre>";
            print_r("4");
            echo "</pre>";

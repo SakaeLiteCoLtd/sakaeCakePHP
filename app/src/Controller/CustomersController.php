@@ -135,9 +135,13 @@ class CustomersController extends AppController
 				$connection->begin();//トランザクション3
 				try {//トランザクション4
 					if ($this->Customers->save($customer)) {//
+						$mes = "※下記のように登録されました";
+						$this->set('mes',$mes);
 						$connection->commit();// コミット5
 					} else {
-						$this->Flash->error(__('The user could not be saved. Please, try again.'));
+						$mes = "※登録されませんでした";
+						$this->set('mes',$mes);
+						$this->Flash->error(__('The data could not be saved. Please, try again.'));
 						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
 					}
 				} catch (Exception $e) {//トランザクション7
@@ -252,7 +256,7 @@ class CustomersController extends AppController
 						$connection->rollback();//トランザクション9
 					}//トランザクション10
 				}
-				
+
     }
 
 }

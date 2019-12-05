@@ -14,7 +14,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Cache-Control:');
           header('Pragma:');
           echo $this->Form->create($kensahyouSokuteidatas, ['url' => ['action' => 'search']]);
-?>
+        ?>
 <br>
     <table align="center" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
             <?php foreach ($kensahyouSokuteidatas as $KensahyouSokuteidata): ?>

@@ -1613,9 +1613,10 @@ class LabelsController extends AppController
          $sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
          $arrFp[] = $sample;//配列に追加する
          if(isset($arrFp[$k-1][10]) && ($arrFp[$k-1][10] != "")){//product_codeが２つある時
-           echo "<pre>";
+/*           echo "<pre>";
            print_r("if");
            echo "<br>";
+*/
            $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
              $renban = $arrFp[$k-1][5] + $m;
@@ -1629,9 +1630,10 @@ class LabelsController extends AppController
            }
 
          }else{//product_codeが１つの時
-           echo "<pre>";
+/*           echo "<pre>";
            print_r("else");
            echo "<br>";
+*/
            $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
              $renban = $arrFp[$k-1][5] + $m;
@@ -1661,11 +1663,11 @@ class LabelsController extends AppController
 */
          }
        }
-
+/*
        echo "<pre>";
        print_r($arrLot);
        echo "<br>";
-
+*/
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
 

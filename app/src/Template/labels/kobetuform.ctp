@@ -287,7 +287,7 @@ ${"n".$j} = 1;
 
 <?php else: //csv押したとき ?>
   <br><br>
-    <div align="center"><font color="red" size="4">C:\Users\info\sakaeCakePHP\app\webroot\labels にＣＳＶファイルが出力されました</font></div>
+    <div align="center"><font color="red" size="4">\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました</font></div>
   <br><br><br><br><br>
 
 <?php endif; ?>

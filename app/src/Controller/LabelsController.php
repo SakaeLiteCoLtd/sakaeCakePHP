@@ -895,13 +895,13 @@ class LabelsController extends AppController
        }//トランザクション10
      }
    }
-   public function preform()//ラベル発行
+   public function preform()//一括ラベル発行
    {
      $this->request->session()->destroy(); // セッションの破棄
      $scheduleKouteis = $this->ScheduleKouteis->newEntity();
      $this->set('scheduleKouteis',$scheduleKouteis);
    }
-   public function form()//ラベル発行
+   public function form()//一括ラベル発行
    {
      session_start();
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
@@ -932,6 +932,7 @@ class LabelsController extends AppController
           $Product = $this->Products->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
           if(isset($Product[0])){
             $costomerId = $Product[0]->customer_id;
+            $product_name = $Product[0]->product_name;
           }else{
             $costomerId = "";
           }
@@ -959,9 +960,14 @@ class LabelsController extends AppController
           }else{
             $Layout = "-";
           }
-          $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
+/*          $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
            'lotnum' => $lotnum, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
            'irisu' => $irisu];
+*/
+           $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+            'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'costomer' => $costomerName, '?1' => "",//costomer , '?1'　ではなく、$place1、$place2
+             'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], '?product_code2' => "", 'product_name' => $product_name,//product_code2がまだ対応できてない
+              '?product_name2' => "", 'irisu' => $irisu, '?irisu2' => "", '?unit1' => "", '?1' => "", '?2' => ""];
            //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
            $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
            if(isset($Customer[0])){
@@ -976,9 +982,14 @@ class LabelsController extends AppController
            if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ"){//mb_substrだと文字化けしない
              $lotnumIN = "IN.".$lotnum;
              $Layout = "B";
-             $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
+/*             $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
               'lotnum' => $lotnumIN, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
               'irisu' => $irisu];
+*/
+              $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+               'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'costomer' => $costomerName, '?1' => "",//costomer , '?1'　ではなく、$place1、$place2
+                'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], '?product_code2' => "", 'product_name' => $product_name,//product_code2がまだ対応できてない
+                 '?product_name2' => "", 'irisu' => $irisu, '?irisu2' => "", '?unit1' => "", '?1' => "", '?2' => ""];
            }
         }
         $fp = fopen('labels/labeljunbi.csv', 'w');
@@ -1191,13 +1202,13 @@ class LabelsController extends AppController
       }//トランザクション10
     }
   }
-     public function kobetupreform()//個別ラベル発行
+     public function kobetupreform()//個別成形時間
      {
        $this->request->session()->destroy(); // セッションの破棄
        $scheduleKouteis = $this->ScheduleKouteis->newEntity();
        $this->set('scheduleKouteis',$scheduleKouteis);
      }
-     public function kobetuform()//個別ラベル発行
+     public function kobetuform()//個別成形時間
      {
        session_start();
        $KadouSeikeis = $this->KadouSeikeis->newEntity();
@@ -1242,9 +1253,9 @@ class LabelsController extends AppController
              'irisu' => $irisu];
 */
              $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
-              'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'costomer' => $costomerName, '?1' => "",
-               'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], '?2' => "", 'product_name' => $product_name,
-                '?3' => "", 'irisu' => $irisu, '?4' => "", '?5' => "", '?6' => "", '?7' => ""];
+              'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'costomer' => $costomerName, '?1' => "",//costomer , '?1'　ではなく、$place1、$place2
+               'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], '?product_code2' => "", 'product_name' => $product_name,//product_code2がまだ対応できてない
+                '?product_name2' => "", 'irisu' => $irisu, '?irisu2' => "", '?unit1' => "", '?1' => "", '?2' => ""];
              //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
              $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
              if(isset($Customer[0])){
@@ -1278,8 +1289,8 @@ class LabelsController extends AppController
                 'irisu' => $irisu2];
   */           }
           }
-  //$fp = fopen('/labels/label_hirokawa.csv', 'w');
-  $fp = fopen('/home/centosuser/labeltest/label_hirokawa.csv', 'w');
+  $fp = fopen('labels/label_hirokawa.csv', 'w');
+  //$fp = fopen('/home/centosuser/labeltest/label_hirokawa.csv', 'w');
           foreach ($arrCsv as $line) {
           	fputcsv($fp, $line);
           }

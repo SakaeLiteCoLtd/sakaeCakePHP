@@ -65,25 +65,25 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
                 }
               ?>
               </div>
-              <p><?php echo $this->Html->image('logo.gif',array('width'=>'157','height'=>'22'));?></p>
+              <div align="left"><p><?php echo $this->Html->image('logo.gif',array('width'=>'157','height'=>'22'));?></p></div>
               <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
                         <tr style="border-style: none; background-color: #E6FFFF">
                           <td style="padding: 0.1rem 0.1rem;"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'user','action'=>'index')));?></td>
-                          <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'Kadous', 'action'=>'kariindex', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_shinki.gif',array('width'=>'105','height'=>'36'));?></a></td>
-                          <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'Kadous', 'action'=>'index', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_shinki.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'Kadous', 'action'=>'kariindex', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_nouki.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'Kadous', 'action'=>'index', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_kadou.gif',array('width'=>'105','height'=>'36'));?></a></td>
                           <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'SyukkaKensas', 'action'=>'index2', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_setubi.gif',array('width'=>'105','height'=>'36'));?></a></td>
-                          <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'KensahyouSokuteidatas', 'action'=>'index', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_setubi.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'KensahyouSokuteidatas', 'action'=>'index', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_seipro.gif',array('width'=>'105','height'=>'36'));?></a></td>
                           <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'KensahyouSokuteidatas', 'action'=>'index1', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_setubi.gif',array('width'=>'105','height'=>'36'));?></a></td>
-                          <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_material.gif',array('width'=>'105','height'=>'36'));?></a></td>
                         </tr>
                         <tr style="border-style: none;background-color: #E6FFFF">
-                          <td style="padding: 0.1rem 0.1rem;"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'user','action'=>'index')));?></td>
-                          <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
-                          <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
-                          <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
-                          <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_qr.gif',array('width'=>'105','height'=>'36'));?></a></td>
                           <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'Shinkies', 'action'=>'index', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_shinki.gif',array('width'=>'105','height'=>'36'));?></a></td>
-                          <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'Labels', 'action'=>'index0', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_shinki.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td style="padding: 0.1rem 0.1rem;"><?php echo $this->Html->image('HeaderMenu/menu_edi.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'user','action'=>'index')));?></td>
+                          <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_rejection.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_denpyou.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_csv.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_kouteikensa.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'Labels', 'action'=>'indexmenu', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_label.gif',array('width'=>'105','height'=>'36'));?></a></td>
                         </tr>
               </table>
             </td>

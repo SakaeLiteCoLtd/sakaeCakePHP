@@ -48,7 +48,7 @@ class CheckLot extends Entity
         'cs_name' => true,
         'operator_deliver' => true,
         'flag_deliver' => true,
-        'delete_flg' => true,
+        'delete_flag' => true,
         'created_at' => true,
         'created_staff' => true,
         'updated_at' => true,

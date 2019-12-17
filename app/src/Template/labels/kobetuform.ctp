@@ -22,7 +22,6 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
 
 <br><br><br>
 
-<?php   /*ここから１号機*/    ?>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
     <tr style="border-bottom: 0px;border-width: 0px">
@@ -122,10 +121,9 @@ ${"n".$j} = 1;
    <td align="right" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->control('追加取り消し', array('type'=>'submit', 'name' => 'sakujo11', 'value'=>1, 'label'=>false)) ?></div></td>
  </tr>
 </table>
-<br>
-<?php   /*ここまで１号機*/    ?>
 
-<br>
+<br><br>
+
 <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr bgcolor="#E6FFFF" >
   <td align="right" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'confirm', 'value'=>"1")); ?></div></td>
@@ -145,7 +143,7 @@ ${"n".$j} = 1;
 <?php elseif(isset($confirm)): //確認押したとき ?>
 
 <br><br><br>
-<?php   /*ここから１号機*/    ?>
+
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <caption style="text-align: left">１号機</caption>
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
@@ -272,7 +270,6 @@ ${"n".$j} = 1;
 */
   ?>
   <br>
-  <?php   /*ここまで１号機*/    ?>
 
   <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr bgcolor="#E6FFFF" >
@@ -286,8 +283,11 @@ ${"n".$j} = 1;
   <p align="right"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
 
 <?php else: //csv押したとき ?>
+
   <br><br>
+
     <div align="center"><font color="red" size="4">\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました</font></div>
+
   <br><br><br><br><br>
 
 <?php endif; ?>

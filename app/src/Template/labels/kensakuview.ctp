@@ -3,6 +3,8 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Staff[]|\Cake\Collection\CollectionInterface $staffs
  */
+ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
+ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 ?>
         <?php
           $username = $this->request->Session()->read('Auth.User.username');
@@ -10,55 +12,46 @@
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-?>
-
-<?=$this->Form->create($checkLots, ['url' => ['action' => 'kensakuview']]) ?>
+        ?>
 
 <hr size="5">
+<?=$this->Form->create($checkLots, ['url' => ['action' => 'kensakuview']]) ?>
+<br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
-    <tr style="border-bottom: 0px;border-width: 0px">
-      <td width="250" height="60" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">品番</strong></div></td>
-      <td width="250" height="60" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">ロットＮｏ．</strong></div></td>
-      <td width="500" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">ロット発行日</strong></div></td>
-    </tr>
-
-
-<?php
-      $dateYMD = date('Y-m-d');
-      $dateYMD1 = strtotime($dateYMD);
-      $dayye = date('Y-m-d', strtotime('-1 day', $dateYMD1));
-
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td rowspan='2'  height='6' colspan='20'>\n";
-      echo "<input type='text' name=product_code size='6'/>\n";
-      echo "</td>\n";
-      echo "<td rowspan='2' height='6' colspan='20'>\n";
-      echo "<input type='text' name=lot_num size='6'/>\n";
-      echo "</td>\n";
-      echo "<td width='50' colspan='3' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "開始";
-      echo "</strong></div></td>\n";
-      echo "<td width='350' colspan='37' style='border-bottom: 0px'><div align='center'>\n";
-      echo "<input type='date' value=$dayye name=starting_tm size='6'/>\n";
-      echo "</div></td>\n";
-      echo "</tr>\n";
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td colspan='3'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "終了";
-      echo "</strong></div></td>\n";
-      echo "<td colspan='37'><div align='center'>\n";
-      echo "<input type='date' value=$dateYMD name=finishing_tm size='6'/>\n";
-      echo "</div></td>\n";
-      echo "</tr>\n";
- ?>
-<br>
-  <tr bgcolor="#E6FFFF" >
-    <td width="250" colspan="30" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
-    <td width="250" colspan="30" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
-    <td align="right" rowspan="2"  colspan="20" width="350" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('検索'), array('name' => 'kensaku')); ?></div></td>
-  </tr>
-</table>
-</fieldset>
-
-<?=$this->Form->end() ?>
+        <thead>
+            <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品番</strong></div></td>
+              <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品名</strong></div></td>
+              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">ロットNo.</strong></div></td>
+              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">数量</strong></div></td>
+              <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">出荷状態</strong></div></td>
+            </tr>
+        </thead>
+        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+            <?php foreach ($checkLots as $checkLot): ?>
+            <tr style="border-bottom: solid;border-width: 1px">
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($checkLot->product_code) ?></td>
+                <?php
+                  $product_code = $checkLot->product_code;
+              		$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+              		$product_name = $Product[0]->product_name;
+                ?>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($checkLot->lot_num) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($checkLot->amount) ?></td>
+            <?php
+            	if($checkLot->flag_used == 0){
+            	$flag_used = '出荷待ち';
+            	} elseif($checkLot->flag_used == 1) {
+            	$flag_used = '出荷済み';
+            	} else {
+            	$flag_used = '不明';
+            	}
+            ?>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h($flag_used) ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<br><br>

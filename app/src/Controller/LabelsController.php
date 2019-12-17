@@ -35,14 +35,22 @@ class LabelsController extends AppController
        $this->Products = TableRegistry::get('products');//productsテーブルを使う
        $this->CheckLots = TableRegistry::get('checkLots');
      }
-   public function index0()
-   {
-     $this->request->session()->destroy(); // セッションの破棄
-   }
-   public function index1()
-   {
-     $this->request->session()->destroy(); // セッションの破棄
-   }
+     public function indexmenu()
+     {
+       $this->request->session()->destroy(); // セッションの破棄
+     }
+     public function index0()
+     {
+       $this->request->session()->destroy(); // セッションの破棄
+     }
+     public function index1()
+     {
+       $this->request->session()->destroy(); // セッションの破棄
+     }
+     public function index2()
+     {
+       $this->request->session()->destroy(); // セッションの破棄
+     }
    public function confirmcsv()
   {
 /*    $fp = fopen("label_element_place.csv", "r");//csvファイルはwebrootに入れる
@@ -1270,27 +1278,7 @@ class LabelsController extends AppController
                 'irisu' => $irisu2];
   */           }
           }
-/*
-      echo "<pre>";
-      print_r("ふぁいるしゅつりょくてすと");
-      echo "</pre>";
-*/
-/*
-	$path = "labels/label_hakkou.csv";
-//	$path = "C:\Users\CGS\Desktop\label191205.csv";
-//	$path = "\\Ts5400d8a6\社内共通\hirokawa\label191205.csv";
-	echo "Path : $path";
-	require "$path";
-
-	echo "<pre>";
-	echo getcwd() . "\n";
-	echo realpath("../") . "\n";
-	echo realpath("../../../../../") . "\n";
- 	echo "</pre>";
-*/
-  //$fp = fopen('C:/Users/CGS/Desktop/label191205.csv', 'w');
-  //$fp = fopen('//192.168.4.1/Public/Downloads/hirokawa/label_hirokawa.csv', 'w');
-  //$fp = fopen('/hirokawa/label_hirokawa3.csv', 'w');
+  //$fp = fopen('/labels/label_hirokawa.csv', 'w');
   $fp = fopen('/home/centosuser/labeltest/label_hirokawa.csv', 'w');
           foreach ($arrCsv as $line) {
           	fputcsv($fp, $line);
@@ -1409,12 +1397,12 @@ class LabelsController extends AppController
            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
              $renban = $arrFp[$k-1][5] + $m;
              $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-             $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flg' => 0, 'created_staff' => $created_staff];
+             $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
            }
            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
              $renban = $arrFp[$k-1][5] + $m;
              $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-             $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flg' => 0, 'created_staff' => $created_staff];
+             $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
            }
          }else{//product_codeが１つの時
 /*           echo "<pre>";
@@ -1425,7 +1413,7 @@ class LabelsController extends AppController
            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
              $renban = $arrFp[$k-1][5] + $m;
              $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-             $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flg' => 0, 'created_staff' => $created_staff];
+             $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
            }
 /*
              $Product = $this->Products->find()->where(['product_code' => $arrFp[$k-1][6]])->toArray();
@@ -1444,7 +1432,7 @@ class LabelsController extends AppController
                for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
                  $renban = $arrFp[$k-1][5] + $m;
                  $lot_num = "IN.".$arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-                 $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flg' => 0, 'created_staff' => 'f606ea4c-3274-4db6-9c95-52304761b41d'];
+                 $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => 'f606ea4c-3274-4db6-9c95-52304761b41d'];
                }
              }
 */
@@ -1479,13 +1467,15 @@ class LabelsController extends AppController
           }//トランザクション10
         }
      }
-     public function kensakuform()//発行履歴取り込み
+
+     public function kensakuform()//ロット検索
      {
        $this->request->session()->destroy(); // セッションの破棄
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
      }
-     public function kensakuview()//発行履歴取り込み
+
+     public function kensakuview()//ロット検索
      {
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
@@ -1498,42 +1488,22 @@ class LabelsController extends AppController
          $product_code = "no";
          if(empty($data['lot_num'])){//lot_numの入力がないとき　product_code×　lot_num×　date〇
            $lot_num = "no";//日にちだけで絞り込み
-           $arrLots = array();
-           echo "<pre>";
-           print_r("1");
-           echo "</pre>";
-         }else{//lot_numの入力があるとき　product_code×　lot_num〇　date〇
-           $arrLots = array();//ロットと日にちで絞り込み
-           echo "<pre>";
-           print_r("2");
-           echo "</pre>";
+           $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+             ->where(['delete_flag' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin]));
+         }else{//lot_numの入力があるとき　product_code×　lot_num〇　date〇//ロットと日にちで絞り込み
+           $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+             ->where(['delete_flag' => '0', 'lot_num like' => '%'.$lot_num.'%', 'datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin]));
          }
        }else{//product_codeの入力があるとき
          if(empty($data['lot_num'])){//lot_numの入力がないとき　product_code〇　lot_num×　date〇
            $lot_num = "no";//プロダクトコードと日にちで絞り込み
-           $arrLots = array();
-           echo "<pre>";
-           print_r("3");
-           echo "</pre>";
-         }else{//lot_numの入力があるとき　product_code〇　lot_num〇　date〇
-           $arrLots = array();//プロダクトコードとロットナンバーと日にちで絞り込み
-           echo "<pre>";
-           print_r("4");
-           echo "</pre>";
+           $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+             ->where(['delete_flag' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin, 'product_code' => $product_code]));
+         }else{//lot_numの入力があるとき　product_code〇　lot_num〇　date〇//プロダクトコードとロットナンバーと日にちで絞り込み
+           $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+             ->where(['delete_flag' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin, 'lot_num like' => '%'.$lot_num.'%', 'product_code' => $product_code]));
          }
        }
-       echo "<pre>";
-       print_r($product_code);
-       echo "</pre>";
-       echo "<pre>";
-       print_r($lot_num);
-       echo "</pre>";
-       echo "<pre>";
-       print_r($date_sta);
-       echo "</pre>";
-       echo "<pre>";
-       print_r($date_fin);
-       echo "</pre>";
 /*
        $KensahyouSokuteidata = $this->KensahyouSokuteidatas->find()->where(['manu_date >=' => $value_start, 'manu_date <=' => $value_end, 'delete_flag' => '0', 'product_code' => $product_code])->toArray();
        $arrP = array();

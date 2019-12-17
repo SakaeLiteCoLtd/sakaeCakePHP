@@ -111,9 +111,9 @@ class CheckLotsTable extends Table
             ->allowEmpty('flag_deliver');
 
         $validator
-            ->integer('delete_flg')
-            ->requirePresence('delete_flg', 'create')
-            ->notEmpty('delete_flg');
+            ->integer('delete_flag')
+            ->requirePresence('delete_flag', 'create')
+            ->notEmpty('delete_flag');
             /*
                     $validator
                         ->dateTime('created_at')

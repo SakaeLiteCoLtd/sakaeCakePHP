@@ -1248,14 +1248,57 @@ class LabelsController extends AppController
             }else{
               $Layout = "-";
             }
+
+            $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+            if(isset($LabelTypeProduct[0])){
+              $place_code = $LabelTypeProduct[0]->place_code;
+              if($place_code != 0){
+                $LabelElementPlace = $this->LabelElementPlaces->find()->where(['place_code' => $place_code])->toArray();
+                $place1 = $LabelElementPlace[0]->place1;
+                $place2 = $LabelElementPlace[0]->place2;
+              }else{
+                $place1 = "";
+                $place2 = "";
+              }
+            }else{
+              $place1 = $costomerName;
+              $place2 = "";
+            }
+
+            $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+            $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+            if(isset($LabelSetikkatsu1[0])){
+              $product_code2 = $LabelSetikkatsu1[0]->product_id2;
+              $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
+              $product_name2 = $Product2[0]->product_name;
+              $unit = "set";
+            }elseif(isset($LabelSetikkatsu2[0])){
+              $product_code2 = $LabelSetikkatsu2[0]->product_id1;
+              $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
+              $product_name2 = $Product2[0]->product_name;
+              $unit = "set";
+            }else{
+              $product_code2 = "";
+              $product_name2 = "";
+              $unit = "";
+            }
+
+/*
+            echo "<pre>";
+            print_r($_SESSION['labeljunbi'][$i]['product_code']);
+            echo "</pre>";
+            echo "<pre>";
+            print_r($product_code2);
+            echo "</pre>";
+*/
 /*            $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
              'lotnum' => $lotnum, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
              'irisu' => $irisu];
 */
              $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
-              'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'costomer' => $costomerName, '?1' => "",//costomer , '?1'　ではなく、$place1、$place2
-               'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], '?product_code2' => "", 'product_name' => $product_name,//product_code2がまだ対応できてない
-                '?product_name2' => "", 'irisu' => $irisu, '?irisu2' => "", '?unit1' => "", '?1' => "", '?2' => ""];
+              'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+               'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+                '?product_name2' => trim($product_name2), 'irisu' => $irisu, '?irisu2' => "", 'unit' => trim($unit), '?1' => "", '?2' => ""];
              //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
              $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
              if(isset($Customer[0])){
@@ -1281,15 +1324,15 @@ class LabelsController extends AppController
                $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside;
                $irisu2 = $irisu/$num_inside;
                $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
-                'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'costomer' => $costomerName, '?1' => "",
-                 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], '?2' => "", 'product_name' => $product_name,
-                  '?3' => "", 'irisu' => $irisu2, '?4' => "", '?5' => "", '?6' => "", '?7' => ""];
+               'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+               'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+                 '?product_name2' => "", 'irisu' => $irisu, '?irisu2' => "", '?unit1' => "", '?1' => "", '?2' => ""];
 /*               $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $maisu,
                 'lotnum' => $lotnumIN, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
                 'irisu' => $irisu2];
   */           }
           }
-  $fp = fopen('labels/label_hirokawa.csv', 'w');
+  $fp = fopen('labels/label_hirokawa1220.csv', 'w');
   //$fp = fopen('/home/centosuser/labeltest/label_hirokawa.csv', 'w');
           foreach ($arrCsv as $line) {
           	fputcsv($fp, $line);

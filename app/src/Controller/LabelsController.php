@@ -1689,6 +1689,20 @@ $fp = fopen('labels/label_hirokawa1223.csv', 'w');
         }
      }
 
+     public function fushiyouform()//ラベル不使用
+     {
+       $this->request->session()->destroy(); // セッションの破棄
+       $labelElementPlaces = $this->LabelElementPlaces->newEntity();
+       $this->set('labelElementPlaces',$labelElementPlaces);
+     }
+
+     public function hasuform()//端数登録
+     {
+       $this->request->session()->destroy(); // セッションの破棄
+       $scheduleKouteis = $this->ScheduleKouteis->newEntity();
+       $this->set('scheduleKouteis',$scheduleKouteis);
+     }
+
      public function kensakuform()//ロット検索
      {
        $this->request->session()->destroy(); // セッションの破棄
@@ -1725,21 +1739,25 @@ $fp = fopen('labels/label_hirokawa1223.csv', 'w');
              ->where(['delete_flag' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin, 'lot_num like' => '%'.$lot_num.'%', 'product_code' => $product_code]));
          }
        }
-/*
-       $KensahyouSokuteidata = $this->KensahyouSokuteidatas->find()->where(['manu_date >=' => $value_start, 'manu_date <=' => $value_end, 'delete_flag' => '0', 'product_code' => $product_code])->toArray();
-       $arrP = array();
-       foreach ($KensahyouSokuteidata as $value) {
-          $product_code= $value->product_code;
-          $lot_num = $value->lot_num;
-          $manu_date = $value->manu_date->format('Y-m-d H:i:s');
-          $manu_date = substr($manu_date,0,10);
-          $arrP[] = ['product_code' => $product_code, 'lot_num' => $lot_num, 'manu_date' => $manu_date];
-        }
-        foreach ((array) $uniquearrP as $key => $value) {
-            $sort[$key] = $value['manu_date'];
-        }
-        array_multisort($sort, SORT_DESC, $uniquearrP);
-        $this->set('uniquearrP',$uniquearrP);//セット
-*/
      }
+
+     public function kensakucheck()//端数の準備実験
+     {
+       $this->request->session()->destroy(); // セッションの破棄
+       $checkLots = $this->CheckLots->newEntity();
+       $this->set('checkLots',$checkLots);
+
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       for ($m=0; $m<=$data['num'] ; $m++) {
+         if(isset($data["check".$m])){
+         $arrcheck[] = ['product_code' => $data[$m]];
+         }
+       }
+
+       echo "<pre>";
+       print_r($arrcheck);
+       echo "<br>";
+
+     }
+
 }

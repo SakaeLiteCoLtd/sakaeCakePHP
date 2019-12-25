@@ -46,23 +46,28 @@
     <fieldset>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <td><div align="center"><strong style="font-size: 12pt; color:blue">グレード</strong></div></td>
-          <td style="border-left-style: none;"><div align="center"><strong style="font-size: 12pt; color:blue">色番号</strong></div></td>
+            <th scope="row"><?= __('グレード') ?></th>
+		<td><?= $this->Form->input("grade", array('type' => 'value', 'label'=>false)); ?></td>
+	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <td><?= $this->Form->input("grade", array('type' => 'value', 'label'=>false)); ?></td>
-      		<td style="border-left-style: none;"><?= $this->Form->input("color", array('type' => 'value', 'label'=>false)); ?></td>
+            <th scope="row"><?= __('色番号') ?></th>
+		<td><?= $this->Form->input("color", array('type' => 'value', 'label'=>false)); ?></td>
+	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <td><div align="center"><strong style="font-size: 12pt; color:blue">material_type_id</strong></div></td>
-          <td style="border-left-style: none;"><div align="center"><strong style="font-size: 12pt; color:blue">tani</strong></div></td>
+            <th scope="row"><?= __('material_type_id') ?></th>
+		<td><?= $this->Form->input("material_type_id", ["type"=>"select","empty"=>"Please select", "options"=>$arrMaterialType, 'label'=>false]); ?></td>
+	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <td><?= $this->Form->input("material_type_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrMaterialType, 'label'=>false]); ?></td>
-		      <td style="border-left-style: none;"><?= $this->Form->input("tani", array('type' => 'value', 'label'=>false)); ?></td>
+            <th scope="row"><?= __('tani') ?></th>
+		<td><?= $this->Form->input("tani", array('type' => 'value', 'label'=>false)); ?></td>
+	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <td><div align="center"><strong style="font-size: 12pt; color:blue">multiple_sup</strong></div></td>
-          <td style="border-left-style: none;"><div align="center"><strong style="font-size: 12pt; color:blue">Status</strong></div></td>
+            <th scope="row"><?= __('multiple_sup') ?></th>
+		<td><?= $this->Form->input("multiple_sup", array('type' => 'value', 'label'=>false)); ?></td>
+	</tr>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <td><?= $this->Form->input("multiple_sup", array('type' => 'value', 'label'=>false)); ?></td>
-		      <td style="border-left-style: none;"><?= $this->Form->input("status", array('type' => 'value', 'label'=>false)); ?></td>
+            <th scope="row"><?= __('Status') ?></th>
+		<td><?= $this->Form->input("status", array('type' => 'value', 'label'=>false)); ?></td>
 	</p>
 </table>
 
@@ -72,10 +77,6 @@
             echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
-
-    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-    <tr>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')); ?></div></td>
-    </tr>
-  </table>
+    <center><?= $this->Form->button(__('confirm'), array('name' => 'kakunin')) ?></center>
+    <?= $this->Form->end() ?>
 <br>

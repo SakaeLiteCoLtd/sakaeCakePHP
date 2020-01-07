@@ -2019,7 +2019,7 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
 
 <?php else: //csv押したとき ?>
   <br><br>
-    <div align="center"><font color="red" size="4">C:\Users\info\sakaeCakePHP\app\webroot\labels にＣＳＶファイルが出力されました</font></div>
+    <div align="center"><font color="red" size="4"><?= __($mes) ?></font></div>
   <br><br><br><br><br>
 
 <?php endif; ?>

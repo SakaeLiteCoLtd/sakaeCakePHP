@@ -285,7 +285,7 @@ ${"n".$j} = 1;
 
   <br><br>
 
-    <div align="center"><font color="red" size="4">\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました</font></div>
+    <div align="center"><font color="red" size="4"><?= __($mes) ?></font></div>
 
   <br><br><br><br><br>
 

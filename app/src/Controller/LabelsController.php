@@ -930,6 +930,7 @@ class LabelsController extends AppController
           $datetimeymd = substr($date,0,10);
           $datetimehm = substr($date,11,5);
           $lotnum = substr($date,2,2).substr($date,5,2).substr($date,8,2);
+          $date = substr($date,0,4)."-".substr($date,5,2)."-".substr($date,8,2);
           $Product = $this->Products->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
           if(isset($Product[0])){
             $costomerId = $Product[0]->customer_id;
@@ -1008,6 +1009,10 @@ class LabelsController extends AppController
            'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
            'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
            //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
+           $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+            'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+            'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+            'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
            $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
            if(isset($Customer[0])){
              $costomerName = $Customer[0]->name;
@@ -1045,6 +1050,10 @@ class LabelsController extends AppController
              'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
              'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
              'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+             $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+               'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+               'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+               'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
            }
         }
         $fp = fopen('labels/label_ikkatu.csv', 'w');
@@ -1052,6 +1061,36 @@ class LabelsController extends AppController
         	fputcsv($fp, $line);
         }
           fclose($fp);
+/*
+          echo "<pre>";
+          print_r($arrCsvtouroku);
+          echo "</pre>";
+*/
+          $labelCsvs = $this->LabelCsvs->newEntity();
+          $this->set('labelCsvs',$labelCsvs);
+           if ($this->request->is('post')) {
+             $labelCsvs = $this->LabelCsvs->patchEntities($labelCsvs, $arrCsvtouroku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+             $connection = ConnectionManager::get('default');//トランザクション1
+             // トランザクション開始2
+             $connection->begin();//トランザクション3
+             try {//トランザクション4
+                 if ($this->LabelCsvs->saveMany($labelCsvs)) {//saveManyで一括登録
+                   $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました";
+                   $this->set('mes',$mes);
+                   $connection->commit();// コミット5
+                 } else {
+                   $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました※データベースへ登録されませんでした";
+                   $this->set('mes',$mes);
+                   $this->Flash->error(__('The data could not be saved. Please, try again.'));
+                   throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                 }
+             } catch (Exception $e) {//トランザクション7
+             //ロールバック8
+               $connection->rollback();//トランザクション9
+             }//トランザクション10
+           }
+
+
       }elseif(isset($data['confirm'])){//確認おしたとき
        $this->set('confirm',$data['confirm']);
        $dateYMDs = $data['dateYMDs'];
@@ -1435,7 +1474,6 @@ class LabelsController extends AppController
             }//トランザクション10
           }
 
-
      }elseif(isset($data['confirm'])){//確認おしたとき
       $this->set('confirm',$data['confirm']);
     }elseif(empty($data['formset']) && !isset($data['touroku'])){//最初のフォーム画面
@@ -1467,6 +1505,7 @@ class LabelsController extends AppController
             $datetimeymd = substr($date,0,10);
             $datetimehm = substr($date,11,5);
             $lotnum = substr($date,2,2).substr($date,5,2).substr($date,8,2);
+            $date = substr($date,0,4)."-".substr($date,5,2)."-".substr($date,8,2);
             $Product = $this->Products->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
             if(isset($Product[0])){
               $costomerId = $Product[0]->customer_id;
@@ -1539,23 +1578,15 @@ class LabelsController extends AppController
               $irisu2 = "";
               $unit = "";
             }
-/*
-            echo "<pre>";
-            print_r($_SESSION['labeljunbi'][$i]['product_code']);
-            echo "</pre>";
-            echo "<pre>";
-            print_r($product_code2);
-            echo "</pre>";
-*/
-/*            $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'],
-             'lotnum' => $lotnum, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
-             'irisu' => $irisu];
-*/
              $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
               'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
               'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
               'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
              //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
+             $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+              'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+              'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
              $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
              if(isset($Customer[0])){
                $costomerName = $Customer[0]->name;
@@ -1587,7 +1618,6 @@ class LabelsController extends AppController
                }
                $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
                $irisu12 = $irisu/$num_inside1;
-//               $irisu22 = $irisu2/$num_inside2;
                $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
                'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
@@ -1595,7 +1625,11 @@ class LabelsController extends AppController
 /*               $arrCsv[] = ['date' => $datetimeymd, 'datetime' => $datetimehm, 'layout' => '現品札_'.$Layout.'.mllay', 'maisu' => $maisu,
                 'lotnum' => $lotnumIN, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
                 'irisu' => $irisu2];
-  */           }
+*/             $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+               'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+               'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+               'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+           }
           }
         $fp = fopen('labels/label_hirokawa1220.csv', 'w');
         //$fp = fopen('/home/centosuser/labeltest/label_hirokawa.csv', 'w');
@@ -1603,6 +1637,32 @@ class LabelsController extends AppController
           	fputcsv($fp, $line);
           }
             fclose($fp);
+
+            $labelCsvs = $this->LabelCsvs->newEntity();
+            $this->set('labelCsvs',$labelCsvs);
+             if ($this->request->is('post')) {
+               $labelCsvs = $this->LabelCsvs->patchEntities($labelCsvs, $arrCsvtouroku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+               $connection = ConnectionManager::get('default');//トランザクション1
+               // トランザクション開始2
+               $connection->begin();//トランザクション3
+               try {//トランザクション4
+                   if ($this->LabelCsvs->saveMany($labelCsvs)) {//saveManyで一括登録
+                     $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました";
+                     $this->set('mes',$mes);
+                     $connection->commit();// コミット5
+                   } else {
+                     $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました※データベースへ登録されませんでした";
+                     $this->set('mes',$mes);
+                     $this->Flash->error(__('The data could not be saved. Please, try again.'));
+                     throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                   }
+               } catch (Exception $e) {//トランザクション7
+               //ロールバック8
+                 $connection->rollback();//トランザクション9
+               }//トランザクション10
+             }
+
+
         }elseif(isset($data['confirm'])){//確認おしたとき
          $this->set('confirm',$data['confirm']);
          $dateto = $data['dateto'];

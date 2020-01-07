@@ -15,7 +15,7 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($KadouSeikeis, ['url' => ['action' => 'kobetuform2']]);
+          echo $this->Form->create($labelCsvs, ['url' => ['action' => 'kobetuform2']]);
 ?>
 
 <?php if(!isset($confirm) && !isset($touroku)): ?>
@@ -114,7 +114,7 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
 
   <br><br>
 
-    <div align="center"><font color="red" size="4">\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました</font></div>
+    <div align="center"><font color="red" size="4"><?= __($mes) ?></font></div>
 
   <br><br><br><br><br>
 

@@ -53,7 +53,7 @@
       		<td style="border-left-style: none;"><?= $this->Form->input("color", array('type' => 'value', 'label'=>false)); ?></td>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
           <td><div align="center"><strong style="font-size: 12pt; color:blue">material_type_id</strong></div></td>
-          <td style="border-left-style: none;"><div align="center"><strong style="font-size: 12pt; color:blue">tani</strong></div></td>
+          <td style="border-left-style: none;"><div align="center"><strong style="font-size: 12pt; color:blue">単位</strong></div></td>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
           <td><?= $this->Form->input("material_type_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrMaterialType, 'label'=>false]); ?></td>
 		      <td style="border-left-style: none;"><?= $this->Form->input("tani", array('type' => 'value', 'label'=>false)); ?></td>

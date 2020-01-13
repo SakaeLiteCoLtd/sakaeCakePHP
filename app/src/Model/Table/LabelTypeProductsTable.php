@@ -107,7 +107,7 @@ class LabelTypeProductsTable extends Table
                         ->notEmpty('created_at');
             */
                     $validator
-                        ->uuid('created_staff')
+                        ->integer('created_staff')
                         ->requirePresence('created_staff', 'create')
                         ->notEmpty('created_staff');
             /*
@@ -116,7 +116,7 @@ class LabelTypeProductsTable extends Table
                         ->allowEmpty('updated_at');
             */
         $validator
-            ->uuid('updated_staff')
+            ->integer('updated_staff')
             ->allowEmpty('updated_staff');
 
         return $validator;

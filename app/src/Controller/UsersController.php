@@ -126,11 +126,11 @@ class UsersController extends AppController
 
 			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 			$data['userdata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
-		/*
+
 			echo "<pre>";
 			print_r($data['userdata']);
 			echo "<br>";
-		*/
+		
 			$role = $data['userdata']['role_id'];//$dataのrole_idに$roleという名前を付ける
 			$roleData = $this->Roles->find()->where(['id' => $role])->toArray();//'id' => $roleとなるデータをRolesテーブルから配列で取得
 			$Role = $roleData[0]->name;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける

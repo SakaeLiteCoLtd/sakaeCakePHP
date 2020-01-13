@@ -192,87 +192,87 @@ class ProductsController extends AppController
 
      public function confirmcsv()//「出荷検査表登録」確認画面
     {
-	$product = $this->Products->newEntity();//newentityに$productという名前を付ける
-	$this->set('product',$product);//1行上の$productをctpで使えるようにセット
+			$product = $this->Products->newEntity();//newentityに$productという名前を付ける
+			$this->set('product',$product);//1行上の$productをctpで使えるようにセット
     }
 
      public function docsv()
     {
-	$staff_id = $this->Auth->user('staff_id');
-	$this->set('staff_id',$staff_id);//1行上の$staff_idをctpで使えるようにセット
+			$staff_id = $this->Auth->user('staff_id');
+			$this->set('staff_id',$staff_id);//1行上の$staff_idをctpで使えるようにセット
 
-	$fp = fopen("product.csv", "r");//csvファイルはwebrootに入れる
-	$this->set('fp',$fp);
+			$fp = fopen("product191106.csv", "r");//csvファイルはwebrootに入れる
+			$this->set('fp',$fp);
 
-	$fpcount = fopen("product.csv", 'r' );
-	for( $count = 0; fgets( $fpcount ); $count++ );
-	$this->set('count',$count);
+			$fpcount = fopen("product191106.csv", 'r' );
+			for( $count = 0; fgets( $fpcount ); $count++ );
+			$this->set('count',$count);
 
-	$arrFp = array();//空の配列を作る
-	$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目はカラム名なので先に取っておく）
-	for ($k=1; $k<=$count-1; $k++) {//行数分
-		$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
-		$sample = explode(',',$line);//$lineを","毎に配列に入れる
+			$arrFp = array();//空の配列を作る
+			$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目はカラム名なので先に取っておく）
+			for ($k=1; $k<=$count-1; $k++) {//行数分
+				$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+				$sample = explode(',',$line);//$lineを","毎に配列に入れる
 
-		array_push($sample, '0', '0', $staff_id);//配列に追加
+				array_push($sample, '0', '0', $staff_id);//配列に追加
 
-		$keys=array_keys($sample);
-		$keys[array_search('0',$keys)]='product_code';//名前の変更
-		$keys[array_search('1',$keys)]='product_name';
-		$keys[array_search('2',$keys)]='weight';
-		$keys[array_search('4',$keys)]='customer_id';
-		$keys[array_search('9',$keys)]='torisu';
-		$keys[array_search('10',$keys)]='cycle';
-		$keys[array_search('12',$keys)]='primary_p';
-		$keys[array_search('13',$keys)]='gaityu';
-		$keys[array_search('16',$keys)]='delete_flag';//追加した配列の値(値は0)
-		$keys[array_search('17',$keys)]='status';//追加した配列の値(値は0)
-		$keys[array_search('18',$keys)]='created_staff';//追加した配列の値(値は$staff_id)
+				$keys=array_keys($sample);
+				$keys[array_search('0',$keys)]='product_code';//名前の変更
+				$keys[array_search('1',$keys)]='product_name';
+				$keys[array_search('2',$keys)]='weight';
+				$keys[array_search('4',$keys)]='customer_id';
+				$keys[array_search('9',$keys)]='torisu';
+				$keys[array_search('10',$keys)]='cycle';
+				$keys[array_search('12',$keys)]='primary_p';
+				$keys[array_search('13',$keys)]='gaityu';
+				$keys[array_search('16',$keys)]='delete_flag';//追加した配列の値(値は0)
+				$keys[array_search('17',$keys)]='status';//追加した配列の値(値は0)
+				$keys[array_search('18',$keys)]='created_staff';//追加した配列の値(値は$staff_id)
 
-		$sample = array_combine($keys, $sample );
+				$sample = array_combine($keys, $sample );
 
-		$Customer = $this->Customers->find()->where(['customer_code' => $sample['customer_id']])->toArray();//'customer_code' => $sample['customer_id']となるデータをCustomersテーブルから配列で取得
-		$customer_id = $Customer[0]->id;//配列の0番目（0番目しかない）のidに$customer_idと名前を付ける
-		$replacements = array('customer_id' => $customer_id);//配列のデータの置き換え（customer_idを$customer_idに変更）
-		$sample = array_replace($sample, $replacements);//配列のデータの置き換え（customer_idを$customer_idに変更）
+				$Customer = $this->Customers->find()->where(['customer_code' => $sample['customer_id']])->toArray();//'customer_code' => $sample['customer_id']となるデータをCustomersテーブルから配列で取得
+				$customer_id = $Customer[0]->id;//配列の0番目（0番目しかない）のidに$customer_idと名前を付ける
+				$replacements = array('customer_id' => $customer_id);//配列のデータの置き換え（customer_idを$customer_idに変更）
+				$sample = array_replace($sample, $replacements);//配列のデータの置き換え（customer_idを$customer_idに変更）
 
-		unset($sample['3']);//削除
-		unset($sample['5']);//削除
-		unset($sample['6']);//削除
-		unset($sample['7']);//削除
-		unset($sample['8']);//削除
-		unset($sample['11']);//削除
-		unset($sample['14']);//削除
-		unset($sample['15']);//削除
+				unset($sample['3']);//削除
+				unset($sample['5']);//削除
+				unset($sample['6']);//削除
+				unset($sample['7']);//削除
+				unset($sample['8']);//削除
+				unset($sample['11']);//削除
+				unset($sample['14']);//削除
+				unset($sample['15']);//削除
 
-		$arrFp[] = $sample;//配列に追加する
-	}
-	$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
-//	echo "<pre>";
-//	print_r($arrFp[0]);
-//	print_r($arrFp);
-//	echo "<br>";
+				$arrFp[] = $sample;//配列に追加する
+			}
+			$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
+		//	echo "<pre>";
+		//	print_r($arrFp[0]);
+		//	print_r($arrFp);
+		//	echo "<br>";
 
-	$product = $this->Products->newEntity();//newentityに$productという名前を付ける
-	$this->set('product',$product);//1行上の$productをctpで使えるようにセット
+			$product = $this->Products->newEntity();//newentityに$productという名前を付ける
+			$this->set('product',$product);//1行上の$productをctpで使えるようにセット
 
-	if ($this->request->is('post')) {//postなら登録
-		$product = $this->Products->patchEntities($product, $arrFp);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-		$connection = ConnectionManager::get('default');//トランザクション1
-		// トランザクション開始2
-		$connection->begin();//トランザクション3
-		try {//トランザクション4
-				if ($this->Products->saveMany($product)) {//saveManyで一括登録
-					$connection->commit();// コミット5
-				} else {
-					$this->Flash->error(__('The Products could not be saved. Please, try again.'));
-					throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-				}
-		} catch (Exception $e) {//トランザクション7
-		//ロールバック8
-			$connection->rollback();//トランザクション9
-		}//トランザクション10
-	}
+			if ($this->request->is('post')) {//postなら登録
+				$product = $this->Products->patchEntities($product, $arrFp);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+				$connection = ConnectionManager::get('default');//トランザクション1
+				// トランザクション開始2
+				$connection->begin();//トランザクション3
+				try {//トランザクション4
+						if ($this->Products->saveMany($product)) {//saveManyで一括登録
+							$connection->commit();// コミット5
+						} else {
+							$this->Flash->error(__('The Products could not be saved. Please, try again.'));
+							throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+						}
+				} catch (Exception $e) {//トランザクション7
+				//ロールバック8
+					$connection->rollback();//トランザクション9
+				}//トランザクション10
+			}
     }
 
 

@@ -57,7 +57,7 @@ class KariKadouSeikeisTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->uuid('id')
+            ->integer('id')
             ->allowEmpty('id', 'create');
         $validator
             ->maxLength('product_code', 255)
@@ -101,7 +101,7 @@ class KariKadouSeikeisTable extends Table
             ->notEmpty('created_at');
 */
         $validator
-            ->uuid('created_staff')
+            ->integer('created_staff')
 //            ->requirePresence('created_staff', 'create')
 //            ->notEmpty('created_staff');
             ->allowEmpty('updated_staff');
@@ -111,7 +111,7 @@ class KariKadouSeikeisTable extends Table
             ->allowEmpty('updated_at');
 */
         $validator
-            ->uuid('updated_staff')
+            ->integer('updated_staff')
             ->allowEmpty('updated_staff');
         return $validator;
     }

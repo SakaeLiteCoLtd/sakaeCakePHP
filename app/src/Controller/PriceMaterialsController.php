@@ -269,7 +269,10 @@ class PriceMaterialsController extends AppController
 		$replacements = array('supplier_id' => $supplier_id);//配列のデータの置き換え（supplier_idを$supplier_idに変更）
 		$sample = array_replace($sample, $replacements);//配列のデータの置き換え（supplier_idを$supplier_idに変更）
 
-		unset($sample['1']);//削除
+		$replacements = array('created_staff' => 9999);//配列のデータの置き換え（supplier_idを$supplier_idに変更）
+		$sample = array_replace($sample, $replacements);//配列のデータの置き換え（supplier_idを$supplier_idに変更）
+
+ 		unset($sample['1']);//削除
 		unset($sample['2']);//削除
 		unset($sample['5']);//削除
 		unset($sample['8']);//削除

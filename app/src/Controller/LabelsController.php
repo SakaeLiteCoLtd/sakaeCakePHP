@@ -937,18 +937,20 @@ class LabelsController extends AppController
             $product_name = $Product[0]->product_name;
           }else{
             $costomerId = "";
+            $product_name = "登録されていません";
           }
           $Konpou = $this->Konpous->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
           if(isset($Konpou[0])){
             $irisu = $Konpou[0]->irisu;
           }else{
             $irisu = "";
+            $meserror = "登録されていない製品です：".$_SESSION['labeljunbi'][$i]['product_code'];
           }
           $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
           if(isset($Customer[0])){
             $costomerName = $Customer[0]->name;
           }else{
-            $costomerName = "";
+            $costomerName = "登録されていません";
           }
           $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
           if(isset($LabelTypeProduct[0])){
@@ -965,7 +967,7 @@ class LabelsController extends AppController
               $place1 = $LabelElementPlace[0]->place1;
               $place2 = $LabelElementPlace[0]->place2;
             }else{
-              $place1 = "";
+              $place1 = "登録されていません";
               $place2 = "";
             }
           }else{
@@ -1056,16 +1058,17 @@ class LabelsController extends AppController
                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
            }
         }
-        $fp = fopen('labels/label_ikkatu.csv', 'w');
+//        $fp = fopen('labels/label_ikkatu.csv', 'w');
+        $fp = fopen('/home/centosuser/label_csv/label_ikkatu0106.csv', 'w');
         foreach ($arrCsv as $line) {
         	fputcsv($fp, $line);
         }
           fclose($fp);
-/*
+
           echo "<pre>";
           print_r($arrCsvtouroku);
           echo "</pre>";
-*/
+
           $labelCsvs = $this->LabelCsvs->newEntity();
           $this->set('labelCsvs',$labelCsvs);
            if ($this->request->is('post')) {
@@ -1079,7 +1082,7 @@ class LabelsController extends AppController
                    $this->set('mes',$mes);
                    $connection->commit();// コミット5
                  } else {
-                   $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました※データベースへ登録されませんでした";
+                   $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました。※データベースへ登録されませんでした。Productsテーブルに".$meserror;
                    $this->set('mes',$mes);
                    $this->Flash->error(__('The data could not be saved. Please, try again.'));
                    throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
@@ -1438,13 +1441,13 @@ class LabelsController extends AppController
              'lotnum' => $lotnumIN, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
              'irisu' => $irisu2];
 */           }
-/*
+
       echo "<pre>";
       print_r($arrCsvtouroku);
       echo "</pre>";
-*/
+
       $fp = fopen('labels/label_hirokawa0107.csv', 'w');
-      //$fp = fopen('/home/centosuser/labeltest/label_hirokawa.csv', 'w');
+  //    $fp = fopen('/home/centosuser/label_csv/label_hirokawa0106.csv', 'w');
        foreach ($arrCsv as $line) {
          fputcsv($fp, $line);
        }
@@ -1631,8 +1634,8 @@ class LabelsController extends AppController
                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
            }
           }
-        $fp = fopen('labels/label_hirokawa1220.csv', 'w');
-        //$fp = fopen('/home/centosuser/labeltest/label_hirokawa.csv', 'w');
+//        $fp = fopen('labels/label_hirokawa1220.csv', 'w');
+        $fp = fopen('/home/centosuser/label_csv/label_hirokawa0106.csv', 'w');
           foreach ($arrCsv as $line) {
           	fputcsv($fp, $line);
           }
@@ -1817,11 +1820,11 @@ class LabelsController extends AppController
 */
          }
        }
-
+/*
        echo "<pre>";
        print_r($arrLot);
        echo "<br>";
-
+*/
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
         if ($this->request->is('get')) {

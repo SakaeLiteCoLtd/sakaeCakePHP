@@ -52,7 +52,7 @@ class ImKikakusTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->uuid('id')
+            ->integer('id')
             ->allowEmpty('id', 'create');
 
         $validator

@@ -20,12 +20,11 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 
 <div align="center"><strong><font color="red">＊登録されました</font></strong></div>
 <br>
-
-
-
-<p align="center"><?= $this->Form->button(__('top'), array('name' => 'index')) ?></p>
-
-
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('トップ'), array('name' => 'top')); ?></div></td>
+</tr>
+</table>
 <br>
 <br>
 <br>

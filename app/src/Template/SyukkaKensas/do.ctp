@@ -108,8 +108,10 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         </tr>
        <tr>
 </table>
-
 <br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('トップ'), array('name' => 'top')); ?></div></td>
+</tr>
+</table>
 <br>
-        <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
-        <?= $this->Form->end() ?>

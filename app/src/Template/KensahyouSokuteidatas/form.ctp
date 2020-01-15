@@ -128,5 +128,9 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
             echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
-    <p align="center"><?= $this->Form->button(__('確認'), array('name' => 'touroku')) ?></p>
-    <?= $this->Form->end() ?>
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')); ?></div></td>
+    </tr>
+  </table>
+<br>

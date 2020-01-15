@@ -190,7 +190,12 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
       }
         ?>
     </fieldset>
-    <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')); ?></div></td>
+    </tr>
+  </table>
+<br>
     <fieldset>
       <?= $this->Form->control('lot_num', array('type'=>'hidden', 'value'=>$lot_num, 'label'=>false)) ?>
       <?= $this->Form->control('kind_kensa_1', array('type'=>'hidden', 'value'=>$kind_kensa1, 'label'=>false)) ?>

@@ -660,7 +660,9 @@ $j = 9;
 
 <br>
 
-<p align="center"><?= $this->Form->button(__('確認'), array('name' => 'confirm', 'value'=>"1")) ?></p>
-
-
-<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')); ?></div></td>
+</tr>
+</table>
+<br><br>

@@ -6,26 +6,17 @@
 use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 $this->Customers = TableRegistry::get('customers');//productsテーブルを使う
 $this->Delivers = TableRegistry::get('delivers');//productsテーブルを使う
+use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置したクラスを使用
+
+$htmlShinkimenu = new htmlShinkimenu();
+$htmlShinkis = $htmlShinkimenu->Shinkimenus();
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <?= $this->Html->charset() ?>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <?= $cakeDescription ?>:
-        <?= $this->fetch('title') ?>
-    </title>
-    <?= $this->Html->meta('icon') ?>
-
-    <?= $this->Html->css('base2.css') ?>
-    <?= $this->Html->css('cake.css') ?>
-
-    <?= $this->fetch('meta') ?>
-    <?= $this->fetch('css') ?>
-    <?= $this->fetch('script') ?>
-</head>
-<body>
+<hr size="5">
+<table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+<?php
+   echo $htmlShinkis;
+?>
+</table>
 <hr size="5">
 <table width="1500" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>

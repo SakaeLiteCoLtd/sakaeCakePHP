@@ -3,26 +3,17 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\MaterialType[]|\Cake\Collection\CollectionInterface $materialTypes
  */
-?>
-<!DOCTYPE html>
-<html>
-<head>
-    <?= $this->Html->charset() ?>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <?= $cakeDescription ?>:
-        <?= $this->fetch('title') ?>
-    </title>
-    <?= $this->Html->meta('icon') ?>
+ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置したクラスを使用
 
-    <?= $this->Html->css('base1.css') ?>
-    <?= $this->Html->css('cake.css') ?>
-
-    <?= $this->fetch('meta') ?>
-    <?= $this->fetch('css') ?>
-    <?= $this->fetch('script') ?>
-</head>
-<body>
+ $htmlShinkimenu = new htmlShinkimenu();
+ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
+ ?>
+ <hr size="5">
+ <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <?php
+    echo $htmlShinkis;
+ ?>
+ </table>
 <hr size="5">
 <table width="1500" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>
@@ -73,6 +64,3 @@
         </ul>
         <p><?= $this->Paginator->counter(['format' => __('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')]) ?></p>
     </div>
-
-
-

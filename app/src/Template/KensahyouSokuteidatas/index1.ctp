@@ -25,8 +25,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
   </table>
 </div>
 <br>
-    <center><?= $this->Form->button(__('選択'), array('name' => 'kakunin')) ?></center>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('検索'), array('name' => 'kakunin')); ?></div></td>
+</tr>
+</table>
 <br>
-</fieldset>
-
-<?=$this->Form->end() ?>

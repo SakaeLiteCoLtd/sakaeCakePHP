@@ -3,7 +3,11 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Supplier $supplier
  */
-?>
+ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置したクラスを使用
+
+ $htmlShinkimenu = new htmlShinkimenu();
+ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
+ ?>
 <?= $this->Form->create($supplier, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
@@ -36,7 +40,13 @@
             $session->write('supplierdata.created_staff', $_POST['created_staff']);
             $session->write('supplierdata.updated_staff', null);
         ?>
-<hr size="5">
+        <hr size="5">
+        <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+        <?php
+           echo $htmlShinkis;
+        ?>
+        </table>
+        <hr size="5">
 
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
 
@@ -81,6 +91,11 @@
     </table>
 <br>
 <br>
-        <p align="center"><?= $this->Form->button('back', ['onclick' => 'history.back()', 'type' => 'button']) ?>
-        <?= $this->Form->button(__('add'), array('name' => 'touroku')) ?></p>
-        <?= $this->Form->end() ?>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('追加', array('name' => 'kakunin')); ?></div></td>
+</tr>
+</table>
+<br>
+<?= $this->Form->end() ?>

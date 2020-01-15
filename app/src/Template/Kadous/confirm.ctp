@@ -739,6 +739,11 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
 
  <br>
 
- <p align="center"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
- <?= $this->Form->button(__('登録'), array('name' => 'touroku')) ?></p>
+ <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+ <tr>
+   <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+   <td style="border-style: none;"><div align="center"><?= $this->Form->submit('追加', array('name' => 'kakunin')); ?></div></td>
+ </tr>
+ </table>
+ <br>
  <?= $this->Form->end() ?>

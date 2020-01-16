@@ -17,7 +17,7 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 ?>
 </table>
 <hr size="5">
-<table width="1500" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
+<table width="1000" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>
           <tr>
               <br>
@@ -30,51 +30,48 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 
 <hr size="5">
 
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/menu_csv.gif',array('url'=>array('controller'=>'delivers','action'=>'confirmcsv')));?></p>
-
-<hr size="5">
-
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/sinnkitouroku.gif',array('url'=>array('controller'=>'delivers','action'=>'form')));?></p>
 
 <hr size="5">
 
-    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-        <thead>
-            <tr  border="2" bordercolor="#E6FFFF" bgcolor="#FFDEAD">
-                <th scope="col"><?= $this->Paginator->sort('customer_id') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('place_deliver_id') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('name') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('zip') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('address') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('tel') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('fax') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('status') ?></th>
-                <th scope="col" class="actions"><?= __('') ?></th>
-            </tr>
-        </thead>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
-            <?php foreach ($delivers as $deliver): ?>
-            <tr>
-            	<?php
-                $customer_id = $deliver->customer_id;//$userのrole_idに$role_idと名前をつける
-            		$Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $role_idとなるデータをRolesテーブルから配列で取得
-            		$customer_name = $Customer[0]->name;//配列の0番目（0番目しかない）のnameに$user_roleと名前を付ける
-            	?>
-                <td><?= h($customer_name) ?></td>
-                <td><?= h($deliver->place_deliver_id) ?></td>
-                <td><?= h($deliver->name) ?></td>
-                <td><?= h($deliver->zip) ?></td>
-                <td><?= h($deliver->address) ?></td>
-                <td><?= h($deliver->tel) ?></td>
-                <td><?= h($deliver->fax) ?></td>
-                <td><?= $this->Number->format($deliver->status) ?></td>
-                <td class="actions">
-                    <?= $this->Html->link(__('編集'), ['action' => 'edit', $deliver->id]) ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+      <tr>
+        <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('顧客') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('place_deliver_id') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('名前') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('zip') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('住所') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('電話') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('FAX') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('status') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('') ?></font></strong></div></td>
+      </tr>
+
+      <?php foreach ($delivers as $deliver): ?>
+      <tr>
+        <?php
+          $customer_id = $deliver->customer_id;
+          $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+          $customer_name = $Customer[0]->name;
+        ?>
+          <td><?= h($customer_name) ?></td>
+          <td><?= h($deliver->place_deliver_id) ?></td>
+          <td><?= h($deliver->name) ?></td>
+          <td><?= h($deliver->zip) ?></td>
+          <td><?= h($deliver->address) ?></td>
+          <td><?= h($deliver->tel) ?></td>
+          <td><?= h($deliver->fax) ?></td>
+          <td><?= $this->Number->format($deliver->status) ?></td>
+          <td class="actions">
+              <?= $this->Html->link(__('編集'), ['action' => 'edit', $deliver->id]) ?>
+          </td>
+      </tr>
+      <?php endforeach; ?>
+</table>
+<br>
+
     <div class="paginator">
         <ul class="pagination">
             <?= $this->Paginator->first('<< ' . __('first')) ?>

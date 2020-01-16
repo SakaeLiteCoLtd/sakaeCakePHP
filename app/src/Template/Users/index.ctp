@@ -18,7 +18,7 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 ?>
 </table>
 <hr size="5">
-<table width="1500" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
+<table width="800" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>
           <tr>
               <br>
@@ -31,51 +31,47 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 
 <hr size="5">
 
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/menu_csv.gif',array('url'=>array('controller'=>'users','action'=>'confirmcsv')));?></p>
-
-<hr size="5">
-
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/sinnkitouroku.gif',array('url'=>array('controller'=>'users','action'=>'form')));?></p>
 
 <hr size="5">
 
-    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-        <thead>
-            <tr  border="2" bordercolor="#E6FFFF" bgcolor="#FFDEAD">
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('ユーザー名') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('権限') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('スタッフ') ?></th>
-                <th scope="col" class="actions" style="background-color: #FFDEAD"><?= __('') ?></th>
-            </tr>
-        </thead>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
-            <?php foreach ($users as $user): ?>
-            <tr>
-                <td><?= h($user->username) ?></td>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+      <tr>
+        <td width="200" ><div align="center"><strong><font color="blue" size="2"><?= h('ユーザー名') ?></font></strong></div></td>
+        <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('権限') ?></font></strong></div></td>
+        <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('スタッフ') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('') ?></font></strong></div></td>
+      </tr>
 
-            	<?php
-                    $role_id = $user->role_id;//$userのrole_idに$role_idと名前をつける
-            		$Role = $this->Roles->find()->where(['id' => $role_id])->toArray();//'id' => $role_idとなるデータをRolesテーブルから配列で取得
-            		$user_role = $Role[0]->name;//配列の0番目（0番目しかない）のnameに$user_roleと名前を付ける
-            	?>
+      <?php foreach ($users as $user): ?>
+      <tr>
+          <td><?= h($user->username) ?></td>
 
-                <td><?= h($user_role) ?></td>
+        <?php
+              $role_id = $user->role_id;//$userのrole_idに$role_idと名前をつける
+          $Role = $this->Roles->find()->where(['id' => $role_id])->toArray();//'id' => $role_idとなるデータをRolesテーブルから配列で取得
+          $user_role = $Role[0]->name;//配列の0番目（0番目しかない）のnameに$user_roleと名前を付ける
+        ?>
 
-            	<?php
-                    $staff_id = $user->staff_id;//$userのrole_idに$role_idと名前をつける
-            		$Staff = $this->Staffs->find()->where(['id' => $staff_id])->toArray();//'id' => $role_idとなるデータをRolesテーブルから配列で取得
-            		$user_staff = $Staff[0]->f_name.$Staff[0]->l_name;//配列の0番目（0番目しかない）のnameに$user_roleと名前を付ける
-            	?>
+          <td><?= h($user_role) ?></td>
 
-                <td><?= h($user_staff) ?></td>
+        <?php
+              $staff_id = $user->staff_id;//$userのrole_idに$role_idと名前をつける
+          $Staff = $this->Staffs->find()->where(['id' => $staff_id])->toArray();//'id' => $role_idとなるデータをRolesテーブルから配列で取得
+          $user_staff = $Staff[0]->f_name.$Staff[0]->l_name;//配列の0番目（0番目しかない）のnameに$user_roleと名前を付ける
+        ?>
 
-                <td class="actions">
-                    <?= $this->Html->link(__('編集'), ['action' => 'edit', $user->id]) ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+          <td><?= h($user_staff) ?></td>
+
+          <td class="actions">
+              <?= $this->Html->link(__('編集'), ['action' => 'edit', $user->id]) ?>
+          </td>
+      </tr>
+      <?php endforeach; ?>
+</table>
+<br>
     <div class="paginator">
         <ul class="pagination">
             <?= $this->Paginator->first('<< ' . __('first')) ?>

@@ -18,7 +18,7 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 ?>
 </table>
 <hr size="5">
-<table width="1500" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
+<table width="1200" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>
           <tr>
               <br>
@@ -31,55 +31,52 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 
 <hr size="5">
 
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/menu_csv.gif',array('url'=>array('controller'=>'products','action'=>'confirmcsv')));?></p>
-
-<hr size="5">
-
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/sinnkitouroku.gif',array('url'=>array('controller'=>'products','action'=>'form')));?></p>
 
 <hr size="5">
 
-    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-        <thead>
-            <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFDEAD">
-                <th scope="col"><?= $this->Paginator->sort('product_code') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('product_name') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('customer_id') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('multiple_cs') ?></th>
-                <th scope="col" style="width: 100px"><?= $this->Paginator->sort('material_id') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('torisu') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('cycle') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('primary_p') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('gaityu') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('status') ?></th>
-                <th scope="col" class="actions"><?= __('') ?></th>
-            </tr>
-        </thead>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
-            <?php foreach ($products as $product): ?>
-            <tr>
-                <td><?= h($product->product_code) ?></td>
-                <td><?= h($product->product_name) ?></td>
-            	<?php
-                $customer_id = $product->customer_id;
-            		$Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
-            		$customer_name = $Customer[0]->name;
-            	?>
-                <td><?= h($customer_name) ?></td>
-                <td><?= h($product->multiple_cs) ?></td>
-                <td><?= h($product->material_id) ?></td>
-                <td><?= h($product->torisu) ?></td>
-                <td><?= h($product->cycle) ?></td>
-                <td><?= h($product->primary_p) ?></td>
-                <td><?= h($product->gaityu) ?></td>
-                <td><?= h($product->status) ?></td>
-                <td class="actions">
-                    <?= $this->Html->link(__('edit'), ['action' => 'edit', $product->id]) ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+      <tr>
+        <td width="120" ><div align="center"><strong><font color="blue" size="3"><?= h('品番') ?></font></strong></div></td>
+        <td width="120" ><div align="center"><strong><font color="blue" size="3"><?= h('品名') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('顧客') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('multiple_cs') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('material_id') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('torisu') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('cycle') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('primary_p') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('gaityu') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('status') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('') ?></font></strong></div></td>
+      </tr>
+
+      <?php foreach ($products as $product): ?>
+      <tr>
+          <td><?= h($product->product_code) ?></td>
+          <td><?= h($product->product_name) ?></td>
+        <?php
+          $customer_id = $product->customer_id;
+          $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+          $customer_name = $Customer[0]->name;
+        ?>
+          <td><?= h($customer_name) ?></td>
+          <td><?= h($product->multiple_cs) ?></td>
+          <td><?= h($product->material_id) ?></td>
+          <td><?= h($product->torisu) ?></td>
+          <td><?= h($product->cycle) ?></td>
+          <td><?= h($product->primary_p) ?></td>
+          <td><?= h($product->gaityu) ?></td>
+          <td><?= h($product->status) ?></td>
+          <td class="actions">
+              <?= $this->Html->link(__('編集'), ['action' => 'edit', $product->id]) ?>
+          </td>
+      </tr>
+      <?php endforeach; ?>
+</table>
+<br>
+
     <div class="paginator">
         <ul class="pagination">
             <?= $this->Paginator->first('<< ' . __('first')) ?>

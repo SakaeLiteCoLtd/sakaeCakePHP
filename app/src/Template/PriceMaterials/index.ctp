@@ -18,7 +18,7 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 ?>
 </table>
 <hr size="5">
-<table width="1500" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
+<table width="1000" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>
           <tr>
               <br>
@@ -31,56 +31,53 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 
 <hr size="5">
 
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/menu_csv.gif',array('url'=>array('controller'=>'priceMaterials','action'=>'confirmcsv')));?></p>
-
-<hr size="5">
-
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/sinnkitouroku.gif',array('url'=>array('controller'=>'priceMaterials','action'=>'form1')));?></p>
 
 <hr size="5">
 
-    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-        <thead>
-            <tr  border="2" bordercolor="#E6FFFF" bgcolor="#FFDEAD">
-                <th scope="col" style="width: 150px"><?= $this->Paginator->sort('material_id') ?></th>
-                <th scope="col" style="width: 150px"><?= $this->Paginator->sort('supplier_id') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('lot_low') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('lot_upper') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('price') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('start') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('finish') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('status') ?></th>
-                <th scope="col" class="actions"><?= __('') ?></th>
-            </tr>
-        </thead>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
-            <?php foreach ($priceMaterials as $priceMaterial): ?>
-            <tr>
-            	<?php
-                    $material_id = $priceMaterial->material_id;//$userのrole_idに$role_idと名前をつける
-            		$Material = $this->Materials->find()->where(['id' => $material_id])->toArray();//'id' => $role_idとなるデータをRolesテーブルから配列で取得
-            		$material_name = $Material[0]->grade.'='.$Material[0]->color;//配列の0番目（0番目しかない）のnameに$user_roleと名前を付ける
-            	?>
-                <td><?= h($material_name) ?></td>
-            	<?php
-                    $supplier_id = $priceMaterial->supplier_id;//$userのrole_idに$role_idと名前をつける
-            		$Supplier = $this->Suppliers->find()->where(['id' => $supplier_id])->toArray();//'id' => $role_idとなるデータをRolesテーブルから配列で取得
-            		$supplier_name = $Supplier[0]->name;//配列の0番目（0番目しかない）のnameに$user_roleと名前を付ける
-            	?>
-                <td><?= h($supplier_name) ?></td>
-                <td><?= h($priceMaterial->lot_low) ?></td>
-                <td><?= h($priceMaterial->lot_upper) ?></td>
-                <td><?= h($priceMaterial->price) ?></td>
-                <td><?= h($priceMaterial->start) ?></td>
-                <td><?= h($priceMaterial->finish) ?></td>
-                <td><?= h($priceMaterial->status) ?></td>
-                <td class="actions">
-                    <?= $this->Html->link(__('edit'), ['action' => 'edit', $priceMaterial->id]) ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+      <tr>
+        <td width="120" ><div align="center"><strong><font color="blue" size="3"><?= h('material_id') ?></font></strong></div></td>
+        <td width="120" ><div align="center"><strong><font color="blue" size="3"><?= h('supplier_id') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('lot_low') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('lot_upper') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('price') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('start') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('finish') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('status') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('') ?></font></strong></div></td>
+      </tr>
+
+      <?php foreach ($priceMaterials as $priceMaterial): ?>
+      <tr>
+        <?php
+              $material_id = $priceMaterial->material_id;
+          $Material = $this->Materials->find()->where(['id' => $material_id])->toArray();
+          $material_name = $Material[0]->grade.'='.$Material[0]->color;
+        ?>
+          <td><?= h($material_name) ?></td>
+        <?php
+          $supplier_id = $priceMaterial->supplier_id;
+          $Supplier = $this->Suppliers->find()->where(['id' => $supplier_id])->toArray();
+          $supplier_name = $Supplier[0]->name;
+        ?>
+          <td><?= h($supplier_name) ?></td>
+          <td><?= h($priceMaterial->lot_low) ?></td>
+          <td><?= h($priceMaterial->lot_upper) ?></td>
+          <td><?= h($priceMaterial->price) ?></td>
+          <td><?= h($priceMaterial->start) ?></td>
+          <td><?= h($priceMaterial->finish) ?></td>
+          <td><?= h($priceMaterial->status) ?></td>
+          <td class="actions">
+              <?= $this->Html->link(__('編集'), ['action' => 'edit', $priceMaterial->id]) ?>
+          </td>
+      </tr>
+      <?php endforeach; ?>
+</table>
+<br>
+
     <div class="paginator">
         <ul class="pagination">
             <?= $this->Paginator->first('<< ' . __('first')) ?>

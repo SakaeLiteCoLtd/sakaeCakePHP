@@ -17,7 +17,7 @@
 
 <body>
 <hr size="5">
-<table width="1500" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
+<table width="800" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>
           <tr>
               <br>
@@ -27,10 +27,6 @@
 </table>
 </body>
 </html>
-
-<hr size="5">
-
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/menu_csv.gif',array('url'=>array('controller'=>'materials','action'=>'confirmcsv')));?></p>
 
 <hr size="5">
 
@@ -55,34 +51,35 @@
 </fieldset>
 <?=$this->Form->end() ?>
 
-    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-        <thead>
-            <tr  border="2" bordercolor="#E6FFFF" bgcolor="#FFDEAD">
-                <th scope="col"><?= $this->Paginator->sort('grade') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('color') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('material_type_id') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('tani') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('multiple_sup') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('status') ?></th>
-                <th scope="col" class="actions"><?= __('') ?></th>
-            </tr>
-        </thead>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
-            <?php foreach ($materials as $material): ?>
-            <tr>
-                <td><?= h($material->grade) ?></td>
-                <td><?= h($material->color) ?></td>
-                <td><?= h($material->material_type_id) ?></td>
-                <td><?= h($material->tani) ?></td>
-                <td><?= h($material->multiple_sup) ?></td>
-                <td><?= h($material->status) ?></td>
-                <td class="actions">
-                    <?= $this->Html->link(__('edit'), ['action' => 'edit', $material->id]) ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+      <tr>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('グレード') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('色') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('原料タイプ') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('単位') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('multiple_sup') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('status') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('') ?></font></strong></div></td>
+      </tr>
+
+      <?php foreach ($materials as $material): ?>
+      <tr>
+          <td><?= h($material->grade) ?></td>
+          <td><?= h($material->color) ?></td>
+          <td><?= h($material->material_type_id) ?></td>
+          <td><?= h($material->tani) ?></td>
+          <td><?= h($material->multiple_sup) ?></td>
+          <td><?= h($material->status) ?></td>
+          <td class="actions">
+              <?= $this->Html->link(__('編集'), ['action' => 'edit', $material->id]) ?>
+          </td>
+      </tr>
+      <?php endforeach; ?>
+</table>
+<br>
+
     <div class="paginator">
         <ul class="pagination">
             <?= $this->Paginator->first('<< ' . __('first')) ?>

@@ -30,15 +30,12 @@ class SyukkaKensasController extends AppController {
     public function index()
     {
       //メニュー画面
-
-
     }
 
     public function index1()//IMtaiou
     {
     	$this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
     }
-
 
     public function imtaiouform()//IMtaiou
     {

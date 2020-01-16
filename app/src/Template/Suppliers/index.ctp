@@ -17,7 +17,7 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 ?>
 </table>
 <hr size="5">
-<table width="1500" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
+<table width="1300" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>
           <tr>
               <br>
@@ -29,54 +29,52 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 </html>
 
 <hr size="5">
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/menu_csv.gif',array('url'=>array('controller'=>'suppliers','action'=>'confirmcsv')));?></p>
-
-<hr size="5">
 
               <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/sinnkitouroku.gif',array('url'=>array('controller'=>'suppliers','action'=>'form')));?></p>
 
 <hr size="5">
 
 
-    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-        <thead>
-            <tr  border="2" bordercolor="#E6FFFF" bgcolor="#FFDEAD">
-                <th scope="col"><?= $this->Paginator->sort('supplier_section_id') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('supplier_code') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('name') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('zip') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('address') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('tel') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('fax') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('charge_p') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('status') ?></th>
-                <th scope="col" class="actions"><?= __('') ?></th>
-            </tr>
-        </thead>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
-            <?php foreach ($suppliers as $supplier): ?>
-            <tr>
-            	<?php
-                    $supplierSection_id = $supplier->supplier_section_id;//$userのrole_idに$role_idと名前をつける
-            		$SupplierSection = $this->SupplierSections->find()->where(['id' => $supplierSection_id])->toArray();//'id' => $role_idとなるデータをRolesテーブルから配列で取得
-            		$supplierSection_name = $SupplierSection[0]->name;//配列の0番目（0番目しかない）のnameに$user_roleと名前を付ける
-            	?>
-                <td><?= h($supplierSection_name) ?></td>
-                <td><?= h($supplier->supplier_code) ?></td>
-                <td><?= h($supplier->name) ?></td>
-                <td><?= h($supplier->zip) ?></td>
-                <td><?= h($supplier->address) ?></td>
-                <td><?= h($supplier->tel) ?></td>
-                <td><?= h($supplier->fax) ?></td>
-                <td><?= h($supplier->charge_p) ?></td>
-                <td><?= $this->Number->format($supplier->status) ?></td>
-                <td class="actions">
-                    <?= $this->Html->link(__('edit'), ['action' => 'edit', $supplier->id]) ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+      <tr>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('supplier_section_id') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('supplier_code') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('名前') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('zip') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('住所') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('電話') ?></font></strong></div></td>
+        <td width="50" ><div align="center"><strong><font color="blue" size="3"><?= h('FAX') ?></font></strong></div></td>
+        <td width="20" ><div align="center"><strong><font color="blue" size="3"><?= h('charge_p') ?></font></strong></div></td>
+        <td width="20" ><div align="center"><strong><font color="blue" size="3"><?= h('status') ?></font></strong></div></td>
+        <td width="20" ><div align="center"><strong><font color="blue" size="3"><?= h('') ?></font></strong></div></td>
+      </tr>
+
+      <?php foreach ($suppliers as $supplier): ?>
+      <tr>
+        <?php
+          $supplierSection_id = $supplier->supplier_section_id;
+          $SupplierSection = $this->SupplierSections->find()->where(['id' => $supplierSection_id])->toArray();
+          $supplierSection_name = $SupplierSection[0]->name;
+        ?>
+          <td><?= h($supplierSection_name) ?></td>
+          <td><?= h($supplier->supplier_code) ?></td>
+          <td><?= h($supplier->name) ?></td>
+          <td><?= h($supplier->zip) ?></td>
+          <td><?= h($supplier->address) ?></td>
+          <td><?= h($supplier->tel) ?></td>
+          <td><?= h($supplier->fax) ?></td>
+          <td><?= h($supplier->charge_p) ?></td>
+          <td><?= $this->Number->format($supplier->status) ?></td>
+          <td class="actions">
+              <?= $this->Html->link(__('編集'), ['action' => 'edit', $supplier->id]) ?>
+          </td>
+      </tr>
+      <?php endforeach; ?>
+</table>
+<br>
+
     <div class="paginator">
         <ul class="pagination">
             <?= $this->Paginator->first('<< ' . __('first')) ?>

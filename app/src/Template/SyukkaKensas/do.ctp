@@ -101,8 +101,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         ?>
         </tr>
 
-          <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px">
-            <strong>備考：</strong><br>
+        <td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
+          <strong style="text-align: left">備考：</strong><br>
                   <?= h($KensahyouHeadbik) ?>
               </td>
         </tr>

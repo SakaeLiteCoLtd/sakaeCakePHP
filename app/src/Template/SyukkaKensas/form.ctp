@@ -163,16 +163,19 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
         ?>
 
         </tr>
-          <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px">
-            <strong>備考：</strong><br>
+          <td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
+            <strong style="text-align: left">備考：</strong><br>
                   <?= h($KensahyouHeadbik) ?>
               </td>
         </tr>
        <tr>
 </table>
 <br>
-<strong>　　*備考の欄内にはソリ・フレ値・外観の検査基準を外観の規格欄内の値と関連付けてください。</strong>
-
+<table>
+<td style="text-align: left">
+  <strong>　*備考の欄内にはソリ・フレ値・外観の検査基準を外観の規格欄内の値と関連付けてください。</strong>
+</td>
+</table>
         <?php
         if(isset($ImSokuteidataHead[0])){
         echo $this->Form->hidden('inspec_date' ,['value'=>$inspec_date]);

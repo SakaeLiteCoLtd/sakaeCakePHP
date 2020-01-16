@@ -87,8 +87,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         ?>
 
         </tr>
-          <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px; text-align: left;">
-            <strong>備考：</strong><br>
+        <td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
+          <strong style="text-align: left">備考：</strong><br>
                   <?= h($KensahyouHeadbik) ?>
               </td>
         </tr>
@@ -96,7 +96,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 </table>
 <br>
 
-<div align="left"><strong>　　*備考の欄内にはソリ・フレ値・外観の検査基準を外観の規格欄内の値と関連付けてください。</strong></div>
+<table>
+<td style="text-align: left">
+  <strong>　*備考の欄内にはソリ・フレ値・外観の検査基準を外観の規格欄内の値と関連付けてください。</strong>
+</td>
+</table>
         <?php
             echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
             echo $this->Form->hidden('product_code' ,['value'=>$product_code]) ;

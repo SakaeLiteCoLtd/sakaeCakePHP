@@ -15,7 +15,7 @@
  ?>
  </table>
  <hr size="5">
-<table width="1500" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
+<table width="800" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>
           <tr>
               <br>
@@ -25,10 +25,6 @@
 </table>
 </body>
 </html>
-
-<hr size="5">
-
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/menu_csv.gif',array('url'=>array('controller'=>'staffs','action'=>'confirmcsv')));?></p>
 
 <hr size="5">
 
@@ -51,45 +47,45 @@
 </fieldset>
 <?=$this->Form->end() ?>
 
-    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-        <thead>
-            <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFDEAD">
-                <th scope="col"><?= $this->Paginator->sort('スタッフＩＤ') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('姓') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('名') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('性別') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('誕生日') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('入社日') ?></th>
-                <th scope="col" style="background-color: #FFDEAD"><?= $this->Paginator->sort('退社日') ?></th>
-                <th scope="col" style="background-color: #FFDEAD" class="actions"><?= __('') ?></th>
-            </tr>
-        </thead>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFEFD5">
-            <?php foreach ($staffs as $staff): ?>
-            <tr>
-                <td><?= h($staff->staff_code) ?></td>
-                <td><?= h($staff->f_name) ?></td>
-                <td><?= h($staff->l_name) ?></td>
-            <?php
-            	if($staff->sex == null){
-            	$sex = '';
-            	} elseif($staff->sex == 1) {
-            	$sex = '女';
-            	} else {
-            	$sex = '男';
-            	}
-            ?>
-                <td><?= h($sex) ?></td>
-                <td><?= h($staff->birth) ?></td>
-                <td><?= h($staff->date_start) ?></td>
-                <td><?= h($staff->date_finish) ?></td>
-                <td class="actions">
-                    <?= $this->Html->link(__('編集'), ['action' => 'edit', $staff->id]) ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+      <tr>
+        <td width="200" ><div align="center"><strong><font color="blue" size="2"><?= h('スタッフＩＤ') ?></font></strong></div></td>
+        <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('姓') ?></font></strong></div></td>
+        <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('名') ?></font></strong></div></td>
+        <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('性別') ?></font></strong></div></td>
+        <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('誕生日') ?></font></strong></div></td>
+        <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('入社日') ?></font></strong></div></td>
+        <td width="200" ><div align="center"><strong><font color="blue" size="3"><?= h('退社日') ?></font></strong></div></td>
+        <td width="100" ><div align="center"><strong><font color="blue" size="3"><?= h('') ?></font></strong></div></td>
+      </tr>
+
+      <?php foreach ($staffs as $staff): ?>
+      <tr>
+          <td><?= h($staff->staff_code) ?></td>
+          <td><?= h($staff->f_name) ?></td>
+          <td><?= h($staff->l_name) ?></td>
+      <?php
+        if($staff->sex == null){
+        $sex = '';
+        } elseif($staff->sex == 1) {
+        $sex = '女';
+        } else {
+        $sex = '男';
+        }
+      ?>
+          <td><?= h($sex) ?></td>
+          <td><?= h($staff->birth) ?></td>
+          <td><?= h($staff->date_start) ?></td>
+          <td><?= h($staff->date_finish) ?></td>
+          <td class="actions">
+              <?= $this->Html->link(__('編集'), ['action' => 'edit', $staff->id]) ?>
+          </td>
+      </tr>
+      <?php endforeach; ?>
+</table>
+<br>
     <div class="paginator">
         <ul class="pagination">
             <?= $this->Paginator->first('<< ' . __('first')) ?>

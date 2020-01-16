@@ -79,8 +79,8 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
                 <td colspan='2'><div align="center"><?= h($KensahyouSokuteidata->result_weight) ?></div></td>
             <?php endforeach; ?>
         </tr>
-          <td height="120" colspan="28" style="border-bottom: solid;border-width: 1px">
-	      <strong>備考：</strong><br>
+        <td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
+          <strong style="text-align: left">備考：</strong><br>
               <div cols="120" rows="10"><?= h($KensahyouHeadbik) ?></div>
           </td>
         </tr>

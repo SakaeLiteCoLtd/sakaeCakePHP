@@ -39,4 +39,9 @@
 </table>
 <br>
 
-<p align="center"><?= $this->Form->button(__('確認'), array('name' => 'do')) ?></p>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+<td style="border-style: none;"><div align="center"><?= $this->Form->submit('確認', array('name' => 'do')); ?></div></td>
+</tr>
+</table>
+<br>

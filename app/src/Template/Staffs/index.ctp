@@ -15,7 +15,7 @@
  ?>
  </table>
  <hr size="5">
-<table width="800" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
+<table width="880" border="0" bordercolor="#E6FFFF" align="center" cellpadding="0" cellspacing="0" bgcolor="#E6FFFF">
   <tr>
           <tr>
               <br>
@@ -35,14 +35,17 @@
 <?=$this->Form->create($entity) ?>
 <fieldset align="center">
 
+
 <table border="2" bordercolor="#E6FFFF" align="center">
-		<td bgcolor="#E6FFFF" style="width: 120px;border-bottom: solid;border-width: 1px">スタッフＩＤ</td>
-		<td bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("staff_code", array('type' => 'value', 'label'=>false)) ?></td>
-		<td  bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px">姓</td>
-		<td bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("f_name", array('type' => 'value', 'label'=>false)); ?></td>
-		<td  bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px">名</td>
-		<td bgcolor="#E6FFFF" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("l_name", array('type' => 'value', 'label'=>false)); ?></td>
-        <td bgcolor="#E6FFFF" class="noborder" style="border-style: none;color: #E6FFFF"><?=$this->Form->button("検索") ?></td>
+<tr>
+  	<td bgcolor="#E6FFFF" style="width: 120px; border-bottom: solid;border-width: 1px">スタッフＩＤ</td>
+		<td bgcolor="#E6FFFF" style="width: 40px; border-bottom: solid;border-width: 1px"><?= $this->Form->input("staff_code", array('type' => 'value', 'label'=>false)) ?></td>
+		<td bgcolor="#E6FFFF" style="width: 30px; border-bottom: solid;border-width: 1px">姓</td>
+		<td bgcolor="#E6FFFF" style="width: 40px; border-bottom: solid;border-width: 1px"><?= $this->Form->input("f_name", array('type' => 'value', 'label'=>false)); ?></td>
+		<td bgcolor="#E6FFFF" style="width: 30px; border-bottom: solid;border-width: 1px">名</td>
+		<td bgcolor="#E6FFFF" style="width: 40px; border-bottom: solid;border-width: 1px"><?= $this->Form->input("l_name", array('type' => 'value', 'label'=>false)); ?></td>
+    <td bgcolor="#E6FFFF" class="noborder" style="width: 30px;border-style: none;"><div align="center"><?= $this->Form->submit(__('検索'), array('name' => 'index')); ?></div></td>
+</tr>
 </table>
 </fieldset>
 <?=$this->Form->end() ?>

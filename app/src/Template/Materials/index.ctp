@@ -39,12 +39,12 @@
 <fieldset align="center">
 
 <table border="2" bordercolor="#E6FFFF" align="center">
-        <tr>
-		<td bgcolor="#E6FFFF" style="width: 60px;border-bottom: solid;border-width: 1px">grade</td>
+  <tr>
+		<td bgcolor="#E6FFFF" style="width: 100px;border-bottom: solid;border-width: 1px">グレード</td>
 		<td bgcolor="#E6FFFF" style="width: 200px;border-bottom: solid;border-width: 1px"><?= $this->Form->input("grade", array('type' => 'value', 'label'=>false)) ?></td>
-		<td bgcolor="#E6FFFF" style="width: 60px;border-bottom: solid;border-width: 1px">color</td>
+		<td bgcolor="#E6FFFF" style="width: 60px;border-bottom: solid;border-width: 1px">色</td>
 		<td bgcolor="#E6FFFF" style="width: 200px;border-bottom: solid;border-width: 1px"><?= $this->Form->input("color", array('type' => 'value', 'label'=>false)); ?></td>
-                <td bgcolor="#E6FFFF" class="noborder" style="border-style: none;color: #E6FFFF" ><?=$this->Form->button("search") ?></td>
+    <td bgcolor="#E6FFFF" class="noborder" style="border-style: none" ><?= $this->Form->submit(__('検索'), array('name' => 'index')); ?></td>
 	</tr>
 </table>
 

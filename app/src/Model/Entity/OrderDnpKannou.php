@@ -21,7 +21,7 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\FrozenTime $updated_at
  * @property int $updated_staff
  */
-class OrderDnpKannous extends Entity
+class OrderDnpKannou extends Entity
 {
 
     /**

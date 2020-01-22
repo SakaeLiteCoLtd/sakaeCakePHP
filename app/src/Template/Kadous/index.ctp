@@ -34,6 +34,4 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
     </tr>
       <td width="300" colspan="20" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("manu_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></div></td>
 </table>
-<br>
-<br>
-<br>
+<br><br><br>

@@ -11,6 +11,8 @@
   header('Cache-Control:');
   header('Pragma:');
   echo $this->Form->create($orderEdis, ['url' => ['action' => 'dnpcsvdo']]);
+  echo $this->Form->create($denpyouDnps, ['url' => ['action' => 'dnpcsvdo']]);
+  echo $this->Form->create($orderDnpKannous, ['url' => ['action' => 'dnpcsvdo']]);
 ?>
 <br><br>
 <legend align="center"><font color="red"><?= __($mes) ?></font></legend>

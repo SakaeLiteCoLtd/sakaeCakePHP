@@ -41,8 +41,8 @@ class SyukkaKensasController extends AppController {
     {
     	$this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
-/*      echo "<pre>";
+/*
+      echo "<pre>";
  		  print_r($data["product_code"]);
  	  	echo "<br>";
 */

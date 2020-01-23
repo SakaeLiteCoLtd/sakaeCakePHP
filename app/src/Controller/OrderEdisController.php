@@ -217,6 +217,8 @@ class OrderEdisController extends AppController
       $this->set('file',$file);
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+      $denpyouDnps = $this->DenpyouDnps->newEntity();
+      $this->set('denpyouDnps',$denpyouDnps);
       $orderDnpKannous = $this->OrderDnpKannous->newEntity();
       $this->set('orderDnpKannous',$orderDnpKannous);
 
@@ -277,11 +279,11 @@ class OrderEdisController extends AppController
             break;
           }
         }
-      echo "<pre>";
+/*      echo "<pre>";
       print_r("arrEDI");
       print_r($arrEDI);
       echo "<br>";
-
+*/
       $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrEDI);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
       $connection = ConnectionManager::get('default');//トランザクション1
       // トランザクション開始2
@@ -319,14 +321,13 @@ class OrderEdisController extends AppController
                 break;
               }
             }
-            echo "<pre>";
+/*            echo "<pre>";
             print_r("arrDenpyou");
             print_r($arrDenpyou);
             echo "<br>";
-
+*/
             $denpyouDnps = $this->DenpyouDnps->patchEntities($denpyouDnps, $arrDenpyou);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-          //  if ($this->DenpyouDnps->saveMany($denpyouDnps)) {//saveManyで一括登録
-            if ($num = 1) {//saveManyで一括登録
+            if ($this->DenpyouDnps->saveMany($denpyouDnps)) {//saveManyで一括登録
 
               for ($k=1; $k<=$count-1; $k++) {//最後の行まで
                 $line = fgets($fp3);//ファイル$fpの上の１行を取る（２行目から）
@@ -358,11 +359,11 @@ class OrderEdisController extends AppController
                   break;
                 }
               }
-              echo "<pre>";
+/*              echo "<pre>";
               print_r("arrKannou");
               print_r($arrKannou);
               echo "<br>";
-
+*/
                $orderDnpKannous = $this->OrderDnpKannous->patchEntities($orderDnpKannous, $arrKannou);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                    if ($this->OrderDnpKannous->saveMany($orderDnpKannous)) {//saveManyで一括登録
                      $mes = "※登録されました";
@@ -386,8 +387,6 @@ class OrderEdisController extends AppController
       //ロールバック8
         $connection->rollback();//トランザクション9
       }//トランザクション10
-
-
 
 /*
       for ($k=1; $k<=$count-1; $k++) {//最後の行まで
@@ -498,10 +497,8 @@ class OrderEdisController extends AppController
                print_r($arrDenpyou);
                echo "<br>";
 
-               $denpyouDnps = $this->DenpyouDnps->newEntity();
-
                 if ($this->request->is('get')) {
-                  $denpyouDnps = $this->DenpyouDnps->patchEntities($orderDnpKannous, $arrDenpyou);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+                  $denpyouDnps = $this->DenpyouDnps->patchEntities($denpyouDnps, $arrDenpyou);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                   $connection = ConnectionManager::get('default');//トランザクション1
                   // トランザクション開始2
                   $connection->begin();//トランザクション3

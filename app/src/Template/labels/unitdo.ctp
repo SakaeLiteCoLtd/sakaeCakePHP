@@ -5,19 +5,26 @@
  * @var \App\Model\Entity\Deliver $priceMaterial
  */
 ?>
-<?= $this->Form->create($labelElementUnits, ['url' => ['action' => 'index']]) ?>
+<?= $this->Form->create($labelElementUnits, ['url' => ['action' => 'indexmenu']]) ?>
 
 <?php
   $username = $this->request->Session()->read('Auth.User.username');
   $session = $this->request->getSession();
   $unit = $session->read('labelunits.unit');
 ?>
-<hr size="5">
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
-<hr size="5">
-
-
-
+<?php
+ use App\myClass\Labelmenus\htmlLabelmenu;//myClassフォルダに配置したクラスを使用
+ $htmlLabelmenu = new htmlLabelmenu();
+ $htmlLabels = $htmlLabelmenu->Labelmenus();
+ ?>
+ <hr size="5" style="margin: 0.5rem">
+ <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <?php
+    echo $htmlLabels;
+ ?>
+ </table>
+ <hr size="5" style="margin: 0.5rem">
+ <br>
 <legend align="center"><font color="red"><?= __('＊下記のように登録されました。') ?></font></legend>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -33,6 +40,10 @@
             <td><?= h($CreatedStaff) ?></td>
     </table>
 <br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('トップ'), array('name' => 'top')); ?></div></td>
+</tr>
+</table>
 <br>
-        <p align="center"><?= $this->Form->button(__('top'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>

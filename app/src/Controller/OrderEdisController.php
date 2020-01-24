@@ -680,12 +680,7 @@ class OrderEdisController extends AppController
       }
 
       if($countP >= 10){//この場合、customer_id=1（customer_code=10001）パナソニック(株)HA社キッチンアプライアンス（事）草津工場の製品をSyoyouKeikakusテーブルから削除
-/*        echo "<pre>";
-        print_r($countP."P");
-        echo "</pre>";
-*/
         $Products_P = $this->Products->find()->where(['customer_id' => '1']);
-
         foreach ($Products_P as $value) {
           $product_code= $value->product_code;
           $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
@@ -693,12 +688,7 @@ class OrderEdisController extends AppController
       }
 
       if($countW >= 5){//customer_id=2（customer_code=10002）パナソニック(株)HA社ランドリークリーナー（事）静岡工場の製品をSyoyouKeikakusテーブルから削除
-/*        echo "<pre>";
-        print_r($countW."W");
-        echo "</pre>";
-*/
         $Products_W = $this->Products->find()->where(['customer_id' => '2']);
-
         foreach ($Products_W as $value) {
           $product_code= $value->product_code;
           $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
@@ -706,12 +696,7 @@ class OrderEdisController extends AppController
       }
 
       if($countR >= 5){//customer_id=3（customer_code=10003）パナソニック(株)HA社キッチンアプライアンス（事）加東工場の製品をSyoyouKeikakusテーブルから削除
-/*        echo "<pre>";
-        print_r($countR."R");
-        echo "</pre>";
-*/
         $Products_R = $this->Products->find()->where(['customer_id' => '3']);
-
         foreach ($Products_R as $value) {
           $product_code= $value->product_code;
           $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
@@ -722,7 +707,6 @@ class OrderEdisController extends AppController
       print_r($arrSyoyouKeikaku);
       echo "<br>";
 */
-
        if ($this->request->is('get')) {
          $syoyouKeikakus = $this->SyoyouKeikakus->patchEntities($syoyouKeikakus, $arrSyoyouKeikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
          $connection = ConnectionManager::get('default');//トランザクション1

@@ -5,6 +5,18 @@
  */
 ?>
 <?= $this->Form->create($labelElementPlaces, ['url' => ['action' => 'placepreadd']]) ?>
+<?php
+ use App\myClass\Labelmenus\htmlLabelmenu;//myClassフォルダに配置したクラスを使用
+ $htmlLabelmenu = new htmlLabelmenu();
+ $htmlLabels = $htmlLabelmenu->Labelmenus();
+ ?>
+ <hr size="5" style="margin: 0.5rem">
+ <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <?php
+    echo $htmlLabels;
+ ?>
+ </table>
+ <hr size="5" style="margin: 0.5rem">
 
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
@@ -18,27 +30,8 @@
 
             $session = $this->request->getSession();
             $data = $session->read();
-            echo "<pre>";
-            print_r($_SESSION['labelplaces']);
-            echo "</pre>";
-
         ?>
 
-<hr size="5">
-<table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-          <tr style="background-color: #E6FFFF">
-            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_hakkou.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Labels','action'=>'index')));?></td>
-            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_touroku_place.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Labels','action'=>'placeform')));?></td>
-          </tr>
-</table>
-<hr size="5">
-<table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-          <tr style="background-color: #E6FFFF">
-            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_hakkou.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Labels','action'=>'index')));?></td>
-            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_touroku_place.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Labels','action'=>'placeform')));?></td>
-          </tr>
-</table>
-<hr size="5">
 <br>
 <legend align="center"><strong style="font-size: 15pt; color:blue"><?= __('ラベル納品場所登録') ?></strong></legend>
 <br><br>
@@ -55,6 +48,10 @@
     </table>
 <br>
 <br>
-        <p align="center"><?= $this->Form->button('back', ['onclick' => 'history.back()', 'type' => 'button']) ?>
-        <?= $this->Form->button(__('add'), array('name' => 'touroku')) ?></p>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('追加', array('name' => 'touroku')); ?></div></td>
+</tr>
+</table>
         <?= $this->Form->end() ?>

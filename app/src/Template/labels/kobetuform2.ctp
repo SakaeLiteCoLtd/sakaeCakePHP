@@ -17,6 +17,18 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
           header('Pragma:');
           echo $this->Form->create($labelCsvs, ['url' => ['action' => 'kobetuform2']]);
 ?>
+<?php
+ use App\myClass\Labelmenus\htmlLabelmenu;//myClassフォルダに配置したクラスを使用
+ $htmlLabelmenu = new htmlLabelmenu();
+ $htmlLabels = $htmlLabelmenu->Labelmenus();
+ ?>
+ <hr size="5" style="margin: 0.5rem">
+ <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <?php
+    echo $htmlLabels;
+ ?>
+ </table>
+ <hr size="5" style="margin: 0.5rem">
 
 <?php if(!isset($confirm) && !isset($touroku)): ?>
 
@@ -98,17 +110,17 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
 */
   ?>
  </table>
- <br><br><br>
-
-  <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-  <tr bgcolor="#E6FFFF" >
-    <td align="right" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('csv登録'), array('name' => 'touroku', 'value'=>"1")); ?></div></td>
-  </tr>
-  </table>
+ <br>
+ <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+ <tr>
+   <td align="right" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('csv登録'), array('name' => 'touroku', 'value'=>"1")); ?></div></td>
+   <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+ </tr>
+ </table>
+<br>
   <fieldset>
     <?= $this->Form->control('formset', array('type'=>'hidden', 'value'=>"1", 'label'=>false)) ?>
   </fieldset>
-  <p align="right"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
 
 <?php else: //csv押したとき ?>
 

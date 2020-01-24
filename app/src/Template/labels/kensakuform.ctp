@@ -13,8 +13,19 @@
 ?>
 
 <?=$this->Form->create($checkLots, ['url' => ['action' => 'kensakuview']]) ?>
+<?php
+ use App\myClass\Labelmenus\htmlLabelmenu;//myClassフォルダに配置したクラスを使用
+ $htmlLabelmenu = new htmlLabelmenu();
+ $htmlLabels = $htmlLabelmenu->Labelmenus();
+ ?>
+ <hr size="5" style="margin: 0.5rem">
+ <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <?php
+    echo $htmlLabels;
+ ?>
+ </table>
+ <hr size="5" style="margin: 0.5rem">
 
-<hr size="5">
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
     <tr style="border-bottom: 0px;border-width: 0px">

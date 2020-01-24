@@ -13,21 +13,18 @@
 ?>
 
 <?=$this->Form->create($labelElementPlaces, ['url' => ['action' => 'placeconfirm']]) ?>
-
-<hr size="5">
-<table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-          <tr style="background-color: #E6FFFF">
-            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_hakkou.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Labels','action'=>'index')));?></td>
-            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_touroku_place.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Labels','action'=>'placeform')));?></td>
-          </tr>
-</table>
-<hr size="5">
-<table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-          <tr style="background-color: #E6FFFF">
-            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_hakkou.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Labels','action'=>'index')));?></td>
-            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_touroku_place.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Labels','action'=>'placeform')));?></td>
-          </tr>
-</table>
+<?php
+ use App\myClass\Labelmenus\htmlLabelmenu;//myClassフォルダに配置したクラスを使用
+ $htmlLabelmenu = new htmlLabelmenu();
+ $htmlLabels = $htmlLabelmenu->Labelmenus();
+ ?>
+ <hr size="5" style="margin: 0.5rem">
+ <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <?php
+    echo $htmlLabels;
+ ?>
+ </table>
+ <hr size="5" style="margin: 0.5rem">
 <br><br>
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
           <tr style="background-color: #E6FFFF">
@@ -46,9 +43,11 @@
 		<td bgcolor="#FFFFCC"><?= $this->Form->control('place1', array('type'=>'text', 'label'=>false)) ?></td>
 	</tr>
 </table>
-<br><br>
-    <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
 <br>
-</fieldset>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')); ?></div></td>
+</tr>
+</table>
 
 <?=$this->Form->end() ?>

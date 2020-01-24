@@ -24,6 +24,7 @@ class OrderEdisController extends AppController
        $this->OrderEdis = TableRegistry::get('orderEdis');
        $this->DenpyouDnps = TableRegistry::get('denpyouDnps');
        $this->OrderDnpKannous = TableRegistry::get('orderDnpKannous');
+       $this->SyoyouKeikakus = TableRegistry::get('syoyouKeikakus');
      }
 
      public function indexmenu()
@@ -64,8 +65,8 @@ class OrderEdisController extends AppController
  					if(empty($Userdata)){
  						$delete_flag = "";
  					}else{
- 						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
- 						$this->set('delete_flag',$delete_flag);//登録者の表示のため
+ 						$delete_flag = $Userdata[0]->delete_flag;
+ 						$this->set('delete_flag',$delete_flag);
  					}
  						$user = $this->Auth->identify();
  					if ($user) {
@@ -198,8 +199,8 @@ class OrderEdisController extends AppController
          if(empty($Userdata)){
            $delete_flag = "";
          }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+           $delete_flag = $Userdata[0]->delete_flag;
+           $this->set('delete_flag',$delete_flag);
          }
            $user = $this->Auth->identify();
          if ($user) {
@@ -615,8 +616,8 @@ class OrderEdisController extends AppController
           if(empty($Userdata)){
             $delete_flag = "";
           }else{
-            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-            $this->set('delete_flag',$delete_flag);//登録者の表示のため
+            $delete_flag = $Userdata[0]->delete_flag;
+            $this->set('delete_flag',$delete_flag);
           }
             $user = $this->Auth->identify();
           if ($user) {
@@ -632,11 +633,16 @@ class OrderEdisController extends AppController
       $data = $session->read();
       $file = $_SESSION['keikakucsvs']['file'];
       $this->set('file',$file);
+      $syoyouKeikakus = $this->SyoyouKeikakus->newEntity();
+      $this->set('syoyouKeikakus',$syoyouKeikakus);
+      $countP = 0;
+      $countW = 0;
+      $countR = 0;
 
       $fp = fopen("EDI/$file", "r");//csvファイルはwebrootに入れる
       $fpcount = fopen("EDI/$file", 'r' );
       for($count = 0; fgets( $fpcount ); $count++ );
-      $arrFp = array();//空の配列を作る
+      $arrSyoyouKeikaku = array();//空の配列を作る
       $created_staff = $this->Auth->user('staff_id');
       for ($k=1; $k<=$count-1; $k++) {//最後の行まで
         $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
@@ -656,33 +662,74 @@ class OrderEdisController extends AppController
          unset($sample['27'],$sample['28'],$sample['29'],$sample['30'],$sample['31'],$sample['32'],$sample['33'],$sample['34']);
          unset($sample['35'],$sample['36'],$sample['37'],$sample['38'],$sample['39'],$sample['40'],$sample['41']);//最後の改行も削除
 
-         if($k>=2){
-           $arrFp[] = $sample;//配列に追加する
+         if($k>=2 && !empty($sample['product_code'])){
+             $arrSyoyouKeikaku[] = $sample;//配列に追加する
+             $this->SyoyouKeikakus->deleteAll(['product_code' => $sample['product_code']]);//格納した品番の所要計画データは一旦削除
+             if(substr($sample['product_code'],0,1) == "P"){
+               $countP = $countP + 1;
+             }elseif(substr($sample['product_code'],0,1) == "w"){
+               $countW = $countW + 1;
+             }elseif(substr($sample['product_code'],0,1) == "R"){
+               $countR = $countR + 1;
+             }else{
+               $countP = $countP;
+               $countW = $countW;
+               $countR = $countR;
+             }
           }
       }
 
-      for($n=0; $n<=10000; $n++){
-        if(isset($arrFp[$n])){
-          $arrFp[$n] = array_merge($arrFp[$n],array('delete_flag'=>0));
-          $arrFp[$n] = array_merge($arrFp[$n],array('created_staff'=>$created_staff));
-        }else{
-          break;
+      if($countP >= 10){//この場合、customer_id=1（customer_code=10001）パナソニック(株)HA社キッチンアプライアンス（事）草津工場の製品をSyoyouKeikakusテーブルから削除
+/*        echo "<pre>";
+        print_r($countP."P");
+        echo "</pre>";
+*/
+        $Products_P = $this->Products->find()->where(['customer_id' => '1']);
+
+        foreach ($Products_P as $value) {
+          $product_code= $value->product_code;
+          $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
         }
       }
 
+      if($countW >= 5){//customer_id=2（customer_code=10002）パナソニック(株)HA社ランドリークリーナー（事）静岡工場の製品をSyoyouKeikakusテーブルから削除
+/*        echo "<pre>";
+        print_r($countW."W");
+        echo "</pre>";
+*/
+        $Products_W = $this->Products->find()->where(['customer_id' => '2']);
+
+        foreach ($Products_W as $value) {
+          $product_code= $value->product_code;
+          $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
+        }
+      }
+
+      if($countR >= 5){//customer_id=3（customer_code=10003）パナソニック(株)HA社キッチンアプライアンス（事）加東工場の製品をSyoyouKeikakusテーブルから削除
+/*        echo "<pre>";
+        print_r($countR."R");
+        echo "</pre>";
+*/
+        $Products_R = $this->Products->find()->where(['customer_id' => '3']);
+
+        foreach ($Products_R as $value) {
+          $product_code= $value->product_code;
+          $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
+        }
+      }
+/*
       echo "<pre>";
-      print_r($arrFp);
+      print_r($arrSyoyouKeikaku);
       echo "<br>";
-    /*
-      $orderEdis = $this->OrderEdis->newEntity();
-      $this->set('orderEdis',$orderEdis);
+*/
+
        if ($this->request->is('get')) {
-         $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrFp);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+         $syoyouKeikakus = $this->SyoyouKeikakus->patchEntities($syoyouKeikakus, $arrSyoyouKeikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
          $connection = ConnectionManager::get('default');//トランザクション1
          // トランザクション開始2
          $connection->begin();//トランザクション3
          try {//トランザクション4
-             if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
+             if ($this->SyoyouKeikakus->saveMany($syoyouKeikakus)) {//saveManyで一括登録
                $mes = "※登録されました";
                $this->set('mes',$mes);
                $connection->commit();// コミット5
@@ -697,6 +744,7 @@ class OrderEdisController extends AppController
            $connection->rollback();//トランザクション9
          }//トランザクション10
        }
-*/    }
+
+    }
 
 }

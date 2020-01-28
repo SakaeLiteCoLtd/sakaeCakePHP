@@ -123,11 +123,12 @@ class DenpyouDnpsTable extends Table
 
         return $validator;
     }
-
+/*
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->isUnique(['num_order','product_code','tourokubi']));
 
         return $rules;
     }
+*/
 }

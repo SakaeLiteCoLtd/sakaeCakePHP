@@ -123,11 +123,12 @@ class OrderDnpKannousTable extends Table
 
         return $validator;
     }
-
+/*
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->isUnique(['date_order','num_order','product_code','code','bunnou','date_deliver','delete_flag']));
 
         return $rules;
     }
+*/
 }

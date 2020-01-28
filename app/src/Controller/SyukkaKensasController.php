@@ -48,8 +48,8 @@ class SyukkaKensasController extends AppController {
 */
       $product_code = $data["product_code"];
       $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
-      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-    	$product_id = $Product[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+    	$product_id = $Product[0]->id;
       $this->set('product_id',$product_id);//セット
 
       $ImKikakuex = $this->ImKikakuTaious->find()->where(['product_id' => $product_id])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
@@ -102,8 +102,8 @@ class SyukkaKensasController extends AppController {
     	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
     	$this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
-    	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-    	$Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+    	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+    	$Productid = $Producti[0]->id;
     	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_id' => $Productid])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
     	$this->set('KensahyouHead',$KensahyouHead);//セット
 
@@ -142,8 +142,8 @@ class SyukkaKensasController extends AppController {
      $data = $this->request->getData();
      $product_id = $data['product_id'];
      $this->set('product_id',$product_id);//セット
-     $Product = $this->Products->find()->where(['id' => $product_id])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-     $product_code = $Product[0]->product_code;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+     $Product = $this->Products->find()->where(['id' => $product_id])->toArray();
+     $product_code = $Product[0]->product_code;
      $this->set('product_code',$product_code);//セット
      $Productname = $Product[0]->product_name;
      $this->set('Productname',$Productname);//セット
@@ -215,8 +215,8 @@ class SyukkaKensasController extends AppController {
 */
    $product_id = $sessiondata['kikakudata'][1]['product_id'];//$dataの'product_code'を$product_codeに
    $this->set('product_id',$product_id);//セット
-   $Product = $this->Products->find()->where(['id' => $product_id])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-   $product_code = $Product[0]->product_code;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+   $Product = $this->Products->find()->where(['id' => $product_id])->toArray();
+   $product_code = $Product[0]->product_code;
    $this->set('product_code',$product_code);//セット
    $Productname = $Product[0]->product_name;
    $this->set('Productname',$Productname);//セット
@@ -784,8 +784,8 @@ class SyukkaKensasController extends AppController {
     	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
     	$this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
-    	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-    	$Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+    	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+    	$Productid = $Producti[0]->id;
     	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_id' => $Productid])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
     	$this->set('KensahyouHead',$KensahyouHead);//セット
 
@@ -853,8 +853,8 @@ class SyukkaKensasController extends AppController {
     	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
     	$this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
-    	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-    	$Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+    	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+    	$Productid = $Producti[0]->id;
     	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_id' => $Productid])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
     	$this->set('KensahyouHead',$KensahyouHead);//セット
 
@@ -864,7 +864,7 @@ class SyukkaKensasController extends AppController {
     	$KensahyouHeadid = $KensahyouHead[0]->id;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のidに$KensahyouHeadidと名前を付ける
     	$this->set('KensahyouHeadid',$KensahyouHeadid);//セット
 
-      $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
+      $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();
 //
 for($i=1; $i<=9; $i++){//size_1～9までセット
   ${"kind_kensa".$i} = "ノギス";
@@ -872,17 +872,17 @@ for($i=1; $i<=9; $i++){//size_1～9までセット
 }
 if(isset($ImSokuteidataHead[0])){
 //
-      $ImSokuteidataHead_id = $ImSokuteidataHead[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
-      $ImKikaku = $this->ImKikakus->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHead_id])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
+      $ImSokuteidataHead_id = $ImSokuteidataHead[0]->id;
+      $ImKikaku = $this->ImKikakus->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHead_id])->toArray();
       for($i=1; $i<=5; $i++){//size_1～9までセット
         if(isset($ImSokuteidataHead[$i])){
-          ${"ImSokuteidataHead_id_".$i} = $ImSokuteidataHead[$i]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
-          $ImKikakutuika = $this->ImKikakus->find()->where(['im_sokuteidata_head_id' => ${"ImSokuteidataHead_id_".$i}])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
+          ${"ImSokuteidataHead_id_".$i} = $ImSokuteidataHead[$i]->id;
+          $ImKikakutuika = $this->ImKikakus->find()->where(['im_sokuteidata_head_id' => ${"ImSokuteidataHead_id_".$i}])->toArray();
           $ImKikaku = array_merge($ImKikaku, $ImKikakutuika);
         }
       }
-      $ImSokuteidataHead_id = $ImKikaku[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
-      $ImSokuteidataHeadId = $ImKikaku[0]->im_sokuteidata_head_id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+      $ImSokuteidataHead_id = $ImKikaku[0]->id;
+      $ImSokuteidataHeadId = $ImKikaku[0]->im_sokuteidata_head_id;
       $ImSokuteidataResult = $this->ImSokuteidataResults->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHeadId ])->toArray();
 
     	for($i=1; $i<=9; $i++){//size_1～9までセット
@@ -898,8 +898,8 @@ if(isset($ImSokuteidataHead[0])){
               print_r(${"size_".$i}."-".$ImKikaku[$j]['size']);
               echo "</pre>";
 */
-              $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['id' => $ImKikaku[$j]['im_sokuteidata_head_id']])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-              ${"kind_kensa".$i} = $ImSokuteidataHead[0]->kind_kensa;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+              $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['id' => $ImKikaku[$j]['im_sokuteidata_head_id']])->toArray();
+              ${"kind_kensa".$i} = $ImSokuteidataHead[0]->kind_kensa;
 
               $this->set('kind_kensa'.$i,${"kind_kensa".$i});//セット
               $ImSokuteidataResult = $this->ImSokuteidataResults->find()->where(['im_sokuteidata_head_id' => $ImKikaku[$j]['im_sokuteidata_head_id'] , 'size_num' => $ImKikaku[$j]['size_num']])->toArray();
@@ -980,8 +980,8 @@ if(isset($ImSokuteidataHead[0])){
      $KensahyouHeadid = $data['kensahyou_heads_id'];
      $this->set('KensahyouHeadid',$KensahyouHeadid);//セット
 
-     $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-     $Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+     $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+     $Productid = $Producti[0]->id;
      $KensahyouHead = $this->KensahyouHeads->find()->where(['product_id' => $Productid])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
      $this->set('KensahyouHead',$KensahyouHead);//セット
      $Productname = $Producti[0]->product_name;//$Productiの0番目のデータ（0番目のデータしかない）のproduct_nameに$Productnameと名前を付ける
@@ -1106,8 +1106,8 @@ if(isset($ImSokuteidataHead[0])){
     $ImKikakuid_9 = "ノギス";
     $this->set('ImKikakuid_9',$ImKikakuid_9);
 
-    $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-    $Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+    $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+    $Productid = $Producti[0]->id;
     $ImKikakus = $this->ImKikakuTaious->find()->where(['product_id' => $Productid])->toArray();//'id' => $product_code_idとなるデータをProductsテーブルから配列で取得（プルダウン）
     foreach ((array)$ImKikakus as $key => $value) {
          $sort[$key] = $value['kensahyuo_num'];
@@ -1155,8 +1155,8 @@ if(isset($ImSokuteidataHead[0])){
    $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
    $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
-   $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-   $Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+   $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+   $Productid = $Producti[0]->id;
    $KensahyouHead = $this->KensahyouHeads->find()->where(['product_id' => $Productid])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
    $this->set('KensahyouHead',$KensahyouHead);//セット
    $Productname = $Producti[0]->product_name;//$Productiの0番目のデータ（0番目のデータしかない）のproduct_nameに$Productnameと名前を付ける

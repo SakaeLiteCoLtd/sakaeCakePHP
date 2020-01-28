@@ -1059,16 +1059,16 @@ class LabelsController extends AppController
            }
         }
 //        $fp = fopen('labels/label_ikkatu.csv', 'w');
-        $fp = fopen('/home/centosuser/label_csv/label_ikkatu0106.csv', 'w');
+        $fp = fopen('/home/centosuser/label_csv/label_ikkatu_test.csv', 'w');
         foreach ($arrCsv as $line) {
         	fputcsv($fp, $line);
         }
           fclose($fp);
-
+/*
           echo "<pre>";
           print_r($arrCsvtouroku);
           echo "</pre>";
-
+*/
           $labelCsvs = $this->LabelCsvs->newEntity();
           $this->set('labelCsvs',$labelCsvs);
            if ($this->request->is('post')) {
@@ -1441,13 +1441,13 @@ class LabelsController extends AppController
              'lotnum' => $lotnumIN, 'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'product_code' => $_SESSION['labeljunbi'][$i]['product_code'],
              'irisu' => $irisu2];
 */           }
-
+/*
       echo "<pre>";
       print_r($arrCsvtouroku);
       echo "</pre>";
-
-      $fp = fopen('labels/label_hirokawa0107.csv', 'w');
-  //    $fp = fopen('/home/centosuser/label_csv/label_hirokawa0106.csv', 'w');
+*/
+  //    $fp = fopen('labels/label_hirokawa0107.csv', 'w');
+      $fp = fopen('/home/centosuser/label_csv/label_test.csv', 'w');
        foreach ($arrCsv as $line) {
          fputcsv($fp, $line);
        }
@@ -1635,7 +1635,7 @@ class LabelsController extends AppController
            }
           }
 //        $fp = fopen('labels/label_hirokawa1220.csv', 'w');
-        $fp = fopen('/home/centosuser/label_csv/label_hirokawa0106.csv', 'w');
+        $fp = fopen('/home/centosuser/label_csv/label_kobetutest.csv', 'w');
           foreach ($arrCsv as $line) {
           	fputcsv($fp, $line);
           }

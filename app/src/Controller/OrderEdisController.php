@@ -148,7 +148,7 @@ class OrderEdisController extends AppController
 
       echo "<pre>";
       print_r($arrFp);
-      echo "<br>";
+      echo "</pre>";
 
        $orderEdis = $this->OrderEdis->newEntity();
        $this->set('orderEdis',$orderEdis);
@@ -393,26 +393,13 @@ class OrderEdisController extends AppController
                   echo "</pre>";
                     for($m=0; $m<=$n; $m++){
                       if((${"kannnou".$n} == ${"kannnou".$m})){//$num_order.$code.$product_code.$date_orderが同じとき
-/*                        echo "<pre>";
-                        print_r("同じ");
-                        print_r($arrKannou[$n]['date_deliver']."_".$arrKannou[$m]['date_deliver']);
-                        echo "</pre>";
-*/                        if($arrKannou[$n]['date_deliver'] > $arrKannou[$m]['date_deliver']){//この場合$arrKannou[$m]は未納（'minoukannou'=>0）
-/*                          echo "<pre>";
-                          print_r("A");
-                          echo "</pre>";
-*/                          $arrKannou[$m] = array_merge($arrKannou[$m],array('minoukannou'=>0));
+                        if($arrKannou[$n]['date_deliver'] > $arrKannou[$m]['date_deliver']){//この場合$arrKannou[$m]は未納（'minoukannou'=>0）
+                          $arrKannou[$m] = array_merge($arrKannou[$m],array('minoukannou'=>0));
                         }else{//この場合$arrKannou[$m]は完納（'minoukannou'=>1）
-/*                          echo "<pre>";
-                          print_r("B");
-                          echo "</pre>";
-*/                          $arrKannou[$m] = array_merge($arrKannou[$m],array('minoukannou'=>1));
+                          $arrKannou[$m] = array_merge($arrKannou[$m],array('minoukannou'=>1));
                         }
                       }else{
-/*                        echo "<pre>";
-                        print_r("違う");
-                        echo "</pre>";
-*/                      }
+                      }
                     }
                 }else{
                   break;
@@ -590,7 +577,7 @@ class OrderEdisController extends AppController
 /*
       echo "<pre>";
       print_r($arrSyoyouKeikaku);
-      echo "<br>";
+      echo "</pre>";
 */
        if ($this->request->is('get')) {
          $syoyouKeikakus = $this->SyoyouKeikakus->patchEntities($syoyouKeikakus, $arrSyoyouKeikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
@@ -617,5 +604,50 @@ class OrderEdisController extends AppController
        }
 
     }
+
+    public function henkou1top()
+    {
+      $this->request->session()->destroy();// セッションの破棄
+    }
+    public function henkou1sentaku()
+    {
+      $this->request->session()->destroy();// セッションの破棄
+    }
+    public function henkou2pana()
+    {
+      $this->request->session()->destroy();// セッションの破棄
+    }
+    public function henkou3pana()
+    {
+      $this->request->session()->destroy();// セッションの破棄
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+    }
+
+    public function henkou4pana()
+    {
+      $this->request->session()->destroy();//セッションの破棄
+      $data = $this->request->getData();
+      for ($k=2; $k<=$data["nummax"]; $k++) {
+        if(isset($data["check".$k])){
+          echo "<pre>";
+          print_r($data["$k"]);
+          echo "</pre>";
+        }else{
+        }
+      }
+      $product_code = $data['product_code'];
+      $date_sta = $data['date_sta'];
+      $date_fin = $data['date_fin'];
+      if(empty($data['product_code'])){//product_codeの入力がないとき
+        $product_code = "no";
+        $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin]));
+      }else{//product_codeの入力があるとき
+        $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+          ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code]));
+      }
+    }
+
 
 }

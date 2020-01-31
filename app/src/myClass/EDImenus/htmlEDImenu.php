@@ -19,19 +19,19 @@ class htmlEDImenu extends AppController
      public function EDImenus()
   	{
         $html =
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/EDIs/index1'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/index1'>\n".
                   "<img src='/img/Labelimg/edi_sub_order.gif' width=115 height=40>\n".
                   "</a></td>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/EDIs/index2'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/index2'>\n".
                   "<img src='/img/Labelimg/edi_sub_touroku.gif' width=115 height=40>\n".
                   "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/EDIs/index'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/henkou1top'>\n".
                   "<img src='/img/Labelimg/edi_sub_henkou.gif' width=115 height=40>\n".
                   "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/EDIs/index'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/index'>\n".
                   "<img src='/img/Labelimg/edi_sub_syuyou.gif' width=115 height=40>\n".
                   "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/EDIs/index0'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/index0'>\n".
                   "<img src='/img/Labelimg/edi_sub_productions.gif' width=115 height=40>\n".
                   "</a>\n";
 

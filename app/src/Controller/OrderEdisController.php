@@ -609,14 +609,17 @@ class OrderEdisController extends AppController
     {
       $this->request->session()->destroy();// セッションの破棄
     }
+
     public function henkou1sentaku()
     {
       $this->request->session()->destroy();// セッションの破棄
     }
+
     public function henkou2pana()
     {
       $this->request->session()->destroy();// セッションの破棄
     }
+
     public function henkou3pana()
     {
       $this->request->session()->destroy();// セッションの破棄
@@ -628,14 +631,6 @@ class OrderEdisController extends AppController
     {
       $this->request->session()->destroy();//セッションの破棄
       $data = $this->request->getData();
-      for ($k=2; $k<=$data["nummax"]; $k++) {
-        if(isset($data["check".$k])){
-          echo "<pre>";
-          print_r($data["$k"]);
-          echo "</pre>";
-        }else{
-        }
-      }
       $product_code = $data['product_code'];
       $date_sta = $data['date_sta'];
       $date_fin = $data['date_fin'];
@@ -649,5 +644,60 @@ class OrderEdisController extends AppController
       }
     }
 
+    public function henkou5pana()
+    {
+      $data = $this->request->getData();
+      $array = array();
+      if(isset($data["nummax"])){
+        for ($k=2; $k<=$data["nummax"]; $k++){
+          if(isset($data["check".$k])){
+            $array[] = $data["$k"];
+          }else{
+          }
+        }
+      }
+/*      echo "<pre>";
+      print_r($array);
+      echo "</pre>";
+*/
+      for ($i=0; $i<=$data["nummax"]; $i++){
+        if(isset($array[$i])){
+          $this->set('orderEdis'.$i,$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['id' => $array[$i]]));
+          $i_num = $i;
+          $this->set('i_num',$i_num);
+        }else{
+          break;
+        }
+      }
+/*      echo "<pre>";
+      print_r($i_num);
+      echo "</pre>";
+*/
+    }
+
+    public function henkou6pana()
+    {
+      $data = $this->request->getData();
+      $array = array();
+      if(isset($data["nummax"])){
+        for ($k=2; $k<=$data["nummax"]; $k++){
+          if(isset($data["check".$k])){
+            $array[] = $data["$k"];
+          }else{
+          }
+        }
+      }
+      for ($i=0; $i<=$data["nummax"]; $i++){
+        if(isset($array[$i])){
+          $this->set('orderEdis'.$i,$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['id' => $array[$i]]));
+          $i_num = $i;
+          $this->set('i_num',$i_num);
+        }else{
+          break;
+        }
+      }
+    }
 
 }

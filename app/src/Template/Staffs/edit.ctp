@@ -11,7 +11,7 @@
                     ];
             $options2 = [
 	            '0' => 'edit this data　',
-	            '1' => 'delete this data' 
+	            '1' => 'delete this data'
                     ];
         ?>
     <?= $this->Form->create($staff) ?>
@@ -60,10 +60,11 @@
 	</tr>
 </table>
         <?php
-            echo $this->Form->hidden('status');
+        echo $this->Form->hidden('id' ,['value'=>$staff->id ]) ;
+        echo $this->Form->hidden('status');
 //            echo $this->Form->hidden('delete_flag');
 //            echo $this->Form->hidden('created_at') ;
-            echo $this->Form->hidden('created_staff' ,['value'=>$staff->created_staff ]) ;
+          echo $this->Form->hidden('created_staff' ,['value'=>$staff->created_staff ]) ;
 //            echo $this->Form->hidden('updated_at' ,['value'=>date('Y-m-d H:i:s')]) ;
 //            echo $this->Form->hidden('updated_at', ['empty' => true]);
             echo $this->Form->hidden('updated_staff');

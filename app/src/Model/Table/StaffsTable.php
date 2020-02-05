@@ -138,7 +138,7 @@ class StaffsTable extends Table
             ->notEmpty('created_at');
 */
         $validator
-            ->uuid('created_staff')
+            ->integer('created_staff')
             ->allowEmpty('created_staff');
 /*
         $validator

@@ -118,6 +118,10 @@ class MaterialTypesController extends AppController
 	$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 	$data['materialTypedata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
 
+	echo "<pre>";
+ 	print_r($data['materialTypedata']);
+	echo "</pre>";
+
 	if ($this->request->is('get')) {//postの場合
 		$supplierSection = $this->MaterialTypes->patchEntity($materialType, $data['materialTypedata']);//$materialTypeデータ（空の行）を$this->request->getData()に更新する
 		$connection = ConnectionManager::get('default');//トランザクション1
@@ -150,28 +154,67 @@ class MaterialTypesController extends AppController
      */
     public function edit($id = null)
     {
-	$materialType = $this->MaterialTypes->get($id);//選んだidに関するMaterialTypesテーブルのデータに$materialTypeと名前を付ける
-	$this->set('materialType',$materialType);//1行上の$materialTypeをctpで使えるようにセット
+			$materialType = $this->MaterialTypes->newEntity();//newentityに$materialTypeという名前を付ける
+			$this->set('materialType',$materialType);//1行上の$materialTypeをctpで使えるようにセット
+			$materialType = $this->MaterialTypes->get($id);//選んだidに関するMaterialTypesテーブルのデータに$materialTypeと名前を付ける
+			$this->set('materialType',$materialType);//1行上の$materialTypeをctpで使えるようにセット
 
+			$data = $this->request->getData();
+/*
+			echo "<pre>";
+		 	print_r($data);
+			echo "</pre>";
+/*
 	if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
-		$materialType = $this->MaterialTypes->patchEntity($materialType, $this->request->getData());//98行目でとったもともとの$materialTypeデータを$this->request->getData()に更新する
-		$connection = ConnectionManager::get('default');//トランザクション1
-			// トランザクション開始2
-		$connection->begin();//トランザクション3
-		try {//トランザクション4
-			if ($this->MaterialTypes->save($materialType)) {
-				$this->Flash->success(__('The materialType has been updated.'));
-				$connection->commit();// コミット5
-				return $this->redirect(['action' => 'index']);
-			} else {
-				$this->Flash->error(__('The materialType could not be updated. Please, try again.'));
-				throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+			$this->MaterialTypes->updateAll(
+				//			['name' => 1 ,'name' => $KariKadouSeikeistarting_tm ,'created_at' => $KariKadouSeikeicreated_at ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
+			['name' => $data['name'] ,'delete_flag' => $data['delete_flag']],
+			['id'   => $data['id'] ]
+			);
+*/
+/*
+			if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
+
+				$materialType = $this->MaterialTypes->patchEntity($materialType, $data);//98行目でとったもともとの$materialTypeデータを$this->request->getData()に更新する
+				$connection = ConnectionManager::get('default');//トランザクション1
+					// トランザクション開始2
+				$connection->begin();//トランザクション3
+				try {//トランザクション4
+					if ($this->MaterialTypes->save($materialType)) {
+						$this->Flash->success(__('The materialType has been updated.'));
+						$connection->commit();// コミット5
+						return $this->redirect(['action' => 'index']);
+					} else {
+						$this->Flash->error(__('The materialType could not be updated. Please, try again.'));
+						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+					}
+				} catch (Exception $e) {//トランザクション7
+				//ロールバック8
+					$connection->rollback();//トランザクション9
+				}//トランザクション10
 			}
-		} catch (Exception $e) {//トランザクション7
-		//ロールバック8
-			$connection->rollback();//トランザクション9
-		}//トランザクション10
-	}
+*/
+
+			if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
+				$connection = ConnectionManager::get('default');//トランザクション1
+					// トランザクション開始2
+				$connection->begin();//トランザクション3
+				try {//トランザクション4
+					if ($this->MaterialTypes->updateAll(['name' => $data['name'] ,'delete_flag' => $data['delete_flag']],['id' => $data['id']])) {
+						$this->Flash->success(__('The materialType has been updated.'));
+						$connection->commit();// コミット5
+						return $this->redirect(['action' => 'index']);
+					} else {
+						$this->Flash->error(__('The materialType could not be updated. Please, try again.'));
+						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+					}
+				} catch (Exception $e) {//トランザクション7
+				//ロールバック8
+					$connection->rollback();//トランザクション9
+				}//トランザクション10
+			}
+
     }
 
 }

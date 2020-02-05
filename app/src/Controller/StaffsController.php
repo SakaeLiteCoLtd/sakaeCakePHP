@@ -261,6 +261,7 @@ $this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
 	$updated_staff = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$updated_staffという名前を付ける
 	$staff['updated_staff'] = $updated_staff;//$staffのupdated_staffを$updated_staffにする
 
+
 	if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
 		$staff = $this->Staffs->patchEntity($staff, $this->request->getData());//96行目でとったもともとの$roleデータを$this->request->getData()に更新する
 		$connection = ConnectionManager::get('default');//トランザクション1

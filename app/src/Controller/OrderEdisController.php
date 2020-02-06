@@ -83,15 +83,14 @@ class OrderEdisController extends AppController
        $file = $_SESSION['hattyucsvs']['file'];
        $this->set('file',$file);
 
-/*
-      file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'UTF-8', 'SJIS'));
+  //文字変換（不要）    file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'UTF-8', 'SJIS'));
       $fp = fopen("/home/centosuser/EDI/$file", "r");
       $fpcount = fopen("/home/centosuser/EDI/$file", 'r' );
-*/
-      file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'UTF-8', 'SJIS'));
+/*
+//文字変換（不要）      file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'UTF-8', 'SJIS'));
       $fp = fopen("EDI/$file", "r");//csvファイルはwebrootに入れる
       $fpcount = fopen("EDI/$file", 'r' );
-       for($count = 0; fgets( $fpcount ); $count++ );
+*/       for($count = 0; fgets( $fpcount ); $count++ );
        $arrFp = array();//空の配列を作る
        $created_staff = $this->Auth->user('staff_id');
        for ($k=1; $k<=$count-1; $k++) {//最後の行まで
@@ -145,11 +144,11 @@ class OrderEdisController extends AppController
            break;
          }
        }
-
+/*
       echo "<pre>";
       print_r($arrFp);
       echo "</pre>";
-
+*/
        $orderEdis = $this->OrderEdis->newEntity();
        $this->set('orderEdis',$orderEdis);
         if ($this->request->is('get')) {
@@ -161,8 +160,8 @@ class OrderEdisController extends AppController
               if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
                 $mes = "※登録されました";
                 $this->set('mes',$mes);
-                file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
-            //    file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'SJIS', 'UTF-8'));
+            //    file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
+    //            file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'SJIS', 'UTF-8'));
                 $connection->commit();// コミット5
               } else {
                 $mes = "※登録されませんでした";
@@ -234,19 +233,19 @@ class OrderEdisController extends AppController
       $this->set('denpyouDnps',$denpyouDnps);
       $orderDnpKannous = $this->OrderDnpKannous->newEntity();
       $this->set('orderDnpKannous',$orderDnpKannous);
-/*
-      file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'UTF-8', 'SJIS'));
+
+    //  file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'UTF-8', 'SJIS'));
       $fp1 = fopen("/home/centosuser/EDI/$file", "r");
       $fp2 = fopen("/home/centosuser/EDI/$file", "r");
       $fp3 = fopen("/home/centosuser/EDI/$file", "r");
       $fpcount = fopen("/home/centosuser/EDI/$file", 'r' );
-*/
+/*
       file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'UTF-8', 'SJIS'));
       $fp1 = fopen("EDI/$file", "r");//csvファイルはwebrootに入れる
       $fp2 = fopen("EDI/$file", "r");//csvファイルはwebrootに入れる
       $fp3 = fopen("EDI/$file", "r");//csvファイルはwebrootに入れる
       $fpcount = fopen("EDI/$file", 'r' );
-
+*/
       for($count = 0; fgets( $fpcount ); $count++ );
       $arrEDI = array();//空の配列を作る
       $arrDenpyou = array();//空の配列を作る
@@ -300,11 +299,12 @@ class OrderEdisController extends AppController
             break;
           }
         }
-/*      echo "<pre>";
+
+      echo "<pre>";
       print_r("arrEDI");
       print_r($arrEDI);
       echo "</pre>";
-*/
+
       $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrEDI);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
       $connection = ConnectionManager::get('default');//トランザクション1
       // トランザクション開始2
@@ -341,12 +341,13 @@ class OrderEdisController extends AppController
               }else{
                 break;
               }
-            }/*
+            }
+
             echo "<pre>";
             print_r("arrDenpyou");
             print_r($arrDenpyou);
             echo "</pre>";
-*/
+
             $denpyouDnps = $this->DenpyouDnps->patchEntities($denpyouDnps, $arrDenpyou);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
             if ($this->DenpyouDnps->saveMany($denpyouDnps)) {//saveManyで一括登録
 
@@ -405,12 +406,12 @@ class OrderEdisController extends AppController
                   break;
                 }
               }
-/*
+
               echo "<pre>";
               print_r("arrKannou");
               print_r($arrKannou);
               echo "</pre>";
-*/
+
                $orderDnpKannous = $this->OrderDnpKannous->patchEntities($orderDnpKannous, $arrKannou);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                    if ($this->OrderDnpKannous->saveMany($orderDnpKannous)) {//saveManyで一括登録
                      $mes = "※登録されました";
@@ -418,7 +419,7 @@ class OrderEdisController extends AppController
                    } else {
                      $mes = "※登録されませんでした";
                      $this->set('mes',$mes);
-                     file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
+              //       file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
           //         file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'SJIS', 'UTF-8'));
                      $this->Flash->error(__('The orderDnpKannous could not be saved. Please, try again.'));
                      throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
@@ -426,18 +427,18 @@ class OrderEdisController extends AppController
               } else {
                 $mes = "※登録されませんでした";
                 $this->set('mes',$mes);
-                file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
+          //      file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
      //         file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'SJIS', 'UTF-8'));
                 $this->Flash->error(__('This denpyouDnps could not be saved. Please, try again.'));
                 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
               }
-              file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
+        //      file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
    //         file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'SJIS', 'UTF-8'));
               $connection->commit();// コミット5
         } else {
           $mes = "※登録されませんでした";
           $this->set('mes',$mes);
-          file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
+      //    file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
 //         file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'SJIS', 'UTF-8'));
           $this->Flash->error(__('This orderEdis could not be saved. Please, try again.'));
           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
@@ -504,15 +505,15 @@ class OrderEdisController extends AppController
       $countP = 0;
       $countW = 0;
       $countR = 0;
-
-      file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'UTF-8', 'SJIS'));
+/*
+    //文字変換（不要）  file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'UTF-8', 'SJIS'));//
       $fp = fopen("EDI/$file", "r");//csvファイルはwebrootに入れる
       $fpcount = fopen("EDI/$file", 'r' );
-/*
-      file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'UTF-8', 'SJIS'));
+*/
+//文字変換（不要）     file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'UTF-8', 'SJIS'));
       $fp = fopen("/home/centosuser/EDI/$file", "r");
       $fpcount = fopen("/home/centosuser/EDI/$file", 'r' );
-*/
+
       for($count = 0; fgets( $fpcount ); $count++ );
       $arrSyoyouKeikaku = array();//空の配列を作る
       $created_staff = $this->Auth->user('staff_id');
@@ -588,7 +589,7 @@ class OrderEdisController extends AppController
              if ($this->SyoyouKeikakus->saveMany($syoyouKeikakus)) {//saveManyで一括登録
                $mes = "※登録されました";
                $this->set('mes',$mes);
-               file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
+    //           file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
             //    file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'SJIS', 'UTF-8'));
                $connection->commit();// コミット5
              } else {
@@ -646,7 +647,13 @@ class OrderEdisController extends AppController
 
     public function henkou5pana()
     {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+
       $array = array();
       if(isset($data["nummax"])){
         for ($k=2; $k<=$data["nummax"]; $k++){
@@ -678,26 +685,97 @@ class OrderEdisController extends AppController
 
     public function henkou6pana()
     {
+      session_start();
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
-      $array = array();
-      if(isset($data["nummax"])){
-        for ($k=2; $k<=$data["nummax"]; $k++){
-          if(isset($data["check".$k])){
-            $array[] = $data["$k"];
+
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+
+    }
+
+    public function henkoupanapreadd()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+    }
+
+    public function henkoupanalogin()
+    {
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+        $ary = explode(',', $str);//$strを配列に変換
+        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+        $this->set('username', $username);
+        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+          if(empty($Userdata)){
+            $delete_flag = "";
           }else{
+            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+            $this->set('delete_flag',$delete_flag);//登録者の表示のため
+          }
+            $user = $this->Auth->identify();
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkoupanado']);
           }
         }
-      }
-      for ($i=0; $i<=$data["nummax"]; $i++){
-        if(isset($array[$i])){
-          $this->set('orderEdis'.$i,$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-            ->where(['id' => $array[$i]]));
-          $i_num = $i;
-          $this->set('i_num',$i_num);
+    }
+
+    public function henkoupanado()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $session = $this->request->getSession();
+      $data = $session->read();
+      $cnt = count($data);//配列（更新するカラム）の個数
+/*
+      echo "<pre>";
+      print_r($cnt);
+      print_r($data['orderEdis'][0]['id']);
+      echo "</pre>";
+
+      for($n=0; $n<=$cnt; $n++){
+        if(isset($data['orderEdis'][$n])){
+          $this->OrderEdis->updateAll(
+          ['date_deliver' => $data['orderEdis'][$n]['date_deliver'] ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
+          ['id'   => $data['orderEdis'][$n]['id'] ]
+          );
         }else{
           break;
         }
       }
+*/
+      $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        for($n=0; $n<=$cnt; $n++){
+         if(isset($data['orderEdis'][$n])){
+          if ($this->OrderEdis->updateAll(['date_deliver' => $data['orderEdis'][$n]['date_deliver'] ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],['id' => $data['orderEdis'][$n]['id']])) {
+          }else{
+            $mes = "※更新されませんでした";
+            $this->set('mes',$mes);
+            $this->Flash->error(__('The data could not be saved. Please, try again.'));
+            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            break;
+          }
+         }else{
+           $mes = "※更新されました";
+           $this->set('mes',$mes);
+           $connection->commit();// コミット5
+           break;
+         }
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
     }
 
 }

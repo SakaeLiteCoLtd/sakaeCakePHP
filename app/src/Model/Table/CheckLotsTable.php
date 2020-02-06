@@ -150,4 +150,5 @@ class CheckLotsTable extends Table
 
         return $rules;
     }
+
 }

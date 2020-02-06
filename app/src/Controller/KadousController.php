@@ -711,7 +711,6 @@ class KadousController extends AppController
               break;
             }
           }
-
           $connection->commit();// コミット5
         } else {
           $this->Flash->error(__('The data could not be saved. Please, try again.'));

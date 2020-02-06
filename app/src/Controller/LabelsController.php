@@ -1760,8 +1760,10 @@ class LabelsController extends AppController
        print_r($data['file']);
        echo "</pre>";
 */
-       $fp = fopen("labels/$file", "r");//csvファイルはwebrootに入れる
-       $fpcount = fopen("labels/$file", 'r' );
+    //    $fp = fopen("labels/$file", "r");//csvファイルはwebrootに入れる
+    //    $fpcount = fopen("labels/$file", 'r' );
+        $fp = fopen('/home/centosuser/label_csv/$file', 'r');
+        $fpcount = fopen("/home/centosuser/label_csv/$file", 'r' );
        for($count = 0; fgets( $fpcount ); $count++ );
        $arrFp = array();//空の配列を作る
        $arrLot = array();//空の配列を作る

@@ -43,13 +43,13 @@ class htmlEDImenu extends AppController
     public function EDIsubmenus()
    {
        $html =
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/hattyucsv'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/hattyucsvpreadd'>\n".
                  "<img src='/img/Labelimg/edi_csv.gif' width=85 height=36>\n".
                  "</a></td>\n".
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/dnpcsvpreadd'>\n".
                  "<img src='/img/Labelimg/dnp_csv.gif' width=85 height=36>\n".
                  "</a></td>\n".
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/keikakucsv'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/keikakucsvpreadd'>\n".
                  "<img src='/img/Labelimg/keikaku_csv.gif' width=85 height=36>\n".
                  "</a>\n".
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/hasuform'>\n".

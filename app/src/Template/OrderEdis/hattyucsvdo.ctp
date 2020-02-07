@@ -10,7 +10,6 @@
   header('Expires:-1');
   header('Cache-Control:');
   header('Pragma:');
-  echo $this->Form->create($orderEdis, ['url' => ['action' => 'torikomido']]);
 ?>
 <br><br>
 <legend align="center"><font color="red"><?= __($mes) ?></font></legend>

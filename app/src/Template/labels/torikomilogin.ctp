@@ -20,7 +20,7 @@ header('Pragma:');
   <?= $this->Form->control('username', array('type'=>'hidden', 'value'=>$username, 'label'=>false)) ?>
 	<?= $this->Form->control('delete_flag', array('type'=>'hidden', 'value'=>$delete_flag, 'label'=>false)) ?>
     </fieldset>
-    <center><input type="submit" value="登録しています…" name="OK" style="background-color:#E6FFFF; border-width: 0px"></center>
+    <center><input type="submit" value="ログインしています…" name="OK" style="background-color:#E6FFFF; border-width: 0px"></center>
     <br><br><br>
 </body>
     <?= $this->Form->end() ?>

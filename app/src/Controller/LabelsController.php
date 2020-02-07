@@ -1699,18 +1699,76 @@ class LabelsController extends AppController
         }
        }
      }
+
      public function torikomiselect()//発行履歴取り込み
      {
-       $this->request->session()->destroy(); // セッションの破棄
+//       $this->request->session()->destroy(); // セッションの破棄
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
+
+       if ($this->request->is('post')) {
+         $source_file = $_FILES['file']['tmp_name'];
+         $fp = fopen($source_file, "r");
+         $fpcount = fopen($source_file, 'r' );
+          for($count = 0; fgets( $fpcount ); $count++ );
+          $arrFp = array();//空の配列を作る
+          $arrLot = array();//空の配列を作る
+          $created_staff = $this->Auth->user('staff_id');
+          for ($k=1; $k<=$count; $k++) {//最後の行まで
+            $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+            $sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
+            $arrFp[] = $sample;//配列に追加する
+            if(isset($arrFp[$k-1][10]) && ($arrFp[$k-1][10] != "")){//product_codeが２つある時
+            $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+              $renban = $arrFp[$k-1][5] + $m;
+              $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
+              $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
+            }
+            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+              $renban = $arrFp[$k-1][5] + $m;
+              $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
+              $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
+            }
+          }else{//product_codeが１つの時
+            $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+              $renban = $arrFp[$k-1][5] + $m;
+              $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
+              $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
+            }
+          }
+        }
+        $checkLots = $this->CheckLots->newEntity();
+        $this->set('checkLots',$checkLots);
+           $checkLots = $this->CheckLots->patchEntities($checkLots, $arrLot);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+           $connection = ConnectionManager::get('default');//トランザクション1
+           // トランザクション開始2
+           $connection->begin();//トランザクション3
+           try {//トランザクション4
+               if ($this->CheckLots->saveMany($checkLots)) {//saveManyで一括登録
+                 $mes = "※登録されました";
+                 $this->set('mes',$mes);
+                 $connection->commit();// コミット5
+               } else {
+                 $mes = "※登録されませんでした";
+                 $this->set('mes',$mes);
+                 $this->Flash->error(__('The data could not be saved. Please, try again.'));
+                 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+               }
+           } catch (Exception $e) {//トランザクション7
+           //ロールバック8
+             $connection->rollback();//トランザクション9
+           }//トランザクション10
+        }
      }
+
      public function torikomipreadd()
  		{
       session_start();
       $checkLots = $this->CheckLots->newEntity();
       $this->set('checkLots',$checkLots);
-      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+/*      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
       $file = $data['file'];
       $this->set('file',$file);
 /*      $session = $this->request->getSession();
@@ -1718,8 +1776,8 @@ class LabelsController extends AppController
         "file" => $file,
       );
 */
-      $session = $this->request->getSession();
-      $session->write('labelfiles.file', $file);
+//      $session = $this->request->getSession();
+//      $session->write('labelfiles.file', $file);
 /*
       echo "<pre>";
       print_r($_SESSION['labelfiles']['file']);
@@ -1745,7 +1803,8 @@ class LabelsController extends AppController
  						$user = $this->Auth->identify();
  					if ($user) {
  						$this->Auth->setUser($user);
- 						return $this->redirect(['action' => 'torikomido']);
+    //        return $this->redirect(['action' => 'torikomido']);
+            return $this->redirect(['action' => 'torikomiselect']);
  					}
  				}
  		}

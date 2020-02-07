@@ -61,7 +61,7 @@ class htmlLabelmenu extends AppController
    public function LabelLotsubmenus()
   {
       $html =
-                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/torikomiselect'>\n".
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/torikomipreadd'>\n".
                 "<img src='/img/Labelimg/lot_rireki_torikomi.gif' width=85 height=36>\n".
                 "</a></td>\n".
                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/fushiyouform'>\n".

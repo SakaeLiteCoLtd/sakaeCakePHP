@@ -50,6 +50,17 @@ class KensahyouSokuteidatasController  extends AppController
     public function indexcsv()//csvテスト用
     {
     	$this->set('kensahyouSokuteidata',$this->KensahyouSokuteidatas->newEntity());//空のカラムに$KensahyouSokuteidataと名前を付け、ctpで使えるようにセット
+
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();
+        $source_file = $_FILES['file']['tmp_name'];
+        echo "<pre>";
+        print_r($data);
+        echo "</pre>";
+        echo "<pre>";
+        print_r($source_file);
+        echo "</pre>";
+      }
     }
 
     public function search()//「出荷検査用呼出」の日付で絞り込むページ

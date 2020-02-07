@@ -46,7 +46,7 @@ class htmlEDImenu extends AppController
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/hattyucsv'>\n".
                  "<img src='/img/Labelimg/edi_csv.gif' width=85 height=36>\n".
                  "</a></td>\n".
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/dnpcsv'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/dnpcsvpreadd'>\n".
                  "<img src='/img/Labelimg/dnp_csv.gif' width=85 height=36>\n".
                  "</a></td>\n".
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/keikakucsv'>\n".

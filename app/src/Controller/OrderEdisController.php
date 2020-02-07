@@ -176,11 +176,236 @@ class OrderEdisController extends AppController
         }
      }
 
+
+
     public function dnpcsv()
     {
-      $this->request->session()->destroy(); // セッションの破棄
+  //    $this->request->session()->destroy(); // セッションの破棄
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      if ($this->request->is('post')) {
+/*      $data = $this->request->getData();
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $denpyouDnps = $this->DenpyouDnps->newEntity();
+      $this->set('denpyouDnps',$denpyouDnps);
+      $orderDnpKannous = $this->OrderDnpKannous->newEntity();
+      $this->set('orderDnpKannous',$orderDnpKannous);
+
+      $source_file = $_FILES['file']['tmp_name'];
+      $fp1 = fopen($source_file, 'r');
+      $fp2 = fopen($source_file, 'r');
+      $fp3 = fopen($source_file, 'r');
+      $fpcount = fopen($source_file, 'r' );
+
+      for($count = 0; fgets( $fpcount ); $count++ );
+      $arrEDI = array();//空の配列を作る
+      $arrDenpyou = array();//空の配列を作る
+      $arrKannou = array();//空の配列を作る
+      $created_staff = $this->Auth->user('staff_id');
+
+      $num = 1;
+
+        for ($k=1; $k<=$count-1; $k++) {//最後の行まで
+          $line = fgets($fp1);//ファイル$fpの上の１行を取る（２行目から）
+          $sample = explode(',',$line);//$lineを','毎に配列に入れる
+
+           $keys=array_keys($sample);
+           $keys[array_search('2',$keys)]='num_order';//名前の変更
+           $keys[array_search('3',$keys)]='name_order';
+  //         $keys[array_search('4',$keys)]='code';
+           $keys[array_search('7',$keys)]='product_code';
+           $keys[array_search('9',$keys)]='date_order';
+           $keys[array_search('10',$keys)]='amount';
+           $keys[array_search('11',$keys)]='price';
+           $keys[array_search('13',$keys)]='date_deliver';
+           $keys[array_search('14',$keys)]='place_deliver_code';
+  //         $keys[array_search('15',$keys)]='place_deliver_name';
+           $sample = array_combine( $keys, $sample );
+
+           unset($sample['0'],$sample['1'],$sample['4'],$sample['5'],$sample['6'],$sample['8']);
+           unset($sample['12'],$sample['15'],$sample['16'],$sample['17'],$sample['18']);//最後の改行も削除
+
+           if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき
+             $arrEDI[] = $sample;//配列に追加する
+           }
+        }
+
+        for($n=0; $n<=10000; $n++){
+          if(isset($arrEDI[$n])){
+            $Product = $this->Products->find()->where(['product_code' => $arrEDI[$n]['product_code']])->toArray();
+    				$customer_id = $Product[0]->customer_id;
+            $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+    				$customer_code = $Customer[0]->customer_code;
+
+            $arrEDI[$n] = array_merge($arrEDI[$n],array('place_line'=>"-"));
+            $arrEDI[$n] = array_merge($arrEDI[$n],array('check_denpyou'=>0));
+            $arrEDI[$n] = array_merge($arrEDI[$n],array('customer_code'=>$customer_code));
+            $arrEDI[$n] = array_merge($arrEDI[$n],array('first_date_deliver'=>$arrEDI[$n]['date_deliver']));
+            $arrEDI[$n] = array_merge($arrEDI[$n],array('gaityu'=>0));
+            $arrEDI[$n] = array_merge($arrEDI[$n],array('bunnou'=>0));
+            $arrEDI[$n] = array_merge($arrEDI[$n],array('kannou'=>0));
+            $arrEDI[$n] = array_merge($arrEDI[$n],array('delete_flag'=>0));
+            $arrEDI[$n] = array_merge($arrEDI[$n],array('created_staff'=>$created_staff));
+          }else{
+            break;
+          }
+        }
+
+      echo "<pre>";
+      print_r("arrEDI");
+      print_r($arrEDI);
+      echo "</pre>";
+
+      $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrEDI);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+      $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+          if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
+
+            for ($k=1; $k<=$count-1; $k++) {//最後の行まで
+              $line = fgets($fp2);//ファイル$fpの上の１行を取る（２行目から）
+              $sample = explode(',',$line);//$lineを','毎に配列に入れる
+
+               $keys=array_keys($sample);
+               $keys[array_search('2',$keys)]='num_order';//名前の変更
+               $keys[array_search('3',$keys)]='name_order';
+               $keys[array_search('4',$keys)]='code';
+               $keys[array_search('7',$keys)]='product_code';
+               $keys[array_search('9',$keys)]='tourokubi';
+               $keys[array_search('15',$keys)]='place_deliver';
+               $sample = array_combine( $keys, $sample );
+
+               unset($sample['0'],$sample['1'],$sample['5'],$sample['6'],$sample['8'],$sample['10']);
+               unset($sample['11'],$sample['12'],$sample['13'],$sample['14'],$sample['16'],$sample['17'],$sample['18']);//最後の改行も削除
+
+               if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき
+                 $arrDenpyou[] = $sample;//配列に追加する
+               }
+            }
+
+            for($n=0; $n<=10000; $n++){
+              if(isset($arrDenpyou[$n])){
+                $arrDenpyou[$n] = array_merge($arrDenpyou[$n],array('conf_print'=>0));
+                $arrDenpyou[$n] = array_merge($arrDenpyou[$n],array('delete_flag'=>0));
+                $arrDenpyou[$n] = array_merge($arrDenpyou[$n],array('created_staff'=>$created_staff));
+              }else{
+                break;
+              }
+            }
+
+            echo "<pre>";
+            print_r("arrDenpyou");
+            print_r($arrDenpyou);
+            echo "</pre>";
+
+            $denpyouDnps = $this->DenpyouDnps->patchEntities($denpyouDnps, $arrDenpyou);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+            if ($this->DenpyouDnps->saveMany($denpyouDnps)) {//saveManyで一括登録
+
+              for ($k=1; $k<=$count-1; $k++) {//最後の行まで
+                $line = fgets($fp3);//ファイル$fpの上の１行を取る（２行目から）
+                $sample = explode(',',$line);//$lineを','毎に配列に入れる
+
+                 $keys=array_keys($sample);
+                 $keys[array_search('2',$keys)]='num_order';//名前の変更
+                 $keys[array_search('4',$keys)]='code';
+                 $keys[array_search('7',$keys)]='product_code';
+                 $keys[array_search('9',$keys)]='date_order';
+                 $keys[array_search('10',$keys)]='amount';
+                 $keys[array_search('13',$keys)]='date_deliver';
+                 $sample = array_combine( $keys, $sample );
+
+                 unset($sample['0'],$sample['1'],$sample['3'],$sample['5'],$sample['6'],$sample['8']);
+                 unset($sample['11'],$sample['12'],$sample['14'],$sample['15'],$sample['16'],$sample['17'],$sample['18']);//最後の改行も削除
+
+                 if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき
+                   $arrKannou[] = $sample;//配列に追加する
+                 }
+              }
+
+              for($n=0; $n<=10000; $n++){
+                if(isset($arrKannou[$n])){
+                  $arrKannou[$n] = array_merge($arrKannou[$n],array('bunnou'=>0));
+                  $arrKannou[$n] = array_merge($arrKannou[$n],array('delete_flag'=>0));
+                  $arrKannou[$n] = array_merge($arrKannou[$n],array('created_staff'=>$created_staff));
+                }else{
+                  break;
+                }
+              }
+              //$arrKannouの、date_order、num_order、product_code、codeが同じものを集めてdate_deliverの一番遅いもののminoukannouを1にする
+              for($n=0; $n<=10000; $n++){
+                if(isset($arrKannou[$n])){
+                  $num_order = $arrKannou[$n]['num_order'];
+                  $code = $arrKannou[$n]['code'];
+                  $product_code = $arrKannou[$n]['product_code'];
+                  $date_order = $arrKannou[$n]['date_order'];
+                  ${"kannnou".$n} = $num_order.$code.$product_code.$date_order;
+                  echo "<pre>";
+                  print_r(${"kannnou".$n});
+                  echo "</pre>";
+                    for($m=0; $m<=$n; $m++){
+                      if((${"kannnou".$n} == ${"kannnou".$m})){//$num_order.$code.$product_code.$date_orderが同じとき
+                        if($arrKannou[$n]['date_deliver'] > $arrKannou[$m]['date_deliver']){//この場合$arrKannou[$m]は未納（'minoukannou'=>0）
+                          $arrKannou[$m] = array_merge($arrKannou[$m],array('minoukannou'=>0));
+                        }else{//この場合$arrKannou[$m]は完納（'minoukannou'=>1）
+                          $arrKannou[$m] = array_merge($arrKannou[$m],array('minoukannou'=>1));
+                        }
+                      }else{
+                      }
+                    }
+                }else{
+                  break;
+                }
+              }
+
+              echo "<pre>";
+              print_r("arrKannou");
+              print_r($arrKannou);
+              echo "</pre>";
+
+               $orderDnpKannous = $this->OrderDnpKannous->patchEntities($orderDnpKannous, $arrKannou);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+                   if ($this->OrderDnpKannous->saveMany($orderDnpKannous)) {//saveManyで一括登録
+                     $mes = "※登録されました";
+                     $this->set('mes',$mes);
+                   } else {
+                     $mes = "※登録されませんでした";
+                     $this->set('mes',$mes);
+              //       file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
+          //         file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'SJIS', 'UTF-8'));
+                     $this->Flash->error(__('The orderDnpKannous could not be saved. Please, try again.'));
+                     throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                   }
+              } else {
+                $mes = "※登録されませんでした";
+                $this->set('mes',$mes);
+          //      file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
+     //         file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'SJIS', 'UTF-8'));
+                $this->Flash->error(__('This denpyouDnps could not be saved. Please, try again.'));
+                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+              }
+        //      file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
+   //         file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'SJIS', 'UTF-8'));
+              $connection->commit();// コミット5
+        } else {
+          $mes = "※登録されませんでした";
+          $this->set('mes',$mes);
+      //    file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'SJIS', 'UTF-8'));
+//         file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'SJIS', 'UTF-8'));
+          $this->Flash->error(__('This orderEdis could not be saved. Please, try again.'));
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+      }
     }
 
     public function dnpcsvpreadd()
@@ -189,12 +414,10 @@ class OrderEdisController extends AppController
      $orderEdis = $this->OrderEdis->newEntity();
      $this->set('orderEdis',$orderEdis);
      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-     $file = $data['file'];
-     $this->set('file',$file);
-
+/*
      $session = $this->request->getSession();
      $session->write('dnpcsvs.file', $file);
-
+*/
     }
 
     public function dnpcsvlogin()
@@ -216,7 +439,7 @@ class OrderEdisController extends AppController
            $user = $this->Auth->identify();
          if ($user) {
            $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'dnpcsvdo']);
+           return $this->redirect(['action' => 'dnpcsv']);
          }
        }
     }
@@ -225,27 +448,42 @@ class OrderEdisController extends AppController
     {
       $session = $this->request->getSession();
       $data = $session->read();
+      /*
       $file = $_SESSION['dnpcsvs']['file'];
       $this->set('file',$file);
+      */
+      $file = $_SESSION['dnpcsvs']['file'];
+      $source_file = $_FILES['file']['tmp_name'];
+    //  $source_file = $_FILES[$_SESSION['dnpcsvs']['file']]['tmp_name'];
+
+      echo "<pre>";
+      print_r($source_file);
+      echo "</pre>";
+
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $denpyouDnps = $this->DenpyouDnps->newEntity();
       $this->set('denpyouDnps',$denpyouDnps);
       $orderDnpKannous = $this->OrderDnpKannous->newEntity();
       $this->set('orderDnpKannous',$orderDnpKannous);
-
-    //  file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'UTF-8', 'SJIS'));
+/*
+      file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'UTF-8', 'SJIS'));
       $fp1 = fopen("/home/centosuser/EDI/$file", "r");
       $fp2 = fopen("/home/centosuser/EDI/$file", "r");
       $fp3 = fopen("/home/centosuser/EDI/$file", "r");
       $fpcount = fopen("/home/centosuser/EDI/$file", 'r' );
-/*
-      file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'UTF-8', 'SJIS'));
+
+//      file_put_contents("EDI/$file", mb_convert_encoding(file_get_contents("EDI/$file"), 'UTF-8', 'SJIS'));
       $fp1 = fopen("EDI/$file", "r");//csvファイルはwebrootに入れる
       $fp2 = fopen("EDI/$file", "r");//csvファイルはwebrootに入れる
       $fp3 = fopen("EDI/$file", "r");//csvファイルはwebrootに入れる
       $fpcount = fopen("EDI/$file", 'r' );
 */
+      $fp1 = fopen($source_file, 'r');//csvファイルはwebrootに入れる
+      $fp2 = fopen($source_file, 'r');//csvファイルはwebrootに入れる
+      $fp3 = fopen($source_file, 'r');//csvファイルはwebrootに入れる
+      $fpcount = fopen($source_file, 'r' );
+
       for($count = 0; fgets( $fpcount ); $count++ );
       $arrEDI = array();//空の配列を作る
       $arrDenpyou = array();//空の配列を作る

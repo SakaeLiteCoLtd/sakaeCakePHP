@@ -12,11 +12,11 @@
    $username = $this->request->Session()->read('Auth.User.username');
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
+   $this->OrderEdis = TableRegistry::get('orderEdis');//productsテーブルを使う
 ?>
 <?php
   $data = $this->request->getData();
 ?>
-
  </table>
  <hr size="5" style="margin: 0.5rem">
  <br>
@@ -44,6 +44,24 @@
 <hr size="5" style="margin: 0.5rem">
 
 <?php if(isset($data["touroku"])): ?>
+
+  <?php
+  $data = $this->request->getData();
+  (int)$amount_total = 0;
+  for ($j=0;$j<$data["tsuikanum"];$j++){
+    (int)$amount_total = (int)$amount_total + (int)$data["amount_".$j];
+  }
+  echo "<pre>";
+  print_r($amount_total);
+  echo "</pre>";
+
+  $OrderEdi = $this->OrderEdis->find()->where(['id' => $data['orderEdis_0']])->toArray();
+  $amount_moto = $OrderEdi[0]->amount;
+  echo "<pre>";
+  print_r($amount_moto);
+  echo "</pre>";
+
+  ?>
 
 <?php else: ?>
   <form method="post" action="henkou5panabunnou" enctype="multipart/form-data">

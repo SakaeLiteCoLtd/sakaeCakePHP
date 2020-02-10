@@ -832,25 +832,65 @@ class OrderEdisController extends AppController
           }else{
           }
         }
-      }
 /*      echo "<pre>";
       print_r($array);
       echo "</pre>";
 */
-      for ($i=0; $i<=$data["nummax"]; $i++){
-        if(isset($array[$i])){
-          $this->set('orderEdis'.$i,$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-            ->where(['id' => $array[$i]]));
-          $i_num = $i;
-          $this->set('i_num',$i_num);
-        }else{
-          break;
+        for ($i=0; $i<=$data["nummax"]; $i++){
+          if(isset($array[$i])){
+            $this->set('orderEdis'.$i,$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+              ->where(['id' => $array[$i]]));
+            $i_num = $i;
+            $this->set('i_num',$i_num);
+          }else{
+            break;
+          }
         }
       }
+
 /*      echo "<pre>";
       print_r($i_num);
       echo "</pre>";
 */
+    }
+
+    public function henkou5panabunnou()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $data = $this->request->getData();
+
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+
+      $i = 0;
+      $this->set('orderEdis'.$i,$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+        ->where(['id' => $data['orderEdis_0']]));
+
+        if(isset($data['tsuika'])){
+          $tsuikanum = $data['tsuikanum'] + 1;
+          $this->set('tsuikanum',$tsuikanum);
+          echo "<pre>";
+          print_r("tsuika");
+          echo "</pre>";
+          echo "<pre>";
+          print_r($tsuikanum);
+          echo "</pre>";
+
+        }elseif(isset($data['sakujo'])){
+          $tsuikanum = $data['tsuikanum'] - 1;
+          $this->set('tsuikanum',$tsuikanum);
+          echo "<pre>";
+          print_r("sakujo");
+          echo "</pre>";
+          echo "<pre>";
+          print_r($tsuikanum);
+          echo "</pre>";
+
+        }
+
+
     }
 
     public function henkou6pana()

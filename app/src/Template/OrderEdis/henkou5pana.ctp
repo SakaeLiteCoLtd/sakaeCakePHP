@@ -12,7 +12,7 @@
    $username = $this->request->Session()->read('Auth.User.username');
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
-   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkou6pana']]);
+//   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkou5pana']]);
 ?>
 <?php
   $data = $this->request->getData();
@@ -45,6 +45,8 @@
 <hr size="5" style="margin: 0.5rem">
 
 <?php if(isset($data["nouki"])): ?>
+
+<form method="post" action="henkou6pana" enctype="multipart/form-data">
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -124,7 +126,16 @@
 
 <?=$this->Form->end() ?>
 
+</form>
+
 <?php elseif(isset($data["bunnnou"])): ?>
+
+<form method="post" action="henkou5panabunnou" enctype="multipart/form-data">
+
+    <?php
+      $data = $this->request->getData();
+    ?>
+
 <br>
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
@@ -152,8 +163,6 @@
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->date_deliver) ?></td>
               <?php
-               $i_count = $i;
-               echo $this->Form->hidden('i_count' ,['value'=>$i_count]);
                echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
               ?>
 
@@ -167,9 +176,8 @@
   <br><br>
   <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
-    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('分納追加', array('name' => 'noukikakunin')); ?></div></td>
-    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('分納削除', array('name' => 'noukikakunin')); ?></div></td>
-    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('分納伝票登録', array('name' => 'noukikakunin')); ?></div></td>
+    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('分納追加', array('name' => 'tsuika')); ?></div></td>
+    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('分納伝票登録', array('name' => 'touroku')); ?></div></td>
     </tr>
   </table>
 
@@ -199,14 +207,28 @@
                  echo "<input type='text' value=$amount name=amount_{$j} empty=Please select size='6'/>\n";
                  echo "</div></td>\n";
                 ?>
-                <td width="200" colspan="20" nowrap="nowrap"><?= h("登録可") ?></td>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h("変更可") ?></td>
               </tr>
             <?php endfor;?>
           </tbody>
       </table>
 <br><br><br>
+<?php
+ echo $this->Form->hidden('tsuikanum' ,['value'=>1]);
+?>
 
   <?=$this->Form->end() ?>
+
+</form>
+
+<?php elseif(isset($data["tsuika"])): ?>
+
+  <?php
+    $data = $this->request->getData();
+    echo "<pre>";
+    print_r($data);
+    echo "</pre>";
+  ?>
 
 <?php else: ?>
 

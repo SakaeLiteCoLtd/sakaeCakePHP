@@ -1768,21 +1768,6 @@ class LabelsController extends AppController
       session_start();
       $checkLots = $this->CheckLots->newEntity();
       $this->set('checkLots',$checkLots);
-/*      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-      $file = $data['file'];
-      $this->set('file',$file);
-/*      $session = $this->request->getSession();
-      $_SESSION['file'] = array(
-        "file" => $file,
-      );
-*/
-//      $session = $this->request->getSession();
-//      $session->write('labelfiles.file', $file);
-/*
-      echo "<pre>";
-      print_r($_SESSION['labelfiles']['file']);
-      echo "</pre>";
-*/
  		}
  		public function torikomilogin()
  		{
@@ -1808,7 +1793,7 @@ class LabelsController extends AppController
  					}
  				}
  		}
-     public function torikomido()//発行履歴取り込み
+     public function torikomido()//発行履歴取り込み//不使用200207
      {
        $session = $this->request->getSession();
        $data = $session->read();

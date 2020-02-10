@@ -90,7 +90,7 @@ class KadousController extends AppController
           $this->set('tuika4',$tuika4);//
 */
 
-}elseif(isset($data['sakujo11']) && $data['tuika1'] > 0){//1goukisakujo
+        }elseif(isset($data['sakujo11']) && $data['tuika1'] > 0){//1goukisakujo
           $dateye = $data['dateye'];
           $dateto = $data['dateto'];
           $this->set('dateye',$dateye);

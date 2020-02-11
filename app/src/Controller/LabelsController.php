@@ -1703,11 +1703,18 @@ class LabelsController extends AppController
      public function torikomiselect()//発行履歴取り込み
      {
 //       $this->request->session()->destroy(); // セッションの破棄
+       $session = $this->request->getSession();
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
-
+/*
+       $created_staff = $this->Auth->user('staff_id');
+       echo "<pre>";
+       print_r($created_staff);
+       echo "</pre>";
+*/
        if ($this->request->is('post')) {
          $source_file = $_FILES['file']['tmp_name'];
+
          $fp = fopen($source_file, "r");
          $fpcount = fopen($source_file, 'r' );
           for($count = 0; fgets( $fpcount ); $count++ );
@@ -1739,6 +1746,21 @@ class LabelsController extends AppController
             }
           }
         }
+/*
+        echo "<pre>";
+        print_r($arrLot);
+        echo "</pre>";
+*/
+
+//ファイル名変更実験
+        $file_test = $_FILES['file']['name'];
+        echo "<pre>";
+        print_r($_FILES['file']);
+        echo "</pre>";
+
+        $toFile = "test_".$file_test;
+        rename('labels/'.$file_test, 'labels/'.$toFile );
+
         $checkLots = $this->CheckLots->newEntity();
         $this->set('checkLots',$checkLots);
            $checkLots = $this->CheckLots->patchEntities($checkLots, $arrLot);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a

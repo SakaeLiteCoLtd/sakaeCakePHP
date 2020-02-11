@@ -532,8 +532,8 @@ class OrderEdisController extends AppController
       $countR = 0;
 
       if ($this->request->is('post')) {
-/*      $data = $this->request->getData();
-      echo "<pre>";
+      $data = $this->request->getData();
+/*      echo "<pre>";
       print_r($_FILES['file']['tmp_name']);
       echo "</pre>";
 */
@@ -608,6 +608,8 @@ class OrderEdisController extends AppController
       print_r($arrSyoyouKeikaku);
       echo "</pre>";
 */
+          rename($source_file,$source_file."test");
+
 //       if ($this->request->is('get')) {
          $syoyouKeikakus = $this->SyoyouKeikakus->patchEntities($syoyouKeikakus, $arrSyoyouKeikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
          $connection = ConnectionManager::get('default');//トランザクション1

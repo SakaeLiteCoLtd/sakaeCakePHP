@@ -1765,7 +1765,7 @@ class LabelsController extends AppController
     //    if (copy($_FILES['file']['tmp_name'], "copy_".$_FILES['file']['name'])) {//copyはいける//webrootにファイルのコピーが作成される
         if (copy($_FILES['file']['tmp_name'], 'test20200213/'."copy_200213.txt")) {//webrootのフォルダにcopyが作成される
     //    if (rename($_FILES['file']['tmp_name'], '/home/centosuser/test20200213/'.$toFile)) {
-          echo 'コピーしました。';
+          echo 'コピーしました！';
         }else{
           echo 'コピーできない！';
         }

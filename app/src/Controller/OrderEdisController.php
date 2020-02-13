@@ -858,6 +858,7 @@ class OrderEdisController extends AppController
 
     public function henkou5panabunnou()
     {
+      session_start();
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
@@ -962,6 +963,84 @@ class OrderEdisController extends AppController
         }
       }
 */
+      $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        for($n=0; $n<=$cnt; $n++){
+         if(isset($data['orderEdis'][$n])){
+          if ($this->OrderEdis->updateAll(['date_deliver' => $data['orderEdis'][$n]['date_deliver'] ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],['id' => $data['orderEdis'][$n]['id']])) {
+          }else{
+            $mes = "※更新されませんでした";
+            $this->set('mes',$mes);
+            $this->Flash->error(__('The data could not be saved. Please, try again.'));
+            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            break;
+          }
+         }else{
+           $mes = "※更新されました";
+           $this->set('mes',$mes);
+           $connection->commit();// コミット5
+           break;
+         }
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+    }
+
+
+    public function henkoupanabunnnoupreadd()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      echo "<pre>";
+      print_r($_SESSION['orderEdis']);
+      echo "</pre>";
+    }
+
+    public function henkoupanabunnnoulogin()
+    {
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+        $ary = explode(',', $str);//$strを配列に変換
+        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+        $this->set('username', $username);
+        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+          if(empty($Userdata)){
+            $delete_flag = "";
+          }else{
+            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+            $this->set('delete_flag',$delete_flag);//登録者の表示のため
+          }
+            $user = $this->Auth->identify();
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkoupanabunnnoudo']);
+          }
+        }
+    }
+
+    public function henkoupanabunnnoudo()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $session = $this->request->getSession();
+      $data = $session->read();
+      $cnt = count($data);//配列（更新するカラム）の個数
+
+      echo "<pre>";
+      print_r($_SESSION['orderEdis']);
+      echo "</pre>";
+
       $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2
       $connection->begin();//トランザクション3

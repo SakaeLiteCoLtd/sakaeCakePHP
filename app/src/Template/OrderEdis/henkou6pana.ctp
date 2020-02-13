@@ -85,7 +85,6 @@
             </tr>
             <?php
             $session = $this->request->getSession();
-
             $_SESSION['orderEdis'][$i] = array(
               'id' => $data["orderEdis_".$i],
               'date_deliver' => ${"date_deliver_".$i}

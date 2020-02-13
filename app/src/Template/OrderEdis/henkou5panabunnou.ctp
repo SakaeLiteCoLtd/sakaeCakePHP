@@ -43,25 +43,143 @@
 <br>
 <hr size="5" style="margin: 0.5rem">
 
-<?php if(isset($data["touroku"])): ?>
 
   <?php
-  $data = $this->request->getData();
-  (int)$amount_total = 0;
-  for ($j=0;$j<$data["tsuikanum"];$j++){
-    (int)$amount_total = (int)$amount_total + (int)$data["amount_".$j];
+  if(isset($data["touroku"])){
+    $data = $this->request->getData();
+    (int)$amount_total = 0;
+    for ($j=0;$j<$data["tsuikanum"];$j++){
+      (int)$amount_total = (int)$amount_total + (int)$data["amount_".$j];
+    }
+    $OrderEdi = $this->OrderEdis->find()->where(['id' => $data['orderEdis_0']])->toArray();
+    $amount_moto = $OrderEdi[0]->amount;
+/*
+    echo "<pre>";
+    print_r("合計：".$amount_total);
+    echo "</pre>";
+    echo "<pre>";
+    print_r("元々：".$amount_moto);
+    echo "</pre>";
+*/
+  }else{
   }
-  echo "<pre>";
-  print_r($amount_total);
-  echo "</pre>";
-
-  $OrderEdi = $this->OrderEdis->find()->where(['id' => $data['orderEdis_0']])->toArray();
-  $amount_moto = $OrderEdi[0]->amount;
-  echo "<pre>";
-  print_r($amount_moto);
-  echo "</pre>";
-
   ?>
+
+
+<?php if((isset($data["touroku"]))&&($amount_total == $amount_moto)): ?>
+  <?php
+    $data = $this->request->getData();
+  ?>
+  <form method="post" action="henkoupanabunnnoupreadd" enctype="multipart/form-data">
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+    <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+          <thead>
+              <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+                <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">注文ＮＯ</strong></div></td>
+                <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品番</strong></div></td>
+                <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品名</strong></div></td>
+                <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納期</strong></div></td>
+                <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">数量</strong></div></td>
+              </tr>
+          </thead>
+          <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+            <?php for ($i=0;$i<1;$i++): ?>
+              <?php foreach (${"orderEdis".$i} as ${"orderEdis".$i}): ?>
+              <?php //foreach ($orderEdis as $orderEdis): ?>
+              <tr style="border-bottom: solid;border-width: 1px">
+                <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->num_order) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->product_code) ?></td>
+                  <?php
+                    $product_code = ${"orderEdis".$i}->product_code;
+                    $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+                    $product_name = $Product[0]->product_name;
+                  ?>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->date_deliver) ?></td>
+              <?php
+               echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
+              ?>
+
+                <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
+              </tr>
+              <?php endforeach; ?>
+            <?php endfor;?>
+
+          </tbody>
+      </table>
+  <br><br>
+      <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="border-style: none;"><div align="center"><?= $this->Form->submit('以下登録', array('name' => 'kousindo')); ?></div></td>
+          <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+        </tr>
+      </table>
+<br><br><br>
+      <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+              <thead>
+                  <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+                    <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">分納回数</strong></div></td>
+                    <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納期</strong></div></td>
+                    <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">数量</strong></div></td>
+                  </tr>
+              </thead>
+              <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+
+        <?php for ($j=0;$j<1;$j++): ?>
+          <tr style="border-bottom: solid;border-width: 1px">
+            <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
+            <td width="150" colspan="20" nowrap="nowrap"><?= h($data["date_deliver_".$j]) ?></td>
+            <td width="150" colspan="20" nowrap="nowrap"><?= h($data["amount_".$j]) ?></td>
+          </tr>
+
+          <?php
+          $session = $this->request->getSession();
+          $_SESSION['orderEdis'][$j] = array(
+            'id' => $data["orderEdis_".$j],
+            'date_deliver' => $data["date_deliver_".$j],
+            'amount' => $data["amount_".$j]
+          );
+          ?>
+
+      <?php endfor;?>
+        <?php for ($j=1;$j<$data["tsuikanum"];$j++): ?>
+          <tr style="border-bottom: solid;border-width: 1px">
+            <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
+            <td width="150" colspan="20" nowrap="nowrap"><?= h($data["date_deliver_".$j]) ?></td>
+            <td width="150" colspan="20" nowrap="nowrap"><?= h($data["amount_".$j]) ?></td>
+          </tr>
+
+          <?php
+          $session = $this->request->getSession();
+          $_SESSION['orderEdis'][$j] = array(
+            'date_deliver' => $data["date_deliver_".$j],
+            'amount' => $data["amount_".$j]
+          );
+          ?>
+
+        <?php endfor;?>
+      </tbody>
+  </table>
+<br><br><br><br><br><br><br><br>
+
+<?php
+echo "<pre>";
+print_r($_SESSION['orderEdis']);
+echo "</pre>";
+?>
+
+</form>
+
+<?=$this->Form->end() ?>
+
+
+<?php elseif(isset($data["touroku"])): ?>
+  <br><br>
+  <legend align="center"><strong style="font-size: 11pt; color:blue"><?= "入力間違いがあります。ブラウザの「戻る」で戻ってください。" ?></strong></legend>
+  <br>
+  <legend align="center"><strong style="font-size: 11pt; color:red"><?= "！合計数量が合いません" ?></strong></legend>
+  <br><br><br>
 
 <?php else: ?>
   <form method="post" action="henkou5panabunnou" enctype="multipart/form-data">

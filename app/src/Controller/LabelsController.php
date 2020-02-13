@@ -1752,14 +1752,44 @@ class LabelsController extends AppController
         echo "</pre>";
 */
 
-//ファイル名変更実験
+//ファイル名の変更実験
         $file_test = $_FILES['file']['name'];
+        $toFile = "copy_".$file_test;
+//        echo "<pre>";
+//        print_r($_FILES['file']);
+//        echo "</pre>";
         echo "<pre>";
-        print_r($_FILES['file']);
+        print_r("元々：".$file_test."  登録用：".$toFile);
         echo "</pre>";
 
-        $toFile = "test_".$file_test;
-        rename('labels/'.$file_test, 'labels/'.$toFile );
+    //    if (copy($_FILES['file']['tmp_name'], "copy_".$_FILES['file']['name'])) {//copyはいける//webrootにファイルのコピーが作成される
+        if (copy($_FILES['file']['tmp_name'], 'test20200213/'."copy_200213.txt")) {//webrootのフォルダにcopyが作成される
+    //    if (rename($_FILES['file']['tmp_name'], '/home/centosuser/test20200213/'.$toFile)) {
+          echo 'コピーしました。';
+        }else{
+          echo 'コピーできない！';
+        }
+
+/*
+      //if (rename('labels/furiwake111.txt', 'EDI/furiwake111.txt')) {//1回できたが、「Device or resource busy」のエラーが発生
+      //if (rename('/home/centosuser/EDI/'.$file_test, '/home/centosuser/EDI/'.$toFile)) {
+      if (copy('test20200213/'.$file_test, 'test20200213/'.$toFile)) {//copyはいける
+        echo 'コピーしました。';
+        if (unlink('test20200213/'.$file_test)) {//unlinkは「Device or resource busy」のエラーが発生（たまにできる時もある）
+          echo '削除しました。';
+        } else {
+          echo '削除できない！';
+        }
+      }else{
+        echo 'コピーできない！';
+      }
+
+      if (rename('test20200213/'.$file_test, 'test19080501/'.$toFile)) {//renameは「Device or resource busy」のエラーが発生（たまにできる時もある）
+        echo '移動しました。';
+      } else {
+        echo '移動できない！';
+      }
+*/
 
         $checkLots = $this->CheckLots->newEntity();
         $this->set('checkLots',$checkLots);

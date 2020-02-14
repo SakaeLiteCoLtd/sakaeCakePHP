@@ -822,10 +822,11 @@ class OrderEdisController extends AppController
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
+/*
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-
+*/
       $array = array();
       if(isset($data["nummax"])){
         for ($k=2; $k<=$data["nummax"]; $k++){
@@ -862,11 +863,11 @@ class OrderEdisController extends AppController
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
-
+/*
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-
+*/
       $i = 0;
       $this->set('orderEdis'.$i,$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
         ->where(['id' => $data['orderEdis_0']]));
@@ -874,23 +875,23 @@ class OrderEdisController extends AppController
         if(isset($data['tsuika'])){
           $tsuikanum = $data['tsuikanum'] + 1;
           $this->set('tsuikanum',$tsuikanum);
-          echo "<pre>";
+/*          echo "<pre>";
           print_r("tsuika");
           echo "</pre>";
           echo "<pre>";
           print_r($tsuikanum);
           echo "</pre>";
-
+*/
         }elseif(isset($data['sakujo'])){
           $tsuikanum = $data['tsuikanum'] - 1;
           $this->set('tsuikanum',$tsuikanum);
-          echo "<pre>";
+/*          echo "<pre>";
           print_r("sakujo");
           echo "</pre>";
           echo "<pre>";
           print_r($tsuikanum);
           echo "</pre>";
-
+*/
         }
 
 
@@ -999,10 +1000,11 @@ class OrderEdisController extends AppController
 
       $session = $this->request->getSession();
       $data = $session->read();
-
+/*
       echo "<pre>";
       print_r($_SESSION['orderEdis']);
       echo "</pre>";
+*/
     }
 
     public function henkoupanabunnnoulogin()
@@ -1037,31 +1039,49 @@ class OrderEdisController extends AppController
       $data = $session->read();
       $cnt = count($data);//配列（更新するカラム）の個数
 
+      $updated_staff = array('updated_staff'=>$this->Auth->user('staff_id'));
+      $_SESSION['orderEdis'][0] = array_merge($_SESSION['orderEdis'][0],$updated_staff);
+      for($n=1; $n<=count($_SESSION['orderEdis']); $n++){
+        if(isset($_SESSION['orderEdis'][$n])){
+          $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+          $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$created_staff);
+          $arrOrderEdis[] = $_SESSION['orderEdis'][$n];
+        }else{
+          break;
+        }
+      }
+/*
       echo "<pre>";
-      print_r($_SESSION['orderEdis']);
+      print_r($_SESSION['orderEdis'][0]);
       echo "</pre>";
+      echo "<pre>";
+      print_r($arrOrderEdis);
+      echo "</pre>";
+*/
 
       $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2
       $connection->begin();//トランザクション3
       try {//トランザクション4
-        for($n=0; $n<=$cnt; $n++){
-         if(isset($data['orderEdis'][$n])){
-          if ($this->OrderEdis->updateAll(['date_deliver' => $data['orderEdis'][$n]['date_deliver'] ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],['id' => $data['orderEdis'][$n]['id']])) {
-          }else{
-            $mes = "※更新されませんでした";
-            $this->set('mes',$mes);
-            $this->Flash->error(__('The data could not be saved. Please, try again.'));
-            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-            break;
+         if(isset($_SESSION['orderEdis'][0])){
+          if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][0]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][0]['amount'] ,'bunnou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],['id' => $_SESSION['orderEdis'][0]['id']])) {
+            $OrderEdis = $this->OrderEdis->patchEntities($OrderEdis, $arrOrderEdis);
+            if ($this->OrderEdis->saveMany($OrderEdis)) {
+              $mes = "※更新されました";
+              $this->set('mes',$mes);
+              $connection->commit();// コミット5
+            }else{
+              $mes = "※更新されませんでした";
+              $this->set('mes',$mes);
+              $this->Flash->error(__('The data could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            }
           }
          }else{
-           $mes = "※更新されました";
+           $mes = "※更新されませんでした";
            $this->set('mes',$mes);
            $connection->commit();// コミット5
-           break;
          }
-        }
       } catch (Exception $e) {//トランザクション7
       //ロールバック8
         $connection->rollback();//トランザクション9

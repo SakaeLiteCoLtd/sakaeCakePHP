@@ -152,9 +152,47 @@
 
           <?php
           $session = $this->request->getSession();
+          $OrderEdi = $this->OrderEdis->find()->where(['id' => $data['orderEdis_0']])->toArray();
+          $place_deliver_code = $OrderEdi[0]->place_deliver_code;
+          $date_order = $OrderEdi[0]->date_order->format('Y-m-d');
+          $price = $OrderEdi[0]->price;
+          $product_code = $OrderEdi[0]->product_code;
+          $line_code = $OrderEdi[0]->line_code;
+          $num_order = $OrderEdi[0]->num_order;
+          if(isset($OrderEdi[0]->first_date_deliver)){
+            $first_date_deliver = $OrderEdi[0]->first_date_deliver->format('Y-m-d');
+          }else{
+            $first_date_deliver = $OrderEdi[0]->first_date_deliver;
+          }
+          $customer_code = $OrderEdi[0]->customer_code;
+          $place_line = $OrderEdi[0]->place_line;
+          $check_denpyou = $OrderEdi[0]->check_denpyou;
+          $gaityu = $OrderEdi[0]->gaityu;
+          $bunnou = 1;
+          $kannou = $OrderEdi[0]->kannou;
+          $date_bunnou = $OrderEdi[0]->date_bunnou;
+          $check_kannou = $OrderEdi[0]->check_kannou;
+          $delete_flag = $OrderEdi[0]->delete_flag;
+
           $_SESSION['orderEdis'][$j] = array(
+            'place_deliver_code' => $place_deliver_code,
+            'date_order' => $date_order,
+            'price' => $price,
+            'amount' => $data["amount_".$j],
+            'product_code' => $product_code,
+            'line_code' => $line_code,
             'date_deliver' => $data["date_deliver_".$j],
-            'amount' => $data["amount_".$j]
+            'num_order' => $num_order,
+            'first_date_deliver' => $first_date_deliver,
+            'customer_code' => $customer_code,
+            'place_line' => $place_line,
+            'check_denpyou' => $check_denpyou,
+            'gaityu' => $gaityu,
+            'bunnou' => $bunnou,
+            'kannou' => $kannou,
+            'date_bunnou' => $date_bunnou,
+            'check_kannou' => $check_kannou,
+            'delete_flag' => $delete_flag
           );
           ?>
 
@@ -164,9 +202,11 @@
 <br><br><br><br><br><br><br><br>
 
 <?php
+/*
 echo "<pre>";
 print_r($_SESSION['orderEdis']);
 echo "</pre>";
+*/
 ?>
 
 </form>

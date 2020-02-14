@@ -44,14 +44,24 @@
     </table>
   </form>
 
+  <br><br>
+
+<?php elseif(isset($counttourokuzumi)): ?>
+
+  <br><br>
+  <legend align="center"><strong style="font-size: 12pt; color:red"><?= __($mes) ?></strong></legend>
   <br>
-  <br>
+
+  <?php for ($k=0;$k<$counttourokuzumi;$k++): ?>
+    <legend align="center"><strong style="font-size: 11pt; color:red"><?= __(${"CheckLottourokuzumiproduct_code".$k}." --- ".${"CheckLottourokuzumilot_num".$k}) ?></strong></legend>
+  <?php endfor;?>
+
+  <br><br>
 
 <?php else: ?>
 
   <br><br>
   <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
   <br>
-
 
 <?php endif; ?>

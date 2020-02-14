@@ -1750,8 +1750,11 @@ class LabelsController extends AppController
         echo "<pre>";
         print_r($arrLot);
         echo "</pre>";
+        echo "<pre>";
+        print_r(count($arrLot));
+        echo "</pre>";
 */
-
+/*
 //ファイル名の変更実験
         $file_test = $_FILES['file']['name'];
         $toFile = "copy_".$file_test;
@@ -1763,13 +1766,13 @@ class LabelsController extends AppController
         echo "</pre>";
 
     //    if (copy($_FILES['file']['tmp_name'], "copy_".$_FILES['file']['name'])) {//copyはいける//webrootにファイルのコピーが作成される
-        if (copy($_FILES['file']['tmp_name'], 'test20200213/'."copy_200213.txt")) {//webrootのフォルダにcopyが作成される
-    //    if (rename($_FILES['file']['tmp_name'], '/home/centosuser/test20200213/'.$toFile)) {
+    //    if (copy($_FILES['file']['tmp_name'], 'test20200213/'."copy_200213.txt")) {//webrootのフォルダにcopyが作成される
+        if (copy($_FILES['file']['tmp_name'], '/home/centosuser/test20200213/'.$toFile)) {
           echo 'コピーしました！';
         }else{
           echo 'コピーできない！';
         }
-
+*/
 /*
       //if (rename('labels/furiwake111.txt', 'EDI/furiwake111.txt')) {//1回できたが、「Device or resource busy」のエラーが発生
       //if (rename('/home/centosuser/EDI/'.$file_test, '/home/centosuser/EDI/'.$toFile)) {
@@ -1791,23 +1794,44 @@ class LabelsController extends AppController
       }
 */
 
-        $checkLots = $this->CheckLots->newEntity();
-        $this->set('checkLots',$checkLots);
+      $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[0]["datetime_hakkou"], 'product_code' => $arrLot[0]["product_code"], 'lot_num' => $arrLot[0]["lot_num"], 'amount' => $arrLot[0]["amount"]])->toArray();
+      if(isset($CheckLottourokuzumi[0])){
+        $mes = "※以下のロットは既に登録されています。";
+        $this->set('mes',$mes);
+        $counttourokuzumi = 0;
+        for($k=0; $k<count($arrLot); $k++){
+          $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[$k]["datetime_hakkou"], 'product_code' => $arrLot[$k]["product_code"], 'lot_num' => $arrLot[$k]["lot_num"], 'amount' => $arrLot[$k]["amount"]])->toArray();
+          if(isset($CheckLottourokuzumi[0])){
+            ${"CheckLottourokuzumiproduct_code".$k} = $CheckLottourokuzumi[0]->product_code;
+            $this->set('CheckLottourokuzumiproduct_code'.$k,${"CheckLottourokuzumiproduct_code".$k});
+            ${"CheckLottourokuzumilot_num".$k} = $CheckLottourokuzumi[0]->lot_num;
+            $this->set('CheckLottourokuzumilot_num'.$k,${"CheckLottourokuzumilot_num".$k});
+            $counttourokuzumi = $counttourokuzumi + 1;
+            $this->set('counttourokuzumi',$counttourokuzumi);
+          }else{
+            $arrLotmitouroku[] = $arrLot[$k];
+            $mes = "※以下のロットは既に登録されています。他のロットは登録されました。";
+            $this->set('mes',$mes);
+          }
+        }
+        if(isset($arrLotmitouroku)){
+          $arrLot = $arrLotmitouroku;
+        }
+      }
+
+           $checkLots = $this->CheckLots->newEntity();
+           $this->set('checkLots',$checkLots);
            $checkLots = $this->CheckLots->patchEntities($checkLots, $arrLot);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
            $connection = ConnectionManager::get('default');//トランザクション1
            // トランザクション開始2
            $connection->begin();//トランザクション3
            try {//トランザクション4
-               if ($this->CheckLots->saveMany($checkLots)) {//saveManyで一括登録
-                 $mes = "※登録されました";
-                 $this->set('mes',$mes);
-                 $connection->commit();// コミット5
-               } else {
-                 $mes = "※登録されませんでした";
-                 $this->set('mes',$mes);
-                 $this->Flash->error(__('The data could not be saved. Please, try again.'));
-                 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-               }
+             if ($this->CheckLots->saveMany($checkLots)) {//saveManyで一括登録
+               $connection->commit();// コミット5
+             } else {
+      //         $this->Flash->error(__('The data could not be saved. Please, try again.'));
+               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+             }
            } catch (Exception $e) {//トランザクション7
            //ロールバック8
              $connection->rollback();//トランザクション9

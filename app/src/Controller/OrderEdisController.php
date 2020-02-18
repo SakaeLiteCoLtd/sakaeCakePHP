@@ -804,10 +804,18 @@ class OrderEdisController extends AppController
     {
       $this->request->session()->destroy();//セッションの破棄
       $data = $this->request->getData();
-      $product_code = $data['product_code'];
-      $date_sta = $data['date_sta'];
-      $date_fin = $data['date_fin'];
-      if(empty($data['product_code'])){//product_codeの入力がないとき
+      $Data=$this->request->query('s');//1度henkou5panaへ行って戻ってきたとき（検索を押したとき）
+      if(isset($Data)){
+        $product_code = $Data['product_code'];
+        $date_sta = $Data['date_sta'];
+        $date_fin = $Data['date_fin'];
+      }else{
+        $product_code = $data['product_code'];
+        $date_sta = $data['date_sta'];
+        $date_fin = $data['date_fin'];
+      }
+
+      if(empty($product_code)){//product_codeの入力がないとき
         $product_code = "no";
         $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
           ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin]));
@@ -815,13 +823,24 @@ class OrderEdisController extends AppController
         $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
           ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code]));
       }
+/*
+      echo "<pre>";
+      print_r($Data);
+      echo "</pre>";
+*/
     }
 
     public function henkou5pana()
     {
+      $data = $this->request->getData();
+
+      if(isset($data['kensaku'])){
+        return $this->redirect(['action' => 'henkou4pana',
+        's' => ['product_code' => $data['product_code'],'date_sta' => $data['date_sta'],'date_fin' => $data['date_fin']]]);
+      }
+
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-      $data = $this->request->getData();
 /*
       echo "<pre>";
       print_r($data);
@@ -830,12 +849,15 @@ class OrderEdisController extends AppController
       $array = array();
       if(isset($data["nummax"])){
         for ($k=2; $k<=$data["nummax"]; $k++){
-          if(isset($data["check".$k])){
+          if(isset($data["subete"])){
+            $array[] = $data["$k"];
+          }elseif(isset($data["check".$k])){
             $array[] = $data["$k"];
           }else{
           }
         }
-/*      echo "<pre>";
+/*
+      echo "<pre>";
       print_r($array);
       echo "</pre>";
 */
@@ -850,8 +872,8 @@ class OrderEdisController extends AppController
           }
         }
       }
-
-/*      echo "<pre>";
+/*
+      echo "<pre>";
       print_r($i_num);
       echo "</pre>";
 */
@@ -903,11 +925,11 @@ class OrderEdisController extends AppController
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
-
+/*
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-
+*/
     }
 
     public function henkoupanapreadd()
@@ -946,13 +968,13 @@ class OrderEdisController extends AppController
       $this->set('orderEdis',$orderEdis);
       $session = $this->request->getSession();
       $data = $session->read();
-      $cnt = count($data);//配列（更新するカラム）の個数
-/*
+      $cnt = count($data['orderEdis']);//配列（更新するカラム）の個数
+      /*
       echo "<pre>";
       print_r($cnt);
-      print_r($data['orderEdis'][0]['id']);
+      print_r($data['orderEdis']);
       echo "</pre>";
-
+      /*
       for($n=0; $n<=$cnt; $n++){
         if(isset($data['orderEdis'][$n])){
           $this->OrderEdis->updateAll(

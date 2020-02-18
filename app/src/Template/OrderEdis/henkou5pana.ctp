@@ -15,6 +15,10 @@
 //   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkou5pana']]);
 ?>
 <?php
+header('Expires:-1');
+header('Cache-Control:');
+header('Pragma:');
+
   $data = $this->request->getData();
 ?>
 
@@ -231,5 +235,88 @@
   ?>
 
 <?php else: ?>
+
+  <form method="post" action="henkou6pana" enctype="multipart/form-data">
+
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+    <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+
+  <?php
+        $dateYMD = date('Y-m-d');
+
+        echo "<td width='150' colspan='3' style='border-bottom: solid;border-width: 1px'><div align='center'><strong style='font-size: 12pt; color:blue'>\n";
+        echo "納期一括変更";
+        echo "</strong></div></td>\n";
+        echo "<td width='250' colspan='37' style='border-bottom: solid;border-width: 1px'><div align='center'>\n";
+        echo "<input type='date' value=$dateYMD name=date_ikkatsu empty=Please select size='6'/>\n";
+        echo "</div></td>\n";
+        echo "</tr>\n";
+   ?>
+  <br>
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+  <tr>
+  <br>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('一括変更', array('name' => 'ikkatsu')); ?></div></td>
+  </tr>
+  </table>
+  <br><br><br><br>
+
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+    <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+          <thead>
+              <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+                <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">注文ＮＯ</strong></div></td>
+                <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品番</strong></div></td>
+                <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品名</strong></div></td>
+                <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品数</strong></div></td>
+                <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納期</strong></div></td>
+                <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品場所</strong></div></td>
+              </tr>
+          </thead>
+          <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+            <?php for ($i=0;$i<$i_num+1;$i++): ?>
+              <?php foreach (${"orderEdis".$i} as ${"orderEdis".$i}): ?>
+              <?php //foreach ($orderEdis as $orderEdis): ?>
+              <tr style="border-bottom: solid;border-width: 1px">
+                <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->num_order) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->product_code) ?></td>
+                  <?php
+                    $product_code = ${"orderEdis".$i}->product_code;
+                		$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+                		$product_name = $Product[0]->product_name;
+                  ?>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
+                <td width="100" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
+               <?php
+                $dateYMD = date('Y-m-d');
+                $date_deliver = ${"orderEdis".$i}->date_deliver->format('Y-m-d');
+                echo "<td width='200' colspan='20'><div align='center'>\n";
+                echo "<input type='date' value=$date_deliver name=date_deliver_{$i} empty=Please select size='6'/>\n";
+                echo "</div></td>\n";
+               ?>
+              <?php
+               $i_count = $i;
+               echo $this->Form->hidden('i_count' ,['value'=>$i_count]);
+               echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
+              ?>
+
+                <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
+              </tr>
+              <?php endforeach; ?>
+            <?php endfor;?>
+
+          </tbody>
+      </table>
+  <br>
+  <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+  <tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('納期変更確認', array('name' => 'noukikakunin')); ?></div></td>
+  </tr>
+  </table>
+
+  <?=$this->Form->end() ?>
+
+  </form>
+
 
 <?php endif; ?>

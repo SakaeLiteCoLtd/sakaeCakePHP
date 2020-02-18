@@ -16,6 +16,9 @@
    echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkoupanapreadd']]);
 ?>
 <?php
+header('Expires:-1');//この３行がなければ「戻る」をしたら「フォーム再送信の確認」が表示される。
+header('Cache-Control:');
+header('Pragma:');
   $data = $this->request->getData();
 ?>
 

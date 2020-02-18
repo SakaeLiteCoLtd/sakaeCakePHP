@@ -15,6 +15,10 @@
    $this->OrderEdis = TableRegistry::get('orderEdis');//productsテーブルを使う
 ?>
 <?php
+header('Expires:-1');
+header('Cache-Control:');
+header('Pragma:');
+
   $data = $this->request->getData();
 ?>
  </table>
@@ -218,7 +222,7 @@ echo "</pre>";
   <br><br>
   <legend align="center"><strong style="font-size: 11pt; color:blue"><?= "入力間違いがあります。ブラウザの「戻る」で戻ってください。" ?></strong></legend>
   <br>
-  <legend align="center"><strong style="font-size: 11pt; color:red"><?= "！合計数量が合いません" ?></strong></legend>
+  <legend align="center"><strong style="font-size: 11pt; color:red"><?= "合計数量が合いません！" ?></strong></legend>
   <br><br><br>
 
 <?php else: ?>

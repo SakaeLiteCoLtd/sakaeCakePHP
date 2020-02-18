@@ -798,6 +798,12 @@ class OrderEdisController extends AppController
       $this->request->session()->destroy();// セッションの破棄
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+/*
+      $Data=$this->request->query();
+      echo "<pre>";
+      print_r($Data);
+      echo "</pre>";
+*/
     }
 
     public function henkou4pana()
@@ -809,19 +815,31 @@ class OrderEdisController extends AppController
         $product_code = $Data['product_code'];
         $date_sta = $Data['date_sta'];
         $date_fin = $Data['date_fin'];
+        $Pro = $Data['Pro'];
       }else{
         $product_code = $data['product_code'];
         $date_sta = $data['date_sta'];
         $date_fin = $data['date_fin'];
+        $Pro = $data['Pro'];
       }
+/*
+      echo "<pre>";
+      print_r($Pro);
+      echo "</pre>";
+*/
+
 
       if(empty($product_code)){//product_codeの入力がないとき
         $product_code = "no";
         $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin]));
+          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
+//          'OR' => [['product_code like' => "P".'%'], ['product_code like' => '%'."W".'%'], ['product_code like' => "H".'%'], ['product_code like' => "R".'%']]]));//対象の製品を絞り込む
+          ));//対象の製品を絞り込む
       }else{//product_codeの入力があるとき
         $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-          ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code]));
+          ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => $Pro.'%']
+//          'OR' => [['product_code like' => "P".'%'], ['product_code like' => '%'."W".'%'], ['product_code like' => "H".'%'], ['product_code like' => "R".'%']]]));
+          ));//対象の製品を絞り込む
       }
 /*
       echo "<pre>";
@@ -836,7 +854,7 @@ class OrderEdisController extends AppController
 
       if(isset($data['kensaku'])){
         return $this->redirect(['action' => 'henkou4pana',
-        's' => ['product_code' => $data['product_code'],'date_sta' => $data['date_sta'],'date_fin' => $data['date_fin']]]);
+        's' => ['product_code' => $data['product_code'],'Pro' => $data['Pro'],'date_sta' => $data['date_sta'],'date_fin' => $data['date_fin']]]);
       }
 
       $orderEdis = $this->OrderEdis->newEntity();

@@ -21,6 +21,15 @@ header('Cache-Control:');
 header('Pragma:');
 
   $data = $this->request->getData();
+  $Data=$this->request->query();
+
+
+  if(isset($Data["s"]["Pro"])){
+    echo $this->Form->hidden('Pro' ,['value'=>$Data["s"]["Pro"]]);
+  }else{
+    echo $this->Form->hidden('Pro' ,['value'=>$data["Pro"]]);
+  }
+
 ?>
 
  </table>

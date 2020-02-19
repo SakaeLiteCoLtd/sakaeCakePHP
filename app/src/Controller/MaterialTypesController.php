@@ -7,6 +7,8 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 
+//use \PDO;
+
 /**
  * MaterialTypes Controller
  *
@@ -27,36 +29,21 @@ class MaterialTypesController extends AppController
 		 parent::initialize();
 			$this->Users = TableRegistry::get('users');//staffsテーブルを使う
 	}
-
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|void
-     */
+/*
+	public function getRemoteData()
+	{
+		$conn1 = ConnectionManager::get('default');//local
+		$conn2 = ConnectionManager::get('DB_sakae');//192
+	}
+*/
     public function index()
     {
-	$this->set('materialType', $this->MaterialTypes->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
-	$this->set('materialType', $this->paginate());//※ページネーションに必要
-    }
-/*
-    public function login()
-    {
-	if ($this->request->is('post')) {
-		$user = $this->Auth->identify();
-		if ($user) {
-			$this->Auth->setUser($user);
-			return $this->redirect($this->Auth->redirectUrl());
-		}
-		$this->Flash->error(__('Invalid username or password, try again'));
-	}
+//			$this->MaterialTypes->defaultConnectionName('default');//local
+//			$this->MaterialTypes->defaultConnectionName('DB_sakae');//192
+			$this->set('materialType', $this->MaterialTypes->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
+			$this->set('materialType', $this->paginate());//※ページネーションに必要
     }
 
-    public function logout()
-    {
-	$this->request->session()->destroy(); // セッションの破棄
-	return $this->redirect($this->Auth->logout()); // ログアウト処理
-    }
-*/
     public function form()
     {
 	$materialType = $this->MaterialTypes->newEntity();//newentityに$materialTypeという名前を付ける
@@ -109,40 +96,41 @@ class MaterialTypesController extends AppController
 
      public function do()
     {
-	$materialType = $this->MaterialTypes->newEntity();//newentityに$materialTypeという名前を付ける
-	$this->set('materialType',$materialType);//1行上の$materialTypeをctpで使えるようにセット
 
-	$session = $this->request->getSession();
-	$data = $session->read();//postデータ取得し、$dataと名前を付ける
+			$materialType = $this->MaterialTypes->newEntity();//newentityに$materialTypeという名前を付ける
+			$this->set('materialType',$materialType);//1行上の$materialTypeをctpで使えるようにセット
 
-	$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-	$data['materialTypedata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+			$session = $this->request->getSession();
+			$data = $session->read();//postデータ取得し、$dataと名前を付ける
 
-	echo "<pre>";
- 	print_r($data['materialTypedata']);
-	echo "</pre>";
-
-	if ($this->request->is('get')) {//postの場合
-		$supplierSection = $this->MaterialTypes->patchEntity($materialType, $data['materialTypedata']);//$materialTypeデータ（空の行）を$this->request->getData()に更新する
-		$connection = ConnectionManager::get('default');//トランザクション1
-		// トランザクション開始2
-		$connection->begin();//トランザクション3
-		try {//トランザクション4
-			if ($this->MaterialTypes->save($materialType)) {
-				$mes = "※下記のように登録されました";
-				$this->set('mes',$mes);
-				$connection->commit();// コミット5
-			} else {
-				$mes = "※登録されませんでした";
-				$this->set('mes',$mes);
-				$this->Flash->error(__('The materialType could not be saved. Please, try again.'));
-				throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+			$data['materialTypedata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+		/*
+			echo "<pre>";
+		 	print_r($data['materialTypedata']);
+			echo "</pre>";
+		*/
+			if ($this->request->is('get')) {//postの場合
+				$supplierSection = $this->MaterialTypes->patchEntity($materialType, $data['materialTypedata']);//$materialTypeデータ（空の行）を$this->request->getData()に更新する
+				$connection = ConnectionManager::get('default');//トランザクション1
+				// トランザクション開始2
+				$connection->begin();//トランザクション3
+				try {//トランザクション4
+					if ($this->MaterialTypes->save($materialType)) {
+						$mes = "※下記のように登録されました";
+						$this->set('mes',$mes);
+						$connection->commit();// コミット5
+					} else {
+						$mes = "※登録されませんでした";
+						$this->set('mes',$mes);
+						$this->Flash->error(__('The materialType could not be saved. Please, try again.'));
+						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+					}
+				} catch (Exception $e) {//トランザクション7
+				//ロールバック8
+					$connection->rollback();//トランザクション9
+				}//トランザクション10
 			}
-		} catch (Exception $e) {//トランザクション7
-		//ロールバック8
-			$connection->rollback();//トランザクション9
-		}//トランザクション10
-	}
     }
 
     /**

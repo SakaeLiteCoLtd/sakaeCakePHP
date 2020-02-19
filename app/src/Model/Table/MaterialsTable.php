@@ -28,7 +28,6 @@ class MaterialsTable extends Table
         parent::beforeFilter($event);
         $this->Auth->allow(['add', 'logout']);
     }
-
     /**
      * Initialize method
      *

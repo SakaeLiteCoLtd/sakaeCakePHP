@@ -41,6 +41,16 @@ class MaterialTypesTable extends Table
         ]);
 
     }
+/*
+    public static function defaultConnectionName()
+    {
+      return 'default';//local
+    }
+*/
+    public static function defaultConnectionName()
+    {
+      return 'DB_sakae';//192の方のデータベースを使用（mysqlへリモートアクセスの許可済https://qiita.com/n0bisuke/items/bd86dd3a79cd7cbcd92e）
+    }
 
     /**
      * Default validation rules.

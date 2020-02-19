@@ -828,18 +828,28 @@ class OrderEdisController extends AppController
       echo "</pre>";
 */
 
-
-      if(empty($product_code)){//product_codeの入力がないとき
-        $product_code = "no";
-        $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
-//          'OR' => [['product_code like' => "P".'%'], ['product_code like' => '%'."W".'%'], ['product_code like' => "H".'%'], ['product_code like' => "R".'%']]]));//対象の製品を絞り込む
-          ));//対象の製品を絞り込む
-      }else{//product_codeの入力があるとき
-        $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-          ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => $Pro.'%']
-//          'OR' => [['product_code like' => "P".'%'], ['product_code like' => '%'."W".'%'], ['product_code like' => "H".'%'], ['product_code like' => "R".'%']]]));
-          ));//対象の製品を絞り込む
+      if($Pro == "W"){//Wのとき
+        if(empty($product_code)){//product_codeの入力がないとき
+          $product_code = "no";
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => '%'.$Pro.'%']
+            ));//対象の製品を絞り込む
+        }else{//product_codeの入力があるとき
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => '%'.$Pro.'%']
+            ));//対象の製品を絞り込む
+        }
+      }else{//P,H,Rのとき
+        if(empty($product_code)){//product_codeの入力がないとき
+          $product_code = "no";
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
+            ));//対象の製品を絞り込む
+        }else{//product_codeの入力があるとき
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => $Pro.'%']
+            ));//対象の製品を絞り込む
+        }
       }
 /*
       echo "<pre>";

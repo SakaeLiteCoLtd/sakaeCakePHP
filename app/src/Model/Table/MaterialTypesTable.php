@@ -36,22 +36,19 @@ class MaterialTypesTable extends Table
         $this->setPrimaryKey('id');
 
         $this->belongsTo('Staffs', [
-            'foreignKey' => 'created_staff',//�ύX
-            'joinType' => 'LEFT'//
+            'foreignKey' => 'created_staff',
+            'joinType' => 'LEFT'
         ]);
 
     }
 /*
-    public static function defaultConnectionName()
+    public static function defaultConnectionName()// DB切替(default -> DB_sakae)
     {
-      return 'default';//local
+//      return 'default';//localhostのデータベース
+      return 'DB_sakae';//192.168.4.246のデータベースを使用
+                        //mysqlへリモートアクセスの許可が必要https://qiita.com/n0bisuke/items/bd86dd3a79cd7cbcd92e
     }
 */
-    public static function defaultConnectionName()
-    {
-      return 'DB_sakae';//192の方のデータベースを使用（mysqlへリモートアクセスの許可済https://qiita.com/n0bisuke/items/bd86dd3a79cd7cbcd92e）
-    }
-
     /**
      * Default validation rules.
      *

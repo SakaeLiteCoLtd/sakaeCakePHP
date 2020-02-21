@@ -282,6 +282,7 @@ header('Pragma:');
   <tr>
   <td style="border-style: none;"><div align="center"><?= $this->Form->submit('日付変更', array('name' => 'nouki')); ?></div></td>
   <td style="border-style: none;"><div align="center"><?= $this->Form->submit('分納', array('name' => 'bunnnou')); ?></div></td>
+  <td style="border-style: none;"><legend align="center"><font color="red"><?= __("※分納は１行のみ選択してください。") ?></font></legend></td>
   </tr>
   </table>
   <?=$this->Form->end() ?>

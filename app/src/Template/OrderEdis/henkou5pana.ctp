@@ -130,7 +130,8 @@ header('Pragma:');
               </tr>
           </thead>
           <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <?php for ($i=0;$i<1;$i++): ?>
+
+            <?php for ($i=0;$i<$bunnou_num;$i++): ?>
               <?php foreach (${"orderEdis".$i} as ${"orderEdis".$i}): ?>
               <?php //foreach ($orderEdis as $orderEdis): ?>
               <tr style="border-bottom: solid;border-width: 1px">
@@ -146,8 +147,7 @@ header('Pragma:');
               <?php
                echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
               ?>
-
-                <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($Totalamount) ?></td>
               </tr>
               <?php endforeach; ?>
             <?php endfor;?>
@@ -159,6 +159,7 @@ header('Pragma:');
     <tr>
     <td style="border-style: none;"><div align="center"><?= $this->Form->submit('分納追加', array('name' => 'tsuika')); ?></div></td>
     <td style="border-style: none;"><div align="center"><?= $this->Form->submit('分納伝票登録', array('name' => 'touroku')); ?></div></td>
+    <td style="border-style: none;"><legend align="center"><font color="red"><?= __($meschecknum) ?></font></legend></td>
     </tr>
   </table>
 
@@ -174,7 +175,7 @@ header('Pragma:');
           </thead>
           <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
 
-            <?php for ($j=0;$j<1;$j++): ?>
+            <?php for ($j=0;$j<$bunnou_num;$j++): ?>
               <tr style="border-bottom: solid;border-width: 1px">
                 <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
                 <?php

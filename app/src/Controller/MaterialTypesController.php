@@ -7,8 +7,6 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 
-//use \PDO;
-
 /**
  * MaterialTypes Controller
  *
@@ -30,10 +28,11 @@ class MaterialTypesController extends AppController
 			$this->Users = TableRegistry::get('users');//staffsテーブルを使う
 	}
 /*
-	public function getRemoteData()
+	public function getRemoteData()//Tableのコードのみでデータベースが決まる。関係なし…
 	{
 		$conn1 = ConnectionManager::get('default');//local
 		$conn2 = ConnectionManager::get('DB_sakae');//192
+    $this->MaterialTypes = TableRegistry::get('material_types', ['table' => 'sakaedb', 'connection' => $conn2]);
 	}
 */
     public function index()
@@ -96,7 +95,6 @@ class MaterialTypesController extends AppController
 
      public function do()
     {
-
 			$materialType = $this->MaterialTypes->newEntity();//newentityに$materialTypeという名前を付ける
 			$this->set('materialType',$materialType);//1行上の$materialTypeをctpで使えるようにセット
 
@@ -133,13 +131,6 @@ class MaterialTypesController extends AppController
 			}
     }
 
-    /**
-     * Edit method
-     *
-     * @param string|null $id Material Type id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Network\Exception\NotFoundException When record not found.
-     */
     public function edit($id = null)
     {
 			$materialType = $this->MaterialTypes->newEntity();//newentityに$materialTypeという名前を付ける

@@ -824,10 +824,9 @@ class OrderEdisController extends AppController
       }
 /*
       echo "<pre>";
-      print_r($Pro);
+      print_r($data);
       echo "</pre>";
 */
-
       if($Pro == "W"){//Wのとき
         if(empty($product_code)){//product_codeの入力がないとき
           $product_code = "no";
@@ -843,7 +842,8 @@ class OrderEdisController extends AppController
         if(empty($product_code)){//product_codeの入力がないとき
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-            ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
+    //      ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
+          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => "B".'%']//DNP実験
             ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -875,36 +875,78 @@ class OrderEdisController extends AppController
       echo "</pre>";
 */
       $array = array();
+      $checknum = 0;
       if(isset($data["nummax"])){
         for ($k=2; $k<=$data["nummax"]; $k++){
           if(isset($data["subete"])){
             $array[] = $data["$k"];
           }elseif(isset($data["check".$k])){
             $array[] = $data["$k"];
+            $checknum = $checknum + 1;
           }else{
           }
         }
 /*
-      echo "<pre>";
-      print_r($array);
-      echo "</pre>";
+        echo "<pre>";
+        print_r($checknum);
+        echo "</pre>";
 */
+        if($checknum > 1){
+          $meschecknum = "※複数行の選択がありました。先頭の行のみ表示しています。";
+          $this->set('meschecknum',$meschecknum);
+        }else{
+          $meschecknum = " ";
+          $this->set('meschecknum',$meschecknum);
+        }
+
         for ($i=0; $i<=$data["nummax"]; $i++){
           if(isset($array[$i])){
-            $this->set('orderEdis'.$i,$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-              ->where(['id' => $array[$i]]));
+            ${"orderEdis".$i} = $this->OrderEdis->find()->where(['id' => $array[$i]])->toArray();
+            $this->set('orderEdis'.$i,${"orderEdis".$i});
             $i_num = $i;
             $this->set('i_num',$i_num);
           }else{
             break;
           }
         }
-      }
+
+        $bunnou_num = 1;
+        $Totalamount = 0;
+        $this->set('bunnou_num',$bunnou_num);
+        $num_order0 = $orderEdis0[0]->num_order;
+        $product_code0 = $orderEdis0[0]->product_code;
+        $orderEdis = $this->OrderEdis->find()->where(['num_order' => $num_order0,'product_code' => $product_code0])->toArray();
+        for($n=0; $n<=100; $n++){
+          if(isset($orderEdis[$n])){
+            ${"orderEdis".$n} = $this->OrderEdis->find()->where(['id' => $orderEdis[$n]->id])->toArray();
+            $this->set('orderEdis'.$n,${"orderEdis".$n});
 /*
+            $num_order = ${"orderEdis".$n}[0]->num_order;
+            $this->set('num_order',$num_order);
+            $product_code = ${"orderEdis".$n}[0]->product_code;
+            $this->set('product_code',$product_code);
+            $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+            $product_name = $Product[0]->product_name;
+            $this->set('product_name',$product_name);
+            $date_deliver = ${"orderEdis".$n}[0]->date_deliver;
+            $this->set('date_deliver',$date_deliver);
+*/
+            ${"Totalamount".$n} = ${"orderEdis".$n}[0]->amount;
+            $Totalamount = $Totalamount + ${"Totalamount".$n};
+            $this->set('Totalamount',$Totalamount);
+            $bunnou_num = $n+1;
+            $this->set('bunnou_num',$bunnou_num);
+          }else{
+            break;
+          }
+        }
+      }
+      /*
       echo "<pre>";
-      print_r($i_num);
+      print_r($Totalamount);
       echo "</pre>";
 */
+
     }
 
     public function henkou5panabunnou()
@@ -913,19 +955,40 @@ class OrderEdisController extends AppController
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
-/*
+
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-*/
+
+      $orderEdis0 = $this->OrderEdis->find()->where(['id' => $data['orderEdis_0']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+      $num_order0 = $orderEdis0[0]->num_order;
+      $product_code0 = $orderEdis0[0]->product_code;
+      $orderEdis = $this->OrderEdis->find()->where(['num_order' => $num_order0,'product_code' => $product_code0])->toArray();
+      for($n=0; $n<=100; $n++){
+        if(isset($orderEdis[$n])){
+          echo "<pre>";
+          print_r($orderEdis[$n]->num_order);
+          echo "</pre>";
+        }else{
+          echo "<pre>";
+          print_r("NO");
+          echo "</pre>";
+          break;
+        }
+      }
+
+
+      $orderEdis0 = $this->OrderEdis->find()->where(['id' => $data['orderEdis_0']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
       $i = 0;
-      $this->set('orderEdis'.$i,$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-        ->where(['id' => $data['orderEdis_0']]));
+      $this->set('orderEdis'.$i,${"orderEdis".$i});
+
+
 
         if(isset($data['tsuika'])){
           $tsuikanum = $data['tsuikanum'] + 1;
           $this->set('tsuikanum',$tsuikanum);
-/*          echo "<pre>";
+/*
+          echo "<pre>";
           print_r("tsuika");
           echo "</pre>";
           echo "<pre>";
@@ -953,11 +1016,11 @@ class OrderEdisController extends AppController
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
-/*
+
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-*/
+
     }
 
     public function henkoupanapreadd()
@@ -1138,5 +1201,7 @@ class OrderEdisController extends AppController
       }//トランザクション10
 
     }
+
+
 
 }

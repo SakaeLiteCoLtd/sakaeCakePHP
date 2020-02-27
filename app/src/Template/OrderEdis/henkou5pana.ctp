@@ -12,6 +12,7 @@
    $username = $this->request->Session()->read('Auth.User.username');
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
+   $this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
 //   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkou5pana']]);
 ?>
 <?php
@@ -25,7 +26,7 @@ header('Pragma:');
  </table>
 <hr size="5" style="margin: 0.5rem">
 
-<?php if(isset($data["nouki"])): ?>
+<?php if(isset($data["nouki"]))://日付変更を押したとき ?>
 
 <form method="post" action="henkou6pana" enctype="multipart/form-data">
 
@@ -109,7 +110,7 @@ header('Pragma:');
 
 </form>
 
-<?php elseif(isset($data["bunnnou"])): ?>
+<?php elseif(isset($data["bunnnou"]))://分納を押したとき ?>
 
 <form method="post" action="henkou5panabunnou" enctype="multipart/form-data">
 
@@ -131,9 +132,8 @@ header('Pragma:');
           </thead>
           <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
 
-            <?php for ($i=0;$i<$bunnou_num;$i++): ?>
+            <?php for ($i=0;$i<1;$i++): ?>
               <?php foreach (${"orderEdis".$i} as ${"orderEdis".$i}): ?>
-              <?php //foreach ($orderEdis as $orderEdis): ?>
               <tr style="border-bottom: solid;border-width: 1px">
                 <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->num_order) ?></td>
                 <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->product_code) ?></td>
@@ -143,11 +143,21 @@ header('Pragma:');
                 		$product_name = $Product[0]->product_name;
                   ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
-                <td width="200" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->date_deliver) ?></td>
+                <?php
+                  $product_code = ${"orderEdis".$i}->product_code;
+                  $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
+                  $Dnpdate_deliver = $DnpTotalAmount[0]->date_deliver;
+                ?>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h($Dnpdate_deliver) ?></td>
               <?php
                echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
               ?>
-                <td width="150" colspan="20" nowrap="nowrap"><?= h($Totalamount) ?></td>
+              <?php
+                $product_code = ${"orderEdis".$i}->product_code;
+                $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
+                $TotalAmount = $DnpTotalAmount[0]->amount;
+              ?>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($TotalAmount) ?></td>
               </tr>
               <?php endforeach; ?>
             <?php endfor;?>
@@ -180,13 +190,13 @@ header('Pragma:');
                 <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
                 <?php
                  $dateYMD = date('Y-m-d');
-                 $date_deliver = ${"orderEdis".$j}->date_deliver->format('Y-m-d');
-                 $amount = ${"orderEdis".$j}->amount;
+          //       $date_deliver = ${"orderEdis".$j}->date_deliver->format('Y-m-d');
+          //       $amount = ${"orderEdis".$j}->amount;
                  echo "<td width='200' colspan='20'><div align='center'>\n";
-                 echo "<input type='date' value=$date_deliver name=date_deliver_{$j} empty=Please select size='6'/>\n";
+                 echo "<input type='date' value=${"date_deliver".$j} name=date_deliver_{$j} empty=Please select size='6'/>\n";
                  echo "</div></td>\n";
                  echo "<td width='200' colspan='20'><div align='center'>\n";
-                 echo "<input type='text' value=$amount name=amount_{$j} empty=Please select size='6'/>\n";
+                 echo "<input type='text' value=${"amount".$j} name=amount_{$j} empty=Please select size='6'/>\n";
                  echo "</div></td>\n";
                 ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h("変更可") ?></td>

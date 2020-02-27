@@ -13,6 +13,7 @@
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
    $this->OrderEdis = TableRegistry::get('orderEdis');//productsテーブルを使う
+   $this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
 ?>
 <?php
 header('Expires:-1');
@@ -20,6 +21,11 @@ header('Cache-Control:');
 header('Pragma:');
 
   $data = $this->request->getData();
+/*
+  echo "<pre>";
+  print_r($num);
+  echo "</pre>";
+*/
 ?>
  </table>
  <hr size="5" style="margin: 0.5rem">
@@ -29,11 +35,15 @@ header('Pragma:');
   if(isset($data["touroku"])){
     $data = $this->request->getData();
     (int)$amount_total = 0;
-    for ($j=0;$j<$data["tsuikanum"];$j++){
+    for ($j=0;$j<$data["tsuikanum"]+$num;$j++){
       (int)$amount_total = (int)$amount_total + (int)$data["amount_".$j];
     }
     $OrderEdi = $this->OrderEdis->find()->where(['id' => $data['orderEdis_0']])->toArray();
-    $amount_moto = $OrderEdi[0]->amount;
+    $date_order_moto = $OrderEdi[0]->date_order;
+    $num_order_moto = $OrderEdi[0]->num_order;
+    $product_code_moto = $OrderEdi[0]->product_code;
+    $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['date_order' => $date_order_moto, 'num_order' => $num_order_moto, 'product_code' => $product_code_moto])->toArray();
+    $amount_moto = $DnpTotalAmount[0]->amount;
 /*
     echo "<pre>";
     print_r("合計：".$amount_total);
@@ -47,9 +57,12 @@ header('Pragma:');
   ?>
 
 
-<?php if((isset($data["touroku"]))&&($amount_total == $amount_moto)): ?>
+<?php if((isset($data["touroku"]))&&($amount_total == $amount_moto)): //分納伝票登録を押されて、合計数量が合っている場合?>
   <?php
-    $data = $this->request->getData();
+  $data = $this->request->getData();
+  echo "<pre>";
+  print_r($data);
+  echo "</pre>";
   ?>
   <form method="post" action="henkoupanabunnnoupreadd" enctype="multipart/form-data">
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -76,12 +89,17 @@ header('Pragma:');
                     $product_name = $Product[0]->product_name;
                   ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
-                <td width="200" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->date_deliver) ?></td>
+                <?php
+                  $product_code = ${"orderEdis".$i}->product_code;
+                  $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
+                  $Dnpdate_deliver = $DnpTotalAmount[0]->date_deliver;
+                ?>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h($Dnpdate_deliver) ?></td>
               <?php
                echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
               ?>
 
-                <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($amount_moto) ?></td>
               </tr>
               <?php endforeach; ?>
             <?php endfor;?>
@@ -107,7 +125,7 @@ header('Pragma:');
               </thead>
               <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
 
-        <?php for ($j=0;$j<1;$j++): ?>
+        <?php for ($j=0;$j<=$num;$j++): ?>
           <tr style="border-bottom: solid;border-width: 1px">
             <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
             <td width="150" colspan="20" nowrap="nowrap"><?= h($data["date_deliver_".$j]) ?></td>
@@ -116,15 +134,29 @@ header('Pragma:');
 
           <?php
           $session = $this->request->getSession();
+          if(isset($data["orderEdis_".$j])){
+            $_SESSION['orderEdis'][$j] = array(
+              'id' => $data["orderEdis_".$j],
+              'date_deliver' => $data["date_deliver_".$j],
+              'amount' => $data["amount_".$j]
+            );
+          }else{
+            $_SESSION['orderEdis'][$j] = array(
+              'date_deliver' => $data["date_deliver_".$j],
+              'amount' => $data["amount_".$j]
+            );
+          }
+/*
           $_SESSION['orderEdis'][$j] = array(
             'id' => $data["orderEdis_".$j],
             'date_deliver' => $data["date_deliver_".$j],
             'amount' => $data["amount_".$j]
           );
+*/
           ?>
 
       <?php endfor;?>
-        <?php for ($j=1;$j<$data["tsuikanum"];$j++): ?>
+        <?php for ($j=$num+1;$j<$data["tsuikanum"]+$num;$j++): ?>
           <tr style="border-bottom: solid;border-width: 1px">
             <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
             <td width="150" colspan="20" nowrap="nowrap"><?= h($data["date_deliver_".$j]) ?></td>
@@ -180,7 +212,8 @@ header('Pragma:');
         <?php endfor;?>
       </tbody>
   </table>
-<br><br><br><br><br><br><br><br>
+  <br><br><br><br><br><br><br><br>
+  <br><br><br>
 
 <?php
 /*
@@ -195,18 +228,21 @@ echo "</pre>";
 <?=$this->Form->end() ?>
 
 
-<?php elseif(isset($data["touroku"])): ?>
+<?php elseif(isset($data["touroku"])): //分納伝票登録を押されて、合計数量が合わない場合?>
   <br><br>
   <legend align="center"><strong style="font-size: 11pt; color:blue"><?= "入力間違いがあります。ブラウザの「戻る」で戻ってください。" ?></strong></legend>
   <br>
   <legend align="center"><strong style="font-size: 11pt; color:red"><?= "合計数量が合いません！" ?></strong></legend>
   <br><br><br>
 
-<?php else: ?>
+<?php else: //分納追加を押された場合?>
   <form method="post" action="henkou5panabunnou" enctype="multipart/form-data">
 
       <?php
         $data = $this->request->getData();
+        echo "<pre>";
+        print_r($data);
+        echo "</pre>";
       ?>
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -233,7 +269,12 @@ echo "</pre>";
                   		$product_name = $Product[0]->product_name;
                     ?>
                   <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
-                  <td width="200" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->date_deliver) ?></td>
+                  <?php
+                    $product_code = ${"orderEdis".$i}->product_code;
+                    $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
+                    $Dnpdate_deliver = $DnpTotalAmount[0]->date_deliver;
+                  ?>
+                  <td width="200" colspan="20" nowrap="nowrap"><?= h($Dnpdate_deliver) ?></td>
                 <?php
                  echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
                 ?>
@@ -266,13 +307,15 @@ echo "</pre>";
             </thead>
             <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
 
-              <?php for ($j=0;$j<1;$j++): ?>
+              <?php for ($j=0;$j<=$num;$j++): ?>
                 <tr style="border-bottom: solid;border-width: 1px">
                   <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
                   <?php
                    $dateYMD = date('Y-m-d');
-                   $date_deliver = ${"orderEdis".$j}->date_deliver->format('Y-m-d');
-                   $amount = ${"orderEdis".$j}->amount;
+            //       $date_deliver = ${"orderEdis".$j}->date_deliver->format('Y-m-d');
+                   $date_deliver = $data["date_deliver_{$j}"];
+            //       $amount = ${"orderEdis".$j}->amount;
+                   $amount = $data["amount_{$j}"];
                    echo "<td width='200' colspan='20'><div align='center'>\n";
                    echo "<input type='date' value=$date_deliver name=date_deliver_{$j} empty=Please select size='6'/>\n";
                    echo "</div></td>\n";
@@ -283,7 +326,7 @@ echo "</pre>";
                   <td width="200" colspan="20" nowrap="nowrap"><?= h("変更可") ?></td>
                 </tr>
               <?php endfor;?>
-              <?php for ($j=1;$j<$tsuikanum;$j++): ?>
+              <?php for ($j=$num+1;$j<$num+$tsuikanum;$j++): ?>
                 <tr style="border-bottom: solid;border-width: 1px">
                   <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
                   <?php

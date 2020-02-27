@@ -166,12 +166,13 @@ class OrderEdisTable extends Table
 
         return $validator;
     }
-/*
+
         public function buildRules(RulesChecker $rules)
         {
-            $rules->add($rules->isUnique(['date_deliver','place_deliver_code','product_code','amount','delete_flag']));
+    //    $rules->add($rules->isUnique(['date_deliver','place_deliver_code','product_code','amount','delete_flag']));
+        $rules->add($rules->isUnique(['date_order','date_deliver','num_order','line_code','product_code','delete_flag']));
 
             return $rules;
         }
-*/
+
 }

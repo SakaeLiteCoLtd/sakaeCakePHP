@@ -20,10 +20,10 @@ header('Expires:-1');
 header('Cache-Control:');
 header('Pragma:');
 
-  $data = $this->request->getData();
+$data = $this->request->getData();
 /*
   echo "<pre>";
-  print_r($num);
+  print_r($data);
   echo "</pre>";
 */
 ?>
@@ -35,8 +35,10 @@ header('Pragma:');
   if(isset($data["touroku"])){
     $data = $this->request->getData();
     (int)$amount_total = 0;
+    $arrdate_deliver = array();//空の配列を作る
     for ($j=0;$j<$data["tsuikanum"]+$num;$j++){
       (int)$amount_total = (int)$amount_total + (int)$data["amount_".$j];
+      $arrdate_deliver[] = $data["date_deliver_".$j];//配列に追加する
     }
     $OrderEdi = $this->OrderEdis->find()->where(['id' => $data['orderEdis_0']])->toArray();
     $date_order_moto = $OrderEdi[0]->date_order;
@@ -44,7 +46,19 @@ header('Pragma:');
     $product_code_moto = $OrderEdi[0]->product_code;
     $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['date_order' => $date_order_moto, 'num_order' => $num_order_moto, 'product_code' => $product_code_moto])->toArray();
     $amount_moto = $DnpTotalAmount[0]->amount;
+
+    //納期がかぶっているかチェック
+    $uniquearrdate_deliver = array_unique($arrdate_deliver, SORT_REGULAR);//重複削除
+    $cntdate_deliver = count($arrdate_deliver);
+    $cntuniquearrdate_deliver = count($uniquearrdate_deliver);
+
 /*
+    echo "<pre>";
+    print_r($cntdate_deliver);
+    echo "</pre>";
+    echo "<pre>";
+    print_r($cntuniquearrdate_deliver);
+    echo "</pre>";
     echo "<pre>";
     print_r("合計：".$amount_total);
     echo "</pre>";
@@ -57,12 +71,9 @@ header('Pragma:');
   ?>
 
 
-<?php if((isset($data["touroku"]))&&($amount_total == $amount_moto)): //分納伝票登録を押されて、合計数量が合っている場合?>
+<?php if((isset($data["touroku"]))&&($amount_total == $amount_moto)&&($cntdate_deliver == $cntuniquearrdate_deliver)): //分納伝票登録を押されて、合計数量が合っていて、納期がかぶっていない場合?>
   <?php
   $data = $this->request->getData();
-  echo "<pre>";
-  print_r($data);
-  echo "</pre>";
   ?>
   <form method="post" action="henkoupanabunnnoupreadd" enctype="multipart/form-data">
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -216,11 +227,11 @@ header('Pragma:');
   <br><br><br>
 
 <?php
-/*
+
 echo "<pre>";
 print_r($_SESSION['orderEdis']);
 echo "</pre>";
-*/
+
 ?>
 
 </form>
@@ -228,20 +239,34 @@ echo "</pre>";
 <?=$this->Form->end() ?>
 
 
-<?php elseif(isset($data["touroku"])): //分納伝票登録を押されて、合計数量が合わない場合?>
+<?php elseif(isset($data["touroku"])): //分納伝票登録を押されて、合計数量が合わないまたは納期がかぶっている場合?>
+  <?php
+  if($cntdate_deliver == $cntuniquearrdate_deliver){
+    $errmesdeliver = "";
+    $errmesamount = "合計数量が合いません！";
+  }elseif($amount_total == $amount_moto){
+    $errmesdeliver = "納期が被っているものがあります。納期を変更してください。";
+    $errmesamount = "";
+  }else{
+    $errmesdeliver = "納期が被っているものがあります。納期を変更してください。";
+    $errmesamount = "合計数量が合いません！";
+  }
+  ?>
   <br><br>
   <legend align="center"><strong style="font-size: 11pt; color:blue"><?= "入力間違いがあります。ブラウザの「戻る」で戻ってください。" ?></strong></legend>
   <br>
-  <legend align="center"><strong style="font-size: 11pt; color:red"><?= "合計数量が合いません！" ?></strong></legend>
+  <legend align="center"><strong style="font-size: 11pt; color:red"><?= $errmesdeliver ?></strong></legend>
+  <br>
+  <legend align="center"><strong style="font-size: 11pt; color:red"><?= $errmesamount ?></strong></legend>
   <br><br><br>
 
-<?php else: //分納追加を押された場合?>
+<?php else: //分納追加（削除）を押された場合?>
   <form method="post" action="henkou5panabunnou" enctype="multipart/form-data">
 
       <?php
         $data = $this->request->getData();
         echo "<pre>";
-        print_r($data);
+        print_r("tuika/sakujo");
         echo "</pre>";
       ?>
 
@@ -276,9 +301,9 @@ echo "</pre>";
                   ?>
                   <td width="200" colspan="20" nowrap="nowrap"><?= h($Dnpdate_deliver) ?></td>
                 <?php
-                 echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
+                echo $this->Form->hidden("orderEdis_".$i ,['value'=>$data["orderEdis_".$i]]);
+//                echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
                 ?>
-
                   <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
                 </tr>
                 <?php endforeach; ?>
@@ -306,7 +331,6 @@ echo "</pre>";
                 </tr>
             </thead>
             <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-
               <?php for ($j=0;$j<=$num;$j++): ?>
                 <tr style="border-bottom: solid;border-width: 1px">
                   <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
@@ -323,6 +347,12 @@ echo "</pre>";
                    echo "<input type='text' value=$amount name=amount_{$j} empty=Please select size='6'/>\n";
                    echo "</div></td>\n";
                   ?>
+                  <?php
+                  if(isset($data["orderEdis_".$j])){
+                    echo $this->Form->hidden("orderEdis_".$j ,['value'=>$data["orderEdis_".$j]]);
+                  }
+                  ?>
+
                   <td width="200" colspan="20" nowrap="nowrap"><?= h("変更可") ?></td>
                 </tr>
               <?php endfor;?>
@@ -331,12 +361,21 @@ echo "</pre>";
                   <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
                   <?php
                    $dateYMD = date('Y-m-d');
+                   if(isset($data["orderEdis_{$j}"])){
+                     ${"id".$j} = $data["orderEdis_{$j}"];
+                     echo "<input type='hidden' value=${"id".$j} name=orderEdis_{$j} empty=Please select size='6'/>\n";
+                   }
                    echo "<td width='200' colspan='20'><div align='center'>\n";
                    echo "<input type='date' value=$date_deliver name=date_deliver_{$j} empty=Please select size='6'/>\n";
                    echo "</div></td>\n";
                    echo "<td width='200' colspan='20'><div align='center'>\n";
                    echo "<input type='text' name=amount_{$j} empty=Please select size='6'/>\n";
                    echo "</div></td>\n";
+                  ?>
+                  <?php
+                  if(isset($data["orderEdis_".$j])){
+                    echo $this->Form->hidden("orderEdis_".$j ,['value'=>$data["orderEdis_".$j]]);
+                  }
                   ?>
                   <td width="200" colspan="20" nowrap="nowrap"><?= h("変更可") ?></td>
                 </tr>

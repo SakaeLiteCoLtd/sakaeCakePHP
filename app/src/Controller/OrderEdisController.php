@@ -871,7 +871,8 @@ class OrderEdisController extends AppController
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
     //      ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
           ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => "M".'%']//DNP実験
-            ));//対象の製品を絞り込む
+          //role_code順に並べる
+          ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
             ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => $Pro.'%']
@@ -896,28 +897,24 @@ class OrderEdisController extends AppController
 
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-/*
+
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-*/
+
       $array = array();
       $checknum = 0;
       if(isset($data["nummax"])){
         for ($k=2; $k<=$data["nummax"]; $k++){
           if(isset($data["subete"])){
             $array[] = $data["$k"];
-          }elseif(isset($data["check".$k])){
+          }elseif(isset($data["check".$k])){//checkがついているもののidをキープ
             $array[] = $data["$k"];
             $checknum = $checknum + 1;
           }else{
           }
         }
-/*
-        echo "<pre>";
-        print_r($checknum);
-        echo "</pre>";
-*/
+
         if($checknum > 1){
           $meschecknum = "※複数行の選択がありました。先頭の行のみ表示しています。";
           $this->set('meschecknum',$meschecknum);
@@ -927,7 +924,7 @@ class OrderEdisController extends AppController
         }
 
         for ($i=0; $i<=$data["nummax"]; $i++){
-          if(isset($array[$i])){
+          if(isset($array[$i])){//checkがついているもののidと同じidのデータを取り出す
             ${"orderEdis".$i} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $array[$i]])->toArray();
             $this->set('orderEdis'.$i,${"orderEdis".$i});
             $i_num = $i;
@@ -948,16 +945,15 @@ class OrderEdisController extends AppController
             ${"orderEdis".$n} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $orderEdis[$n]->id])->toArray();
             $this->set('orderEdis'.$n,${"orderEdis".$n});
 
+            ${"id".$n} = ${"orderEdis".$n}[0]->id;
+            $this->set('id'.$n,${"id".$n});
+
             ${"date_deliver".$n} = ${"orderEdis".$n}[0]->date_deliver->format('Y-m-d');
             $this->set('date_deliver'.$n,${"date_deliver".$n});
 
             ${"amount".$n} = ${"orderEdis".$n}[0]->amount;
             $this->set('amount'.$n,${"amount".$n});
-/*
-            ${"Totalamount".$n} = ${"orderEdis".$n}[0]->amount;
-            $Totalamount = $Totalamount + ${"Totalamount".$n};
-            $this->set('Totalamount',$Totalamount);
-  */
+
             $bunnou_num = $n+1;
             $this->set('bunnou_num',$bunnou_num);
           }else{
@@ -965,12 +961,6 @@ class OrderEdisController extends AppController
           }
         }
       }
-      /*
-      echo "<pre>";
-      print_r($Totalamount);
-      echo "</pre>";
-*/
-
     }
 
     public function henkou5panabunnou()
@@ -979,60 +969,44 @@ class OrderEdisController extends AppController
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
-/*
+
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-*/
+
       $orderEdis0 = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $data['orderEdis_0']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
       $num_order0 = $orderEdis0[0]->num_order;
       $product_code0 = $orderEdis0[0]->product_code;
       $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'product_code' => $product_code0])->toArray();
       for($n=0; $n<=100; $n++){
         if(isset($orderEdis[$n])){
-/*
-          echo "<pre>";
-          print_r($orderEdis[$n]->num_order);
-          echo "</pre>";
-*/
           $num = $n;
           $this->set('num',$num);//既に分納している場合１以上になる
         }else{
-/*          echo "<pre>";
-          print_r("break");
-          echo "</pre>";
-*/
           break;
         }
       }
 
-      $orderEdis0 = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $data['orderEdis_0']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
-      $i = 0;
-      $this->set('orderEdis'.$i,${"orderEdis".$i});
+      for($n=0; $n<=100; $n++){
+        if(isset($orderEdis[$n])){
+  //      if(isset($orderEdis[$n])){
+          ${"orderEdis".$n} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $data["orderEdis_{$n}"]])->toArray();
+          $this->set('orderEdis'.$n,${"orderEdis".$n});
+        }else{
+          break;
+        }
+      }
 
-
+//      $orderEdis0 = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $data['orderEdis_0']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+//      $i = 0;
+//      $this->set('orderEdis'.$i,${"orderEdis".$i});
 
         if(isset($data['tsuika'])){
           $tsuikanum = $data['tsuikanum'] + 1;
           $this->set('tsuikanum',$tsuikanum);
-/*
-          echo "<pre>";
-          print_r("tsuika");
-          echo "</pre>";
-          echo "<pre>";
-          print_r($tsuikanum);
-          echo "</pre>";
-*/
         }elseif(isset($data['sakujo'])){
           $tsuikanum = $data['tsuikanum'] - 1;
           $this->set('tsuikanum',$tsuikanum);
-/*          echo "<pre>";
-          print_r("sakujo");
-          echo "</pre>";
-          echo "<pre>";
-          print_r($tsuikanum);
-          echo "</pre>";
-*/
         }
 
 
@@ -1130,9 +1104,7 @@ class OrderEdisController extends AppController
       //ロールバック8
         $connection->rollback();//トランザクション9
       }//トランザクション10
-
     }
-
 
     public function henkoupanabunnnoupreadd()
     {
@@ -1191,16 +1163,16 @@ class OrderEdisController extends AppController
           break;
         }
       }
-/*
+
       echo "<pre>";
-      print_r($_SESSION['orderEdis'][0]);
+      print_r($_SESSION['orderEdis']);
       echo "</pre>";
       echo "<pre>";
       print_r($arrOrderEdis);
       echo "</pre>";
-*/
 
 //orderEdisを分納するときidがすでにあれば更新、なければ新規登録
+//mikanのテーブルも更新（date_deliverが一番遅いやつのminoukannouの更新）
 
       $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2

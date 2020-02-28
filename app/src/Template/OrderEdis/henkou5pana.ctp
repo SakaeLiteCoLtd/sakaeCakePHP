@@ -116,6 +116,9 @@ header('Pragma:');
 
     <?php
       $data = $this->request->getData();
+      echo "<pre>";
+      print_r("bunnou");
+      echo "</pre>";
     ?>
 
 <br>
@@ -150,7 +153,7 @@ header('Pragma:');
                 ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($Dnpdate_deliver) ?></td>
               <?php
-               echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
+              echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
               ?>
               <?php
                 $product_code = ${"orderEdis".$i}->product_code;
@@ -197,6 +200,7 @@ header('Pragma:');
                  echo "</div></td>\n";
                  echo "<td width='200' colspan='20'><div align='center'>\n";
                  echo "<input type='text' value=${"amount".$j} name=amount_{$j} empty=Please select size='6'/>\n";
+                 echo "<input type='hidden' value=${"id".$j} name=orderEdis_{$j} empty=Please select size='6'/>\n";
                  echo "</div></td>\n";
                 ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h("変更可") ?></td>
@@ -218,8 +222,9 @@ header('Pragma:');
   <?php
     $data = $this->request->getData();
     echo "<pre>";
-    print_r($data);
+    print_r("tuika");
     echo "</pre>";
+
   ?>
 
 <?php else: ?>

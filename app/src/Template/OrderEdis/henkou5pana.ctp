@@ -116,9 +116,10 @@ header('Pragma:');
 
     <?php
       $data = $this->request->getData();
-      echo "<pre>";
+/*      echo "<pre>";
       print_r("bunnou");
       echo "</pre>";
+*/
     ?>
 
 <br>

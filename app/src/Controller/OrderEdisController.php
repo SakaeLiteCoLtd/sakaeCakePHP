@@ -897,11 +897,11 @@ class OrderEdisController extends AppController
 
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-
+/*
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-
+*/
       $array = array();
       $checknum = 0;
       if(isset($data["nummax"])){
@@ -969,11 +969,11 @@ class OrderEdisController extends AppController
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
-
+/*
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-
+*/
       $orderEdis0 = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $data['orderEdis_0']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
       $num_order0 = $orderEdis0[0]->num_order;
       $product_code0 = $orderEdis0[0]->product_code;
@@ -1152,10 +1152,12 @@ class OrderEdisController extends AppController
       $data = $session->read();
       $cnt = count($data);//配列（更新するカラム）の個数
 
-      $updated_staff = array('updated_staff'=>$this->Auth->user('staff_id'));
-      $_SESSION['orderEdis'][0] = array_merge($_SESSION['orderEdis'][0],$updated_staff);
-      for($n=1; $n<=count($_SESSION['orderEdis']); $n++){
+//      $updated_staff = array('updated_staff'=>$this->Auth->user('staff_id'));
+//      $_SESSION['orderEdis'][0] = array_merge($_SESSION['orderEdis'][0],$updated_staff);
+      for($n=0; $n<=count($_SESSION['orderEdis']); $n++){
         if(isset($_SESSION['orderEdis'][$n])){
+          $bunnou = array('bunnou'=>$n+1);
+          $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
           $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
           $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$created_staff);
           $arrOrderEdis[] = $_SESSION['orderEdis'][$n];
@@ -1163,47 +1165,59 @@ class OrderEdisController extends AppController
           break;
         }
       }
-
+/*
       echo "<pre>";
       print_r($_SESSION['orderEdis']);
       echo "</pre>";
       echo "<pre>";
       print_r($arrOrderEdis);
       echo "</pre>";
-
+*/
 //orderEdisを分納するときidがすでにあれば更新、なければ新規登録
 //mikanのテーブルも更新（date_deliverが一番遅いやつのminoukannouの更新）
+//idがあればupdate,なければ新規登録（場合分け）
+//amount=0 or 1 で場合分け（amount=0ならdelete_flag=1にする）
 
       $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2
       $connection->begin();//トランザクション3
       try {//トランザクション4
-         if(isset($_SESSION['orderEdis'][0])){
-          if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][0]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][0]['amount'] ,'bunnou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],['id' => $_SESSION['orderEdis'][0]['id']])) {
-            $OrderEdis = $this->OrderEdis->patchEntities($OrderEdis, $arrOrderEdis);
-            if ($this->OrderEdis->saveMany($OrderEdis)) {
+        $arrOrderEdisnew = array();
+        for($n=0; $n<=count($_SESSION['orderEdis'])+1; $n++){
+          if(isset($_SESSION['orderEdis'][$n]['id'])){
+            if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
+            ,'bunnou' => ($n+1) ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+            ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
               $mes = "※更新されました";
               $this->set('mes',$mes);
-              $connection->commit();// コミット5
             }else{
               $mes = "※更新されませんでした";
               $this->set('mes',$mes);
               $this->Flash->error(__('The data could not be saved. Please, try again.'));
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
+          }elseif(isset($_SESSION['orderEdis'][$n])){
+            $arrOrderEdisnew[] = $_SESSION['orderEdis'][$n];
+          }else{
+            $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);
+            if ($this->OrderEdis->saveMany($OrderEdis)) {
+              $mes = "※更新されました";
+              $this->set('mes',$mes);
+              $connection->commit();// コミット5
+              break;
+            }else{
+              $mes = "※更新されませんでした";
+              $this->set('mes',$mes);
+              $this->Flash->error(__('The data could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+              break;
+            }
           }
-         }else{
-           $mes = "※更新されませんでした";
-           $this->set('mes',$mes);
-           $connection->commit();// コミット5
-         }
+        }
       } catch (Exception $e) {//トランザクション7
       //ロールバック8
         $connection->rollback();//トランザクション9
       }//トランザクション10
-
     }
-
-
 
 }

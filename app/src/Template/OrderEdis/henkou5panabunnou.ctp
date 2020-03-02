@@ -194,7 +194,8 @@ $data = $this->request->getData();
           $gaityu = $OrderEdi[0]->gaityu;
           $bunnou = 1;
           $kannou = $OrderEdi[0]->kannou;
-          $date_bunnou = $OrderEdi[0]->date_bunnou;
+    //      $date_bunnou = $OrderEdi[0]->date_bunnou;
+          $date_bunnou = date('Y-m-d');
           $check_kannou = $OrderEdi[0]->check_kannou;
           $delete_flag = $OrderEdi[0]->delete_flag;
 
@@ -227,11 +228,11 @@ $data = $this->request->getData();
   <br><br><br>
 
 <?php
-
+/*
 echo "<pre>";
 print_r($_SESSION['orderEdis']);
 echo "</pre>";
-
+*/
 ?>
 
 </form>

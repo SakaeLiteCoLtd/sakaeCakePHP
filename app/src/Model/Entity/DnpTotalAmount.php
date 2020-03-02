@@ -34,6 +34,7 @@ class DnpTotalAmount extends Entity
     protected $_accessible = [
         'date_order' => true,
         'num_order' => true,
+        'name_order' => true,
         'product_code' => true,
         'line_code' => true,
         'date_deliver' => true,

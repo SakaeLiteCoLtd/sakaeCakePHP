@@ -62,7 +62,7 @@ class DenpyouDnpMinoukannousTable extends Table
         $validator
             ->integer('id')
             ->allowEmpty('id', 'create');
-
+/*
         $validator
             ->scalar('num_order')
             ->maxLength('num_order', 20)
@@ -74,19 +74,19 @@ class DenpyouDnpMinoukannousTable extends Table
             ->maxLength('product_code', 30)
             ->requirePresence('product_code', 'create')
             ->notEmpty('product_code');
-
+*/
         $validator
             ->scalar('name_order')
             ->maxLength('name_order', 100)
             ->requirePresence('name_order', 'create')
             ->notEmpty('name_order');
-
+/*
         $validator
             ->scalar('code')
             ->maxLength('code', 5)
             ->requirePresence('code', 'create')
             ->notEmpty('code');
-
+*/
         $validator
             ->scalar('place_deliver')
             ->maxLength('place_deliver', 30)
@@ -98,6 +98,7 @@ class DenpyouDnpMinoukannousTable extends Table
             ->maxLength('conf_print', 2)
             ->requirePresence('conf_print', 'create')
             ->notEmpty('conf_print');
+            /*
 
         $validator
             ->date('date_deliver')
@@ -108,7 +109,7 @@ class DenpyouDnpMinoukannousTable extends Table
                 ->date('tourokubi')
                 ->requirePresence('tourokubi', 'create')
                 ->notEmpty('tourokubi');
-
+*/
         $validator
             ->integer('minoukannou')
             ->requirePresence('minoukannou', 'create')

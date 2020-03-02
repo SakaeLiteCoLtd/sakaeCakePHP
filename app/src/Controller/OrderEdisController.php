@@ -324,6 +324,7 @@ class OrderEdisController extends AppController
       $arrEDI = array();//空の配列を作る
       $arrDenpyouDnpMinoukannous = array();//空の配列を作る
       $arrDnpTotalAmounts = array();//空の配列を作る
+      $arrDnpdouitutyuumon = array();//空の配列を作る
       $created_staff = $this->Auth->user('staff_id');
 
       $num = 1;
@@ -409,9 +410,16 @@ class OrderEdisController extends AppController
             }
 
             for($n=0; $n<=10000; $n++){
-              if(isset($arrDenpyouDnpMinoukannous[$n])){//実験（OK）
+              if(isset($arrDenpyouDnpMinoukannous[$n])){
                 $OrderEdi = $this->OrderEdis->find()->where(['num_order' => $arrDenpyouDnpMinoukannous[$n]['num_order'], 'product_code' => $arrDenpyouDnpMinoukannous[$n]['product_code'], 'date_order' => $arrDenpyouDnpMinoukannous[$n]['tourokubi'], 'date_deliver' => $arrDenpyouDnpMinoukannous[$n]['date_deliver']])->toArray();
         				$OrderEdi_id = $OrderEdi[0]->id;
+
+                unset($arrDenpyouDnpMinoukannous[$n]['num_order']);
+                unset($arrDenpyouDnpMinoukannous[$n]['code']);
+                unset($arrDenpyouDnpMinoukannous[$n]['date_deliver']);
+                unset($arrDenpyouDnpMinoukannous[$n]['product_code']);
+                unset($arrDenpyouDnpMinoukannous[$n]['tourokubi']);
+
                 $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('order_edi_id'=>$OrderEdi_id));
                 $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('conf_print'=>0));
                 $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('minoukannou'=>1));
@@ -421,12 +429,12 @@ class OrderEdisController extends AppController
                 break;
               }
             }
-
+/*
             echo "<pre>";
             print_r("arrDenpyouDnpMinoukannous");
             print_r($arrDenpyouDnpMinoukannous);
             echo "</pre>";
-
+*/
             $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($denpyouDnpMinoukannous, $arrDenpyouDnpMinoukannous);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
             if ($this->DenpyouDnpMinoukannous->saveMany($denpyouDnpMinoukannous)) {//saveManyで一括登録
 
@@ -436,6 +444,7 @@ class OrderEdisController extends AppController
 
                  $keys=array_keys($sample);
                  $keys[array_search('2',$keys)]='num_order';//名前の変更
+                 $keys[array_search('3',$keys)]='name_order';
                  $keys[array_search('4',$keys)]='line_code';
                  $keys[array_search('7',$keys)]='product_code';
                  $keys[array_search('9',$keys)]='date_order';
@@ -447,9 +456,37 @@ class OrderEdisController extends AppController
                  unset($sample['11'],$sample['12'],$sample['14'],$sample['15'],$sample['16'],$sample['17'],$sample['18']);//最後の改行も削除
 
                  if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき
-                     $OrderEdi = $this->OrderEdis->find()->where(['num_order' => $sample['num_order'], 'product_code' => $sample['product_code'], 'date_order' => $sample['date_order']])->toArray();//
-                     $total_amount = $OrderEdi[0]['amount'];
-                     $date_deliver = $OrderEdi[0]['date_deliver'];
+                   $OrderEdi = $this->OrderEdis->find()->where(['line_code' => $sample['line_code'], 'num_order' => $sample['num_order'], 'product_code' => $sample['product_code'], 'date_order' => $sample['date_order']])->toArray();//
+                   $total_amount = $OrderEdi[0]['amount'];
+                   $date_deliver = $OrderEdi[0]['date_deliver'];
+                   ${"arrDnpdouitutyuumon".($k-2)} = array();//空の配列を作る
+
+                     for($n=0; $n<=10000; $n++){
+                       if(isset($OrderEdi[$n])){//同じ注番のものが既に分納されているとき
+                         if(isset($OrderEdi[$n+1])){
+                           $total_amount = $total_amount + $OrderEdi[$n+1]['amount'];//amountを合計する、DenpyouDnpMinoukannousのminoukannouを更新する（date_deliverが小さい方を０に）
+                           $orderedi_id = $OrderEdi[$n]['id'];
+                           $date_deliver = $OrderEdi[$n]['date_deliver'];
+                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['id'] = $orderedi_id;
+                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['date_deliver'] = $date_deliver->format('Y-m-d');
+                         }else{
+                           $orderedi_id = $OrderEdi[$n]['id'];
+                           $date_deliver = $OrderEdi[$n]['date_deliver'];
+                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['id'] = $orderedi_id;
+                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['date_deliver'] = $date_deliver->format('Y-m-d');
+                         }
+                       }else{
+                         break;
+                       }
+                     }
+
+                      foreach (${"arrDnpdouitutyuumon".($k-2)} as $key => $value) {
+                          $sort[$key] = $value['date_deliver'];
+                      }
+                      array_multisort( array_map( "strtotime", array_column( ${"arrDnpdouitutyuumon".($k-2)}, "date_deliver" ) ), SORT_ASC, ${"arrDnpdouitutyuumon".($k-2)} ) ;//時間で並び替え
+
+                      $arrDnpdouitutyuumon[] = ${"arrDnpdouitutyuumon".($k-2)};
+/*
                      for($n=1; $n<=10000; $n++){
                        if(isset($OrderEdi[$n])){//同じ注番のものが既に分納されているとき
 //                         echo "<pre>";
@@ -468,7 +505,6 @@ class OrderEdisController extends AppController
 
                           }elseif($sample['date_deliver'] < $OrderEdi[$n]['date_deliver']){
                             $date_deliver = $OrderEdi[$n]['date_deliver'];
-
                             $DenpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['num_order' => $sample['num_order'], 'product_code' => $sample['product_code'], 'date_deliver' => $sample['date_deliver']])->toArray();//
                             $DenpyouDnpMinoukannouId = $DenpyouDnpMinoukannou[0]->id;
                             $this->DenpyouDnpMinoukannous->updateAll(
@@ -481,13 +517,57 @@ class OrderEdisController extends AppController
                          }
                        }
                      }
+*/
                      $arrDnpTotalAmounts[$k-2]['num_order'] = $sample['num_order'];//配列に追加する
+                     $arrDnpTotalAmounts[$k-2]['name_order'] = $sample['name_order'];//配列に追加する
                      $arrDnpTotalAmounts[$k-2]['line_code'] = $sample['line_code'];//配列に追加する
                      $arrDnpTotalAmounts[$k-2]['product_code'] = $sample['product_code'];//配列に追加する
                      $arrDnpTotalAmounts[$k-2]['date_order'] = $sample['date_order'];//配列に追加する
                      $arrDnpTotalAmounts[$k-2]['amount'] = $total_amount;//配列に追加する
                      $arrDnpTotalAmounts[$k-2]['date_deliver'] = $date_deliver->format('Y-m-d');//配列に追加する
                  }
+              }
+
+              $uniquearrDnpdouitutyuumon = array_unique($arrDnpdouitutyuumon, SORT_REGULAR);//重複削除
+              $uniquearrDnpdouitutyuumon = array_values($uniquearrDnpdouitutyuumon);
+/*
+              echo "<pre>";
+              print_r($uniquearrDnpdouitutyuumon);
+              echo "</pre>";
+*/
+              //これを使って、１order_ediテーブルのbunnnouを更新、２dnp_minoukannouテーブルのminoukannouを更新
+
+              //1
+              for($n=0; $n<=10000; $n++){
+                if(isset($uniquearrDnpdouitutyuumon[$n])){
+                  for($m=1; $m<=10000; $m++){
+                    if(isset($uniquearrDnpdouitutyuumon[$n][$m])){//id = $uniquearrDnpdouitutyuumon[$n][$m-1]['id']　のDenpyouDnpMinoukannousデータを更新
+                      $DenpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $uniquearrDnpdouitutyuumon[$n][$m-1]['id']])->toArray();//
+                      $DenpyouDnpMinoukannouId = $DenpyouDnpMinoukannou[0]->id;
+                      $this->DenpyouDnpMinoukannous->updateAll(
+                      ['minoukannou' => 0],//updated_atは自動更新されない
+                      ['id'  => $DenpyouDnpMinoukannouId]
+                      );
+/*
+                      echo "<pre>";
+                      print_r($n."--".$m."--".$DenpyouDnpMinoukannouId);
+                      echo "</pre>";
+*/
+                      $this->OrderEdis->updateAll(
+                      ['bunnou' => $m],//updated_atは自動更新されない
+                      ['id'   => $uniquearrDnpdouitutyuumon[$n][$m-1]['id']]
+                      );
+                      $this->OrderEdis->updateAll(
+                      ['bunnou' => $m+1],//updated_atは自動更新されない
+                      ['id'   => $uniquearrDnpdouitutyuumon[$n][$m]['id']]
+                      );
+                    }else{
+                      break;
+                    }
+                  }
+                }else{
+                  break;
+                }
               }
 
               for($n=0; $n<=10000; $n++){
@@ -1018,11 +1098,11 @@ class OrderEdisController extends AppController
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
-
+/*
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-
+*/
     }
 
     public function henkoupanapreadd()
@@ -1173,9 +1253,9 @@ class OrderEdisController extends AppController
       print_r($arrOrderEdis);
       echo "</pre>";
 */
-//orderEdisを分納するときidがすでにあれば更新、なければ新規登録
+
+//orderEdisを分納するときidがすでにあれば更新、なければ新規登録ok
 //mikanのテーブルも更新（date_deliverが一番遅いやつのminoukannouの更新）
-//idがあればupdate,なければ新規登録（場合分け）
 //amount=0 or 1 で場合分け（amount=0ならdelete_flag=1にする）
 
       $connection = ConnectionManager::get('default');//トランザクション1
@@ -1184,7 +1264,7 @@ class OrderEdisController extends AppController
       try {//トランザクション4
         $arrOrderEdisnew = array();
         for($n=0; $n<=count($_SESSION['orderEdis'])+1; $n++){
-          if(isset($_SESSION['orderEdis'][$n]['id'])){
+          if(isset($_SESSION['orderEdis'][$n]['id']) && ($_SESSION['orderEdis'][$n]['amount'] > 0)){
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
             ,'bunnou' => ($n+1) ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
@@ -1196,9 +1276,21 @@ class OrderEdisController extends AppController
               $this->Flash->error(__('The data could not be saved. Please, try again.'));
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
+          }elseif(isset($_SESSION['orderEdis'][$n]['id'])){
+            if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => 0
+            ,'bunnou' => ($n+1) ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+            ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
+              $mes = "※更新されました";
+              $this->set('mes',$mes);
+            }else{
+              $mes = "※更新されませんでした";
+              $this->set('mes',$mes);
+              $this->Flash->error(__('The data could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            }
           }elseif(isset($_SESSION['orderEdis'][$n])){
             $arrOrderEdisnew[] = $_SESSION['orderEdis'][$n];
-          }else{
+          }elseif(isset($arrOrderEdisnew[0])){
             $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);
             if ($this->OrderEdis->saveMany($OrderEdis)) {
               $mes = "※更新されました";
@@ -1212,6 +1304,9 @@ class OrderEdisController extends AppController
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
               break;
             }
+          }else{
+            $connection->commit();// コミット5
+            break;
           }
         }
       } catch (Exception $e) {//トランザクション7

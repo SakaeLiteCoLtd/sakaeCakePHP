@@ -52,6 +52,16 @@ $data = $this->request->getData();
     $cntdate_deliver = count($arrdate_deliver);
     $cntuniquearrdate_deliver = count($uniquearrdate_deliver);
 
+    for ($j=1;$j<$data["tsuikanum"]+$num;$j++){
+      $k = $j-1;
+      if($data["date_deliver_".$k] < $data["date_deliver_".$j]){
+        $deliver_check = 0;
+      }else{
+        $deliver_check = 1;
+        break;
+      }
+    }
+
 /*
     echo "<pre>";
     print_r($cntdate_deliver);
@@ -71,7 +81,7 @@ $data = $this->request->getData();
   ?>
 
 
-<?php if((isset($data["touroku"]))&&($amount_total == $amount_moto)&&($cntdate_deliver == $cntuniquearrdate_deliver)): //分納伝票登録を押されて、合計数量が合っていて、納期がかぶっていない場合?>
+<?php if((isset($data["touroku"]))&&($amount_total == $amount_moto)&&($cntdate_deliver == $cntuniquearrdate_deliver)&&($deliver_check = 0)): //分納伝票登録を押されて、合計数量が合っていて、納期がかぶっていない場合?>
   <?php
   $data = $this->request->getData();
   ?>
@@ -242,21 +252,30 @@ echo "</pre>";
 
 <?php elseif(isset($data["touroku"])): //分納伝票登録を押されて、合計数量が合わないまたは納期がかぶっている場合?>
   <?php
-  if($cntdate_deliver == $cntuniquearrdate_deliver){
-    $errmesdeliver = "";
+  if(($cntdate_deliver == $cntuniquearrdate_deliver) && ($amount_total != $amount_moto) && ($deliver_check = 0)){
+    $errmesdeliver1 = "";
+    $errmesdeliver2 = "";
     $errmesamount = "合計数量が合いません！";
-  }elseif($amount_total == $amount_moto){
-    $errmesdeliver = "納期が被っているものがあります。納期を変更してください。";
+  }elseif(($cntdate_deliver != $cntuniquearrdate_deliver) && ($amount_total == $amount_moto) && ($deliver_check = 0)){
+    $errmesdeliver1 = "納期が被っているものがあります。納期を変更してください。";
+    $errmesdeliver2 = "";
+    $errmesamount = "";
+  }elseif(($cntdate_deliver == $cntuniquearrdate_deliver) && ($amount_total == $amount_moto) && ($deliver_check = 1)){
+    $errmesdeliver1 = "";
+    $errmesdeliver2 = "納期は日程の若い順に入力してください";
     $errmesamount = "";
   }else{
-    $errmesdeliver = "納期が被っているものがあります。納期を変更してください。";
-    $errmesamount = "合計数量が合いません！";
+    $errmesdeliver1 = "納期が被っているものがないか確認してください　　　　　　　";
+    $errmesdeliver2 = "納期は日程の若い順に入力してください　　　　　　　　　　　";
+    $errmesamount = "合計数量を確認してください　　　　　　　　　　　　　　　　";
   }
   ?>
   <br><br>
   <legend align="center"><strong style="font-size: 11pt; color:blue"><?= "入力間違いがあります。ブラウザの「戻る」で戻ってください。" ?></strong></legend>
   <br>
-  <legend align="center"><strong style="font-size: 11pt; color:red"><?= $errmesdeliver ?></strong></legend>
+  <legend align="center"><strong style="font-size: 11pt; color:red"><?= $errmesdeliver1 ?></strong></legend>
+  <br>
+  <legend align="center"><strong style="font-size: 11pt; color:red"><?= $errmesdeliver2 ?></strong></legend>
   <br>
   <legend align="center"><strong style="font-size: 11pt; color:red"><?= $errmesamount ?></strong></legend>
   <br><br><br>
@@ -269,6 +288,13 @@ echo "</pre>";
         echo "<pre>";
         print_r("tuika/sakujo");
         echo "</pre>";
+        $OrderEdi = $this->OrderEdis->find()->where(['id' => $data['orderEdis_0']])->toArray();
+        $date_order_moto = $OrderEdi[0]->date_order;
+        $num_order_moto = $OrderEdi[0]->num_order;
+        $product_code_moto = $OrderEdi[0]->product_code;
+        $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['date_order' => $date_order_moto, 'num_order' => $num_order_moto, 'product_code' => $product_code_moto])->toArray();
+        $amount_moto = $DnpTotalAmount[0]->amount;
+
       ?>
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -305,7 +331,7 @@ echo "</pre>";
                 echo $this->Form->hidden("orderEdis_".$i ,['value'=>$data["orderEdis_".$i]]);
 //                echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
                 ?>
-                  <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
+                  <td width="150" colspan="20" nowrap="nowrap"><?= h($amount_moto) ?></td>
                 </tr>
                 <?php endforeach; ?>
               <?php endfor;?>

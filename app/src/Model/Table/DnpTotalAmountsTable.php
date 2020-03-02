@@ -67,6 +67,12 @@ class DnpTotalAmountsTable extends Table
             ->requirePresence('num_order', 'create')
             ->notEmpty('num_order');
 
+                    $validator
+                        ->scalar('name_order')
+                        ->maxLength('name_order', 100)
+                        ->requirePresence('name_order', 'create')
+                        ->notEmpty('name_order');
+
         $validator
             ->scalar('product_code')
             ->maxLength('product_code', 30)

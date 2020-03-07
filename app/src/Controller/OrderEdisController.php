@@ -1231,42 +1231,48 @@ class OrderEdisController extends AppController
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data);//配列（更新するカラム）の個数
+      $p = 0;
 
 //      $updated_staff = array('updated_staff'=>$this->Auth->user('staff_id'));
 //      $_SESSION['orderEdis'][0] = array_merge($_SESSION['orderEdis'][0],$updated_staff);
-      for($n=0; $n<=count($_SESSION['orderEdis']); $n++){
+      for($n=0; $n<=count($_SESSION['orderEdis'])+1; $n++){
         if(isset($_SESSION['orderEdis'][$n])){
-          $bunnou = array('bunnou'=>$n+1);
-          $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
+  //        $bunnou = array('bunnou'=>$n+1);
+    //      $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
           $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
           $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$created_staff);
           $arrOrderEdis[] = $_SESSION['orderEdis'][$n];
         }else{
+          $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+          $_SESSION['minoukannou'] = array_merge($_SESSION['minoukannou'],$created_staff);
           break;
         }
       }
-/*
+
       echo "<pre>";
-      print_r($_SESSION['orderEdis']);
+      print_r($_SESSION['minoukannou']);
       echo "</pre>";
-      echo "<pre>";
-      print_r($arrOrderEdis);
+/*      echo "<pre>";
+      print_r($_SESSION['orderEdis']);
       echo "</pre>";
 */
 
 //orderEdisを分納するときidがすでにあれば更新、なければ新規登録ok
+//amount=0 or 1 で場合分け（amount=0ならdelete_flag=1にする）ok
 //mikanのテーブルも更新（date_deliverが一番遅いやつのminoukannouの更新）
-//amount=0 or 1 で場合分け（amount=0ならdelete_flag=1にする）
 
       $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2
       $connection->begin();//トランザクション3
       try {//トランザクション4
         $arrOrderEdisnew = array();
-        for($n=0; $n<=count($_SESSION['orderEdis'])+1; $n++){
-          if(isset($_SESSION['orderEdis'][$n]['id']) && ($_SESSION['orderEdis'][$n]['amount'] > 0)){
+        $arrBunnnou = array();
+        $bunnnou = 0;
+        for($n=0; $n<=count($_SESSION['orderEdis'])+10; $n++){
+          if(isset($_SESSION['orderEdis'][$n]['id']) && ($_SESSION['orderEdis'][$n]['amount'] > 0)){//amount>0の時
+            $bunnnou = $bunnnou +1;
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
-            ,'bunnou' => ($n+1) ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+            ,'bunnou' => $bunnnou ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
               $mes = "※更新されました";
               $this->set('mes',$mes);
@@ -1276,10 +1282,13 @@ class OrderEdisController extends AppController
               $this->Flash->error(__('The data could not be saved. Please, try again.'));
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
-          }elseif(isset($_SESSION['orderEdis'][$n]['id'])){
+          }elseif(isset($_SESSION['orderEdis'][$n]['id'])){//amount=0 or nullの時//minoukannouテーブルも更新
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => 0
-            ,'bunnou' => ($n+1) ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+            ,'bunnou' => 0 ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
+
+
+
               $mes = "※更新されました";
               $this->set('mes',$mes);
             }else{
@@ -1289,10 +1298,22 @@ class OrderEdisController extends AppController
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
           }elseif(isset($_SESSION['orderEdis'][$n])){
+            $bunnnou = $bunnnou +1;
+            $bunnou = array('bunnou'=>$bunnnou);
+            $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
             $arrOrderEdisnew[] = $_SESSION['orderEdis'][$n];
-          }elseif(isset($arrOrderEdisnew[0])){
+            $arrBunnnou[] = $bunnnou;
+          }elseif(isset($arrOrderEdisnew[0])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
             $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);
-            if ($this->OrderEdis->saveMany($OrderEdis)) {
+            if ($this->OrderEdis->saveMany($OrderEdis)) {//minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
+              echo "<pre>";
+              print_r($n."保存");
+              echo "</pre>";
+              echo "<pre>";
+              print_r($arrBunnnou);
+              echo "</pre>";
+
+
               $mes = "※更新されました";
               $this->set('mes',$mes);
               $connection->commit();// コミット5

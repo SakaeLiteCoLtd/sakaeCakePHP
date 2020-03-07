@@ -14,6 +14,7 @@
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
    $this->OrderEdis = TableRegistry::get('orderEdis');//productsテーブルを使う
    $this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
+   $this->DenpyouDnpMinoukannous = TableRegistry::get('denpyouDnpMinoukannous');
 ?>
 <?php
 header('Expires:-1');
@@ -46,6 +47,10 @@ $data = $this->request->getData();
     $product_code_moto = $OrderEdi[0]->product_code;
     $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['date_order' => $date_order_moto, 'num_order' => $num_order_moto, 'product_code' => $product_code_moto])->toArray();
     $amount_moto = $DnpTotalAmount[0]->amount;
+    $DnpTotalAmountId = $DnpTotalAmount[0]->id;
+    $DnpTotalAmountNameOrder = $DnpTotalAmount[0]->name_order;
+    $DenpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $data['orderEdis_0']])->toArray();
+    $DenpyouDnpMinoukannousPlaceDeliver = $DenpyouDnpMinoukannous[0]->place_deliver;
 
     //納期がかぶっているかチェック
     $uniquearrdate_deliver = array_unique($arrdate_deliver, SORT_REGULAR);//重複削除
@@ -61,27 +66,12 @@ $data = $this->request->getData();
         break;
       }
     }
-
-/*
-    echo "<pre>";
-    print_r($cntdate_deliver);
-    echo "</pre>";
-    echo "<pre>";
-    print_r($cntuniquearrdate_deliver);
-    echo "</pre>";
-    echo "<pre>";
-    print_r("合計：".$amount_total);
-    echo "</pre>";
-    echo "<pre>";
-    print_r("元々：".$amount_moto);
-    echo "</pre>";
-*/
   }else{
   }
   ?>
 
 
-<?php if((isset($data["touroku"]))&&($amount_total == $amount_moto)&&($cntdate_deliver == $cntuniquearrdate_deliver)&&($deliver_check = 0)): //分納伝票登録を押されて、合計数量が合っていて、納期がかぶっていない場合?>
+<?php if((isset($data["touroku"]))&&($amount_total == $amount_moto)&&($cntdate_deliver == $cntuniquearrdate_deliver)&&($deliver_check == 0)): //分納伝票登録を押されて、合計数量が合っていて、納期がかぶっていない場合?>
   <?php
   $data = $this->request->getData();
   ?>
@@ -167,6 +157,17 @@ $data = $this->request->getData();
               'amount' => $data["amount_".$j]
             );
           }
+          $_SESSION['total_amount'] = array(
+            'id' => $DnpTotalAmountId,
+            'name_order' => $DnpTotalAmountNameOrder
+          );
+          $_SESSION['minoukannou'] = array(
+            'name_order' => $DnpTotalAmountNameOrder,
+            'place_deliver' => $DenpyouDnpMinoukannousPlaceDeliver,
+            'conf_print' => 0,
+            'minoukannou' => 0,
+            'delete_flag' =>  0
+          );
 /*
           $_SESSION['orderEdis'][$j] = array(
             'id' => $data["orderEdis_".$j],
@@ -252,15 +253,15 @@ echo "</pre>";
 
 <?php elseif(isset($data["touroku"])): //分納伝票登録を押されて、合計数量が合わないまたは納期がかぶっている場合?>
   <?php
-  if(($cntdate_deliver == $cntuniquearrdate_deliver) && ($amount_total != $amount_moto) && ($deliver_check = 0)){
+  if(($cntdate_deliver == $cntuniquearrdate_deliver) && ($amount_total != $amount_moto) && ($deliver_check == 0)){
     $errmesdeliver1 = "";
     $errmesdeliver2 = "";
     $errmesamount = "合計数量が合いません！";
-  }elseif(($cntdate_deliver != $cntuniquearrdate_deliver) && ($amount_total == $amount_moto) && ($deliver_check = 0)){
+  }elseif(($cntdate_deliver != $cntuniquearrdate_deliver) && ($amount_total == $amount_moto) && ($deliver_check == 0)){
     $errmesdeliver1 = "納期が被っているものがあります。納期を変更してください。";
     $errmesdeliver2 = "";
     $errmesamount = "";
-  }elseif(($cntdate_deliver == $cntuniquearrdate_deliver) && ($amount_total == $amount_moto) && ($deliver_check = 1)){
+  }elseif(($cntdate_deliver == $cntuniquearrdate_deliver) && ($amount_total == $amount_moto) && ($deliver_check == 1)){
     $errmesdeliver1 = "";
     $errmesdeliver2 = "納期は日程の若い順に入力してください";
     $errmesamount = "";
@@ -285,9 +286,7 @@ echo "</pre>";
 
       <?php
         $data = $this->request->getData();
-        echo "<pre>";
-        print_r("tuika/sakujo");
-        echo "</pre>";
+
         $OrderEdi = $this->OrderEdis->find()->where(['id' => $data['orderEdis_0']])->toArray();
         $date_order_moto = $OrderEdi[0]->date_order;
         $num_order_moto = $OrderEdi[0]->num_order;

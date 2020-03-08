@@ -537,7 +537,6 @@ class OrderEdisController extends AppController
 */
               //これを使って、１order_ediテーブルのbunnnouを更新、２dnp_minoukannouテーブルのminoukannouを更新
 
-              //1
               for($n=0; $n<=10000; $n++){
                 if(isset($uniquearrDnpdouitutyuumon[$n])){
                   for($m=1; $m<=10000; $m++){
@@ -1267,8 +1266,9 @@ class OrderEdisController extends AppController
       try {//トランザクション4
         $arrOrderEdisnew = array();
         $arrBunnnou = array();
+        $arrDenpyouDnpMinoukannousnew = array();
         $bunnnou = 0;
-        for($n=0; $n<=count($_SESSION['orderEdis'])+10; $n++){
+        for($n=0; $n<=count($_SESSION['orderEdis'])+100; $n++){
           if(isset($_SESSION['orderEdis'][$n]['id']) && ($_SESSION['orderEdis'][$n]['amount'] > 0)){//amount>0の時
             $bunnnou = $bunnnou +1;
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
@@ -1287,7 +1287,10 @@ class OrderEdisController extends AppController
             ,'bunnou' => 0 ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
 
-
+              $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $_SESSION['orderEdis'][$n]['id']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+              $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
+              $this->DenpyouDnpMinoukannous->updateAll(['delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+              ,['id' => $denpyouDnpMinoukannouId]);
 
               $mes = "※更新されました";
               $this->set('mes',$mes);
@@ -1297,22 +1300,40 @@ class OrderEdisController extends AppController
               $this->Flash->error(__('The data could not be saved. Please, try again.'));
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
-          }elseif(isset($_SESSION['orderEdis'][$n])){
+          }elseif(isset($_SESSION['orderEdis'][$n])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
             $bunnnou = $bunnnou +1;
             $bunnou = array('bunnou'=>$bunnnou);
             $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
             $arrOrderEdisnew[] = $_SESSION['orderEdis'][$n];
+            $arrDenpyouDnpMinoukannousnew[] = $_SESSION['minoukannou'];
             $arrBunnnou[] = $bunnnou;
+            $num_order = $_SESSION['orderEdis'][$n]['num_order'];
+            $product_code = $_SESSION['orderEdis'][$n]['product_code'];
+            $line_code = $_SESSION['orderEdis'][$n]['line_code'];
           }elseif(isset($arrOrderEdisnew[0])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
             $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);
             if ($this->OrderEdis->saveMany($OrderEdis)) {//minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
-              echo "<pre>";
-              print_r($n."保存");
-              echo "</pre>";
-              echo "<pre>";
-              print_r($arrBunnnou);
-              echo "</pre>";
+              for($m=0; $m<=100; $m++){
+                if(isset($arrBunnnou[$m])){
+                  $orderEdi = $this->OrderEdis->find()->where(['delete_flag' => '0', 'num_order' => $num_order, 'product_code' => $product_code, 'bunnou' => $arrBunnnou[$m]])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+                  $orderEdiId = $orderEdi[0]->id;
+                  $arrorderEdiId = array('order_edi_id'=>$orderEdiId);
+                  $arrDenpyouDnpMinoukannousnew[$m] = array_merge($arrDenpyouDnpMinoukannousnew[$m],$arrorderEdiId);
+                }else{
 
+                  echo "<pre>";
+                  print_r($arrDenpyouDnpMinoukannousnew);
+                  echo "</pre>";
+
+                  $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($this->DenpyouDnpMinoukannous->newEntity(), $arrDenpyouDnpMinoukannousnew);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+                  $this->DenpyouDnpMinoukannous->saveMany($denpyouDnpMinoukannous);//saveManyで一括登録
+
+                  //minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
+
+
+                  break;
+                }
+              }
 
               $mes = "※更新されました";
               $this->set('mes',$mes);
@@ -1325,7 +1346,12 @@ class OrderEdisController extends AppController
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
               break;
             }
-          }else{
+          }else{//分納追加はせずに納期や数量を変更した場合//minoukannouテーブルのdate_deliverが一番遅いやつのminoukannouだけ1にする
+
+
+            echo "<pre>";
+            print_r($n."break");
+            echo "</pre>";
             $connection->commit();// コミット5
             break;
           }

@@ -99,11 +99,11 @@ class OrderEdisController extends AppController
             break;
           }
         }
-
+/*
        echo "<pre>";
        print_r($arrFp);
        echo "</pre>";
-
+*/
            $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrFp);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
            $connection = ConnectionManager::get('default');//トランザクション1
            // トランザクション開始2
@@ -165,11 +165,11 @@ class OrderEdisController extends AppController
        $data = $session->read();
        $file = $_SESSION['hattyucsvs']['file']['tmp_name'];
        $this->set('file',$file);
-
+/*
        echo "<pre>";
        print_r($file);
        echo "</pre>";
-
+*/
   //文字変換（不要）    file_put_contents("/home/centosuser/EDI/$file", mb_convert_encoding(file_get_contents("/home/centosuser/EDI/$file"), 'UTF-8', 'SJIS'));
       $fp = fopen($file, 'r');
       $fpcount = fopen($file, 'r' );
@@ -231,11 +231,11 @@ class OrderEdisController extends AppController
            break;
          }
        }
-
+/*
       echo "<pre>";
       print_r($arrFp);
       echo "</pre>";
-
+*/
        $orderEdis = $this->OrderEdis->newEntity();
        $this->set('orderEdis',$orderEdis);
         if ($this->request->is('get')) {
@@ -948,8 +948,7 @@ class OrderEdisController extends AppController
         if(empty($product_code)){//product_codeの入力がないとき
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-    //      ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
-          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => "M".'%']//DNP実験
+          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
           //role_code順に並べる
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
@@ -1259,6 +1258,491 @@ class OrderEdisController extends AppController
 //orderEdisを分納するときidがすでにあれば更新、なければ新規登録ok
 //amount=0 or 1 で場合分け（amount=0ならdelete_flag=1にする）ok
 //mikanのテーブルも更新（date_deliverが一番遅いやつのminoukannouの更新）
+
+      $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        $arrOrderEdisnew = array();
+        $arrBunnnou = array();
+        $arrDenpyouDnpMinoukannousnew = array();
+        $bunnnou = 0;
+        for($n=0; $n<=count($_SESSION['orderEdis'])+100; $n++){
+          if(isset($_SESSION['orderEdis'][$n]['id']) && ($_SESSION['orderEdis'][$n]['amount'] > 0)){//amount>0の時
+            $bunnnou = $bunnnou +1;
+            if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
+            ,'bunnou' => $bunnnou ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+            ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
+              $mes = "※更新されました";
+              $this->set('mes',$mes);
+            }else{
+              $mes = "※更新されませんでした";
+              $this->set('mes',$mes);
+              $this->Flash->error(__('The data could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            }
+          }elseif(isset($_SESSION['orderEdis'][$n]['id'])){//amount=0 or nullの時//minoukannouテーブルも更新
+            if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => 0
+            ,'bunnou' => 0 ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+            ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
+
+              $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $_SESSION['orderEdis'][$n]['id']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+              $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
+              $this->DenpyouDnpMinoukannous->updateAll(['delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+              ,['id' => $denpyouDnpMinoukannouId]);
+
+              $mes = "※更新されました";
+              $this->set('mes',$mes);
+            }else{
+              $mes = "※更新されませんでした";
+              $this->set('mes',$mes);
+              $this->Flash->error(__('The data could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            }
+          }elseif(isset($_SESSION['orderEdis'][$n])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
+            $bunnnou = $bunnnou +1;
+            $bunnou = array('bunnou'=>$bunnnou);
+            $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
+            $arrOrderEdisnew[] = $_SESSION['orderEdis'][$n];
+            $arrDenpyouDnpMinoukannousnew[] = $_SESSION['minoukannou'];
+            $arrBunnnou[] = $bunnnou;
+            $num_order = $_SESSION['orderEdis'][$n]['num_order'];
+            $product_code = $_SESSION['orderEdis'][$n]['product_code'];
+            $line_code = $_SESSION['orderEdis'][$n]['line_code'];
+          }elseif(isset($arrOrderEdisnew[0])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
+            $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);
+            if ($this->OrderEdis->saveMany($OrderEdis)) {//minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
+              for($m=0; $m<=100; $m++){
+                if(isset($arrBunnnou[$m])){
+                  $orderEdi = $this->OrderEdis->find()->where(['delete_flag' => '0', 'num_order' => $num_order, 'product_code' => $product_code, 'bunnou' => $arrBunnnou[$m]])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+                  $orderEdiId = $orderEdi[0]->id;
+                  $arrorderEdiId = array('order_edi_id'=>$orderEdiId);
+                  $arrDenpyouDnpMinoukannousnew[$m] = array_merge($arrDenpyouDnpMinoukannousnew[$m],$arrorderEdiId);
+                }else{
+/*
+                  echo "<pre>";
+                  print_r($arrDenpyouDnpMinoukannousnew);
+                  echo "</pre>";
+*/
+                  $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($this->DenpyouDnpMinoukannous->newEntity(), $arrDenpyouDnpMinoukannousnew);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+                  $this->DenpyouDnpMinoukannous->saveMany($denpyouDnpMinoukannous);//saveManyで一括登録
+
+                  //minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
+                  $orderedi_id = $_SESSION['orderEdis'][0]['id'];
+                  $orderEdi = $this->OrderEdis->find()->where(['id' => $orderedi_id])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+                  $num_order = $orderEdi[0]['num_order'];
+                  $product_code = $orderEdi[0]['product_code'];
+                  $line_code = $orderEdi[0]['line_code'];
+                  $arrDnpdouitutyuumon = array();//空の配列を作る
+                  $arrDnpdouitutyuumonSort = array();//空の配列を作る
+
+                  $orderEdidouitu = $this->OrderEdis->find()->where(['delete_flag' => '0', 'num_order' => $num_order, 'product_code' => $product_code, 'line_code' => $line_code])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+                  for($m=0; $m<=100; $m++){//orderedisテーブルから同一注文のid,date_deliverを取出し配列に追加
+                    if(isset($orderEdidouitu[$m])){
+                      $date_deliver = $orderEdidouitu[$m]['date_deliver'];
+                      $arrDnpdouitutyuumon[$m]['id'] = $orderEdidouitu[$m]['id'];
+                      $arrDnpdouitutyuumon[$m]['date_deliver'] = $date_deliver->format('Y-m-d');
+                    }else{
+                      break;
+                    }
+                  }
+
+                  foreach ($arrDnpdouitutyuumon as $key => $value) {
+                      $sort[$key] = $value['date_deliver'];
+                  }
+                  array_multisort( array_map( "strtotime", array_column( $arrDnpdouitutyuumon, "date_deliver" ) ), SORT_ASC, $arrDnpdouitutyuumon ) ;//時間で並び替え
+                  $arrDnpdouitutyuumonSort[] = $arrDnpdouitutyuumon;
+
+                  for($m=0; $m<count($arrDnpdouitutyuumonSort[0]); $m++){
+                    if($m< (count($arrDnpdouitutyuumonSort[0])-1) ){
+                      $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
+                      $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
+                      $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 0 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+                      ,['id' => $denpyouDnpMinoukannouId]);
+                    }else{
+                      $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
+                      $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
+                      $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+                      ,['id' => $denpyouDnpMinoukannouId]);
+                    }
+                  }
+                  break;
+                }
+              }
+
+              $mes = "※更新されました";
+              $this->set('mes',$mes);
+              $connection->commit();// コミット5
+              break;
+            }else{
+              $mes = "※更新されませんでした";
+              $this->set('mes',$mes);
+              $this->Flash->error(__('The data could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+              break;
+            }
+          }else{//分納追加はせずに納期や数量を変更した場合//minoukannouテーブルのdate_deliverが一番遅いやつのminoukannouだけ1にする
+
+            //minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
+            $orderedi_id = $_SESSION['orderEdis'][0]['id'];
+            $orderEdi = $this->OrderEdis->find()->where(['id' => $orderedi_id])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            $num_order = $orderEdi[0]['num_order'];
+            $product_code = $orderEdi[0]['product_code'];
+            $line_code = $orderEdi[0]['line_code'];
+            $arrDnpdouitutyuumon = array();//空の配列を作る
+            $arrDnpdouitutyuumonSort = array();//空の配列を作る
+
+            $orderEdidouitu = $this->OrderEdis->find()->where(['delete_flag' => '0', 'num_order' => $num_order, 'product_code' => $product_code, 'line_code' => $line_code])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            for($m=0; $m<=100; $m++){//orderedisテーブルから同一注文のid,date_deliverを取出し配列に追加
+              if(isset($orderEdidouitu[$m])){
+                $date_deliver = $orderEdidouitu[$m]['date_deliver'];
+                $arrDnpdouitutyuumon[$m]['id'] = $orderEdidouitu[$m]['id'];
+                $arrDnpdouitutyuumon[$m]['date_deliver'] = $date_deliver->format('Y-m-d');
+              }else{
+                break;
+              }
+            }
+
+            foreach ($arrDnpdouitutyuumon as $key => $value) {
+                $sort[$key] = $value['date_deliver'];
+            }
+            array_multisort( array_map( "strtotime", array_column( $arrDnpdouitutyuumon, "date_deliver" ) ), SORT_ASC, $arrDnpdouitutyuumon ) ;//時間で並び替え
+            $arrDnpdouitutyuumonSort[] = $arrDnpdouitutyuumon;
+/*
+            echo "<pre>";
+            print_r($arrDnpdouitutyuumonSort);
+            echo "</pre>";
+*/
+            for($m=0; $m<count($arrDnpdouitutyuumonSort[0]); $m++){
+              if($m< (count($arrDnpdouitutyuumonSort[0])-1) ){
+                $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
+                $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
+                $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 0 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+                ,['id' => $denpyouDnpMinoukannouId]);
+              }else{
+                $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
+                $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
+                $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+                ,['id' => $denpyouDnpMinoukannouId]);
+              }
+            }
+            $connection->commit();// コミット5
+            break;
+          }
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+    }
+
+
+    public function henkou2dnp()
+    {
+      $this->request->session()->destroy();// セッションの破棄
+    }
+
+    public function henkou3dnp()
+    {
+      $this->request->session()->destroy();// セッションの破棄
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+    }
+
+    public function henkou4dnp()
+    {
+      $this->request->session()->destroy();//セッションの破棄
+      $data = $this->request->getData();
+      $Data=$this->request->query('s');//1度henkou5panaへ行って戻ってきたとき（検索を押したとき）
+      if(isset($Data)){
+        $product_code = $Data['product_code'];
+        $date_sta = $Data['date_sta'];
+        $date_fin = $Data['date_fin'];
+        $Pro = $Data['Pro'];
+      }else{
+        $product_code = $data['product_code'];
+        $date_sta = $data['date_sta'];
+        $date_fin = $data['date_fin'];
+        $Pro = $data['Pro'];
+      }
+
+      if($Pro == "BON"){//Bのとき
+        if(empty($product_code)){//product_codeの入力がないとき
+          $product_code = "no";
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => '%'.$Pro.'%']
+            ));//対象の製品を絞り込む
+        }else{//product_codeの入力があるとき
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => $Pro.'%']
+            ));//対象の製品を絞り込む
+        }
+      }elseif($Pro == "CAS"){//CASのとき
+        if(empty($product_code)){//product_codeの入力がないとき
+          $product_code = "no";
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
+          //role_code順に並べる
+          ));//対象の製品を絞り込む
+        }else{//product_codeの入力があるとき
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => $Pro.'%']
+            ));//対象の製品を絞り込む
+        }
+      }else{//MLDのとき
+        if(empty($product_code)){//product_codeの入力がないとき
+          $product_code = "no";
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
+          //role_code順に並べる
+          ));//対象の製品を絞り込む
+        }else{//product_codeの入力があるとき
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => $Pro.'%']
+            ));//対象の製品を絞り込む
+        }
+      }
+    }
+
+    public function henkou5dnp()
+    {
+      $data = $this->request->getData();
+
+      if(isset($data['kensaku'])){
+        return $this->redirect(['action' => 'henkou4dnp',
+        's' => ['product_code' => $data['product_code'],'Pro' => $data['Pro'],'date_sta' => $data['date_sta'],'date_fin' => $data['date_fin']]]);
+      }
+
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $array = array();
+      $checknum = 0;
+      if(isset($data["nummax"])){
+        for ($k=2; $k<=$data["nummax"]; $k++){
+          if(isset($data["subete"])){
+            $array[] = $data["$k"];
+          }elseif(isset($data["check".$k])){//checkがついているもののidをキープ
+            $array[] = $data["$k"];
+            $checknum = $checknum + 1;
+          }else{
+          }
+        }
+
+        if($checknum > 1){
+          $meschecknum = "※複数行の選択がありました。先頭の行のみ表示しています。";
+          $this->set('meschecknum',$meschecknum);
+        }else{
+          $meschecknum = " ";
+          $this->set('meschecknum',$meschecknum);
+        }
+
+        for ($i=0; $i<=$data["nummax"]; $i++){
+          if(isset($array[$i])){//checkがついているもののidと同じidのデータを取り出す
+            ${"orderEdis".$i} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $array[$i]])->toArray();
+            $this->set('orderEdis'.$i,${"orderEdis".$i});
+            $i_num = $i;
+            $this->set('i_num',$i_num);
+          }else{
+            break;
+          }
+        }
+
+        $bunnou_num = 1;
+        $Totalamount = 0;
+        $this->set('bunnou_num',$bunnou_num);
+        $num_order0 = $orderEdis0[0]->num_order;
+        $product_code0 = $orderEdis0[0]->product_code;
+        $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'product_code' => $product_code0])->toArray();
+        for($n=0; $n<=100; $n++){
+          if(isset($orderEdis[$n])){
+            ${"orderEdis".$n} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $orderEdis[$n]->id])->toArray();
+            $this->set('orderEdis'.$n,${"orderEdis".$n});
+
+            ${"id".$n} = ${"orderEdis".$n}[0]->id;
+            $this->set('id'.$n,${"id".$n});
+
+            ${"date_deliver".$n} = ${"orderEdis".$n}[0]->date_deliver->format('Y-m-d');
+            $this->set('date_deliver'.$n,${"date_deliver".$n});
+
+            ${"amount".$n} = ${"orderEdis".$n}[0]->amount;
+            $this->set('amount'.$n,${"amount".$n});
+
+            $bunnou_num = $n+1;
+            $this->set('bunnou_num',$bunnou_num);
+          }else{
+            break;
+          }
+        }
+      }
+    }
+
+    public function henkou5dnpbunnou()
+    {
+      session_start();
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $data = $this->request->getData();
+
+      $orderEdis0 = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $data['orderEdis_0']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+      $num_order0 = $orderEdis0[0]->num_order;
+      $product_code0 = $orderEdis0[0]->product_code;
+      $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'product_code' => $product_code0])->toArray();
+      for($n=0; $n<=100; $n++){
+        if(isset($orderEdis[$n])){
+          $num = $n;
+          $this->set('num',$num);//既に分納している場合１以上になる
+        }else{
+          break;
+        }
+      }
+
+      for($n=0; $n<=100; $n++){
+        if(isset($orderEdis[$n])){
+          ${"orderEdis".$n} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $data["orderEdis_{$n}"]])->toArray();
+          $this->set('orderEdis'.$n,${"orderEdis".$n});
+        }else{
+          break;
+        }
+      }
+
+        if(isset($data['tsuika'])){
+          $tsuikanum = $data['tsuikanum'] + 1;
+          $this->set('tsuikanum',$tsuikanum);
+        }elseif(isset($data['sakujo'])){
+          $tsuikanum = $data['tsuikanum'] - 1;
+          $this->set('tsuikanum',$tsuikanum);
+        }
+
+
+    }
+
+    public function henkou6dnp()
+    {
+      session_start();
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $data = $this->request->getData();
+    }
+
+    public function henkoudnppreadd()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+    }
+
+    public function henkoudnplogin()
+    {
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+        $ary = explode(',', $str);//$strを配列に変換
+        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+        $this->set('username', $username);
+        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+          if(empty($Userdata)){
+            $delete_flag = "";
+          }else{
+            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+            $this->set('delete_flag',$delete_flag);//登録者の表示のため
+          }
+            $user = $this->Auth->identify();
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkoudnpdo']);
+          }
+        }
+    }
+
+    public function henkoudnpdo()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $session = $this->request->getSession();
+      $data = $session->read();
+      $cnt = count($data['orderEdis']);//配列（更新するカラム）の個数
+
+      $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        for($n=0; $n<=$cnt; $n++){
+         if(isset($data['orderEdis'][$n])){
+          if ($this->OrderEdis->updateAll(['date_deliver' => $data['orderEdis'][$n]['date_deliver'] ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],['id' => $data['orderEdis'][$n]['id']])) {
+          }else{
+            $mes = "※更新されませんでした";
+            $this->set('mes',$mes);
+            $this->Flash->error(__('The data could not be saved. Please, try again.'));
+            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            break;
+          }
+         }else{
+           $mes = "※更新されました";
+           $this->set('mes',$mes);
+           $connection->commit();// コミット5
+           break;
+         }
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+    }
+
+    public function henkoudnpbunnnoupreadd()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $session = $this->request->getSession();
+      $data = $session->read();
+    }
+
+    public function henkoudnpbunnnoulogin()
+    {
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+        $ary = explode(',', $str);//$strを配列に変換
+        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+        $this->set('username', $username);
+        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+          if(empty($Userdata)){
+            $delete_flag = "";
+          }else{
+            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+            $this->set('delete_flag',$delete_flag);//登録者の表示のため
+          }
+            $user = $this->Auth->identify();
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkoudnpbunnnoudo']);
+          }
+        }
+    }
+
+    public function henkoudnpbunnnoudo()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $session = $this->request->getSession();
+      $data = $session->read();
+      $cnt = count($data);//配列（更新するカラム）の個数
+      $p = 0;
+
+      for($n=0; $n<=count($_SESSION['orderEdis'])+1; $n++){
+        if(isset($_SESSION['orderEdis'][$n])){
+          $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+          $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$created_staff);
+          $arrOrderEdis[] = $_SESSION['orderEdis'][$n];
+        }else{
+          $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+          $_SESSION['minoukannou'] = array_merge($_SESSION['minoukannou'],$created_staff);
+          break;
+        }
+      }
 
       $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2

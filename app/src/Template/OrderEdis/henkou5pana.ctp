@@ -103,7 +103,7 @@ header('Pragma:');
              echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
             ?>
 
-              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
+              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->place_line) ?></td>
             </tr>
             <?php endforeach; ?>
           <?php endfor;?>
@@ -309,7 +309,7 @@ header('Pragma:');
                echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
               ?>
 
-                <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->place_line) ?></td>
               </tr>
               <?php endforeach; ?>
             <?php endfor;?>

@@ -183,7 +183,7 @@ header('Pragma:');
                     echo "<input type='date' value=$date_deliver name=date_deliver empty=Please select size='6'/>\n";
                     echo "</div></td>\n";
                ?>
-                <td width="150" colspan="20" nowrap="nowrap"><?= h($orderEdis->amount) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($orderEdis->place_line) ?></td>
               </tr>
               <?php endforeach; ?>
 
@@ -253,7 +253,7 @@ header('Pragma:');
                     echo "<input type='date' value=$date_deliver name=date_deliver empty=Please select size='6'/>\n";
                     echo "</div></td>\n";
                ?>
-                <td width="150" colspan="20" nowrap="nowrap"><?= h($orderEdis->amount) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($orderEdis->place_line) ?></td>
               </tr>
               <?php endforeach; ?>
 

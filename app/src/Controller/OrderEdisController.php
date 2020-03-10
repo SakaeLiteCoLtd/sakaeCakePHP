@@ -5,6 +5,11 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 use Cake\Datasource\ConnectionManager;//トランザクション
 use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
+
+use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
+$htmlLogin = new htmlLogin();
+$htmlLogin = $htmlLogin->Login();
+
 /**
  * Roles Controller
  *
@@ -90,6 +95,12 @@ class OrderEdisController extends AppController
 
         for($n=0; $n<=10000; $n++){
           if(isset($arrFp[$n])){
+            $Product = $this->Products->find()->where(['product_code' => $arrFp[$n]['product_code']])->toArray();
+    				$customer_id = $Product[0]->customer_id;
+            $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+    				$customer_code = $Customer[0]->customer_code;
+            $arrFp[$n] = array_merge($arrFp[$n],array('customer_code'=>$customer_code));
+
             $arrFp[$n] = array_merge($arrFp[$n],array('check_denpyou'=>0));
             $arrFp[$n] = array_merge($arrFp[$n],array('bunnou'=>0));
             $arrFp[$n] = array_merge($arrFp[$n],array('kannou'=>0));
@@ -143,12 +154,16 @@ class OrderEdisController extends AppController
  				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
  				$this->set('username', $username);
  				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+    //    $htmlLogin = $htmlLogin->Login();
+
  					if(empty($Userdata)){
  						$delete_flag = "";
  					}else{
  						$delete_flag = $Userdata[0]->delete_flag;
  						$this->set('delete_flag',$delete_flag);
  					}
+
  						$user = $this->Auth->identify();
  					if ($user) {
  						$this->Auth->setUser($user);
@@ -901,23 +916,47 @@ class OrderEdisController extends AppController
         if(empty($product_code)){//product_codeの入力がないとき
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-            ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => '%'.$Pro.'%']
+            ->where(['delete_flag' => '0', 'customer_code' => '10002', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => '%'.$Pro.'%']
             ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-            ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => '%'.$Pro.'%']
+            ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => '%'.$Pro.'%']
             ));//対象の製品を絞り込む
         }
-      }else{//P,H,Rのとき
+      }elseif($Pro == "P"){//Pのとき
         if(empty($product_code)){//product_codeの入力がないとき
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
+          ->where(['delete_flag' => '0', 'customer_code' => '10001',  'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
           //role_code順に並べる
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-            ->where(['delete_flag' => '0','date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => $Pro.'%']
+            ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => $Pro.'%']
+            ));//対象の製品を絞り込む
+        }
+      }elseif($Pro == "H"){//Hのとき
+        if(empty($product_code)){//product_codeの入力がないとき
+          $product_code = "no";
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+          ->where(['delete_flag' => '0', 'customer_code' => '10002',  'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
+          //role_code順に並べる
+          ));//対象の製品を絞り込む
+        }else{//product_codeの入力があるとき
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => $Pro.'%']
+            ));//対象の製品を絞り込む
+        }
+      }else{//Rのとき
+        if(empty($product_code)){//product_codeの入力がないとき
+          $product_code = "no";
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+          ->where(['delete_flag' => '0', 'customer_code' => '10003',  'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
+          //role_code順に並べる
+          ));//対象の製品を絞り込む
+        }else{//product_codeの入力があるとき
+          $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+            ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,'product_code like' => $Pro.'%']
             ));//対象の製品を絞り込む
         }
       }
@@ -1121,23 +1160,7 @@ class OrderEdisController extends AppController
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data['orderEdis']);//配列（更新するカラム）の個数
-      /*
-      echo "<pre>";
-      print_r($cnt);
-      print_r($data['orderEdis']);
-      echo "</pre>";
-      /*
-      for($n=0; $n<=$cnt; $n++){
-        if(isset($data['orderEdis'][$n])){
-          $this->OrderEdis->updateAll(
-          ['date_deliver' => $data['orderEdis'][$n]['date_deliver'] ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
-          ['id'   => $data['orderEdis'][$n]['id'] ]
-          );
-        }else{
-          break;
-        }
-      }
-*/
+
       $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2
       $connection->begin();//トランザクション3
@@ -1172,16 +1195,12 @@ class OrderEdisController extends AppController
 
       $session = $this->request->getSession();
       $data = $session->read();
-/*
-      echo "<pre>";
-      print_r($_SESSION['orderEdis']);
-      echo "</pre>";
-*/
     }
 
     public function henkoupanabunnnoulogin()
     {
       if ($this->request->is('post')) {
+
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
         $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
         $ary = explode(',', $str);//$strを配列に変換
@@ -1196,6 +1215,7 @@ class OrderEdisController extends AppController
             $this->set('delete_flag',$delete_flag);//登録者の表示のため
           }
             $user = $this->Auth->identify();
+
           if ($user) {
             $this->Auth->setUser($user);
             return $this->redirect(['action' => 'henkoupanabunnnoudo']);
@@ -1212,33 +1232,19 @@ class OrderEdisController extends AppController
       $cnt = count($data);//配列（更新するカラム）の個数
       $p = 0;
 
-//      $updated_staff = array('updated_staff'=>$this->Auth->user('staff_id'));
-//      $_SESSION['orderEdis'][0] = array_merge($_SESSION['orderEdis'][0],$updated_staff);
       for($n=0; $n<=count($_SESSION['orderEdis'])+1; $n++){
         if(isset($_SESSION['orderEdis'][$n])){
-  //        $bunnou = array('bunnou'=>$n+1);
-    //      $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
           $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
           $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$created_staff);
           $arrOrderEdis[] = $_SESSION['orderEdis'][$n];
         }else{
           $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
-//          $_SESSION['minoukannou'] = array_merge($_SESSION['minoukannou'],$created_staff);
           break;
         }
       }
-/*
-      echo "<pre>";
-      print_r($_SESSION['orderEdis']);
-      echo "</pre>";
-       echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
 
 //orderEdisを分納するときidがすでにあれば更新、なければ新規登録ok
 //amount=0 or 1 で場合分け（amount=0ならdelete_flag=1にする）ok
-//mikanのテーブルも更新（date_deliverが一番遅いやつのminoukannouの更新）
 
       $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2
@@ -1266,12 +1272,6 @@ class OrderEdisController extends AppController
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => 0
             ,'bunnou' => 0 ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
-/*
-              $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $_SESSION['orderEdis'][$n]['id']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
-              $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
-              $this->DenpyouDnpMinoukannous->updateAll(['delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
-              ,['id' => $denpyouDnpMinoukannouId]);
-*/
               $mes = "※更新されました";
               $this->set('mes',$mes);
             }else{
@@ -1285,7 +1285,6 @@ class OrderEdisController extends AppController
             $bunnou = array('bunnou'=>$bunnnou);
             $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
             $arrOrderEdisnew[] = $_SESSION['orderEdis'][$n];
-  //          $arrDenpyouDnpMinoukannousnew[] = $_SESSION['minoukannou'];
             $arrBunnnou[] = $bunnnou;
             $num_order = $_SESSION['orderEdis'][$n]['num_order'];
             $product_code = $_SESSION['orderEdis'][$n]['product_code'];
@@ -1293,64 +1292,6 @@ class OrderEdisController extends AppController
           }elseif(isset($arrOrderEdisnew[0])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
             $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);
             if ($this->OrderEdis->saveMany($OrderEdis)) {//minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
-  /*            for($m=0; $m<=100; $m++){
-                if(isset($arrBunnnou[$m])){
-                  $orderEdi = $this->OrderEdis->find()->where(['delete_flag' => '0', 'num_order' => $num_order, 'product_code' => $product_code, 'bunnou' => $arrBunnnou[$m]])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
-                  $orderEdiId = $orderEdi[0]->id;
-                  $arrorderEdiId = array('order_edi_id'=>$orderEdiId);
-                  $arrDenpyouDnpMinoukannousnew[$m] = array_merge($arrDenpyouDnpMinoukannousnew[$m],$arrorderEdiId);
-                }else{
-/*
-                  echo "<pre>";
-                  print_r($arrDenpyouDnpMinoukannousnew);
-                  echo "</pre>";
-*/
-  //                $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($this->DenpyouDnpMinoukannous->newEntity(), $arrDenpyouDnpMinoukannousnew);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-  //                $this->DenpyouDnpMinoukannous->saveMany($denpyouDnpMinoukannous);//saveManyで一括登録
-/*
-                  //minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
-                  $orderedi_id = $_SESSION['orderEdis'][0]['id'];
-                  $orderEdi = $this->OrderEdis->find()->where(['id' => $orderedi_id])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
-                  $num_order = $orderEdi[0]['num_order'];
-                  $product_code = $orderEdi[0]['product_code'];
-                  $line_code = $orderEdi[0]['line_code'];
-                  $arrDnpdouitutyuumon = array();//空の配列を作る
-                  $arrDnpdouitutyuumonSort = array();//空の配列を作る
-
-                  $orderEdidouitu = $this->OrderEdis->find()->where(['delete_flag' => '0', 'num_order' => $num_order, 'product_code' => $product_code, 'line_code' => $line_code])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
-                  for($m=0; $m<=100; $m++){//orderedisテーブルから同一注文のid,date_deliverを取出し配列に追加
-                    if(isset($orderEdidouitu[$m])){
-                      $date_deliver = $orderEdidouitu[$m]['date_deliver'];
-                      $arrDnpdouitutyuumon[$m]['id'] = $orderEdidouitu[$m]['id'];
-                      $arrDnpdouitutyuumon[$m]['date_deliver'] = $date_deliver->format('Y-m-d');
-                    }else{
-                      break;
-                    }
-                  }
-
-                  foreach ($arrDnpdouitutyuumon as $key => $value) {
-                      $sort[$key] = $value['date_deliver'];
-                  }
-                  array_multisort( array_map( "strtotime", array_column( $arrDnpdouitutyuumon, "date_deliver" ) ), SORT_ASC, $arrDnpdouitutyuumon ) ;//時間で並び替え
-                  $arrDnpdouitutyuumonSort[] = $arrDnpdouitutyuumon;
-
-                  for($m=0; $m<count($arrDnpdouitutyuumonSort[0]); $m++){
-                    if($m< (count($arrDnpdouitutyuumonSort[0])-1) ){
-                      $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
-                      $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
-                      $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 0 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
-                      ,['id' => $denpyouDnpMinoukannouId]);
-                    }else{
-                      $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
-                      $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
-                      $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
-                      ,['id' => $denpyouDnpMinoukannouId]);
-                    }
-                  }
-                  break;
-                }
-              }
-*/
               $mes = "※更新されました";
               $this->set('mes',$mes);
               $connection->commit();// コミット5
@@ -1362,51 +1303,7 @@ class OrderEdisController extends AppController
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
               break;
             }
-          }else{//分納追加はせずに納期や数量を変更した場合//minoukannouテーブルのdate_deliverが一番遅いやつのminoukannouだけ1にする
-
-            //minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
-            $orderedi_id = $_SESSION['orderEdis'][0]['id'];
-            $orderEdi = $this->OrderEdis->find()->where(['id' => $orderedi_id])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
-            $num_order = $orderEdi[0]['num_order'];
-            $product_code = $orderEdi[0]['product_code'];
-            $line_code = $orderEdi[0]['line_code'];
-            $arrDnpdouitutyuumon = array();//空の配列を作る
-            $arrDnpdouitutyuumonSort = array();//空の配列を作る
-
-            $orderEdidouitu = $this->OrderEdis->find()->where(['delete_flag' => '0', 'num_order' => $num_order, 'product_code' => $product_code, 'line_code' => $line_code])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
-            for($m=0; $m<=100; $m++){//orderedisテーブルから同一注文のid,date_deliverを取出し配列に追加
-              if(isset($orderEdidouitu[$m])){
-                $date_deliver = $orderEdidouitu[$m]['date_deliver'];
-                $arrDnpdouitutyuumon[$m]['id'] = $orderEdidouitu[$m]['id'];
-                $arrDnpdouitutyuumon[$m]['date_deliver'] = $date_deliver->format('Y-m-d');
-              }else{
-                break;
-              }
-            }
-
-            foreach ($arrDnpdouitutyuumon as $key => $value) {
-                $sort[$key] = $value['date_deliver'];
-            }
-            array_multisort( array_map( "strtotime", array_column( $arrDnpdouitutyuumon, "date_deliver" ) ), SORT_ASC, $arrDnpdouitutyuumon ) ;//時間で並び替え
-            $arrDnpdouitutyuumonSort[] = $arrDnpdouitutyuumon;
-/*
-            echo "<pre>";
-            print_r($arrDnpdouitutyuumonSort);
-            echo "</pre>";
-*/
-            for($m=0; $m<count($arrDnpdouitutyuumonSort[0]); $m++){
-              if($m< (count($arrDnpdouitutyuumonSort[0])-1) ){
-                $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
-                $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
-                $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 0 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
-                ,['id' => $denpyouDnpMinoukannouId]);
-              }else{
-                $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
-                $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
-                $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
-                ,['id' => $denpyouDnpMinoukannouId]);
-              }
-            }
+          }else{//終了
             $connection->commit();// コミット5
             break;
           }
@@ -1447,11 +1344,11 @@ class OrderEdisController extends AppController
         $Pro = $data['Pro'];
       }
 
-      if($Pro == "BON"){//Bのとき
+      if($Pro == "BON"){//BONのとき
         if(empty($product_code)){//product_codeの入力がないとき
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-            ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => '%'.$Pro.'%']
+            ->where(['delete_flag' => '0', 'customer_code' => '20001', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => '%'.$Pro.'%']
             ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -1462,7 +1359,7 @@ class OrderEdisController extends AppController
         if(empty($product_code)){//product_codeの入力がないとき
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
+          ->where(['delete_flag' => '0', 'customer_code' => '20001', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
           //role_code順に並べる
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
@@ -1474,7 +1371,7 @@ class OrderEdisController extends AppController
         if(empty($product_code)){//product_codeの入力がないとき
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
+          ->where(['delete_flag' => '0', 'customer_code' => '20001', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
           //role_code順に並べる
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき

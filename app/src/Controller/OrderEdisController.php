@@ -8,7 +8,7 @@ use Cake\Core\Configure;//トランザクション
 
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 $htmlLogin = new htmlLogin();
-$htmlLogin = $htmlLogin->Login();
+$htmlLogin = $htmlLogin->htmlLogin();
 
 /**
  * Roles Controller

@@ -12,6 +12,7 @@ class htmlLogin extends AppController
      public function initialize()
     {
         parent::initialize();
+        $this->Users = TableRegistry::get('users');
     }
 
      public function Prelogin()
@@ -27,10 +28,8 @@ class htmlLogin extends AppController
     		$this->data = $prelogin;
   	}
 
-    public function Login()
+    public function htmlLogin()
    {
-       $html = "<a>\n";
-/*
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
        $ary = explode(',', $str);//$strを配列に変換
@@ -44,10 +43,9 @@ class htmlLogin extends AppController
          $delete_flag = $Userdata[0]->delete_flag;
          $this->set('delete_flag',$delete_flag);
        }
-*/
-       return $html;
-       $this->html = $html;
-       $this->data = $Login;
+
+       $result = new htmlLogin();
+  //     $htmlLogin = $result->htmlLogin;
    }
 
 	public function get_data(){

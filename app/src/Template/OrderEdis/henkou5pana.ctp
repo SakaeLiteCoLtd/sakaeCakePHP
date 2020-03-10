@@ -21,12 +21,21 @@ header('Cache-Control:');
 header('Pragma:');
 
   $data = $this->request->getData();
+
+  $bunnoucheck = 0;
+  for($i=0; $i<=100; $i++){
+    if(isset(${"bunnou".$i})){
+      $bunnoucheck = $bunnoucheck + ${"bunnou".$i};
+    }else{
+      break;
+    }
+  }
 ?>
 
  </table>
 <hr size="5" style="margin: 0.5rem">
 
-<?php if(isset($data["nouki"]))://日付変更を押したとき ?>
+<?php if(isset($data["nouki"]) && $bunnoucheck==0)://日付変更を押したとき ?>
 
 <form method="post" action="henkou6pana" enctype="multipart/form-data">
 
@@ -51,8 +60,9 @@ header('Pragma:');
 <td style="border-style: none;"><div align="center"><?= $this->Form->submit('一括変更', array('name' => 'ikkatsu')); ?></div></td>
 </tr>
 </table>
-<br><br><br><br>
+<br><br><br>
 
+<br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
         <thead>
@@ -79,13 +89,14 @@ header('Pragma:');
                 ?>
               <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
               <td width="100" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
-             <?php
-              $dateYMD = date('Y-m-d');
-              $date_deliver = ${"orderEdis".$i}->date_deliver->format('Y-m-d');
-              echo "<td width='200' colspan='20'><div align='center'>\n";
-              echo "<input type='date' value=$date_deliver name=date_deliver_{$i} empty=Please select size='6'/>\n";
-              echo "</div></td>\n";
-             ?>
+                 <?php
+                   $dateYMD = date('Y-m-d');
+                   $date_deliver = ${"orderEdis".$i}->date_deliver->format('Y-m-d');
+                   echo "<td width='200' colspan='20'><div align='center'>\n";
+                   echo "<input type='date' value=$date_deliver name=date_deliver_{$i} empty=Please select size='6'/>\n";
+                   echo "</div></td>\n";
+                 ?>
+
             <?php
              $i_count = $i;
              echo $this->Form->hidden('i_count' ,['value'=>$i_count]);
@@ -109,6 +120,12 @@ header('Pragma:');
 <?=$this->Form->end() ?>
 
 </form>
+
+<?php elseif(isset($data["nouki"]) && $bunnoucheck!=0)://日付変更を押したとき ?>
+  <br>
+  <legend align="center"><strong style="font-size: 12pt; color:red"><?= "分納済みの注文が選択されています。" ?></strong></legend>
+  <legend align="center"><strong style="font-size: 12pt; color:red"><?= "分納済みの注文は納期変更できません。" ?></strong></legend>
+  <br><br><br>
 
 <?php elseif(isset($data["bunnnou"]))://分納を押したとき ?>
 
@@ -147,21 +164,15 @@ header('Pragma:');
                 		$product_name = $Product[0]->product_name;
                   ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
-                <?php
-                  $product_code = ${"orderEdis".$i}->product_code;
-                  $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
-                  $Dnpdate_deliver = $DnpTotalAmount[0]->date_deliver;
-                ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($Dnpdate_deliver) ?></td>
               <?php
               echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
               ?>
-              <?php
-                $product_code = ${"orderEdis".$i}->product_code;
-                $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
-                $TotalAmount = $DnpTotalAmount[0]->amount;
-              ?>
-                <td width="150" colspan="20" nowrap="nowrap"><?= h($TotalAmount) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($Totalamount) ?></td>
+                <?php
+                echo $this->Form->hidden("Dnpdate_deliver" ,['value'=>$Dnpdate_deliver]);
+                echo $this->Form->hidden("Totalamount" ,['value'=>$Totalamount]);
+                ?>
               </tr>
               <?php endforeach; ?>
             <?php endfor;?>
@@ -169,6 +180,7 @@ header('Pragma:');
           </tbody>
       </table>
   <br><br>
+
   <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
     <td style="border-style: none;"><div align="center"><?= $this->Form->submit('分納追加', array('name' => 'tsuika')); ?></div></td>
@@ -209,7 +221,10 @@ header('Pragma:');
             <?php endfor;?>
           </tbody>
       </table>
-<br><br><br>
+      <br>
+      <legend align="center"><strong style="font-size: 11pt; color:red"><?= "元々あった分納を削除する場合は数量を空にしてください。" ?></strong></legend>
+
+<br><br>
 <?php
  echo $this->Form->hidden('tsuikanum' ,['value'=>1]);
 ?>
@@ -228,7 +243,7 @@ header('Pragma:');
 
   ?>
 
-<?php else: ?>
+<?php elseif($bunnoucheck==0): ?>
 
   <form method="post" action="henkou6pana" enctype="multipart/form-data">
 
@@ -311,6 +326,11 @@ header('Pragma:');
   <?=$this->Form->end() ?>
 
   </form>
+<?php else: ?>
+  <br>
+  <legend align="center"><strong style="font-size: 12pt; color:red"><?= "分納済みの注文が選択されています。" ?></strong></legend>
+  <legend align="center"><strong style="font-size: 12pt; color:red"><?= "分納済みの注文は納期変更できません。" ?></strong></legend>
+  <br><br><br>
 
 
 <?php endif; ?>

@@ -408,6 +408,9 @@ echo "</pre>";
               <?php endfor;?>
             </tbody>
         </table>
+        <br>
+        <legend align="center"><strong style="font-size: 11pt; color:red"><?= "元々あった分納を削除する場合は数量を空にしてください。" ?></strong></legend>
+
   <br><br><br>
 
   <?php

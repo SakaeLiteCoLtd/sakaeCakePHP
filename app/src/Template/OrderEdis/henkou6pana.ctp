@@ -61,7 +61,7 @@ header('Pragma:');
               <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
               <td width="100" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
               <td width="200" colspan="20" nowrap="nowrap"><?= h(${"date_deliver_".$i}) ?></td>
-              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
+              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->place_line) ?></td>
             </tr>
             <?php
             $session = $this->request->getSession();
@@ -131,7 +131,7 @@ header('Pragma:');
               <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
               <td width="100" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
               <td width="200" colspan="20" nowrap="nowrap"><?= h(${"date_deliver_".$i}) ?></td>
-              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
+              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->place_line) ?></td>
             </tr>
             <?php
             $session = $this->request->getSession();

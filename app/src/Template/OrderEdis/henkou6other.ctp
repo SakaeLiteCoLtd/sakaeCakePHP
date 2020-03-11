@@ -13,7 +13,7 @@
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
    $this->OrderEdis = TableRegistry::get('orderEdis');
-   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkoupanapreadd']]);
+   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkouotherpreadd']]);
 ?>
 <?php
 header('Expires:-1');//この３行がなければ「戻る」をしたら「フォーム再送信の確認」が表示される。

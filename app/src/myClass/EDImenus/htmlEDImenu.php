@@ -19,7 +19,7 @@ class htmlEDImenu extends AppController
      public function EDImenus()
   	{
         $html =
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/index1'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/indexmenu'>\n".
                   "<img src='/img/Labelimg/edi_sub_order.gif' width=115 height=40>\n".
                   "</a></td>\n".
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/index2'>\n".

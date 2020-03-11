@@ -928,7 +928,7 @@ class OrderEdisController extends AppController
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
           ->where(['delete_flag' => '0', 'customer_code' => '10001',  'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
-          //role_code順に並べる
+
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -940,7 +940,7 @@ class OrderEdisController extends AppController
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
           ->where(['delete_flag' => '0', 'customer_code' => '10002',  'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
-          //role_code順に並べる
+
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -952,7 +952,7 @@ class OrderEdisController extends AppController
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
           ->where(['delete_flag' => '0', 'customer_code' => '10003',  'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
-          //role_code順に並べる
+
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -1360,7 +1360,6 @@ class OrderEdisController extends AppController
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
           ->where(['delete_flag' => '0', 'customer_code' => '20001', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
-          //role_code順に並べる
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -1372,7 +1371,6 @@ class OrderEdisController extends AppController
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
           ->where(['delete_flag' => '0', 'customer_code' => '20001', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
-          //role_code順に並べる
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -1792,6 +1790,404 @@ class OrderEdisController extends AppController
                 ,['id' => $denpyouDnpMinoukannouId]);
               }
             }
+            $connection->commit();// コミット5
+            break;
+          }
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+    }
+
+
+    public function henkou3other()
+    {
+      $this->request->session()->destroy();// セッションの破棄
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+/*
+      $Data=$this->request->query();
+      echo "<pre>";
+      print_r($Data);
+      echo "</pre>";
+*/
+    }
+
+    public function henkou4other()
+    {
+      $this->request->session()->destroy();//セッションの破棄
+      $data = $this->request->getData();
+
+      $Data=$this->request->query('s');//1度henkou5otherへ行って戻ってきたとき（検索を押したとき）
+      if(isset($Data)){
+        $product_code = $Data['product_code'];
+        $date_sta = $Data['date_sta'];
+        $date_fin = $Data['date_fin'];
+      }else{
+        $product_code = $data['product_code'];
+        $date_sta = $data['date_sta'];
+        $date_fin = $data['date_fin'];
+      }
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      if(empty($product_code)){//product_codeの入力がないとき
+        $product_code = "no";
+        $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+        ->where(['delete_flag' => '0', 'customer_code !=' => '10001', 'customer_code !=' => '10002', 'customer_code !=' => '10003', 'customer_code !=' => '20001', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin]
+        ));//対象の製品を絞り込む
+      }else{//product_codeの入力があるとき
+        $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
+          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code]
+          ));//対象の製品を絞り込む
+      }
+/*
+      echo "<pre>";
+      print_r($Data);
+      echo "</pre>";
+*/
+    }
+
+    public function henkou5other()
+    {
+      $data = $this->request->getData();
+
+      if(isset($data['kensaku'])){
+        return $this->redirect(['action' => 'henkou4other',
+        's' => ['product_code' => $data['product_code'],'date_sta' => $data['date_sta'],'date_fin' => $data['date_fin']]]);
+      }
+
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $array = array();
+      $checknum = 0;
+      if(isset($data["nummax"])){
+        for ($k=2; $k<=$data["nummax"]; $k++){
+          if(isset($data["subete"])){
+            $array[] = $data["$k"];
+          }elseif(isset($data["check".$k])){//checkがついているもののidをキープ
+            $array[] = $data["$k"];
+            $checknum = $checknum + 1;
+          }else{
+          }
+        }
+
+        if($checknum > 1){
+          $meschecknum = "※複数行の選択がありました。先頭の行のみ表示しています。";
+          $this->set('meschecknum',$meschecknum);
+        }else{
+          $meschecknum = " ";
+          $this->set('meschecknum',$meschecknum);
+        }
+
+        for ($i=0; $i<=$data["nummax"]; $i++){
+          if(isset($array[$i])){//checkがついているもののidと同じidのデータを取り出す
+            ${"orderEdis".$i} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $array[$i]])->toArray();
+            $this->set('orderEdis'.$i,${"orderEdis".$i});
+            ${"bunnou".$i} = ${"orderEdis".$i}[0]->bunnou;
+            $this->set('bunnou'.$i,${"bunnou".$i});
+/*
+            echo "<pre>";
+            print_r(${"bunnou".$i});
+            echo "</pre>";
+*/
+            $i_num = $i;
+            $this->set('i_num',$i_num);
+          }else{
+            break;
+          }
+        }
+
+        $bunnou_num = 1;
+        $Totalamount = 0;
+        $this->set('bunnou_num',$bunnou_num);
+        $num_order0 = $orderEdis0[0]->num_order;
+        $product_code0 = $orderEdis0[0]->product_code;
+        $Dnpdate_deliver = $orderEdis0[0]->date_deliver->format('Y-m-d');
+        $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'product_code' => $product_code0])->toArray();
+        for($n=0; $n<=100; $n++){
+          if(isset($orderEdis[$n])){
+            ${"orderEdis".$n} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $orderEdis[$n]->id])->toArray();
+            $this->set('orderEdis'.$n,${"orderEdis".$n});
+
+            ${"id".$n} = ${"orderEdis".$n}[0]->id;
+            $this->set('id'.$n,${"id".$n});
+
+            ${"date_deliver".$n} = ${"orderEdis".$n}[0]->date_deliver->format('Y-m-d');
+            $this->set('date_deliver'.$n,${"date_deliver".$n});
+
+            if($n==0){
+              $Dnpdate_deliver = ${"date_deliver".$n};
+              $this->set("Dnpdate_deliver",$Dnpdate_deliver);
+            }elseif($Dnpdate_deliver > ${"date_deliver".$n}){
+              $Dnpdate_deliver = $Dnpdate_deliver;
+              $this->set("Dnpdate_deliver",$Dnpdate_deliver);
+            }else{
+              $Dnpdate_deliver = ${"date_deliver".$n};
+              $this->set("Dnpdate_deliver",$Dnpdate_deliver);
+            }
+
+            ${"amount".$n} = ${"orderEdis".$n}[0]->amount;
+            $this->set('amount'.$n,${"amount".$n});
+            $Totalamount = $Totalamount + ${"amount".$n};
+            $this->set("Totalamount",$Totalamount);
+
+            $bunnou_num = $n+1;
+            $this->set('bunnou_num',$bunnou_num);
+
+          }else{
+            break;
+          }
+        }
+      }
+    }
+
+    public function henkou5otherbunnou()
+    {
+      session_start();
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $Dnpdate_deliver = $data['Dnpdate_deliver'];
+      $this->set("Dnpdate_deliver",$Dnpdate_deliver);
+      $Totalamount = $data['Totalamount'];
+      $this->set("Totalamount",$Totalamount);
+      $orderEdis0 = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $data['orderEdis_0']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+      $num_order0 = $orderEdis0[0]->num_order;
+      $product_code0 = $orderEdis0[0]->product_code;
+      $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'product_code' => $product_code0])->toArray();
+      for($n=0; $n<=100; $n++){
+        if(isset($orderEdis[$n])){
+          $num = $n;
+          $this->set('num',$num);//既に分納している場合１以上になる
+        }else{
+          break;
+        }
+      }
+
+      for($n=0; $n<=100; $n++){
+        if(isset($orderEdis[$n])){
+          ${"orderEdis".$n} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $data["orderEdis_{$n}"]])->toArray();
+          $this->set('orderEdis'.$n,${"orderEdis".$n});
+        }else{
+          break;
+        }
+      }
+
+        if(isset($data['tsuika'])){
+          $tsuikanum = $data['tsuikanum'] + 1;
+          $this->set('tsuikanum',$tsuikanum);
+        }elseif(isset($data['sakujo'])){
+          $tsuikanum = $data['tsuikanum'] - 1;
+          $this->set('tsuikanum',$tsuikanum);
+        }
+
+
+    }
+
+    public function henkou6other()
+    {
+      session_start();
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+    }
+
+    public function henkouotherpreadd()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+    }
+
+    public function henkouotherlogin()
+    {
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+        $ary = explode(',', $str);//$strを配列に変換
+        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+        $this->set('username', $username);
+        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+          if(empty($Userdata)){
+            $delete_flag = "";
+          }else{
+            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+            $this->set('delete_flag',$delete_flag);//登録者の表示のため
+          }
+            $user = $this->Auth->identify();
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkouotherdo']);
+          }
+        }
+    }
+
+    public function henkouotherdo()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $session = $this->request->getSession();
+      $data = $session->read();
+      $cnt = count($data['orderEdis']);//配列（更新するカラム）の個数
+
+      $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        for($n=0; $n<=$cnt; $n++){
+         if(isset($data['orderEdis'][$n])){
+          if ($this->OrderEdis->updateAll(['date_deliver' => $data['orderEdis'][$n]['date_deliver'] ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],['id' => $data['orderEdis'][$n]['id']])) {
+          }else{
+            $mes = "※更新されませんでした";
+            $this->set('mes',$mes);
+            $this->Flash->error(__('The data could not be saved. Please, try again.'));
+            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            break;
+          }
+         }else{
+           $mes = "※更新されました";
+           $this->set('mes',$mes);
+           $connection->commit();// コミット5
+           break;
+         }
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+    }
+
+    public function henkouotherbunnnoupreadd()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $session = $this->request->getSession();
+      $data = $session->read();
+    }
+
+    public function henkouotherbunnnoulogin()
+    {
+      if ($this->request->is('post')) {
+
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+        $ary = explode(',', $str);//$strを配列に変換
+        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+        $this->set('username', $username);
+        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+          if(empty($Userdata)){
+            $delete_flag = "";
+          }else{
+            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+            $this->set('delete_flag',$delete_flag);//登録者の表示のため
+          }
+            $user = $this->Auth->identify();
+
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkouotherbunnnoudo']);
+          }
+        }
+    }
+
+    public function henkouotherbunnnoudo()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $session = $this->request->getSession();
+      $data = $session->read();
+      $cnt = count($data);//配列（更新するカラム）の個数
+      $p = 0;
+
+      for($n=0; $n<=count($_SESSION['orderEdis'])+1; $n++){
+        if(isset($_SESSION['orderEdis'][$n])){
+          $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+          $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$created_staff);
+          $arrOrderEdis[] = $_SESSION['orderEdis'][$n];
+        }else{
+          $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+          break;
+        }
+      }
+
+//orderEdisを分納するときidがすでにあれば更新、なければ新規登録ok
+//amount=0 or 1 で場合分け（amount=0ならdelete_flag=1にする）ok
+
+      $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        $arrOrderEdisnew = array();
+        $arrBunnnou = array();
+        $arrDenpyouDnpMinoukannousnew = array();
+        $bunnnou = 0;
+        for($n=0; $n<=count($_SESSION['orderEdis'])+100; $n++){
+          if(isset($_SESSION['orderEdis'][$n]['id']) && ($_SESSION['orderEdis'][$n]['amount'] > 0)){//amount>0の時
+            $bunnnou = $bunnnou +1;
+            if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
+            ,'bunnou' => $bunnnou ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+            ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
+              $mes = "※更新されました";
+              $this->set('mes',$mes);
+            }else{
+              $mes = "※更新されませんでした";
+              $this->set('mes',$mes);
+              $this->Flash->error(__('The data could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            }
+          }elseif(isset($_SESSION['orderEdis'][$n]['id'])){//amount=0 or nullの時//minoukannouテーブルも更新
+            if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => 0
+            ,'bunnou' => 0 ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
+            ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
+              $mes = "※更新されました";
+              $this->set('mes',$mes);
+            }else{
+              $mes = "※更新されませんでした";
+              $this->set('mes',$mes);
+              $this->Flash->error(__('The data could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            }
+          }elseif(isset($_SESSION['orderEdis'][$n])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
+            $bunnnou = $bunnnou +1;
+            $bunnou = array('bunnou'=>$bunnnou);
+            $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
+            $arrOrderEdisnew[] = $_SESSION['orderEdis'][$n];
+            $arrBunnnou[] = $bunnnou;
+            $num_order = $_SESSION['orderEdis'][$n]['num_order'];
+            $product_code = $_SESSION['orderEdis'][$n]['product_code'];
+            $line_code = $_SESSION['orderEdis'][$n]['line_code'];
+          }elseif(isset($arrOrderEdisnew[0])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
+            $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);
+            if ($this->OrderEdis->saveMany($OrderEdis)) {//minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
+              $mes = "※更新されました";
+              $this->set('mes',$mes);
+              $connection->commit();// コミット5
+              break;
+            }else{
+              $mes = "※更新されませんでした";
+              $this->set('mes',$mes);
+              $this->Flash->error(__('The data could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+              break;
+            }
+          }else{//終了
             $connection->commit();// コミット5
             break;
           }

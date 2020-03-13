@@ -7,9 +7,10 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
-$htmlLogin = new htmlLogin();
-$htmlLogin = $htmlLogin->htmlLogin();
-
+/*
+$htmllogin = new htmlLogin();
+$htmllogin = $htmllogin->htmllogin();
+*/
 /**
  * Roles Controller
  *
@@ -286,21 +287,22 @@ class OrderEdisController extends AppController
 
     public function dnpcsvlogin()
     {
-     if ($this->request->is('post')) {
-       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;
-           $this->set('delete_flag',$delete_flag);
-         }
-           $user = $this->Auth->identify();
+       if ($this->request->is('post')) {
+         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+         $this->set('data',$data);//セット
+         $userdata = $data['username'];
+         $this->set('userdata',$userdata);//セット
+
+         $htmllogin = new htmlLogin();
+         $arraylogindate = $htmllogin->htmllogin($userdata);
+
+         $username = $arraylogindate[0];
+         $delete_flag = $arraylogindate[1];
+         $this->set('username',$username);
+         $this->set('delete_flag',$delete_flag);
+
+         $user = $this->Auth->identify();
+
          if ($user) {
            $this->Auth->setUser($user);
            return $this->redirect(['action' => 'dnpcsv']);

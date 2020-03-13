@@ -28,24 +28,23 @@ class htmlLogin extends AppController
     		$this->data = $prelogin;
   	}
 
-    public function htmlLogin()
+    public function htmllogin($userdata)
    {
-       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
+       $data = $userdata;//postデータ取得し、$dataと名前を付ける
+       $ary = explode(',', $userdata);//$strを配列に変換
        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       $this->set('username', $username);
        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+         if(empty($Userdata)){
+           $delete_flag = "";
+         }else{
+           $delete_flag = $Userdata[0]->delete_flag;
+         }
+           $user = $this->Auth->identify();
+           $arraylogindate = array();
+           $arraylogindate[] = $username;
+           $arraylogindate[] = $delete_flag;
 
-       if(empty($Userdata)){
-         $delete_flag = "";
-       }else{
-         $delete_flag = $Userdata[0]->delete_flag;
-         $this->set('delete_flag',$delete_flag);
-       }
-
-       $result = new htmlLogin();
-  //     $htmlLogin = $result->htmlLogin;
+           return $arraylogindate;
    }
 
 	public function get_data(){

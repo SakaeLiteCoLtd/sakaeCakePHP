@@ -40,35 +40,35 @@ class OrderEdisController extends AppController
        $this->request->session()->destroy();// セッションの破棄
      }
 
-     public function hattyucsv()
+     public function hattyucsv()//発注CSV
      {
        $orderEdis = $this->OrderEdis->newEntity();
        $this->set('orderEdis',$orderEdis);
 
        if ($this->request->is('post')) {
-       $source_file = $_FILES['file']['tmp_name'];
+       $source_file = $_FILES['file']['tmp_name'];//ファイルを選択、そのファイルが一時的に作られる（$source_fileと名付ける）
 //文字変換（不要）     file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'UTF-8', 'SJIS'));
-       $fp = fopen($source_file, 'r');
-       $fpcount = fopen($source_file, 'r' );
+       $fp = fopen($source_file, 'r');//ファイルを開き、$fpと名付ける
+       $fpcount = fopen($source_file, 'r' );//ファイルを開き、$fpcountと名付ける
 
-        for($count = 0; fgets( $fpcount ); $count++ );
+        for($count = 0; fgets( $fpcount ); $count++ );//$fpcountの行数を数え、$countと名付ける
         $arrFp = array();//空の配列を作る
         $created_staff = $this->Auth->user('staff_id');
         for ($k=1; $k<=$count-1; $k++) {//最後の行まで
-          $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+          $line = fgets($fp);//ファイル$fpの上の１行（カラム名が並んでいるため）を取る（２行目から読み込み開始）
           $sample = explode(',',$line);//$lineを','毎に配列に入れる
 
            $keys=array_keys($sample);
-           $keys[array_search('3',$keys)]='place_deliver_code';
+           $keys[array_search('3',$keys)]='place_deliver_code';//名前の変更（3➝place_deliver_code）
            $keys[array_search('10',$keys)]='date_order';
            $keys[array_search('12',$keys)]='price';
            $keys[array_search('14',$keys)]='amount';
            $keys[array_search('23',$keys)]='product_code';
            $keys[array_search('27',$keys)]='line_code';
            $keys[array_search('30',$keys)]='date_deliver';
-           $keys[array_search('32',$keys)]='num_order';//名前の変更
+           $keys[array_search('32',$keys)]='num_order';
            $keys[array_search('50',$keys)]='place_line';
-           $sample = array_combine( $keys, $sample );
+           $sample = array_combine( $keys, $sample );//配列を作成
 
            unset($sample['0'],$sample['1'],$sample['2'],$sample['4'],$sample['5'],$sample['6'],$sample['7'],$sample['8']);
            unset($sample['9'],$sample['11'],$sample['13'],$sample['15'],$sample['16'],$sample['17'],$sample['18']);
@@ -87,15 +87,15 @@ class OrderEdisController extends AppController
            unset($sample['107'],$sample['108'],$sample['109'],$sample['110'],$sample['111'],$sample['112'],$sample['113']);
            unset($sample['114'],$sample['115'],$sample['116'],$sample['117'],$sample['118'],$sample['119'],$sample['120']);
            unset($sample['121'],$sample['122'],$sample['123'],$sample['124'],$sample['125'],$sample['126'],$sample['127']);
-           unset($sample['128'],$sample['129']);//最後の改行も削除
+           unset($sample['128'],$sample['129']);//不要な行を削除、最後の改行も削除（改行が読み込まれるとエラーが出るため）
 
            if($k>=2){
-             $arrFp[] = $sample;//配列に追加する
+             $arrFp[] = $sample;//$sampleを配列に追加する
            }
         }
 
         for($n=0; $n<=10000; $n++){
-          if(isset($arrFp[$n])){
+          if(isset($arrFp[$n])){//$arrFp[$n]が存在する時、対応するcustomer_code等を配列に追加する
             $Product = $this->Products->find()->where(['product_code' => $arrFp[$n]['product_code']])->toArray();
     				$customer_id = $Product[0]->customer_id;
             $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
@@ -116,7 +116,7 @@ class OrderEdisController extends AppController
        print_r($arrFp);
        echo "</pre>";
 */
-           $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrFp);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+           $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrFp);//patchEntitiesで一括登録
            $connection = ConnectionManager::get('default');//トランザクション1
            // トランザクション開始2
            $connection->begin();//トランザクション3
@@ -140,7 +140,7 @@ class OrderEdisController extends AppController
 
      public function hattyucsvpreadd()
  		{
-      session_start();
+      session_start();//セッションの開始
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
  		}
@@ -148,27 +148,24 @@ class OrderEdisController extends AppController
  		public function hattyucsvlogin()
  		{
  			if ($this->request->is('post')) {
- 				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
- 				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
- 				$ary = explode(',', $str);//$strを配列に変換
- 				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
- 				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
- 				$this->set('username', $username);
- 				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
 
-    //    $htmlLogin = $htmlLogin->Login();
+        $htmllogin = new htmlLogin();//クラスを使用
+        $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
 
- 					if(empty($Userdata)){
- 						$delete_flag = "";
- 					}else{
- 						$delete_flag = $Userdata[0]->delete_flag;
- 						$this->set('delete_flag',$delete_flag);
- 					}
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
 
- 						$user = $this->Auth->identify();
+        $user = $this->Auth->identify();
+
  					if ($user) {
  						$this->Auth->setUser($user);
-            return $this->redirect(['action' => 'hattyucsv']);
+            return $this->redirect(['action' => 'hattyucsv']);//hattyucsvへ移動
  					}
  				}
  		}
@@ -178,7 +175,7 @@ class OrderEdisController extends AppController
      session_start();
      $orderEdis = $this->OrderEdis->newEntity();
      $this->set('orderEdis',$orderEdis);
-     $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+     $data = $this->request->getData();
     }
 
     public function dnpcsvlogin()
@@ -226,7 +223,7 @@ class OrderEdisController extends AppController
       $this->set('dnpTotalAmounts',$dnpTotalAmounts);
 
       $source_file = $_FILES['file']['tmp_name'];
-      file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'UTF-8', 'SJIS'));
+      file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'UTF-8', 'SJIS'));//SJISのファイルをUTF-8に変換する
       $fp1 = fopen($source_file, 'r');
       $fp2 = fopen($source_file, 'r');
       $fp3 = fopen($source_file, 'r');
@@ -255,13 +252,12 @@ class OrderEdisController extends AppController
            $keys[array_search('11',$keys)]='price';
            $keys[array_search('13',$keys)]='date_deliver';
            $keys[array_search('14',$keys)]='place_deliver_code';
-  //         $keys[array_search('15',$keys)]='place_deliver_name';
            $sample = array_combine( $keys, $sample );
 
            unset($sample['0'],$sample['1'],$sample['4'],$sample['5'],$sample['6'],$sample['8']);
            unset($sample['12'],$sample['15'],$sample['16'],$sample['17'],$sample['18']);//最後の改行も削除
 
-           if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき
+           if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき（カンマのみの行が出てきたら配列への追加を終了）
              $arrEDI[] = $sample;//配列に追加する
            }
         }
@@ -475,23 +471,23 @@ class OrderEdisController extends AppController
                    } else {
                      $mes = "※登録されませんでした";
                      $this->set('mes',$mes);
-                     file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));
+                     file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
                      $this->Flash->error(__('The dnpTotalAmounts could not be saved. Please, try again.'));
                      throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
                    }
               } else {
                 $mes = "※登録されませんでした";
                 $this->set('mes',$mes);
-                file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));
+                file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
                 $this->Flash->error(__('This denpyouDnpMinoukannous could not be saved. Please, try again.'));
                 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
               }
-              file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));
+              file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
               $connection->commit();// コミット5
         } else {
           $mes = "※登録されませんでした";
           $this->set('mes',$mes);
-          file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));
+          file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
           $this->Flash->error(__('This orderEdis could not be saved. Please, try again.'));
           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
         }
@@ -630,19 +626,20 @@ class OrderEdisController extends AppController
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-        $ary = explode(',', $str);//$strを配列に変換
-        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-        $this->set('username', $username);
-        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-          if(empty($Userdata)){
-            $delete_flag = "";
-          }else{
-            $delete_flag = $Userdata[0]->delete_flag;
-            $this->set('delete_flag',$delete_flag);
-          }
-            $user = $this->Auth->identify();
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmllogin($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();
+
           if ($user) {
             $this->Auth->setUser($user);
             return $this->redirect(['action' => 'keikakucsv']);
@@ -839,6 +836,9 @@ class OrderEdisController extends AppController
             $Totalamount = $Totalamount + ${"amount".$n};
             $this->set("Totalamount",$Totalamount);
 
+            ${"kannou".$n} = ${"orderEdis".$n}[0]->kannou;
+            $this->set('kannou'.$n,${"kannou".$n});
+
             $bunnou_num = $n+1;
             $this->set('bunnou_num',$bunnou_num);
 
@@ -920,19 +920,20 @@ class OrderEdisController extends AppController
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-        $ary = explode(',', $str);//$strを配列に変換
-        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-        $this->set('username', $username);
-        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-          if(empty($Userdata)){
-            $delete_flag = "";
-          }else{
-            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-            $this->set('delete_flag',$delete_flag);//登録者の表示のため
-          }
-            $user = $this->Auth->identify();
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmllogin($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();
+
           if ($user) {
             $this->Auth->setUser($user);
             return $this->redirect(['action' => 'henkoupanado']);
@@ -987,21 +988,20 @@ class OrderEdisController extends AppController
     public function henkoupanabunnnoulogin()
     {
       if ($this->request->is('post')) {
-
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-        $ary = explode(',', $str);//$strを配列に変換
-        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-        $this->set('username', $username);
-        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-          if(empty($Userdata)){
-            $delete_flag = "";
-          }else{
-            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-            $this->set('delete_flag',$delete_flag);//登録者の表示のため
-          }
-            $user = $this->Auth->identify();
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmllogin($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();
 
           if ($user) {
             $this->Auth->setUser($user);
@@ -1234,6 +1234,9 @@ class OrderEdisController extends AppController
             ${"amount".$n} = ${"orderEdis".$n}[0]->amount;
             $this->set('amount'.$n,${"amount".$n});
 
+            ${"kannou".$n} = ${"orderEdis".$n}[0]->kannou;
+            $this->set('kannou'.$n,${"kannou".$n});
+
             $bunnou_num = $n+1;
             $this->set('bunnou_num',$bunnou_num);
           }else{
@@ -1301,19 +1304,20 @@ class OrderEdisController extends AppController
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-        $ary = explode(',', $str);//$strを配列に変換
-        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-        $this->set('username', $username);
-        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-          if(empty($Userdata)){
-            $delete_flag = "";
-          }else{
-            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-            $this->set('delete_flag',$delete_flag);//登録者の表示のため
-          }
-            $user = $this->Auth->identify();
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmllogin($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();
+
           if ($user) {
             $this->Auth->setUser($user);
             return $this->redirect(['action' => 'henkoudnpdo']);
@@ -1369,19 +1373,20 @@ class OrderEdisController extends AppController
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-        $ary = explode(',', $str);//$strを配列に変換
-        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-        $this->set('username', $username);
-        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-          if(empty($Userdata)){
-            $delete_flag = "";
-          }else{
-            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-            $this->set('delete_flag',$delete_flag);//登録者の表示のため
-          }
-            $user = $this->Auth->identify();
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmllogin($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();
+
           if ($user) {
             $this->Auth->setUser($user);
             return $this->redirect(['action' => 'henkoudnpbunnnoudo']);
@@ -1777,8 +1782,6 @@ class OrderEdisController extends AppController
           $tsuikanum = $data['tsuikanum'] - 1;
           $this->set('tsuikanum',$tsuikanum);
         }
-
-
     }
 
     public function henkou6other()
@@ -1787,11 +1790,6 @@ class OrderEdisController extends AppController
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
-/*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
     }
 
     public function henkouotherpreadd()
@@ -1804,19 +1802,20 @@ class OrderEdisController extends AppController
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-        $ary = explode(',', $str);//$strを配列に変換
-        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-        $this->set('username', $username);
-        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-          if(empty($Userdata)){
-            $delete_flag = "";
-          }else{
-            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-            $this->set('delete_flag',$delete_flag);//登録者の表示のため
-          }
-            $user = $this->Auth->identify();
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmllogin($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();
+
           if ($user) {
             $this->Auth->setUser($user);
             return $this->redirect(['action' => 'henkouotherdo']);
@@ -1871,21 +1870,20 @@ class OrderEdisController extends AppController
     public function henkouotherbunnnoulogin()
     {
       if ($this->request->is('post')) {
-
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-        $ary = explode(',', $str);//$strを配列に変換
-        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-        $this->set('username', $username);
-        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-          if(empty($Userdata)){
-            $delete_flag = "";
-          }else{
-            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-            $this->set('delete_flag',$delete_flag);//登録者の表示のため
-          }
-            $user = $this->Auth->identify();
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmllogin($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();
 
           if ($user) {
             $this->Auth->setUser($user);

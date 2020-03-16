@@ -364,20 +364,43 @@ echo "</pre>";
                    $date_deliver = $data["date_deliver_{$j}"];
             //       $amount = ${"orderEdis".$j}->amount;
                    $amount = $data["amount_{$j}"];
-                   echo "<td width='200' colspan='20'><div align='center'>\n";
+                   $kannou = $data["kannou_{$j}"];
+
+                   if($kannou == 0){
+                     $meskannou = "変更可";
+                     echo "<td width='200' colspan='20'><div align='center'>\n";
+                     echo "<input type='date' value=$date_deliver name=date_deliver_{$j} empty=Please select size='6'/>\n";
+                     echo "</div></td>\n";
+                     echo "<td width='200' colspan='20'><div align='center'>\n";
+                     echo "<input type='text' value=$amount name=amount_{$j} empty=Please select size='6'/>\n";
+                     echo "<input type='hidden' value=$kannou name=kannou_{$j} empty=Please select size='6'/>\n";
+                     echo "</div></td>\n";
+                   }else{
+                     $meskannou = "変更不可";
+                     echo "<td width='200' colspan='20'><div align='center'>\n";
+                     echo $date_deliver;
+                     echo "<input type='hidden' value=$date_deliver name=date_deliver_{$j} empty=Please select size='6'/>\n";
+                     echo "</div></td>\n";
+                     echo "<td width='200' colspan='20'><div align='center'>\n";
+                     echo $amount;
+                     echo "<input type='hidden' value=$amount name=amount_{$j} empty=Please select size='6'/>\n";
+                     echo "<input type='hidden' value=$kannou name=kannou_{$j} empty=Please select size='6'/>\n";
+                     echo "</div></td>\n";
+                   }
+    /*               echo "<td width='200' colspan='20'><div align='center'>\n";
                    echo "<input type='date' value=$date_deliver name=date_deliver_{$j} empty=Please select size='6'/>\n";
                    echo "</div></td>\n";
                    echo "<td width='200' colspan='20'><div align='center'>\n";
                    echo "<input type='text' value=$amount name=amount_{$j} empty=Please select size='6'/>\n";
                    echo "</div></td>\n";
-                  ?>
+      */            ?>
                   <?php
                   if(isset($data["orderEdis_".$j])){
                     echo $this->Form->hidden("orderEdis_".$j ,['value'=>$data["orderEdis_".$j]]);
                   }
                   ?>
 
-                  <td width="200" colspan="20" nowrap="nowrap"><?= h("変更可") ?></td>
+                  <td width="200" colspan="20" nowrap="nowrap"><?= h($meskannou) ?></td>
                 </tr>
               <?php endfor;?>
               <?php for ($j=$num+1;$j<$num+$tsuikanum;$j++): ?>

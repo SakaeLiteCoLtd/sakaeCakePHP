@@ -205,18 +205,34 @@ header('Pragma:');
               <tr style="border-bottom: solid;border-width: 1px">
                 <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
                 <?php
+                if(${"kannou".$j} == 0){
+                  $meskannou = "変更可";
+                  echo "<td width='200' colspan='20'><div align='center'>\n";
+                  echo "<input type='date' value=${"date_deliver".$j} name=date_deliver_{$j} empty=Please select size='6'/>\n";
+                  echo "</div></td>\n";
+                  echo "<td width='200' colspan='20'><div align='center'>\n";
+                  echo "<input type='text' value=${"amount".$j} name=amount_{$j} empty=Please select size='6'/>\n";
+                  echo "<input type='hidden' value=${"kannou".$j} name=kannou_{$j} empty=Please select size='6'/>\n";
+                  echo "<input type='hidden' value=${"id".$j} name=orderEdis_{$j} empty=Please select size='6'/>\n";
+                  echo "</div></td>\n";
+                }else{
+                  $meskannou = "変更不可";
+                  echo "<td width='200' colspan='20'><div align='center'>\n";
+                  echo ${"date_deliver".$j};
+                  echo "<input type='hidden' value=${"date_deliver".$j} name=date_deliver_{$j} empty=Please select size='6'/>\n";
+                  echo "</div></td>\n";
+                  echo "<td width='200' colspan='20'><div align='center'>\n";
+                  echo ${"amount".$j};
+                  echo "<input type='hidden' value=${"amount".$j} name=amount_{$j} empty=Please select size='6'/>\n";
+                  echo "<input type='hidden' value=${"kannou".$j} name=kannou_{$j} empty=Please select size='6'/>\n";
+                  echo "<input type='hidden' value=${"id".$j} name=orderEdis_{$j} empty=Please select size='6'/>\n";
+                  echo "</div></td>\n";
+                }
                  $dateYMD = date('Y-m-d');
           //       $date_deliver = ${"orderEdis".$j}->date_deliver->format('Y-m-d');
           //       $amount = ${"orderEdis".$j}->amount;
-                 echo "<td width='200' colspan='20'><div align='center'>\n";
-                 echo "<input type='date' value=${"date_deliver".$j} name=date_deliver_{$j} empty=Please select size='6'/>\n";
-                 echo "</div></td>\n";
-                 echo "<td width='200' colspan='20'><div align='center'>\n";
-                 echo "<input type='text' value=${"amount".$j} name=amount_{$j} empty=Please select size='6'/>\n";
-                 echo "<input type='hidden' value=${"id".$j} name=orderEdis_{$j} empty=Please select size='6'/>\n";
-                 echo "</div></td>\n";
                 ?>
-                <td width="200" colspan="20" nowrap="nowrap"><?= h("変更可") ?></td>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h($meskannou) ?></td>
               </tr>
             <?php endfor;?>
           </tbody>

@@ -6,6 +6,7 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 use Cake\Datasource\ConnectionManager;//トランザクション
 use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
+use Cake\Auth\DefaultPasswordHasher;//
 
 /**
  * Users Controller
@@ -19,7 +20,7 @@ class UsersController extends AppController
 
 	public $paginate = [//ページネーションを定義（indexで使う）
 		'limit' => 20,//データを1ページに20個ずつ表示する
-		'conditions' => ['delete_flag' => '0']//'delete_flag' => '0'を満たすものだけ表示する
+		'conditions' => ['delete_flag' => '1']//'delete_flag' => '1'を満たすものだけ表示する
 	];
 
      public function initialize()
@@ -126,11 +127,11 @@ class UsersController extends AppController
 
 			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 			$data['userdata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
-
+/*
 			echo "<pre>";
 			print_r($data['userdata']);
 			echo "<br>";
-		
+*/
 			$role = $data['userdata']['role_id'];//$dataのrole_idに$roleという名前を付ける
 			$roleData = $this->Roles->find()->where(['id' => $role])->toArray();//'id' => $roleとなるデータをRolesテーブルから配列で取得
 			$Role = $roleData[0]->name;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
@@ -203,9 +204,6 @@ class UsersController extends AppController
 				$arrFp[] = $sample;//配列に追加する
 			}
 			$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
-			echo "<pre>";
-			print_r($arrFp);
-			echo "<br>";
     }
 
      public function docsv()
@@ -238,14 +236,6 @@ class UsersController extends AppController
 				}
     }
 
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id User id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Network\Exception\NotFoundException When record not found.
-     */
     public function edit($id = null)
     {
 			$user = $this->Users->get($id);//選んだidに関するUsersテーブルのデータに$userと名前を付ける
@@ -265,27 +255,118 @@ class UsersController extends AppController
 			}
 			$this->set('arrRole',$arrRole);//4行上$arrRoleをctpで使えるようにセット
 
-			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-			$user['updated_staff'] = $staff_id;//$userのupdated_staffを$staff_idにする
-
 				if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
-					$user = $this->Users->patchEntity($user, $this->request->getData());//125行目でとったもともとの$priceProductデータを$this->request->getData()に更新する
-					$connection = ConnectionManager::get('default');//トランザクション1
-						// トランザクション開始2
-					$connection->begin();//トランザクション3
-					try {//トランザクション4
-						if ($this->Users->save($user)) {
-							$this->Flash->success(__('The user has been updated.'));
-							$connection->commit();// コミット5
-							return $this->redirect(['action' => 'index']);
-						} else {
-							$this->Flash->error(__('The user could not be updated. Please, try again.'));
-							throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-						}
-					} catch (Exception $e) {//トランザクション7
-					//ロールバック8
-						$connection->rollback();//トランザクション9
-					}//トランザクション10
+					$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+					return $this->redirect(['action' => 'editconfirm',
+	        's' => ['id' => $data['id'], 'staff_id' => $data['staff_id'], 'username' => $data['username'], 'created_staff' => $data['created_staff'],
+					 'role_id' => $data['role_id'], 'delete_flag' => $data['delete_flag'], 'password' => $data['password']]]);
 				}
     }
+
+		public function editconfirm()
+	 {
+		 $user = $this->Users->newEntity();//newentityに$userという名前を付ける
+		 $this->set('user',$user);//1行上の$userをctpで使えるようにセット
+
+		 $data = $this->request->query('s');//1度henkou5panaへ行って戻ってきたとき（検索を押したとき）
+/*
+		 echo "<pre>";
+		 print_r($data);
+		 echo "<br>";
+*/
+		 $role = $data['role_id'];//$dataのrole_idに$roleという名前を付ける
+		 $roleData = $this->Roles->find()->where(['id' => $role])->toArray();//'id' => $roleとなるデータをRolesテーブルから配列で取得
+		 $Role = $roleData[0]->name;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+		 $this->set('Role',$Role);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+
+		 $staff = $data['staff_id'];//
+		 $staffData = $this->Staffs->find()->where(['id' => $staff])->toArray();//
+		 $Staff = $staffData[0]->f_name.$staffData[0]->l_name;//
+		 $this->set('Staff',$Staff);//
+	 }
+
+	 public function editpreadd()
+	 {
+		$user = $this->Users->newEntity();//newentityに$userという名前を付ける
+		$this->set('user',$user);//1行上の$userをctpで使えるようにセット
+
+		$session = $this->request->getSession();
+ 	 	$data = $session->read();//postデータ取得し、$dataと名前を付ける
+	 }
+
+	public function editlogin()
+	{
+		if ($this->request->is('post')) {
+			$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+			$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+			$ary = explode(',', $str);//$strを配列に変換
+
+			$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+			//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+			$this->set('username', $username);
+			$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+				if(empty($Userdata)){
+					$delete_flag = "";
+				}else{
+					$delete_flag = $Userdata[0]->delete_flag;
+					$this->set('delete_flag',$delete_flag);
+				}
+					$user = $this->Auth->identify();
+				if ($user) {
+					$this->Auth->setUser($user);
+					return $this->redirect(['action' => 'editdo']);
+				}
+			}
+	}
+
+	public function editdo()
+ {
+
+	 $user = $this->Users->newEntity();//newentityに$userという名前を付ける
+	 $this->set('user',$user);//1行上の$userをctpで使えるようにセット
+
+	 $session = $this->request->getSession();
+	 $data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+	 $makepassword = new DefaultPasswordHasher();
+	 $password = $makepassword->hash($data['userdata']['password']);
+/*
+	 echo "<pre>";
+	 print_r($password);
+	 echo "<br>";
+*/
+	 $role = $data['userdata']['role_id'];//$dataのrole_idに$roleという名前を付ける
+	 $roleData = $this->Roles->find()->where(['id' => $role])->toArray();//'id' => $roleとなるデータをRolesテーブルから配列で取得
+	 $Role = $roleData[0]->name;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+	 $this->set('Role',$Role);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+
+	 $staff = $data['userdata']['staff_id'];//
+	 $staffData = $this->Staffs->find()->where(['id' => $staff])->toArray();//
+	 $Staff = $staffData[0]->f_name.$staffData[0]->l_name;//
+	 $this->set('Staff',$Staff);//
+
+	 $created_staff = $data['userdata']['created_staff'];//$dataのcreated_staffに$created_staffという名前を付ける
+	 $Created = $this->Staffs->find()->where(['id' => $created_staff])->toArray();//'id' => $created_staffとなるデータをStaffsテーブルから配列で取得
+	 $CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+	 $this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+
+	 if ($this->Users->updateAll(['username' => $data['userdata']['username'] ,'password' => $password, 'delete_flag' => $data['userdata']['delete_flag']
+	 ,'role_id' => $data['userdata']['role_id'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $this->Auth->user('staff_id')]
+	 ,['id' => $data['userdata']['id']])) {
+		 if($data['userdata']['delete_flag'] == 0){
+			 $mes = "※削除されました";
+			 $this->set('mes',$mes);
+		 }else{
+			 $mes = "※更新されました";
+			 $this->set('mes',$mes);
+		 }
+	 }else{
+		 $mes = "※更新されませんでした";
+		 $this->set('mes',$mes);
+		 $this->Flash->error(__('The data could not be saved. Please, try again.'));
+		 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+	 }
+ }
+
 }

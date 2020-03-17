@@ -1375,25 +1375,25 @@ class LabelsController extends AppController
             $sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
             $arrFp[] = $sample;//配列に追加する
             if(isset($arrFp[$k-1][10]) && ($arrFp[$k-1][10] != "")){//product_codeが２つある時
-            $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
-            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
-              $renban = $arrFp[$k-1][5] + $m;
-              $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-              $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
+              $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+              for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+                $renban = $arrFp[$k-1][5] + $m;
+                $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
+                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
+              }
+              for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+                $renban = $arrFp[$k-1][5] + $m;
+                $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
+                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
+              }
+            }else{//product_codeが１つの時
+              $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+              for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+                $renban = $arrFp[$k-1][5] + $m;
+                $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
+                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
+              }
             }
-            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
-              $renban = $arrFp[$k-1][5] + $m;
-              $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-              $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
-            }
-          }else{//product_codeが１つの時
-            $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
-            for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
-              $renban = $arrFp[$k-1][5] + $m;
-              $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-              $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
-            }
-          }
         }
 /*
         echo "<pre>";

@@ -293,7 +293,8 @@ class OrderEdisController extends AppController
       // トランザクション開始2
       $connection->begin();//トランザクション3
       try {//トランザクション4
-          if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録//ここからDenpyouDnpMinoukannousへ登録用
+          if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
+            //ここからDenpyouDnpMinoukannousへ登録用
 
             for ($k=1; $k<=$count-1; $k++) {//最後の行まで
               $line = fgets($fp2);//ファイル$fpの上の１行を取る（２行目から）
@@ -394,6 +395,7 @@ class OrderEdisController extends AppController
                       array_multisort( array_map( "strtotime", array_column( ${"arrDnpdouitutyuumon".($k-2)}, "date_deliver" ) ), SORT_ASC, ${"arrDnpdouitutyuumon".($k-2)} ) ;//並び替え
 
                      $arrDnpdouitutyuumon[] = ${"arrDnpdouitutyuumon".($k-2)};
+                     //以下、DnpTotalAmounts登録用
 
                      $arrDnpTotalAmounts[$k-2]['num_order'] = $sample['num_order'];//配列に追加する
                      $arrDnpTotalAmounts[$k-2]['name_order'] = $sample['name_order'];
@@ -884,7 +886,7 @@ class OrderEdisController extends AppController
       session_start();
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-      $data = $this->request->getData();
+//      $data = $this->request->getData();
     }
 
     public function henkoupanapreadd()
@@ -918,7 +920,7 @@ class OrderEdisController extends AppController
         }
     }
 
-    public function henkoupanado()
+    public function henkoupanado()//日付更新
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
@@ -987,7 +989,7 @@ class OrderEdisController extends AppController
         }
     }
 
-    public function henkoupanabunnnoudo()
+    public function henkoupanabunnnoudo()//分納
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
@@ -1007,8 +1009,8 @@ class OrderEdisController extends AppController
         }
       }
 
-//orderEdisを分納するときidがすでにあれば更新、なければ新規登録ok
-//amount=0 or 1 で場合分け（amount=0ならdelete_flag=1にする）ok
+//orderEdisを分納するときidがすでにあれば更新、なければ新規登録
+//amount=0 or 1 で場合分け（amount=0ならdelete_flag=1にする）
 
       $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2
@@ -1045,7 +1047,7 @@ class OrderEdisController extends AppController
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
           }elseif(isset($_SESSION['orderEdis'][$n])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
-            $bunnnou = $bunnnou +1;
+            $bunnnou = $bunnnou +1;//$bunnnouを振り直す
             $bunnou = array('bunnou'=>$bunnnou);
             $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
             $arrOrderEdisnew[] = $_SESSION['orderEdis'][$n];
@@ -1149,7 +1151,7 @@ class OrderEdisController extends AppController
       $data = $this->request->getData();
 
       if(isset($data['kensaku'])){
-        return $this->redirect(['action' => 'henkou4dnp',
+        return $this->redirect(['action' => 'henkou4dnp',//以下のデータを持ってhenkou4dnpに移動
         's' => ['product_code' => $data['product_code'],'Pro' => $data['Pro'],'date_sta' => $data['date_sta'],'date_fin' => $data['date_fin']]]);
       }
 
@@ -1260,7 +1262,6 @@ class OrderEdisController extends AppController
           $this->set('tsuikanum',$tsuikanum);
         }
 
-
     }
 
     public function henkou6dnp()
@@ -1268,7 +1269,7 @@ class OrderEdisController extends AppController
       session_start();
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-      $data = $this->request->getData();
+//      $data = $this->request->getData();
     }
 
     public function henkoudnppreadd()
@@ -1342,8 +1343,8 @@ class OrderEdisController extends AppController
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
 
-      $session = $this->request->getSession();
-      $data = $session->read();
+//      $session = $this->request->getSession();
+//      $data = $session->read();
     }
 
     public function henkoudnpbunnnoulogin()
@@ -1371,7 +1372,7 @@ class OrderEdisController extends AppController
         }
     }
 
-    public function henkoudnpbunnnoudo()
+    public function henkoudnpbunnnoudo()//DNP分納
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
@@ -1381,11 +1382,11 @@ class OrderEdisController extends AppController
       $p = 0;
 
       for($n=0; $n<=count($_SESSION['orderEdis'])+1; $n++){
-        if(isset($_SESSION['orderEdis'][$n])){
+        if(isset($_SESSION['orderEdis'][$n])){//$_SESSION['orderEdis'][$n]に$created_staffを追加
           $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
           $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$created_staff);
           $arrOrderEdis[] = $_SESSION['orderEdis'][$n];
-        }else{
+        }else{//$_SESSION['minoukannou']に$created_staffを追加
           $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
           $_SESSION['minoukannou'] = array_merge($_SESSION['minoukannou'],$created_staff);
           break;
@@ -1402,7 +1403,7 @@ class OrderEdisController extends AppController
         $bunnnou = 0;
         for($n=0; $n<=count($_SESSION['orderEdis'])+100; $n++){
           if(isset($_SESSION['orderEdis'][$n]['id']) && ($_SESSION['orderEdis'][$n]['amount'] > 0)){//amount>0の時
-            $bunnnou = $bunnnou +1;
+            $bunnnou = $bunnnou +1;//登録するものの$bunnnouを振り直し
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
             ,'bunnou' => $bunnnou ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
@@ -1414,7 +1415,7 @@ class OrderEdisController extends AppController
               $this->Flash->error(__('The data could not be saved. Please, try again.'));
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
-          }elseif(isset($_SESSION['orderEdis'][$n]['id'])){//amount=0 or nullの時//minoukannouテーブルも更新
+          }elseif(isset($_SESSION['orderEdis'][$n]['id'])){//amount=0 or nullの時//minoukannouテーブルも更新（'delete_flag' => 1 にする）
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => 0
             ,'bunnou' => 0 ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
@@ -1433,20 +1434,20 @@ class OrderEdisController extends AppController
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
           }elseif(isset($_SESSION['orderEdis'][$n])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
-            $bunnnou = $bunnnou +1;
+            $bunnnou = $bunnnou +1;//$bunnnouを振り直し
             $bunnou = array('bunnou'=>$bunnnou);
             $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
-            $arrOrderEdisnew[] = $_SESSION['orderEdis'][$n];
-            $arrDenpyouDnpMinoukannousnew[] = $_SESSION['minoukannou'];
-            $arrBunnnou[] = $bunnnou;
+            $arrOrderEdisnew[] = $_SESSION['orderEdis'][$n];//新しいOrderEdiデータを$arrOrderEdisnewという配列に追加
+            $arrDenpyouDnpMinoukannousnew[] = $_SESSION['minoukannou'];//新しいDenpyouDnpMinoukannousデータを$arrDenpyouDnpMinoukannousnewという配列に追加
+            $arrBunnnou[] = $bunnnou;//新しいOrderEdiデータのためのbunnouを$arrBunnnouという配列に追加
             $num_order = $_SESSION['orderEdis'][$n]['num_order'];
             $product_code = $_SESSION['orderEdis'][$n]['product_code'];
             $line_code = $_SESSION['orderEdis'][$n]['line_code'];
           }elseif(isset($arrOrderEdisnew[0])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
-            $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);
+            $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);//$arrOrderEdisnewを登録
             if ($this->OrderEdis->saveMany($OrderEdis)) {//minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
               for($m=0; $m<=100; $m++){
-                if(isset($arrBunnnou[$m])){
+                if(isset($arrBunnnou[$m])){//登録するOrderEdiデータ（amount>0）が存在する場合
                   $orderEdi = $this->OrderEdis->find()->where(['delete_flag' => '0', 'num_order' => $num_order, 'product_code' => $product_code, 'bunnou' => $arrBunnnou[$m]])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
                   $orderEdiId = $orderEdi[0]->id;
                   $arrorderEdiId = array('order_edi_id'=>$orderEdiId);
@@ -1625,7 +1626,7 @@ class OrderEdisController extends AppController
       $data = $this->request->getData();
 
       if(isset($data['kensaku'])){
-        return $this->redirect(['action' => 'henkou4other',
+        return $this->redirect(['action' => 'henkou4other',//以下のデータを持ってhenkou4otherに移動
         's' => ['product_code' => $data['product_code'],'date_sta' => $data['date_sta'],'date_fin' => $data['date_fin']]]);
       }
 

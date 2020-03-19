@@ -48,7 +48,7 @@ class htmlzensumenu extends AppController
                 "<td style='padding: 0.1rem 0.1rem;'>\n".
                 "<img src='/img/Labelimg/sub_kensa_start.gif' width=85 height=36>\n".
                 "</a></td>\n".
-                "<td style='padding: 0.1rem 0.1rem;'><a href='/Zensukensas/zensustafftouroku'>\n".
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Zensukensas/zensuendstaff'>\n".
                 "<img src='/img/Labelimg/sub_kensa_finish.gif' width=85 height=36>\n".
                 "</a>\n";
 

@@ -18,9 +18,9 @@
  ?>
  </table>
     <?= $this->Flash->render() ?>
-    <?= $this->Form->create($ResultZensuHeads, ['url' => ['action' => 'zensustafflogin']]) ?>
+    <?= $this->Form->create($ResultZensuHeads, ['url' => ['action' => 'zensuendstafflogin']]) ?>
     <br><br>
-    <legend align="center"><strong style="font-size: 11pt; color:blue"><?= __("開始　社員ID登録") ?></strong></legend>
+    <legend align="center"><strong style="font-size: 11pt; color:blue"><?= __("終了　社員ID登録") ?></strong></legend>
     <fieldset>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
@@ -32,12 +32,8 @@
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
-    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('開始', array('name' => 'login')); ?></div></td>
+    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('終了', array('name' => 'login')); ?></div></td>
   </tr>
   </table>
-<br><br>
-<?php for ($i=0;$i<$cnt;$i++): ?>
-<legend align="left"><strong style="font-size: 12pt; color:blue"><?= __(${"mess".$i}) ?></strong></legend>
-<?php endfor;?>
-
+<br>
     <?= $this->Form->end() ?>

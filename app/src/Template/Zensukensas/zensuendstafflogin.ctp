@@ -14,7 +14,7 @@ error_reporting(0);
   <?= $this->Form->control('username', array('type'=>'hidden', 'value'=>$username, 'label'=>false)) ?>
 	<?= $this->Form->control('delete_flag', array('type'=>'hidden', 'value'=>$delete_flag, 'label'=>false)) ?>
     </fieldset>
-    <center><input type="submit" value="社員IDを登録しています…" name="OK" style="background-color:#E6FFFF; border-width: 0px"></center>
+    <center><input type="submit" value="ページを移動しています…" name="OK" style="background-color:#E6FFFF; border-width: 0px"></center>
     <br><br><br>
 </body>
     <?= $this->Form->end() ?>

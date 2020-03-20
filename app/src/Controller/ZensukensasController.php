@@ -21,6 +21,7 @@ class ZensukensasController extends AppController
        $this->ResultZensuFooders = TableRegistry::get('resultZensuFooders');
        $this->ResultZensuHeads = TableRegistry::get('resultZensuHeads');
        $this->ZensuProducts = TableRegistry::get('zensuProducts');
+       $this->CheckLots = TableRegistry::get('checkLots');
      }
 
      public function indexmenu()
@@ -373,6 +374,8 @@ class ZensukensasController extends AppController
           "updated_staff" => $staff_id
         );
         $_SESSION['result_zensu_head_id'] = array(
+          'product_code' => $product_code,
+          'lot_num' => $lot_num,
           'result_zensu_head_id' => $result_zensu_head_id
         );
         /*
@@ -386,14 +389,17 @@ class ZensukensasController extends AppController
      {
        $session = $this->request->getSession();
        $data = $session->read();
+/*
        echo "<pre>";
        print_r($_SESSION);
        echo "</pre>";
-
+*/
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
        $ResultZensuFooders = $this->ResultZensuFooders->newEntity();
        $this->set('ResultZensuFooders',$ResultZensuFooders);
+       $CheckLots = $this->CheckLots->newEntity();
+       $this->set('CheckLots',$CheckLots);
 
        $ResultZensuFooders = $this->ResultZensuFooders->patchEntities($ResultZensuFooders, $_SESSION['zensufooder']);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
        $connection = ConnectionManager::get('default');//トランザクション1
@@ -407,20 +413,36 @@ class ZensukensasController extends AppController
                ['id'  => $_SESSION['result_zensu_head_id']['result_zensu_head_id']]
              )){
 
-               $mes = "登録されました。";
-               $this->set('mes',$mes);
-               $connection->commit();// コミット5
+               $CheckLot = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num' => $_SESSION['result_zensu_head_id']['lot_num']])->toArray();
+               $CheckLotId = $CheckLot[0]->id;
+               $CheckLotcreated_at = $CheckLot[0]->created_at;
+
+               if ($this->CheckLots->updateAll(
+                 ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff']],
+                 ['id'  => $CheckLotId]
+               )){
+
+                 $mes = "登録されました。";
+                 $this->set('mes',$mes);
+                 $connection->commit();// コミット5
+               }else{
+                 $mes = "登録されませんでした。";
+                 $this->set('mes',$mes);
+                 $this->Flash->error(__('The CheckLots could not be saved. Please, try again.'));
+                 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+               }
+
              }else{
                $mes = "登録されませんでした。";
                $this->set('mes',$mes);
-               $this->Flash->error(__('The data could not be saved. Please, try again.'));
+               $this->Flash->error(__('The ResultZensuHeads could not be saved. Please, try again.'));
                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
              }
 
            } else {
              $mes = "登録されませんでした。";
              $this->set('mes',$mes);
-             $this->Flash->error(__('The data could not be saved. Please, try again.'));
+             $this->Flash->error(__('The ResultZensuFooders could not be saved. Please, try again.'));
              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
            }
        } catch (Exception $e) {//トランザクション7

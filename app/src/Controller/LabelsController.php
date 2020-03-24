@@ -1652,6 +1652,9 @@ class LabelsController extends AppController
        $lot_num = $data['lot_num'];
        $date_sta = $data['date_sta'];
        $date_fin = $data['date_fin'];
+       $date_fin = strtotime($date_fin);
+       $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
+
        if(empty($data['product_code'])){//product_codeの入力がないとき
          $product_code = "no";
          if(empty($data['lot_num'])){//lot_numの入力がないとき　product_code×　lot_num×　date〇

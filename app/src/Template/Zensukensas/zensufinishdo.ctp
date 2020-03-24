@@ -26,4 +26,6 @@
     echo $htmlzensustartends;
  ?>
  </table>
+ <br>
+ <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
  <br><br>

@@ -76,8 +76,8 @@ class ResultZensuFoodersTable extends Table
         $validator
             ->scalar('bik')
             ->maxLength('bik', 256)
-            ->requirePresence('bik', 'create')
-            ->notEmpty('bik');
+    //        ->requirePresence('bik', 'create')
+            ->allowEmpty('bik');
 
         $validator
             ->integer('delete_flag')

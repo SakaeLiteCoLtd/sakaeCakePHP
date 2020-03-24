@@ -366,12 +366,13 @@ class ZensukensasController extends AppController
            'amount' => $data["amount{$n}"],
            'bik' => $data["bik{$n}"],
            "delete_flag" => 0,
+  //         "created_at" => date('Y-m-d h:m:s'),
            "created_staff" => $staff_id
          );
         }
         $_SESSION['zensuhead'] = array(
           'datetime_finish' => date('Y-m-d h:m:s'),
-          "updated_staff" => $staff_id
+          'updated_staff' => $staff_id
         );
         $_SESSION['result_zensu_head_id'] = array(
           'product_code' => $product_code,

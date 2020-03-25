@@ -5,6 +5,7 @@
  */
  use Cake\ORM\TableRegistry;//独立したテーブルを扱う
  $this->Products = TableRegistry::get('products');//productsテーブルを使う
+ $this->NameLotFlagUseds = TableRegistry::get('nameLotFlagUseds');
 ?>
         <?php
           $username = $this->request->Session()->read('Auth.User.username');
@@ -41,13 +42,10 @@
                 <td width="150" colspan="20" nowrap="nowrap"><?= h($checkLot->lot_num) ?></td>
                 <td width="150" colspan="20" nowrap="nowrap"><?= h($checkLot->amount) ?></td>
             <?php
-            	if($checkLot->flag_used == 0){
-            	$flag_used = '出荷待ち';
-            	} elseif($checkLot->flag_used == 1) {
-            	$flag_used = '出荷済み';
-            	} else {
-            	$flag_used = '不明';
-            	}
+            //flag_usedの数=name_lot_flag_usedsのidとなるname_lot_flag_usedsのnameを表示する
+              $f_used = $checkLot->flag_used;
+              $NameLotFlagUsed = $this->NameLotFlagUseds->find()->where(['id' => $f_used])->toArray();
+              $flag_used = $NameLotFlagUsed[0]->name;
             ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($flag_used) ?></td>
             </tr>

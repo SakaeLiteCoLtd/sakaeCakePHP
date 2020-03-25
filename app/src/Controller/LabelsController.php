@@ -35,6 +35,8 @@ class LabelsController extends AppController
        $this->Products = TableRegistry::get('products');//productsテーブルを使う
        $this->CheckLots = TableRegistry::get('checkLots');
        $this->LabelCsvs = TableRegistry::get('labelCsvs');
+       $this->NameLotFlagUseds = TableRegistry::get('nameLotFlagUseds');
+       $this->ZensuProducts = TableRegistry::get('zensuProducts');
      }
      public function indexmenu()
      {
@@ -1379,19 +1381,39 @@ class LabelsController extends AppController
               for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
                 $renban = $arrFp[$k-1][5] + $m;
                 $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                //product_code=$arrFp[$k-1][6],status=0がzensu_productsに存在するときflag_used=9
+                //else...flag_used=0
+                $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][6], 'status' => 0])->toArray();
+                if(isset($ZensuProduct[0])){
+                  $flag_used = 9;
+                }else{
+                  $flag_used = 0;
+                }
+                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
               }
               for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
                 $renban = $arrFp[$k-1][5] + $m;
                 $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][7], 'status' => 0])->toArray();
+                if(isset($ZensuProduct[0])){
+                  $flag_used = 9;
+                }else{
+                  $flag_used = 0;
+                }
+                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
               }
             }else{//product_codeが１つの時
               $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
               for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
                 $renban = $arrFp[$k-1][5] + $m;
                 $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => 0, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][6], 'status' => 0])->toArray();
+                if(isset($ZensuProduct[0])){
+                  $flag_used = 9;
+                }else{
+                  $flag_used = 0;
+                }
+                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
               }
             }
         }
@@ -1443,6 +1465,8 @@ class LabelsController extends AppController
       }
 */
       $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[0]["datetime_hakkou"], 'product_code' => $arrLot[0]["product_code"], 'lot_num' => $arrLot[0]["lot_num"], 'amount' => $arrLot[0]["amount"]])->toArray();
+      $mes = "登録されました。";
+      $this->set('mes',$mes);
       if(isset($CheckLottourokuzumi[0])){
         $mes = "※以下のロットは既に登録されています。";
         $this->set('mes',$mes);
@@ -1466,7 +1490,6 @@ class LabelsController extends AppController
           $arrLot = $arrLotmitouroku;
         }
       }
-
            $checkLots = $this->CheckLots->newEntity();
            $this->set('checkLots',$checkLots);
            $checkLots = $this->CheckLots->patchEntities($checkLots, $arrLot);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a

@@ -7,6 +7,7 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
+use App\myClass\Productcheck\htmlProductcheck;
 
 class ZensukensasController extends AppController
 {
@@ -100,6 +101,31 @@ class ZensukensasController extends AppController
        $staff_id = $ary[7];
        $created_staff = $ary[8];
        $datetime_start = $ary[9];
+
+       if($product_code1 != null){
+         $product_code = $product_code1;
+         $htmlProductcheck = new htmlProductcheck();//クラスを使用
+         $product_code_check = $htmlProductcheck->Productcheck($product_code);
+         if($product_code_check == 1){
+           return $this->redirect(
+            ['controller' => 'Products', 'action' => 'index']
+           );
+         }else{
+           $product_code_check = $product_code_check;
+         }
+       }
+       if($product_code2 != null){
+         $product_code = $product_code2;
+         $htmlProductcheck = new htmlProductcheck();//クラスを使用
+         $product_code_check = $htmlProductcheck->Productcheck($product_code);
+         if($product_code_check == 1){
+           return $this->redirect(
+             ['controller' => 'Products', 'action' => 'index']
+           );
+         }else{
+           $product_code_check = $product_code_check;
+         }
+       }
 
        $arr1 = array();//$product_code1用の配列
        $arr1 = array_merge($arr1,array('product_code'=>$product_code1));

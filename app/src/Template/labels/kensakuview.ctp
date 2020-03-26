@@ -43,9 +43,17 @@
                 <td width="150" colspan="20" nowrap="nowrap"><?= h($checkLot->amount) ?></td>
             <?php
             //flag_usedの数=name_lot_flag_usedsのidとなるname_lot_flag_usedsのnameを表示する
+            //$checkLot->flag_deliverがnullでないとき、「flag_deliver（の日付）納品済み」とする
               $f_used = $checkLot->flag_used;
-              $NameLotFlagUsed = $this->NameLotFlagUseds->find()->where(['id' => $f_used])->toArray();
-              $flag_used = $NameLotFlagUsed[0]->name;
+              $flag_deliver = $checkLot->flag_deliver;
+              if($flag_deliver != null){
+                $flag_used = $flag_deliver->format('Y-m-d')." 納品済み";
+              }elseif($f_used == 0){
+                $flag_used = "出荷待ち";
+              }else{
+                $NameLotFlagUsed = $this->NameLotFlagUseds->find()->where(['id' => $f_used])->toArray();
+                $flag_used = $NameLotFlagUsed[0]->name;
+              }
             ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($flag_used) ?></td>
             </tr>

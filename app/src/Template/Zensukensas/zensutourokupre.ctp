@@ -41,7 +41,7 @@
   <?php for ($i=0;$i<$cnt;$i++): ?>
     <tr style="border-bottom: solid;border-width: 1px">
       <td width="220"  bgcolor="#FFFFCC" style="font-size: 12pt;"><?= h(${"product_code".$i}) ?></td>
-      <td width="220"  bgcolor="#FFFFCC" style="font-size: 12pt;"><?= h(${"product_name".$i}) ?></td>
+      <td width="250"  bgcolor="#FFFFCC" style="font-size: 12pt;"><?= h(${"product_name".$i}) ?></td>
       <td width="220"  bgcolor="#FFFFCC" style="font-size: 12pt;"><?= h(${"lot_num".$i}) ?></td>
       <td width="100"  bgcolor="#FFFFCC" style="font-size: 10pt;"><?= $this->Form->submit('登録', array('name' => $i)); ?></td>
     </tr>

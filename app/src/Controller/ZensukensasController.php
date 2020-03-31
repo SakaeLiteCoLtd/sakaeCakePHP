@@ -442,22 +442,42 @@ class ZensukensasController extends AppController
 
                $CheckLot = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num' => $_SESSION['result_zensu_head_id']['lot_num']])->toArray();
                $CheckLotId = $CheckLot[0]->id;
+               $CheckLotflag_used = $CheckLot[0]->flag_used;
                $CheckLotcreated_at = $CheckLot[0]->created_at;
 
-               if ($this->CheckLots->updateAll(
-                 ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff']],
-                 ['id'  => $CheckLotId]
-               )){
-
+               if($CheckLotflag_used == 0){//更新する必要がないとき
                  $mes = "登録されました。";
                  $this->set('mes',$mes);
                  $connection->commit();// コミット5
                }else{
-                 $mes = "登録されませんでした。";
-                 $this->set('mes',$mes);
-                 $this->Flash->error(__('The CheckLots could not be saved. Please, try again.'));
-                 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-               }
+                 if ($this->CheckLots->updateAll(
+                   ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff']],
+                   ['id'  => $CheckLotId]
+                 )){
+
+                   //INだった場合親ロットの'flag_used' => 0にするかどうかをチェックする。
+                   $lot_oomoto = substr($_SESSION['result_zensu_head_id']['lot_num'], 4, 6);
+                   $lot_kodomo = substr($_SESSION['result_zensu_head_id']['lot_num'], 0, 6);
+                   $CheckLotkodomo = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num like' => '%'.$lot_kodomo.'%'])->toArray();//子ロットの仲間全部
+                   $CheckLotoya = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num like' => '%'.$lot_oomoto.'%',//親ロットの仲間全部
+                   'NOT' => [['lot_num like' => '%'."IN.".'%']]])->toArray();
+                   $cntkodomo = count($CheckLotkodomo);//子ロットの仲間の個数
+                   $cntoya = count($CheckLotoya);//親ロットの仲間の個数
+
+                   echo "<pre>";
+                   print_r($cntkodomo."---".$cntoya);
+                   echo "</pre>";
+
+                   $mes = "登録されました。";
+                   $this->set('mes',$mes);
+                   $connection->commit();// コミット5
+                 }else{
+                   $mes = "登録されませんでした。";
+                   $this->set('mes',$mes);
+                   $this->Flash->error(__('The CheckLots could not be saved. Please, try again.'));
+                   throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                 }
+             }
 
              }else{
                $mes = "登録されませんでした。";

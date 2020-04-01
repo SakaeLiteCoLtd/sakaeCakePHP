@@ -146,7 +146,7 @@ class CheckLotsTable extends Table
     public function buildRules(RulesChecker $rules)
     {
 //        $rules->add($rules->existsIn(['place_deliver_id'], 'PlaceDelivers'));
-        $rules->add($rules->isUnique(['product_code','lot_num'], 'バリデーションエラー'));
+        $rules->add($rules->isUnique(['product_code','lot_num'], 'バリデーションエラー'));//product_codeとlot_numでバリデーションエラー確認済みOK
 
         return $rules;
     }

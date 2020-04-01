@@ -464,8 +464,20 @@ class ZensukensasController extends AppController
                    $cntkodomo = count($CheckLotkodomo);//子ロットの仲間の個数
                    $cntoya = count($CheckLotoya);//親ロットの仲間の個数
 
+/*
+                   $arrCheckLotkodomo = array();//空の配列を作る
+                   foreach ((array)$CheckLotkodomo as $key => $value) {//datetimeで並び替え
+                        $sort[$key] = $value['datetime'];
+                         array_push(${"ScheduleKouteisarry".$j}, ['id' => $value['id'], 'starting_tm' => $value['datetime'],
+                          'seikeiki' => $value['seikeiki'], 'product_code' => $value['product_code'],
+                           'present_kensahyou' => $value['present_kensahyou'], 'product_name' => $value['product_name'],
+                         'finishing_tm' => $value['finishing_tm']]);
+                   }
+                   array_multisort(array_map("strtotime", array_column( ${"ScheduleKouteisarry".$j}, "starting_tm" ) ), SORT_ASC, ${"ScheduleKouteisarry".$j});
+*/
+
                    echo "<pre>";
-                   print_r($cntkodomo."---".$cntoya);
+                   print_r((array)$CheckLotkodomo);
                    echo "</pre>";
 
                    $mes = "登録されました。";

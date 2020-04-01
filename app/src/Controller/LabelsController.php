@@ -1421,6 +1421,7 @@ class LabelsController extends AppController
         echo "<pre>";
         print_r($arrLot);
         echo "</pre>";
+
         echo "<pre>";
         print_r(count($arrLot));
         echo "</pre>";
@@ -1464,10 +1465,20 @@ class LabelsController extends AppController
         echo '移動できない！';
       }
 */
-      $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[0]["datetime_hakkou"], 'product_code' => $arrLot[0]["product_code"], 'lot_num' => $arrLot[0]["lot_num"], 'amount' => $arrLot[0]["amount"]])->toArray();
+      $count = 0;
+      for($k=0; $k<count($arrLot); $k++){
+        $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[$k]["datetime_hakkou"], 'product_code' => $arrLot[$k]["product_code"], 'lot_num' => $arrLot[$k]["lot_num"], 'amount' => $arrLot[$k]["amount"]])->toArray();
+        $count = $count + count($CheckLottourokuzumi);
+      }
+      /*
+      echo "<pre>";
+      print_r($count);
+      echo "</pre>";
+*/
       $mes = "登録されました。";
       $this->set('mes',$mes);
-      if(isset($CheckLottourokuzumi[0])){
+      //if(isset($CheckLottourokuzumi[0])){
+      if($count != 0){
         $mes = "※以下のロットは既に登録されています。";
         $this->set('mes',$mes);
         $counttourokuzumi = 0;
@@ -1481,6 +1492,12 @@ class LabelsController extends AppController
             $counttourokuzumi = $counttourokuzumi + 1;
             $this->set('counttourokuzumi',$counttourokuzumi);
           }else{
+            ${"CheckLottourokuzumiproduct_code".$k} = "";
+            $this->set('CheckLottourokuzumiproduct_code'.$k,${"CheckLottourokuzumiproduct_code".$k});
+            ${"CheckLottourokuzumilot_num".$k} = "";
+            $this->set('CheckLottourokuzumilot_num'.$k,${"CheckLottourokuzumilot_num".$k});
+            $counttourokuzumi = $counttourokuzumi + 1;
+            $this->set('counttourokuzumi',$counttourokuzumi);
             $arrLotmitouroku[] = $arrLot[$k];
             $mes = "※以下のロットは既に登録されています。他のロットは登録されました。";
             $this->set('mes',$mes);
@@ -1490,6 +1507,7 @@ class LabelsController extends AppController
           $arrLot = $arrLotmitouroku;
         }
       }
+
            $checkLots = $this->CheckLots->newEntity();
            $this->set('checkLots',$checkLots);
            $checkLots = $this->CheckLots->patchEntities($checkLots, $arrLot);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a

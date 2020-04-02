@@ -510,8 +510,8 @@ class ZensukensasController extends AppController
                       $sort[$key] = $value['lot_num'];
                       array_push($arrCheckLotoya, ['id' => $value['id'], 'product_code' => $value['product_code'], 'lot_num' => $value['lot_num'], 'flag_used' => $value['flag_used']]);
                     }
-              //      array_multisort(array_map("strtotime", array_column($arrCheckLotoya, "lot_num" ) ), SORT_ASC, $arrCheckLotoya);
-                    array_multisort($sort , SORT_ASC, $arrCheckLotoya);
+                    array_multisort(array_map("strtotime", array_column($arrCheckLotoya, "lot_num" ) ), SORT_ASC, $arrCheckLotoya);
+              //      array_multisort($sort , SORT_ASC, $CheckLotoya);
 /*
                     echo "<pre>";
                     print_r($arrCheckLotoya);

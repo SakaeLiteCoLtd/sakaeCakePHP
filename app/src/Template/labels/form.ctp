@@ -2018,6 +2018,7 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
   <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr bgcolor="#E6FFFF" >
     <td align="right" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('csv登録'), array('name' => 'touroku', 'value'=>"1")); ?></div></td>
+    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
   </tr>
   </table>
   <fieldset>
@@ -2026,7 +2027,6 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
     <?= $this->Form->control('dateYMDs', array('type'=>'hidden', 'value'=>$dateYMDs, 'label'=>false)) ?>
     <?= $this->Form->control('dateYMDf', array('type'=>'hidden', 'value'=>$dateYMDf, 'label'=>false)) ?>
   </fieldset>
-  <p align="right"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
 
 
 <?php else: //csv押したとき ?>

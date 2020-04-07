@@ -57,7 +57,7 @@ header('Pragma:');
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr>
 <br>
-<td style="border-style: none;"><div align="center"><?= $this->Form->submit('一括変更', array('name' => 'ikkatsu')); ?></div></td>
+<td style="border-style: none;"><div align="center"><?= $this->Form->submit('一括変更２', array('name' => 'ikkatsu')); ?></div></td>
 </tr>
 </table>
 <br><br><br>
@@ -281,7 +281,7 @@ header('Pragma:');
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr>
   <br>
-  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('一括変更', array('name' => 'ikkatsu')); ?></div></td>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('一括変更１', array('name' => 'ikkatsu')); ?></div></td>
   </tr>
   </table>
   <br><br><br><br>

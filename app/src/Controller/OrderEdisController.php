@@ -785,7 +785,7 @@ class OrderEdisController extends AppController
             ${"bunnou".$i} = ${"orderEdis".$i}[0]->bunnou;
             $this->set('bunnou'.$i,${"bunnou".$i});
 
-            $i_num = $i;//既に分納されている場合、いくつに分納されているかを$i_numとしてキープ
+            $i_num = $i;//選択した個数をキープ
             $this->set('i_num',$i_num);
           }else{
             break;

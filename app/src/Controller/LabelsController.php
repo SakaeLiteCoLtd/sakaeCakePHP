@@ -1803,18 +1803,9 @@ class LabelsController extends AppController
      {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-      $mes = "test";
-      $this->set('mes',$mes);
       $session = $this->request->getSession();
       $data = $session->read();
-/*
-      echo "<pre>";
-      print_r($data['labelhasu']);
-      echo "<br>";
-      echo "<pre>";
-      print_r(count($data['labelhasu']));
-      echo "<br>";
-*/
+
       //csv発行と、データベース登録
       $arrCsv = array();
       for($i=0; $i<count($data['labelhasu']); $i++){
@@ -1822,7 +1813,7 @@ class LabelsController extends AppController
         $datetimeymd = substr($date,0,10);
         $datetimehm = substr($date,11,5);
         $lotnum = substr($date,2,2).substr($date,5,2).substr($date,8,2);
-        $lotnumHS = "HS.".$lotnum;
+        $lotnumHS = "HS.".$lotnum;//端数用のロットナンバー
         $date = substr($date,0,4)."-".substr($date,5,2)."-".substr($date,8,2);
         $Product = $this->Products->find()->where(['product_code' => $data['labelhasu'][$i]['product_code']])->toArray();
         if(isset($Product[0])){
@@ -1834,12 +1825,12 @@ class LabelsController extends AppController
         }
         $Konpou = $this->Konpous->find()->where(['product_code' => $data['labelhasu'][$i]['product_code']])->toArray();
         if(isset($Konpou[0])){
-          $irisu = $Konpou[0]->irisu;
+          $irisu = $data['labelhasu'][$i]['hasu'];
         }else{
           $irisu = "";
           $meserror = "登録されていない製品です：".$data['labelhasu'][$i]['product_code'];
         }
-        $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
+        $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();
         if(isset($Customer[0])){
           $costomerName = $Customer[0]->name;
         }else{
@@ -1868,100 +1859,55 @@ class LabelsController extends AppController
           $place2 = "";
         }
 
-        $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $data['labelhasu'][$i]['product_code']])->toArray();
-        $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $data['labelhasu'][$i]['product_code']])->toArray();
-        if(isset($LabelSetikkatsu1[0])){
-          $product_code2 = $LabelSetikkatsu1[0]->product_id2;
-          $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
-          $product_name2 = $Product2[0]->product_name;
-          $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
-            if(isset($Konpou[0])){
-              $irisu2 = $Konpou[0]->irisu;
-            }else{
-              $irisu2 = "";
-            }
-          $unit = "set";
-        }elseif(isset($LabelSetikkatsu2[0])){
-          $product_code2 = $LabelSetikkatsu2[0]->product_id1;
-          $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
-          $product_name2 = $Product2[0]->product_name;
-          $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
-            if(isset($Konpou[0])){
-              $irisu2 = $Konpou[0]->irisu;
-  //            $amount = $data['labelhasu'][$i]['amount'];
-  //            $irisu2 = $amount % $irisu2;
-            }else{
-              $irisu2 = "";
-            }
-          $unit = "set";
-        }else{
-          $product_code2 = "";
-          $product_name2 = "";
-          $irisu2 = "";
-          $unit = "";
-        }
-
         $arrCsv[] = ['maisu' => 1, 'layout' => $Layout, 'lotnum' => $lotnumHS,
          'renban' => 1, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-         'product_code' => $data['labelhasu'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
-         'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => "", 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+         'product_code' => $data['labelhasu'][$i]['product_code'], 'product_code2' => "", 'product_name' => trim($product_name),
+         'product_name2' => "", 'irisu' => trim($irisu), 'irisu2' => "", 'unit' => "", 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
          //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
          $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-          'product1' => $data['labelhasu'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
-          'name_pro2' => trim($product_name2), 'irisu1' => $data['labelhasu'][$i]['hasu'], 'irisu2' => "", 'unit1' => trim($unit), 'unit2' => "",
+          'product1' => $data['labelhasu'][$i]['product_code'], 'product2' => "", 'name_pro1' => trim($product_name),
+          'name_pro2' => "", 'irisu1' => $data['labelhasu'][$i]['hasu'], 'irisu2' => "", 'unit1' => "", 'unit2' => "",
           'line_code' => "", 'date' => $date, 'start_lot' => 1, 'delete_flag' => 0];//unit2,line_code1...不要
       }
-
+/*
       echo "<pre>";
       print_r($arrCsv);
       echo "<br>";
+*/
+      $fp = fopen('labels/label_hasu_200408.csv', 'w');
+//      $fp = fopen('/home/centosuser/label_csv/label_ikkatu_test.csv', 'w');
+      foreach ($arrCsv as $line) {
+        fputcsv($fp, $line);
+      }
+        fclose($fp);
 
-            $fp = fopen('labels/label_hasu_200407.csv', 'w');
-      //      $fp = fopen('/home/centosuser/label_csv/label_ikkatu_test.csv', 'w');
-            foreach ($arrCsv as $line) {
-            	fputcsv($fp, $line);
-            }
-              fclose($fp);
-
-              $labelCsvs = $this->LabelCsvs->newEntity();
-              $this->set('labelCsvs',$labelCsvs);
-               if ($this->request->is('post')) {
-                 $labelCsvs = $this->LabelCsvs->patchEntities($labelCsvs, $arrCsvtouroku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-                 $connection = ConnectionManager::get('default');//トランザクション1
-                 // トランザクション開始2
-                 $connection->begin();//トランザクション3
-                 try {//トランザクション4
-                     if ($this->LabelCsvs->saveMany($labelCsvs)) {//saveManyで一括登録
-                       $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました";
-                       $this->set('mes',$mes);
-                       $connection->commit();// コミット5
-                     } else {
-                       $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました。※データベースへ登録されませんでした。Productsテーブルに".$meserror;
-                       $this->set('mes',$mes);
-                       $this->Flash->error(__('The data could not be saved. Please, try again.'));
-                       throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-                     }
-                 } catch (Exception $e) {//トランザクション7
-                 //ロールバック8
-                   $connection->rollback();//トランザクション9
-                 }//トランザクション10
+        $labelCsvs = $this->LabelCsvs->newEntity();
+        $this->set('labelCsvs',$labelCsvs);
+         if ($this->request->is('post')) {
+           $labelCsvs = $this->LabelCsvs->patchEntities($labelCsvs, $arrCsvtouroku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+           $connection = ConnectionManager::get('default');//トランザクション1
+           // トランザクション開始2
+           $connection->begin();//トランザクション3
+           try {//トランザクション4
+               if ($this->LabelCsvs->saveMany($labelCsvs)) {//saveManyで一括登録
+                 $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました";
+                 $this->set('mes',$mes);
+                 $connection->commit();// コミット5
+               } else {
+                 $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました。※データベースへ登録されませんでした。Productsテーブルに".$meserror;
+                 $this->set('mes',$mes);
+                 $this->Flash->error(__('The data could not be saved. Please, try again.'));
+                 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
                }
-
-
+           } catch (Exception $e) {//トランザクション7
+           //ロールバック8
+             $connection->rollback();//トランザクション9
+           }//トランザクション10
+         }
      }
 
      public function kensakucheck()//端数の準備実験
      {
-       $this->request->session()->destroy(); // セッションの破棄
-       $checkLots = $this->CheckLots->newEntity();
-       $this->set('checkLots',$checkLots);
-
-       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       for ($m=0; $m<=$data['num'] ; $m++) {
-         if(isset($data["check".$m])){
-         $arrcheck[] = ['product_code' => $data[$m]];
-         }
-       }
 /*
        echo "<pre>";
        print_r($arrcheck);

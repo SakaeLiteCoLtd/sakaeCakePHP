@@ -1874,8 +1874,8 @@ class LabelsController extends AppController
       print_r($arrCsv);
       echo "<br>";
 */
-      $fp = fopen('labels/label_hasu_200408.csv', 'w');
-//      $fp = fopen('/home/centosuser/label_csv/label_ikkatu_test.csv', 'w');
+//      $fp = fopen('labels/label_hasu_200408.csv', 'w');
+      $fp = fopen('/home/centosuser/label_csv/label_ikkatu_test.csv', 'w');
       foreach ($arrCsv as $line) {
         fputcsv($fp, $line);
       }

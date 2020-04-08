@@ -25,20 +25,22 @@ class MaterialTypesController extends AppController
 	public function initialize()
 	{
 		 parent::initialize();
-			$this->Users = TableRegistry::get('users');//staffsテーブルを使う
+		 $this->Users = TableRegistry::get('users');//staffsテーブルを使う
 	}
 /*
 	public function getRemoteData()//Tableのコードのみでデータベースが決まる。関係なし…
 	{
 		$conn1 = ConnectionManager::get('default');//local
 		$conn2 = ConnectionManager::get('DB_sakae');//192
-    $this->MaterialTypes = TableRegistry::get('material_types', ['table' => 'sakaedb', 'connection' => $conn2]);
+		$conn3 = ConnectionManager::get('test_desktop');//test_desktop
+    $this->MaterialTypes = TableRegistry::get('material_types', ['table' => 'sakaedb', 'connection' => $conn3]);
 	}
 */
     public function index()
     {
 //			$this->MaterialTypes->defaultConnectionName('default');//local
 //			$this->MaterialTypes->defaultConnectionName('DB_sakae');//192
+//			$this->MaterialTypes->defaultConnectionName('test_desktop');//test_desktop
 			$this->set('materialType', $this->MaterialTypes->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
 			$this->set('materialType', $this->paginate());//※ページネーションに必要
     }

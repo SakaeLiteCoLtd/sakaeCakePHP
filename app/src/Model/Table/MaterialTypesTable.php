@@ -20,7 +20,6 @@ use Cake\Validation\Validator;
  */
 class MaterialTypesTable extends Table
 {
-
     /**
      * Initialize method
      *
@@ -42,13 +41,14 @@ class MaterialTypesTable extends Table
 
     }
 /*
-    public static function defaultConnectionName()// DB切替(default -> DB_sakae)
+    public static function defaultConnectionName()// DB切替
     {
-//      return 'default';//localhostのデータベース
-      return 'DB_sakae';//192.168.4.246のデータベースを使用
+//      return 'default';//defaultのデータベース
+//      return 'DB_sakae';//192.168.4.246のデータベースを使用
+      return 'test_desktop';//test_desktopのデータベースを使用
                         //mysqlへリモートアクセスの許可が必要https://qiita.com/n0bisuke/items/bd86dd3a79cd7cbcd92e
     }
-*/
+
     /**
      * Default validation rules.
      *

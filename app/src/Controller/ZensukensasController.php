@@ -207,7 +207,7 @@ class ZensukensasController extends AppController
       }
      }
 
-     public function zensuendstaff()
+     public function zensuendstaff()//検査終了時のスタッフ登録
      {
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
@@ -567,7 +567,6 @@ class ZensukensasController extends AppController
        //ロールバック8
          $connection->rollback();//トランザクション9
        }//トランザクション10
-
      }
 
 }

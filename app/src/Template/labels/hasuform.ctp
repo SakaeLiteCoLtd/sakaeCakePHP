@@ -17,11 +17,9 @@
    header('Cache-Control:');
    header('Pragma:');
    echo $this->Form->create($orderEdis, ['url' => ['action' => 'hasuichiran']]);
-/*
-   $Data=$this->request->query();
-   $Pro=$Data["Pro"];
-   echo $this->Form->hidden('Pro' ,['value'=>$Pro]);
-*/
+   $dateYMD = date('Y-m-d');
+   $dateYMD1 = strtotime($dateYMD);
+   $dayto = date('Y-m-d', strtotime('+1 day', $dateYMD1));
 ?>
 
 <br>
@@ -32,7 +30,7 @@
       <td width="350" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">納入日指定</strong></div></td>
       <td rowspan="2" width="150"  style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->submit(__('呼出'), array('name' => 'yobidasi')); ?></div></td>
     </tr>
-      <td width="250" colspan="20" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("data_yobidashi", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></div></td>
+      <td width="250" colspan="20" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("data_yobidashi", array('type' => 'date', 'value' => $dayto, 'monthNames' => false, 'label'=>false)); ?></div></td>
 </table>
 <br>
 <br>

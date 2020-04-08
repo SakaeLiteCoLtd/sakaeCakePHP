@@ -209,12 +209,6 @@ class OrderEdisController extends AppController
       $this->set('orderEdis',$orderEdis);
 
       if ($this->request->is('post')) {
-/*
-      $data = $this->request->getData();
-      echo "<pre>";
-      print_r($_FILES['file']['tmp_name']);
-      echo "</pre>";
-*/
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->newEntity();
@@ -235,8 +229,6 @@ class OrderEdisController extends AppController
       $arrDnpTotalAmounts = array();//空の配列を作る
       $arrDnpdouitutyuumon = array();//空の配列を作る
       $created_staff = $this->Auth->user('staff_id');
-
-//      $num = 1;//$numを定義する
 
         for ($k=1; $k<=$count-1; $k++) {//最後の行まで
           $line = fgets($fp1);//ファイル$fpの上の１行を取る（２行目から）
@@ -396,7 +388,6 @@ class OrderEdisController extends AppController
 
                      $arrDnpdouitutyuumon[] = ${"arrDnpdouitutyuumon".($k-2)};
                      //以下、DnpTotalAmounts登録用
-
                      $arrDnpTotalAmounts[$k-2]['num_order'] = $sample['num_order'];//配列に追加する
                      $arrDnpTotalAmounts[$k-2]['name_order'] = $sample['name_order'];
                      $arrDnpTotalAmounts[$k-2]['line_code'] = $sample['line_code'];
@@ -414,7 +405,7 @@ class OrderEdisController extends AppController
               print_r($uniquearrDnpdouitutyuumon);
               echo "</pre>";
 */
-              //$uniquearrDnpdouitutyuumonを使って、order_ediテーブルのbunnnouを更新、dnp_minoukannouテーブルのminoukannouを更新
+//$uniquearrDnpdouitutyuumonを使って、order_ediテーブルのbunnnouを更新、dnp_minoukannouテーブルのminoukannouを更新
 
               for($n=0; $n<=10000; $n++){
                 if(isset($uniquearrDnpdouitutyuumon[$n])){
@@ -454,12 +445,6 @@ class OrderEdisController extends AppController
                   break;
                 }
               }
-/*
-              echo "<pre>";
-              print_r("arrDnpTotalAmounts");
-              print_r($arrDnpTotalAmounts);
-              echo "</pre>";
-*/
               $uniquearrDnpTotalAmounts = array_unique($arrDnpTotalAmounts, SORT_REGULAR);//重複削除
 /*
               echo "<pre>";
@@ -504,7 +489,6 @@ class OrderEdisController extends AppController
 
     public function keikakucsv()
     {
-//      $this->request->session()->destroy(); // セッションの破棄
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
 
@@ -516,10 +500,7 @@ class OrderEdisController extends AppController
 
       if ($this->request->is('post')) {
       $data = $this->request->getData();
-/*      echo "<pre>";
-      print_r($_FILES['file']['tmp_name']);
-      echo "</pre>";
-*/
+
       $source_file = $_FILES['file']['tmp_name'];
 //文字変換（不要）     file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'UTF-8', 'SJIS'));
       $fp = fopen($source_file, "r");
@@ -591,9 +572,8 @@ class OrderEdisController extends AppController
       print_r($arrSyoyouKeikaku);
       echo "</pre>";
 */
-          rename($source_file,$source_file."test");
+         rename($source_file,$source_file."test");
 
-//       if ($this->request->is('get')) {
          $syoyouKeikakus = $this->SyoyouKeikakus->patchEntities($syoyouKeikakus, $arrSyoyouKeikaku);//patchEntitiesで一括登録
          $connection = ConnectionManager::get('default');//トランザクション1
          // トランザクション開始2
@@ -670,12 +650,6 @@ class OrderEdisController extends AppController
       $this->request->session()->destroy();// セッションの破棄
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-/*
-      $Data=$this->request->query();
-      echo "<pre>";
-      print_r($Data);
-      echo "</pre>";
-*/
     }
 
     public function henkou4pana()
@@ -711,7 +685,6 @@ class OrderEdisController extends AppController
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
           ->where(['delete_flag' => '0', 'customer_code' => '10001',  'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
-
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -723,7 +696,6 @@ class OrderEdisController extends AppController
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
           ->where(['delete_flag' => '0', 'customer_code' => '10002',  'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
-
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -735,7 +707,6 @@ class OrderEdisController extends AppController
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
           ->where(['delete_flag' => '0', 'customer_code' => '10003',  'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => $Pro.'%']
-
           ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -886,7 +857,6 @@ class OrderEdisController extends AppController
       session_start();
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-//      $data = $this->request->getData();
     }
 
     public function henkoupanapreadd()
@@ -959,7 +929,6 @@ class OrderEdisController extends AppController
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-
       $session = $this->request->getSession();
       $data = $session->read();
     }
@@ -1011,7 +980,6 @@ class OrderEdisController extends AppController
 
 //orderEdisを分納するときidがすでにあれば更新、なければ新規登録
 //amount=0 or 1 で場合分け（amount=0ならdelete_flag=1にする）
-
       $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2
       $connection->begin();//トランザクション3
@@ -1079,7 +1047,6 @@ class OrderEdisController extends AppController
         $connection->rollback();//トランザクション9
       }//トランザクション10
     }
-
 
     public function henkou2dnp()
     {
@@ -1269,7 +1236,6 @@ class OrderEdisController extends AppController
       session_start();
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-//      $data = $this->request->getData();
     }
 
     public function henkoudnppreadd()
@@ -1342,9 +1308,6 @@ class OrderEdisController extends AppController
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-
-//      $session = $this->request->getSession();
-//      $data = $session->read();
     }
 
     public function henkoudnpbunnnoulogin()
@@ -1576,12 +1539,6 @@ class OrderEdisController extends AppController
       $this->request->session()->destroy();// セッションの破棄
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-/*
-      $Data=$this->request->query();
-      echo "<pre>";
-      print_r($Data);
-      echo "</pre>";
-*/
     }
 
     public function henkou4other()
@@ -1599,11 +1556,7 @@ class OrderEdisController extends AppController
         $date_sta = $data['date_sta'];
         $date_fin = $data['date_fin'];
       }
-/*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
+
       if(empty($product_code)){//product_codeの入力がないとき
         $product_code = "no";
         $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -1614,11 +1567,6 @@ class OrderEdisController extends AppController
         ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,
         'AND' => [['customer_code !=' => '10001'], ['customer_code !=' => '10002'], ['customer_code !=' => '10003'], ['customer_code !=' => '20001']]]));
       }
-/*
-      echo "<pre>";
-      print_r($Data);
-      echo "</pre>";
-*/
     }
 
     public function henkou5other()
@@ -1660,11 +1608,6 @@ class OrderEdisController extends AppController
             $this->set('orderEdis'.$i,${"orderEdis".$i});
             ${"bunnou".$i} = ${"orderEdis".$i}[0]->bunnou;
             $this->set('bunnou'.$i,${"bunnou".$i});
-/*
-            echo "<pre>";
-            print_r(${"bunnou".$i});
-            echo "</pre>";
-*/
             $i_num = $i;
             $this->set('i_num',$i_num);
           }else{
@@ -1722,11 +1665,7 @@ class OrderEdisController extends AppController
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
-/*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
+
       $Dnpdate_deliver = $data['Dnpdate_deliver'];
       $this->set("Dnpdate_deliver",$Dnpdate_deliver);
       $Totalamount = $data['Totalamount'];
@@ -1892,7 +1831,6 @@ class OrderEdisController extends AppController
 
 //orderEdisを分納するときidがすでにあれば更新、なければ新規登録ok
 //amount=0 or 1 で場合分け（amount=0ならdelete_flag=1にする）ok
-
       $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2
       $connection->begin();//トランザクション3

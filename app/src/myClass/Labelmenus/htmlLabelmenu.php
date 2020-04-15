@@ -67,7 +67,7 @@ class htmlLabelmenu extends AppController
                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/fushiyouform'>\n".
                 "<img src='/img/Labelimg/label_fushiyou.gif' width=85 height=36>\n".
                 "</a>\n".
-                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/torikomiselect'>\n".
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/hasulotstafftouroku'>\n".
                 "<img src='/img/Labelimg/label_hasu.gif' width=85 height=36>\n".
                 "</a>\n".
                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/torikomiselect'>\n".
@@ -109,7 +109,22 @@ class htmlLabelmenu extends AppController
      $this->data = $labelshinkisubmenus;
  }
 
-	public function get_data(){
+     public function Labelhasulotmenus()
+    {
+      $html =
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/layoutform1'>\n".
+                "<img src='/img/Labelimg/label_touroku.gif' width=85 height=36>\n".
+                "</a></td>\n".
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/placeform'>\n".
+                "<img src='/img/Labelimg/label_kensaku.gif' width=85 height=36>\n".
+                "</a>\n";
+
+        return $html;
+        $this->html = $html;
+        $this->data = $labelshinkisubmenus;
+    }
+
+  	public function get_data(){
 		return $this->data;
 		}
 

@@ -417,11 +417,11 @@ class ZensukensasController extends AppController
      {
        $session = $this->request->getSession();
        $data = $session->read();
-/*
+
        echo "<pre>";
        print_r($_SESSION);
        echo "</pre>";
-*/
+
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
        $ResultZensuFooders = $this->ResultZensuFooders->newEntity();

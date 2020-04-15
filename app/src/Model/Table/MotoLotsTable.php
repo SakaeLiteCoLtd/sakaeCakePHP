@@ -63,7 +63,7 @@ class MotoLotsTable extends Table
             ->notEmpty('hasu_lot');
 
         $validator
-            ->integer('moto_lot')
+            ->scalar('moto_lot')
             ->maxLength('moto_lot', 40)
             ->requirePresence('moto_lot', 'create')
             ->notEmpty('moto_lot');

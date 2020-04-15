@@ -5,6 +5,10 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 use Cake\Datasource\ConnectionManager;//トランザクション
 use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
+
+use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
+use App\myClass\Productcheck\htmlProductcheck;
+
 /**
  * Roles Controller
  *
@@ -38,6 +42,7 @@ class LabelsController extends AppController
        $this->NameLotFlagUseds = TableRegistry::get('nameLotFlagUseds');
        $this->ZensuProducts = TableRegistry::get('zensuProducts');
        $this->OrderEdis = TableRegistry::get('orderEdis');
+       $this->MotoLots = TableRegistry::get('motoLots');
  }
      public function indexmenu()
      {
@@ -1700,6 +1705,229 @@ class LabelsController extends AppController
            }//トランザクション10
          }
      }
+
+     public function hasulotstafftouroku()
+    {
+      $this->request->session()->destroy();// セッションの破棄
+      $MotoLots = $this->MotoLots->newEntity();
+      $this->set('MotoLots',$MotoLots);
+    }
+
+    public function hasulotlogin()
+   {
+     if ($this->request->is('post')) {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $this->set('data',$data);//セット
+       $userdata = $data['username'];
+       $this->set('userdata',$userdata);//セット
+
+       $htmllogin = new htmlLogin();//クラスを使用
+       $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();
+
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'hasulotform',//以下のデータを持ってhasulotformに移動
+          's' => ['username' => $username]]);
+        }
+      }
+   }
+
+      public function hasulotform()
+     {
+       $MotoLots = $this->MotoLots->newEntity();
+       $this->set('MotoLots',$MotoLots);
+       $Data=$this->request->query('s');
+
+       $username = $Data['username'];
+       $UserData = $this->Users->find()->where(['username' => $username])->toArray();
+       $staffData = $this->Staffs->find()->where(['id' => $UserData[0]['staff_id']])->toArray();
+       $Staff = $staffData[0]->staff_code." : ".$staffData[0]->f_name." ".$staffData[0]->l_name;
+       $this->set('Staff',$Staff);
+       $Staffcode = $staffData[0]->staff_code;
+       $this->set('Staffcode',$Staffcode);
+       $Staffid = $staffData[0]->id;
+       $this->set('Staffid',$Staffid);
+     }
+
+     public function hasulotmoto()
+    {
+      $MotoLots = $this->MotoLots->newEntity();
+      $this->set('MotoLots',$MotoLots);
+      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+      if(isset($data['torikomi'])){//取り込みの場合
+        $str = implode(',', $data);//配列データをカンマ区切りの文字列にする
+        $ary = explode(',', $str);//$strを配列に変換
+        $product_code1 = $ary[0];//入力したデータをカンマ区切りの最初のデータを$product_code1とする（以下同様）
+        $this->set('product_code1',$product_code1);
+        $product_code2 = $ary[1];
+        $this->set('product_code2',$product_code2);
+        $amount = $ary[2];
+        $this->set('amount',$amount);
+        $lot_num = $ary[4];
+        $this->set('lot_num',$lot_num);
+        $staff_id = $ary[7];
+        $this->set('staff_id',$staff_id);
+        $staffData = $this->Staffs->find()->where(['id' => $staff_id])->toArray();
+        $Staff = $staffData[0]->staff_code." : ".$staffData[0]->f_name." ".$staffData[0]->l_name;
+        $this->set('Staff',$Staff);
+        $tuika = 0;
+        $this->set('tuika',$tuika);
+      }else{
+        $product_code1 = $data['product_code'];
+        $this->set('product_code1',$product_code1);
+        $lot_num = $data['lot_num'];
+        $this->set('lot_num',$lot_num);
+        $amount = $data['amount'];
+        $this->set('amount',$amount);
+        $Staff = $data['Staff'];
+        $this->set('Staff',$Staff);
+        $staff_id = $data['staff_id'];
+        $this->set('staff_id',$staff_id);
+      }
+      /*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      if(isset($data['tuika'])){
+        $tuika = $data['num'] + 1;
+        $this->set('tuika',$tuika);
+      }elseif(isset($data['sakujo'])){
+        if($data['num'] == 0){
+          $tuika = 0;
+          $this->set('tuika',$tuika);
+        }else{
+          $tuika = $data['num'] - 1;
+          $this->set('tuika',$tuika);
+        }
+      }elseif(isset($data['kakunin'])){
+        $tuika = $data['num'];
+        $this->set('tuika',$tuika);
+        return $this->redirect(['action' => 'hasulotconfirm',//以下のデータを持ってzensufinishconfirmに移動
+        's' => ['data' => $data]]);//登録するデータを全部配列に入れておく
+      }
+
+
+    }
+
+      public function hasulotconfirm()
+     {
+       session_start();
+       $MotoLots = $this->MotoLots->newEntity();
+       $this->set('MotoLots',$MotoLots);
+       $Data = $this->request->query('s');
+       $data = $Data['data'];//postデータ取得し、$dataと名前を付ける
+       $product_code1 = $data['product_code'];
+       $this->set('product_code1',$product_code1);
+       $lot_num = $data['lot_num'];
+       $this->set('lot_num',$lot_num);
+       $amount = $data['amount'];
+       $this->set('amount',$amount);
+       $Staff = $data['Staff'];
+       $this->set('Staff',$Staff);
+       $staff_id = $data['staff_id'];
+       $this->set('staff_id',$staff_id);
+       $tuika = $data['num'];
+       $this->set('tuika',$tuika);
+
+       $_SESSION['hyouji'] = array(
+         'Staff' => $Staff,
+         'product_code1' => $product_code1,
+         'amount' => $amount,
+         'tuika' => $tuika,
+         'lot_num' => $lot_num
+       );
+
+       $amount_sum = 0;
+       $check_product = 0;
+       for($i=0; $i<=$data['num']; $i++){
+         if(isset($data['text'.$i])){
+           $ary = explode(',', $data['text'.$i]);//$data['text'.$i]を配列に変換
+           ${"product_moto".$i} = $ary[0];//入力したデータをカンマ区切りの最初のデータを$product_code1とする（以下同様）
+           $this->set('product_moto'.$i,${"product_moto".$i});
+           ${"amount_moto".$i} = $ary[2];
+           $this->set('amount_moto'.$i,${"amount_moto".$i});
+           ${"lot_moto".$i} = $ary[4];
+           $this->set('lot_moto'.$i,${"lot_moto".$i});
+
+           $_SESSION['lot_hasu'][$i] = array(
+             'hasu_lot' => $lot_num,
+             'moto_lot' => ${"lot_moto".$i},
+             'moto_lot_amount' => ${"amount_moto".$i},
+             "delete_flag" => 0,
+             "created_staff" => $staff_id
+           );
+           /*
+           echo "<pre>";
+           print_r($_SESSION['lot_hasu'][$i]);
+           echo "</pre>";
+*/
+           $amount_sum = $amount_sum + ${"amount_moto".$i};
+           $this->set('amount_sum',$amount_sum);
+
+           if(${"product_moto".$i} == $product_code1){
+             $check_product = $check_product;
+             $this->set('check_product',$check_product);
+           }else{
+             $check_product = 1;
+             $this->set('check_product',$check_product);
+           }
+         }else{
+           $i = $i;
+         }
+       }
+     }
+
+     public function hasulotdo()
+    {
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      $Staff = $_SESSION['hyouji']['Staff'];
+      $this->set('Staff',$Staff);
+      $product_code1 = $_SESSION['hyouji']['product_code1'];
+      $this->set('product_code1',$product_code1);
+      $lot_num = $_SESSION['hyouji']['lot_num'];
+      $this->set('lot_num',$lot_num);
+      $amount = $_SESSION['hyouji']['amount'];
+      $this->set('amount',$amount);
+      $tuika = $_SESSION['hyouji']['tuika'];
+      $this->set('tuika',$tuika);
+      for($i=0; $i<=$tuika; $i++){
+        ${"lot_moto".$i} = $_SESSION['lot_hasu'][$i]["moto_lot"];
+        $this->set('lot_moto'.$i,${"lot_moto".$i});
+        ${"amount_moto".$i} = $_SESSION['lot_hasu'][$i]["moto_lot_amount"];
+        $this->set('amount_moto'.$i,${"amount_moto".$i});
+      }
+
+      $motoLots = $this->MotoLots->newEntity();
+      $this->set('MotoLots',$motoLots);
+      if ($this->request->is('post')) {
+        $motoLots = $this->MotoLots->patchEntities($this->MotoLots->newEntity(), $data['lot_hasu']);
+        $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+        $connection->begin();//トランザクション3
+        try {//トランザクション4
+          if ($this->MotoLots->saveMany($motoLots)) {
+            $connection->commit();// コミット5
+          } else {
+            $this->Flash->error(__('The data could not be saved. Please, try again.'));
+            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+          }
+        } catch (Exception $e) {//トランザクション7
+        //ロールバック8
+          $connection->rollback();//トランザクション9
+        }//トランザクション10
+      }
+    }
 
      public function confirmcsv()
     {

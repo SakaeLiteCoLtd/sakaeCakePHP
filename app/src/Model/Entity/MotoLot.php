@@ -29,13 +29,14 @@ class MotoLot extends Entity
      * @var array
      */
     protected $_accessible = [
-        'hasu_lot' => true,
-        'moto_lot' => true,
-        'moto_lot_amount' => true,
-        'delete_flag' => true,
-        'created_at' => true,
-        'created_staff' => true,
-        'updated_at' => true,
-        'updated_staff' => true
+      'hasu_lot' => true,
+      'product_code' => true,
+      'moto_lot' => true,
+      'moto_lot_amount' => true,
+      'delete_flag' => true,
+      'created_at' => true,
+      'created_staff' => true,
+      'updated_at' => true,
+      'updated_staff' => true
     ];
 }

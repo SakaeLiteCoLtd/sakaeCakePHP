@@ -62,6 +62,12 @@ class MotoLotsTable extends Table
             ->requirePresence('hasu_lot', 'create')
             ->notEmpty('hasu_lot');
 
+            $validator
+                ->scalar('product_code')
+                ->maxLength('product_code', 40)
+                ->requirePresence('product_code', 'create')
+                ->notEmpty('product_code');
+
         $validator
             ->scalar('moto_lot')
             ->maxLength('moto_lot', 40)

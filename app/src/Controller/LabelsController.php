@@ -1780,6 +1780,15 @@ class LabelsController extends AppController
         $this->set('Staff',$Staff);
         $tuika = 0;
         $this->set('tuika',$tuika);
+        $htmlProductcheck = new htmlProductcheck();//クラスを使用
+        $product_code_check = $htmlProductcheck->Productcheck($product_code1);
+        if($product_code_check == 1){
+          return $this->redirect(
+           ['controller' => 'Products', 'action' => 'index']
+          );
+        }else{
+          $product_code_check = $product_code_check;
+        }
       }else{
         $product_code1 = $data['product_code'];
         $this->set('product_code1',$product_code1);
@@ -1860,6 +1869,7 @@ class LabelsController extends AppController
 
            $_SESSION['lot_hasu'][$i] = array(
              'hasu_lot' => $lot_num,
+             'product_code' => $product_code1,
              'moto_lot' => ${"lot_moto".$i},
              'moto_lot_amount' => ${"amount_moto".$i},
              "delete_flag" => 0,

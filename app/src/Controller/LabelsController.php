@@ -1927,8 +1927,12 @@ class LabelsController extends AppController
         $connection->begin();//トランザクション3
         try {//トランザクション4
           if ($this->MotoLots->saveMany($motoLots)) {
+            $mes = "※以上のように登録されました。";
+            $this->set('mes',$mes);
             $connection->commit();// コミット5
           } else {
+            $mes = "登録されませんでした。";
+            $this->set('mes',$mes);
             $this->Flash->error(__('The data could not be saved. Please, try again.'));
             throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
           }
@@ -1938,6 +1942,54 @@ class LabelsController extends AppController
         }//トランザクション10
       }
     }
+
+    public function hasukensakuform()
+   {
+     $this->request->session()->destroy();// セッションの破棄
+     $MotoLots = $this->MotoLots->newEntity();
+     $this->set('MotoLots',$MotoLots);
+   }
+
+   public function hasukensakuview()
+  {
+    $MotoLots = $this->MotoLots->newEntity();
+    $this->set('MotoLots',$MotoLots);
+    $data = $this->request->getData();
+    $product_code = $data['product_code'];
+    $this->set('product_code',$product_code);
+    $lot_num = $data['lot_num'];
+    $this->set('lot_num',$lot_num);
+
+    if(empty($data['product_code'])){//product_codeの入力がないとき
+      $product_code = "入力されていません";
+      $this->set('product_code',$product_code);
+      if(empty($data['lot_num'])){//lot_numの入力がないとき
+        $mes = "※検索情報が入力されていません";
+        $this->set('mes',$mes);
+        $kensakucheck = 2;
+        $this->set('kensakucheck',$kensakucheck);
+      }else{//lot_numの入力があるとき　ロットで絞り込み
+        $this->set('MotoLots',$this->MotoLots->find()//以下の条件を満たすデータをMotoLotsテーブルから見つける
+          ->where(['delete_flag' => '0', 'hasu_lot' => $lot_num]));
+          $kensakucheck = 1;
+          $this->set('kensakucheck',$kensakucheck);
+      }
+    }else{//product_codeの入力があるとき
+      if(empty($data['lot_num'])){//lot_numの入力がないとき
+        $lot_num = "入力されていません";//プロダクトコードで絞り込み
+        $this->set('lot_num',$lot_num);
+        $this->set('MotoLots',$this->MotoLots->find()//以下の条件を満たすデータをMotoLotsテーブルから見つける
+          ->where(['delete_flag' => '0', 'product_code' => $product_code]));
+          $kensakucheck = 1;
+          $this->set('kensakucheck',$kensakucheck);
+      }else{//lot_numの入力があるとき　プロダクトコードとロットナンバーで絞り込み
+        $this->set('MotoLots',$this->MotoLots->find()//以下の条件を満たすデータをMotoLotsテーブルから見つける
+          ->where(['delete_flag' => '0', 'hasu_lot' => $lot_num, 'product_code' => $product_code]));
+          $kensakucheck = 1;
+          $this->set('kensakucheck',$kensakucheck);
+      }
+    }
+  }
 
      public function confirmcsv()
     {

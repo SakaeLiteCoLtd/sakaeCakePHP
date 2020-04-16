@@ -61,7 +61,7 @@
 
 </table>
 <br><br><br><br><br><br><br>
-<legend align="left"><font color="red"><?= __('＊以上のように登録されました。') ?></font></legend>
+<legend align="left"><font color="red"><?= __($mes) ?></font></legend>
 
 
 <br><br><br>

@@ -49,7 +49,7 @@
               if($flag_deliver != null){
                 $flag_used = $flag_deliver->format('Y-m-d')." 納品済み";
               }elseif($f_used == 0){
-                $flag_used = "出荷待ち";
+                $flag_used = "検査済み";
               }else{
                 $NameLotFlagUsed = $this->NameLotFlagUseds->find()->where(['id' => $f_used])->toArray();
                 $flag_used = $NameLotFlagUsed[0]->name;

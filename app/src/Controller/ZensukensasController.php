@@ -382,7 +382,7 @@ class ZensukensasController extends AppController
        $this->set('result_zensu_head_id',$result_zensu_head_id);
 /*
        echo "<pre>";
-       print_r($Data['data']);
+       print_r(date('Y-m-d H:i:s'));
        echo "</pre>";
 */
        session_start();
@@ -393,12 +393,11 @@ class ZensukensasController extends AppController
            'amount' => $data["amount{$n}"],
            'bik' => $data["bik{$n}"],
            "delete_flag" => 0,
-  //         "created_at" => date('Y-m-d h:m:s'),
            "created_staff" => $staff_id
          );
         }
         $_SESSION['zensuhead'] = array(
-          'datetime_finish' => date('Y-m-d h:m:s'),
+          'datetime_finish' => date('Y-m-d H:i:s'),
           'updated_staff' => $staff_id
         );
         $_SESSION['result_zensu_head_id'] = array(
@@ -437,7 +436,7 @@ class ZensukensasController extends AppController
            if ($this->ResultZensuFooders->saveMany($ResultZensuFooders)) {//saveManyで一括登録
 
              if ($this->ResultZensuHeads->updateAll(
-               ['datetime_finish' => $_SESSION['zensuhead']['datetime_finish'], 'updated_staff' => $_SESSION['zensuhead']['updated_staff']],
+               ['datetime_finish' => $_SESSION['zensuhead']['datetime_finish'], 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
                ['id'  => $_SESSION['result_zensu_head_id']['result_zensu_head_id']]
              )){
 
@@ -452,7 +451,7 @@ class ZensukensasController extends AppController
                  $connection->commit();// コミット5
                }else{
                  if ($this->CheckLots->updateAll(
-                   ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff']],
+                   ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
                    ['id'  => $CheckLotId]
                  )){
 
@@ -525,7 +524,7 @@ class ZensukensasController extends AppController
   */
                        $bangou_arr_oya_lot = $bangou_oya_lot - 1;
                        $this->CheckLots->updateAll(
-                        ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff']],
+                        ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
                         ['id'  => $arrCheckLotoya[$bangou_arr_oya_lot]['id']]);
 
                         $mes = "登録されました。親ロットも検査済みに変更しました。";

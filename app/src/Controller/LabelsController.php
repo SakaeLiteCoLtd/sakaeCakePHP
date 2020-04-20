@@ -662,7 +662,12 @@ class LabelsController extends AppController
              if(isset($LabelInsideout2[0])){
                $num_inside2 = $LabelInsideout2[0]->num_inside;
                $irisu22 = $irisu2/$num_inside2;
-           }else{
+/*
+               echo "<pre>";//num_inside=0の製品もある（MLD-NDS-20001,MLD-NDS-20002）
+               print_r($product_code2."-".$num_inside2);
+               echo "</pre>";
+*/
+             }else{
                $num_inside2 = 1;
                $irisu22 = "";
              }
@@ -741,7 +746,7 @@ class LabelsController extends AppController
         ${"ntuika".$i} = 0;
         $this->set('ntuika'.$i,${"ntuika".$i});//セット
        }
-     }else{
+     }else{//追加押したとき
        $dateYMDs = $data['dateYMDs'];
        $dateYMDf = $data['dateYMDf'];
        $this->set('dateYMDs',$dateYMDs);

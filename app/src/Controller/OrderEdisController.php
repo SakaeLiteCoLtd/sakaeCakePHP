@@ -414,17 +414,17 @@ class OrderEdisController extends AppController
                       $DenpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $uniquearrDnpdouitutyuumon[$n][$m-1]['id']])->toArray();
                       $DenpyouDnpMinoukannouId = $DenpyouDnpMinoukannou[0]->id;
                       $this->DenpyouDnpMinoukannous->updateAll(
-                      ['minoukannou' => 0],//これ以降の納期の注文があるため、'minoukannou' => 0にする
+                      ['minoukannou' => 0, 'updated_at' => date('Y-m-d H:i:s')],//これ以降の納期の注文があるため、'minoukannou' => 0にする
                       ['id'  => $DenpyouDnpMinoukannouId]
                       );
 
                       $this->OrderEdis->updateAll(
-                      ['bunnou' => $m],//bunnouを納期順に1,2,3...とうまく更新していく
+                      ['bunnou' => $m, 'updated_at' => date('Y-m-d H:i:s')],//bunnouを納期順に1,2,3...とうまく更新していく
                       ['id'   => $uniquearrDnpdouitutyuumon[$n][$m-1]['id']]
                       );
 
                       $this->OrderEdis->updateAll(
-                      ['bunnou' => $m+1],//bunnouを納期順に1,2,3...とうまく更新していく
+                      ['bunnou' => $m+1, 'updated_at' => date('Y-m-d H:i:s')],//bunnouを納期順に1,2,3...とうまく更新していく
                       ['id'   => $uniquearrDnpdouitutyuumon[$n][$m]['id']]
                       );
                     }else{

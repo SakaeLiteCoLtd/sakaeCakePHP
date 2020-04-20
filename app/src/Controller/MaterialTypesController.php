@@ -27,20 +27,17 @@ class MaterialTypesController extends AppController
 		 parent::initialize();
 		 $this->Users = TableRegistry::get('users');//staffsテーブルを使う
 	}
-/*
-	public function getRemoteData()//Tableのコードのみでデータベースが決まる。関係なし…
-	{
-		$conn1 = ConnectionManager::get('default');//local
-		$conn2 = ConnectionManager::get('DB_sakae');//192
-		$conn3 = ConnectionManager::get('test_desktop');//test_desktop
-    $this->MaterialTypes = TableRegistry::get('material_types', ['table' => 'sakaedb', 'connection' => $conn3]);
-	}
-*/
+
     public function index()
     {
-//			$this->MaterialTypes->defaultConnectionName('default');//local
-//			$this->MaterialTypes->defaultConnectionName('DB_sakae');//192
-//			$this->MaterialTypes->defaultConnectionName('test_desktop');//test_desktop
+/*
+			$i = 1;
+			if($i == 1){//indexの表示だけDB_sakaeを使用
+				$connection = ConnectionManager::get('DB_sakae');
+				$table = TableRegistry::get('MaterialTypes');
+				$table->setConnection($connection);
+			}
+*/
 			$this->set('materialType', $this->MaterialTypes->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
 			$this->set('materialType', $this->paginate());//※ページネーションに必要
     }
@@ -97,6 +94,45 @@ class MaterialTypesController extends AppController
 
      public function do()
     {
+			$Data = $this->request->query('s');
+			if(isset($Data["double"])){//戻ってきた場合、DB_sakaeに登録
+				$connection = ConnectionManager::get('DB_sakae');
+				$table = TableRegistry::get('MaterialTypes');
+				$table->setConnection($connection);
+
+				$materialType = $this->MaterialTypes->newEntity();//newentityに$materialTypeという名前を付ける
+				$this->set('materialType',$materialType);//1行上の$materialTypeをctpで使えるようにセット
+
+				$session = $this->request->getSession();
+				$data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+				$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+				$data['materialTypedata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+
+				if ($this->request->is('get')) {//postの場合
+					$materialType = $this->MaterialTypes->patchEntity($materialType, $data['materialTypedata']);//$materialTypeデータ（空の行）を$this->request->getData()に更新する
+					$connection = ConnectionManager::get('default');//トランザクション1
+					// トランザクション開始2
+					$connection->begin();//トランザクション3
+					try {//トランザクション4
+						if ($this->MaterialTypes->save($materialType)) {
+							$mes = "※下記のように登録されました";
+							$this->set('mes',$mes);
+							$connection->commit();// コミット5
+						} else {
+							$mes = "※登録されませんでした1";
+							$this->set('mes',$mes);
+							$this->Flash->error(__('The materialType could not be saved. Please, try again.'));
+							throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+						}
+					} catch (Exception $e) {//トランザクション7
+					//ロールバック8
+						$connection->rollback();//トランザクション9
+					}//トランザクション10
+				}
+
+			}else{//はじめはdefaultに登録
+
 			$materialType = $this->MaterialTypes->newEntity();//newentityに$materialTypeという名前を付ける
 			$this->set('materialType',$materialType);//1行上の$materialTypeをctpで使えるようにセット
 
@@ -105,13 +141,9 @@ class MaterialTypesController extends AppController
 
 			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 			$data['materialTypedata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
-		/*
-			echo "<pre>";
-		 	print_r($data['materialTypedata']);
-			echo "</pre>";
-		*/
+
 			if ($this->request->is('get')) {//postの場合
-				$supplierSection = $this->MaterialTypes->patchEntity($materialType, $data['materialTypedata']);//$materialTypeデータ（空の行）を$this->request->getData()に更新する
+				$materialType = $this->MaterialTypes->patchEntity($materialType, $data['materialTypedata']);//$materialTypeデータ（空の行）を$this->request->getData()に更新する
 				$connection = ConnectionManager::get('default');//トランザクション1
 				// トランザクション開始2
 				$connection->begin();//トランザクション3
@@ -121,7 +153,7 @@ class MaterialTypesController extends AppController
 						$this->set('mes',$mes);
 						$connection->commit();// コミット5
 					} else {
-						$mes = "※登録されませんでした";
+						$mes = "※登録されませんでした1";
 						$this->set('mes',$mes);
 						$this->Flash->error(__('The materialType could not be saved. Please, try again.'));
 						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
@@ -131,6 +163,12 @@ class MaterialTypesController extends AppController
 					$connection->rollback();//トランザクション9
 				}//トランザクション10
 			}
+
+			return $this->redirect(['action' => 'do',//以下のデータを持ってdoにもう一度戻ってくる
+			's' => ['double' => 1]]);
+
+		}
+
     }
 
     public function edit($id = null)

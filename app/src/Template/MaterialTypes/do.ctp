@@ -9,7 +9,8 @@
  $htmlShinkimenu = new htmlShinkimenu();
  $htmlShinkis = $htmlShinkimenu->Shinkimenus();
  ?>
-<?= $this->Form->create($materialType, ['url' => ['action' => 'index']]) ?>
+
+<?//= $this->Form->create($materialType, ['url' => ['action' => 'index']]) //ダブル登録のため一時削除?>
 
 <?php
   $username = $this->request->Session()->read('Auth.User.username');

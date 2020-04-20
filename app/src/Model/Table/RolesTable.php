@@ -96,7 +96,7 @@ class RolesTable extends Table
             ->notEmpty('created_at');
 */
         $validator
-            ->uuid('created_staff')
+            ->integer('created_staff')
             ->requirePresence('created_staff', 'create')
             ->notEmpty('created_staff');
 /*

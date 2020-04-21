@@ -25,19 +25,20 @@ class MaterialTypesController extends AppController
 	public function initialize()
 	{
 		 parent::initialize();
-		 $this->Users = TableRegistry::get('users');//staffsテーブルを使う
+		 $this->Users = TableRegistry::get('users');
+		 $this->Material2Types = TableRegistry::get('material2Types');
 	}
 
     public function index()
     {
-/*
+
 			$i = 1;
 			if($i == 1){//indexの表示だけDB_sakaeを使用
 				$connection = ConnectionManager::get('DB_sakae');
 				$table = TableRegistry::get('MaterialTypes');
 				$table->setConnection($connection);
 			}
-*/
+
 			$this->set('materialType', $this->MaterialTypes->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
 			$this->set('materialType', $this->paginate());//※ページネーションに必要
     }
@@ -97,25 +98,25 @@ class MaterialTypesController extends AppController
 			$Data = $this->request->query('s');
 			if(isset($Data["double"])){//戻ってきた場合、DB_sakaeに登録
 				$connection = ConnectionManager::get('DB_sakae');
-				$table = TableRegistry::get('MaterialTypes');
+				$table = TableRegistry::get('Material2Types');
 				$table->setConnection($connection);
 
-				$materialType = $this->MaterialTypes->newEntity();//newentityに$materialTypeという名前を付ける
-				$this->set('materialType',$materialType);//1行上の$materialTypeをctpで使えるようにセット
+				$material2Type = $this->Material2Types->newEntity();
+				$this->set('material2Type',$material2Type);
 
 				$session = $this->request->getSession();
-				$data = $session->read();//postデータ取得し、$dataと名前を付ける
+				$data = $session->read();
 
-				$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-				$data['materialTypedata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+				$staff_id = $this->Auth->user('staff_id');
+				$data['materialTypedata']['created_staff'] = $staff_id;
 
-				if ($this->request->is('get')) {//postの場合
-					$materialType = $this->MaterialTypes->patchEntity($materialType, $data['materialTypedata']);//$materialTypeデータ（空の行）を$this->request->getData()に更新する
+				if ($this->request->is('get')) {
+					$material2Type = $this->Material2Types->patchEntity($material2Type, $data['materialTypedata']);
 					$connection = ConnectionManager::get('default');//トランザクション1
 					// トランザクション開始2
 					$connection->begin();//トランザクション3
 					try {//トランザクション4
-						if ($this->MaterialTypes->save($materialType)) {
+						if ($this->Material2Types->save($material2Type)) {
 							$mes = "※下記のように登録されました";
 							$this->set('mes',$mes);
 							$connection->commit();// コミット5

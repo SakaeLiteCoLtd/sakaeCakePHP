@@ -44,7 +44,7 @@ class CheckLot extends Entity
         'amount' => true,
         'flag_used' => true,
         'date_deliver' => true,
-        'place_deliver_id' => true,
+        'place_deliver_code' => true,
         'cs_name' => true,
         'operator_deliver' => true,
         'flag_deliver' => true,

@@ -27,6 +27,7 @@ class ScheduleKoutei extends Entity
      * @var array
      */
     protected $_accessible = [
+      /*
         'datetime' => true,
         'seikeiki' => true,
         'product_code' => true,
@@ -38,5 +39,13 @@ class ScheduleKoutei extends Entity
         'created_staff' => true,
         'updated_at' => true,
         'updated_staff' => true
+*/
+        'datetime' => true,
+        'seikeiki' => true,
+        'product_id' => true,
+        'present_kensahyou' => true,
+        'product_name' => true,
+        'tantou' => true
+
     ];
 }

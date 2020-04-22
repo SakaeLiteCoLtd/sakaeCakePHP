@@ -43,7 +43,7 @@ class LabelsController extends AppController
        $this->ZensuProducts = TableRegistry::get('zensuProducts');
        $this->OrderEdis = TableRegistry::get('orderEdis');
        $this->MotoLots = TableRegistry::get('motoLots');
-       $this->ScheduleKoutei = TableRegistry::get('scheduleKoutei');//sakaeMotoDB
+  //     $this->ScheduleKoutei = TableRegistry::get('scheduleKoutei');//sakaeMotoDB必要なし
  }
      public function indexmenu()
      {
@@ -538,6 +538,17 @@ class LabelsController extends AppController
      $this->request->session()->destroy(); // セッションの破棄
      $scheduleKouteis = $this->ScheduleKouteis->newEntity();
      $this->set('scheduleKouteis',$scheduleKouteis);
+/*
+	//$f = fopen("\\192.168.4.1\Public\Downloads\label_csv\label_hakkou.csv", "r");
+	     $f = fopen('labels/label_ikkatu_200407.csv', 'r');
+	 //    $f = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'r');
+	while($line = fgetcsv($f)){
+	               echo "<pre>";
+	               print_r($line);
+	               echo "</pre>";
+	}
+	fclose($f);
+*/
    }
    public function form()//一括ラベル発行
    {
@@ -693,12 +704,15 @@ class LabelsController extends AppController
                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
            }
         }
-  //      $fp = fopen('labels/label_ikkatu_200407.csv', 'w');
-        $fp = fopen('/home/centosuser/label_csv/label_ikkatu_test.csv', 'w');
+  //      $fp = fopen('\\192.168.4.1\Public\Downloads\label_csv\label_hakkou_test.csv', 'w');
+        $fp = fopen('labels/label_ikkatu_200422.csv', 'w');
+  //      $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
+
         foreach ($arrCsv as $line) {
+          $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
         	fputcsv($fp, $line);
         }
-          fclose($fp);
+        fclose($fp);
 /*
           echo "<pre>";
           print_r($arrCsvtouroku);
@@ -713,11 +727,11 @@ class LabelsController extends AppController
              $connection->begin();//トランザクション3
              try {//トランザクション4
                  if ($this->LabelCsvs->saveMany($labelCsvs)) {//saveManyで一括登録
-                   $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました";
+                   $mes = "\\192.168.4.246\home\centosuser\label_csv にＣＳＶファイルが出力されました";
                    $this->set('mes',$mes);
                    $connection->commit();// コミット5
                  } else {
-                   $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました。※データベースへ登録されませんでした。Productsテーブルに".$meserror;
+                   $mes = "\\192.168.4.246\home\centosuser\label_csv にＣＳＶファイルが出力されました。※データベースへ登録されませんでした。Productsテーブルに".$meserror;
                    $this->set('mes',$mes);
                    $this->Flash->error(__('The data could not be saved. Please, try again.'));
                    throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
@@ -1548,6 +1562,26 @@ class LabelsController extends AppController
            try {//トランザクション4
              if ($this->CheckLots->saveMany($checkLots)) {//saveManyで一括登録
                $connection->commit();// コミット5
+
+               //$arrLotをinsert into check_lotsする
+               $connection = ConnectionManager::get('DB_ikou');
+               $table = TableRegistry::get('check_lots');
+               $table->setConnection($connection);
+/*
+               echo "<pre>";
+               print_r($arrLot);
+               echo "</pre>";
+*/
+               for($k=0; $k<count($arrLot); $k++){
+                 $connection->insert('check_lots', [
+                     'datetime_hakkou' => $arrLot[$k]["datetime_hakkou"],
+                     'product_id' => $arrLot[$k]["product_code"],
+                     'lot_num' => $arrLot[$k]["lot_num"],
+                     'amount' => $arrLot[$k]["amount"],
+                     'flag_used' => $arrLot[$k]["flag_used"]
+                 ]);
+               }
+
              } else {
       //         $this->Flash->error(__('The data could not be saved. Please, try again.'));
                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6

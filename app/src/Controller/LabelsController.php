@@ -167,7 +167,6 @@ class LabelsController extends AppController
                  'unit_id' => $_SESSION['labellayouts']["unit"]
              ]);
 
-
          } else {
            $this->Flash->error(__('The product could not be saved. Please, try again.'));
            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
@@ -1869,7 +1868,7 @@ class LabelsController extends AppController
        $this->set('checkLots',$checkLots);
        $data = $this->request->getData();
        $maisuu = $data["maisuu"];
-       for($i=0; $i<$maisuu; $i++){//１号機
+       for($i=0; $i<$maisuu; $i++){
          $CheckLots = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
            ->where(['product_code' => $data["product_code"], 'lot_num' => $data["lot_num_".$i]])->toArray();
          $CheckLotId = $CheckLots[0]->id;
@@ -1879,25 +1878,24 @@ class LabelsController extends AppController
          echo "</pre>";
 */
          if(isset($CheckLotId)){
+           $connection = ConnectionManager::get('default');
+           $table = TableRegistry::get('check_lots');
+           $table->setConnection($connection);
+
            $this->CheckLots->updateAll(
            ['flag_used' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
            ['id'   => $CheckLotId ]
            );
            $mes = "不使用ロットが登録されました";
            $this->set('mes',$mes);
-/*
-           //$_SESSION['labellayouts']をinsert into label_type_productする
-           $connection = ConnectionManager::get('DB_ikou_test');
+
+           $connection = ConnectionManager::get('DB_ikou');
            $table = TableRegistry::get('check_lots');
            $table->setConnection($connection);
 
-             $connection->UPDATE('check_lots', [
-                 'product_id' => $_SESSION['labellayouts']["product_code"],
-                 'type_id' => $_SESSION['labellayouts']["type"],
-                 'place_id' => $_SESSION['labellayouts']["place_code"],
-                 'unit_id' => $_SESSION['labellayouts']["unit"]
-             ]);
-*/
+           $updater = "UPDATE check_lots set flag_used = 1 where product_id ='".$data["product_code"]."' and lot_num = '".$data["lot_num_".$i]."'";//もとのDBも更新
+           $connection->execute($updater);
+
          }else{
            print_r($data["lot_num_".$i]."というロットナンバーは存在しません（他のロットは不使用登録されます）");
          }
@@ -1908,6 +1906,43 @@ class LabelsController extends AppController
      {
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
+     }
+
+     public function fushiyouichiran()//ラベル不使用一覧
+     {
+       $checkLots = $this->CheckLots->newEntity();
+       $this->set('checkLots',$checkLots);
+       $data = $this->request->getData();
+       $datesta = $data["date_sta"].' 08:00:00';
+       $datefin = $data["date_fin"].' 08:00:00';
+       $date_count = (strtotime($data["date_fin"])-strtotime($data["date_sta"]))/(3600*24);
+
+       for($i=0; $i<$date_count; $i++){
+         $dateYMD = $data["date_sta"];
+         $dateYMD1 = strtotime($dateYMD);
+         $date_sta = date('Y-m-d', strtotime("+{$i} day", $dateYMD1)).' 08:00:00';
+         $j = $i + 1;
+         $date_fin = date('Y-m-d', strtotime("+{$j} day", $dateYMD1)).' 08:00:00';
+         $this->set('date'.$i,date('Y-m-d', strtotime("+{$i} day", $dateYMD1)));
+
+         $arrAll = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+           ->where(['delete_flag' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin])->toArray();
+           $countAll = count($arrAll);
+           $this->set('countAll'.$i,$countAll);
+         $arrfushiyou = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+           ->where(['delete_flag' => '0','flag_used' => '1','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin])->toArray();
+           $countfushiyou = count($arrfushiyou);
+           $this->set('countfushiyou'.$i,$countfushiyou);
+         $arrkinnshi = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+           ->where(['delete_flag' => '0','flag_used' => '2','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin])->toArray();
+           $countkinnshi = count($arrkinnshi);
+           $this->set('countkinnshi'.$i,$countkinnshi);
+         $arrzaiko = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+           ->where(['lot_num not like' => '%'."IN".'%','flag_deliver IS' => NULL, 'delete_flag' => '0', 'flag_used' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin])->toArray();
+           $countzaiko = count($arrzaiko);
+           $this->set('countzaiko'.$i,$countzaiko);
+           $this->set('icount',$i);//ループ回数-1
+         }
      }
 
      public function kensakuform()//ロット検索
@@ -1960,7 +1995,7 @@ class LabelsController extends AppController
 
      public function hasuichiran()//ラベル発行の端数登録（一覧画面）
      {
-       $this->request->session()->destroy();//セッションの破棄
+       session_start();
        $data = $this->request->getData();
        $Data = $this->request->query('s');//1度henkou5panaへ行って戻ってきたとき（検索を押したとき）
        if(isset($Data)){
@@ -1970,6 +2005,10 @@ class LabelsController extends AppController
          $data_yobidashi_D = $Data['data_yobidashi']['day'];
          $data_yobidashi = $data_yobidashi_Y."-".$data_yobidashi_M."-".$data_yobidashi_D;
          $this->set('data_yobidashi',$data_yobidashi);
+         $_SESSION['lotdate'] = array(
+           "lotnum" => $Data['data_yobidashi']['year'].$Data['data_yobidashi']['month'].$Data['data_yobidashi']['day']
+         );
+
        }else{
          $data_yobidashi_input = $data['data_yobidashi'];
          $data_yobidashi_Y = $data['data_yobidashi']['year'];
@@ -1977,6 +2016,10 @@ class LabelsController extends AppController
          $data_yobidashi_D = $data['data_yobidashi']['day'];
          $data_yobidashi = $data_yobidashi_Y."-".$data_yobidashi_M."-".$data_yobidashi_D;
          $this->set('data_yobidashi',$data_yobidashi);
+         $_SESSION['lotdate'] = array(
+           "lotnum" => $data['data_yobidashi']['year'].$data['data_yobidashi']['month'].$data['data_yobidashi']['day']
+         );
+
        }
        $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
          ->where(['delete_flag' => '0', 'date_deliver' => $data_yobidashi]
@@ -1985,7 +2028,6 @@ class LabelsController extends AppController
 
      public function hasuconfirm()//ラベル発行の端数登録（確認画面）
      {
-       session_start();
        $data = $this->request->getData();
 
        if(isset($data['yobidasi'])){//もう一度検索（絞り込み）をした場合
@@ -1993,7 +2035,7 @@ class LabelsController extends AppController
          's' => ['data_yobidashi' => $data['data_yobidashi']]]);
        }
 
-       $this->request->session()->destroy();// セッションの破棄
+//       $this->request->session()->destroy();// セッションの破棄
        $orderEdis = $this->OrderEdis->newEntity();
        $this->set('orderEdis',$orderEdis);
        $checknum = 0;
@@ -2035,7 +2077,11 @@ class LabelsController extends AppController
       $this->set('orderEdis',$orderEdis);
       $session = $this->request->getSession();
       $data = $session->read();
-
+/*
+      echo "<pre>";
+      print_r($_SESSION['lotdate']['lotnum']);
+      echo "</pre>";
+*/
       //csv発行と、データベース登録
       $arrCsv = array();
       for($i=0; $i<count($data['labelhasu']); $i++){
@@ -2101,10 +2147,10 @@ class LabelsController extends AppController
           'line_code' => "", 'date' => $date, 'start_lot' => 1, 'delete_flag' => 0];//unit2,line_code1...不要
       }
 
-//      $fp = fopen('labels/label_hasu_200408.csv', 'w');
+  //    $fp = fopen('labels/label_hasu_200424.csv', 'w');
       $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
       foreach ($arrCsv as $line) {
-        $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+  //      $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
         fputcsv($fp, $line);
       }
         fclose($fp);

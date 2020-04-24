@@ -70,7 +70,7 @@ class htmlLabelmenu extends AppController
                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/hasulotstafftouroku'>\n".
                 "<img src='/img/Labelimg/label_hasu.gif' width=85 height=36>\n".
                 "</a>\n".
-                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/torikomiselect'>\n".
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/misakusei'>\n".
                 "<img src='/img/Labelimg/label_syukkateishi.gif' width=85 height=36>\n".
                 "</a>\n".
                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/kensakuform'>\n".

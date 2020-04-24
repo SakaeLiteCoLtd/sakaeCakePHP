@@ -28,8 +28,8 @@
 <br><br>
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
           <tr style="background-color: #E6FFFF">
-            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_touroku.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Labels','action'=>'fushiyoupreadd')));?></td>
-            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_ichiran.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Labels','action'=>'fushiyouichiranpre')));?></td>
+            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_touroku.gif',array('width'=>'85','height'=>'30','url'=>array('controller'=>'Labels','action'=>'fushiyoupreadd')));?></td>
+            <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_ichiran.gif',array('width'=>'85','height'=>'30','url'=>array('controller'=>'Labels','action'=>'fushiyouichiranpre')));?></td>
           </tr>
 </table>
 <br><br><br>
@@ -43,7 +43,7 @@
     <td bgcolor="#FFFFCC" style="width: 200px"><strong style="font-size: 13pt; color:blue">ロットNo．</strong></td>
 	</tr>
     <?php
-    for($i=0; $i<$maisuu; $i++){//１号機
+    for($i=0; $i<$maisuu; $i++){
       echo "<tr><td bgcolor='#FFFFCC' style='width: 200px'>\n";
       echo $product_code;
       echo "</td>\n";

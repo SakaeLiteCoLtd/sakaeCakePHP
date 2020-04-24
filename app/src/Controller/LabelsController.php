@@ -835,9 +835,40 @@ class LabelsController extends AppController
              $connection->begin();//トランザクション3
              try {//トランザクション4
                  if ($this->LabelCsvs->saveMany($labelCsvs)) {//saveManyで一括登録
-                   $mes = "\\192.168.4.246\home\centosuser\label_csv にＣＳＶファイルが出力されました";
+                   $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました";
                    $this->set('mes',$mes);
                    $connection->commit();// コミット5
+
+                   //insert into label_csvする
+                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $table = TableRegistry::get('label_csv');
+                   $table->setConnection($connection);
+  /*
+                   echo "<pre>";
+                   print_r($arrCsvtouroku);
+                   echo "</pre>";
+  */
+                   for($k=0; $k<count($arrCsvtouroku); $k++){
+                     $connection->insert('label_csv', [
+                         'number_sheet' => $arrCsvtouroku[$k]["number_sheet"],
+                         'hanbetsu' => $arrCsvtouroku[$k]["hanbetsu"],
+                         'place1' => $arrCsvtouroku[$k]["place1"],
+                         'place2' => $arrCsvtouroku[$k]["place2"],
+                         'product1' => $arrCsvtouroku[$k]["product1"],
+                         'product2' => $arrCsvtouroku[$k]["product2"],
+                         'name_pro1' => $arrCsvtouroku[$k]["name_pro1"],
+                         'name_pro2' => $arrCsvtouroku[$k]["name_pro2"],
+                         'irisu1' => $arrCsvtouroku[$k]["irisu1"],
+                         'irisu2' => $arrCsvtouroku[$k]["irisu2"],
+                         'unit1' => $arrCsvtouroku[$k]["unit1"],
+                         'unit2' => $arrCsvtouroku[$k]["unit2"],
+                         'line_code' => $arrCsvtouroku[$k]["line_code"],
+                         'date' => $arrCsvtouroku[$k]["date"],
+                         'start_lot' => $arrCsvtouroku[$k]["start_lot"]
+                     ]);
+                   }
+
+
                  } else {
                    $mes = "\\192.168.4.246\home\centosuser\label_csv にＣＳＶファイルが出力されました。※データベースへ登録されませんでした。Productsテーブルに".$meserror;
                    $this->set('mes',$mes);
@@ -1302,6 +1333,37 @@ class LabelsController extends AppController
                   $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました";
                   $this->set('mes',$mes);
                   $connection->commit();// コミット5
+
+                  //insert into label_csvする
+                  $connection = ConnectionManager::get('DB_ikou_test');
+                  $table = TableRegistry::get('label_csv');
+                  $table->setConnection($connection);
+ /*
+                  echo "<pre>";
+                  print_r($arrCsvtouroku);
+                  echo "</pre>";
+ */
+                  for($k=0; $k<count($arrCsvtouroku); $k++){
+                    $connection->insert('label_csv', [
+                        'number_sheet' => $arrCsvtouroku[$k]["number_sheet"],
+                        'hanbetsu' => $arrCsvtouroku[$k]["hanbetsu"],
+                        'place1' => $arrCsvtouroku[$k]["place1"],
+                        'place2' => $arrCsvtouroku[$k]["place2"],
+                        'product1' => $arrCsvtouroku[$k]["product1"],
+                        'product2' => $arrCsvtouroku[$k]["product2"],
+                        'name_pro1' => $arrCsvtouroku[$k]["name_pro1"],
+                        'name_pro2' => $arrCsvtouroku[$k]["name_pro2"],
+                        'irisu1' => $arrCsvtouroku[$k]["irisu1"],
+                        'irisu2' => $arrCsvtouroku[$k]["irisu2"],
+                        'unit1' => $arrCsvtouroku[$k]["unit1"],
+                        'unit2' => $arrCsvtouroku[$k]["unit2"],
+                        'line_code' => $arrCsvtouroku[$k]["line_code"],
+                        'date' => $arrCsvtouroku[$k]["date"],
+                        'start_lot' => $arrCsvtouroku[$k]["start_lot"]
+                    ]);
+                  }
+
+
                 } else {
                   $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました※データベースへ登録されませんでした";
                   $this->set('mes',$mes);
@@ -1511,6 +1573,37 @@ class LabelsController extends AppController
                      $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました";
                      $this->set('mes',$mes);
                      $connection->commit();// コミット5
+
+                     //insert into label_csvする
+                     $connection = ConnectionManager::get('DB_ikou_test');
+                     $table = TableRegistry::get('label_csv');
+                     $table->setConnection($connection);
+    /*
+                     echo "<pre>";
+                     print_r($arrCsvtouroku);
+                     echo "</pre>";
+    */
+                     for($k=0; $k<count($arrCsvtouroku); $k++){
+                       $connection->insert('label_csv', [
+                           'number_sheet' => $arrCsvtouroku[$k]["number_sheet"],
+                           'hanbetsu' => $arrCsvtouroku[$k]["hanbetsu"],
+                           'place1' => $arrCsvtouroku[$k]["place1"],
+                           'place2' => $arrCsvtouroku[$k]["place2"],
+                           'product1' => $arrCsvtouroku[$k]["product1"],
+                           'product2' => $arrCsvtouroku[$k]["product2"],
+                           'name_pro1' => $arrCsvtouroku[$k]["name_pro1"],
+                           'name_pro2' => $arrCsvtouroku[$k]["name_pro2"],
+                           'irisu1' => $arrCsvtouroku[$k]["irisu1"],
+                           'irisu2' => $arrCsvtouroku[$k]["irisu2"],
+                           'unit1' => $arrCsvtouroku[$k]["unit1"],
+                           'unit2' => $arrCsvtouroku[$k]["unit2"],
+                           'line_code' => $arrCsvtouroku[$k]["line_code"],
+                           'date' => $arrCsvtouroku[$k]["date"],
+                           'start_lot' => $arrCsvtouroku[$k]["start_lot"]
+                       ]);
+                     }
+
+
                    } else {
                      $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました※データベースへ登録されませんでした";
                      $this->set('mes',$mes);
@@ -2147,8 +2240,8 @@ class LabelsController extends AppController
           'line_code' => "", 'date' => $date, 'start_lot' => 1, 'delete_flag' => 0];//unit2,line_code1...不要
       }
 
-  //    $fp = fopen('labels/label_hasu_200424.csv', 'w');
-      $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
+      $fp = fopen('labels/label_hasu_200424.csv', 'w');
+  //    $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
       foreach ($arrCsv as $line) {
   //      $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
         fputcsv($fp, $line);
@@ -2167,6 +2260,37 @@ class LabelsController extends AppController
                  $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました";
                  $this->set('mes',$mes);
                  $connection->commit();// コミット5
+
+                 //insert into label_csvする
+                 $connection = ConnectionManager::get('DB_ikou_test');
+                 $table = TableRegistry::get('label_csv');
+                 $table->setConnection($connection);
+/*
+                 echo "<pre>";
+                 print_r($arrCsvtouroku);
+                 echo "</pre>";
+*/
+                 for($k=0; $k<count($arrCsvtouroku); $k++){
+                   $connection->insert('label_csv', [
+                       'number_sheet' => $arrCsvtouroku[$k]["number_sheet"],
+                       'hanbetsu' => $arrCsvtouroku[$k]["hanbetsu"],
+                       'place1' => $arrCsvtouroku[$k]["place1"],
+                       'place2' => $arrCsvtouroku[$k]["place2"],
+                       'product1' => $arrCsvtouroku[$k]["product1"],
+                       'product2' => $arrCsvtouroku[$k]["product2"],
+                       'name_pro1' => $arrCsvtouroku[$k]["name_pro1"],
+                       'name_pro2' => $arrCsvtouroku[$k]["name_pro2"],
+                       'irisu1' => $arrCsvtouroku[$k]["irisu1"],
+                       'irisu2' => $arrCsvtouroku[$k]["irisu2"],
+                       'unit1' => $arrCsvtouroku[$k]["unit1"],
+                       'unit2' => $arrCsvtouroku[$k]["unit2"],
+                       'line_code' => $arrCsvtouroku[$k]["line_code"],
+                       'date' => $arrCsvtouroku[$k]["date"],
+                       'start_lot' => $arrCsvtouroku[$k]["start_lot"]
+                   ]);
+                 }
+
+
                } else {
                  $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました。※データベースへ登録されませんでした。Productsテーブルに".$meserror;
                  $this->set('mes',$mes);

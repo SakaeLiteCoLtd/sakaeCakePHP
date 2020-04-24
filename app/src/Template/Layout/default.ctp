@@ -83,7 +83,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
                           <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_denpyou.gif',array('width'=>'105','height'=>'36'));?></a></td>
                           <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'PriceMaterials', 'action'=>'confirmcsv', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_csv.gif',array('width'=>'105','height'=>'36'));?></a></td>
                           <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_kouteikensa.gif',array('width'=>'105','height'=>'36'));?></a></td>
-                          <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'Labels', 'action'=>'indexmenu', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_label.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'Labels', 'action'=>'indexMenu', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_label.gif',array('width'=>'105','height'=>'36'));?></a></td>
                         </tr>
               </table>
             </td>

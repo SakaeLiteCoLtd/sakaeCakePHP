@@ -8,7 +8,7 @@
  $this->LabelElementPlaces = TableRegistry::get('labelElementPlaces');
 
 ?>
-<?= $this->Form->create($labelTypeProducts, ['url' => ['action' => 'indexmenu']]) ?>
+<?= $this->Form->create($labelTypeProducts, ['url' => ['action' => 'indexMenu']]) ?>
 
 <?php
   $username = $this->request->Session()->read('Auth.User.username');

@@ -46,6 +46,8 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
   <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="left"><?= $this->Form->submit(__('９号機'), array('name' => '9gouki')); ?></div></td>
 </tr>
 </table>
+<br><br><br><br>
+
 
 <?php for ($j=1;$j<10;$j++): ?>
   <?php for ($i=1;$i<${"n".$j}+1;$i++): ?>
@@ -60,8 +62,8 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
     <tr style="border-bottom: 0px;border-width: 0px">
       <td width="10" colspan="10" nowrap="nowrap"><div align="center"></div></td>
-      <td width="250" height="60" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 20pt; color:blue">品番</strong></div></td>
-      <td width="400" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">成形時間</strong></div></td>
+      <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">品番</strong></div></td>
+      <td width="400" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">成形時間</strong></div></td>
       <td width="200" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:blue">予定枚数</strong></div></td>
       <td width="200" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:blue">箱NO.</strong></div></td>
     </tr>
@@ -100,10 +102,10 @@ if(null == ($this->request->getData("11gouki")) && null == ($this->request->getD
     ${"present_kensahyou".$i} = ${"arrP".$j.$i}['present_kensahyou'];
 
         echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-        echo "<td rowspan='2'  height='6' colspan='10' nowrap='nowrap'>\n";
+        echo "<td rowspan='2' colspan='10' nowrap='nowrap'>\n";
         echo "<input type='checkbox' name=check".$j.$i." size='6'/>\n";
         echo "</td>\n";
-        echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+        echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
         echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
         echo "</td>\n";
         echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";

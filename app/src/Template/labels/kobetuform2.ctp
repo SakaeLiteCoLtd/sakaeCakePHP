@@ -81,7 +81,7 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
 
             echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
             echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap' style='font-size: 15pt'>\n";
-            echo $data['product_code'];
+            echo $product_code;
             echo "</td>\n";
             echo "<td colspan='40' nowrap='nowrap' style='font-size: 15pt'><div align='center'>\n";
             echo $datekobetu;
@@ -98,7 +98,7 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
        $username = $this->request->Session()->read('Auth.User.username');
                $resultArray = Array();
                  $_SESSION['labeljunbi'] = array(
-                   'product_code' => $_POST["product_code"],
+                   'product_code' => $product_code,
                    'kobetudate' => $_POST["kobetudate"],
                    'hakoNo' => $_POST["hakoNo"],
                    "present_kensahyou" => 0,

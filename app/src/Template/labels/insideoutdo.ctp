@@ -5,7 +5,7 @@
  * @var \App\Model\Entity\Deliver $priceMaterial
  */
 ?>
-<?= $this->Form->create($labelInsideouts, ['url' => ['action' => 'indexmenu']]) ?>
+<?= $this->Form->create($labelInsideouts, ['url' => ['action' => 'indexMenu']]) ?>
 
 <?php
   $username = $this->request->Session()->read('Auth.User.username');

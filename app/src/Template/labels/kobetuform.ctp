@@ -173,7 +173,7 @@ ${"n".$j} = 1;
  $nij = ${"n".$j} + $this->request->getData("ntuika{$j}");
  for($i=1; $i<=$nij; $i++){//１号機
    if(null !== ($this->request->getData("product_code{$j}{$i}"))){
-     ${"product_code".$i} = $this->request->getData("product_code{$j}{$i}");
+     ${"product_code".$i} = $product_code;
      $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
      if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
        $torisu = $Product[0]->torisu;
@@ -199,7 +199,7 @@ ${"n".$j} = 1;
      ${"hakoNo".$i} = $this->request->getData("hakoNo{$j}{$i}");
        echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
        echo "<td rowspan='2'  height='10' colspan='20' nowrap='nowrap' style='font-size: 18pt'><div align='center'>\n";
-       echo $this->request->getData("product_code{$j}{$i}");
+       echo $product_code;
        echo "</div></td>\n";
        echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
        echo "開始";
@@ -229,7 +229,7 @@ ${"n".$j} = 1;
          $m = $m + 1;
                $resultArray = Array();
                  $_SESSION['labeljunbi'][$m] = array(
-                   'product_code' => $_POST["product_code{$j}{$i}"],
+                   'product_code' => $product_code,
                    'seikeiki_code' => "",
                    'starting_tm' => ${"hyoujistarting_tm".$j.$i},
                    'finishing_tm' => ${"hyoujifinishing_tm".$j.$i},
@@ -249,37 +249,6 @@ ${"n".$j} = 1;
  </table>
  <br><br>
 
- <?php
-//   $session = $this->request->getSession();
-//   $username = $this->request->Session()->read('Auth.User.username');
-/*
-   $m = 0;
-   for($n=1; $n<=$countj; $n++){
-     $m = $m + 1;
-           $resultArray = Array();
-             $_SESSION['labeljunbi'][$m] = array(
-               'product_code' => $_POST["product_code{$j}{$n}"],
-               'seikeiki' => $j,
-               'seikeiki_code' => "",
-               'starting_tm' => $_POST["starting_tm{$j}{$n}"],
-               'finishing_tm' => $_POST["finishing_tm{$j}{$n}"],
-               'hakoNo' => $_POST["hakoNo{$j}{$n}"],
-               'yoteimaisu' => $_POST["yoteimaisu{$j}{$n}"],
-               "present_kensahyou" => 0,
-             );
-         }
-   $this->set('m',$m);
-   $m1 = $m;
-   $this->set('m1',$m1);
-
-   echo "<pre>";
-   print_r($_SESSION['labeljunbi']);
-   echo "</pre>";
-  echo "<pre>";
-  print_r($m);
-  echo "</pre>";
-*/
-  ?>
   <br>
 
   <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

@@ -12,7 +12,7 @@
           header('Pragma:');
 ?>
 
-<?=$this->Form->create($checkLots, ['url' => ['action' => 'fushiyoumaisuu']]) ?>
+<?=$this->Form->create($checkLots, ['url' => ['action' => 'fushiyouconfirm']]) ?>
 <?php
  use App\myClass\Labelmenus\htmlLabelmenu;//myClassフォルダに配置したクラスを使用
  $htmlLabelmenu = new htmlLabelmenu();
@@ -37,17 +37,23 @@
 <br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-		<td bgcolor="#FFFFCC" style="width: 300px"><strong style="font-size: 13pt; color:blue">ロットNo．</strong></td>
+    <td bgcolor="#FFFFCC" style="width: 200px"><strong style="font-size: 13pt; color:blue">品番</strong></td>
+    <td bgcolor="#FFFFCC" style="width: 200px"><strong style="font-size: 13pt; color:blue">ロットNo．</strong></td>
+    <td bgcolor="#FFFFCC" style="width: 200px"><strong style="font-size: 13pt; color:blue">連続枚数</strong></td>
 	</tr>
   <tr>
-		<td bgcolor="#FFFFCC"><?= $this->Form->control('place1', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="263"  bgcolor="#FFFFCC" style="font-size: 12pt;"><?= h($product_code1) ?></td>
+    <td width="263"  bgcolor="#FFFFCC" style="font-size: 12pt;"><?= h($lot_num) ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->control('maisuu', array('type'=>'text', 'value'=>1, 'label'=>false)) ?></td>
 	</tr>
 </table>
 <br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr>
-  <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('枚数登録'), array('name' => 'kakunin')); ?></div></td>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('登録確認'), array('name' => 'kakunin')); ?></div></td>
 </tr>
 </table>
+<?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$product_code1, 'label'=>false)) ?>
+<?= $this->Form->control('lot_num', array('type'=>'hidden', 'value'=>$lot_num, 'label'=>false)) ?>
 
 <?=$this->Form->end() ?>

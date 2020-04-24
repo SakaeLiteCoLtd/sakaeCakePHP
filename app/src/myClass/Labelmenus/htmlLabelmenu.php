@@ -28,7 +28,7 @@ class htmlLabelmenu extends AppController
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/index'>\n".
                   "<img src='/img/Labelimg/label_genzai.gif' width=115 height=40>\n".
                   "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/index0'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/indexShinki'>\n".//ctpの名前は、index_shinki.ctp
                   "<img src='/img/Labelimg/label_shinki.gif' width=115 height=40>\n".
                   "</a>\n";
 
@@ -64,7 +64,7 @@ class htmlLabelmenu extends AppController
                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/torikomipreadd'>\n".
                 "<img src='/img/Labelimg/lot_rireki_torikomi.gif' width=85 height=36>\n".
                 "</a></td>\n".
-                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/fushiyouform'>\n".
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/fushiyouMenu'>\n".
                 "<img src='/img/Labelimg/label_fushiyou.gif' width=85 height=36>\n".
                 "</a>\n".
                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/hasulotstafftouroku'>\n".

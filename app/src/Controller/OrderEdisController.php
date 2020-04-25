@@ -125,6 +125,41 @@ class OrderEdisController extends AppController
                  $mes = "※登録されました";
                  $this->set('mes',$mes);
                  $connection->commit();// コミット5
+
+                 //insert into order_ediする
+                 $connection = ConnectionManager::get('DB_ikou_test');
+                 $table = TableRegistry::get('order_edi');
+                 $table->setConnection($connection);
+/*
+                 echo "<pre>";
+                 print_r($arrFp);
+                 echo "</pre>";
+*/
+                 for($k=0; $k<count($arrFp); $k++){
+                   $connection->insert('order_edi', [
+                       'date_order' => $arrFp[$k]["date_order"],
+                       'num_order' => $arrFp[$k]["num_order"],
+                       'product_id' => $arrFp[$k]["product_code"],
+                       'price' => $arrFp[$k]["price"],
+                       'date_deliver' => $arrFp[$k]["date_deliver"],
+                    //   'first_date_deliver' => $arrFp[$k]["first_date_deliver"],
+                       'amount' => $arrFp[$k]["amount"],
+                       'cs_id' => $arrFp[$k]["customer_code"],
+                       'place_deliver_id' => $arrFp[$k]["place_deliver_code"],
+                       'place_line' => $arrFp[$k]["place_line"],
+                       'line_code' => $arrFp[$k]["line_code"],
+                       'check_denpyou' => $arrFp[$k]["check_denpyou"],
+                    //   'gaityu' => $arrFp[$k]["gaityu"],
+                       'bunnou' => $arrFp[$k]["bunnou"],
+                       'kannou' => $arrFp[$k]["kannou"],
+                    //   'date_bunnou' => $arrFp[$k]["date_bunnou"],
+                    //   'check_kannou' => $arrFp[$k]["check_kannou"],
+                       'delete_flg' => $arrFp[$k]["delete_flag"],
+                       'created_at' => date("Y-m-d H:i:s")
+                   ]);
+                 }
+
+
                } else {
                  $mes = "※登録されませんでした";
                  $this->set('mes',$mes);
@@ -288,6 +323,37 @@ class OrderEdisController extends AppController
           if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
             //ここからDenpyouDnpMinoukannousへ登録用
 
+            //insert into order_ediする
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('order_edi');
+            $table->setConnection($connection);
+/*
+            echo "<pre>";
+            print_r($arrFp);
+            echo "</pre>";
+*/
+            for($k=0; $k<count($arrEDI); $k++){
+              $connection->insert('order_edi', [
+                  'date_order' => $arrEDI[$k]["date_order"],
+                  'num_order' => $arrEDI[$k]["num_order"],
+                  'product_id' => $arrEDI[$k]["product_code"],
+                  'price' => $arrEDI[$k]["price"],
+                  'date_deliver' => $arrEDI[$k]["date_deliver"],
+                  'amount' => $arrEDI[$k]["amount"],
+                  'cs_id' => $arrEDI[$k]["customer_code"],
+                  'place_deliver_id' => $arrEDI[$k]["place_deliver_code"],
+                  'place_line' => $arrEDI[$k]["place_line"],
+                  'line_code' => $arrEDI[$k]["line_code"],
+                  'check_denpyou' => $arrEDI[$k]["check_denpyou"],
+                  'bunnou' => $arrEDI[$k]["bunnou"],
+                  'kannou' => $arrEDI[$k]["kannou"],
+                  'delete_flg' => $arrEDI[$k]["delete_flag"],
+                  'created_at' => date("Y-m-d H:i:s")
+              ]);
+            }
+            $connection = ConnectionManager::get('default');
+
+
             for ($k=1; $k<=$count-1; $k++) {//最後の行まで
               $line = fgets($fp2);//ファイル$fpの上の１行を取る（２行目から）
               $sample = explode(',',$line);//$lineを','毎に配列に入れる
@@ -339,6 +405,37 @@ class OrderEdisController extends AppController
             $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($denpyouDnpMinoukannous, $arrDenpyouDnpMinoukannous);//patchEntitiesで一括登録
             if ($this->DenpyouDnpMinoukannous->saveMany($denpyouDnpMinoukannous)) {//saveManyで一括登録//ここからDnpTotalAmountsへ登録用
 
+              /*
+              //insert into order_ediする
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_edi');
+              $table->setConnection($connection);
+
+              echo "<pre>";
+              print_r($uniquearrDnpTotalAmounts);
+              echo "</pre>";
+
+              for($k=0; $k<count($arrEDI); $k++){
+                $connection->insert('order_edi', [
+                    'date_order' => $uniquearrDnpTotalAmounts[$k]["date_order"],
+                    'num_order' => $uniquearrDnpTotalAmounts[$k]["num_order"],
+                    'product_id' => $uniquearrDnpTotalAmounts[$k]["product_code"],
+                    'price' => $uniquearrDnpTotalAmounts[$k]["price"],
+                    'date_deliver' => $uniquearrDnpTotalAmounts[$k]["date_deliver"],
+                    'amount' => $uniquearrDnpTotalAmounts[$k]["amount"],
+                    'cs_id' => $uniquearrDnpTotalAmounts[$k]["customer_code"],
+                    'place_deliver_id' => $uniquearrDnpTotalAmounts[$k]["place_deliver_code"],
+                    'place_line' => $uniquearrDnpTotalAmounts[$k]["place_line"],
+                    'line_code' => $uniquearrDnpTotalAmounts[$k]["line_code"],
+                    'check_denpyou' => $uniquearrDnpTotalAmounts[$k]["check_denpyou"],
+                    'bunnou' => $uniquearrDnpTotalAmounts[$k]["bunnou"],
+                    'kannou' => $uniquearrDnpTotalAmounts[$k]["kannou"],
+                    'delete_flg' => $uniquearrDnpTotalAmounts[$k]["delete_flag"],
+                    'created_at' => $uniquearrDnpTotalAmounts("Y-m-d H:i:s")
+                ]);
+              }
+              $connection = ConnectionManager::get('default');
+*/
               for ($k=1; $k<=$count-1; $k++) {//最後の行まで
                 $line = fgets($fp3);//ファイル$fpの上の１行を取る（２行目から）
                 $sample = explode(',',$line);//$lineを','毎に配列に入れる
@@ -400,11 +497,11 @@ class OrderEdisController extends AppController
 
               $uniquearrDnpdouitutyuumon = array_unique($arrDnpdouitutyuumon, SORT_REGULAR);//重複削除
               $uniquearrDnpdouitutyuumon = array_values($uniquearrDnpdouitutyuumon);
-/*
+
               echo "<pre>";
               print_r($uniquearrDnpdouitutyuumon);
               echo "</pre>";
-*/
+
 //$uniquearrDnpdouitutyuumonを使って、order_ediテーブルのbunnnouを更新、dnp_minoukannouテーブルのminoukannouを更新
 
               for($n=0; $n<=10000; $n++){
@@ -427,6 +524,18 @@ class OrderEdisController extends AppController
                       ['bunnou' => $m+1, 'updated_at' => date('Y-m-d H:i:s')],//bunnouを納期順に1,2,3...とうまく更新していく
                       ['id'   => $uniquearrDnpdouitutyuumon[$n][$m]['id']]
                       );
+
+/*
+                      $connection = ConnectionManager::get('DB_ikou');
+                      $table = TableRegistry::get('check_lots');
+                      $table->setConnection($connection);
+
+                      $updater = "UPDATE check_lots set flag_used = 1 where product_id ='".$data["product_code"]."' and lot_num = '".$data["lot_num_".$i]."'";//もとのDBも更新
+                      $connection->execute($updater);
+
+                      $connection = ConnectionManager::get('default');
+*/
+
                     }else{
                       break;
                     }
@@ -456,6 +565,37 @@ class OrderEdisController extends AppController
                    if ($this->DnpTotalAmounts->saveMany($dnpTotalAmounts)) {//saveManyで一括登録
                      $mes = "※登録されました";
                      $this->set('mes',$mes);
+/*
+                     //insert into order_ediする
+                     $connection = ConnectionManager::get('DB_ikou_test');
+                     $table = TableRegistry::get('order_edi');
+                     $table->setConnection($connection);
+
+                     echo "<pre>";
+                     print_r($uniquearrDnpTotalAmounts);
+                     echo "</pre>";
+
+                     for($k=0; $k<count($arrEDI); $k++){
+                       $connection->insert('order_edi', [
+                           'date_order' => $uniquearrDnpTotalAmounts[$k]["date_order"],
+                           'num_order' => $uniquearrDnpTotalAmounts[$k]["num_order"],
+                           'product_id' => $uniquearrDnpTotalAmounts[$k]["product_code"],
+                           'price' => $uniquearrDnpTotalAmounts[$k]["price"],
+                           'date_deliver' => $uniquearrDnpTotalAmounts[$k]["date_deliver"],
+                           'amount' => $uniquearrDnpTotalAmounts[$k]["amount"],
+                           'cs_id' => $uniquearrDnpTotalAmounts[$k]["customer_code"],
+                           'place_deliver_id' => $uniquearrDnpTotalAmounts[$k]["place_deliver_code"],
+                           'place_line' => $uniquearrDnpTotalAmounts[$k]["place_line"],
+                           'line_code' => $uniquearrDnpTotalAmounts[$k]["line_code"],
+                           'check_denpyou' => $uniquearrDnpTotalAmounts[$k]["check_denpyou"],
+                           'bunnou' => $uniquearrDnpTotalAmounts[$k]["bunnou"],
+                           'kannou' => $uniquearrDnpTotalAmounts[$k]["kannou"],
+                           'delete_flg' => $uniquearrDnpTotalAmounts[$k]["delete_flag"],
+                           'created_at' => $uniquearrDnpTotalAmounts("Y-m-d H:i:s")
+                       ]);
+                     }
+*/
+
                    } else {
                      $mes = "※登録されませんでした";
                      $this->set('mes',$mes);
@@ -584,6 +724,26 @@ class OrderEdisController extends AppController
                $this->set('mes',$mes);
     //           file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));
                $connection->commit();// コミット5
+
+               //insert into label_csvする
+               $connection = ConnectionManager::get('DB_ikou_test');
+               $table = TableRegistry::get('syoyou_keikaku');
+               $table->setConnection($connection);
+/*
+               echo "<pre>";
+               print_r($arrSyoyouKeikaku);
+               echo "</pre>";
+*/
+               for($k=0; $k<count($arrSyoyouKeikaku); $k++){
+                 $connection->insert('syoyou_keikaku', [
+                     'date_keikaku' => $arrSyoyouKeikaku[$k]["date_keikaku"],
+                     'num_keikaku' => $arrSyoyouKeikaku[$k]["num_keikaku"],
+                     'product_id' => $arrSyoyouKeikaku[$k]["product_code"],
+                     'date_deliver' => $arrSyoyouKeikaku[$k]["date_deliver"],
+                     'amount' => $arrSyoyouKeikaku[$k]["amount"]
+                 ]);
+               }
+
              } else {
                $mes = "※登録されませんでした";
                $this->set('mes',$mes);

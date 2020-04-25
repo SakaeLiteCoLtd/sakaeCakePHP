@@ -725,95 +725,272 @@ class LabelsController extends AppController
 
           $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
-          if(isset($LabelSetikkatsu1[0])){
-            $product_code2 = $LabelSetikkatsu1[0]->product_id2;
-            $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
-            $product_name2 = $Product2[0]->product_name;
-            $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
-              if(isset($Konpou[0])){
-                $irisu2 = $Konpou[0]->irisu;
-              }else{
-                $irisu2 = "";
-              }
-      //      $unit = "set";
-          }elseif(isset($LabelSetikkatsu2[0])){
-            $product_code2 = $LabelSetikkatsu2[0]->product_id1;
-            $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
-            $product_name2 = $Product2[0]->product_name;
-            $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
-              if(isset($Konpou[0])){
-                $irisu2 = $Konpou[0]->irisu;
-              }else{
-                $irisu2 = "";
-              }
-      //      $unit = "set";
-          }else{
+          $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+
+          if($LabelTypeProduct[0]->type == "C"){//〇タイプCの場合は１行に２製品の表示
+
+            if(isset($LabelSetikkatsu1[0])){
+              $product_code2 = $LabelSetikkatsu1[0]->product_id2;
+              $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
+              $product_name2 = $Product2[0]->product_name;
+              $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
+                if(isset($Konpou[0])){
+                  $irisu2 = $Konpou[0]->irisu;
+                }else{
+                  $irisu2 = "";
+                }
+            }elseif(isset($LabelSetikkatsu2[0])){
+              $product_code2 = $LabelSetikkatsu2[0]->product_id1;
+              $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
+              $product_name2 = $Product2[0]->product_name;
+              $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
+                if(isset($Konpou[0])){
+                  $irisu2 = $Konpou[0]->irisu;
+                }else{
+                  $irisu2 = "";
+                }
+            }else{
+              $product_code2 = "";
+              $product_name2 = "";
+              $irisu2 = "";
+            }
+
+            $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+             'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+             'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+             'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+             $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+              'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+              'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+          }elseif(isset($LabelSetikkatsu1[0]) || isset($LabelSetikkatsu2[0])){//〇タイプCでなくセット取りの場合
+          //まずセット取りの片方の行を登録
             $product_code2 = "";
             $product_name2 = "";
             $irisu2 = "";
-      //      $unit = "";
-          }
 
-          $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
-           'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-           'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
-           'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
-           //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
-           $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-            'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
-            'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-            'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
-           $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
-           if(isset($Customer[0])){
-             $costomerName = $Customer[0]->name;
-           }else{
-             $costomerName = "";
-           }
-           if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ"){//mb_substrだと文字化けしない
-             $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
-             //maisu=$_SESSION['labeljunbi'][$i]['yoteimaisu']*num_inside
-             $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
-             $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
-             if(isset($LabelInsideout1[0])){
-               $num_inside1 = $LabelInsideout1[0]->num_inside;
-             }else{
-               $num_inside1 = 1;
-             }
-             if(isset($LabelInsideout2[0])){
-               $num_inside2 = $LabelInsideout2[0]->num_inside;
-               $irisu22 = $irisu2/$num_inside2;
-/*
-               echo "<pre>";//num_inside=0の製品もある（MLD-NDS-20001,MLD-NDS-20002）
-               print_r($product_code2."-".$num_inside2);
-               echo "</pre>";
-*/
-             }else{
-               $num_inside2 = 1;
-               $irisu22 = "";
-             }
-             $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
-             if(isset($LabelTypeProduct[0])){
-               $Layout = $LabelTypeProduct[0]->type;
-             }else{
-               $Layout = "-";
-             }
-             $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
-             $irisu12 = $irisu/$num_inside1;
-             $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
-//             $irisu22 = $irisu2/$num_inside2;
-
-             $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
-             'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-             'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
-             'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+            $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+             'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+             'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+             'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
              $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-               'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
-               'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-               'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
-           }
+              'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+              'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+              if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+
+                $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+                //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
+                $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+                if(isset($LabelInsideout1[0])){
+                  $num_inside1 = $LabelInsideout1[0]->num_inside;
+                }else{
+                  $num_inside1 = 1;
+                }
+                if(isset($LabelInsideout2[0])){
+                  $num_inside2 = $LabelInsideout2[0]->num_inside;
+                  $irisu22 = $irisu2/$num_inside2;
+                }else{
+                    $num_inside2 = 1;
+                    $irisu22 = "";
+                }
+                $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                if(isset($LabelTypeProduct[0])){
+                  $Layout = $LabelTypeProduct[0]->type;
+                }else{
+                  $Layout = "-";
+                }
+                $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
+                $irisu12 = $irisu/$num_inside1;
+                $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+    //            $irisu22 = $irisu2/$num_inside2;
+                $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
+                'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                 'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                 'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                 'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+               }
+
+                if(isset($LabelSetikkatsu1[0])){//セット取りのもう片方が$LabelSetikkatsu1[0]にあった場合
+                  $product_id2 = $LabelSetikkatsu1[0]->product_id2;
+                  $Product2 = $this->Products->find()->where(['product_code' => $product_id2])->toArray();
+                  $product_name = $Product2[0]->product_name;
+                  $Konpou = $this->Konpous->find()->where(['product_code' => $product_id2])->toArray();
+                    if(isset($Konpou[0])){
+                      $irisu = $Konpou[0]->irisu;
+                    }else{
+                      $irisu = "";
+                    }
+
+                    $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+                     'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                     'product_code' => $product_id2, 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+                     'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                     $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                      'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                      'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+                      'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+                      if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+
+                        $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+                        //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
+                        $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                        $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+                        if(isset($LabelInsideout1[0])){
+                          $num_inside1 = $LabelInsideout1[0]->num_inside;
+                        }else{
+                          $num_inside1 = 1;
+                        }
+                        if(isset($LabelInsideout2[0])){
+                          $num_inside2 = $LabelInsideout2[0]->num_inside;
+                          $irisu22 = $irisu2/$num_inside2;
+                        }else{
+                            $num_inside2 = 1;
+                            $irisu22 = "";
+                        }
+                        $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                        if(isset($LabelTypeProduct[0])){
+                          $Layout = $LabelTypeProduct[0]->type;
+                        }else{
+                          $Layout = "-";
+                        }
+                        $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
+                        $irisu12 = $irisu/$num_inside1;
+                        $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+            //            $irisu22 = $irisu2/$num_inside2;
+                        $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
+                        'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                        'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                        'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                        $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                         'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                         'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                         'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                       }
+
+                }else{//セット取りのもう片方が$LabelSetikkatsu2[0]にあった場合
+                  $product_id2 = $LabelSetikkatsu2[0]->product_id1;
+                  $Product2 = $this->Products->find()->where(['product_code' => $product_id2])->toArray();
+                  $product_name = $Product2[0]->product_name;
+                  $Konpou = $this->Konpous->find()->where(['product_code' => $product_id2])->toArray();
+                    if(isset($Konpou[0])){
+                      $irisu = $Konpou[0]->irisu;
+                    }else{
+                      $irisu = "";
+                    }
+
+                    $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+                     'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                     'product_code' => $product_id2, 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+                     'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                     $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                      'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                      'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+                      'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+                      if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+
+                        $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+                        //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
+                        $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                        $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+                        if(isset($LabelInsideout1[0])){
+                          $num_inside1 = $LabelInsideout1[0]->num_inside;
+                        }else{
+                          $num_inside1 = 1;
+                        }
+                        if(isset($LabelInsideout2[0])){
+                          $num_inside2 = $LabelInsideout2[0]->num_inside;
+                          $irisu22 = $irisu2/$num_inside2;
+                        }else{
+                            $num_inside2 = 1;
+                            $irisu22 = "";
+                        }
+                        $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                        if(isset($LabelTypeProduct[0])){
+                          $Layout = $LabelTypeProduct[0]->type;
+                        }else{
+                          $Layout = "-";
+                        }
+                        $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
+                        $irisu12 = $irisu/$num_inside1;
+                        $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+            //            $irisu22 = $irisu2/$num_inside2;
+                        $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
+                        'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                        'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                        'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                        $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                         'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                         'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                         'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                       }
+              }
+
+          }else{//〇タイプCでもセット取りでもない場合１行に１製品
+            $product_code2 = "";
+            $product_name2 = "";
+            $irisu2 = "";
+
+            $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+             'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+             'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+             'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+             $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+              'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+              'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+              if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+
+                $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+                //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
+                $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+                if(isset($LabelInsideout1[0])){
+                  $num_inside1 = $LabelInsideout1[0]->num_inside;
+                }else{
+                  $num_inside1 = 1;
+                }
+                if(isset($LabelInsideout2[0])){
+                  $num_inside2 = $LabelInsideout2[0]->num_inside;
+                  $irisu22 = $irisu2/$num_inside2;
+                }else{
+                    $num_inside2 = 1;
+                    $irisu22 = "";
+                }
+                $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                if(isset($LabelTypeProduct[0])){
+                  $Layout = $LabelTypeProduct[0]->type;
+                }else{
+                  $Layout = "-";
+                }
+                $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
+                $irisu12 = $irisu/$num_inside1;
+                $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+    //            $irisu22 = $irisu2/$num_inside2;
+                $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
+                'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                 'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                 'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                 'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+               }
+          }//修正
+
         }
+
   //      $fp = fopen('\\192.168.4.1\Public\Downloads\label_csv\label_hakkou_test.csv', 'w');
-  //      $fp = fopen('labels/label_ikkatu_2004232set.csv', 'w');
+  //      $fp = fopen('labels/label_ikkatu_2004253.csv', 'w');
         $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
 
         foreach ($arrCsv as $line) {
@@ -840,7 +1017,7 @@ class LabelsController extends AppController
                    $connection->commit();// コミット5
 
                    //insert into label_csvする
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('label_csv');
                    $table->setConnection($connection);
   /*
@@ -1219,34 +1396,36 @@ class LabelsController extends AppController
 
          $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $_SESSION['labeljunbi']['product_code']])->toArray();
          $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $_SESSION['labeljunbi']['product_code']])->toArray();
-         if(isset($LabelSetikkatsu1[0])){
-           $product_code2 = $LabelSetikkatsu1[0]->product_id2;
-           $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
-           $product_name2 = $Product2[0]->product_name;
-           $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
-             if(isset($Konpou[0])){
-               $irisu2 = $Konpou[0]->irisu;
-             }else{
-               $irisu2 = "";
-             }
-    //       $unit = "set";
-         }elseif(isset($LabelSetikkatsu2[0])){
-           $product_code2 = $LabelSetikkatsu2[0]->product_id1;
-           $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
-           $product_name2 = $Product2[0]->product_name;
-           $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
-             if(isset($Konpou[0])){
-               $irisu2 = $Konpou[0]->irisu;
-             }else{
-               $irisu2 = "";
-             }
-    //       $unit = "set";
-         }else{
-           $product_code2 = "";
-           $product_name2 = "";
-           $irisu2 = "";
-    //       $unit = "";
-         }
+         $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
+
+         if($LabelTypeProduct[0]->type == "C"){//〇タイプCの場合は１行に２製品の表示
+
+           if(isset($LabelSetikkatsu1[0])){
+             $product_code2 = $LabelSetikkatsu1[0]->product_id2;
+             $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
+             $product_name2 = $Product2[0]->product_name;
+             $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
+               if(isset($Konpou[0])){
+                 $irisu2 = $Konpou[0]->irisu;
+               }else{
+                 $irisu2 = "";
+               }
+           }elseif(isset($LabelSetikkatsu2[0])){
+             $product_code2 = $LabelSetikkatsu2[0]->product_id1;
+             $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
+             $product_name2 = $Product2[0]->product_name;
+             $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
+               if(isset($Konpou[0])){
+                 $irisu2 = $Konpou[0]->irisu;
+               }else{
+                 $irisu2 = "";
+               }
+           }else{
+             $product_code2 = "";
+             $product_name2 = "";
+             $irisu2 = "";
+           }
+
            $arrCsv[] = ['maisu' => "", 'layout' => $Layout, 'lotnum' => $lotnum,
             'renban' => $_SESSION['labeljunbi']['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
             'product_code' => $_SESSION['labeljunbi']['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
@@ -1255,72 +1434,246 @@ class LabelsController extends AppController
              'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
              'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
-          //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
-          $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
-          if(isset($Customer[0])){
-            $costomerName = $Customer[0]->name;
-          }else{
-            $costomerName = "";
-          }
-          if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ"){//mb_substrだと文字化けしない
-            $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
-            //maisu=$_SESSION['labeljunbi'][$i]['yoteimaisu']*num_inside
-            $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
-            $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
-            if(isset($LabelInsideout1[0])){
-              $num_inside1 = $LabelInsideout1[0]->num_inside;
-            }else{
-              $num_inside1 = 1;
-            }
-            if(isset($LabelInsideout2[0])){
-              $num_inside2 = $LabelInsideout2[0]->num_inside;
-              $irisu22 = $irisu2/$num_inside2;
-            }else{
-                $num_inside2 = 1;
-                $irisu22 = "";
-            }
-            $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
-            if(isset($LabelTypeProduct[0])){
-              $Layout = $LabelTypeProduct[0]->type;
-            }else{
-              $Layout = "-";
-            }
-            $irisu12 = $irisu/$num_inside1;
-            $renban = (($_SESSION['labeljunbi']['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
-//            $irisu22 = $irisu2/$num_inside2;
-            $arrCsv[] = ['maisu' => "", 'layout' => $Layout, 'lotnum' => $lotnumIN,
-            'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-            'product_code' => $_SESSION['labeljunbi']['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
-            'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+
+         }elseif(isset($LabelSetikkatsu1[0]) || isset($LabelSetikkatsu2[0])){//〇タイプCでなくセット取りの場合
+    /*       echo "<pre>";
+           print_r("セット");
+           echo "</pre>";
+      */    //まずセット取りの片方の行を登録
+           $product_code2 = "";
+           $product_name2 = "";
+           $irisu2 = "";
+
+           $arrCsv[] = ['maisu' => "", 'layout' => $Layout, 'lotnum' => $lotnum,
+            'renban' => $_SESSION['labeljunbi']['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+            'product_code' => $_SESSION['labeljunbi']['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+            'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
             $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
              'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
-             'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+             'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
-           }
+
+             if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+
+               $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+               //maisu=$_SESSION['labeljunbi'][$i]['yoteimaisu']*num_inside
+               $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
+               $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+               if(isset($LabelInsideout1[0])){
+                 $num_inside1 = $LabelInsideout1[0]->num_inside;
+               }else{
+                 $num_inside1 = 1;
+               }
+               if(isset($LabelInsideout2[0])){
+                 $num_inside2 = $LabelInsideout2[0]->num_inside;
+                 $irisu22 = $irisu2/$num_inside2;
+               }else{
+                   $num_inside2 = 1;
+                   $irisu22 = "";
+               }
+               $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
+               if(isset($LabelTypeProduct[0])){
+                 $Layout = $LabelTypeProduct[0]->type;
+               }else{
+                 $Layout = "-";
+               }
+               $irisu12 = $irisu/$num_inside1;
+               $renban = (($_SESSION['labeljunbi']['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+   //            $irisu22 = $irisu2/$num_inside2;
+               $arrCsv[] = ['maisu' => "", 'layout' => $Layout, 'lotnum' => $lotnumIN,
+               'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+               'product_code' => $_SESSION['labeljunbi']['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+               'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+               $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+              }
+
+               if(isset($LabelSetikkatsu1[0])){//セット取りのもう片方が$LabelSetikkatsu1[0]にあった場合
+                 $product_id2 = $LabelSetikkatsu1[0]->product_id2;
+                 $Product2 = $this->Products->find()->where(['product_code' => $product_id2])->toArray();
+                 $product_name = $Product2[0]->product_name;
+                 $Konpou = $this->Konpous->find()->where(['product_code' => $product_id2])->toArray();
+                   if(isset($Konpou[0])){
+                     $irisu = $Konpou[0]->irisu;
+                   }else{
+                     $irisu = "";
+                   }
+
+                   $arrCsv[] = ['maisu' => "", 'layout' => $Layout, 'lotnum' => $lotnum,
+                    'renban' => $_SESSION['labeljunbi']['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                    'product_code' => $product_id2, 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+                    'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                    $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                     'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                     'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+                     'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+                     if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+
+                       $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+                       //maisu=$_SESSION['labeljunbi'][$i]['yoteimaisu']*num_inside
+                       $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
+                       $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+                       if(isset($LabelInsideout1[0])){
+                         $num_inside1 = $LabelInsideout1[0]->num_inside;
+                       }else{
+                         $num_inside1 = 1;
+                       }
+                       if(isset($LabelInsideout2[0])){
+                         $num_inside2 = $LabelInsideout2[0]->num_inside;
+                         $irisu22 = $irisu2/$num_inside2;
+                       }else{
+                           $num_inside2 = 1;
+                           $irisu22 = "";
+                       }
+                       $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
+                       if(isset($LabelTypeProduct[0])){
+                         $Layout = $LabelTypeProduct[0]->type;
+                       }else{
+                         $Layout = "-";
+                       }
+                       $irisu12 = $irisu/$num_inside1;
+                       $renban = (($_SESSION['labeljunbi']['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+           //            $irisu22 = $irisu2/$num_inside2;
+                       $arrCsv[] = ['maisu' => "", 'layout' => $Layout, 'lotnum' => $lotnumIN,
+                       'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                       'product_code' => $_SESSION['labeljunbi']['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                       'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                       $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                        'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                        'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                        'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                      }
+
+               }else{//セット取りのもう片方が$LabelSetikkatsu2[0]にあった場合
+                 $product_id2 = $LabelSetikkatsu2[0]->product_id1;
+                 $Product2 = $this->Products->find()->where(['product_code' => $product_id2])->toArray();
+                 $product_name = $Product2[0]->product_name;
+                 $Konpou = $this->Konpous->find()->where(['product_code' => $product_id2])->toArray();
+                   if(isset($Konpou[0])){
+                     $irisu = $Konpou[0]->irisu;
+                   }else{
+                     $irisu = "";
+                   }
+
+                   $arrCsv[] = ['maisu' => "", 'layout' => $Layout, 'lotnum' => $lotnum,
+                    'renban' => $_SESSION['labeljunbi']['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                    'product_code' => $product_id2, 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+                    'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                    $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                     'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                     'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+                     'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+                     if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+
+                       $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+                       //maisu=$_SESSION['labeljunbi'][$i]['yoteimaisu']*num_inside
+                       $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
+                       $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+                       if(isset($LabelInsideout1[0])){
+                         $num_inside1 = $LabelInsideout1[0]->num_inside;
+                       }else{
+                         $num_inside1 = 1;
+                       }
+                       if(isset($LabelInsideout2[0])){
+                         $num_inside2 = $LabelInsideout2[0]->num_inside;
+                         $irisu22 = $irisu2/$num_inside2;
+                       }else{
+                           $num_inside2 = 1;
+                           $irisu22 = "";
+                       }
+                       $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
+                       if(isset($LabelTypeProduct[0])){
+                         $Layout = $LabelTypeProduct[0]->type;
+                       }else{
+                         $Layout = "-";
+                       }
+                       $irisu12 = $irisu/$num_inside1;
+                       $renban = (($_SESSION['labeljunbi']['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+           //            $irisu22 = $irisu2/$num_inside2;
+                       $arrCsv[] = ['maisu' => "", 'layout' => $Layout, 'lotnum' => $lotnumIN,
+                       'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                       'product_code' => $_SESSION['labeljunbi']['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                       'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                       $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                        'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                        'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                        'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                      }
+             }
+
+         }else{//〇タイプCでもセット取りでもない場合１行に１製品
+    /*       echo "<pre>";
+           print_r("単体");
+           echo "</pre>";
+*/
+           $product_code2 = "";//修正
+           $product_name2 = "";//修正
+           $irisu2 = "";//修正
+
+           $arrCsv[] = ['maisu' => "", 'layout' => $Layout, 'lotnum' => $lotnum,
+            'renban' => $_SESSION['labeljunbi']['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+            'product_code' => $_SESSION['labeljunbi']['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+            'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+            $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+             'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+             'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+             'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+             if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+
+               $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+               //maisu=$_SESSION['labeljunbi'][$i]['yoteimaisu']*num_inside
+               $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
+               $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+               if(isset($LabelInsideout1[0])){
+                 $num_inside1 = $LabelInsideout1[0]->num_inside;
+               }else{
+                 $num_inside1 = 1;
+               }
+               if(isset($LabelInsideout2[0])){
+                 $num_inside2 = $LabelInsideout2[0]->num_inside;
+                 $irisu22 = $irisu2/$num_inside2;
+               }else{
+                   $num_inside2 = 1;
+                   $irisu22 = "";
+               }
+               $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
+               if(isset($LabelTypeProduct[0])){
+                 $Layout = $LabelTypeProduct[0]->type;
+               }else{
+                 $Layout = "-";
+               }
+               $irisu12 = $irisu/$num_inside1;
+               $renban = (($_SESSION['labeljunbi']['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+   //            $irisu22 = $irisu2/$num_inside2;
+               $arrCsv[] = ['maisu' => "", 'layout' => $Layout, 'lotnum' => $lotnumIN,
+               'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+               'product_code' => $_SESSION['labeljunbi']['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+               'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+               $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+              }
+         }//修正
+
 /*
       echo "<pre>";
       print_r($arrCsvtouroku);
       echo "</pre>";
 */
-  //    $fp = fopen('labels/label_hakkou_kobetu200424.csv', 'w');
-      $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
+  //     $fp = fopen('labels/label_hakkou_kobetu200425.csv', 'w');
+       $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
        foreach ($arrCsv as $line) {
          $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
          fputcsv($fp, $line);
        }
        fclose($fp);
-  /*
-       $fp = fopen('labels/label_hakkou_kobetu200423_1.csv', 'r');
-       $fp2 = fopen('labels/label_hakkou_kobetu200423_2.csv', 'w');
-       foreach ($fp as $line) {
-         $line = str_replace('\"', '', $line);
-         echo "<pre>";
-         print_r($line);
-         echo "</pre>";
-         fputcsv($fp, $line);
-       }
-       fclose($fp2);
-*/
+
          $labelCsvs = $this->LabelCsvs->newEntity();
          $this->set('labelCsvs',$labelCsvs);
           if ($this->request->is('post')) {
@@ -1335,7 +1688,7 @@ class LabelsController extends AppController
                   $connection->commit();// コミット5
 
                   //insert into label_csvする
-                  $connection = ConnectionManager::get('DB_ikou_test');
+                  $connection = ConnectionManager::get('sakaeMotoDB');
                   $table = TableRegistry::get('label_csv');
                   $table->setConnection($connection);
  /*
@@ -1473,87 +1826,279 @@ class LabelsController extends AppController
 
             $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
             $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+            $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
 
-            if(isset($LabelSetikkatsu1[0])){
-              $product_code2 = $LabelSetikkatsu1[0]->product_id2;
-              $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
-              $product_name2 = $Product2[0]->product_name;
-              $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
-                if(isset($Konpou[0])){
-                  $irisu2 = $Konpou[0]->irisu;
-                }else{
-                  $irisu2 = "";
-                }
-          //    $unit = "set";
-            }elseif(isset($LabelSetikkatsu2[0])){
-              $product_code2 = $LabelSetikkatsu2[0]->product_id1;
-              $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
-              $product_name2 = $Product2[0]->product_name;
-              $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
-                if(isset($Konpou[0])){
-                  $irisu2 = $Konpou[0]->irisu;
-                }else{
-                  $irisu2 = "";
-                }
-          //    $unit = "set";
-            }else{
+            if($LabelTypeProduct[0]->type == "C"){//〇タイプCの場合は１行に２製品の表示
+
+              if(isset($LabelSetikkatsu1[0])){
+                $product_code2 = $LabelSetikkatsu1[0]->product_id2;
+                $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
+                $product_name2 = $Product2[0]->product_name;
+                $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
+                  if(isset($Konpou[0])){
+                    $irisu2 = $Konpou[0]->irisu;
+                  }else{
+                    $irisu2 = "";
+                  }
+              }elseif(isset($LabelSetikkatsu2[0])){
+                $product_code2 = $LabelSetikkatsu2[0]->product_id1;
+                $Product2 = $this->Products->find()->where(['product_code' => $product_code2])->toArray();
+                $product_name2 = $Product2[0]->product_name;
+                $Konpou = $this->Konpous->find()->where(['product_code' => $product_code2])->toArray();
+                  if(isset($Konpou[0])){
+                    $irisu2 = $Konpou[0]->irisu;
+                  }else{
+                    $irisu2 = "";
+                  }
+              }else{
+                $product_code2 = "";
+                $product_name2 = "";
+                $irisu2 = "";
+              }
+
+              $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+               'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+               'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+               'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+               $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+            }elseif(isset($LabelSetikkatsu1[0]) || isset($LabelSetikkatsu2[0])){//〇タイプCでなくセット取りの場合
+       /*       echo "<pre>";
+              print_r("セット");
+              echo "</pre>";
+         */    //まずセット取りの片方の行を登録
               $product_code2 = "";
               $product_name2 = "";
               $irisu2 = "";
-          //    $unit = "";
-            }
-             $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
-              'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-              'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
-              'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
-             //date…出力した日付、datetime…出力した時間、layout…レイアウト、maisu…予定枚数、lotnum…lotnum、renban…連番、product_code…product_code、irisu…irisu
-             $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-              'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
-              'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
-             $Customer = $this->Customers->find()->where(['id' => $costomerId])->toArray();//(株)ＤＮＰのときは"IN.".$lotnumを追加
-             if(isset($Customer[0])){
-               $costomerName = $Customer[0]->name;
-             }else{
-               $costomerName = "";
-             }
-             if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ"){//mb_substrだと文字化けしない
-               $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
-               //maisu=$_SESSION['labeljunbi'][$i]['yoteimaisu']*num_inside
-               $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
-               $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
-               if(isset($LabelInsideout1[0])){
-                 $num_inside1 = $LabelInsideout1[0]->num_inside;
-               }else{
-                 $num_inside1 = 1;
-               }
-               if(isset($LabelInsideout2[0])){
-                 $num_inside2 = $LabelInsideout2[0]->num_inside;
-                 $irisu22 = $irisu2/$num_inside2;
-               }else{
-                   $num_inside2 = 1;
-                   $irisu22 = "";
-               }
-               $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
-               if(isset($LabelTypeProduct[0])){
-                 $Layout = $LabelTypeProduct[0]->type;
-               }else{
-                 $Layout = "-";
-               }
-               $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
-               $irisu12 = $irisu/$num_inside1;
-               $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
-               $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
-               'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+
+              $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+               'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
-               'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+               'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
                $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-               'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
-               'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-               'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
-           }
+                'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+                if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+
+                  $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+                  //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
+                  $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                  $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+                  if(isset($LabelInsideout1[0])){
+                    $num_inside1 = $LabelInsideout1[0]->num_inside;
+                  }else{
+                    $num_inside1 = 1;
+                  }
+                  if(isset($LabelInsideout2[0])){
+                    $num_inside2 = $LabelInsideout2[0]->num_inside;
+                    $irisu22 = $irisu2/$num_inside2;
+                  }else{
+                      $num_inside2 = 1;
+                      $irisu22 = "";
+                  }
+                  $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                  if(isset($LabelTypeProduct[0])){
+                    $Layout = $LabelTypeProduct[0]->type;
+                  }else{
+                    $Layout = "-";
+                  }
+                  $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
+                  $irisu12 = $irisu/$num_inside1;
+                  $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+      //            $irisu22 = $irisu2/$num_inside2;
+                  $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
+                  'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                  'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                  'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                  $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                   'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                   'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                   'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                 }
+
+                  if(isset($LabelSetikkatsu1[0])){//セット取りのもう片方が$LabelSetikkatsu1[0]にあった場合
+                    $product_id2 = $LabelSetikkatsu1[0]->product_id2;
+                    $Product2 = $this->Products->find()->where(['product_code' => $product_id2])->toArray();
+                    $product_name = $Product2[0]->product_name;
+                    $Konpou = $this->Konpous->find()->where(['product_code' => $product_id2])->toArray();
+                      if(isset($Konpou[0])){
+                        $irisu = $Konpou[0]->irisu;
+                      }else{
+                        $irisu = "";
+                      }
+
+                      $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+                       'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                       'product_code' => $product_id2, 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+                       'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                       $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                        'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                        'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+                        'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+                        if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+
+                          $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+                          //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
+                          $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                          $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+                          if(isset($LabelInsideout1[0])){
+                            $num_inside1 = $LabelInsideout1[0]->num_inside;
+                          }else{
+                            $num_inside1 = 1;
+                          }
+                          if(isset($LabelInsideout2[0])){
+                            $num_inside2 = $LabelInsideout2[0]->num_inside;
+                            $irisu22 = $irisu2/$num_inside2;
+                          }else{
+                              $num_inside2 = 1;
+                              $irisu22 = "";
+                          }
+                          $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                          if(isset($LabelTypeProduct[0])){
+                            $Layout = $LabelTypeProduct[0]->type;
+                          }else{
+                            $Layout = "-";
+                          }
+                          $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
+                          $irisu12 = $irisu/$num_inside1;
+                          $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+              //            $irisu22 = $irisu2/$num_inside2;
+                          $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
+                          'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                          'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                          'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                          $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                           'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                           'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                           'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                         }
+
+                  }else{//セット取りのもう片方が$LabelSetikkatsu2[0]にあった場合
+                    $product_id2 = $LabelSetikkatsu2[0]->product_id1;
+                    $Product2 = $this->Products->find()->where(['product_code' => $product_id2])->toArray();
+                    $product_name = $Product2[0]->product_name;
+                    $Konpou = $this->Konpous->find()->where(['product_code' => $product_id2])->toArray();
+                      if(isset($Konpou[0])){
+                        $irisu = $Konpou[0]->irisu;
+                      }else{
+                        $irisu = "";
+                      }
+
+                      $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+                       'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                       'product_code' => $product_id2, 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+                       'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                       $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                        'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                        'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+                        'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+                        if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+
+                          $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+                          //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
+                          $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                          $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+                          if(isset($LabelInsideout1[0])){
+                            $num_inside1 = $LabelInsideout1[0]->num_inside;
+                          }else{
+                            $num_inside1 = 1;
+                          }
+                          if(isset($LabelInsideout2[0])){
+                            $num_inside2 = $LabelInsideout2[0]->num_inside;
+                            $irisu22 = $irisu2/$num_inside2;
+                          }else{
+                              $num_inside2 = 1;
+                              $irisu22 = "";
+                          }
+                          $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                          if(isset($LabelTypeProduct[0])){
+                            $Layout = $LabelTypeProduct[0]->type;
+                          }else{
+                            $Layout = "-";
+                          }
+                          $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
+                          $irisu12 = $irisu/$num_inside1;
+                          $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+              //            $irisu22 = $irisu2/$num_inside2;
+                          $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
+                          'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                          'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                          'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                          $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                           'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                           'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                           'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                         }
+                }
+
+            }else{//〇タイプCでもセット取りでもない場合１行に１製品
+         /*     echo "<pre>";
+              print_r("単体");
+              echo "</pre>";
+   */
+              $product_code2 = "";//修正
+              $product_name2 = "";//修正
+              $irisu2 = "";//修正
+
+              $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
+               'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+               'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => $product_code2, 'product_name' => trim($product_name),
+               'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu2), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+               $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
+                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+
+                if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+
+                  $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
+                  //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
+                  $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                  $LabelInsideout2 = $this->LabelInsideouts->find()->where(['product_code' => $product_code2])->toArray();
+                  if(isset($LabelInsideout1[0])){
+                    $num_inside1 = $LabelInsideout1[0]->num_inside;
+                  }else{
+                    $num_inside1 = 1;
+                  }
+                  if(isset($LabelInsideout2[0])){
+                    $num_inside2 = $LabelInsideout2[0]->num_inside;
+                    $irisu22 = $irisu2/$num_inside2;
+                  }else{
+                      $num_inside2 = 1;
+                      $irisu22 = "";
+                  }
+                  $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
+                  if(isset($LabelTypeProduct[0])){
+                    $Layout = $LabelTypeProduct[0]->type;
+                  }else{
+                    $Layout = "-";
+                  }
+                  $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
+                  $irisu12 = $irisu/$num_inside1;
+                  $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+      //            $irisu22 = $irisu2/$num_inside2;
+                  $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
+                  'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                  'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                  'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                  $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
+                   'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                   'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                   'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                 }
+            }//修正
+
           }
-  //      $fp = fopen('labels/label_kobetu04242set.csv', 'w');
+
+
+  //      $fp = fopen('labels/label_kobetu04252.csv', 'w');
         $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
           foreach ($arrCsv as $line) {
             $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -1575,7 +2120,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5
 
                      //insert into label_csvする
-                     $connection = ConnectionManager::get('DB_ikou_test');
+                     $connection = ConnectionManager::get('sakaeMotoDB');
                      $table = TableRegistry::get('label_csv');
                      $table->setConnection($connection);
     /*
@@ -1808,7 +2353,7 @@ class LabelsController extends AppController
                $connection->commit();// コミット5
 
                //$arrLotをinsert into check_lotsする
-               $connection = ConnectionManager::get('DB_ikou');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('check_lots');
                $table->setConnection($connection);
 /*
@@ -1982,7 +2527,7 @@ class LabelsController extends AppController
            $mes = "不使用ロットが登録されました";
            $this->set('mes',$mes);
 
-           $connection = ConnectionManager::get('DB_ikou');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('check_lots');
            $table->setConnection($connection);
 
@@ -2057,24 +2602,72 @@ class LabelsController extends AppController
        $date_fin = strtotime($date_fin);
        $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
 
+
+       $connection = ConnectionManager::get('sakaeMotoDB');
+       $table = TableRegistry::get('check_lots');
+       $table->setConnection($connection);
+/*
+       $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM check_lots".
+             " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
+       $connection = ConnectionManager::get('sakaeMotoDB');
+       $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
+*/
+
        if(empty($data['product_code'])){//product_codeの入力がないとき
          $product_code = "no";
          if(empty($data['lot_num'])){//lot_numの入力がないとき　product_code×　lot_num×　date〇
            $lot_num = "no";//日にちだけで絞り込み
-           $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
-             ->where(['delete_flag' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin]));
+      //新DB     $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+      //新DB     ->where(['delete_flag' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin]));
+
+             $sql = "SELECT datetime_hakkou,lot_num,product_id,amount,flag_used,flag_deliver FROM check_lots".
+                   " where datetime_hakkou >= '".$date_sta."' and datetime_hakkou <= '".$date_fin."' order by datetime_hakkou asc";
+             $connection = ConnectionManager::get('sakaeMotoDB');
+             $checkLot = $connection->execute($sql)->fetchAll('assoc');
+             $this->set('checkLot',$checkLot);
+             $this->set('countlot',count($checkLot));
+/*
+             echo "<pre>";
+             print_r(count($checkLot));
+             echo "</pre>";
+*/
+
          }else{//lot_numの入力があるとき　product_code×　lot_num〇　date〇//ロットと日にちで絞り込み
-           $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
-             ->where(['delete_flag' => '0', 'lot_num like' => '%'.$lot_num.'%', 'datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin]));
+    //新DB       $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+    //新DB         ->where(['delete_flag' => '0', 'lot_num like' => '%'.$lot_num.'%', 'datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin]));
+
+             $sql = "SELECT datetime_hakkou,lot_num,product_id,amount,flag_used,flag_deliver FROM check_lots".
+                   " where datetime_hakkou >= '".$date_sta."' and datetime_hakkou <= '".$date_fin."' and lot_num like '%".$lot_num."%' order by datetime_hakkou asc";
+             $connection = ConnectionManager::get('sakaeMotoDB');
+             $checkLot = $connection->execute($sql)->fetchAll('assoc');
+             $this->set('checkLot',$checkLot);
+             $this->set('countlot',count($checkLot));
+
          }
        }else{//product_codeの入力があるとき
          if(empty($data['lot_num'])){//lot_numの入力がないとき　product_code〇　lot_num×　date〇
            $lot_num = "no";//プロダクトコードと日にちで絞り込み
-           $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
-             ->where(['delete_flag' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin, 'product_code' => $product_code]));
+    //新DB        $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+    //新DB          ->where(['delete_flag' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin, 'product_code' => $product_code]));
+
+             $sql = "SELECT datetime_hakkou,lot_num,product_id,amount,flag_used,flag_deliver FROM check_lots".
+                   " where datetime_hakkou >= '".$date_sta."' and datetime_hakkou <= '".$date_fin."' and product_id like '%".$product_code."%' order by datetime_hakkou asc";
+             $connection = ConnectionManager::get('sakaeMotoDB');
+             $checkLot = $connection->execute($sql)->fetchAll('assoc');
+             $this->set('checkLot',$checkLot);
+             $this->set('countlot',count($checkLot));
+
          }else{//lot_numの入力があるとき　product_code〇　lot_num〇　date〇//プロダクトコードとロットナンバーと日にちで絞り込み
-           $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
-             ->where(['delete_flag' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin, 'lot_num like' => '%'.$lot_num.'%', 'product_code' => $product_code]));
+    //新DB       $this->set('checkLots',$this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+    //新DB         ->where(['delete_flag' => '0','datetime_hakkou >=' => $date_sta, 'datetime_hakkou <=' => $date_fin, 'lot_num like' => '%'.$lot_num.'%', 'product_code' => $product_code]));
+
+             $sql = "SELECT datetime_hakkou,lot_num,product_id,amount,flag_used,flag_deliver FROM check_lots".
+                   " where datetime_hakkou >= '".$date_sta."' and datetime_hakkou <= '".$date_fin."' and product_id like '%".$product_code."%' and lot_num like '%".$lot_num."%' order by datetime_hakkou asc";
+             $connection = ConnectionManager::get('sakaeMotoDB');
+             $checkLot = $connection->execute($sql)->fetchAll('assoc');
+             $this->set('checkLot',$checkLot);
+             $this->set('countlot',count($checkLot));
+
          }
        }
      }
@@ -2240,10 +2833,10 @@ class LabelsController extends AppController
           'line_code' => "", 'date' => $date, 'start_lot' => 1, 'delete_flag' => 0];//unit2,line_code1...不要
       }
 
-      $fp = fopen('labels/label_hasu_200424.csv', 'w');
-  //    $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
+  //    $fp = fopen('labels/label_hasu_200424.csv', 'w');
+      $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
       foreach ($arrCsv as $line) {
-  //      $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+        $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
         fputcsv($fp, $line);
       }
         fclose($fp);
@@ -2262,7 +2855,7 @@ class LabelsController extends AppController
                  $connection->commit();// コミット5
 
                  //insert into label_csvする
-                 $connection = ConnectionManager::get('DB_ikou_test');
+                 $connection = ConnectionManager::get('sakaeMotoDB');
                  $table = TableRegistry::get('label_csv');
                  $table->setConnection($connection);
 /*
@@ -2478,6 +3071,24 @@ class LabelsController extends AppController
            print_r($_SESSION['lot_hasu'][$i]);
            echo "</pre>";
 */
+
+//以下級DBへの登録用
+          $hasu_lot = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+            ->where(['lot_num' => $lot_num,  'product_code' => $product_code1])->toArray();
+          $hasu_lot_id = $hasu_lot[0]->id;
+          $moto_lot = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+            ->where(['lot_num' => ${"lot_moto".$i},  'product_code' => $product_code1])->toArray();
+          $moto_lot_id = $moto_lot[0]->id;
+
+          $_SESSION['oldDBtouroku'][$i] = array(
+            'hasu_lot_id' => $hasu_lot_id,
+            'moto_lot_id' => $moto_lot_id,
+            'moto_lot_amount' => ${"amount_moto".$i},
+            "emp_id" => $staff_id,
+    // /        'touroku_datetime' => date("Y-m-d H:i:s")//ここで決めておくとエラーが出る
+          );
+//ここまで
+
            $amount_sum = $amount_sum + ${"amount_moto".$i};
            $this->set('amount_sum',$amount_sum);
 
@@ -2528,6 +3139,26 @@ class LabelsController extends AppController
             $mes = "※以上のように登録されました。";
             $this->set('mes',$mes);
             $connection->commit();// コミット5
+
+            //insert into order_ediする
+            $connection = ConnectionManager::get('sakaeMotoDB');
+            $table = TableRegistry::get('moto_lots');
+            $table->setConnection($connection);
+/*
+            echo "<pre>";
+            print_r($data['oldDBtouroku']);
+            echo "</pre>";
+*/
+            for($k=0; $k<count($data['oldDBtouroku']); $k++){
+              $connection->insert('moto_lots', [
+                  'hasu_lot_id' => $data['oldDBtouroku'][$k]["hasu_lot_id"],
+                  'moto_lot_id' => $data['oldDBtouroku'][$k]["moto_lot_id"],
+                  'moto_lot_amount' => $data['oldDBtouroku'][$k]["moto_lot_amount"],
+                  'emp_id' => $data['oldDBtouroku'][$k]["emp_id"],
+                  'touroku_datetime' => date("Y-m-d H:i:s")
+              ]);
+            }
+
           } else {
             $mes = "登録されませんでした。";
             $this->set('mes',$mes);

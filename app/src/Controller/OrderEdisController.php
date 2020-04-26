@@ -253,12 +253,61 @@ class OrderEdisController extends AppController
 
       $source_file = $_FILES['file']['tmp_name'];
       file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'UTF-8', 'SJIS'));//SJISのファイルをUTF-8に変換する
+      $fpmoto = fopen($source_file, 'r');//motoDBへ登録用
       $fp1 = fopen($source_file, 'r');//OrderEdisへ登録用
       $fp2 = fopen($source_file, 'r');//DenpyouDnpMinoukannousへ登録用
       $fp3 = fopen($source_file, 'r');//DnpTotalAmountsへ登録用
       $fpcount = fopen($source_file, 'r' );
 
+//ここからmotoDBへ登録用
       for($count = 0; fgets( $fpcount ); $count++ );
+      $arrEDImotodenpyoudnp = array();//空の配列を作る
+      $arrDenpyouDnpMinoukannous = array();//空の配列を作る
+      $arrDnpTotalAmounts = array();//空の配列を作る
+      $arrDnpdouitutyuumon = array();//空の配列を作る
+      $created_staff = $this->Auth->user('staff_id');
+
+        for ($k=1; $k<=$count-1; $k++) {//最後の行まで
+          $line = fgets($fpmoto);//ファイル$fpの上の１行を取る（２行目から）
+          $sample = explode(',',$line);//$lineを','毎に配列に入れる
+
+           $keys=array_keys($sample);
+           $keys[array_search('2',$keys)]='num_order';//名前の変更
+           $keys[array_search('3',$keys)]='name_order';
+           $keys[array_search('4',$keys)]='line_code';
+           $keys[array_search('7',$keys)]='product_code';
+           $keys[array_search('15',$keys)]='place_deliver';
+           $sample = array_combine( $keys, $sample );
+
+           unset($sample['0'],$sample['1'],$sample['4'],$sample['5'],$sample['6'],$sample['8']);
+           unset($sample['9'],$sample['10'],$sample['11'],$sample['13'],$sample['14']);
+           unset($sample['12'],$sample['16'],$sample['17'],$sample['18']);//最後の改行も削除
+
+           if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき（カンマのみの行が出てきたら配列への追加を終了）
+             $arrEDImotodenpyoudnp[] = $sample;//配列に追加する
+           }
+        }
+
+        for($n=0; $n<=10000; $n++){
+          if(isset($arrEDImotodenpyoudnp[$n])){//$arrEDImotodenpyoudnp[$n]が存在する時、対応するcustomer_code等を配列に追加する
+            $Product = $this->Products->find()->where(['product_code' => $arrEDImotodenpyoudnp[$n]['product_code']])->toArray();
+    				$customer_id = $Product[0]->customer_id;
+            $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+    				$customer_code = $Customer[0]->customer_code;
+
+            $arrEDImotodenpyoudnp[$n] = array_merge($arrEDImotodenpyoudnp[$n],array('customer_code'=>$customer_code));
+          }else{
+            break;
+          }
+        }
+//ここまでmotoDBへ登録用
+/*
+echo "<pre>";
+print_r("arrEDImotodenpyoudnp");
+print_r($arrEDImotodenpyoudnp);
+echo "</pre>";
+*/
+  //    for($count = 0; fgets( $fpcount ); $count++ );//motoDBへ登録用を消したら必要
       $arrEDI = array();//空の配列を作る
       $arrDenpyouDnpMinoukannous = array();//空の配列を作る
       $arrDnpTotalAmounts = array();//空の配列を作る
@@ -329,7 +378,7 @@ class OrderEdisController extends AppController
             $table->setConnection($connection);
 /*
             echo "<pre>";
-            print_r($arrFp);
+            print_r($arrEDImotodenpyoudnp);
             echo "</pre>";
 */
             for($k=0; $k<count($arrEDI); $k++){
@@ -351,6 +400,43 @@ class OrderEdisController extends AppController
                   'created_at' => date("Y-m-d H:i:s")
               ]);
             }
+
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('denpyou_dnp');
+            $table->setConnection($connection);
+
+            for($k=0; $k<count($arrEDImotodenpyoudnp); $k++){
+              echo "<pre>";
+              print_r($arrEDImotodenpyoudnp[$k]["place_deliver"]);
+              print_r(mb_substr($arrEDImotodenpyoudnp[$k]["place_deliver"], 0, 1));
+              echo "</pre>";
+
+              if(mb_substr($arrEDImotodenpyoudnp[$k]["place_deliver"], 0, 1) === "弊"){
+                $place_deliver = str_replace("弊社","",$arrEDImotodenpyoudnp[$k]["place_deliver"]);
+                echo "<pre>";
+                print_r("弊社");
+                echo "</pre>";
+
+              }else{
+                $place_deliver = $arrEDImotodenpyoudnp[$k]["place_deliver"];
+//                echo "<pre>";
+//                print_r($place_deliver);
+//                echo "</pre>";
+            }
+
+              $connection->insert('denpyou_dnp', [
+                  'num_order' => $arrEDImotodenpyoudnp[$k]["num_order"],
+                  'product_id' => $arrEDImotodenpyoudnp[$k]["product_code"],
+                  'name_order' => $arrEDImotodenpyoudnp[$k]["name_order"],
+                  'place_deliver' => $place_deliver,
+                  'code' => $arrEDImotodenpyoudnp[$k]["line_code"],
+                  'conf_print' => 0,
+                  'tourokubi' => date("Y-m-d"),
+                  'created_at' => date("Y-m-d H:i:s")
+              ]);
+            }
+
+
             $connection = ConnectionManager::get('default');
 
 
@@ -497,11 +583,11 @@ class OrderEdisController extends AppController
 
               $uniquearrDnpdouitutyuumon = array_unique($arrDnpdouitutyuumon, SORT_REGULAR);//重複削除
               $uniquearrDnpdouitutyuumon = array_values($uniquearrDnpdouitutyuumon);
-
+/*
               echo "<pre>";
               print_r($uniquearrDnpdouitutyuumon);
               echo "</pre>";
-
+*/
 //$uniquearrDnpdouitutyuumonを使って、order_ediテーブルのbunnnouを更新、dnp_minoukannouテーブルのminoukannouを更新
 
               for($n=0; $n<=10000; $n++){

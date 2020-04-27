@@ -27,8 +27,10 @@
  </table>
  <br><br><br>
     <?= $this->Flash->render() ?>
-    <?= $this->Form->create($MotoLots, ['url' => ['action' => 'hasulotmoto']]) ?>
+    <?= $this->Form->create($MotoLots, ['url' => ['action' => 'hasulotconfirm']]) ?>
     <br><br><br><br>
+
+    <?php if($check_product != 1)://問題なしの時 ?>
 
   <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr style="border-bottom: solid;border-width: 1px">
@@ -48,30 +50,31 @@
 
 <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr style="border-bottom: solid;border-width: 1px">
-    <td width='400'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">元ロットNo.</strong></td>
+    <td width='250'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">元ロットNo.</strong></td>
+    <td width='250'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">元ロット数量</strong></td>
   </tr>
 
   <?php for($i=0; $i<=$tuika; $i++): ?>
   <tr style="border-bottom: solid;border-width: 1px">
-    <td bgcolor="#FFFFCC"><?= $this->Form->control('text'.$i, array('type'=>'text', 'label'=>false, 'maxlength' => 100)) ?></td>
+    <td width="250"  bgcolor="#FFFFCC" style="font-size: 12pt;"><?= h(${"lot_moto".$i}) ?></td>
+    <td width="250" bgcolor="#FFFFCC"><?= $this->Form->control('amount_moto'.$i, array('type'=>'text', 'label'=>false, 'maxlength' => 100)) ?></td>
   </tr>
+  <?= $this->Form->control('lot_moto'.$i, array('type'=>'hidden', 'value'=>${"lot_moto".$i}, 'label'=>false)) ?>
   <?= $this->Form->control('num', array('type'=>'hidden', 'value'=>$i, 'label'=>false)) ?>
+
   <?php endfor;?>
 
 </table>
 <br><br><br><br><br><br><br>
 <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr bgcolor="#E6FFFF" >
-  <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="left"><?= $this->Form->submit(__('行追加'), array('name' => 'tuika')); ?></div></td>
-  <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="left"><?= $this->Form->submit(__('行削除'), array('name' => 'sakujo')); ?></div></td>
-  <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="left"><?= $this->Form->submit(__('数量登録'), array('name' => 'suuryou')); ?></div></td>
-  <td width="250" colspan="40" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
+  <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="left"><?= $this->Form->submit(__('登録確認'), array('name' => 'kakunin')); ?></div></td>
+  <td width="400" colspan="40" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
   <td width="300" colspan="50" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
 </tr>
 </table>
 
 <br>
-<?= $this->Form->control('lotmoto', array('type'=>'hidden', 'value'=>1, 'label'=>false)) ?>
 <?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$product_code1, 'label'=>false)) ?>
 <?= $this->Form->control('lot_num', array('type'=>'hidden', 'value'=>$lot_num, 'label'=>false)) ?>
 <?= $this->Form->control('amount', array('type'=>'hidden', 'value'=>$amount, 'label'=>false)) ?>
@@ -80,3 +83,8 @@
 
 <br><br><br>
     <?= $this->Form->end() ?>
+  <?php else: //合計数量が違う時 ?>
+    <br><br>
+    <legend align="center"><font color="red"><?= __('＊そのロットは、製品が違います。') ?></font></legend>
+    <br><br><br><br><br>
+  <?php endif; ?>

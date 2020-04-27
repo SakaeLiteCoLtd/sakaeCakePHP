@@ -13,9 +13,13 @@
     <?= $this->Form->create($orderEdis, ['url' => ['action' => 'dnpcsvlogin']]) ?>
     <br><br>
     <legend align="center"><strong style="font-size: 11pt; color:blue"><?= __("社員ID登録") ?></strong></legend>
-
+    <script type="text/javascript">
+        // 上記の入力欄にフォーカスを与える
+        document.getElementById('login').focus();
+    </script>
       <?php
          echo $htmlPrelogin;
+
       ?>
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

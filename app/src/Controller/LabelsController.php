@@ -1764,6 +1764,11 @@ class LabelsController extends AppController
        $KadouSeikeis = $this->KadouSeikeis->newEntity();
        $this->set('KadouSeikeis',$KadouSeikeis);
        $data = $this->request->getData();//postデータを$dataに
+/*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+*/
         if(isset($data['touroku'])){//csv確認おしたとき
           $this->set('touroku',$data['touroku']);
           $session = $this->request->getSession();
@@ -1866,10 +1871,11 @@ class LabelsController extends AppController
                 'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
             }elseif(isset($LabelSetikkatsu1[0]) || isset($LabelSetikkatsu2[0])){//〇タイプCでなくセット取りの場合
-       /*       echo "<pre>";
+              echo "<pre>";
               print_r("セット");
+              print_r($_SESSION['labeljunbi'][$i]['product_code']);
               echo "</pre>";
-         */    //まずセット取りの片方の行を登録
+            //まずセット取りの片方の行を登録
               $product_code2 = "";
               $product_name2 = "";
               $irisu2 = "";
@@ -1884,6 +1890,10 @@ class LabelsController extends AppController
                 'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
                 if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+                  echo "<pre>";
+                  print_r("セットIN");
+                  print_r($_SESSION['labeljunbi'][$i]['product_code']);
+                  echo "</pre>";
 
                   $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
                   //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
@@ -1931,6 +1941,10 @@ class LabelsController extends AppController
                       }else{
                         $irisu = "";
                       }
+                      echo "<pre>";
+                      print_r("セット1");
+                      print_r($product_id2."--".$irisu);
+                      echo "</pre>";
 
                       $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
                        'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
@@ -1942,6 +1956,9 @@ class LabelsController extends AppController
                         'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
                         if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+                          echo "<pre>";
+                          print_r("セット 1 in ".$product_id2);
+                          echo "</pre>";
 
                           $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
                           //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
@@ -1953,11 +1970,11 @@ class LabelsController extends AppController
                             $num_inside1 = 1;
                           }
                           if(isset($LabelInsideout2[0])){
-                            $num_inside2 = $LabelInsideout2[0]->num_inside;
+                            $num_inside1 = $LabelInsideout2[0]->num_inside;
                             $irisu22 = $irisu2/$num_inside2;
                           }else{
-                              $num_inside2 = 1;
-                              $irisu22 = "";
+                            $num_inside1 = 1;
+                            $irisu22 = "";
                           }
                           $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
                           if(isset($LabelTypeProduct[0])){
@@ -1968,14 +1985,15 @@ class LabelsController extends AppController
                           $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
                           $irisu12 = $irisu/$num_inside1;
                           $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+
               //            $irisu22 = $irisu2/$num_inside2;
                           $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
                           'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-                          'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
-                          'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
+                          'product_code' => $product_id2, 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                          'product_name2' => trim($product_name2), 'irisu' => trim($irisu), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
                           $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-                           'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
-                           'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
+                           'product1' => $product_id2, 'product2' => $product_code2, 'name_pro1' => trim($product_name),
+                           'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
                            'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
                          }
 
@@ -1989,6 +2007,9 @@ class LabelsController extends AppController
                       }else{
                         $irisu = "";
                       }
+                      echo "<pre>";
+                      print_r("セット2");
+                      echo "</pre>";
 
                       $arrCsv[] = ['maisu' => $_SESSION['labeljunbi'][$i]['yoteimaisu'], 'layout' => $Layout, 'lotnum' => $lotnum,
                        'renban' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
@@ -2011,10 +2032,10 @@ class LabelsController extends AppController
                             $num_inside1 = 1;
                           }
                           if(isset($LabelInsideout2[0])){
-                            $num_inside2 = $LabelInsideout2[0]->num_inside;
+                            $num_inside1 = $LabelInsideout2[0]->num_inside;
                             $irisu22 = $irisu2/$num_inside2;
                           }else{
-                              $num_inside2 = 1;
+                              $num_inside1 = 1;
                               $irisu22 = "";
                           }
                           $LabelTypeProduct = $this->LabelTypeProducts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
@@ -2026,10 +2047,14 @@ class LabelsController extends AppController
                           $maisu = $_SESSION['labeljunbi'][$i]['yoteimaisu'] * $num_inside1;
                           $irisu12 = $irisu/$num_inside1;
                           $renban = (($_SESSION['labeljunbi'][$i]['hakoNo'] * $num_inside1) - ($num_inside1 - 1));
+                          echo "<pre>";
+                          print_r("セット2in");
+                          print_r($product_id2."--".$irisu12);
+                          echo "</pre>";
               //            $irisu22 = $irisu2/$num_inside2;
                           $arrCsv[] = ['maisu' => $maisu, 'layout' => $Layout, 'lotnum' => $lotnumIN,
                           'renban' => $renban, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
-                          'product_code' => $_SESSION['labeljunbi'][$i]['product_code'], 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
+                          'product_code' => $product_id2, 'product_code2' => trim($product_code2), 'product_name' => trim($product_name),
                           'product_name2' => trim($product_name2), 'irisu' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit' => trim($unit), 'unit2' => "", 'line_code1' => ""];//unit2,line_code1...不要
                           $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                            'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
@@ -2039,10 +2064,10 @@ class LabelsController extends AppController
                 }
 
             }else{//〇タイプCでもセット取りでもない場合１行に１製品
-         /*     echo "<pre>";
+              echo "<pre>";
               print_r("単体");
               echo "</pre>";
-   */
+
               $product_code2 = "";//修正
               $product_name2 = "";//修正
               $irisu2 = "";//修正
@@ -2098,10 +2123,10 @@ class LabelsController extends AppController
           }
 
 
-  //      $fp = fopen('labels/label_kobetu04252.csv', 'w');
-        $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
+        $fp = fopen('labels/label_kobetu0427.csv', 'w');
+  //      $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
           foreach ($arrCsv as $line) {
-            $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+  //          $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
           	fputcsv($fp, $line);
           }
             fclose($fp);
@@ -2120,7 +2145,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5
 
                      //insert into label_csvする
-                     $connection = ConnectionManager::get('sakaeMotoDB');
+                     $connection = ConnectionManager::get('DB_ikou_test');
                      $table = TableRegistry::get('label_csv');
                      $table->setConnection($connection);
     /*
@@ -2471,7 +2496,9 @@ class LabelsController extends AppController
        $this->set('lot_num',$lot_num);
        $CheckLots = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
          ->where(['product_code' => $product_code1, 'lot_num' => $lot_num])->toArray();
-       $CheckLotId = $CheckLots[0]->id;
+       if(isset($CheckLots[0])){
+         $CheckLotId = $CheckLots[0]->id;
+       }
        /*
          echo "<pre>";
          print_r($CheckLotId."-".$product_code1."-".$lot_num);
@@ -2500,43 +2527,80 @@ class LabelsController extends AppController
        }
      }
 
-     public function fushiyoudo()//ラベル不使用
+     public function fushiyoudo()//ラベル不使用//新DBを見る➝データがある場合ダブル更新、データがない場合旧DBのみ更新
      {
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
        $data = $this->request->getData();
        $maisuu = $data["maisuu"];
-       for($i=0; $i<$maisuu; $i++){
-         $CheckLots = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
-           ->where(['product_code' => $data["product_code"], 'lot_num' => $data["lot_num_".$i]])->toArray();
-         $CheckLotId = $CheckLots[0]->id;
-/*
-         echo "<pre>";
-         print_r($CheckLotId);
-         echo "</pre>";
-*/
-         if(isset($CheckLotId)){
-           $connection = ConnectionManager::get('default');
-           $table = TableRegistry::get('check_lots');
-           $table->setConnection($connection);
 
-           $this->CheckLots->updateAll(
-           ['flag_used' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
-           ['id'   => $CheckLotId ]
-           );
-           $mes = "不使用ロットが登録されました";
-           $this->set('mes',$mes);
 
+       $CheckLots = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+         ->where(['product_code' => $data["product_code"], 'lot_num' => $data["lot_num_0"]])->toArray();
+       if(isset($CheckLots[0])){//新DBにデータがある場合ダブル更新
+         for($i=0; $i<$maisuu; $i++){
+           $CheckLots = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+             ->where(['product_code' => $data["product_code"], 'lot_num' => $data["lot_num_".$i]])->toArray();
+           $CheckLotId = $CheckLots[0]->id;
+  /*
+           echo "<pre>";
+           print_r($CheckLotId);
+           echo "</pre>";
+  */
+           if(isset($CheckLotId)){
+             $connection = ConnectionManager::get('default');
+             $table = TableRegistry::get('check_lots');
+             $table->setConnection($connection);
+
+             $this->CheckLots->updateAll(
+             ['flag_used' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
+             ['id'   => $CheckLotId ]
+             );
+             $mes = "不使用ロットが登録されました";
+             $this->set('mes',$mes);
+
+             $connection = ConnectionManager::get('sakaeMotoDB');
+             $table = TableRegistry::get('check_lots');
+             $table->setConnection($connection);
+
+             $updater = "UPDATE check_lots set flag_used = 1 where product_id ='".$data["product_code"]."' and lot_num = '".$data["lot_num_".$i]."'";//もとのDBも更新
+             $connection->execute($updater);
+
+           }else{
+             echo "<pre>";
+             print_r($data["lot_num_".$i]."というロットナンバーは存在しません（存在するロットは不使用登録されます）");
+             echo "</pre>";
+           }
+         }
+
+       }else{//新DBにデータがない場合旧DBのみ更新
+
+         for($i=0; $i<$maisuu; $i++){
            $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('check_lots');
            $table->setConnection($connection);
 
-           $updater = "UPDATE check_lots set flag_used = 1 where product_id ='".$data["product_code"]."' and lot_num = '".$data["lot_num_".$i]."'";//もとのDBも更新
-           $connection->execute($updater);
+           $sql = "SELECT datetime_hakkou,lot_num,product_id,amount,flag_used,flag_deliver FROM check_lots".
+                 " where product_id ='".$data["product_code"]."' and lot_num = '".$data["lot_num_".$i]."'";
+           $connection = ConnectionManager::get('sakaeMotoDB');
+           $checkLot = $connection->execute($sql)->fetchAll('assoc');
+/*
+           echo "<pre>";
+           print_r($checkLot);
+           echo "</pre>";
+*/
+           if(isset($checkLot[0])){
+             $mes = "不使用ロットが登録されました（このロットは新DBには登録されていません。）";
+             $this->set('mes',$mes);
 
-         }else{
-           print_r($data["lot_num_".$i]."というロットナンバーは存在しません（他のロットは不使用登録されます）");
+             $updater = "UPDATE check_lots set flag_used = 1 where product_id ='".$data["product_code"]."' and lot_num = '".$data["lot_num_".$i]."'";//もとのDBも更新
+             $connection->execute($updater);
+
+           }else{
+             print_r($data["lot_num_".$i]."というロットナンバーは存在しません（他のロットは不使用登録されます）");
+           }
          }
+
        }
      }
 
@@ -3008,19 +3072,38 @@ class LabelsController extends AppController
           $tuika = $data['num'] - 1;
           $this->set('tuika',$tuika);
         }
-      }elseif(isset($data['kakunin'])){
+      }elseif(isset($data['suuryou'])){
         $tuika = $data['num'];
         $this->set('tuika',$tuika);
-        return $this->redirect(['action' => 'hasulotconfirm',//以下のデータを持ってzensufinishconfirmに移動
+        return $this->redirect(['action' => 'hasulotsuuryou',//以下のデータを持ってhasulotconfirmに移動
         's' => ['data' => $data]]);//登録するデータを全部配列に入れておく
       }
-
-
     }
 
-      public function hasulotconfirm()
-     {
-       session_start();
+    public function hasulotsuuryou()
+   {
+       $Data = $this->request->query('s');
+       $data = $Data['data'];//postデータ取得し、$dataと名前を付ける
+
+       $check_product = 0;
+       for($i=0; $i<=$data['num']; $i++){
+         $ary = explode(',', $data['text'.$i]);//$strを配列に変換
+         $product_code = $ary[0];//入力したデータをカンマ区切りの最初のデータを$product_code1とする（以下同様）
+
+         if($data["product_code"] == $product_code){
+           $check_product = $check_product;
+           $this->set('check_product',$check_product);
+         }else{
+           $check_product = 1;
+           $this->set('check_product',$check_product);
+         }
+       }
+/*
+       echo "<pre>";
+       print_r($check_product);
+       echo "</pre>";
+*/
+       $amount_sum = 0;
        $MotoLots = $this->MotoLots->newEntity();
        $this->set('MotoLots',$MotoLots);
        $Data = $this->request->query('s');
@@ -3037,17 +3120,6 @@ class LabelsController extends AppController
        $this->set('staff_id',$staff_id);
        $tuika = $data['num'];
        $this->set('tuika',$tuika);
-
-       $_SESSION['hyouji'] = array(
-         'Staff' => $Staff,
-         'product_code1' => $product_code1,
-         'amount' => $amount,
-         'tuika' => $tuika,
-         'lot_num' => $lot_num
-       );
-
-       $amount_sum = 0;
-       $check_product = 0;
        for($i=0; $i<=$data['num']; $i++){
          if(isset($data['text'.$i])){
            $ary = explode(',', $data['text'.$i]);//$data['text'.$i]を配列に変換
@@ -3056,6 +3128,68 @@ class LabelsController extends AppController
            ${"amount_moto".$i} = $ary[2];
            $this->set('amount_moto'.$i,${"amount_moto".$i});
            ${"lot_moto".$i} = $ary[4];
+           $this->set('lot_moto'.$i,${"lot_moto".$i});
+
+           $amount_sum = $amount_sum + ${"amount_moto".$i};
+           $this->set('amount_sum',$amount_sum);
+
+           if(${"product_moto".$i} == $product_code1){
+             $check_product = $check_product;
+             $this->set('check_product',$check_product);
+           }else{
+             $check_product = 1;
+             $this->set('check_product',$check_product);
+           }
+         }else{
+           $i = $i;
+         }
+       }
+   }
+
+      public function hasulotconfirm()
+     {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+       $MotoLots = $this->MotoLots->newEntity();
+       $this->set('MotoLots',$MotoLots);
+//       $Data = $this->request->query('s');
+  //     $data = $Data['data'];//postデータ取得し、$dataと名前を付ける
+       $product_code1 = $data['product_code'];
+       $this->set('product_code1',$product_code1);
+       $lot_num = $data['lot_num'];
+       $this->set('lot_num',$lot_num);
+       $amount = $data['amount'];
+       $this->set('amount',$amount);
+       $Staff = $data['Staff'];
+       $this->set('Staff',$Staff);
+       $staff_id = $data['staff_id'];
+       $this->set('staff_id',$staff_id);
+       $tuika = $data['num'];
+       $this->set('tuika',$tuika);
+       session_start();
+
+       $_SESSION['hyouji'] = array(
+         'Staff' => $Staff,
+         'product_code1' => $product_code1,
+         'amount' => $amount,
+         'tuika' => $tuika,
+         'lot_num' => $lot_num
+       );
+/*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+*/
+       $amount_sum = 0;
+       $check_product = 0;
+       for($i=0; $i<=$data['num']; $i++){
+         if(isset($data['amount_moto'.$i])){
+    //       $ary = explode(',', $data['text'.$i]);//$data['text'.$i]を配列に変換
+           ${"product_moto".$i} = $data['product_code'];
+           $this->set('product_moto'.$i,${"product_moto".$i});
+           ${"amount_moto".$i} = $data['amount_moto'.$i];
+           $this->set('amount_moto'.$i,${"amount_moto".$i});
+           ${"lot_moto".$i} = $data['lot_moto'.$i];
            $this->set('lot_moto'.$i,${"lot_moto".$i});
 
            $_SESSION['lot_hasu'][$i] = array(
@@ -3075,10 +3209,22 @@ class LabelsController extends AppController
 //以下級DBへの登録用
           $hasu_lot = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
             ->where(['lot_num' => $lot_num,  'product_code' => $product_code1])->toArray();
-          $hasu_lot_id = $hasu_lot[0]->id;
+            if(isset($hasu_lot[0])){
+              $hasu_lot_id = $hasu_lot[0]->id;
+            }else{
+              echo "<pre>";
+              print_r("このロットはデータベースに登録されていません--".$lot_num."---".$product_code1);
+              echo "</pre>";
+            }
           $moto_lot = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
             ->where(['lot_num' => ${"lot_moto".$i},  'product_code' => $product_code1])->toArray();
-          $moto_lot_id = $moto_lot[0]->id;
+            if(isset($moto_lot[0])){
+              $moto_lot_id = $moto_lot[0]->id;
+            }else{
+              echo "<pre>";
+              print_r("このロットはデータベースに登録されていません--".$lot_num."---".$product_code1);
+              echo "</pre>";
+            }
 
           $_SESSION['oldDBtouroku'][$i] = array(
             'hasu_lot_id' => $hasu_lot_id,
@@ -3088,7 +3234,6 @@ class LabelsController extends AppController
     // /        'touroku_datetime' => date("Y-m-d H:i:s")//ここで決めておくとエラーが出る
           );
 //ここまで
-
            $amount_sum = $amount_sum + ${"amount_moto".$i};
            $this->set('amount_sum',$amount_sum);
 

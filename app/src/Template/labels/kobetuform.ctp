@@ -173,7 +173,7 @@ ${"n".$j} = 1;
  $nij = ${"n".$j} + $this->request->getData("ntuika{$j}");
  for($i=1; $i<=$nij; $i++){//１号機
    if(null !== ($this->request->getData("product_code{$j}{$i}"))){
-     ${"product_code".$i} = $product_code;
+     ${"product_code".$i} = $this->request->getData("product_code{$j}{$i}");
      $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
      if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
        $torisu = $Product[0]->torisu;
@@ -199,7 +199,7 @@ ${"n".$j} = 1;
      ${"hakoNo".$i} = $this->request->getData("hakoNo{$j}{$i}");
        echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
        echo "<td rowspan='2'  height='10' colspan='20' nowrap='nowrap' style='font-size: 18pt'><div align='center'>\n";
-       echo $product_code;
+       echo ${"product_code".$i};
        echo "</div></td>\n";
        echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
        echo "開始";
@@ -229,7 +229,7 @@ ${"n".$j} = 1;
          $m = $m + 1;
                $resultArray = Array();
                  $_SESSION['labeljunbi'][$m] = array(
-                   'product_code' => $product_code,
+                   'product_code' => ${"product_code".$i},
                    'seikeiki_code' => "",
                    'starting_tm' => ${"hyoujistarting_tm".$j.$i},
                    'finishing_tm' => ${"hyoujifinishing_tm".$j.$i},

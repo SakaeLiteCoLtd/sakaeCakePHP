@@ -406,22 +406,10 @@ echo "</pre>";
             $table->setConnection($connection);
 
             for($k=0; $k<count($arrEDImotodenpyoudnp); $k++){
-              echo "<pre>";
-              print_r($arrEDImotodenpyoudnp[$k]["place_deliver"]);
-              print_r(mb_substr($arrEDImotodenpyoudnp[$k]["place_deliver"], 0, 1));
-              echo "</pre>";
-
               if(mb_substr($arrEDImotodenpyoudnp[$k]["place_deliver"], 0, 1) === "弊"){
                 $place_deliver = str_replace("弊社","",$arrEDImotodenpyoudnp[$k]["place_deliver"]);
-                echo "<pre>";
-                print_r("弊社");
-                echo "</pre>";
-
               }else{
                 $place_deliver = $arrEDImotodenpyoudnp[$k]["place_deliver"];
-//                echo "<pre>";
-//                print_r($place_deliver);
-//                echo "</pre>";
             }
 
               $connection->insert('denpyou_dnp', [
@@ -435,10 +423,7 @@ echo "</pre>";
                   'created_at' => date("Y-m-d H:i:s")
               ]);
             }
-
-
             $connection = ConnectionManager::get('default');
-
 
             for ($k=1; $k<=$count-1; $k++) {//最後の行まで
               $line = fgets($fp2);//ファイル$fpの上の１行を取る（２行目から）
@@ -490,38 +475,33 @@ echo "</pre>";
 */
             $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($denpyouDnpMinoukannous, $arrDenpyouDnpMinoukannous);//patchEntitiesで一括登録
             if ($this->DenpyouDnpMinoukannous->saveMany($denpyouDnpMinoukannous)) {//saveManyで一括登録//ここからDnpTotalAmountsへ登録用
-
-              /*
-              //insert into order_ediする
-              $connection = ConnectionManager::get('DB_ikou_test');
-              $table = TableRegistry::get('order_edi');
-              $table->setConnection($connection);
-
+/*
               echo "<pre>";
-              print_r($uniquearrDnpTotalAmounts);
+              print_r($arrDenpyouDnpMinoukannous);
               echo "</pre>";
 
-              for($k=0; $k<count($arrEDI); $k++){
-                $connection->insert('order_edi', [
-                    'date_order' => $uniquearrDnpTotalAmounts[$k]["date_order"],
-                    'num_order' => $uniquearrDnpTotalAmounts[$k]["num_order"],
-                    'product_id' => $uniquearrDnpTotalAmounts[$k]["product_code"],
-                    'price' => $uniquearrDnpTotalAmounts[$k]["price"],
-                    'date_deliver' => $uniquearrDnpTotalAmounts[$k]["date_deliver"],
-                    'amount' => $uniquearrDnpTotalAmounts[$k]["amount"],
-                    'cs_id' => $uniquearrDnpTotalAmounts[$k]["customer_code"],
-                    'place_deliver_id' => $uniquearrDnpTotalAmounts[$k]["place_deliver_code"],
-                    'place_line' => $uniquearrDnpTotalAmounts[$k]["place_line"],
-                    'line_code' => $uniquearrDnpTotalAmounts[$k]["line_code"],
-                    'check_denpyou' => $uniquearrDnpTotalAmounts[$k]["check_denpyou"],
-                    'bunnou' => $uniquearrDnpTotalAmounts[$k]["bunnou"],
-                    'kannou' => $uniquearrDnpTotalAmounts[$k]["kannou"],
-                    'delete_flg' => $uniquearrDnpTotalAmounts[$k]["delete_flag"],
-                    'created_at' => $uniquearrDnpTotalAmounts("Y-m-d H:i:s")
+              //insert into order_dnp_kannousする難しい
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_dnp_kannous');
+              $table->setConnection($connection);
+
+              for($k=0; $k<count($arrDenpyouDnpMinoukannous); $k++){
+                $connection->insert('order_dnp_kannous', [
+                    'date_order' => $arrEDI[0]["date_order"],
+                    'num_order' => $arrDenpyouDnpMinoukannous[$k]["num_order"],
+                    'product_id' => $arrDenpyouDnpMinoukannous[$k]["product_code"],
+                    'code' => $arrDenpyouDnpMinoukannous[$k]["line_code"],
+                    'bunnou' => 0,
+                    'date_deliver' => $arrDenpyouDnpMinoukannous[$k]["date_deliver"],
+      //              'amount' => $arrDenpyouDnpMinoukannous[$k]["amount"],
+                    'kannou' => 1,
+                    'delete_flg' => 0,
+                    'created_at' => date("Y-m-d H:i:s")
                 ]);
               }
               $connection = ConnectionManager::get('default');
 */
+
               for ($k=1; $k<=$count-1; $k++) {//最後の行まで
                 $line = fgets($fp3);//ファイル$fpの上の１行を取る（２行目から）
                 $sample = explode(',',$line);//$lineを','毎に配列に入れる

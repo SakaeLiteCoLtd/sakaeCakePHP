@@ -370,17 +370,13 @@ echo "</pre>";
       $connection->begin();//トランザクション3
       try {//トランザクション4
           if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
-            //ここからDenpyouDnpMinoukannousへ登録用
+//ここからDenpyouDnpMinoukannousへ登録用
 
             //insert into order_ediする
             $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('order_edi');
             $table->setConnection($connection);
-/*
-            echo "<pre>";
-            print_r($arrEDImotodenpyoudnp);
-            echo "</pre>";
-*/
+
             for($k=0; $k<count($arrEDI); $k++){
               $connection->insert('order_edi', [
                   'date_order' => $arrEDI[$k]["date_order"],
@@ -423,7 +419,9 @@ echo "</pre>";
                   'created_at' => date("Y-m-d H:i:s")
               ]);
             }
+
             $connection = ConnectionManager::get('default');
+//新DBに戻す
 
             for ($k=1; $k<=$count-1; $k++) {//最後の行まで
               $line = fgets($fp2);//ファイル$fpの上の１行を取る（２行目から）
@@ -475,32 +473,39 @@ echo "</pre>";
 */
             $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($denpyouDnpMinoukannous, $arrDenpyouDnpMinoukannous);//patchEntitiesで一括登録
             if ($this->DenpyouDnpMinoukannous->saveMany($denpyouDnpMinoukannous)) {//saveManyで一括登録//ここからDnpTotalAmountsへ登録用
-/*
-              echo "<pre>";
-              print_r($arrDenpyouDnpMinoukannous);
-              echo "</pre>";
 
-              //insert into order_dnp_kannousする難しい
+//旧DB
+              for($k=0; $k<count($arrDenpyouDnpMinoukannous); $k++){
+              $connection = ConnectionManager::get('default');
+
+              $OrderEdi = $this->OrderEdis->find()->where(['id' => $arrDenpyouDnpMinoukannous[$k]['order_edi_id']])->toArray();
+              $OrderEdi_id = $OrderEdi[0]->id;
+              $mikandate_order = $OrderEdi[0]['date_order'];
+              $mikannum_order = $OrderEdi[0]['num_order'];
+              $mikanproduct_code = $OrderEdi[0]['product_code'];
+              $mikanline_code = $OrderEdi[0]['line_code'];
+              $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+              $mikanamount = $OrderEdi[0]['amount'];
+              $mikanminoukannou = 0;
+
               $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_dnp_kannous');
               $table->setConnection($connection);
 
-              for($k=0; $k<count($arrDenpyouDnpMinoukannous); $k++){
                 $connection->insert('order_dnp_kannous', [
-                    'date_order' => $arrEDI[0]["date_order"],
-                    'num_order' => $arrDenpyouDnpMinoukannous[$k]["num_order"],
-                    'product_id' => $arrDenpyouDnpMinoukannous[$k]["product_code"],
-                    'code' => $arrDenpyouDnpMinoukannous[$k]["line_code"],
-                    'bunnou' => 0,
-                    'date_deliver' => $arrDenpyouDnpMinoukannous[$k]["date_deliver"],
-      //              'amount' => $arrDenpyouDnpMinoukannous[$k]["amount"],
-                    'kannou' => 1,
+                    'date_order' => $mikandate_order,
+                    'num_order' => $mikannum_order,
+                    'product_id' => $mikanproduct_code,
+                    'code' => $mikanline_code,
+                    'date_deliver' => $mikandate_deliver,
+                    'amount' => $mikanamount,
+                    'minoukannou' => 1,
                     'delete_flg' => 0,
                     'created_at' => date("Y-m-d H:i:s")
                 ]);
               }
               $connection = ConnectionManager::get('default');
-*/
+              //旧DBここまで
 
               for ($k=1; $k<=$count-1; $k++) {//最後の行まで
                 $line = fgets($fp3);//ファイル$fpの上の１行を取る（２行目から）
@@ -581,26 +586,84 @@ echo "</pre>";
                       ['id'  => $DenpyouDnpMinoukannouId]
                       );
 
+                      //ここから、旧DBへの登録用
+                      $order_edi_id = $uniquearrDnpdouitutyuumon[$n][$m-1]['id'];
+                      $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+                      $mikandate_order = $OrderEdi[0]['date_order'];
+                      $mikannum_order = $OrderEdi[0]['num_order'];
+                      $mikanproduct_code = $OrderEdi[0]['product_code'];
+                      $mikanline_code = $OrderEdi[0]['line_code'];
+                      $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+                      $mikanamount = $OrderEdi[0]['amount'];
+                      $mikanminoukannou = 0;
+
+                      $connection = ConnectionManager::get('DB_ikou_test');
+                      $table = TableRegistry::get('order_dnp_kannous');
+                      $table->setConnection($connection);
+
+                      $updater = "UPDATE order_dnp_kannous set minoukannou = 0, bunnou = '".$m."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
+                      $connection->execute($updater);
+
+                      $connection = ConnectionManager::get('default');
+                      //ここまで
+
+
                       $this->OrderEdis->updateAll(
                       ['bunnou' => $m, 'updated_at' => date('Y-m-d H:i:s')],//bunnouを納期順に1,2,3...とうまく更新していく
                       ['id'   => $uniquearrDnpdouitutyuumon[$n][$m-1]['id']]
                       );
 
+                      //ここから、旧DBへの更新
+                      $order_edi_id = $uniquearrDnpdouitutyuumon[$n][$m-1]['id'];
+                      $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+                      $mikandate_order = $OrderEdi[0]['date_order'];
+                      $mikannum_order = $OrderEdi[0]['num_order'];
+                      $mikanproduct_code = $OrderEdi[0]['product_code'];
+                      $mikanline_code = $OrderEdi[0]['line_code'];
+                      $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+                      $mikanamount = $OrderEdi[0]['amount'];
+
+                      $connection = ConnectionManager::get('DB_ikou_test');
+                      $table = TableRegistry::get('order_edi');
+                      $table->setConnection($connection);
+
+                      $updater = "UPDATE order_edi set bunnou = '".$m."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
+                      $connection->execute($updater);
+
+                      $connection = ConnectionManager::get('default');
+                      //ここまで
+
                       $this->OrderEdis->updateAll(
                       ['bunnou' => $m+1, 'updated_at' => date('Y-m-d H:i:s')],//bunnouを納期順に1,2,3...とうまく更新していく
                       ['id'   => $uniquearrDnpdouitutyuumon[$n][$m]['id']]
                       );
+                      //ここから、旧DBへの更新
+                      $order_edi_id = $uniquearrDnpdouitutyuumon[$n][$m]['id'];
+                      $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+                      $mikandate_order = $OrderEdi[0]['date_order'];
+                      $mikannum_order = $OrderEdi[0]['num_order'];
+                      $mikanproduct_code = $OrderEdi[0]['product_code'];
+                      $mikanline_code = $OrderEdi[0]['line_code'];
+                      $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+                      $mikanamount = $OrderEdi[0]['amount'];
+                      $m1 = $m + 1;
 
-/*
-                      $connection = ConnectionManager::get('DB_ikou');
-                      $table = TableRegistry::get('check_lots');
+                      $connection = ConnectionManager::get('DB_ikou_test');
+                      $table = TableRegistry::get('order_edi');
                       $table->setConnection($connection);
 
-                      $updater = "UPDATE check_lots set flag_used = 1 where product_id ='".$data["product_code"]."' and lot_num = '".$data["lot_num_".$i]."'";//もとのDBも更新
+                      $updater = "UPDATE order_edi set bunnou = '".$m1."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
+                      $connection->execute($updater);
+
+                      $connection = ConnectionManager::get('DB_ikou_test');
+                      $table = TableRegistry::get('order_dnp_kannous');
+                      $table->setConnection($connection);
+
+                      $updater = "UPDATE order_dnp_kannous set bunnou = '".$m1."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
                       $connection->execute($updater);
 
                       $connection = ConnectionManager::get('default');
-*/
+                      //ここまで
 
                     }else{
                       break;
@@ -1131,6 +1194,24 @@ echo "</pre>";
         for($n=0; $n<=$cnt; $n++){
          if(isset($data['orderEdis'][$n])){
           if ($this->OrderEdis->updateAll(['date_deliver' => $data['orderEdis'][$n]['date_deliver'] ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],['id' => $data['orderEdis'][$n]['id']])) {
+          //旧DB更新
+          $newdate_deliver = $data['orderEdis'][$n]['date_deliver'];
+          $order_edi_id = $data['orderEdis'][$n]['id'];
+          $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+          $mikandate_order = $OrderEdi[0]['date_order'];
+          $mikannum_order = $OrderEdi[0]['num_order'];
+          $mikanproduct_code = $OrderEdi[0]['product_code'];
+          $mikanline_code = $OrderEdi[0]['line_code'];
+          //$mikandate_deliver = $OrderEdi[0]['date_deliver'];
+
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $table = TableRegistry::get('order_edi');
+          $table->setConnection($connection);
+
+          $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' , updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";
+          $connection->execute($updater);
+          $connection = ConnectionManager::get('default');
+          //ここまで
           }else{
             $mes = "※更新されませんでした";
             $this->set('mes',$mes);
@@ -1220,6 +1301,26 @@ echo "</pre>";
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
             ,'bunnou' => $bunnnou ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
+
+              //旧DB更新
+              $newdate_deliver = $_SESSION['orderEdis'][$n]['date_deliver'];
+              $newamount = $_SESSION['orderEdis'][$n]['amount'];
+              $order_edi_id = $_SESSION['orderEdis'][$n]['id'];
+              $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+              $mikandate_order = $OrderEdi[0]['date_order'];
+              $mikannum_order = $OrderEdi[0]['num_order'];
+              $mikanproduct_code = $OrderEdi[0]['product_code'];
+              $mikanline_code = $OrderEdi[0]['line_code'];
+
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_edi');
+              $table->setConnection($connection);
+
+              $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' , amount = '".$newamount."' , bunnou = '".$bunnnou."' , date_bunnou = '".date('Y-m-d')."' , updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";
+              $connection->execute($updater);
+              $connection = ConnectionManager::get('default');
+              //ここまで
+
               $mes = "※更新されました";
               $this->set('mes',$mes);
             }else{
@@ -1232,6 +1333,26 @@ echo "</pre>";
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => 0
             ,'bunnou' => 0 ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
+
+              //旧DB更新
+              $newdate_deliver = $_SESSION['orderEdis'][$n]['date_deliver'];
+              $order_edi_id = $_SESSION['orderEdis'][$n]['id'];
+              $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+              $mikandate_order = $OrderEdi[0]['date_order'];
+              $mikannum_order = $OrderEdi[0]['num_order'];
+              $mikanproduct_code = $OrderEdi[0]['product_code'];
+              $mikanline_code = $OrderEdi[0]['line_code'];
+
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_edi');
+              $table->setConnection($connection);
+
+              $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' , amount = 0 , bunnou = 0 , date_bunnou = '".date('Y-m-d')."' , updated_at = '".date('Y-m-d H:i:s')."' , delete_flg = 1
+              where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";
+              $connection->execute($updater);
+              $connection = ConnectionManager::get('default');
+              //ここまで
+
               $mes = "※更新されました";
               $this->set('mes',$mes);
             }else{
@@ -1252,6 +1373,34 @@ echo "</pre>";
           }elseif(isset($arrOrderEdisnew[0])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
             $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);
             if ($this->OrderEdis->saveMany($OrderEdis)) {//minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
+
+              //旧DB更新
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_edi');
+              $table->setConnection($connection);
+
+              for($k=0; $k<count($arrOrderEdisnew); $k++){
+                $connection->insert('order_edi', [
+                    'date_order' => $arrOrderEdisnew[$k]["date_order"],
+                    'num_order' => $arrOrderEdisnew[$k]["num_order"],
+                    'product_id' => $arrOrderEdisnew[$k]["product_code"],
+                    'price' => $arrOrderEdisnew[$k]["price"],
+                    'date_deliver' => $arrOrderEdisnew[$k]["date_deliver"],
+                    'amount' => $arrOrderEdisnew[$k]["amount"],
+                    'cs_id' => $arrOrderEdisnew[$k]["customer_code"],
+                    'place_deliver_id' => $arrOrderEdisnew[$k]["place_deliver_code"],
+                    'place_line' => $arrOrderEdisnew[$k]["place_line"],
+                    'line_code' => $arrOrderEdisnew[$k]["line_code"],
+                    'check_denpyou' => $arrOrderEdisnew[$k]["check_denpyou"],
+                    'bunnou' => $arrOrderEdisnew[$k]["bunnou"],
+                    'kannou' => $arrOrderEdisnew[$k]["kannou"],
+                    'delete_flg' => $arrOrderEdisnew[$k]["delete_flag"],
+                    'created_at' => date("Y-m-d H:i:s")
+                ]);
+              }
+              $connection = ConnectionManager::get('default');
+              //ここまで
+
               $mes = "※更新されました";
               $this->set('mes',$mes);
               $connection->commit();// コミット5
@@ -1510,6 +1659,24 @@ echo "</pre>";
         for($n=0; $n<=$cnt; $n++){
          if(isset($data['orderEdis'][$n])){
           if ($this->OrderEdis->updateAll(['date_deliver' => $data['orderEdis'][$n]['date_deliver'] ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],['id' => $data['orderEdis'][$n]['id']])) {
+            //旧DB更新
+            $newdate_deliver = $data['orderEdis'][$n]['date_deliver'];
+            $order_edi_id = $data['orderEdis'][$n]['id'];
+            $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+            $mikandate_order = $OrderEdi[0]['date_order'];
+            $mikannum_order = $OrderEdi[0]['num_order'];
+            $mikanproduct_code = $OrderEdi[0]['product_code'];
+            $mikanline_code = $OrderEdi[0]['line_code'];
+            //$mikandate_deliver = $OrderEdi[0]['date_deliver'];
+
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('order_edi');
+            $table->setConnection($connection);
+
+            $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' , updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";
+            $connection->execute($updater);
+            $connection = ConnectionManager::get('default');
+            //ここまで
           }else{
             $mes = "※更新されませんでした";
             $this->set('mes',$mes);
@@ -1596,6 +1763,29 @@ echo "</pre>";
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
             ,'bunnou' => $bunnnou ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
+
+              //ここから、旧DBへの更新
+              $newdate_deliver = $_SESSION['orderEdis'][$n]['date_deliver'];
+              $newamount = $_SESSION['orderEdis'][$n]['amount'];
+              $order_edi_id = $_SESSION['orderEdis'][$n]['id'];
+              $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+              $mikandate_order = $OrderEdi[0]['date_order'];
+              $mikannum_order = $OrderEdi[0]['num_order'];
+              $mikanproduct_code = $OrderEdi[0]['product_code'];
+              $mikanline_code = $OrderEdi[0]['line_code'];
+              $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_edi');
+              $table->setConnection($connection);
+
+              $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."', amount = '".$newamount."', bunnou = '".$bunnnou."' , date_bunnou = '".date('Y-m-d')."' ,
+               updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";//もとのDBも更新
+              $connection->execute($updater);
+
+              $connection = ConnectionManager::get('default');
+              //ここまで
+
               $mes = "※更新されました";
               $this->set('mes',$mes);
             }else{
@@ -1609,10 +1799,51 @@ echo "</pre>";
             ,'bunnou' => 0 ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
 
+              //ここから、旧DBへの更新
+              $order_edi_id = $_SESSION['orderEdis'][$n]['id'];
+              $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+              $mikandate_order = $OrderEdi[0]['date_order'];
+              $mikannum_order = $OrderEdi[0]['num_order'];
+              $mikanproduct_code = $OrderEdi[0]['product_code'];
+              $mikanline_code = $OrderEdi[0]['line_code'];
+              $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+              $mikanamount = $OrderEdi[0]['amount'];
+
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_edi');
+              $table->setConnection($connection);
+
+              $updater = "UPDATE order_edi set bunnou = 0 , date_bunnou = '".date('Y-m-d')."' , updated_at = '".date('Y-m-d H:i:s')."' ,delete_flg = 1  where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
+              $connection->execute($updater);
+
+              $connection = ConnectionManager::get('default');
+              //ここまで
+
               $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $_SESSION['orderEdis'][$n]['id']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
               $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
               $this->DenpyouDnpMinoukannous->updateAll(['delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
               ,['id' => $denpyouDnpMinoukannouId]);
+
+              //ここから、旧DBへの登録用
+              $order_edi_id = $_SESSION['orderEdis'][$n]['id'];
+              $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+              $mikandate_order = $OrderEdi[0]['date_order'];
+              $mikannum_order = $OrderEdi[0]['num_order'];
+              $mikanproduct_code = $OrderEdi[0]['product_code'];
+              $mikanline_code = $OrderEdi[0]['line_code'];
+              $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+              $mikanamount = $OrderEdi[0]['amount'];
+              $mikanminoukannou = 0;
+
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_dnp_kannous');
+              $table->setConnection($connection);
+
+              $updater = "UPDATE order_dnp_kannous set delete_flg = 1 , updated_at = '".date('Y-m-d H:i:s')."' 　where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
+              $connection->execute($updater);
+
+              $connection = ConnectionManager::get('default');
+              //ここまで
 
               $mes = "※更新されました";
               $this->set('mes',$mes);
@@ -1635,6 +1866,34 @@ echo "</pre>";
           }elseif(isset($arrOrderEdisnew[0])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
             $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);//$arrOrderEdisnewを登録
             if ($this->OrderEdis->saveMany($OrderEdis)) {//minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
+
+              //旧DB更新
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_edi');
+              $table->setConnection($connection);
+
+              for($k=0; $k<count($arrOrderEdisnew); $k++){
+                $connection->insert('order_edi', [
+                    'date_order' => $arrOrderEdisnew[$k]["date_order"],
+                    'num_order' => $arrOrderEdisnew[$k]["num_order"],
+                    'product_id' => $arrOrderEdisnew[$k]["product_code"],
+                    'price' => $arrOrderEdisnew[$k]["price"],
+                    'date_deliver' => $arrOrderEdisnew[$k]["date_deliver"],
+                    'amount' => $arrOrderEdisnew[$k]["amount"],
+                    'cs_id' => $arrOrderEdisnew[$k]["customer_code"],
+                    'place_deliver_id' => $arrOrderEdisnew[$k]["place_deliver_code"],
+                    'place_line' => $arrOrderEdisnew[$k]["place_line"],
+                    'line_code' => $arrOrderEdisnew[$k]["line_code"],
+                    'check_denpyou' => $arrOrderEdisnew[$k]["check_denpyou"],
+                    'bunnou' => $arrOrderEdisnew[$k]["bunnou"],
+                    'kannou' => $arrOrderEdisnew[$k]["kannou"],
+                    'delete_flg' => $arrOrderEdisnew[$k]["delete_flag"],
+                    'created_at' => date("Y-m-d H:i:s")
+                ]);
+              }
+              $connection = ConnectionManager::get('default');
+              //ここまで
+
               for($m=0; $m<=100; $m++){
                 if(isset($arrBunnnou[$m])){//登録するOrderEdiデータ（amount>0）が存在する場合
                   $orderEdi = $this->OrderEdis->find()->where(['delete_flag' => '0', 'num_order' => $num_order, 'product_code' => $product_code, 'bunnou' => $arrBunnnou[$m]])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
@@ -1649,6 +1908,40 @@ echo "</pre>";
 */
                   $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($this->DenpyouDnpMinoukannous->newEntity(), $arrDenpyouDnpMinoukannousnew);//patchEntitiesで一括登録
                   $this->DenpyouDnpMinoukannous->saveMany($denpyouDnpMinoukannous);//saveManyで一括登録
+
+                  //旧DB
+                  for($k=0; $k<count($arrDenpyouDnpMinoukannousnew); $k++){
+                  $connection = ConnectionManager::get('default');
+
+                  $OrderEdi = $this->OrderEdis->find()->where(['id' => $arrDenpyouDnpMinoukannousnew[$k]['order_edi_id']])->toArray();
+                  $OrderEdi_id = $OrderEdi[0]->id;
+                  $mikandate_order = $OrderEdi[0]['date_order'];
+                  $mikannum_order = $OrderEdi[0]['num_order'];
+                  $mikanproduct_code = $OrderEdi[0]['product_code'];
+                  $mikanline_code = $OrderEdi[0]['line_code'];
+                  $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+                  $mikanamount = $OrderEdi[0]['amount'];
+                  $mikanminoukannou = 0;
+
+                  $connection = ConnectionManager::get('DB_ikou_test');
+                  $table = TableRegistry::get('order_dnp_kannous');
+                  $table->setConnection($connection);
+
+                    $connection->insert('order_dnp_kannous', [
+                        'date_order' => $mikandate_order,
+                        'num_order' => $mikannum_order,
+                        'product_id' => $mikanproduct_code,
+                        'code' => $mikanline_code,
+                        'date_deliver' => $mikandate_deliver,
+                        'amount' => $mikanamount,
+                        'minoukannou' => 1,
+                        'delete_flg' => 0,
+                        'created_at' => date("Y-m-d H:i:s")
+                    ]);
+                  }
+                  $connection = ConnectionManager::get('default');
+                  //旧DBここまで
+
 
                   //minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
                   $orderedi_id = $_SESSION['orderEdis'][0]['id'];
@@ -1682,11 +1975,56 @@ echo "</pre>";
                       $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
                       $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 0 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
                       ,['id' => $denpyouDnpMinoukannouId]);
+
+                      //ここから、旧DBへの登録用
+                      $order_edi_id = $arrDnpdouitutyuumonSort[0][$m]['id'];
+                      $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+                      $mikandate_order = $OrderEdi[0]['date_order'];
+                      $mikannum_order = $OrderEdi[0]['num_order'];
+                      $mikanproduct_code = $OrderEdi[0]['product_code'];
+                      $mikanline_code = $OrderEdi[0]['line_code'];
+                      $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+                      $mikanamount = $OrderEdi[0]['amount'];
+                      $mikanminoukannou = 0;
+
+                      $connection = ConnectionManager::get('DB_ikou_test');
+                      $table = TableRegistry::get('order_dnp_kannous');
+                      $table->setConnection($connection);
+
+                      $updater = "UPDATE order_dnp_kannous set minoukannou = 0, updated_at = '".date('Y-m-d H:i:s')."'
+                      where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."'";//もとのDBも更新
+                      $connection->execute($updater);
+
+                      $connection = ConnectionManager::get('default');
+                      //ここまで
+
                     }else{
                       $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
                       $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
                       $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
                       ,['id' => $denpyouDnpMinoukannouId]);
+
+                      //ここから、旧DBへの登録用
+                      $order_edi_id = $arrDnpdouitutyuumonSort[0][$m]['id'];
+                      $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+                      $mikandate_order = $OrderEdi[0]['date_order'];
+                      $mikannum_order = $OrderEdi[0]['num_order'];
+                      $mikanproduct_code = $OrderEdi[0]['product_code'];
+                      $mikanline_code = $OrderEdi[0]['line_code'];
+                      $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+                      $mikanamount = $OrderEdi[0]['amount'];
+                      $mikanminoukannou = 0;
+
+                      $connection = ConnectionManager::get('DB_ikou_test');
+                      $table = TableRegistry::get('order_dnp_kannous');
+                      $table->setConnection($connection);
+
+                      $updater = "UPDATE order_dnp_kannous set minoukannou = 1, updated_at = '".date('Y-m-d H:i:s')."'
+                       where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
+                      $connection->execute($updater);
+
+                      $connection = ConnectionManager::get('default');
+                      //ここまで
                     }
                   }
                   break;
@@ -1742,11 +2080,56 @@ echo "</pre>";
                 $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
                 $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 0 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
                 ,['id' => $denpyouDnpMinoukannouId]);
+
+                //ここから、旧DBへの登録用
+                $order_edi_id = $arrDnpdouitutyuumonSort[0][$m]['id'];
+                $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+                $mikandate_order = $OrderEdi[0]['date_order'];
+                $mikannum_order = $OrderEdi[0]['num_order'];
+                $mikanproduct_code = $OrderEdi[0]['product_code'];
+                $mikanline_code = $OrderEdi[0]['line_code'];
+                $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+                $mikanamount = $OrderEdi[0]['amount'];
+                $mikanminoukannou = 0;
+
+                $connection = ConnectionManager::get('DB_ikou_test');
+                $table = TableRegistry::get('order_dnp_kannous');
+                $table->setConnection($connection);
+
+                $updater = "UPDATE order_dnp_kannous set minoukannou = 0, updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."'";//もとのDBも更新
+                $connection->execute($updater);
+
+                $connection = ConnectionManager::get('default');
+                //ここまで
+
               }else{
                 $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
                 $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
                 $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
                 ,['id' => $denpyouDnpMinoukannouId]);
+
+                //ここから、旧DBへの登録用
+                $order_edi_id = $arrDnpdouitutyuumonSort[0][$m]['id'];
+                $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+                $mikandate_order = $OrderEdi[0]['date_order'];
+                $mikannum_order = $OrderEdi[0]['num_order'];
+                $mikanproduct_code = $OrderEdi[0]['product_code'];
+                $mikanline_code = $OrderEdi[0]['line_code'];
+                $mikandate_deliver = $OrderEdi[0]['date_deliver'];
+                $mikanamount = $OrderEdi[0]['amount'];
+                $mikanminoukannou = 0;
+
+                $connection = ConnectionManager::get('DB_ikou_test');
+                $table = TableRegistry::get('order_dnp_kannous');
+                $table->setConnection($connection);
+
+                $updater = "UPDATE order_dnp_kannous set minoukannou = 1, updated_at = '".date('Y-m-d H:i:s')."'
+                 where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
+                $connection->execute($updater);
+
+                $connection = ConnectionManager::get('default');
+                //ここまで
+
               }
             }
             $connection->commit();// コミット5
@@ -1981,6 +2364,26 @@ echo "</pre>";
         for($n=0; $n<=$cnt; $n++){
          if(isset($data['orderEdis'][$n])){
           if ($this->OrderEdis->updateAll(['date_deliver' => $data['orderEdis'][$n]['date_deliver'] ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],['id' => $data['orderEdis'][$n]['id']])) {
+
+            //旧DB更新
+            $newdate_deliver = $data['orderEdis'][$n]['date_deliver'];
+            $order_edi_id = $data['orderEdis'][$n]['id'];
+            $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+            $mikandate_order = $OrderEdi[0]['date_order'];
+            $mikannum_order = $OrderEdi[0]['num_order'];
+            $mikanproduct_code = $OrderEdi[0]['product_code'];
+            $mikanline_code = $OrderEdi[0]['line_code'];
+            //$mikandate_deliver = $OrderEdi[0]['date_deliver'];
+
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('order_edi');
+            $table->setConnection($connection);
+
+            $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' , updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";
+            $connection->execute($updater);
+            $connection = ConnectionManager::get('default');
+            //ここまで
+
           }else{
             $mes = "※更新されませんでした";
             $this->set('mes',$mes);
@@ -2071,6 +2474,26 @@ echo "</pre>";
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
             ,'bunnou' => $bunnnou ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
+
+              //旧DB更新
+              $newdate_deliver = $_SESSION['orderEdis'][$n]['date_deliver'];
+              $newamount = $_SESSION['orderEdis'][$n]['amount'];
+              $order_edi_id = $_SESSION['orderEdis'][$n]['id'];
+              $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+              $mikandate_order = $OrderEdi[0]['date_order'];
+              $mikannum_order = $OrderEdi[0]['num_order'];
+              $mikanproduct_code = $OrderEdi[0]['product_code'];
+              $mikanline_code = $OrderEdi[0]['line_code'];
+
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_edi');
+              $table->setConnection($connection);
+
+              $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' , amount = '".$newamount."' , bunnou = '".$bunnnou."' , date_bunnou = '".date('Y-m-d')."' , updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";
+              $connection->execute($updater);
+              $connection = ConnectionManager::get('default');
+              //ここまで
+
               $mes = "※更新されました";
               $this->set('mes',$mes);
             }else{
@@ -2083,6 +2506,26 @@ echo "</pre>";
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => 0
             ,'bunnou' => 0 ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
+
+              //旧DB更新
+              $newdate_deliver = $_SESSION['orderEdis'][$n]['date_deliver'];
+              $order_edi_id = $_SESSION['orderEdis'][$n]['id'];
+              $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
+              $mikandate_order = $OrderEdi[0]['date_order'];
+              $mikannum_order = $OrderEdi[0]['num_order'];
+              $mikanproduct_code = $OrderEdi[0]['product_code'];
+              $mikanline_code = $OrderEdi[0]['line_code'];
+
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_edi');
+              $table->setConnection($connection);
+
+              $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' , amount = 0 , bunnou = 0 , date_bunnou = '".date('Y-m-d')."' , updated_at = '".date('Y-m-d H:i:s')."' , delete_flg = 1
+              where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";
+              $connection->execute($updater);
+              $connection = ConnectionManager::get('default');
+              //ここまで
+
               $mes = "※更新されました";
               $this->set('mes',$mes);
             }else{
@@ -2103,6 +2546,34 @@ echo "</pre>";
           }elseif(isset($arrOrderEdisnew[0])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
             $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);
             if ($this->OrderEdis->saveMany($OrderEdis)) {//minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
+
+              //旧DB更新
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_edi');
+              $table->setConnection($connection);
+
+              for($k=0; $k<count($arrOrderEdisnew); $k++){
+                $connection->insert('order_edi', [
+                    'date_order' => $arrOrderEdisnew[$k]["date_order"],
+                    'num_order' => $arrOrderEdisnew[$k]["num_order"],
+                    'product_id' => $arrOrderEdisnew[$k]["product_code"],
+                    'price' => $arrOrderEdisnew[$k]["price"],
+                    'date_deliver' => $arrOrderEdisnew[$k]["date_deliver"],
+                    'amount' => $arrOrderEdisnew[$k]["amount"],
+                    'cs_id' => $arrOrderEdisnew[$k]["customer_code"],
+                    'place_deliver_id' => $arrOrderEdisnew[$k]["place_deliver_code"],
+                    'place_line' => $arrOrderEdisnew[$k]["place_line"],
+                    'line_code' => $arrOrderEdisnew[$k]["line_code"],
+                    'check_denpyou' => $arrOrderEdisnew[$k]["check_denpyou"],
+                    'bunnou' => $arrOrderEdisnew[$k]["bunnou"],
+                    'kannou' => $arrOrderEdisnew[$k]["kannou"],
+                    'delete_flg' => $arrOrderEdisnew[$k]["delete_flag"],
+                    'created_at' => date("Y-m-d H:i:s")
+                ]);
+              }
+              $connection = ConnectionManager::get('default');
+              //ここまで
+
               $mes = "※更新されました";
               $this->set('mes',$mes);
               $connection->commit();// コミット5

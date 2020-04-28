@@ -1809,6 +1809,8 @@ class LabelsController extends AppController
             $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
             $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi'][$i]['product_code']])->toArray();
 
+
+
             if($Layout == "C"){//〇タイプCの場合は１行に２製品の表示//OK
 
               if(isset($LabelSetikkatsu1[0])){
@@ -2063,10 +2065,10 @@ class LabelsController extends AppController
           }
 
 
-  //      $fp = fopen('labels/label_kobetu0427.csv', 'w');
-        $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
+        $fp = fopen('labels/label_kobetu0428.csv', 'w');
+  //      $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
           foreach ($arrCsv as $line) {
-            $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+  //          $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
           	fputcsv($fp, $line);
           }
             fclose($fp);
@@ -2085,7 +2087,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5
 
                      //insert into label_csvする
-                     $connection = ConnectionManager::get('sakaeMotoDB');
+                     $connection = ConnectionManager::get('DB_ikou_test');
                      $table = TableRegistry::get('label_csv');
                      $table->setConnection($connection);
     /*
@@ -2113,7 +2115,6 @@ class LabelsController extends AppController
                        ]);
                      }
 
-
                    } else {
                      $mes = "\\192.168.4.246\centosuser\label_csv にＣＳＶファイルが出力されました※データベースへ登録されませんでした";
                      $this->set('mes',$mes);
@@ -2131,13 +2132,6 @@ class LabelsController extends AppController
             "lotnum" => substr($data['finishing_tm11'],2,2).substr($data['finishing_tm11'],5,2).substr($data['finishing_tm11'],8,2)
           );
 
-          $product_code = mb_strtoupper($data["product_code11"]);
-          $this->set('product_code',$product_code);
-/*
-          echo "<pre>";
-          print_r($product_code);
-          echo "</pre>";
-*/
          $this->set('confirm',$data['confirm']);
          $dateto = $data['dateto'];
          $this->set('dateto',$dateto);

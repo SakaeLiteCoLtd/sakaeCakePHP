@@ -173,7 +173,10 @@ ${"n".$j} = 1;
  $nij = ${"n".$j} + $this->request->getData("ntuika{$j}");
  for($i=1; $i<=$nij; $i++){//１号機
    if(null !== ($this->request->getData("product_code{$j}{$i}"))){
-     ${"product_code".$i} = $this->request->getData("product_code{$j}{$i}");
+
+     $product_code = mb_strtoupper($this->request->getData("product_code{$j}{$i}"));
+
+     ${"product_code".$i} = $product_code;
      $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
      if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
        $torisu = $Product[0]->torisu;

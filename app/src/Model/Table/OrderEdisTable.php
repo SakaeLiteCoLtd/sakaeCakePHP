@@ -109,7 +109,7 @@ class OrderEdisTable extends Table
 
         $validator
             ->scalar('line_code')
-            ->maxLength('line_code', 20)
+            ->maxLength('line_code', 30)
             ->allowEmpty('line_code');
 
         $validator
@@ -117,12 +117,12 @@ class OrderEdisTable extends Table
             ->maxLength('check_denpyou', 2)
             ->requirePresence('check_denpyou', 'create')
             ->notEmpty('check_denpyou');
-
+/*
         $validator
             ->scalar('gaityu')
             ->maxLength('gaityu', 2)
             ->allowEmpty('gaityu');
-
+*/
         $validator
             ->integer('bunnou')
             ->requirePresence('bunnou', 'create')

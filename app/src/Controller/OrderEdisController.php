@@ -33,6 +33,8 @@ class OrderEdisController extends AppController
        $this->SyoyouKeikakus = TableRegistry::get('syoyouKeikakus');
        $this->DenpyouDnpMinoukannous = TableRegistry::get('denpyouDnpMinoukannous');
        $this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
+       $this->PlaceDelivers = TableRegistry::get('placeDelivers');
+       $this->AssembleProducts = TableRegistry::get('assembleProducts');
      }
 
      public function indexmenu()
@@ -2595,5 +2597,385 @@ echo "</pre>";
         $connection->rollback();//トランザクション9
       }//トランザクション10
     }
+
+    public function chokusetsuformpro()
+    {
+      $this->request->session()->destroy();// セッションの破棄
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+      if(isset($data["syousai"])){
+        $Product = $this->Products->find()->where(['product_code' => $data['product_code']])->toArray();
+        $customer_id = $Product[0]->customer_id;
+        $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+        $customer_code = $Customer[0]->customer_code;
+        if($customer_code == "20001" || $customer_code == "20002" || $customer_code == "20003" || $customer_code == "20004"){
+          return $this->redirect(['action' => 'chokusetsuformalldnp',//以下のデータを持ってhenkou4panaに移動
+          's' => ['product_code' => $data['product_code']]]);
+        }else{
+          return $this->redirect(['action' => 'chokusetsuformallpana',//以下のデータを持ってhenkou4panaに移動
+          's' => ['product_code' => $data['product_code']]]);
+        }
+      }
+
+    }
+
+    public function chokusetsuformallpana()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      $data = $Data;
+      $product_code = $data["product_code"];
+      $this->set("product_code",$product_code);
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $product_name = $Product[0]->product_name;
+      $this->set("product_name",$product_name);
+
+      $PlaceDelivers = $this->PlaceDelivers->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+        ->where(['cs_id not like' => '%'."20".'%'])->toArray();
+        $arrPlaceDeliver = array();//配列の初期化
+      	foreach ($PlaceDelivers as $value) {//2行上のCustomersテーブルのデータそれぞれに対して
+      		$arrPlaceDeliver[] = array($value->id=>$value->name);//配列に3行上のCustomersテーブルのデータそれぞれのcustomer_code:name
+      	}
+      	$this->set('arrPlaceDeliver',$arrPlaceDeliver);//4行上$arrCustomerをctpで使えるようにセット
+    }
+
+    public function chokusetsuconfirmpana()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+      $date_order = $data["date_order"]["year"]."-".$data["date_order"]["month"]."-".$data["date_order"]["day"];
+      $this->set('date_order',$date_order);
+      $num_order = $data["num_order"];
+      $this->set('num_order',$num_order);
+      $place_deliver = $data["place_deliver"];
+      $PlaceDeliver = $this->PlaceDelivers->find()->where(['id' => $place_deliver])->toArray();
+      $place_deliver_name = $PlaceDeliver[0]->name;
+      $this->set('place_deliver_name',$place_deliver_name);
+      $place_deliver_code = $PlaceDeliver[0]->id_from_order;
+      $this->set('place_deliver_code',$place_deliver_code);
+      $line_code = $data["line_code"];
+      $this->set('line_code',$line_code);
+      $product_code = $data["product_code"];
+      $this->set('product_code',$product_code);
+      $product_name = $data["product_name"];
+      $this->set('product_name',$product_name);
+      $amount = $data["amount"];
+      $this->set('amount',$amount);
+      $date_deliver = $data["date_deliver"]["year"]."-".$data["date_deliver"]["month"]."-".$data["date_deliver"]["day"];
+      $this->set('date_deliver',$date_deliver);
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $customer_id = $Product[0]->customer_id;
+      $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+      $customer_code = $Customer[0]->customer_code;
+      $this->set("customer_code",$customer_code);
+    }
+
+    public function chokusetsupanapreadd()
+    {
+      session_start();
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $data = $this->request->getData();
+
+      $_SESSION['order_edi'] = array(
+        'place_deliver_code' => $data["place_deliver_code"],
+        'date_order' => $data["date_order"],
+        'price' => $data["price"],
+        'amount' => $data["amount"],
+        'product_code' => $data["product_code"],
+        'line_code' => $data["line_code"],
+        'date_deliver' => $data["date_deliver"],
+        'num_order' => $data["num_order"],
+        'first_date_deliver' => $data["first_date_deliver"],
+        'customer_code' => $data["customer_code"],
+        'place_line' => $data["place_line"],
+        'check_denpyou' => 0,
+        'bunnou' => 0,
+        'kannou' => 0,
+        'delete_flag' => 0
+      );
+
+    }
+
+    public function chokusetsupanalogin()
+    {
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmllogin($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();
+
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'chokusetsupanado']);
+          }
+        }
+    }
+
+    public function chokusetsupanado()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+      $_SESSION['order_edi'] = array_merge($_SESSION['order_edi'],$created_staff);
+
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $data['order_edi']['product_code']])->toArray();
+
+      if(count($AssembleProduct) > 0){
+        for($n=0; $n<count($AssembleProduct); $n++){
+          $child_pid = $AssembleProduct[$n]->child_pid;
+
+          $_SESSION['order_edi_kumitate'][$n] = array(
+            'place_deliver_code' => $data['order_edi']["place_deliver_code"],
+            'date_order' => $data['order_edi']["date_order"],
+            'price' => $data['order_edi']["price"],
+            'amount' => $data['order_edi']["amount"],
+            'product_code' => $child_pid,
+            'line_code' => $data['order_edi']["line_code"],
+            'date_deliver' => $data['order_edi']["date_deliver"],
+            'num_order' => $data['order_edi']["num_order"],
+            'first_date_deliver' => $data['order_edi']["first_date_deliver"],
+            'customer_code' => $data['order_edi']["customer_code"],
+            'place_line' => $data['order_edi']["place_line"],
+            'check_denpyou' => 0,
+            'bunnou' => 0,
+            'kannou' => 0,
+            'delete_flag' => 0,
+            'created_staff' => $this->Auth->user('staff_id')
+          );
+        }
+      }
+
+      $orderEdis = $this->OrderEdis->patchEntity($orderEdis, $data['order_edi']);//$productデータ（空の行）を$this->request->getData()に更新する
+      $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->OrderEdis->save($orderEdis)) {
+          $mes = "※登録されました";
+          $this->set('mes',$mes);
+            if(count($AssembleProduct) > 0){//組み立て製品の場合はそちらも登録
+              $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $_SESSION['order_edi_kumitate']);
+              if ($this->OrderEdis->saveMany($OrderEdis)) {
+                $mes = "※登録されました（組み立て品も登録されました）";
+                $this->set('mes',$mes);
+                $connection->commit();// コミット5
+              }else{
+                $mes = "※登録されました（組み立て品は登録できませんでした）";
+                $this->set('mes',$mes);
+                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+              }
+            }
+          $connection->commit();// コミット5
+        } else {
+          $mes = "※登録されませんでした";
+          $this->set('mes',$mes);
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+    }
+
+    public function chokusetsuformalldnp()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      $data = $Data;
+      $product_code = $data["product_code"];
+      $this->set("product_code",$product_code);
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $product_name = $Product[0]->product_name;
+      $this->set("product_name",$product_name);
+
+      $PlaceDelivers = $this->PlaceDelivers->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+        ->where(['cs_id like' => '%'."20".'%'])->toArray();
+        $arrPlaceDeliver = array();//配列の初期化
+      	foreach ($PlaceDelivers as $value) {//2行上のCustomersテーブルのデータそれぞれに対して
+      		$arrPlaceDeliver[] = array($value->id=>$value->name);//配列に3行上のCustomersテーブルのデータそれぞれのcustomer_code:name
+      	}
+      	$this->set('arrPlaceDeliver',$arrPlaceDeliver);//4行上$arrCustomerをctpで使えるようにセット
+    }
+
+    public function chokusetsuconfirmdnp()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+      $date_order = $data["date_order"]["year"]."-".$data["date_order"]["month"]."-".$data["date_order"]["day"];
+      $this->set('date_order',$date_order);
+      $num_order = $data["num_order"];
+      $this->set('num_order',$num_order);
+      $place_deliver = $data["place_deliver"];
+      $PlaceDeliver = $this->PlaceDelivers->find()->where(['id' => $place_deliver])->toArray();
+      $place_deliver_name = $PlaceDeliver[0]->name;
+      $this->set('place_deliver_name',$place_deliver_name);
+      $place_deliver_code = $PlaceDeliver[0]->id_from_order;
+      $this->set('place_deliver_code',$place_deliver_code);
+      $line_code = $data["line_code"];
+      $this->set('line_code',$line_code);
+      $product_code = $data["product_code"];
+      $this->set('product_code',$product_code);
+      $product_name = $data["product_name"];
+      $this->set('product_name',$product_name);
+      $amount = $data["amount"];
+      $this->set('amount',$amount);
+      $date_deliver = $data["date_deliver"]["year"]."-".$data["date_deliver"]["month"]."-".$data["date_deliver"]["day"];
+      $this->set('date_deliver',$date_deliver);
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $customer_id = $Product[0]->customer_id;
+      $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+      $customer_code = $Customer[0]->customer_code;
+      $this->set("customer_code",$customer_code);
+    }
+
+    public function chokusetsudnppreadd()
+    {
+      session_start();
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $data = $this->request->getData();
+
+      $_SESSION['order_edi'] = array(
+        'place_deliver_code' => $data["place_deliver_code"],
+        'date_order' => $data["date_order"],
+        'price' => $data["price"],
+        'amount' => $data["amount"],
+        'product_code' => $data["product_code"],
+        'line_code' => $data["line_code"],
+        'date_deliver' => $data["date_deliver"],
+        'num_order' => $data["num_order"],
+        'first_date_deliver' => $data["first_date_deliver"],
+        'customer_code' => $data["customer_code"],
+        'place_line' => $data["place_line"],
+        'check_denpyou' => 0,
+        'bunnou' => 0,
+        'kannou' => 0,
+        'delete_flag' => 0
+      );
+
+    }
+
+    public function chokusetsudnplogin()
+    {
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmllogin($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();
+
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'chokusetsupanado']);
+          }
+        }
+    }
+
+    public function chokusetsudnpdo()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+      $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+      $_SESSION['order_edi'] = array_merge($_SESSION['order_edi'],$created_staff);
+
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $data['order_edi']['product_code']])->toArray();
+
+      if(count($AssembleProduct) > 0){
+        for($n=0; $n<count($AssembleProduct); $n++){
+          $child_pid = $AssembleProduct[$n]->child_pid;
+
+          $_SESSION['order_edi_kumitate'][$n] = array(
+            'place_deliver_code' => $data['order_edi']["place_deliver_code"],
+            'date_order' => $data['order_edi']["date_order"],
+            'price' => $data['order_edi']["price"],
+            'amount' => $data['order_edi']["amount"],
+            'product_code' => $child_pid,
+            'line_code' => $data['order_edi']["line_code"],
+            'date_deliver' => $data['order_edi']["date_deliver"],
+            'num_order' => $data['order_edi']["num_order"],
+            'first_date_deliver' => $data['order_edi']["first_date_deliver"],
+            'customer_code' => $data['order_edi']["customer_code"],
+            'place_line' => $data['order_edi']["place_line"],
+            'check_denpyou' => 0,
+            'bunnou' => 0,
+            'kannou' => 0,
+            'delete_flag' => 0,
+            'created_staff' => $this->Auth->user('staff_id')
+          );
+        }
+      }
+
+      $orderEdis = $this->OrderEdis->patchEntity($orderEdis, $data['order_edi']);//$productデータ（空の行）を$this->request->getData()に更新する
+      $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->OrderEdis->save($orderEdis)) {
+          $mes = "※登録されました";
+          $this->set('mes',$mes);
+            if(count($AssembleProduct) > 0){//組み立て製品の場合はそちらも登録
+              $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $_SESSION['order_edi_kumitate']);
+              if ($this->OrderEdis->saveMany($OrderEdis)) {
+                $mes = "※登録されました（組み立て品も登録されました）";
+                $this->set('mes',$mes);
+                $connection->commit();// コミット5
+              }else{
+                $mes = "※登録されました（組み立て品は登録できませんでした）";
+                $this->set('mes',$mes);
+                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+              }
+            }
+          $connection->commit();// コミット5
+        } else {
+          $mes = "※登録されませんでした";
+          $this->set('mes',$mes);
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+    }
+
 
 }

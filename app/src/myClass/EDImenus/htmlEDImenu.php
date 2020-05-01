@@ -16,7 +16,7 @@ class htmlEDImenu extends AppController
          $this->Products = TableRegistry::get('products');//productsテーブルを使う
     }
 
-     public function EDImenus()
+     public function EDImenus()//ピンクのメニュー
   	{
         $html =
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/indexmenu'>\n".
@@ -40,7 +40,7 @@ class htmlEDImenu extends AppController
     		$this->data = $EDImenus;
   	}
 
-    public function EDIsubmenus()
+    public function EDIsubmenus()//黄色のメニュー
    {
        $html =
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/hattyucsvpreadd'>\n".
@@ -52,7 +52,7 @@ class htmlEDImenu extends AppController
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/keikakucsvpreadd'>\n".
                  "<img src='/img/Labelimg/keikaku_csv.gif' width=85 height=36>\n".
                  "</a>\n".
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/hasuform'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/chokusetsuformpro'>\n".
                  "<img src='/img/Labelimg/touroku_tyokusetsu.gif' width=85 height=36>\n".
                  "</a></td>\n".
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/hasuform'>\n".

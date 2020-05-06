@@ -28,37 +28,48 @@
           <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/touroku_tyokusetsu.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'OrderEdis','action'=>'dnpcsv')));?></td>
         </tr>
       </table>
-<br><br>
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+<br><br><br>
+<table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">注文日付</strong></td>
-    <td  width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">注文No</strong></td>
-    <td  width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">発注元顧客</strong></td>
-    <td  width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">納入ライン</strong></td>
+    <td width="270" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">注文日付</strong></td>
+    <td bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">注文No</strong></td>
 	</tr>
   <tr>
     <td bgcolor="#FFFFCC"><?= __($date_order) ?></td>
     <td bgcolor="#FFFFCC"><?= __($num_order) ?></td>
-    <td bgcolor="#FFFFCC"><?= __($place_deliver_name) ?></td>
-    <td bgcolor="#FFFFCC"><?= __($line_code) ?></td>
 	</tr>
 </table>
-<br><br>
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+<br><br><br><br><br><br><br>
+<table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品番</strong></td>
-    <td width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品名</strong></td>
-    <td  width="200"  bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">数量</strong></td>
-    <td   width="200"  bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">納期</strong></td>
+    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品番</strong></td>
+    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品名</strong></td>
+    <td  width="70" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">数量</strong></td>
+    <td  width="270" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">納期</strong></td>
+    <td width="120" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">完納未納</strong></td>
 	</tr>
   <tr>
     <td bgcolor="#FFFFCC"><?= __($product_code) ?></td>
     <td bgcolor="#FFFFCC"><?= __($product_name) ?></td>
     <td bgcolor="#FFFFCC"><?= __($amount) ?></td>
     <td bgcolor="#FFFFCC"><?= __($date_deliver) ?></td>
+    <td bgcolor="#FFFFCC"><?= __($hyoujikannou) ?></td>
 	</tr>
 </table>
-<br><br>
+<br><br><br><br><br><br><br>
+<table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="350" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">注文品名</strong></td>
+    <td  width="350" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">内容コード</strong></td>
+    <td  width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">納入場所</strong></td>
+	</tr>
+  <tr>
+    <td bgcolor="#FFFFCC"><?= __($pro_order) ?></td>
+    <td bgcolor="#FFFFCC"><?= __($line_code) ?></td>
+    <td bgcolor="#FFFFCC"><?= __($place_deliver_name) ?></td>
+	</tr>
+</table>
+<br><br><br><br><br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">単価</strong></td>
@@ -78,6 +89,8 @@
 <?= $this->Form->control('date_deliver', array('type'=>'hidden', 'value'=>$date_deliver, 'label'=>false)) ?>
 <?= $this->Form->control('first_date_deliver', array('type'=>'hidden', 'value'=>$date_deliver, 'label'=>false)) ?>
 <?= $this->Form->control('customer_code', array('type'=>'hidden', 'value'=>$customer_code, 'label'=>false)) ?>
+<?= $this->Form->control('pro_order', array('type'=>'hidden', 'value'=>$pro_order, 'label'=>false)) ?>
+<?= $this->Form->control('kannou', array('type'=>'hidden', 'value'=>$kannou, 'label'=>false)) ?>
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>

@@ -1841,7 +1841,7 @@ echo "</pre>";
               $table = TableRegistry::get('order_dnp_kannous');
               $table->setConnection($connection);
 
-              $updater = "UPDATE order_dnp_kannous set delete_flg = 1 , updated_at = '".date('Y-m-d H:i:s')."' 　where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
+              $updater = "UPDATE order_dnp_kannous set amount = $mikanamount, delete_flg = 1 , updated_at = '".date('Y-m-d H:i:s')."' 　where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
               $connection->execute($updater);
 
               $connection = ConnectionManager::get('default');
@@ -1993,7 +1993,7 @@ echo "</pre>";
                       $table = TableRegistry::get('order_dnp_kannous');
                       $table->setConnection($connection);
 
-                      $updater = "UPDATE order_dnp_kannous set minoukannou = 0, updated_at = '".date('Y-m-d H:i:s')."'
+                      $updater = "UPDATE order_dnp_kannous set minoukannou = 0, updated_at = '".date('Y-m-d H:i:s')."', amount = $mikanamount
                       where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."'";//もとのDBも更新
                       $connection->execute($updater);
 
@@ -2021,7 +2021,7 @@ echo "</pre>";
                       $table = TableRegistry::get('order_dnp_kannous');
                       $table->setConnection($connection);
 
-                      $updater = "UPDATE order_dnp_kannous set minoukannou = 1, updated_at = '".date('Y-m-d H:i:s')."'
+                      $updater = "UPDATE order_dnp_kannous set minoukannou = 1, updated_at = '".date('Y-m-d H:i:s')."', amount = $mikanamount
                        where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
                       $connection->execute($updater);
 
@@ -2491,7 +2491,9 @@ echo "</pre>";
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
-              $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' , amount = '".$newamount."' , bunnou = '".$bunnnou."' , date_bunnou = '".date('Y-m-d')."' , updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";
+              $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' , amount = '".$newamount."' , bunnou = '".$bunnnou."' ,
+               date_bunnou = '".date('Y-m-d')."' , updated_at = '".date('Y-m-d H:i:s')."'
+                where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";
               $connection->execute($updater);
               $connection = ConnectionManager::get('default');
               //ここまで
@@ -2747,9 +2749,9 @@ echo "</pre>";
           $child_pid = $AssembleProduct[$n]->child_pid;
 
           $_SESSION['order_edi_kumitate'][$n] = array(
-            'place_deliver_code' => $data['order_edi']["place_deliver_code"],
+            'place_deliver_code' => "00000",
             'date_order' => $data['order_edi']["date_order"],
-            'price' => $data['order_edi']["price"],
+            'price' => 0,
             'amount' => $data['order_edi']["amount"],
             'product_code' => $child_pid,
             'line_code' => $data['order_edi']["line_code"],
@@ -2773,11 +2775,15 @@ echo "</pre>";
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->OrderEdis->save($orderEdis)) {
+
+
           $mes = "※登録されました";
           $this->set('mes',$mes);
             if(count($AssembleProduct) > 0){//組み立て製品の場合はそちらも登録
               $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $_SESSION['order_edi_kumitate']);
               if ($this->OrderEdis->saveMany($OrderEdis)) {
+
+
                 $mes = "※登録されました（組み立て品も登録されました）";
                 $this->set('mes',$mes);
                 $connection->commit();// コミット5
@@ -2827,7 +2833,11 @@ echo "</pre>";
       $this->set('orderEdis',$orderEdis);
 
       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
       $date_order = $data["date_order"]["year"]."-".$data["date_order"]["month"]."-".$data["date_order"]["day"];
       $this->set('date_order',$date_order);
       $num_order = $data["num_order"];
@@ -2853,6 +2863,18 @@ echo "</pre>";
       $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
       $customer_code = $Customer[0]->customer_code;
       $this->set("customer_code",$customer_code);
+      $pro_order = $data["pro_order"];
+      $this->set("pro_order",$pro_order);
+      $mikan = $data["kannou"];
+      if($mikan == 0){
+        $hyoujikannou = "分納（未了）";
+        $kannou = 0;
+      }else{
+        $hyoujikannou = "完納（完了）";
+        $kannou = 1;
+      }
+      $this->set("hyoujikannou",$hyoujikannou);
+      $this->set("kannou",$kannou);
     }
 
     public function chokusetsudnppreadd()
@@ -2877,7 +2899,43 @@ echo "</pre>";
         'place_line' => $data["place_line"],
         'check_denpyou' => 0,
         'bunnou' => 0,
-        'kannou' => 0,
+        'kannou' => $data["kannou"],
+        'delete_flag' => 0
+      );
+
+      $_SESSION['denpyouDnpMinoukannous'] = array(
+        'place_deliver_code' => $data["place_deliver_code"],
+        'date_order' => $data["date_order"],
+        'price' => $data["price"],
+        'amount' => $data["amount"],
+        'product_code' => $data["product_code"],
+        'line_code' => $data["line_code"],
+        'date_deliver' => $data["date_deliver"],
+        'num_order' => $data["num_order"],
+        'first_date_deliver' => $data["first_date_deliver"],
+        'customer_code' => $data["customer_code"],
+        'place_line' => $data["place_line"],
+        'check_denpyou' => 0,
+        'bunnou' => 0,
+        'kannou' => $data["kannou"],
+        'delete_flag' => 0
+      );
+
+      $_SESSION['dnpTotalAmounts'] = array(
+        'place_deliver_code' => $data["place_deliver_code"],
+        'date_order' => $data["date_order"],
+        'price' => $data["price"],
+        'amount' => $data["amount"],
+        'product_code' => $data["product_code"],
+        'line_code' => $data["line_code"],
+        'date_deliver' => $data["date_deliver"],
+        'num_order' => $data["num_order"],
+        'first_date_deliver' => $data["first_date_deliver"],
+        'customer_code' => $data["customer_code"],
+        'place_line' => $data["place_line"],
+        'check_denpyou' => 0,
+        'bunnou' => 0,
+        'kannou' => $data["kannou"],
         'delete_flag' => 0
       );
 
@@ -2903,7 +2961,7 @@ echo "</pre>";
 
           if ($user) {
             $this->Auth->setUser($user);
-            return $this->redirect(['action' => 'chokusetsupanado']);
+            return $this->redirect(['action' => 'chokusetsudnpdo']);
           }
         }
     }
@@ -2925,9 +2983,9 @@ echo "</pre>";
           $child_pid = $AssembleProduct[$n]->child_pid;
 
           $_SESSION['order_edi_kumitate'][$n] = array(
-            'place_deliver_code' => $data['order_edi']["place_deliver_code"],
+            'place_deliver_code' => "00000",
             'date_order' => $data['order_edi']["date_order"],
-            'price' => $data['order_edi']["price"],
+            'price' => 0,
             'amount' => $data['order_edi']["amount"],
             'product_code' => $child_pid,
             'line_code' => $data['order_edi']["line_code"],
@@ -2938,12 +2996,15 @@ echo "</pre>";
             'place_line' => $data['order_edi']["place_line"],
             'check_denpyou' => 0,
             'bunnou' => 0,
-            'kannou' => 0,
+            'kannou' => $data['order_edi']["kannou"],
             'delete_flag' => 0,
             'created_staff' => $this->Auth->user('staff_id')
           );
         }
       }
+      echo "<pre>";
+      print_r($_SESSION['order_edi_kumitate']);
+      echo "</pre>";
 
       $orderEdis = $this->OrderEdis->patchEntity($orderEdis, $data['order_edi']);//$productデータ（空の行）を$this->request->getData()に更新する
       $connection = ConnectionManager::get('default');//トランザクション1
@@ -2951,6 +3012,12 @@ echo "</pre>";
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->OrderEdis->save($orderEdis)) {
+          $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntity($this->DenpyouDnpMinoukannous->newEntity(), $data['denpyouDnpMinoukannous']);//patchEntitiesで一括登録
+          $this->DenpyouDnpMinoukannous->save($denpyouDnpMinoukannous);//saveManyで一括登録
+
+          $dnpTotalAmounts = $this->DnpTotalAmounts->patchEntity($this->DnpTotalAmounts->newEntity(), $data['dnpTotalAmounts']);//patchEntitiesで一括登録
+          $this->DnpTotalAmounts->save($dnpTotalAmounts);//saveManyで一括登録
+
           $mes = "※登録されました";
           $this->set('mes',$mes);
             if(count($AssembleProduct) > 0){//組み立て製品の場合はそちらも登録

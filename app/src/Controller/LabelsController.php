@@ -2065,8 +2065,8 @@ class LabelsController extends AppController
           }
 
 
-  //      $fp = fopen('labels/label_kobetu0428.csv', 'w');
-        $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
+        $fp = fopen('labels/label_kobetu0428.csv', 'w');
+  //      $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
           foreach ($arrCsv as $line) {
             $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
           	fputcsv($fp, $line);
@@ -2087,7 +2087,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5
 
                      //insert into label_csvする
-                     $connection = ConnectionManager::get('sakaeMotoDB');
+                     $connection = ConnectionManager::get('DB_ikou_test');
                      $table = TableRegistry::get('label_csv');
                      $table->setConnection($connection);
     /*

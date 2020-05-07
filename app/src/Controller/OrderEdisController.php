@@ -133,7 +133,7 @@ class OrderEdisController extends AppController
            try {//トランザクション4
                if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
 
-                 for($k=0; $k<count($arrFp); $k++){
+                 for($k=0; $k<count($arrFp); $k++){//組み立て品登録
                    $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $arrFp[$k]['product_code']])->toArray();
                    if(count($AssembleProduct) > 0){
                      for($n=0; $n<count($AssembleProduct); $n++){
@@ -517,7 +517,8 @@ echo "</pre>";
 
             for($n=0; $n<=10000; $n++){
               if(isset($arrDenpyouDnpMinoukannous[$n])){
-                $OrderEdi = $this->OrderEdis->find()->where(['num_order' => $arrDenpyouDnpMinoukannous[$n]['num_order'], 'product_code' => $arrDenpyouDnpMinoukannous[$n]['product_code'], 'date_order' => $arrDenpyouDnpMinoukannous[$n]['tourokubi'], 'date_deliver' => $arrDenpyouDnpMinoukannous[$n]['date_deliver']])->toArray();
+                $OrderEdi = $this->OrderEdis->find()->where(['num_order' => $arrDenpyouDnpMinoukannous[$n]['num_order'], 'line_code' => $arrDenpyouDnpMinoukannous[$n]['code'],
+                 'product_code' => $arrDenpyouDnpMinoukannous[$n]['product_code'], 'date_order' => $arrDenpyouDnpMinoukannous[$n]['tourokubi'], 'date_deliver' => $arrDenpyouDnpMinoukannous[$n]['date_deliver']])->toArray();
         				$OrderEdi_id = $OrderEdi[0]->id;
 
                 unset($arrDenpyouDnpMinoukannous[$n]['num_order']);
@@ -2703,7 +2704,13 @@ echo "</pre>";
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
       $product_name = $Product[0]->product_name;
       $this->set("product_name",$product_name);
-
+/*
+      $ProductGaityu = $this->ProductGaityu->find()->where(['product_id' => $product_code, 'flag_denpyou' => 1,  'status' => 0])->toArray();
+      $productGaityu = $ProductGaityu[0]->product_id;
+      echo "<pre>";
+      print_r($productGaityu);
+      echo "</pre>";
+*/
       $PlaceDelivers = $this->PlaceDelivers->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
         ->where(['cs_id not like' => '%'."20".'%'])->toArray();
         $arrPlaceDeliver = array();//配列の初期化
@@ -2830,10 +2837,13 @@ echo "</pre>";
             'delete_flag' => 0,
             'created_staff' => $this->Auth->user('staff_id')
           );
-//
+//外注の対応
           echo "<pre>";
           print_r($ProductGaityu[0]['product_id']."---".$ProductGaityu[0]['id_supplier']);
           echo "</pre>";
+
+
+
         }
 
       $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $data['order_edi']['product_code']])->toArray();
@@ -2880,7 +2890,7 @@ echo "</pre>";
                 'delete_flag' => 0,
                 'created_staff' => $this->Auth->user('staff_id')
               );
-//外注の対応
+//外注の対応（組み立て）
               echo "<pre>";
               print_r($ProductGaityu[0]['product_id']."---".$ProductGaityu[0]['id_supplier']);
               echo "</pre>";

@@ -38,47 +38,44 @@ $data = $this->request->getData();
           </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <?php for ($i=0;$i<$i_num+1;$i++): ?>
-            <?php foreach (${"orderEdis".$i} as ${"orderEdis".$i}): ?>
+          <?php for ($i=0;$i<$i_num;$i++): ?>
             <tr style="border-bottom: solid;border-width: 1px">
-              <td colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->product_code) ?></td>
+              <td colspan="20" nowrap="nowrap"><?= h(${"product_code".$i}) ?></td>
                 <?php
-                  $product_code = ${"orderEdis".$i}->product_code;
-              		$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+              		$Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
               		$product_name = $Product[0]->product_name;
-
+/*
                   $amount = ${"orderEdis".$i}->amount;
-                  $Konpou = $this->Konpous->find()->where(['product_code' => $product_code])->toArray();
+                  $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
                   if(isset($Konpou[0])){
                     $irisu = $Konpou[0]->irisu;
                     $hasu = $amount % $irisu;
                   }else{
                     $hasu = "konpousテーブルに登録されていません！責任者に報告してください";
                   }
+*/
                 ?>
                 <td colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
-                <td colspan="20" nowrap="nowrap"><?= h($hasu) ?></td>
+                <td colspan="20" nowrap="nowrap"><?= h(${"hasu".$i}) ?></td>
 
             <?php
              $i_count = $i;
              echo $this->Form->hidden('i_count' ,['value'=>$i_count]);
-             echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
+    //         echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
 
-            if($hasu == 0){
+            if(${"hasu".$i} == 0){
               $p = $p;
             }else{
               $_SESSION['labelhasu'][$p] = array(
-                'product_code' => ${"orderEdis".$i}->product_code,
-                'amount' => $amount,
-                'hasu' => $hasu
+                'product_code' => ${"product_code".$i},
+    //            'amount' => $amount,
+                'hasu' => ${"hasu".$i}
               );
               $p = $p + 1;
             }
-
             ?>
 
             </tr>
-            <?php endforeach; ?>
           <?php endfor;?>
 
         </tbody>

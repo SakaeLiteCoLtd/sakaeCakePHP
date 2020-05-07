@@ -16,7 +16,7 @@
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
    $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
    echo $this->Form->create($orderEdis, ['url' => ['action' => 'hasuconfirm']]);
-   $i = 1 ;
+   $i = 0 ;
 ?>
 <?php
 header('Expires:-1');
@@ -57,24 +57,22 @@ header('Pragma:');
               </tr>
           </thead>
           <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-              <?php foreach ($orderEdis as $orderEdis): ?>
-                <?php
-                $i = $i + 1 ;
-                $this->set('i',$i);
-                 ?>
+              <?php foreach ($arrProcode as $arrProcode): ?>
               <tr style="border-bottom: solid;border-width: 1px">
                 <?php
                 echo "<td colspan='10' nowrap='nowrap'>\n";
                 echo "<input type='checkbox' name=check".$i."  size='6'/>\n";
-                echo "<input type='hidden' name=".$i." value=$orderEdis->id size='6'/>\n";//チェックされたもののidをキープする
+                echo "<input type='hidden' name=product_code".$i." value=${"product_code".$i} size='6'/>\n";//チェックされたもののidをキープする
+                echo "<input type='hidden' name=hasu".$i." value=${"hasu".$i} size='6'/>\n";
+                echo "<input type='hidden' name=".$i." value=$i size='6'/>\n";//チェックされたもののidをキープする
                 echo "</td>\n";
                 ?>
-                <td width="250" colspan="20" nowrap="nowrap"><?= h($orderEdis->product_code) ?></td>
+                <td width="250" colspan="20" nowrap="nowrap"><?= h(${"product_code".$i}) ?></td>
                   <?php
-                    $product_code = $orderEdis->product_code;
-                		$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+            //      $product_code = $orderEdis->product_code;
+                		$Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
                 		$product_name = $Product[0]->product_name;
-
+/*
                     $amount = $orderEdis->amount;
                     $Konpou = $this->Konpous->find()->where(['product_code' => $product_code])->toArray();
                     if(isset($Konpou[0])){
@@ -83,14 +81,19 @@ header('Pragma:');
                     }else{
                       $hasu = "konpousテーブルに登録されていません！責任者に報告してください";
                     }
+  */
                   ?>
                 <td width="300" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
-                <td width="200" colspan="20" nowrap="nowrap"><?= h($hasu) ?></td>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h(${"hasu".$i}) ?></td>
               </tr>
+              <?php
+              $i = $i + 1 ;
+              $this->set('i',$i);
+               ?>
               <?php endforeach; ?>
 
              <?php
-              echo "<input type='hidden' name='nummax' value=$i size='6'/>\n";
+             echo "<input type='hidden' name='nummax' value=$i size='6'/>\n";
               ?>
 
           </tbody>

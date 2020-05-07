@@ -89,7 +89,7 @@
 <?= $this->Form->control('date_deliver', array('type'=>'hidden', 'value'=>$date_deliver, 'label'=>false)) ?>
 <?= $this->Form->control('first_date_deliver', array('type'=>'hidden', 'value'=>$date_deliver, 'label'=>false)) ?>
 <?= $this->Form->control('customer_code', array('type'=>'hidden', 'value'=>$customer_code, 'label'=>false)) ?>
-<?= $this->Form->control('pro_order', array('type'=>'hidden', 'value'=>$pro_order, 'label'=>false)) ?>
+<?= $this->Form->control('name_order', array('type'=>'hidden', 'value'=>$pro_order, 'label'=>false)) ?>
 <?= $this->Form->control('kannou', array('type'=>'hidden', 'value'=>$kannou, 'label'=>false)) ?>
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

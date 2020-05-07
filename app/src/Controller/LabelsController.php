@@ -2065,10 +2065,10 @@ class LabelsController extends AppController
           }
 
 
-        $fp = fopen('labels/label_kobetu0428.csv', 'w');
-  //      $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
+  //      $fp = fopen('labels/label_kobetu0428.csv', 'w');
+        $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
           foreach ($arrCsv as $line) {
-  //          $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+            $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
           	fputcsv($fp, $line);
           }
             fclose($fp);
@@ -2087,7 +2087,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5
 
                      //insert into label_csvする
-                     $connection = ConnectionManager::get('DB_ikou_test');
+                     $connection = ConnectionManager::get('sakaeMotoDB');
                      $table = TableRegistry::get('label_csv');
                      $table->setConnection($connection);
     /*
@@ -2705,9 +2705,40 @@ class LabelsController extends AppController
          );
 
        }
+
        $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
          ->where(['delete_flag' => '0', 'date_deliver' => $data_yobidashi]
          ));//対象の製品を絞り込む
+
+      $arrorderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0', 'date_deliver' => $data_yobidashi])->toArray();
+
+      $arrProcode = array();
+      for($n=0; $n<count($arrorderEdis); $n++){
+        $arrProcode[] = $arrorderEdis[$n]->product_code;
+      }
+      $arrProcode = array_unique($arrProcode);
+      $arrProcode = array_values($arrProcode);
+      $this->set('arrProcode',$arrProcode);
+
+      for($n=0; $n<count($arrProcode); $n++){
+        ${"amount".$n} = 0;
+        $arrorderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0', 'date_deliver' => $data_yobidashi, 'product_code' => $arrProcode[$n]])->toArray();
+        for($m=0; $m<count($arrorderEdis); $m++){
+          $amount = $arrorderEdis[$m]->amount;
+          ${"amount".$n} = ${"amount".$n} + $amount;
+        }
+
+        $Konpou = $this->Konpous->find()->where(['product_code' => $arrProcode[$n]])->toArray();
+        if(isset($Konpou[0])){
+          $irisu = $Konpou[0]->irisu;
+          ${"hasu".$n} = ${"amount".$n} % $irisu;
+        }else{
+          ${"hasu".$n} = "konpousテーブルに登録されていません！責任者に報告してください";
+        }
+        $this->set('product_code'.$n,$arrProcode[$n]);
+        $this->set('hasu'.$n,${"hasu".$n});
+      }
+
      }
 
      public function hasuconfirm()//ラベル発行の端数登録（確認画面）
@@ -2719,12 +2750,12 @@ class LabelsController extends AppController
          's' => ['data_yobidashi' => $data['data_yobidashi']]]);
        }
 
-//       $this->request->session()->destroy();// セッションの破棄
        $orderEdis = $this->OrderEdis->newEntity();
        $this->set('orderEdis',$orderEdis);
        $checknum = 0;
+       $i_num = 0;
 
-       for ($k=2; $k<=$data["nummax"]; $k++){
+       for ($k=0; $k<=$data["nummax"]; $k++){
          if(isset($data["subete"])){
            $array[] = $data["$k"];
          }elseif(isset($data["check".$k])){//checkがついているもののidをキープ
@@ -2732,27 +2763,24 @@ class LabelsController extends AppController
          }else{
          }
        }
+/*
+       echo "<pre>";
+       print_r($array);
+       echo "</pre>";
+*/
        for ($i=0; $i<=$data["nummax"]; $i++){
          if(isset($array[$i])){//checkがついているもののidと同じidのデータを取り出す
-           ${"orderEdis".$i} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $array[$i]])->toArray();
-           $this->set('orderEdis'.$i,${"orderEdis".$i});
-           $i_num = $i;//選択した個数をキープ
+           $n = $array[$i];
+           ${"product_code".$i} = $data["product_code{$n}"];
+           $this->set('product_code'.$i,${"product_code".$i});
+           ${"hasu".$i} = $data["hasu{$n}"];
+           $this->set('hasu'.$i,${"hasu".$i});
+           $i_num = $i_num + 1;
            $this->set('i_num',$i_num);
          }else{
-           break;
          }
        }
-       for($n=0; $n<=100; $n++){
-         if(isset($array[$n])){
-           ${"orderEdis".$n} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $array[$n]])->toArray();
-           $this->set('orderEdis'.$n,${"orderEdis".$n});
 
-           ${"id".$n} = ${"orderEdis".$n}[0]->id;
-           $this->set('id'.$n,${"id".$n});
-         }else{
-           break;
-         }
-       }
      }
 
      public function hasudo()//端数ラベル発行
@@ -2761,11 +2789,7 @@ class LabelsController extends AppController
       $this->set('orderEdis',$orderEdis);
       $session = $this->request->getSession();
       $data = $session->read();
-/*
-      echo "<pre>";
-      print_r($_SESSION['lotdate']['lotnum']);
-      echo "</pre>";
-*/
+
       //csv発行と、データベース登録
       $arrCsv = array();
       for($i=0; $i<count($data['labelhasu']); $i++){
@@ -2831,7 +2855,7 @@ class LabelsController extends AppController
           'line_code' => "", 'date' => $date, 'start_lot' => 1, 'delete_flag' => 0];//unit2,line_code1...不要
       }
 
-  //    $fp = fopen('labels/label_hasu_200424.csv', 'w');
+  //    $fp = fopen('labels/label_hasu_200507.csv', 'w');
       $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
       foreach ($arrCsv as $line) {
         $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -3022,14 +3046,15 @@ class LabelsController extends AppController
        $check_product = 0;
        for($i=0; $i<=$data['num']; $i++){
          $ary = explode(',', $data['text'.$i]);//$strを配列に変換
-         $product_code = $ary[0];//入力したデータをカンマ区切りの最初のデータを$product_code1とする（以下同様）
-
-         if($data["product_code"] == $product_code){
-           $check_product = $check_product;
-           $this->set('check_product',$check_product);
-         }else{
-           $check_product = 1;
-           $this->set('check_product',$check_product);
+         if(isset($ary[2])){
+           $product_code = $ary[0];//入力したデータをカンマ区切りの最初のデータを$product_code1とする（以下同様）
+           if($data["product_code"] == $product_code){
+             $check_product = $check_product;
+             $this->set('check_product',$check_product);
+           }else{
+             $check_product = 1;
+             $this->set('check_product',$check_product);
+           }
          }
        }
 /*
@@ -3052,32 +3077,42 @@ class LabelsController extends AppController
        $this->set('Staff',$Staff);
        $staff_id = $data['staff_id'];
        $this->set('staff_id',$staff_id);
-       $tuika = $data['num'];
-       $this->set('tuika',$tuika);
        for($i=0; $i<=$data['num']; $i++){
          if(isset($data['text'.$i])){
            $ary = explode(',', $data['text'.$i]);//$data['text'.$i]を配列に変換
-           ${"product_moto".$i} = $ary[0];//入力したデータをカンマ区切りの最初のデータを$product_code1とする（以下同様）
-           $this->set('product_moto'.$i,${"product_moto".$i});
-           ${"amount_moto".$i} = $ary[2];
-           $this->set('amount_moto'.$i,${"amount_moto".$i});
-           ${"lot_moto".$i} = $ary[4];
-           $this->set('lot_moto'.$i,${"lot_moto".$i});
+           if(isset($ary[2])){
+             $i = $i;
+             $this->set('tuika',$i);
+             ${"product_moto".$i} = $ary[0];//入力したデータをカンマ区切りの最初のデータを$product_code1とする（以下同様）
+             $this->set('product_moto'.$i,${"product_moto".$i});
+             ${"amount_moto".$i} = $ary[2];
+             $this->set('amount_moto'.$i,${"amount_moto".$i});
+             ${"lot_moto".$i} = $ary[4];
+             $this->set('lot_moto'.$i,${"lot_moto".$i});
 
-           $amount_sum = $amount_sum + ${"amount_moto".$i};
-           $this->set('amount_sum',$amount_sum);
+             $amount_sum = $amount_sum + ${"amount_moto".$i};
+             $this->set('amount_sum',$amount_sum);
 
-           if(${"product_moto".$i} == $product_code1){
-             $check_product = $check_product;
-             $this->set('check_product',$check_product);
+             if(${"product_moto".$i} == $product_code1){
+               $check_product = $check_product;
+               $this->set('check_product',$check_product);
+             }else{
+               $check_product = 1;
+               $this->set('check_product',$check_product);
+             }
            }else{
-             $check_product = 1;
-             $this->set('check_product',$check_product);
+             $check_product = $check_product;
            }
          }else{
            $i = $i;
          }
        }
+    //   $tuika = $data['num'];
+    //   $this->set('tuika',$tuika);
+    //   echo "<pre>";
+    //   print_r($check_product);
+    //   echo "</pre>";
+
    }
 
       public function hasulotconfirm()
@@ -3156,7 +3191,7 @@ class LabelsController extends AppController
               $moto_lot_id = $moto_lot[0]->id;
             }else{
               echo "<pre>";
-              print_r("このロットはデータベースに登録されていません--".$lot_num."---".$product_code1);
+              print_r("このロットはデータベースに登録されていません--".${"lot_moto".$i}."---".$product_code1);
               echo "</pre>";
             }
 

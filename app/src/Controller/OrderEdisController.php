@@ -35,6 +35,7 @@ class OrderEdisController extends AppController
        $this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
        $this->PlaceDelivers = TableRegistry::get('placeDelivers');
        $this->AssembleProducts = TableRegistry::get('assembleProducts');
+       $this->ProductGaityu = TableRegistry::get('productGaityu');
      }
 
      public function indexmenu()
@@ -99,6 +100,13 @@ class OrderEdisController extends AppController
         for($n=0; $n<=10000; $n++){
           if(isset($arrFp[$n])){//$arrFp[$n]が存在する時、対応するcustomer_code等を配列に追加する
             $Product = $this->Products->find()->where(['product_code' => $arrFp[$n]['product_code']])->toArray();
+            if(isset($Product[0])){
+              $customer_id = $Product[0]->customer_id;
+            }else{
+              echo "<pre>";
+              print_r($arrFp[$n]['product_code']."が登録されていません");
+              echo "</pre>";
+            }
     				$customer_id = $Product[0]->customer_id;
             $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
     				$customer_code = $Customer[0]->customer_code;
@@ -124,6 +132,36 @@ class OrderEdisController extends AppController
            $connection->begin();//トランザクション3
            try {//トランザクション4
                if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
+
+                 for($k=0; $k<count($arrFp); $k++){
+                   $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $arrFp[$k]['product_code']])->toArray();
+                   if(count($AssembleProduct) > 0){
+                     for($n=0; $n<count($AssembleProduct); $n++){
+                       $child_pid = $AssembleProduct[$n]->child_pid;
+                       $_SESSION['order_edi_kumitate'][$n] = array(
+                         'place_deliver_code' => "00000",
+                         'date_order' => $arrFp[$k]["date_order"],
+                         'price' => 0,
+                         'amount' => $arrFp[$k]["amount"],
+                         'product_code' => $child_pid,
+                         'line_code' => $arrFp[$k]["line_code"],
+                         'date_deliver' => $arrFp[$k]["date_deliver"],
+                         'num_order' => $arrFp[$k]["num_order"],
+              //           'first_date_deliver' => $data['order_edi']["first_date_deliver"],
+                         'customer_code' => $arrFp[$k]["customer_code"],
+                         'place_line' => $arrFp[$k]["place_line"],
+                         'check_denpyou' => 0,
+                         'bunnou' => $arrFp[$k]["bunnou"],
+                         'kannou' => $arrFp[$k]["kannou"],
+                         'delete_flag' => 0,
+                         'created_staff' => $this->Auth->user('staff_id')
+                       );
+                     }
+                     $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $_SESSION['order_edi_kumitate']);
+                     $this->OrderEdis->saveMany($orderEdis);
+                  }
+               }
+
                  $mes = "※登録されました";
                  $this->set('mes',$mes);
                  $connection->commit();// コミット5
@@ -372,6 +410,36 @@ echo "</pre>";
       $connection->begin();//トランザクション3
       try {//トランザクション4
           if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
+
+            for($k=0; $k<count($arrEDI); $k++){//組み立て品登録
+              $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $arrEDI[$k]['product_code']])->toArray();
+              if(count($AssembleProduct) > 0){
+                for($n=0; $n<count($AssembleProduct); $n++){
+                  $child_pid = $AssembleProduct[$n]->child_pid;
+                  $_SESSION['order_edi_kumitate'][$n] = array(
+                    'place_deliver_code' => "00000",
+                    'date_order' => $arrEDI[$k]["date_order"],
+                    'price' => 0,
+                    'amount' => $arrEDI[$k]["amount"],
+                    'product_code' => $child_pid,
+                    'line_code' => $arrEDI[$k]["line_code"],
+                    'date_deliver' => $arrEDI[$k]["date_deliver"],
+                    'num_order' => $arrEDI[$k]["num_order"],
+         //           'first_date_deliver' => $data['order_edi']["first_date_deliver"],
+                    'customer_code' => $arrEDI[$k]["customer_code"],
+                    'place_line' => $arrEDI[$k]["place_line"],
+                    'check_denpyou' => 0,
+                    'bunnou' => $arrEDI[$k]["bunnou"],
+                    'kannou' => $arrEDI[$k]["kannou"],
+                    'delete_flag' => 0,
+                    'created_staff' => $this->Auth->user('staff_id')
+                  );
+                }
+                $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $_SESSION['order_edi_kumitate']);
+                $this->OrderEdis->saveMany($orderEdis);
+             }
+          }
+
 //ここからDenpyouDnpMinoukannousへ登録用
 
             //insert into order_ediする
@@ -2742,8 +2810,33 @@ echo "</pre>";
       $session = $this->request->getSession();
       $data = $session->read();
 
-      $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $data['order_edi']['product_code']])->toArray();
+      $ProductGaityu = $this->ProductGaityu->find()->where(['product_id' => $data['order_edi']['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
+      if(count($ProductGaityu) > 0){
+          $_SESSION['ProductGaityu'] = array(
+            'place_deliver_code' => "00000",
+            'date_order' => $data['order_edi']["date_order"],
+            'price' => 0,
+            'amount' => $data['order_edi']["amount"],
+            'product_code' => $data['order_edi']['product_code'],
+            'line_code' => $data['order_edi']["line_code"],
+            'date_deliver' => $data['order_edi']["date_deliver"],
+            'num_order' => $data['order_edi']["num_order"],
+            'first_date_deliver' => $data['order_edi']["first_date_deliver"],
+            'customer_code' => $data['order_edi']["customer_code"],
+            'place_line' => $data['order_edi']["place_line"],
+            'check_denpyou' => 0,
+            'bunnou' => 0,
+            'kannou' => 0,
+            'delete_flag' => 0,
+            'created_staff' => $this->Auth->user('staff_id')
+          );
+//
+          echo "<pre>";
+          print_r($ProductGaityu[0]['product_id']."---".$ProductGaityu[0]['id_supplier']);
+          echo "</pre>";
+        }
 
+      $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $data['order_edi']['product_code']])->toArray();
       if(count($AssembleProduct) > 0){
         for($n=0; $n<count($AssembleProduct); $n++){
           $child_pid = $AssembleProduct[$n]->child_pid;
@@ -2766,6 +2859,33 @@ echo "</pre>";
             'delete_flag' => 0,
             'created_staff' => $this->Auth->user('staff_id')
           );
+
+          $ProductGaityu = $this->ProductGaityu->find()->where(['product_id' => $child_pid, 'flag_denpyou' => 1,  'status' => 0])->toArray();
+          if(count($ProductGaityu) > 0){
+              $_SESSION['ProductGaityu'] = array(
+                'place_deliver_code' => "00000",
+                'date_order' => $data['order_edi']["date_order"],
+                'price' => 0,
+                'amount' => $data['order_edi']["amount"],
+                'product_code' => $child_pid,
+                'line_code' => $data['order_edi']["line_code"],
+                'date_deliver' => $data['order_edi']["date_deliver"],
+                'num_order' => $data['order_edi']["num_order"],
+                'first_date_deliver' => $data['order_edi']["first_date_deliver"],
+                'customer_code' => $data['order_edi']["customer_code"],
+                'place_line' => $data['order_edi']["place_line"],
+                'check_denpyou' => 0,
+                'bunnou' => 0,
+                'kannou' => 0,
+                'delete_flag' => 0,
+                'created_staff' => $this->Auth->user('staff_id')
+              );
+//外注の対応
+              echo "<pre>";
+              print_r($ProductGaityu[0]['product_id']."---".$ProductGaityu[0]['id_supplier']);
+              echo "</pre>";
+
+          }
         }
       }
 
@@ -2904,25 +3024,16 @@ echo "</pre>";
       );
 
       $_SESSION['denpyouDnpMinoukannous'] = array(
-        'place_deliver_code' => $data["place_deliver_code"],
-        'date_order' => $data["date_order"],
-        'price' => $data["price"],
-        'amount' => $data["amount"],
-        'product_code' => $data["product_code"],
-        'line_code' => $data["line_code"],
-        'date_deliver' => $data["date_deliver"],
-        'num_order' => $data["num_order"],
-        'first_date_deliver' => $data["first_date_deliver"],
-        'customer_code' => $data["customer_code"],
-        'place_line' => $data["place_line"],
-        'check_denpyou' => 0,
-        'bunnou' => 0,
-        'kannou' => $data["kannou"],
-        'delete_flag' => 0
+        'name_order' => $data["name_order"],
+        'place_deliver' => $data["place_deliver_code"],
+        'conf_print' => 0,
+        'minoukannou' => $data["kannou"],
+        'delete_flag' => 0,
+        'created_at' => date("Y-m-d H:i:s")
       );
 
       $_SESSION['dnpTotalAmounts'] = array(
-        'place_deliver_code' => $data["place_deliver_code"],
+        'name_order' => $data["name_order"],
         'date_order' => $data["date_order"],
         'price' => $data["price"],
         'amount' => $data["amount"],
@@ -2930,12 +3041,6 @@ echo "</pre>";
         'line_code' => $data["line_code"],
         'date_deliver' => $data["date_deliver"],
         'num_order' => $data["num_order"],
-        'first_date_deliver' => $data["first_date_deliver"],
-        'customer_code' => $data["customer_code"],
-        'place_line' => $data["place_line"],
-        'check_denpyou' => 0,
-        'bunnou' => 0,
-        'kannou' => $data["kannou"],
         'delete_flag' => 0
       );
 
@@ -2972,6 +3077,8 @@ echo "</pre>";
       $this->set('orderEdis',$orderEdis);
       $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
       $_SESSION['order_edi'] = array_merge($_SESSION['order_edi'],$created_staff);
+      $_SESSION['denpyouDnpMinoukannous'] = array_merge($_SESSION['denpyouDnpMinoukannous'],$created_staff);
+      $_SESSION['dnpTotalAmounts'] = array_merge($_SESSION['dnpTotalAmounts'],$created_staff);
 
       $session = $this->request->getSession();
       $data = $session->read();
@@ -3002,9 +3109,6 @@ echo "</pre>";
           );
         }
       }
-      echo "<pre>";
-      print_r($_SESSION['order_edi_kumitate']);
-      echo "</pre>";
 
       $orderEdis = $this->OrderEdis->patchEntity($orderEdis, $data['order_edi']);//$productデータ（空の行）を$this->request->getData()に更新する
       $connection = ConnectionManager::get('default');//トランザクション1
@@ -3012,11 +3116,27 @@ echo "</pre>";
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->OrderEdis->save($orderEdis)) {
-          $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntity($this->DenpyouDnpMinoukannous->newEntity(), $data['denpyouDnpMinoukannous']);//patchEntitiesで一括登録
-          $this->DenpyouDnpMinoukannous->save($denpyouDnpMinoukannous);//saveManyで一括登録
 
-          $dnpTotalAmounts = $this->DnpTotalAmounts->patchEntity($this->DnpTotalAmounts->newEntity(), $data['dnpTotalAmounts']);//patchEntitiesで一括登録
-          $this->DnpTotalAmounts->save($dnpTotalAmounts);//saveManyで一括登録
+          $OrderEdi = $this->OrderEdis->find()->where(['num_order' => $_SESSION['order_edi']['num_order'], 'product_code' => $_SESSION['order_edi']['product_code'], 'date_order' => $_SESSION['order_edi']['date_order'], 'date_deliver' => $_SESSION['order_edi']['date_deliver']])->toArray();
+          $OrderEdi_id = $OrderEdi[0]->id;
+
+          $arrid = array('order_edi_id'=>$OrderEdi_id);
+          $_SESSION['denpyouDnpMinoukannous'] = array_merge($_SESSION['denpyouDnpMinoukannous'],$arrid);
+
+          $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntity($this->DenpyouDnpMinoukannous->newEntity(), $_SESSION['denpyouDnpMinoukannous']);
+          $this->DenpyouDnpMinoukannous->save($denpyouDnpMinoukannous);
+    /*      if ($this->DenpyouDnpMinoukannous->save($denpyouDnpMinoukannous)) {
+            echo "<pre>";
+            print_r("ok");
+            echo "</pre>";
+          }else{
+            echo "<pre>";
+            print_r("no");
+            echo "</pre>";
+          }
+*/
+          $dnpTotalAmounts = $this->DnpTotalAmounts->patchEntity($this->DnpTotalAmounts->newEntity(), $data['dnpTotalAmounts']);
+          $this->DnpTotalAmounts->save($dnpTotalAmounts);
 
           $mes = "※登録されました";
           $this->set('mes',$mes);

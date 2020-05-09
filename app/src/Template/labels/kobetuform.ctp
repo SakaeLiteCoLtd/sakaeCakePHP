@@ -172,7 +172,7 @@ ${"n".$j} = 1;
  $m = 0;
  $nij = ${"n".$j} + $this->request->getData("ntuika{$j}");
  for($i=1; $i<=$nij; $i++){//１号機
-   if(null !== ($this->request->getData("product_code{$j}{$i}"))){
+   if(!empty($this->request->getData("product_code{$j}{$i}"))){
 
      $product_code = mb_strtoupper($this->request->getData("product_code{$j}{$i}"));
 

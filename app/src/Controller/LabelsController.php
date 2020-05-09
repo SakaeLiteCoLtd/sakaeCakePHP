@@ -2136,11 +2136,19 @@ class LabelsController extends AppController
          $dateto = $data['dateto'];
          $this->set('dateto',$dateto);
        }elseif(empty($data['formset']) && !isset($data['touroku'])){//最初のフォーム画面
+         $i = 1;
+         $j = 1;
+         ${"product_code1".$i} = "";
+         $this->set('product_code1'.$i,${"product_code1".$i});
          $dateYMD = date('Y-m-d');
          $dateYMD1 = strtotime($dateYMD);
          $dateHI = date("09:00");
          $dateto = $dateYMD."T".$dateHI;
          $this->set('dateto',$dateto);
+         ${"starting_tm".$j.$i} = $dateto;
+         $this->set('starting_tm'.$j.$i,${"starting_tm".$j.$i});
+         ${"finishing_tm".$j.$i} = $dateto;
+         $this->set('finishing_tm'.$j.$i,${"finishing_tm".$j.$i});
          for($i=1; $i<=1; $i++){
           ${"tuika".$i} = 0;
           $this->set('tuika'.$i,${"tuika".$i});//セット
@@ -2150,18 +2158,46 @@ class LabelsController extends AppController
           $this->set('ntuika'.$i,${"ntuika".$i});//セット
          }
        }else{
-         $dateto = $data['dateto'];
-         $this->set('dateto',$dateto);
-         for($i=1; $i<=1; $i++){
-           ${"tuika".$i} = $data["tuika".$i];
-           $this->set('tuika'.$i,${"tuika".$i});//セット
-         }
-         for($i=1; $i<=1; $i++){
-           if(isset($data["ntuika".$i])) {
-               ${"ntuika".$i} = $data["ntuika".$i];
-               $this->set('ntuika'.$i,${"ntuika".$i});//セット
+           $dateto = $data['dateto'];
+           $this->set('dateto',$dateto);
+           for($i=1; $i<=1; $i++){
+             ${"tuika".$i} = $data["tuika".$i];
+             $this->set('tuika'.$i,${"tuika".$i});//セット
+           }
+           for($i=1; $i<=1; $i++){
+             if(isset($data["ntuika".$i])) {
+                 ${"ntuika".$i} = $data["ntuika".$i];
+                 $this->set('ntuika'.$i,${"ntuika".$i});//セット
+            }
           }
-        }
+          $j = 1;
+          $count = $data["n".$j] + ${"ntuika".$j} + 1;
+          for($i=1; $i<=$count; $i++){
+            if(isset($data["product_code1".$i])){
+              if(!is_null($data["product_code1".$i])) {
+                ${"product_code1".$i} = $data["product_code1".$i];
+                $this->set('product_code1'.$i,${"product_code1".$i});
+                ${"starting_tm".$j.$i} = $data["starting_tm".$j.$i];
+                $this->set('starting_tm'.$j.$i,${"starting_tm".$j.$i});
+                ${"finishing_tm".$j.$i} = $data["finishing_tm".$j.$i];
+                $this->set('finishing_tm'.$j.$i,${"finishing_tm".$j.$i});
+             }else{
+               ${"product_code1".$i} = "";
+               $this->set('product_code1'.$i,${"product_code1".$i});
+               ${"starting_tm".$j.$i} = $dateto;
+               $this->set('starting_tm'.$j.$i,${"starting_tm".$j.$i});
+               ${"finishing_tm".$j.$i} = $dateto;
+               $this->set('finishing_tm'.$j.$i,${"finishing_tm".$j.$i});
+             }
+           }else{
+             ${"product_code1".$i} = "";
+             $this->set('product_code1'.$i,${"product_code1".$i});
+             ${"starting_tm".$j.$i} = $dateto;
+             $this->set('starting_tm'.$j.$i,${"starting_tm".$j.$i});
+             ${"finishing_tm".$j.$i} = $dateto;
+             $this->set('finishing_tm'.$j.$i,${"finishing_tm".$j.$i});
+           }
+         }
        }
      }
 
@@ -3144,9 +3180,14 @@ class LabelsController extends AppController
          'tuika' => $tuika,
          'lot_num' => $lot_num
        );
-/*
-       echo "<pre>";
-       print_r($data);
+
+       $CheckLot = $this->CheckLots->find()->where(['lot_num' => $lot_num,  'product_code' => $product_code1])->toArray();
+       $CheckLotId = $CheckLot[0]->id;
+       $_SESSION['check_lot_id'] = array(
+         'check_lot_id' => $CheckLotId
+       );
+/*       echo "<pre>";
+       print_r($_SESSION['check_lot_id']["check_lot_id"]);
        echo "</pre>";
 */
        $amount_sum = 0;
@@ -3250,6 +3291,11 @@ class LabelsController extends AppController
         $connection->begin();//トランザクション3
         try {//トランザクション4
           if ($this->MotoLots->saveMany($motoLots)) {
+            $this->CheckLots->updateAll(
+            ['flag_used' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],
+            ['id'   => $_SESSION['check_lot_id']["check_lot_id"] ]
+            );
+
             $mes = "※以上のように登録されました。";
             $this->set('mes',$mes);
             $connection->commit();// コミット5
@@ -3258,11 +3304,7 @@ class LabelsController extends AppController
             $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('moto_lots');
             $table->setConnection($connection);
-/*
-            echo "<pre>";
-            print_r($data['oldDBtouroku']);
-            echo "</pre>";
-*/
+
             for($k=0; $k<count($data['oldDBtouroku']); $k++){
               $connection->insert('moto_lots', [
                   'hasu_lot_id' => $data['oldDBtouroku'][$k]["hasu_lot_id"],
@@ -3272,6 +3314,12 @@ class LabelsController extends AppController
                   'touroku_datetime' => date("Y-m-d H:i:s")
               ]);
             }
+
+            $table = TableRegistry::get('check_lots');
+            $table->setConnection($connection);
+            $updater = "UPDATE check_lots set flag_used = 1, updated_at = '".date('Y-m-d H:i:s')."'
+             where product_id ='".$product_code1."' and lot_num = '".$lot_num."'";//もとのDBも更新
+            $connection->execute($updater);
 
           } else {
             $mes = "登録されませんでした。";

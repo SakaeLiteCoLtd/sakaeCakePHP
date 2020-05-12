@@ -36,6 +36,9 @@ class OrderEdisController extends AppController
        $this->PlaceDelivers = TableRegistry::get('placeDelivers');
        $this->AssembleProducts = TableRegistry::get('assembleProducts');
        $this->ProductGaityu = TableRegistry::get('productGaityu');
+       $this->KariOrderToSuppliers = TableRegistry::get('kariOrderToSuppliers');
+       $this->OrderToSupplier = TableRegistry::get('orderToSupplier');
+       $this->AttachOrderToSupplier = TableRegistry::get('attachOrderToSupplier');
      }
 
      public function indexmenu()
@@ -2780,6 +2783,21 @@ echo "</pre>";
         'delete_flag' => 0
       );
 
+      $datenouki = strtotime($data["date_deliver"]);
+      $datenoukiye = date('Y-m-d', strtotime("-1 day", $datenouki));
+      $w = date("w", strtotime($datenoukiye));//納期の前日の曜日を取得
+      if($w == 0){//前日が日曜日なら３日前の金曜日に変更
+        $kari_datenouki = date('Y-m-d', strtotime("-3 day", $datenouki));
+      }elseif($w == 6){//前日が土曜日なら２日前の金曜日に変更
+        $kari_datenouki = date('Y-m-d', strtotime("-2 day", $datenouki));
+      }else{//前日が平日ならそのまま
+        $kari_datenouki = $datenoukiye;
+      }
+      $kari_w = date("w", strtotime($kari_datenouki));
+      $_SESSION['supplier_date_deliver'] = array(
+        'date_deliver' => $kari_datenouki
+      );
+
     }
 
     public function chokusetsupanalogin()
@@ -2817,32 +2835,23 @@ echo "</pre>";
       $session = $this->request->getSession();
       $data = $session->read();
 
+      //外注の対応
       $ProductGaityu = $this->ProductGaityu->find()->where(['product_id' => $data['order_edi']['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
       if(count($ProductGaityu) > 0){
-          $_SESSION['ProductGaityu'] = array(
-            'place_deliver_code' => "00000",
-            'date_order' => $data['order_edi']["date_order"],
-            'price' => 0,
-            'amount' => $data['order_edi']["amount"],
-            'product_code' => $data['order_edi']['product_code'],
-            'line_code' => $data['order_edi']["line_code"],
-            'date_deliver' => $data['order_edi']["date_deliver"],
-            'num_order' => $data['order_edi']["num_order"],
-            'first_date_deliver' => $data['order_edi']["first_date_deliver"],
-            'customer_code' => $data['order_edi']["customer_code"],
-            'place_line' => $data['order_edi']["place_line"],
-            'check_denpyou' => 0,
-            'bunnou' => 0,
-            'kannou' => 0,
-            'delete_flag' => 0,
-            'created_staff' => $this->Auth->user('staff_id')
+      $id_supplier = $ProductGaityu[0]->id_supplier;
+        $_SESSION['ProductGaityu'] = array(
+          'id_order' => $data['order_edi']["num_order"],
+          'product_code' => $data['order_edi']['product_code'],
+          'price' => $data['order_edi']["price"],
+          'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
+          'amount' => $data['order_edi']["amount"],
+          'id_supplier' => $id_supplier,
+          'tourokubi' => date("Y-m-d"),
+          'flag_attach' => 0,
+          'delete_flag' => 0,
+          'created_at' => date("Y-m-d H:i:s"),
+          'created_staff' => $this->Auth->user('staff_id')
           );
-//外注の対応
-          echo "<pre>";
-          print_r($ProductGaityu[0]['product_id']."---".$ProductGaityu[0]['id_supplier']);
-          echo "</pre>";
-
-
 
         }
 
@@ -2870,31 +2879,29 @@ echo "</pre>";
             'created_staff' => $this->Auth->user('staff_id')
           );
 
-          $ProductGaityu = $this->ProductGaityu->find()->where(['product_id' => $child_pid, 'flag_denpyou' => 1,  'status' => 0])->toArray();
-          if(count($ProductGaityu) > 0){
-              $_SESSION['ProductGaityu'] = array(
-                'place_deliver_code' => "00000",
-                'date_order' => $data['order_edi']["date_order"],
-                'price' => 0,
-                'amount' => $data['order_edi']["amount"],
+          //外注の対応（組み立て）
+          $ProductGaityukumitate = $this->ProductGaityu->find()->where(['product_id' => $child_pid, 'flag_denpyou' => 1,  'status' => 0])->toArray();
+          if(count($ProductGaityukumitate) > 0){
+            $id_supplier = $ProductGaityu[0]->id_supplier;
+              $_SESSION['ProductGaityu_kumitate'] = array(
+                'id_order' => "00000",
                 'product_code' => $child_pid,
-                'line_code' => $data['order_edi']["line_code"],
-                'date_deliver' => $data['order_edi']["date_deliver"],
-                'num_order' => $data['order_edi']["num_order"],
-                'first_date_deliver' => $data['order_edi']["first_date_deliver"],
-                'customer_code' => $data['order_edi']["customer_code"],
-                'place_line' => $data['order_edi']["place_line"],
-                'check_denpyou' => 0,
-                'bunnou' => 0,
-                'kannou' => 0,
+                'price' => 0,
+                'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
+                'amount' => $data['order_edi']["amount"],
+                'id_supplier' => $id_supplier,
+                'tourokubi' => date("Y-m-d"),
+                'flag_attach' => 0,
                 'delete_flag' => 0,
+                'created_at' => date("Y-m-d H:i:s"),
                 'created_staff' => $this->Auth->user('staff_id')
               );
-//外注の対応（組み立て）
+/*
               echo "<pre>";
-              print_r($ProductGaityu[0]['product_id']."---".$ProductGaityu[0]['id_supplier']);
+              print_r('ProductGaityu_kumitate');
+              print_r(count($_SESSION['ProductGaityu_kumitate']));
               echo "</pre>";
-
+*/
           }
         }
       }
@@ -2905,7 +2912,17 @@ echo "</pre>";
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->OrderEdis->save($orderEdis)) {
-
+          if(isset($_SESSION['ProductGaityu'])){//外注がある場合はKariOrderToSuppliersに登録
+            $KariOrderToSuppliers = $this->KariOrderToSuppliers->patchEntity($this->KariOrderToSuppliers->newEntity(), $_SESSION['ProductGaityu']);
+            if ($this->KariOrderToSuppliers->save($KariOrderToSuppliers)) {
+              $mes = "※登録されました";
+              $this->set('mes',$mes);
+            }else{
+              $mes = "※KariOrderToSuppliersに登録できませんでした";
+              $this->set('mes',$mes);
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            }
+          }
 
           $mes = "※登録されました";
           $this->set('mes',$mes);
@@ -2913,6 +2930,17 @@ echo "</pre>";
               $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $_SESSION['order_edi_kumitate']);
               if ($this->OrderEdis->saveMany($OrderEdis)) {
 
+                if(isset($_SESSION['ProductGaityu_kumitate'])){//組み立て製品に外注がある場合はKariOrderToSuppliersに登録
+                  $KariOrderToSuppliers = $this->KariOrderToSuppliers->patchEntity($this->KariOrderToSuppliers->newEntity(), $_SESSION['ProductGaityu_kumitate']);
+                  if ($this->KariOrderToSuppliers->save($KariOrderToSuppliers)) {
+                    $mes = "※登録されました";
+                    $this->set('mes',$mes);
+                  }else{
+                    $mes = "※KariOrderToSuppliersに登録できませんでした";
+                    $this->set('mes',$mes);
+                    throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                  }
+                }
 
                 $mes = "※登録されました（組み立て品も登録されました）";
                 $this->set('mes',$mes);
@@ -2933,6 +2961,8 @@ echo "</pre>";
       //ロールバック8
         $connection->rollback();//トランザクション9
       }//トランザクション10
+
+
     }
 
     public function chokusetsuformalldnp()
@@ -3053,7 +3083,6 @@ echo "</pre>";
         'num_order' => $data["num_order"],
         'delete_flag' => 0
       );
-
     }
 
     public function chokusetsudnplogin()
@@ -3094,7 +3123,6 @@ echo "</pre>";
       $data = $session->read();
 
       $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $data['order_edi']['product_code']])->toArray();
-
       if(count($AssembleProduct) > 0){
         for($n=0; $n<count($AssembleProduct); $n++){
           $child_pid = $AssembleProduct[$n]->child_pid;
@@ -3162,6 +3190,7 @@ echo "</pre>";
                 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
               }
             }
+
           $connection->commit();// コミット5
         } else {
           $mes = "※登録されませんでした";

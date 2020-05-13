@@ -3095,7 +3095,11 @@ echo "</pre>";
 
         $htmllogin = new htmlLogin();
         $arraylogindate = $htmllogin->htmllogin($userdata);
-
+/*
+        echo "<pre>";
+        print_r($arraylogindate);
+        echo "</pre>";
+*/
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);

@@ -2446,6 +2446,26 @@ class LabelsController extends AppController
         echo '移動できない！';
       }
 */
+/*
+      echo "<pre>";
+      print_r(count($arrLot));
+      echo "</pre>";
+*/
+      $count = count($arrLot);
+      for($i = 0 ; $i < $count ; $i++){
+          $tmp_arr[$arrLot[$i]['datetime_hakkou'].'_'.$arrLot[$i]['product_code'].'_'.$arrLot[$i]['lot_num']]
+           = $tmp_arr[$arrLot[$i]['datetime_hakkou'].'_'.$arrLot[$i]['product_code'].'_'.$arrLot[$i]['lot_num']]??$i;
+      }
+      foreach($tmp_arr as $v){
+          $arrLotunique[$v] = $arrLot[$v];
+      }
+/*
+      echo "<pre>";
+      print_r(count($arrLotunique));
+      echo "</pre>";
+*/
+      $arrLot = $arrLotunique;
+
       $count = 0;
       for($k=0; $k<count($arrLot); $k++){
         $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[$k]["datetime_hakkou"], 'product_code' => $arrLot[$k]["product_code"], 'lot_num' => $arrLot[$k]["lot_num"], 'amount' => $arrLot[$k]["amount"]])->toArray();
@@ -2497,11 +2517,11 @@ class LabelsController extends AppController
                $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('check_lots');
                $table->setConnection($connection);
-/*
-               echo "<pre>";
-               print_r($arrLot);
-               echo "</pre>";
-*/
+
+      //         echo "<pre>";
+      //         print_r($arrLot);
+      //         echo "</pre>";
+
                for($k=0; $k<count($arrLot); $k++){
                  $connection->insert('check_lots', [
                      'datetime_hakkou' => $arrLot[$k]["datetime_hakkou"],

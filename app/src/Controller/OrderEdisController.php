@@ -37,6 +37,7 @@ class OrderEdisController extends AppController
        $this->AssembleProducts = TableRegistry::get('assembleProducts');
        $this->ProductGaityu = TableRegistry::get('productGaityu');
        $this->KariOrderToSuppliers = TableRegistry::get('kariOrderToSuppliers');
+       $this->UnitOrderToSuppliers = TableRegistry::get('unitOrderToSuppliers');
        $this->OrderToSupplier = TableRegistry::get('orderToSupplier');
        $this->AttachOrderToSupplier = TableRegistry::get('attachOrderToSupplier');
      }
@@ -165,19 +166,268 @@ class OrderEdisController extends AppController
                   }
                }
 
+               for($k=0; $k<count($arrFp); $k++){//外注登録
+
+                 $ProductGaityu = $this->ProductGaityu->find()->where(['product_id' => $arrFp[$k]['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
+                 if(count($ProductGaityu) > 0){//外注製品であればkari_order_to_suppliersに登録
+
+                   $datenouki = strtotime($arrFp[$k]["date_deliver"]);
+                   $datenoukiye = date('Y-m-d', strtotime("-1 day", $datenouki));
+                   $w = date("w", strtotime($datenoukiye));//納期の前日の曜日を取得
+                   if($w == 0){//前日が日曜日なら３日前の金曜日に変更
+                     $kari_datenouki = date('Y-m-d', strtotime("-3 day", $datenouki));
+                   }elseif($w == 6){//前日が土曜日なら２日前の金曜日に変更
+                     $kari_datenouki = date('Y-m-d', strtotime("-2 day", $datenouki));
+                   }else{//前日が平日ならそのまま
+                     $kari_datenouki = $datenoukiye;
+                   }
+                   $kari_w = date("w", strtotime($kari_datenouki));
+                   $_SESSION['supplier_date_deliver'] = array(
+                     'date_deliver' => $kari_datenouki
+                   );
+
+                   $id_supplier = $ProductGaityu[0]->id_supplier;
+                     $_SESSION['ProductGaityu'] = array(
+                       'id_order' => $arrFp[$k]['num_order'],
+                       'product_code' => $arrFp[$k]['product_code'],
+                       'price' => 0,
+                       'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
+                       'amount' => $arrFp[$k]["amount"],
+                       'id_supplier' => $id_supplier,
+                       'tourokubi' => date("Y-m-d"),
+                       'flag_attach' => 0,
+                       'delete_flag' => 0,
+                       'created_at' => date("Y-m-d H:i:s"),
+                       'created_staff' => $this->Auth->user('staff_id')
+                     );
+/*
+                     echo "<pre>";
+                     print_r('ProductGaityu');
+                     print_r($_SESSION['ProductGaityu']);
+                     echo "</pre>";
+*/
+                     $KariOrderToSuppliers = $this->KariOrderToSuppliers->patchEntity($this->KariOrderToSuppliers->newEntity(), $_SESSION['ProductGaityu']);
+                     if ($this->KariOrderToSuppliers->save($KariOrderToSuppliers)) {
+                       $mes = "※登録されました";
+                       $this->set('mes',$mes);
+                     }else{
+                       echo "<pre>";
+                       print_r("※ ".$arrFp[$k]['product_code']." がkari_order_to_supplierテーブルに登録できませんでした");
+                       echo "</pre>";
+                     }
+
+                 }
+
+               }
+
+               //ここからinsert into order_to_supplier
+               $KariOrderToSupplier = $this->KariOrderToSuppliers->find()->where(['flag_attach' => 0])->toArray();
+               if(count($KariOrderToSupplier) > 0){//KariOrderToSuppliersテーブルの'flag_attach' => 0のデータを取り出す。
+/*
+                 echo "<pre>";
+                 print_r(count($KariOrderToSupplier));
+                 echo "</pre>";
+*/
+                 $arrPro = array();//空の配列を作る
+                 $arrProcode = array();
+                 for($k=0; $k<count($KariOrderToSupplier); $k++){//外注登録
+                   $id = $KariOrderToSupplier[$k]->id;
+                   $id_order = $KariOrderToSupplier[$k]->id_order;
+                   $product_code = $KariOrderToSupplier[$k]->product_code;
+                   $date_deliver = $KariOrderToSupplier[$k]->date_deliver->format('Y-m-d');
+                   $amount = $KariOrderToSupplier[$k]->amount;
+                   $id_supplier = $KariOrderToSupplier[$k]->id_supplier;
+                   $price = $KariOrderToSupplier[$k]->price;
+
+                   $_SESSION['KariOrderToSuppliers'][$k] = array(
+                     'id' => $id,
+                     'id_order' => $id_order,
+                     'product_code' => $product_code,
+                     'date_deliver' => $date_deliver,
+                     'id_supplier' => $id_supplier,
+                     'price' => $price,
+                     'amount' => $amount
+                   );
+
+                   $arrProcode[] = $product_code;
+
+                 }
+
+                 echo "<pre>";
+                 print_r($_SESSION['KariOrderToSuppliers']);
+                 echo "</pre>";
+
+                 $arrProcode = array_unique($arrProcode);//品番の重複を削除
+                 $arrProcode = array_values($arrProcode);//添え字の振り直し
+/*
+                 echo "<pre>";
+                 print_r($arrProcode);
+                 echo "</pre>";
+*/
+                 for($k=0; $k<count($arrProcode); $k++){//品番毎に外注登録していく
+
+                   echo "<pre>";
+                   print_r("ループ".$k);
+                   echo "</pre>";
+
+                   $product_code = $arrProcode[$k];
+                   $total_amount = 0;//その品番のtotal_amountを計算する
+
+                   //その品番のdate_deliverをひとつ取り出す
+                   $keyIndex = array_search($product_code, array_column($_SESSION['KariOrderToSuppliers'], 'product_code'));
+                   $arrKariOrderToSuppliers = $_SESSION['KariOrderToSuppliers'][$keyIndex];
+
+                   $date_deliver = $arrKariOrderToSuppliers["date_deliver"];
+
+                   for($i=0; $i<count($_SESSION['KariOrderToSuppliers']); $i++){//total_amountと最短のdate_deliverを取得する
+                     if($_SESSION['KariOrderToSuppliers'][$i]['product_code'] === $product_code){//狙った品番の場合
+                       $id_order = $_SESSION['KariOrderToSuppliers'][$i]['id_order'];
+                       $id_supplier = $_SESSION['KariOrderToSuppliers'][$i]['id_supplier'];
+                       $total_amount = $total_amount + $_SESSION['KariOrderToSuppliers'][$i]['amount'];
+
+                       if(isset($_SESSION['KariOrderToSuppliers'][$i]['price'])){
+                         $price = $_SESSION['KariOrderToSuppliers'][$i]['price'];
+                       }else{
+                         $price = 0;
+                       }
+
+                       if($date_deliver > $_SESSION['KariOrderToSuppliers'][$i]['date_deliver']){
+                         $date_deliver = $_SESSION['KariOrderToSuppliers'][$i]['date_deliver'];
+                       }else{
+                         $date_deliver = $date_deliver;
+                       }
+
+                       //KariOrderToSuppliersテーブルをupdateする　'flag_attach' => 1にする
+
+
+                     }
+                   }
+
+                   $UnitOrderToSupplier = $this->UnitOrderToSuppliers->find()->where(['product_code' => $product_code])->toArray();
+                   if(isset($UnitOrderToSupplier[0])){
+                     $unit_amount = $UnitOrderToSupplier[0]->unit_amount;
+                   }else{
+                     $unit_amount =0;
+                   }
+
+                   echo "<pre>";
+                   print_r($product_code." -unit-".$unit_amount."  -total-".$total_amount."---".$date_deliver);
+                   echo "</pre>";
+
+          //         for($i=0; $i<count($_SESSION['KariOrderToSuppliers']); $i++){//$_SESSION['KariOrderToSuppliers']の数だけ
+          //           if($_SESSION['KariOrderToSuppliers'][$i]['product_code'] === $product_code){//狙った品番の場合
+
+                       if($unit_amount > 0){//発注単位がある場合
+
+                         $unit_count = floor($total_amount/$unit_amount);//発注単位何個分か
+                         $mod_amount = $total_amount % $unit_amount;//あまりは何個か
+                         $attach_num = 1;
+
+                         for($j=0; $j<=$unit_count; $j++){//発注単位個分
+
+                            if($j<$unit_count){//$j<$unit_countは単位ごとに登録
+
+                              $id_order_attach = $id_order."-".$attach_num;
+
+                              $arrOrderToSuppliers = array();
+                              $arrOrderToSuppliers[] = [//OrderToSuppliersへの登録用
+                                'id_order' => $id_order_attach,
+                                'product_code' => $product_code,
+                                'price' => $price,
+                                'date_deliver' => $date_deliver,
+                                'first_date_deliver' => $date_deliver,
+                                'amount' => $unit_amount,
+                                'first_amount' => $unit_amount,
+                                'id_supplier' => $id_supplier,
+                                'tourokubi' => date("Y-m-d"),
+                                'maisu_denpyou_bunnou' => 0,
+                                'delete_flag' => 0,
+                                'created_staff' => $this->Auth->user('staff_id'),
+                                'created_at' => date("Y-m-d H:i:s")
+                              ];
+
+                              echo "<pre>";
+                              print_r("単位");
+                              print_r($arrOrderToSuppliers);
+                              echo "</pre>";
+
+                              $date_deliver1 = strtotime($date_deliver);
+                              $date_deliver = date('Y-m-d', strtotime('+1 day', $date_deliver1));//単位ごとに納期を次の日にする
+                              $attach_num = $attach_num + 1;
+
+
+
+                            }else{//$j=$unit_countのとき余りを登録
+
+                              $id_order_attach = $id_order."-".$attach_num;
+
+                              $arrOrderToSuppliers = array();
+                              $arrOrderToSuppliers[] = [//OrderToSuppliersへの登録用
+                                'id_order' => $id_order_attach,
+                                'product_code' => $product_code,
+                                'price' => $price,
+                                'date_deliver' => $date_deliver,
+                                'first_date_deliver' => $date_deliver,
+                                'amount' => $mod_amount,
+                                'first_amount' => $mod_amount,
+                                'id_supplier' => $id_supplier,
+                                'tourokubi' => date("Y-m-d"),
+                                'maisu_denpyou_bunnou' => 0,
+                                'delete_flag' => 0,
+                                'created_staff' => $this->Auth->user('staff_id'),
+                                'created_at' => date("Y-m-d H:i:s")
+                              ];
+
+                              echo "<pre>";
+                              print_r("あまり");
+                              print_r($arrOrderToSuppliers);
+                              echo "</pre>";
+
+                            }
+                         }
+
+                       }else{//発注単位がない場合全部発注
+
+                         $attach_num = 1;
+                         $id_order_attach = $id_order."-".$attach_num;
+
+                         $arrOrderToSuppliers = array();
+                         $arrOrderToSuppliers[] = [//OrderToSuppliersへの登録用
+                           'id_order' => $id_order_attach,
+                           'product_code' => $product_code,
+                           'price' => $price,
+                           'date_deliver' => $date_deliver,
+                           'first_date_deliver' => $date_deliver,
+                           'amount' => $unit_amount,
+                           'first_amount' => $unit_amount,
+                           'id_supplier' => $id_supplier,
+                           'tourokubi' => date("Y-m-d"),
+                           'maisu_denpyou_bunnou' => 0,
+                           'delete_flag' => 0,
+                           'created_staff' => $this->Auth->user('staff_id'),
+                           'created_at' => date("Y-m-d H:i:s")
+                         ];
+
+                         echo "<pre>";
+                         print_r("unitなし");
+                         print_r($arrOrderToSuppliers);
+                         echo "</pre>";
+
+                       }
+          //           }
+          //         }
+                 }
+               }
+
                  $mes = "※登録されました";
                  $this->set('mes',$mes);
                  $connection->commit();// コミット5
-
+/*
                  //insert into order_ediする
                  $connection = ConnectionManager::get('DB_ikou_test');
                  $table = TableRegistry::get('order_edi');
                  $table->setConnection($connection);
-/*
-                 echo "<pre>";
-                 print_r($arrFp);
-                 echo "</pre>";
-*/
+
                  for($k=0; $k<count($arrFp); $k++){
                    $connection->insert('order_edi', [
                        'date_order' => $arrFp[$k]["date_order"],
@@ -202,7 +452,7 @@ class OrderEdisController extends AppController
                    ]);
                  }
 
-
+*/
                } else {
                  $mes = "※登録されませんでした";
                  $this->set('mes',$mes);
@@ -2882,7 +3132,7 @@ echo "</pre>";
           //外注の対応（組み立て）
           $ProductGaityukumitate = $this->ProductGaityu->find()->where(['product_id' => $child_pid, 'flag_denpyou' => 1,  'status' => 0])->toArray();
           if(count($ProductGaityukumitate) > 0){
-            $id_supplier = $ProductGaityu[0]->id_supplier;
+            $id_supplier = $ProductGaityukumitate[0]->id_supplier;
               $_SESSION['ProductGaityu_kumitate'] = array(
                 'id_order' => "00000",
                 'product_code' => $child_pid,

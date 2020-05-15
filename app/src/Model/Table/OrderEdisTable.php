@@ -166,7 +166,7 @@ class OrderEdisTable extends Table
 
         return $validator;
     }
-
+/*
         public function buildRules(RulesChecker $rules)
         {
     //    $rules->add($rules->isUnique(['date_deliver','place_deliver_code','product_code','amount','delete_flag']));
@@ -174,5 +174,5 @@ class OrderEdisTable extends Table
 
             return $rules;
         }
-
+*/
 }

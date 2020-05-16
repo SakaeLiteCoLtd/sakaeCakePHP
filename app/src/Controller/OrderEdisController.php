@@ -230,6 +230,7 @@ class OrderEdisController extends AppController
 */
                  $arrPro = array();//空の配列を作る
                  $arrProcode = array();
+                 $arrKariIds = array();
                  for($k=0; $k<count($KariOrderToSupplier); $k++){//外注登録
                    $id = $KariOrderToSupplier[$k]->id;
                    $id_order = $KariOrderToSupplier[$k]->id_order;
@@ -297,7 +298,9 @@ class OrderEdisController extends AppController
                          $date_deliver = $date_deliver;
                        }
 
-                       //KariOrderToSuppliersテーブルをupdateする　'flag_attach' => 1にする
+                       //足し込んだKariOrderToSuppliersテーブルをupdateする　'flag_attach' => 1にする
+                       //足し込んだKariOrderToSuppliersのデータのidを取っておく
+                       $arrKariIds[] = $_SESSION['KariOrderToSuppliers'][$i]['id'];
 
 
                      }
@@ -351,10 +354,16 @@ class OrderEdisController extends AppController
                               print_r($arrOrderToSuppliers);
                               echo "</pre>";
 
+                              //OrderToSupplierの登録
+                              $OrderToSuppliers = $this->OrderToSupplier->patchEntity($this->OrderToSupplier->newEntity(), $arrOrderToSuppliers[0]);
+                              $this->OrderToSupplier->save($OrderToSuppliers);//saveManyで一括登録
+
                               $date_deliver1 = strtotime($date_deliver);
                               $date_deliver = date('Y-m-d', strtotime('+1 day', $date_deliver1));//単位ごとに納期を次の日にする
                               $attach_num = $attach_num + 1;
 
+                              //KariOrderToSuppliersテーブルとOrderToSupplierテーブルを紐づけるためattachテーブルに登録にする
+                              //KariOrderToSuppliersのidとOrderToSupplierのid_orderをセットにして登録する
 
 
                             }else{//$j=$unit_countのとき余りを登録
@@ -382,6 +391,14 @@ class OrderEdisController extends AppController
                               print_r("あまり");
                               print_r($arrOrderToSuppliers);
                               echo "</pre>";
+
+                              //OrderToSupplierの登録
+                              $OrderToSuppliers = $this->OrderToSupplier->patchEntity($this->OrderToSupplier->newEntity(), $arrOrderToSuppliers[0]);
+                              $this->OrderToSupplier->save($OrderToSuppliers);//saveManyで一括登録
+
+                              //KariOrderToSuppliersテーブルとOrderToSupplierテーブルを紐づけるためattachテーブルに登録にする
+                              //KariOrderToSuppliersのidとOrderToSupplierのid_orderをセットにして登録する
+
 
                             }
                          }

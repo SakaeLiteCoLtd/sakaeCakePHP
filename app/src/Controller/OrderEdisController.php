@@ -220,7 +220,7 @@ class OrderEdisController extends AppController
 
                }
 
-               //ここからinsert into order_to_supplier
+               //ここから外注登録（insert into order_to_supplier）
                $KariOrderToSupplier = $this->KariOrderToSuppliers->find()->where(['flag_attach' => 0])->toArray();
                if(count($KariOrderToSupplier) > 0){//KariOrderToSuppliersテーブルの'flag_attach' => 0のデータを取り出す。
 /*
@@ -230,7 +230,6 @@ class OrderEdisController extends AppController
 */
                  $arrPro = array();//空の配列を作る
                  $arrProcode = array();
-                 $arrKariIds = array();
                  for($k=0; $k<count($KariOrderToSupplier); $k++){//外注登録
                    $id = $KariOrderToSupplier[$k]->id;
                    $id_order = $KariOrderToSupplier[$k]->id_order;
@@ -253,11 +252,11 @@ class OrderEdisController extends AppController
                    $arrProcode[] = $product_code;
 
                  }
-
+/*
                  echo "<pre>";
                  print_r($_SESSION['KariOrderToSuppliers']);
                  echo "</pre>";
-
+*/
                  $arrProcode = array_unique($arrProcode);//品番の重複を削除
                  $arrProcode = array_values($arrProcode);//添え字の振り直し
 /*
@@ -267,10 +266,13 @@ class OrderEdisController extends AppController
 */
                  for($k=0; $k<count($arrProcode); $k++){//品番毎に外注登録していく
 
+                   $arrKariIds = array();
+                   $arrAttachnum = array();
+/*
                    echo "<pre>";
                    print_r("ループ".$k);
                    echo "</pre>";
-
+*/
                    $product_code = $arrProcode[$k];
                    $total_amount = 0;//その品番のtotal_amountを計算する
 
@@ -279,6 +281,7 @@ class OrderEdisController extends AppController
                    $arrKariOrderToSuppliers = $_SESSION['KariOrderToSuppliers'][$keyIndex];
 
                    $date_deliver = $arrKariOrderToSuppliers["date_deliver"];
+
 
                    for($i=0; $i<count($_SESSION['KariOrderToSuppliers']); $i++){//total_amountと最短のdate_deliverを取得する
                      if($_SESSION['KariOrderToSuppliers'][$i]['product_code'] === $product_code){//狙った品番の場合
@@ -302,6 +305,10 @@ class OrderEdisController extends AppController
                        //足し込んだKariOrderToSuppliersのデータのidを取っておく
                        $arrKariIds[] = $_SESSION['KariOrderToSuppliers'][$i]['id'];
 
+                       $this->KariOrderToSuppliers->updateAll(
+                       ['flag_attach' => 1],['id'  => $_SESSION['KariOrderToSuppliers'][$i]['id']]
+                       );
+
 
                      }
                    }
@@ -312,14 +319,11 @@ class OrderEdisController extends AppController
                    }else{
                      $unit_amount =0;
                    }
-
+/*
                    echo "<pre>";
                    print_r($product_code." -unit-".$unit_amount."  -total-".$total_amount."---".$date_deliver);
                    echo "</pre>";
-
-          //         for($i=0; $i<count($_SESSION['KariOrderToSuppliers']); $i++){//$_SESSION['KariOrderToSuppliers']の数だけ
-          //           if($_SESSION['KariOrderToSuppliers'][$i]['product_code'] === $product_code){//狙った品番の場合
-
+*/
                        if($unit_amount > 0){//発注単位がある場合
 
                          $unit_count = floor($total_amount/$unit_amount);//発注単位何個分か
@@ -348,15 +352,15 @@ class OrderEdisController extends AppController
                                 'created_staff' => $this->Auth->user('staff_id'),
                                 'created_at' => date("Y-m-d H:i:s")
                               ];
-
+/*
                               echo "<pre>";
                               print_r("単位");
                               print_r($arrOrderToSuppliers);
                               echo "</pre>";
-
+*/
                               //OrderToSupplierの登録
                               $OrderToSuppliers = $this->OrderToSupplier->patchEntity($this->OrderToSupplier->newEntity(), $arrOrderToSuppliers[0]);
-                              $this->OrderToSupplier->save($OrderToSuppliers);//saveManyで一括登録
+                              $this->OrderToSupplier->save($OrderToSuppliers);
 
                               $date_deliver1 = strtotime($date_deliver);
                               $date_deliver = date('Y-m-d', strtotime('+1 day', $date_deliver1));//単位ごとに納期を次の日にする
@@ -364,7 +368,7 @@ class OrderEdisController extends AppController
 
                               //KariOrderToSuppliersテーブルとOrderToSupplierテーブルを紐づけるためattachテーブルに登録にする
                               //KariOrderToSuppliersのidとOrderToSupplierのid_orderをセットにして登録する
-
+                              $arrAttachnum[] = $id_order_attach;
 
                             }else{//$j=$unit_countのとき余りを登録
 
@@ -386,19 +390,19 @@ class OrderEdisController extends AppController
                                 'created_staff' => $this->Auth->user('staff_id'),
                                 'created_at' => date("Y-m-d H:i:s")
                               ];
-
+/*
                               echo "<pre>";
                               print_r("あまり");
                               print_r($arrOrderToSuppliers);
                               echo "</pre>";
-
+*/
                               //OrderToSupplierの登録
                               $OrderToSuppliers = $this->OrderToSupplier->patchEntity($this->OrderToSupplier->newEntity(), $arrOrderToSuppliers[0]);
-                              $this->OrderToSupplier->save($OrderToSuppliers);//saveManyで一括登録
+                              $this->OrderToSupplier->save($OrderToSuppliers);
 
                               //KariOrderToSuppliersテーブルとOrderToSupplierテーブルを紐づけるためattachテーブルに登録にする
                               //KariOrderToSuppliersのidとOrderToSupplierのid_orderをセットにして登録する
-
+                              $arrAttachnum[] = $id_order_attach;
 
                             }
                          }
@@ -415,8 +419,8 @@ class OrderEdisController extends AppController
                            'price' => $price,
                            'date_deliver' => $date_deliver,
                            'first_date_deliver' => $date_deliver,
-                           'amount' => $unit_amount,
-                           'first_amount' => $unit_amount,
+                           'amount' => $total_amount,
+                           'first_amount' => $total_amount,
                            'id_supplier' => $id_supplier,
                            'tourokubi' => date("Y-m-d"),
                            'maisu_denpyou_bunnou' => 0,
@@ -424,15 +428,108 @@ class OrderEdisController extends AppController
                            'created_staff' => $this->Auth->user('staff_id'),
                            'created_at' => date("Y-m-d H:i:s")
                          ];
-
+/*
                          echo "<pre>";
                          print_r("unitなし");
                          print_r($arrOrderToSuppliers);
                          echo "</pre>";
+*/
+                        //OrderToSupplierの登録
+                        $OrderToSuppliers = $this->OrderToSupplier->patchEntity($this->OrderToSupplier->newEntity(), $arrOrderToSuppliers[0]);
+                        $this->OrderToSupplier->save($OrderToSuppliers);
+
+                        //KariOrderToSuppliersテーブルとOrderToSupplierテーブルを紐づけるためattachテーブルに登録にする
+                        //KariOrderToSuppliersのidとOrderToSupplierのid_orderをセットにして登録する
+                        $arrAttachnum[] = $id_order_attach;
 
                        }
-          //           }
-          //         }
+/*
+                       echo "<pre>";
+                       print_r("Kari_id");
+                       print_r($arrKariIds);
+                       echo "</pre>";
+
+                       echo "<pre>";
+                       print_r("id_order");
+                       print_r($arrAttachnum);
+                       echo "</pre>";
+*/
+                       if(count($arrKariIds) > count($arrAttachnum)){//KariOrderToSuppliersの方がOrderToSupplierより多いとき
+
+                         for($m=0; $m<count($arrKariIds); $m++){//$arrKariIds分
+
+                            if(isset($arrAttachnum[$m])){
+                              $arrAttach = array();
+
+                              $arrAttach[] = [//attach_order_to_supplierへの登録用
+                                'id_order' => $arrAttachnum[$m],
+                                'kari_order_to_supplier_id' => $arrKariIds[$m]
+                              ];
+/*
+                              echo "<pre>";
+                              print_r("Attach".$m);
+                              print_r($arrAttach);
+                              echo "</pre>";
+*/
+                            $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
+                              $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);
+
+                            }else{
+                              $arrAttach = array();
+
+                              $arrAttach[] = [//attach_order_to_supplierへの登録用
+                                'id_order' => $arrAttachnum[0],
+                                'kari_order_to_supplier_id' => $arrKariIds[$m]
+                              ];
+/*
+                              echo "<pre>";
+                              print_r("Attach".$m);
+                              print_r($arrAttach);
+                              echo "</pre>";
+*/
+                              $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
+                              $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);
+
+                            }
+
+                         }
+
+                       }else{//OrderToSupplierの方がKariOrderToSuppliersより多いとき
+
+                         for($m=0; $m<count($arrAttachnum); $m++){//$arrKariIds分
+
+                            if(isset($arrKariIds[$m])){
+                              $arrAttach = array();
+
+                              $arrAttach[] = [//attach_order_to_supplierへの登録用
+                                'id_order' => $arrAttachnum[$m],
+                                'kari_order_to_supplier_id' => $arrKariIds[$m]
+                              ];
+                              $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
+                              $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);//saveManyで一括登録
+
+                            }else{
+                              $arrAttach = array();
+
+                              $arrAttach[] = [//attach_order_to_supplierへの登録用
+                                'id_order' => $arrAttachnum[$m],
+                                'kari_order_to_supplier_id' => $arrKariIds[0]
+                              ];
+/*
+                              echo "<pre>";
+                              print_r("Attach".$m);
+                              print_r($arrAttach);
+                              echo "</pre>";
+*/
+                              $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
+                              $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);//saveManyで一括登録
+
+                            }
+
+                         }
+
+                       }
+
                  }
                }
 

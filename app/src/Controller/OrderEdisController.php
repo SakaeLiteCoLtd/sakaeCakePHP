@@ -134,6 +134,14 @@ class OrderEdisController extends AppController
            try {//トランザクション4
                if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
 
+                 //外注仮登録クラス
+                 $htmlgaityukaritouroku = new htmlEDItouroku();
+                 $data = $htmlgaityukaritouroku->htmlgaityukaritouroku($arrFp);
+
+                 //外注登録クラス（紐づけ、kari_orderの更新も）
+                 $htmlgaityutouroku = new htmlEDItouroku();
+                 $data = $htmlgaityutouroku->htmlgaityutouroku();
+
                  for($k=0; $k<count($arrFp); $k++){//組み立て品登録
                    $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $arrFp[$k]['product_code']])->toArray();
                    if(count($AssembleProduct) > 0){
@@ -159,22 +167,23 @@ class OrderEdisController extends AppController
                        );
                      }
                      $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $_SESSION['order_edi_kumitate']);
-                     $this->OrderEdis->saveMany($orderEdis);
+                     if($this->OrderEdis->saveMany($orderEdis)){
+
+                       $arrFp = array();//空の配列を作る
+                       $arrFp = $_SESSION['order_edi_kumitate'];
+
+                       //組み立て外注仮登録クラス
+                       $htmlgaityukaritouroku = new htmlEDItouroku();
+                       $data = $htmlgaityukaritouroku->htmlgaityukaritourokuAssemble($arrFp);
+
+                       //組み立て外注登録クラス（紐づけ、kari_orderの更新も）
+                       $htmlgaityutouroku = new htmlEDItouroku();
+                       $data = $htmlgaityutouroku->htmlgaityutouroku();
+
+                     }
+
                   }
                }
-/*
-               echo "<pre>";
-               print_r("moto");
-               print_r($arrFp);
-               echo "</pre>";
-*/
-               //外注仮登録クラス
-               $htmlgaityukaritouroku = new htmlEDItouroku();
-               $data = $htmlgaityukaritouroku->htmlgaityukaritouroku($arrFp);
-
-               //外注登録クラス（紐づけ、kari_orderの更新も）
-               $htmlgaityutouroku = new htmlEDItouroku();
-               $data = $htmlgaityutouroku->htmlgaityutouroku();
 
                  $mes = "※登録されました";
                  $this->set('mes',$mes);

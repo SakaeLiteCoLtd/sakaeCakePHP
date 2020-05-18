@@ -110,6 +110,15 @@ class htmlEDItouroku extends AppController
             ['flag_attach' => 1],['id'  => $_SESSION['KariOrderToSuppliers'][$i]['id']]
             );
 
+            //update KariOrderToSupplierする（旧DB）
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('kari_order_to_supplier');
+            $table->setConnection($connection);
+
+            $updater = "UPDATE kari_order_to_supplier set flag_attach = 1 where product_id ='".$product_code."' and id_order = '".$id_order."' and flag_attach = 0";//もとのDBも更新
+            $connection->execute($updater);
+
+            $connection = ConnectionManager::get('default');
 
           }
         }
@@ -163,6 +172,29 @@ class htmlEDItouroku extends AppController
                    $OrderToSuppliers = $this->OrderToSupplier->patchEntity($this->OrderToSupplier->newEntity(), $arrOrderToSuppliers[0]);
                    $this->OrderToSupplier->save($OrderToSuppliers);
 
+                   //insert into OrderToSupplierする（旧DB）
+                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $table = TableRegistry::get('order_to_supplier');
+                   $table->setConnection($connection);
+
+                     $connection->insert('order_to_supplier', [
+                       'id_order' => $arrOrderToSuppliers[0]['id_order'],
+                       'product_id' => $arrOrderToSuppliers[0]['product_code'],
+                       'price' => $arrOrderToSuppliers[0]["price"],
+                       'date_deliver' => $arrOrderToSuppliers[0]["date_deliver"],
+                       'first_date_deliver' => $arrOrderToSuppliers[0]["date_deliver"],
+                       'amount' => $arrOrderToSuppliers[0]["amount"],
+                       'first_amount' => $arrOrderToSuppliers[0]["amount"],
+                       'id_supplier' => $id_supplier,
+                       'tourokubi' => date("Y-m-d"),
+                       'maisu_denpyou_bunnou' => 0,
+                       'delete_flag' => 0,
+                       'created_at' => date("Y-m-d H:i:s"),
+                       'created_emp_id' => $this->Auth->user('staff_id')
+                     ]);
+
+                   $connection = ConnectionManager::get('default');
+
                    $date_deliver1 = strtotime($date_deliver);
                    $date_deliver = date('Y-m-d', strtotime('+1 day', $date_deliver1));//単位ごとに納期を次の日にする
                    $attach_num = $attach_num + 1;
@@ -200,6 +232,30 @@ class htmlEDItouroku extends AppController
                    //OrderToSupplierの登録
                    $OrderToSuppliers = $this->OrderToSupplier->patchEntity($this->OrderToSupplier->newEntity(), $arrOrderToSuppliers[0]);
                    $this->OrderToSupplier->save($OrderToSuppliers);
+
+                   //insert into OrderToSupplierする（旧DB）
+                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $table = TableRegistry::get('order_to_supplier');
+                   $table->setConnection($connection);
+
+                   $connection->insert('order_to_supplier', [
+                     'id_order' => $arrOrderToSuppliers[0]['id_order'],
+                     'product_id' => $arrOrderToSuppliers[0]['product_code'],
+                     'price' => $arrOrderToSuppliers[0]["price"],
+                     'date_deliver' => $arrOrderToSuppliers[0]["date_deliver"],
+                     'first_date_deliver' => $arrOrderToSuppliers[0]["date_deliver"],
+                     'amount' => $arrOrderToSuppliers[0]["amount"],
+                     'first_amount' => $arrOrderToSuppliers[0]["amount"],
+                     'id_supplier' => $id_supplier,
+                     'tourokubi' => date("Y-m-d"),
+                     'maisu_denpyou_bunnou' => 0,
+                     'delete_flag' => 0,
+                     'created_at' => date("Y-m-d H:i:s"),
+                     'created_emp_id' => $this->Auth->user('staff_id')
+                   ]);
+
+                   $connection = ConnectionManager::get('default');
+
 
                    //KariOrderToSuppliersテーブルとOrderToSupplierテーブルを紐づけるためattachテーブルに登録にする
                    //KariOrderToSuppliersのidとOrderToSupplierのid_orderをセットにして登録する
@@ -239,6 +295,30 @@ class htmlEDItouroku extends AppController
              $OrderToSuppliers = $this->OrderToSupplier->patchEntity($this->OrderToSupplier->newEntity(), $arrOrderToSuppliers[0]);
              $this->OrderToSupplier->save($OrderToSuppliers);
 
+             //insert into OrderToSupplierする（旧DB）
+             $connection = ConnectionManager::get('DB_ikou_test');
+             $table = TableRegistry::get('order_to_supplier');
+             $table->setConnection($connection);
+
+             $connection->insert('order_to_supplier', [
+               'id_order' => $arrOrderToSuppliers[0]['id_order'],
+               'product_id' => $arrOrderToSuppliers[0]['product_code'],
+               'price' => $arrOrderToSuppliers[0]["price"],
+               'date_deliver' => $arrOrderToSuppliers[0]["date_deliver"],
+               'first_date_deliver' => $arrOrderToSuppliers[0]["date_deliver"],
+               'amount' => $arrOrderToSuppliers[0]["amount"],
+               'first_amount' => $arrOrderToSuppliers[0]["amount"],
+               'id_supplier' => $id_supplier,
+               'tourokubi' => date("Y-m-d"),
+               'maisu_denpyou_bunnou' => 0,
+               'delete_flag' => 0,
+               'created_at' => date("Y-m-d H:i:s"),
+               'created_emp_id' => $this->Auth->user('staff_id')
+             ]);
+
+             $connection = ConnectionManager::get('default');
+
+
              //KariOrderToSuppliersテーブルとOrderToSupplierテーブルを紐づけるためattachテーブルに登録にする
              //KariOrderToSuppliersのidとOrderToSupplierのid_orderをセットにして登録する
              $arrAttachnum[] = $id_order_attach;
@@ -275,6 +355,19 @@ class htmlEDItouroku extends AppController
                  $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
                    $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);
 
+                   //insert into AttachOrderToSupplierする（旧DB）
+
+                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $table = TableRegistry::get('attach_order_to_supplier');
+                   $table->setConnection($connection);
+
+                     $connection->insert('attach_order_to_supplier', [
+                         'id_order' => $arrAttach[0]["id_order"],
+                         'kari_order_to_supplier_id' => $arrAttach[0]["kari_order_to_supplier_id"]
+                     ]);
+
+                   $connection = ConnectionManager::get('default');
+
                  }else{
                    $arrAttach = array();
 
@@ -290,6 +383,20 @@ class htmlEDItouroku extends AppController
 */
                    $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
                    $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);
+
+                   //insert into AttachOrderToSupplierする（旧DB）
+
+                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $table = TableRegistry::get('attach_order_to_supplier');
+                   $table->setConnection($connection);
+
+                     $connection->insert('attach_order_to_supplier', [
+                         'id_order' => $arrAttach[0]["id_order"],
+                         'kari_order_to_supplier_id' => $arrAttach[0]["kari_order_to_supplier_id"]
+                     ]);
+
+                   $connection = ConnectionManager::get('default');
+
 
                  }
 
@@ -309,6 +416,20 @@ class htmlEDItouroku extends AppController
                    $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
                    $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);//saveManyで一括登録
 
+                   //insert into AttachOrderToSupplierする（旧DB）
+
+                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $table = TableRegistry::get('attach_order_to_supplier');
+                   $table->setConnection($connection);
+
+                     $connection->insert('attach_order_to_supplier', [
+                         'id_order' => $arrAttach[0]["id_order"],
+                         'kari_order_to_supplier_id' => $arrAttach[0]["kari_order_to_supplier_id"]
+                     ]);
+
+                   $connection = ConnectionManager::get('default');
+
+
                  }else{
                    $arrAttach = array();
 
@@ -324,6 +445,20 @@ class htmlEDItouroku extends AppController
 */
                    $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
                    $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);//saveManyで一括登録
+
+                   //insert into AttachOrderToSupplierする（旧DB）
+
+                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $table = TableRegistry::get('attach_order_to_supplier');
+                   $table->setConnection($connection);
+
+                     $connection->insert('attach_order_to_supplier', [
+                         'id_order' => $arrAttach[0]["id_order"],
+                         'kari_order_to_supplier_id' => $arrAttach[0]["kari_order_to_supplier_id"]
+                     ]);
+
+                   $connection = ConnectionManager::get('default');
+
 
                  }
 
@@ -368,7 +503,7 @@ class htmlEDItouroku extends AppController
           $_SESSION['ProductGaityu'] = array(
             'id_order' => $arrFp[$k]['num_order'],
             'product_code' => $arrFp[$k]['product_code'],
-            'price' => 0,
+            'price' => $arrFp[$k]["price"],
             'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
             'amount' => $arrFp[$k]["amount"],
             'id_supplier' => $id_supplier,
@@ -388,14 +523,125 @@ class htmlEDItouroku extends AppController
           if ($this->KariOrderToSuppliers->save($KariOrderToSuppliers)) {
             $mes = "※登録されました";
             $this->set('mes',$mes);
+
+            //insert into KariOrderToSupplierする（旧DB）
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('kari_order_to_supplier');
+            $table->setConnection($connection);
+
+              $connection->insert('kari_order_to_supplier', [
+                'id_order' => $arrFp[$k]['num_order'],
+                'product_id' => $arrFp[$k]['product_code'],
+                'price' => $arrFp[$k]["price"],
+                'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
+                'amount' => $arrFp[$k]["amount"],
+                'id_supplier' => $id_supplier,
+                'tourokubi' => date("Y-m-d"),
+                'flag_attach' => 0,
+                'delete_flag' => 0,
+                'created_at' => date("Y-m-d H:i:s"),
+                'created_emp_id' => $this->Auth->user('staff_id')
+              ]);
+
+            $connection = ConnectionManager::get('default');
+
           }else{
             echo "<pre>";
             print_r("※ ".$arrFp[$k]['product_code']." がkari_order_to_supplierテーブルに登録できませんでした");
             echo "</pre>";
           }
+
       }
+
     }
+
   }
+
+      public function htmlgaityukaritourokuAssemble($arrFp)
+     {
+    /*
+       echo "<pre>";
+       print_r("kurasu");
+       print_r($arrFp);
+       echo "</pre>";
+    */
+       for($k=0; $k<count($arrFp); $k++){//外注仮登録
+
+         $ProductGaityu = $this->ProductGaityu->find()->where(['product_id' => $arrFp[$k]['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
+         if(count($ProductGaityu) > 0){//外注製品であればkari_order_to_suppliersに登録
+
+           $datenouki = strtotime($arrFp[$k]["date_deliver"]);
+           $datenoukiye = date('Y-m-d', strtotime("-1 day", $datenouki));
+           $w = date("w", strtotime($datenoukiye));//納期の前日の曜日を取得
+           if($w == 0){//前日が日曜日なら３日前の金曜日に変更
+             $kari_datenouki = date('Y-m-d', strtotime("-3 day", $datenouki));
+           }elseif($w == 6){//前日が土曜日なら２日前の金曜日に変更
+             $kari_datenouki = date('Y-m-d', strtotime("-2 day", $datenouki));
+           }else{//前日が平日ならそのまま
+             $kari_datenouki = $datenoukiye;
+           }
+           $kari_w = date("w", strtotime($kari_datenouki));
+           $_SESSION['supplier_date_deliver'] = array(
+             'date_deliver' => $kari_datenouki
+           );
+
+           $id_supplier = $ProductGaityu[0]->id_supplier;
+             $_SESSION['ProductGaityu'] = array(
+               'id_order' => $arrFp[$k]['num_order'],
+               'product_code' => $arrFp[$k]['product_code'],
+               'price' => 0,
+               'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
+               'amount' => $arrFp[$k]["amount"],
+               'id_supplier' => $id_supplier,
+               'tourokubi' => date("Y-m-d"),
+               'flag_attach' => 0,
+               'delete_flag' => 0,
+               'created_at' => date("Y-m-d H:i:s"),
+               'created_staff' => $this->Auth->user('staff_id')
+             );
+    /*
+             echo "<pre>";
+             print_r('ProductGaityu');
+             print_r($_SESSION['ProductGaityu']);
+             echo "</pre>";
+    */
+             $KariOrderToSuppliers = $this->KariOrderToSuppliers->patchEntity($this->KariOrderToSuppliers->newEntity(), $_SESSION['ProductGaityu']);
+             if ($this->KariOrderToSuppliers->save($KariOrderToSuppliers)) {
+               $mes = "※登録されました";
+               $this->set('mes',$mes);
+
+               //insert into KariOrderToSupplierする（旧DB）
+               $connection = ConnectionManager::get('DB_ikou_test');
+               $table = TableRegistry::get('kari_order_to_supplier');
+               $table->setConnection($connection);
+
+                 $connection->insert('kari_order_to_supplier', [
+                   'id_order' => $arrFp[$k]['num_order'],
+                   'product_id' => $arrFp[$k]['product_code'],
+                   'price' => 0,
+                   'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
+                   'amount' => $arrFp[$k]["amount"],
+                   'id_supplier' => $id_supplier,
+                   'tourokubi' => date("Y-m-d"),
+                   'flag_attach' => 0,
+                   'delete_flag' => 0,
+                   'created_at' => date("Y-m-d H:i:s"),
+                   'created_emp_id' => $this->Auth->user('staff_id')
+                 ]);
+
+               $connection = ConnectionManager::get('default');
+
+             }else{
+               echo "<pre>";
+               print_r("※ ".$arrFp[$k]['product_code']." がkari_order_to_supplierテーブルに登録できませんでした");
+               echo "</pre>";
+             }
+
+         }
+
+       }
+
+     }
 
 	public function get_rows(){
 		return $this->rows;

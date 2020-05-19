@@ -25,7 +25,7 @@
     <fieldset>
       <table style="margin-bottom:0px" width="850" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
         <tr style="background-color: #E6FFFF">
-          <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/touroku_tyokusetsu.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'OrderEdis','action'=>'dnpcsv')));?></td>
+          <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/touroku_tyokusetsu.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'OrderEdis','action'=>'chokusetsuformpro')));?></td>
         </tr>
       </table>
 <br><br><br>

@@ -30,8 +30,8 @@
     <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/edi_csv.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'OrderEdis','action'=>'hattyucsvpreadd')));?></td>
   </tr>
 </table>
-
 <?php if(isset($_FILES['file']['tmp_name']) == FALSE): ?>
+
   <br><br><br>
 
   <form method="post" action="hattyucsv" enctype="multipart/form-data">
@@ -47,11 +47,11 @@
   <br>
   <br>
 
-<?php else: ?>
+  <?php else: ?>
 
-  <br><br>
-  <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
-  <br>
+    <br><br>
+    <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
+    <br>
 
 
-<?php endif; ?>
+  <?php endif; ?>

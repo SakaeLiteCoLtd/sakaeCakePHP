@@ -97,12 +97,15 @@ class OrderEdisController extends AppController
            unset($sample['121'],$sample['122'],$sample['123'],$sample['124'],$sample['125'],$sample['126'],$sample['127']);
            unset($sample['128'],$sample['129']);//不要な行を削除、最後の改行も削除（改行が読み込まれるとエラーが出るため）
 
-           if($k>=2){
-             $arrFp[] = $sample;//$sampleを配列に追加する
+           if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき（カンマのみの行が出てきたら配列への追加を終了）
+             $arrFp[] = $sample;//配列に追加する
            }
+    //       if($k>=2){
+    //         $arrFp[] = $sample;//$sampleを配列に追加する
+    //       }
         }
 
-        for($n=0; $n<=10000; $n++){
+        for($n=0; $n<count($arrFp); $n++){
           if(isset($arrFp[$n])){//$arrFp[$n]が存在する時、対応するcustomer_code等を配列に追加する
             $Product = $this->Products->find()->where(['product_code' => $arrFp[$n]['product_code']])->toArray();
             if(isset($Product[0])){
@@ -800,46 +803,11 @@ echo "</pre>";
                 }
               }
               $uniquearrDnpTotalAmounts = array_unique($arrDnpTotalAmounts, SORT_REGULAR);//重複削除
-/*
-              echo "<pre>";
-              print_r("uniquearrDnpTotalAmounts");
-              print_r($uniquearrDnpTotalAmounts);
-              echo "</pre>";
-*/
+
                $dnpTotalAmounts = $this->DnpTotalAmounts->patchEntities($dnpTotalAmounts, $uniquearrDnpTotalAmounts);//patchEntitiesで一括登録
                    if ($this->DnpTotalAmounts->saveMany($dnpTotalAmounts)) {//saveManyで一括登録
                      $mes = "※登録されました";
                      $this->set('mes',$mes);
-
-                     //insert into order_ediする（旧DB）
-                     $connection = ConnectionManager::get('DB_ikou_test');
-                     $table = TableRegistry::get('order_edi');
-                     $table->setConnection($connection);
-/*
-                     echo "<pre>";
-                     print_r($uniquearrDnpTotalAmounts);
-                     echo "</pre>";
-*/
-                     for($k=0; $k<count($arrEDI); $k++){
-                       $connection->insert('order_edi', [
-                           'date_order' => $uniquearrDnpTotalAmounts[$k]["date_order"],
-                           'num_order' => $uniquearrDnpTotalAmounts[$k]["num_order"],
-                           'product_id' => $uniquearrDnpTotalAmounts[$k]["product_code"],
-                           'price' => $uniquearrDnpTotalAmounts[$k]["price"],
-                           'date_deliver' => $uniquearrDnpTotalAmounts[$k]["date_deliver"],
-                           'amount' => $uniquearrDnpTotalAmounts[$k]["amount"],
-                           'cs_id' => $uniquearrDnpTotalAmounts[$k]["customer_code"],
-                           'place_deliver_id' => $uniquearrDnpTotalAmounts[$k]["place_deliver_code"],
-                           'place_line' => $uniquearrDnpTotalAmounts[$k]["place_line"],
-                           'line_code' => $uniquearrDnpTotalAmounts[$k]["line_code"],
-                           'check_denpyou' => $uniquearrDnpTotalAmounts[$k]["check_denpyou"],
-                           'bunnou' => $uniquearrDnpTotalAmounts[$k]["bunnou"],
-                           'kannou' => $uniquearrDnpTotalAmounts[$k]["kannou"],
-                           'delete_flg' => $uniquearrDnpTotalAmounts[$k]["delete_flag"],
-                           'created_at' => $uniquearrDnpTotalAmounts("Y-m-d H:i:s")
-                       ]);
-                     }
-
 
                    } else {
                      $mes = "※登録されませんでした";

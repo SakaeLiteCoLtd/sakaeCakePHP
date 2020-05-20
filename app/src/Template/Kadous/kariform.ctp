@@ -19,6 +19,117 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 
 <?php if(!isset($confirm)): ?>
 
+
+
+  <?php   /*ここから１号機*/    ?>
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+    <caption style="text-align: left">１号機</caption>
+    <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+      <tr style="border-bottom: 0px;border-width: 0px">
+        <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">品番</strong></div></td>
+        <td width="400" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">成形時間</strong></div></td>
+        <td width="200" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:blue">生産ショット数</strong></div></td>
+        <td width="200" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:blue">成形サイクル</strong></div></td>
+      </tr>
+
+  <?php
+  $j = 1;
+     for($i=1; $i<=${"n".$j}; $i++){//１号機
+      if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
+      ${"product_code".$i} = ${"arrP".$j.$i}[0]['product_code'];
+      ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}[0]['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}[0]['starting_tm'], 11, 5);
+      ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}[0]['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}[0]['finishing_tm'], 11, 5);
+
+      echo "<pre>";
+      print_r($j."---".$i."---");
+      print_r(${"arrP".$j.$i});
+      echo "</pre>";
+
+
+          echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+          echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
+          echo "<input type='text' value=${"product_code".$i} name=product_code".$j.$i." size='6'/>\n";
+          echo "</td>\n";
+          echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+          echo "開始";
+          echo "</strong></div></td>\n";
+          echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
+          echo "<input type='datetime-local' value=${"hyoujistarting_tm".$i} name=starting_tm".$j.$i." size='6'/>\n";
+          echo "</div></td>\n";
+          echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
+          echo "<input type='text' name=amount_shot1_".$i." size='6'/>\n";
+          echo "</td>\n";
+          echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+          echo "<input type='text' name=cycle_shot1_".$i." size='6'/>\n";
+          echo "</td>\n";
+          echo "</tr>\n";
+          echo "</div></td>\n";
+          echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+          echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+          echo "終了";
+          echo "</strong></div></td>\n";
+          echo "<td colspan='37'><div align='center'>\n";
+          echo "<input type='datetime-local' value=${"hyoujifinishing_tm".$i} name=finishing_tm".$j.$i." size='6'/>\n";
+          echo "</div></td>\n";
+          echo "</tr>\n";
+        }
+      }
+    echo $this->Form->hidden('n'.$j ,['value'=>${"n".$j}]);
+
+  //以下追加または削除を押された場合
+    if(null !== ($this->request->getData('tuika'.$j.$j))){//追加の場合
+      ${"tuika".$j} = ${"tuika".$j} + 1;
+      ${"ntuika".$j} = ${"n".$j} + ${"tuika".$j};
+      echo $this->Form->hidden('ntuika'.$j ,['value'=>${"ntuika".$j}]);
+    }elseif (null !== ($this->request->getData('sakujo'.$j.$j)) && ${"tuika".$j} != 0) {//追加後の追加取り消しの場合
+      ${"tuika".$j} = ${"tuika".$j} - 1;
+      ${"ntuika".$j} = ${"n".$j} + ${"tuika".$j};
+      echo $this->Form->hidden('ntuika'.$j ,['value'=>${"ntuika".$j}]);
+    }
+      for($i=${"n".$j}+1; $i<=${"ntuika".$j}; $i++){
+        if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
+          $hyoujistarting_tm1 = substr(${"arrP".$j."1"}['starting_tm'], 0, 10)."T08:00";
+          $hyoujifinishing_tm1 = substr(${"arrP".$j."1"}['finishing_tm'], 0, 10)."T08:00";
+
+          echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+          echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+          echo "<input type='text' name=product_code".$j.$i." size='6'/>\n";
+          echo "</td>\n";
+          echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+          echo "開始";
+          echo "</strong></div></td>\n";
+          echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
+          echo "<input type='datetime-local' value=$hyoujistarting_tm1 name=starting_tm".$j.$i." size='6'/>\n";
+          echo "</div></td>\n";
+          echo "<td rowspan='2' colspan='20' nowrap='nowrap'>\n";
+          echo "<input type='text' name=yoteimaisu".$j.$i." size='6'/>\n";
+          echo "</td>\n";
+          echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
+          echo "<input type='text' value=1  name=hakoNo".$j.$i." size='6'/>\n";
+          echo "</td>\n";
+          echo "</tr>\n";
+          echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
+          echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
+          echo "終了";
+          echo "</strong></div></td>\n";
+          echo "<td colspan='37'><div align='center'>\n";
+          echo "<input type='datetime-local' value=$hyoujifinishing_tm1 name=finishing_tm".$j.$i." size='6'/>\n";
+          echo "</div></td>\n";
+          echo "</tr>\n";
+        }
+      }
+   ?>
+   <tr bgcolor="#E6FFFF" >
+     <td width="550" colspan="40" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
+     <td width="550" colspan="50" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
+     <td align="right" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->control('追加', array('type'=>'submit', 'name' => 'tuika11', 'value'=>1, 'label'=>false)) ?></div></td>
+     <td align="right" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->control('追加取り消し', array('type'=>'submit', 'name' => 'sakujo11', 'value'=>1, 'label'=>false)) ?></div></td>
+   </tr>
+  </table>
+  <br>
+  <?php   /*ここまで１号機*/    ?>
+
+
 <?php   /*ここから１号機*/    ?>
 
 <br>
@@ -36,6 +147,7 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 
 
 <?php
+
 for($i=1; $i<=$tuika1; $i++){//１号機
       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
       echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";

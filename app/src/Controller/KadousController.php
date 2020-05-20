@@ -24,6 +24,8 @@ class KadousController extends AppController
        $this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
        $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');
        $this->Users = TableRegistry::get('users');
+
+       $this->Auth->allow();
      }
 
     public function kariindex()
@@ -62,6 +64,99 @@ class KadousController extends AppController
         print_r($dayye);
         echo "</pre>";
 */
+
+//旧DB参照
+$connection = ConnectionManager::get('DB_ikou_test');
+$table = TableRegistry::get('scheduleKoutei');
+$table->setConnection($connection);
+
+
+ for($j=1; $j<=9; $j++){
+   $daytomo = date('Y-m-d', strtotime('+1 day', $dateYMD1));
+   $dateYMDs = mb_substr($dateYMD, 0, 10);
+   $dateYMDf = mb_substr($daytomo, 0, 10);
+
+   $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM schedule_koutei".
+         " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
+   $connection = ConnectionManager::get('DB_ikou_test');
+   $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
+
+/*
+   echo "<pre>";
+   print_r($scheduleKoutei);
+   echo "</pre>";
+*/
+
+   ${"arrP".$j} = array();
+   ${"n".$j} = 0;
+   $this->set('n'.$j,${"n".$j});
+    for($i=1; $i<=10; $i++){
+      ${"arrP".$j.$i} = array();
+      if(isset($scheduleKoutei[$i-1])) {
+        ${"ScheduleKoutei_id".$i} = 0;
+        ${"datetime".$i} = $scheduleKoutei[$i-1]["datetime"];
+        $dateYMD = $scheduleKoutei[$i-1]["datetime"];
+        $dateYMD1 = strtotime($dateYMD);
+        $dayto = date('Y-m-d', strtotime('+1 day', $dateYMD1));
+        $dateHI = date("08:00");
+        ${"finishing_tm".$i} = $dayto." ".$dateHI;
+        ${"seikeiki".$i} = $scheduleKoutei[$i-1]["seikeiki"];
+        ${"product_code".$i} = $scheduleKoutei[$i-1]["product_id"];
+        ${"present_kensahyou".$i} = $scheduleKoutei[$i-1]["present_kensahyou"];
+        ${"product_name".$i} = $scheduleKoutei[$i-1]["product_name"];
+        ${"arrP".$j}[] = ['id' => ${"ScheduleKoutei_id".$i}, 'datetime' => ${"datetime".$i},
+         'product_code' => ${"product_code".$i},'seikeiki' => ${"seikeiki".$i},
+         'present_kensahyou' => ${"present_kensahyou".$i},'product_name' => ${"product_name".$i},
+         'finishing_tm' => ${"finishing_tm".$i}];
+        ${"n".$j} = $i;
+        $this->set('n'.$j,${"n".$j});//セット
+      }
+     }
+     ${"ScheduleKouteisarry".$j} = array();//空の配列を作る
+     foreach ((array)${"arrP".$j} as $key => $value) {//datetimeで並び替え
+          $sort[$key] = $value['datetime'];
+           array_push(${"ScheduleKouteisarry".$j}, ['id' => $value['id'], 'starting_tm' => $value['datetime'],
+            'seikeiki' => $value['seikeiki'], 'product_code' => $value['product_code'],
+             'present_kensahyou' => $value['present_kensahyou'], 'product_name' => $value['product_name'],
+           'finishing_tm' => $value['finishing_tm']]);
+     }
+
+
+      if(isset(${"ScheduleKouteisarry".$j}[0])){
+         array_multisort(array_map("strtotime", array_column( ${"ScheduleKouteisarry".$j}, "starting_tm" ) ), SORT_ASC, ${"ScheduleKouteisarry".$j});
+     for($m=1; $m<=${"n".$j}; $m++){//同じ成型機で製品が作られている個数分
+       ${"arrP".$j.$m}[] = ${"ScheduleKouteisarry".$j}[$m-1];
+       $this->set('arrP'.$j.$m,${"arrP".$j.$m});//セット
+         if($m>=2){//同じ成型機で２つ以上の製品ができているとき
+           $m1 = $m-1 ;
+           ${"arrP".$j.$m1} = array();//m-1の配列を空にする
+           $replacements = array('finishing_tm' => ${"ScheduleKouteisarry".$j}[$m-1]['starting_tm']);//１つ前のfin_tmを後のsta_tmに変更する
+           ${"ScheduleKouteisarry".$j}[$m-2] = array_replace(${"ScheduleKouteisarry".$j}[$m-2], $replacements);
+           ${"arrP".$j.$m1}[] = ${"ScheduleKouteisarry".$j}[$m-2];
+           $this->set('arrP'.$j.$m1,${"arrP".$j.$m1});//セット
+         }
+/*
+         echo "<pre>";
+         print_r($j."---".$m."---");
+         print_r(${"arrP".$j.$m});
+         echo "</pre>";
+*/
+     }
+
+/*
+     for($m=1; $m<=2; $m++){//同じ成型機で製品が作られている個数分
+     echo "<pre>";
+     print_r($j."---".$m."---");
+     print_r(${"arrP".$j.$m});
+     echo "</pre>";
+     }
+*/
+
+   }
+ }
+
+
+
         for($i=1; $i<=9; $i++){
       		${"tuika".$i} = 0;
       		$this->set('tuika'.$i,${"tuika".$i});//セット
@@ -560,7 +655,7 @@ class KadousController extends AppController
 */
 
       for($j=1; $j<=9; $j++){
-      $KariKadouSeikei = $this->KariKadouSeikeis->find()->where(['finishing_tm >=' => $dateYMDs, 'finishing_tm <=' => $dateYMDf, 'seikeiki' => $j, 'present_kensahyou' => 0])->toArray();//Productsテーブルの'product_code' = $product_codeとなるものを配列で取り出す
+      $KariKadouSeikei = $this->KariKadouSeikeis->find()->where(['finishing_tm >=' => $dateYMDs, 'finishing_tm <=' => $dateYMDf, 'seikeiki' => $j, 'present_kensahyou' => 0])->toArray();
 /*      $seikeiki = $KariKadouSeikei[0]->seikeiki;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
 
       echo "<pre>";

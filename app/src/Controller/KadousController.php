@@ -32,13 +32,15 @@ class KadousController extends AppController
     {
       $this->request->session()->destroy(); // セッションの破棄
 
-			$KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();//newentityに$roleという名前を付ける
+			$KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
 			$this->set('KariKadouSeikeis',$KariKadouSeikeis);//
     }
 
     public function kariform()
     {
-			$KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();//newentityに$roleという名前を付ける
+      $this->request->session()->destroy(); // セッションの破棄
+
+			$KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
 			$this->set('KariKadouSeikeis',$KariKadouSeikeis);//
 			$data = $this->request->getData();//postデータを$dataに
 /*
@@ -46,494 +48,216 @@ class KadousController extends AppController
       print_r($data);
       echo "</pre>";
 */
-      if(empty($data['formset']) && !isset($data['touroku'])){//最初のフォーム画面
-        session_start();
+      if(empty($data['formset'])){//最初のフォーム画面
         $dateYMD = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day'];
         $dateYMD1 = strtotime($dateYMD);
-        $dayye = date('Y-m-d', strtotime('-1 day', $dateYMD1));
-        $this->set('dateYMD',$dateYMD);
-        $dateYMDye = $dayye;
-        $this->set('dateYMDye',$dateYMDye);
+        $dayto = date('Y-m-d', strtotime('+1 day', $dateYMD1));
+        $dateYMDto = $dayto;
+    //    $this->set('dateYMDye',$dateYMDye);
         $dateHI = date("08:00");
-        $dateye = $dateYMDye."T".$dateHI;
-        $dateto = $dateYMD."T".$dateHI;
+        $dateto = $dateYMDto."T".$dateHI;
+        $dateye = $dateYMD."T".$dateHI;
         $this->set('dateye',$dateye);
         $this->set('dateto',$dateto);
-/*
-        echo "<pre>";
-        print_r($dayye);
-        echo "</pre>";
-*/
-
-//旧DB参照
-$connection = ConnectionManager::get('DB_ikou_test');
-$table = TableRegistry::get('scheduleKoutei');
-$table->setConnection($connection);
-
-
- for($j=1; $j<=9; $j++){
-   $daytomo = date('Y-m-d', strtotime('+1 day', $dateYMD1));
-   $dateYMDs = mb_substr($dateYMD, 0, 10);
-   $dateYMDf = mb_substr($daytomo, 0, 10);
-
-   $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM schedule_koutei".
-         " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
-   $connection = ConnectionManager::get('DB_ikou_test');
-   $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
-
-/*
-   echo "<pre>";
-   print_r($scheduleKoutei);
-   echo "</pre>";
-*/
-
-   ${"arrP".$j} = array();
-   ${"n".$j} = 0;
-   $this->set('n'.$j,${"n".$j});
-    for($i=1; $i<=10; $i++){
-      ${"arrP".$j.$i} = array();
-      if(isset($scheduleKoutei[$i-1])) {
-        ${"ScheduleKoutei_id".$i} = 0;
-        ${"datetime".$i} = $scheduleKoutei[$i-1]["datetime"];
-        $dateYMD = $scheduleKoutei[$i-1]["datetime"];
-        $dateYMD1 = strtotime($dateYMD);
-        $dayto = date('Y-m-d', strtotime('+1 day', $dateYMD1));
-        $dateHI = date("08:00");
-        ${"finishing_tm".$i} = $dayto." ".$dateHI;
-        ${"seikeiki".$i} = $scheduleKoutei[$i-1]["seikeiki"];
-        ${"product_code".$i} = $scheduleKoutei[$i-1]["product_id"];
-        ${"present_kensahyou".$i} = $scheduleKoutei[$i-1]["present_kensahyou"];
-        ${"product_name".$i} = $scheduleKoutei[$i-1]["product_name"];
-        ${"arrP".$j}[] = ['id' => ${"ScheduleKoutei_id".$i}, 'datetime' => ${"datetime".$i},
-         'product_code' => ${"product_code".$i},'seikeiki' => ${"seikeiki".$i},
-         'present_kensahyou' => ${"present_kensahyou".$i},'product_name' => ${"product_name".$i},
-         'finishing_tm' => ${"finishing_tm".$i}];
-        ${"n".$j} = $i;
-        $this->set('n'.$j,${"n".$j});//セット
-      }
-     }
-     ${"ScheduleKouteisarry".$j} = array();//空の配列を作る
-     foreach ((array)${"arrP".$j} as $key => $value) {//datetimeで並び替え
-          $sort[$key] = $value['datetime'];
-           array_push(${"ScheduleKouteisarry".$j}, ['id' => $value['id'], 'starting_tm' => $value['datetime'],
-            'seikeiki' => $value['seikeiki'], 'product_code' => $value['product_code'],
-             'present_kensahyou' => $value['present_kensahyou'], 'product_name' => $value['product_name'],
-           'finishing_tm' => $value['finishing_tm']]);
-     }
-
-
-      if(isset(${"ScheduleKouteisarry".$j}[0])){
-         array_multisort(array_map("strtotime", array_column( ${"ScheduleKouteisarry".$j}, "starting_tm" ) ), SORT_ASC, ${"ScheduleKouteisarry".$j});
-     for($m=1; $m<=${"n".$j}; $m++){//同じ成型機で製品が作られている個数分
-       ${"arrP".$j.$m}[] = ${"ScheduleKouteisarry".$j}[$m-1];
-       $this->set('arrP'.$j.$m,${"arrP".$j.$m});//セット
-         if($m>=2){//同じ成型機で２つ以上の製品ができているとき
-           $m1 = $m-1 ;
-           ${"arrP".$j.$m1} = array();//m-1の配列を空にする
-           $replacements = array('finishing_tm' => ${"ScheduleKouteisarry".$j}[$m-1]['starting_tm']);//１つ前のfin_tmを後のsta_tmに変更する
-           ${"ScheduleKouteisarry".$j}[$m-2] = array_replace(${"ScheduleKouteisarry".$j}[$m-2], $replacements);
-           ${"arrP".$j.$m1}[] = ${"ScheduleKouteisarry".$j}[$m-2];
-           $this->set('arrP'.$j.$m1,${"arrP".$j.$m1});//セット
-         }
-/*
-         echo "<pre>";
-         print_r($j."---".$m."---");
-         print_r(${"arrP".$j.$m});
-         echo "</pre>";
-*/
-     }
-
-/*
-     for($m=1; $m<=2; $m++){//同じ成型機で製品が作られている個数分
-     echo "<pre>";
-     print_r($j."---".$m."---");
-     print_r(${"arrP".$j.$m});
-     echo "</pre>";
-     }
-*/
-
-   }
- }
-
-
 
         for($i=1; $i<=9; $i++){
       		${"tuika".$i} = 0;
       		$this->set('tuika'.$i,${"tuika".$i});//セット
       	}
 
-      }else{
+        //旧DB参照
+        $connection = ConnectionManager::get('DB_ikou_test');
+        $table = TableRegistry::get('scheduleKoutei');
+        $table->setConnection($connection);
 
-        if (isset($data['tuika11']) && empty($data['sakujo11'])) {//1goukituika
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
+         for($j=1; $j<=9; $j++){
+           $daytomo = date('Y-m-d', strtotime('+1 day', $dateYMD1));
+           $dateYMDs = mb_substr($dateYMD, 0, 10);
+           $dateYMDf = mb_substr($daytomo, 0, 10);
+           ${"tuika".$j} = 0;
+           $this->set('tuika'.$j,${"tuika".$j});//セット
 
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
-
-          $tuika1 = $data['tuika1'] + 1;
-  				$this->set('tuika1',$tuika1);//
-/*          $tuika2 = $data['tuika2'];
-          $this->set('tuika2',$tuika2);//
-          $tuika3 = $data['tuika3'];
-          $this->set('tuika3',$tuika3);//
-          $tuika4 = $data['tuika4'];
-          $this->set('tuika4',$tuika4);//
-*/
-
-        }elseif(isset($data['sakujo11']) && $data['tuika1'] > 0){//1goukisakujo
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
-
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
-
-  				$tuika1 = $data['tuika1'] - 1;
-  				$this->set('tuika1',$tuika1);//
-
-        }elseif(isset($data['sakujo11']) && $data['tuika1'] == 0){//1goukisakujo0
-  /*				echo "<pre>";
-  				print_r($data['sakujo1']);
-  				echo "</pre>";
-  */
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
-
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
-
-        }elseif(isset($data['confirm']) && !isset($data['touroku'])){//?これがないとエラーが出る
-          $this->set('confirm',$data['confirm']);//
+           $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM schedule_koutei".
+                 " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
+           $connection = ConnectionManager::get('DB_ikou_test');
+           $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
 /*
-          echo "<pre>";
-          print_r($data['confirm']);
-          echo "</pre>";
+           echo "<pre>";
+           print_r(count($scheduleKoutei));
+           echo "</pre>";
 */
+              ${"arrP".$j} = array();
+              ${"n".$j} = count($scheduleKoutei);
+              $this->set('n'.$j,${"n".$j});
+               for($i=1; $i<=count($scheduleKoutei); $i++){
+                 ${"arrP".$j.$i} = array();
+                 if(isset($scheduleKoutei[$i-1])) {
+                   ${"ScheduleKoutei_id".$i} = 0;
+                   ${"datetime".$i} = $scheduleKoutei[$i-1]["datetime"];
+                   $dateYMD = $scheduleKoutei[$i-1]["datetime"];
+                   $dateYMD1 = strtotime($dateYMD);
+                   $dayto = date('Y-m-d', strtotime('+1 day', $dateYMD1));
+                   $dateHI = date("08:00");
+                   ${"finishing_tm".$i} = $dayto." ".$dateHI;
+                   ${"seikeiki".$i} = $scheduleKoutei[$i-1]["seikeiki"];
+                   ${"product_code".$i} = $scheduleKoutei[$i-1]["product_id"];
+                   ${"present_kensahyou".$i} = $scheduleKoutei[$i-1]["present_kensahyou"];
+                   ${"product_name".$i} = $scheduleKoutei[$i-1]["product_name"];
+                   ${"amount_shot".$j.$i} = "";
+                   $this->set('amount_shot'.$j.$i,${"amount_shot".$j.$i});
+                   ${"cycle_shot".$j.$i} = "";
+                   $this->set('cycle_shot'.$j.$i,${"cycle_shot".$j.$i});
 
-          for($i=1; $i<=9; $i++){
-            ${"tuika".$i} = $data["tuika".$i];
-            $this->set('tuika'.$i,${"tuika".$i});//セット
+                   ${"arrP".$j}[] = ['id' => ${"ScheduleKoutei_id".$i}, 'datetime' => ${"datetime".$i},
+                    'product_code' => ${"product_code".$i},'seikeiki' => ${"seikeiki".$i},
+                    'present_kensahyou' => ${"present_kensahyou".$i},'product_name' => ${"product_name".$i},
+                    'finishing_tm' => ${"finishing_tm".$i}];
+                 }
+                }
+                ${"ScheduleKouteisarry".$j} = array();//空の配列を作る
+                foreach ((array)${"arrP".$j} as $key => $value) {//datetimeで並び替え
+                     $sort[$key] = $value['datetime'];
+                      array_push(${"ScheduleKouteisarry".$j}, ['id' => $value['id'], 'starting_tm' => $value['datetime'],
+                       'seikeiki' => $value['seikeiki'], 'product_code' => $value['product_code'],
+                        'present_kensahyou' => $value['present_kensahyou'], 'product_name' => $value['product_name'],
+                      'finishing_tm' => $value['finishing_tm']]);
+                }
+
+                 if(isset(${"ScheduleKouteisarry".$j}[0])){
+                    array_multisort(array_map("strtotime", array_column( ${"ScheduleKouteisarry".$j}, "starting_tm" ) ), SORT_ASC, ${"ScheduleKouteisarry".$j});
+                for($m=1; $m<=${"n".$j}; $m++){//同じ成型機で製品が作られている個数分
+                  ${"arrP".$j.$m}[] = ${"ScheduleKouteisarry".$j}[$m-1];
+                  $this->set('arrP'.$j.$m,${"arrP".$j.$m});//セット
+                    if($m>=2){//同じ成型機で２つ以上の製品ができているときfinishing_tmを修正
+                      $m1 = $m-1 ;
+                      ${"arrP".$j.$m1} = array();//m-1の配列を空にする
+                      $replacements = array('finishing_tm' => ${"ScheduleKouteisarry".$j}[$m-1]['starting_tm']);//１つ前のfin_tmを後のsta_tmに変更する
+                      ${"ScheduleKouteisarry".$j}[$m-2] = array_replace(${"ScheduleKouteisarry".$j}[$m-2], $replacements);
+                      ${"arrP".$j.$m1}[] = ${"ScheduleKouteisarry".$j}[$m-2];
+                      $this->set('arrP'.$j.$m1,${"arrP".$j.$m1});//セット
+                    }
+           /*
+                    echo "<pre>";
+                    print_r($j."---".$m."---");
+                    print_r(${"arrP".$j.$m});
+                    echo "</pre>";
+           */
+                }
+
+              }
+
+              for($i=1; $i<=count($scheduleKoutei); $i++){
+                ${"product_code".$j.$i} = ${"arrP".$j.$i}[0]['product_code'];
+                $this->set('product_code'.$j.$i,${"product_code".$j.$i});
+                ${"hyoujistarting_tm".$j.$i} = substr(${"arrP".$j.$i}[0]['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}[0]['starting_tm'], 11, 5);
+                $this->set('hyoujistarting_tm'.$j.$i,${"hyoujistarting_tm".$j.$i});
+                ${"hyoujifinishing_tm".$j.$i} = substr(${"arrP".$j.$i}[0]['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}[0]['finishing_tm'], 11, 5);
+                $this->set('hyoujifinishing_tm'.$j.$i,${"hyoujifinishing_tm".$j.$i});
+/*
+                echo "<pre>";
+                print_r($j."---".$i."---");
+                print_r(${"product_code".$i});
+                echo "</pre>";
+*/
+              }
+
+            }
+
+        }elseif(isset($data['confirm'])){
+
+          return $this->redirect(['action' => 'kariconfirm',
+          's' => ['data' => $data]]);
+
+      	}else{//追加または削除の場合
+
+          for($j=1; $j<=9; $j++){
+
+            $dateye = $data["dateye"];
+            $dateto = $data["dateto"];
+            $this->set('dateye',$dateye);
+            $this->set('dateto',$dateto);
+
+            if(isset($data["tuika".$j])){
+              ${"n".$j} = $data["n".$j] + 1;
+            }elseif(isset($data["sakujo".$j])){
+              ${"n".$j} = $data["n".$j] - 1;
+            }else{
+              ${"n".$j} = $data["n".$j];
+            }
+            $this->set('n'.$j,${"n".$j});
+
+            for($i=1; $i<=${"n".$j}; $i++){
+
+              if(isset($data["product_code".$j.$i])){
+                ${"product_code".$j.$i} = $data["product_code".$j.$i];
+                $this->set('product_code'.$j.$i,${"product_code".$j.$i});
+                ${"hyoujistarting_tm".$j.$i} = $data["starting_tm".$j.$i];
+                $this->set('hyoujistarting_tm'.$j.$i,${"hyoujistarting_tm".$j.$i});
+                ${"hyoujifinishing_tm".$j.$i} = $data["finishing_tm".$j.$i];
+                $this->set('hyoujifinishing_tm'.$j.$i,${"hyoujifinishing_tm".$j.$i});
+                ${"amount_shot".$j.$i} = $data["amount_shot".$j.$i];
+                $this->set('amount_shot'.$j.$i,${"amount_shot".$j.$i});
+                ${"cycle_shot".$j.$i} = $data["cycle_shot".$j.$i];
+                $this->set('cycle_shot'.$j.$i,${"cycle_shot".$j.$i});
+              }else{
+                ${"product_code".$j.$i} = "";
+                $this->set('product_code'.$j.$i,${"product_code".$j.$i});
+                ${"hyoujistarting_tm".$j.$i} = $data["dateye"];
+                $this->set('hyoujistarting_tm'.$j.$i,${"hyoujistarting_tm".$j.$i});
+                ${"hyoujifinishing_tm".$j.$i} = $data["dateto"];
+                $this->set('hyoujifinishing_tm'.$j.$i,${"hyoujifinishing_tm".$j.$i});
+                ${"amount_shot".$j.$i} = "";
+                $this->set('amount_shot'.$j.$i,${"amount_shot".$j.$i});
+                ${"cycle_shot".$j.$i} = "";
+                $this->set('cycle_shot'.$j.$i,${"cycle_shot".$j.$i});
+              }
+
+            }
           }
 
         }
+    }
 
-        elseif (isset($data['tuika22']) && empty($data['sakujo22'])) {//2goukituika
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
+    public function kariconfirm()
+    {
+      session_start();
+      $KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
+			$this->set('KariKadouSeikeis',$KariKadouSeikeis);
+      $Data = $this->request->query('s');
+/*
+      echo "<pre>";
+      print_r($Data);
+      echo "</pre>";
+*/
+      for($j=1; $j<=9; $j++){
 
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
+      ${"n".$j} = $Data["data"]["n".$j];
+      $this->set('n'.$j,${"n".$j});
 
-  				$tuika2 = $data['tuika2'] + 1;
-  				$this->set('tuika2',$tuika2);//
+        for($i=1; $i<=${"n".$j}; $i++){
 
-        }elseif(isset($data['sakujo22']) && $data['tuika2'] > 0){//2goukisakujo
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
+          ${"product_code".$j.$i} = $Data["data"]["product_code".$j.$i];
+          $this->set('product_code'.$j.$i,${"product_code".$j.$i});
+          ${"amount_shot".$j.$i} = $Data["data"]["amount_shot".$j.$i];
+          $this->set('amount_shot'.$j.$i,${"amount_shot".$j.$i});
+          ${"cycle_shot".$j.$i} = $Data["data"]["cycle_shot".$j.$i];
+          $this->set('cycle_shot'.$j.$i,${"cycle_shot".$j.$i});
+          ${"starting_tm".$j.$i} = $Data["data"]["starting_tm".$j.$i];
+          $this->set('starting_tm'.$j.$i,${"starting_tm".$j.$i});
+          ${"finishing_tm".$j.$i} = $Data["data"]["finishing_tm".$j.$i];
+          $this->set('finishing_tm'.$j.$i,${"finishing_tm".$j.$i});
 
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
+          ${"kadoujikan".$j.$i} = ((strtotime(${"finishing_tm".$j.$i}) - strtotime(${"starting_tm".$j.$i})));
+          $this->set('kadoujikan'.$j.$i,${"kadoujikan".$j.$i});
+          ${"riron_shot".$j.$i} = round(${"kadoujikan".$j.$i}/${"cycle_shot".$j.$i}, 0);
+          $this->set('riron_shot'.$j.$i,${"riron_shot".$j.$i});
+          ${"accomp_rate".$j.$i} = round(100*${"amount_shot".$j.$i}/${"riron_shot".$j.$i}, 0);
+          $this->set('accomp_rate'.$j.$i,${"accomp_rate".$j.$i});
 
-  				$tuika2 = $data['tuika2'] - 1;
-  				$this->set('tuika2',$tuika2);//
+        }
 
-        }elseif(isset($data['sakujo22']) && $data['tuika2'] == 0){//2goukisakujo0
-          $dateye = $data['dateye'];
-          $dateto = $data['dateto'];
-          $this->set('dateye',$dateye);
-          $this->set('dateto',$dateto);
-
-          for($i=1; $i<=9; $i++){
-        		${"tuika".$i} = $data["tuika".$i];
-        		$this->set('tuika'.$i,${"tuika".$i});//セット
-        	}
-
-        }elseif (isset($data['tuika33']) && empty($data['sakujo33'])) {//3goukituika
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-          		${"tuika".$i} = $data["tuika".$i];
-          		$this->set('tuika'.$i,${"tuika".$i});//セット
-          	}
-    				$tuika3 = $data['tuika3'] + 1;
-    				$this->set('tuika3',$tuika3);//
-
-          }elseif(isset($data['sakujo33']) && $data['tuika3'] > 0){//3goukisakujo
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-          		${"tuika".$i} = $data["tuika".$i];
-          		$this->set('tuika'.$i,${"tuika".$i});//セット
-          	}
-    				$tuika3 = $data['tuika3'] - 1;
-    				$this->set('tuika3',$tuika3);//
-
-          }elseif(isset($data['sakujo33']) && $data['tuika3'] == 0){//3goukisakujo0
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-          		${"tuika".$i} = $data["tuika".$i];
-          		$this->set('tuika'.$i,${"tuika".$i});//セット
-          	}
-
-          }elseif (isset($data['tuika44']) && empty($data['sakujo44'])) {//4goukituika
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-            		${"tuika".$i} = $data["tuika".$i];
-            		$this->set('tuika'.$i,${"tuika".$i});//セット
-            	}
-      				$tuika4 = $data['tuika4'] + 1;
-      				$this->set('tuika4',$tuika4);//
-
-            }elseif(isset($data['sakujo44']) && $data['tuika4'] > 0){//4goukisakujo
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-            		${"tuika".$i} = $data["tuika".$i];
-            		$this->set('tuika'.$i,${"tuika".$i});//セット
-            	}
-      				$tuika4 = $data['tuika4'] - 1;
-      				$this->set('tuika4',$tuika4);//
-
-            }elseif(isset($data['sakujo44']) && $data['tuika4'] == 0){//4goukisakujo0
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-            		${"tuika".$i} = $data["tuika".$i];
-            		$this->set('tuika'.$i,${"tuika".$i});//セット
-            	}
-
-            }elseif (isset($data['tuika55']) && empty($data['sakujo55'])) {//5goukituika
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-                $tuika5 = $data['tuika5'] + 1;
-                $this->set('tuika5',$tuika5);//
-
-            }elseif(isset($data['sakujo55']) && $data['tuika5'] > 0){//5goukisakujo
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-                $tuika5 = $data['tuika5'] - 1;
-                $this->set('tuika5',$tuika5);//
-
-            }elseif(isset($data['sakujo55']) && $data['tuika5'] == 0){//5goukisakujo0
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-
-        }elseif (isset($data['tuika66']) && empty($data['sakujo66'])) {//6goukituika
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-              ${"tuika".$i} = $data["tuika".$i];
-              $this->set('tuika'.$i,${"tuika".$i});//セット
-            }
-            $tuika6 = $data['tuika6'] + 1;
-            $this->set('tuika6',$tuika6);//
-
-      }elseif(isset($data['sakujo66']) && $data['tuika6'] > 0){//6goukisakujo
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-              ${"tuika".$i} = $data["tuika".$i];
-              $this->set('tuika'.$i,${"tuika".$i});//セット
-            }
-            $tuika6 = $data['tuika6'] - 1;
-            $this->set('tuika6',$tuika6);//
-
-      }elseif(isset($data['sakujo66']) && $data['tuika6'] == 0){//6goukisakujo0
-            $dateye = $data['dateye'];
-            $dateto = $data['dateto'];
-            $this->set('dateye',$dateye);
-            $this->set('dateto',$dateto);
-
-            for($i=1; $i<=9; $i++){
-              ${"tuika".$i} = $data["tuika".$i];
-              $this->set('tuika'.$i,${"tuika".$i});//セット
-            }
-
-          }elseif (isset($data['tuika77']) && empty($data['sakujo77'])) {//7goukituika
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-                ${"tuika".$i} = $data["tuika".$i];
-                $this->set('tuika'.$i,${"tuika".$i});//セット
-              }
-              $tuika7 = $data['tuika7'] + 1;
-              $this->set('tuika7',$tuika7);//
-
-        }elseif(isset($data['sakujo77']) && $data['tuika7'] > 0){//7goukisakujo
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-                ${"tuika".$i} = $data["tuika".$i];
-                $this->set('tuika'.$i,${"tuika".$i});//セット
-              }
-              $tuika7 = $data['tuika7'] - 1;
-              $this->set('tuika7',$tuika7);//
-
-        }elseif(isset($data['sakujo77']) && $data['tuika7'] == 0){//7goukisakujo0
-              $dateye = $data['dateye'];
-              $dateto = $data['dateto'];
-              $this->set('dateye',$dateye);
-              $this->set('dateto',$dateto);
-
-              for($i=1; $i<=9; $i++){
-                ${"tuika".$i} = $data["tuika".$i];
-                $this->set('tuika'.$i,${"tuika".$i});//セット
-              }
-
-            }elseif (isset($data['tuika88']) && empty($data['sakujo88'])) {//8goukituika
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-                $tuika8 = $data['tuika8'] + 1;
-                $this->set('tuika8',$tuika8);//
-
-          }elseif(isset($data['sakujo88']) && $data['tuika8'] > 0){//8goukisakujo
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-                $tuika8 = $data['tuika8'] - 1;
-                $this->set('tuika8',$tuika8);//
-
-          }elseif(isset($data['sakujo88']) && $data['tuika8'] == 0){//8goukisakujo0
-                $dateye = $data['dateye'];
-                $dateto = $data['dateto'];
-                $this->set('dateye',$dateye);
-                $this->set('dateto',$dateto);
-
-                for($i=1; $i<=9; $i++){
-                  ${"tuika".$i} = $data["tuika".$i];
-                  $this->set('tuika'.$i,${"tuika".$i});//セット
-                }
-
-              }elseif (isset($data['tuika99']) && empty($data['sakujo99'])) {//9goukituika
-                  $dateye = $data['dateye'];
-                  $dateto = $data['dateto'];
-                  $this->set('dateye',$dateye);
-                  $this->set('dateto',$dateto);
-
-                  for($i=1; $i<=9; $i++){
-                    ${"tuika".$i} = $data["tuika".$i];
-                    $this->set('tuika'.$i,${"tuika".$i});//セット
-                  }
-                  $tuika9 = $data['tuika9'] + 1;
-                  $this->set('tuika9',$tuika9);//
-
-            }elseif(isset($data['sakujo99']) && $data['tuika9'] > 0){//9goukisakujo
-                  $dateye = $data['dateye'];
-                  $dateto = $data['dateto'];
-                  $this->set('dateye',$dateye);
-                  $this->set('dateto',$dateto);
-
-                  for($i=1; $i<=9; $i++){
-                    ${"tuika".$i} = $data["tuika".$i];
-                    $this->set('tuika'.$i,${"tuika".$i});//セット
-                  }
-                  $tuika9 = $data['tuika9'] - 1;
-                  $this->set('tuika9',$tuika9);//
-
-            }elseif(isset($data['sakujo99']) && $data['tuika9'] == 0){//9goukisakujo0
-                  $dateye = $data['dateye'];
-                  $dateto = $data['dateto'];
-                  $this->set('dateye',$dateye);
-                  $this->set('dateto',$dateto);
-
-                  for($i=1; $i<=9; $i++){
-                    ${"tuika".$i} = $data["tuika".$i];
-                    $this->set('tuika'.$i,${"tuika".$i});//セット
-                  }
-
-  			}else{
-  //        echo "<pre>";
-  //        print_r("エラー");
-  //        echo "</pre>";
-          return $this->redirect(['action' => 'karipreadd']);
-      	}
       }
+
     }
 
 		public function karipreadd()
@@ -545,7 +269,7 @@ $table->setConnection($connection);
       $data = $session->read();
 /*
       echo "<pre>";
-      print_r($_SESSION['karikadouseikei']);
+      print_r($data["karikadouseikei"]);
       echo "</pre>";
 */
 		}
@@ -576,12 +300,6 @@ $table->setConnection($connection);
 				}
 		}
 
-		public function karilogout()
-		{
-			$this->request->session()->destroy(); // セッションの破棄
-			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
-		}
-
     public function karido()
    {
      $KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
@@ -590,30 +308,68 @@ $table->setConnection($connection);
      $session = $this->request->getSession();
      $data = $session->read();
 
-     for($n=1; $n<=100; $n++){
-       if(isset($_SESSION['karikadouseikei'][$n])){
+     $num = count($data["karikadouseikei"]) + 1;
+
+     for($n=1; $n<=$num; $n++){
+       if(isset($data['karikadouseikei'][$n])){
          $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
-         $_SESSION['karikadouseikei'][$n] = array_merge($_SESSION['karikadouseikei'][$n],$created_staff);
+         $data['karikadouseikei'][$n] = array_merge($data['karikadouseikei'][$n],$created_staff);
        }else{
          break;
        }
      }
 /*
      echo "<pre>";
-     print_r($_SESSION['karikadouseikei']);
+     print_r($data["karikadouseikei"]);
      echo "</pre>";
 */
+
      if ($this->request->is('get')) {
-       $KariKadouSeikeis = $this->KariKadouSeikeis->patchEntities($KariKadouSeikeis, $_SESSION['karikadouseikei']);//$roleデータ（空の行）を$this->request->getData()に更新する
+       $KariKadouSeikeis = $this->KariKadouSeikeis->patchEntities($KariKadouSeikeis, $data['karikadouseikei']);//$roleデータ（空の行）を$this->request->getData()に更新する
        $connection = ConnectionManager::get('default');//トランザクション1
        // トランザクション開始2
        $connection->begin();//トランザクション3
        try {//トランザクション4
          if ($this->KariKadouSeikeis->saveMany($KariKadouSeikeis)) {
+
+//旧DBに登録
+
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('kari_kadou_seikei');
+            $table->setConnection($connection);
+
+            for($k=0; $k<count($arrFp); $k++){
+              $connection->insert('kari_kadou_seikei', [
+                  'date_order' => $arrFp[$k]["date_order"],
+                  'num_order' => $arrFp[$k]["num_order"],
+                  'product_id' => $arrFp[$k]["product_code"],
+                  'price' => $arrFp[$k]["price"],
+                  'date_deliver' => $arrFp[$k]["date_deliver"],
+                  'amount' => $arrFp[$k]["amount"],
+                  'cs_id' => $arrFp[$k]["customer_code"],
+                  'place_deliver_id' => $arrFp[$k]["place_deliver_code"],
+                  'place_line' => $arrFp[$k]["place_line"],
+                  'line_code' => $arrFp[$k]["line_code"],
+                  'check_denpyou' => $arrFp[$k]["check_denpyou"],
+                  'delete_flg' => $arrFp[$k]["delete_flag"],
+                  'created_at' => date("Y-m-d H:i:s")
+              ]);
+            }
+
+
+
+
+           $mes = "※登録されました";
+           $this->set('mes',$mes);
            $connection->commit();// コミット5
+
          } else {
+
+           $mes = "※登録されませんでした";
+           $this->set('mes',$mes);
            $this->Flash->error(__('The data could not be saved. Please, try again.'));
            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
          }
        } catch (Exception $e) {//トランザクション7
        //ロールバック8
@@ -621,6 +377,7 @@ $table->setConnection($connection);
        }//トランザクション10
 
      }
+
    }
 
    public function index()
@@ -637,17 +394,19 @@ $table->setConnection($connection);
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);
 
-     $data = $this->request->getData();//postデータを$dataに
-     $dateYMDs = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day']." 00:00";
-     $dateYMDf = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day']." 23:59";
+     $data = $this->request->getData();
 
-//     $KariKadouSeikei_finishing_tm = $KariKadouSeikei[0]->finishing_tm->format('Y-m-d H:i:s');//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+     $dateYMD = $data['manu_date']['year']."-".$data['manu_date']['month']."-".$data['manu_date']['day'];
+     $dateYMD1 = strtotime($dateYMD);
+     $dayto = date('Y-m-d', strtotime('+1 day', $dateYMD1));
+     $dateYMDto = $dayto;
+     $dateHI = date("08:00");
+     $dateYMDs = $dateYMD."T".$dateHI;
+     $dateYMDf = $dateYMDto."T".$dateHI;
+
 /*
      echo "<pre>";
      print_r($dateYMDs);
-     echo "</pre>";
-     echo "<pre>";
-     print_r($KariKadouSeikei_finishing_tm);
      echo "</pre>";
      echo "<pre>";
      print_r($dateYMDf);
@@ -655,13 +414,8 @@ $table->setConnection($connection);
 */
 
       for($j=1; $j<=9; $j++){
-      $KariKadouSeikei = $this->KariKadouSeikeis->find()->where(['finishing_tm >=' => $dateYMDs, 'finishing_tm <=' => $dateYMDf, 'seikeiki' => $j, 'present_kensahyou' => 0])->toArray();
-/*      $seikeiki = $KariKadouSeikei[0]->seikeiki;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+      $KariKadouSeikei = $this->KariKadouSeikeis->find()->where(['starting_tm >=' => $dateYMDs, 'starting_tm <' => $dateYMDf, 'seikeiki' => $j, 'present_kensahyou' => 0])->toArray();
 
-      echo "<pre>";
-      print_r($seikeiki);
-      echo "</pre>";
-*/
       ${"n".$j} = 0;
       $this->set('n'.$j,${"n".$j});
          for($i=1; $i<=10; $i++){
@@ -689,39 +443,22 @@ $table->setConnection($connection);
              $this->set('arrP'.$j.$i,${"arrP".$j.$i});//セット
              ${"n".$j} = $i;
              $this->set('n'.$j,${"n".$j});//セット
-/*             echo "<pre>";
-             print_r($j);
-             print_r($i);
-             echo "</pre>";
-*/           }
+
+           }
           }
       }
    }
 
    public function confirm()
    {
-     $KadouSeikeis = $this->KadouSeikeis->newEntity();//newentityに$roleという名前を付ける
+     $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);//
-/*
-     $data = $this->request->getData();//postデータを$dataに
-     echo "<pre>";
-     print_r($data);
-     echo "</pre>";
-*/
    }
 
 		public function preadd()
 		{
       $KadouSeikei = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikei',$KadouSeikei);
-/*
-      $session = $this->request->getSession();
-      $data = $session->read();
-
-      echo "<pre>";
-      print_r($_SESSION['kadouseikeiId']);
-      echo "</pre>";
-*/
 		}
 
 		public function login()
@@ -772,12 +509,11 @@ $table->setConnection($connection);
         break;
       }
     }
+
 /*
-    if ($this->request->is('get')) {
     echo "<pre>";
     print_r($_SESSION['kadouseikei']);
     echo "</pre>";
-  }
 */
 
     if ($this->request->is('get')) {
@@ -787,6 +523,11 @@ $table->setConnection($connection);
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->KadouSeikeis->saveMany($KadouSeikeis)) {
+
+          //旧DBに登録
+
+
+
 
           for($n=1; $n<=100; $n++){
             if(isset($_SESSION['kadouseikei'][$n])){
@@ -799,15 +540,26 @@ $table->setConnection($connection);
               $KariKadouSeikeicreated_at = $KariKadouSeikeiData[0]->created_at->format('Y-m-d H:i:s');
 
               $this->KariKadouSeikeis->updateAll(
-              ['present_kensahyou' => 1 ,'starting_tm' => $KariKadouSeikeistarting_tm ,'finishing_tm' => $KariKadouSeikeifinishing_tm ,'created_at' => $KariKadouSeikeicreated_at ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
+              ['present_kensahyou' => 1 ,'starting_tm' => $KariKadouSeikeistarting_tm ,'finishing_tm' => $KariKadouSeikeifinishing_tm  ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
               ['id'   => $_SESSION['kadouseikeiId'][$n] ]
               );
+
+//旧DBを更新
+
+
+
+
             }else{
               break;
             }
           }
+          $mes = "※登録されました";
+          $this->set('mes',$mes);
+
           $connection->commit();// コミット5
         } else {
+          $mes = "※登録されませんでした";
+          $this->set('mes',$mes);
           $this->Flash->error(__('The data could not be saved. Please, try again.'));
           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
         }

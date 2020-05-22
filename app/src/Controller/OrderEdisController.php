@@ -129,14 +129,13 @@ class OrderEdisController extends AppController
             break;
           }
         }
-
+/*
         echo "<pre>";
         print_r("登録内容表示");
         print_r($arrFp);
         echo "</pre>";
-
-
-           $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrFp);//patchEntitiesで一括登録
+*/
+           $orderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrFp);//patchEntitiesで一括登録
            $connection = ConnectionManager::get('default');//トランザクション1
            // トランザクション開始2
            $connection->begin();//トランザクション3

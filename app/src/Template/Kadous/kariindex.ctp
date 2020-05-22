@@ -16,16 +16,18 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Pragma:');
           echo $this->Form->create($KariKadouSeikeis, ['url' => ['action' => 'kariform']]);
 ?>
-<br>
-<table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-            <tr style="background-color: #E6FFFF">
-              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/nippou_kari_touroku.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Kadous','action'=>'kariindex')));?></td>
-              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/nippou_yobidashi.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'KensahyouSokuteidatas','action'=>'yobidasi1')));?></td>
-              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/nippou_syusei.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'KensahyouSokuteidatas','action'=>'yobidasi2')));?></td>
-              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/nippou_saisyu_touroku.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Kadous','action'=>'index')));?></td>
-            </tr>
-</table>
-<br>
+<?php
+ use App\myClass\Kadous\htmlKadoumenu;//myClassフォルダに配置したクラスを使用
+ $htmlKadoumenu = new htmlKadoumenu();
+ $htmlKadoumenus = $htmlKadoumenu->Kadoumenus();
+ ?>
+ <hr size="5" style="margin: 0.5rem">
+ <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <?php
+    echo $htmlKadoumenus;
+ ?>
+ </table>
+ <hr size="5" style="margin: 0.5rem">
 <br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">

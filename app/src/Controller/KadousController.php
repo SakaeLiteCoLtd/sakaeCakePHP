@@ -24,6 +24,7 @@ class KadousController extends AppController
        $this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
        $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');
        $this->Users = TableRegistry::get('users');
+       $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
        $this->Auth->allow();
      }
@@ -614,23 +615,19 @@ class KadousController extends AppController
     }
   }
 
-  public function kensakuform()//ロット検索
+  public function syuuseiday()//ロット検索
   {
     $this->request->session()->destroy(); // セッションの破棄
     $KadouSeikeis = $this->KadouSeikeis->newEntity();
     $this->set('KadouSeikeis',$KadouSeikeis);
   }
 
-  public function kensakuview()//ロット検索
+  public function syuuseiichiran()//ロット検索
   {
     $KadouSeikeis = $this->KadouSeikeis->newEntity();
     $this->set('KadouSeikeis',$KadouSeikeis);
     $data = $this->request->getData();
-/*
-    echo "<pre>";
-    print_r($data);
-    echo "</pre>";
-*/
+
     $product_code = $data['product_code'];
     $seikeiki = $data['seikeiki'];
     $date_sta = $data['date_sta'];
@@ -643,12 +640,12 @@ class KadousController extends AppController
       if(empty($data['seikeiki'])){//seikeikiの入力がないとき　product_code×　seikeiki×　date〇
         $seikeiki = "no";//日にちだけで絞り込み
         $KadouSeikeis = $this->KadouSeikeis->find()
-        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'present_kensahyou' => 0]);
+        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);//品番順に並び変える
         $this->set('KadouSeikeis',$KadouSeikeis);
 
       }else{//seikeikiの入力があるとき　product_code×　seikeiki〇　date〇//seikeikiと日にちで絞り込み
         $KadouSeikeis = $this->KadouSeikeis->find()
-        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'present_kensahyou' => 0]);
+        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
         $this->set('KadouSeikeis',$KadouSeikeis);
 
       }
@@ -656,17 +653,123 @@ class KadousController extends AppController
       if(empty($data['seikeiki'])){//seikeikiの入力がないとき　product_code〇　seikeiki×　date〇
         $seikeiki = "no";//プロダクトコードと日にちで絞り込み
         $KadouSeikeis = $this->KadouSeikeis->find()
-        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'product_code' => $product_code, 'present_kensahyou' => 0]);
+        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
         $this->set('KadouSeikeis',$KadouSeikeis);
 
       }else{//seikeikiの入力があるとき　product_code〇　seikeiki〇　date〇//プロダクトコードとseikeikiと日にちで絞り込み
         $KadouSeikeis = $this->KadouSeikeis->find()
-        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'product_code' => $product_code, 'present_kensahyou' => 0]);
+        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
         $this->set('KadouSeikeis',$KadouSeikeis);
 
       }
     }
   }
+
+    public function kensakuform()//ロット検索
+    {
+      $this->request->session()->destroy(); // セッションの破棄
+      $KadouSeikeis = $this->KadouSeikeis->newEntity();
+      $this->set('KadouSeikeis',$KadouSeikeis);
+    }
+
+    public function kensakuview()//ロット検索
+    {
+      $KadouSeikeis = $this->KadouSeikeis->newEntity();
+      $this->set('KadouSeikeis',$KadouSeikeis);
+      $data = $this->request->getData();
+  /*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+  */
+      $product_code = $data['product_code'];
+      $seikeiki = $data['seikeiki'];
+      $date_sta = $data['date_sta'];
+      $date_fin = $data['date_fin'];
+      $date_fin = strtotime($date_fin);
+      $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
+
+      if(empty($data['product_code'])){//product_codeの入力がないとき
+        $product_code = "no";
+        if(empty($data['seikeiki'])){//seikeikiの入力がないとき　product_code×　seikeiki×　date〇
+          $seikeiki = "no";//日にちだけで絞り込み
+          $KadouSeikeis = $this->KadouSeikeis->find()
+          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
+          $this->set('KadouSeikeis',$KadouSeikeis);
+
+        }else{//seikeikiの入力があるとき　product_code×　seikeiki〇　date〇//seikeikiと日にちで絞り込み
+          $KadouSeikeis = $this->KadouSeikeis->find()
+          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
+          $this->set('KadouSeikeis',$KadouSeikeis);
+
+        }
+      }else{//product_codeの入力があるとき
+        if(empty($data['seikeiki'])){//seikeikiの入力がないとき　product_code〇　seikeiki×　date〇
+          $seikeiki = "no";//プロダクトコードと日にちで絞り込み
+          $KadouSeikeis = $this->KadouSeikeis->find()
+          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
+          $this->set('KadouSeikeis',$KadouSeikeis);
+
+        }else{//seikeikiの入力があるとき　product_code〇　seikeiki〇　date〇//プロダクトコードとseikeikiと日にちで絞り込み
+          $KadouSeikeis = $this->KadouSeikeis->find()
+          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
+          $this->set('KadouSeikeis',$KadouSeikeis);
+
+        }
+      }
+    }
+
+    public function syuuseiform()//ロット検索
+    {
+      $this->request->session()->destroy(); // セッションの破棄
+      $KadouSeikeis = $this->KadouSeikeis->newEntity();
+      $this->set('KadouSeikeis',$KadouSeikeis);
+
+      $data = array_values($this->request->query);//getで取り出した配列の値を取り出す
+
+      $id = $data[1];
+      $this->set('id',$id);
+      $KadouSeikeis = $this->KadouSeikeis->find()->where(['id' => $id])->toArray();
+      $product_code = $KadouSeikeis[0]->product_code;
+      $this->set('product_code',$product_code);
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $product_name = $Product[0]->product_name;
+      $this->set('product_name',$product_name);
+      $seikeiki = $KadouSeikeis[0]->seikeiki;
+      $this->set('seikeiki',$seikeiki);
+      $starting_tm = $KadouSeikeis[0]->starting_tm->format('Y-m-d H:i:s');
+      $starting_tm = substr($starting_tm,0,10)."T".substr($starting_tm,11,5);
+      $this->set('starting_tm',$starting_tm);
+      $finishing_tm = $KadouSeikeis[0]->finishing_tm->format('Y-m-d H:i:s');
+      $finishing_tm = substr($finishing_tm,0,10)."T".substr($finishing_tm,11,5);
+      $this->set('finishing_tm',$finishing_tm);
+      $cycle_shot = $KadouSeikeis[0]->cycle_shot;
+      $this->set('cycle_shot',$cycle_shot);
+      $amount_shot = $KadouSeikeis[0]->amount_shot;
+      $this->set('amount_shot',$amount_shot);
+
+      $first_lot_num = $KadouSeikeis[0]->first_lot_num;
+      $this->set('first_lot_num',$first_lot_num);
+      $last_lot_num = $KadouSeikeis[0]->last_lot_num;
+      $this->set('last_lot_num',$last_lot_num);
+
+    }
+
+    public function syuuseiconfirm()//ロット検索
+    {
+      $this->request->session()->destroy(); // セッションの破棄
+      $KadouSeikeis = $this->KadouSeikeis->newEntity();
+      $this->set('KadouSeikeis',$KadouSeikeis);
+
+      $data = $this->request->getData();
+
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+
+    }
+
+
 
 
 }

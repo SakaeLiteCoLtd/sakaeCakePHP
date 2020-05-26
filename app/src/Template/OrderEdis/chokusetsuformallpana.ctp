@@ -56,8 +56,7 @@
 	</tr>
 </table>
 
-<?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
-<?= $this->Form->control('product_name', array('type'=>'hidden', 'value'=>$product_name, 'label'=>false)) ?>
+<?= $this->Form->control('id', array('type'=>'hidden', 'value'=>$id, 'label'=>false)) ?>
 
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

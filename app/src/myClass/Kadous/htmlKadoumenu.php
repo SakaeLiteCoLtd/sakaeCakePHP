@@ -25,7 +25,7 @@ class htmlKadoumenu extends AppController
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/Kadous/kensakuform'>\n".
                   "<img src='/img/Labelimg/nippou_yobidashi.gif' width=115 height=40>\n".
                   "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Kadous/yobidasi2'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Kadous/syuuseiday'>\n".
                   "<img src='/img/Labelimg/nippou_syusei.gif' width=115 height=40>\n".
                   "</a>\n".
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/Kadous/index'>\n".

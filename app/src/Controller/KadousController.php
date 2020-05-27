@@ -25,6 +25,7 @@ class KadousController extends AppController
        $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');
        $this->Users = TableRegistry::get('users');
        $this->Products = TableRegistry::get('products');//productsテーブルを使う
+       $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
 
        $this->Auth->allow();
      }
@@ -385,7 +386,6 @@ class KadousController extends AppController
 
    public function form()
    {
-     session_start();
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);
 
@@ -446,6 +446,8 @@ class KadousController extends AppController
 
    public function confirm()
    {
+     $this->request->session()->destroy(); // セッションの破棄
+     session_start();
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);//
    }
@@ -535,6 +537,9 @@ class KadousController extends AppController
               'amount_shot' => $_SESSION['kadouseikei'][$k]["amount_shot"],
               'accomp_rate' => $_SESSION['kadouseikei'][$k]["accomp_rate"],
               'present_kensahyou' => 0,
+              'first_lot_num' => $_SESSION['kadouseikei'][$k]["first_lot_num"],
+              'last_lot_num' => $_SESSION['kadouseikei'][$k]["last_lot_num"],
+              'sum_predict_lot_num' => $_SESSION['kadouseikei'][$k]["sum_predict_lot_num"],
             ]);
           }
 
@@ -557,6 +562,9 @@ class KadousController extends AppController
               'amount_shot' => $_SESSION['kadouseikei'][$k]["amount_shot"],
               'accomp_rate' => $_SESSION['kadouseikei'][$k]["accomp_rate"],
               'present_kensahyou' => 0,
+              'first_lot_num' => $_SESSION['kadouseikei'][$k]["first_lot_num"],
+              'last_lot_num' => $_SESSION['kadouseikei'][$k]["last_lot_num"],
+              'sum_predict_lot_num' => $_SESSION['kadouseikei'][$k]["sum_predict_lot_num"],
             ]);
           }
 
@@ -758,18 +766,206 @@ class KadousController extends AppController
     public function syuuseiconfirm()//ロット検索
     {
       $this->request->session()->destroy(); // セッションの破棄
+      session_start();
+
       $KadouSeikeis = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikeis',$KadouSeikeis);
 
       $data = $this->request->getData();
 
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
+      $id = $data["id"];
+      $this->set('id',$id);
+      $starting_tm_moto = $data["starting_tm_moto"];
+      $starting_tm_moto = substr($starting_tm_moto, 0, 10)." ".substr($starting_tm_moto, 11, 5);
+      $this->set('starting_tm_moto',$starting_tm_moto);
+      $seikeiki = $data["seikeiki"];
+      $this->set('seikeiki',$seikeiki);
+      $product_code = $data["product_code"];
+      $this->set('product_code',$product_code);
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $product_name = $Product[0]->product_name;
+      $this->set('product_name',$product_name);
+      $starting_tm = $data["starting_tm"];
+      $starting_tm = substr($starting_tm, 0, 10)." ".substr($starting_tm, 11, 5);
+      $this->set('starting_tm',$starting_tm);
+      $finishing_tm = $data["finishing_tm"];
+      $finishing_tm = substr($finishing_tm, 0, 10)." ".substr($finishing_tm, 11, 5);
+      $this->set('finishing_tm',$finishing_tm);
+      $cycle_shot = $data["cycle_shot"];
+      $this->set('cycle_shot',$cycle_shot);
+      $amount_shot = $data["amount_shot"];
+      $this->set('amount_shot',$amount_shot);
+      $first_lot_num = $data["first_lot_num"];
+      $this->set('first_lot_num',$first_lot_num);
+      $last_lot_num = $data["last_lot_num"];
+      $this->set('last_lot_num',$last_lot_num);
 
+      $kadoujikan = ((strtotime($finishing_tm) - strtotime($starting_tm)));
+      $riron_shot = round($kadoujikan/$cycle_shot, 0);
+      $accomp_rate = round(100*$amount_shot/$riron_shot, 0);
+
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      if(($Product[0]->torisu) > 0){
+
+        $torisu = $Product[0]->torisu;
+        $Konpou = $this->Konpous->find()->where(['product_code' => $product_code])->toArray();
+
+          if(($Konpou[0]->irisu) > 0){
+
+            $irisu = $Konpou[0]->irisu;
+
+            $sum_predict_lot_num = ceil(($amount_shot * $torisu) / $irisu);
+
+          }else{
+
+            echo "<pre>";
+            print_r($product_code."のirisuがKonpousテーブルに登録されていません");
+            echo "</pre>";
+
+          }
+
+      }else{
+
+        echo "<pre>";
+        print_r($product_code."のtorisuがProductsテーブルに登録されていません");
+        echo "</pre>";
+
+        $sum_predict_lot_num = "";
+
+      }
+
+      $this->set('sum_predict_lot_num',$sum_predict_lot_num);
+
+
+      $_SESSION['kadouseikeisyuusei'] = array(
+        'product_code' => $product_code,
+        'seikeiki' => $seikeiki,
+        'starting_tm' => $starting_tm,
+        'finishing_tm' => $finishing_tm,
+        'cycle_shot' => $cycle_shot,
+        'amount_shot' => $amount_shot,
+        'accomp_rate' => $accomp_rate,
+        "first_lot_num" => $first_lot_num,
+        "last_lot_num" => $last_lot_num,
+        "sum_predict_lot_num" => $sum_predict_lot_num,
+      );
+
+      $_SESSION['kadouseikeiid'] = array(
+        "id" => $id,
+        'starting_tm_moto' => $starting_tm_moto
+      );
+/*
+      echo "<pre>";
+      print_r($_SESSION);
+      echo "</pre>";
+*/
     }
 
+    public function syuuseipreadd()
+		{
+      $KadouSeikei = $this->KadouSeikeis->newEntity();
+      $this->set('KadouSeikei',$KadouSeikei);
+		}
 
+		public function syuuseilogin()
+		{
+			if ($this->request->is('post')) {
+				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+				$ary = explode(',', $str);//$strを配列に変換
+
+				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+				$this->set('username', $username);
+				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+					if(empty($Userdata)){
+						$delete_flag = "";
+					}else{
+						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+						$this->set('delete_flag',$delete_flag);//登録者の表示のため
+					}
+						$user = $this->Auth->identify();
+					if ($user) {
+						$this->Auth->setUser($user);
+						return $this->redirect(['action' => 'syuuseido']);
+					}
+				}
+		}
+
+    public function syuuseido()
+   {
+     $KadouSeikeis = $this->KadouSeikeis->newEntity();
+     $this->set('KadouSeikeis',$KadouSeikeis);
+
+     $session = $this->request->getSession();
+     $data = $session->read();
+
+     if ($this->request->is('get')) {
+
+       $connection = ConnectionManager::get('default');//トランザクション1
+       // トランザクション開始2
+       $connection->begin();//トランザクション3
+
+       try {//トランザクション4
+         if ($this->KadouSeikeis->updateAll(
+         ['starting_tm' => $_SESSION['kadouseikeisyuusei']['starting_tm'] ,'finishing_tm' => $_SESSION['kadouseikeisyuusei']['finishing_tm'] ,
+         'cycle_shot' => $_SESSION['kadouseikeisyuusei']['cycle_shot'] ,'amount_shot' => $_SESSION['kadouseikeisyuusei']['amount_shot'] ,
+         'accomp_rate' => $_SESSION['kadouseikeisyuusei']['accomp_rate'] ,'first_lot_num' => $_SESSION['kadouseikeisyuusei']['first_lot_num'] ,
+         'last_lot_num' => $_SESSION['kadouseikeisyuusei']['last_lot_num'] ,'sum_predict_lot_num' => $_SESSION['kadouseikeisyuusei']['sum_predict_lot_num'] ,
+         'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
+         ['id'   => $_SESSION['kadouseikeiid']['id'] ]
+         )) {
+
+           //旧DBも更新
+
+           $connection = ConnectionManager::get('DB_ikou_test');
+           $table = TableRegistry::get('kadou_seikei');
+           $table->setConnection($connection);
+
+           $updater = "UPDATE kadou_seikei set starting_tm = '".$_SESSION['kadouseikeisyuusei']['starting_tm']."', finishing_tm = '".$_SESSION['kadouseikeisyuusei']['finishing_tm']."'
+           , cycle_shot = '".$_SESSION['kadouseikeisyuusei']['cycle_shot']."', amount_shot = '".$_SESSION['kadouseikeisyuusei']['cycle_shot']."', accomp_rate = '".$_SESSION['kadouseikeisyuusei']['accomp_rate']."'
+           , first_lot_num = '".$_SESSION['kadouseikeisyuusei']['first_lot_num']."', last_lot_num = '".$_SESSION['kadouseikeisyuusei']['last_lot_num']."', sum_predict_lot_num = '".$_SESSION['kadouseikeisyuusei']['sum_predict_lot_num']."'
+           where pro_num ='".$_SESSION['kadouseikeisyuusei']['product_code']."' and seikeiki_id = '".$_SESSION['kadouseikeisyuusei']['seikeiki']."' and starting_tm = '".$_SESSION['kadouseikeiid']['starting_tm_moto']."'";//もとのDBも更新
+           $connection->execute($updater);
+
+           $connection = ConnectionManager::get('default');
+           $table->setConnection($connection);
+
+           //big_DBも更新
+           /*
+           $connection = ConnectionManager::get('big_DB');
+           $table = TableRegistry::get('kadou_seikei');
+           $table->setConnection($connection);
+
+           $updater = "UPDATE kadou_seikei set starting_tm = '".$_SESSION['kadouseikeisyuusei']['starting_tm']."', finishing_tm = '".$_SESSION['kadouseikeisyuusei']['finishing_tm']."'
+           , cycle_shot = '".$_SESSION['kadouseikeisyuusei']['cycle_shot']."', amount_shot = '".$_SESSION['kadouseikeisyuusei']['cycle_shot']."', accomp_rate = '".$_SESSION['kadouseikeisyuusei']['accomp_rate']."'
+           , first_lot_num = '".$_SESSION['kadouseikeisyuusei']['first_lot_num']."', last_lot_num = '".$_SESSION['kadouseikeisyuusei']['last_lot_num']."', sum_predict_lot_num = '".$_SESSION['kadouseikeisyuusei']['sum_predict_lot_num']."'
+           where pro_num ='".$_SESSION['kadouseikeisyuusei']['product_code']."' and seikeiki_id = '".$_SESSION['kadouseikeisyuusei']['seikeiki']."' and starting_tm = '".$_SESSION['kadouseikeiid']['starting_tm_moto']."'";//もとのDBも更新
+           $connection->execute($updater);
+
+           $connection = ConnectionManager::get('default');
+           $table->setConnection($connection);
+ */
+
+           $mes = "※登録されました";
+           $this->set('mes',$mes);
+
+           $connection->commit();// コミット5
+         } else {
+           $mes = "※登録されませんでした";
+           $this->set('mes',$mes);
+           $this->Flash->error(__('The data could not be saved. Please, try again.'));
+           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+         }
+       } catch (Exception $e) {//トランザクション7
+       //ロールバック8
+         $connection->rollback();//トランザクション9
+       }//トランザクション10
+
+     }
+
+   }
 
 
 }

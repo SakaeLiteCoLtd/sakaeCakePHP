@@ -21,7 +21,7 @@
  </table>
  <hr size="5" style="margin: 0.5rem">
     <?= $this->Flash->render() ?>
-    <?= $this->Form->create($KadouSeikeis, ['url' => ['action' => 'syuuseiconfirm']]) ?>
+    <?= $this->Form->create($KadouSeikeis, ['url' => ['action' => 'syuuseipreadd']]) ?>
     <fieldset>
 <br>
 <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
@@ -45,47 +45,32 @@
     <td  width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">ショット数</strong></td>
 	</tr>
   <tr>
-    <?php
-    echo "<td bgcolor='#FFFFCC'><div align='center'>\n";
-    echo "<input type='datetime-local' value=$starting_tm name='starting_tm' size='6'/>\n";
-    echo "</div></td>\n";
-    echo "<td bgcolor='#FFFFCC'><div align='center'>\n";
-    echo "<input type='datetime-local' value=$finishing_tm name='finishing_tm' size='6'/>\n";
-    echo "</div></td>\n";
-    echo "<td bgcolor='#FFFFCC'><div align='center'>\n";
-    echo "<input type='text' value=$cycle_shot name='cycle_shot' size='6'/>\n";
-    echo "</div></td>\n";
-    echo "<td bgcolor='#FFFFCC'><div align='center'>\n";
-    echo "<input type='text' value=$amount_shot name='amount_shot' size='6'/>\n";
-    echo "</div></td>\n";
-    ?>
+    <td bgcolor="#FFFFCC"><?= __($starting_tm) ?></td>
+    <td bgcolor="#FFFFCC"><?= __($finishing_tm) ?></td>
+    <td bgcolor="#FFFFCC"><?= __($cycle_shot) ?></td>
+    <td bgcolor="#FFFFCC"><?= __($amount_shot) ?></td>
 	</tr>
 </table>
-<br><br><br><br><br><br><br>
+<br><br><br><br><br><br>
 <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td width="300" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">開始ロット</strong></td>
     <td width="300" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">最終ロット</strong></td>
 	</tr>
   <tr>
-    <?php
-    echo "<td bgcolor='#FFFFCC'><div align='center'>\n";
-    echo "<input type='text' name='first_lot_num' value=$first_lot_num>\n";
-    echo "</div></td>\n";
-    echo "<td bgcolor='#FFFFCC'><div align='center'>\n";
-    echo "<input type='text' name='last_lot_num value=$last_lot_num'>\n";
-    echo "</div></td>\n";
-    ?>
+    <td bgcolor="#FFFFCC"><?= __($first_lot_num) ?></td>
+    <td bgcolor="#FFFFCC"><?= __($last_lot_num) ?></td>
 	</tr>
 </table>
 <br><br>
 
-<?= $this->Form->control('id', array('type'=>'hidden', 'value'=>$id, 'label'=>false)) ?>
+<?= $this->Form->control('starting_tm_moto', array('type'=>'hidden', 'value'=>$starting_tm_moto, 'label'=>false)) ?>
 
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('変更内容確認', array('name' => 'kakunin')); ?></div></td>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('変更登録', array('name' => 'touroku')); ?></div></td>
   </tr>
   </table>
 <br><br><br>

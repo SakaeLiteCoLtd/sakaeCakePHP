@@ -73,13 +73,16 @@
     echo "<input type='text' name='first_lot_num' value=$first_lot_num>\n";
     echo "</div></td>\n";
     echo "<td bgcolor='#FFFFCC'><div align='center'>\n";
-    echo "<input type='text' name='last_lot_num value=$last_lot_num'>\n";
+    echo "<input type='text' name='last_lot_num' value=$last_lot_num>\n";
     echo "</div></td>\n";
     ?>
 	</tr>
 </table>
 <br><br>
 
+<?= $this->Form->control('starting_tm_moto', array('type'=>'hidden', 'value'=>$starting_tm, 'label'=>false)) ?>
+<?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
+<?= $this->Form->control('seikeiki', array('type'=>'hidden', 'value'=>$seikeiki, 'label'=>false)) ?>
 <?= $this->Form->control('id', array('type'=>'hidden', 'value'=>$id, 'label'=>false)) ?>
 
     </fieldset>

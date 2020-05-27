@@ -3,7 +3,10 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Staff $staff
  */
- use Cake\ORM\TableRegistry;//独立したテーブルを扱う
+use Cake\Datasource\ConnectionManager;//トランザクション
+use Cake\ORM\TableRegistry;//独立したテーブルを扱う
+ $this->Products = TableRegistry::get('products');//productsテーブルを使う
+ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
 ?>
 <?= $this->Form->create($KadouSeikeis, ['url' => ['action' => 'preadd']]) ?>
 <br>
@@ -74,6 +77,69 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
             }else{
               ${"seikeiki_code".$j.$n} = "";
             }
+
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('shotdata_sensors');
+            $table->setConnection($connection);
+
+//first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
+            $sql = "SELECT lot_num FROM shotdata_sensors".
+                  " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
+            $connection = ConnectionManager::get('DB_ikou_test');
+            ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
+
+            $connection = ConnectionManager::get('default');
+            $table->setConnection($connection);
+
+            if(isset(${"shotdata_sensors".$j.$n}[0])){
+
+              $count = count(${"shotdata_sensors".$j.$n}) - 1;
+              ${"first_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[0]["lot_num"];
+              ${"last_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[$count]["lot_num"];
+/*
+              echo "<pre>";
+              print_r($shotdata_sensors);
+              echo "</pre>";
+              echo "<pre>";
+              print_r($first_lot_num);
+              echo "</pre>";
+              echo "<pre>";
+              print_r($last_lot_num);
+              echo "</pre>";
+*/
+            }else{
+              ${"first_lot_num".$j.$n} = "";
+              ${"last_lot_num".$j.$n} = "";
+            }
+
+            $Product = $this->Products->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+            if(($Product[0]->torisu) > 0){
+              $torisu = $Product[0]->torisu;
+              $Konpou = $this->Konpous->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+
+                if(($Konpou[0]->irisu) > 0){
+                  $irisu = $Konpou[0]->irisu;
+
+                  $sum_predict_lot_num = ceil(($_POST["amount_shot{$j}{$n}"] * $torisu) / $irisu);
+
+                }else{
+
+                  echo "<pre>";
+                  print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                  echo "</pre>";
+
+                }
+
+            }else{
+
+              echo "<pre>";
+              print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+              echo "</pre>";
+
+              $sum_predict_lot_num = "";
+            }
+
+
             $_SESSION['kadouseikei'][$m] = array(
               'product_code' => $_POST["product_code{$j}{$n}"],
               'seikeiki' => $_POST["seikeiki{$j}{$n}"],
@@ -83,11 +149,11 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
               'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
               'amount_shot' => $_POST["amount_shot{$j}{$n}"],
               'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
-              "present_kensahyou" => 0,
-/*              'id' => $_POST["id{$j}_{$n}"],
-              'created_at' => $_POST["created_at{$j}_{$n}"],
-              'created_staff' => $_POST["created_staff{$j}{$n}"],
-*/            );
+              'present_kensahyou' => 0,
+              "first_lot_num" => ${"first_lot_num".$j.$n},
+              "last_lot_num" => ${"last_lot_num".$j.$n},
+              "sum_predict_lot_num" => $sum_predict_lot_num,
+            );
 
           $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
@@ -161,21 +227,76 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
            }else{
              ${"seikeiki_code".$j.$n} = "";
            }
-             $_SESSION['kadouseikei'][$m] = array(
-               'product_code' => $_POST["product_code{$j}{$n}"],
-               'seikeiki' => $_POST["seikeiki{$j}{$n}"],
-               'seikeiki_code' => ${"seikeiki_code".$j.$n},
-               'starting_tm' => ${"starting_tm".$j.$n},
-               'finishing_tm' => ${"finishing_tm".$j.$n},
-               'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
-               'amount_shot' => $_POST["amount_shot{$j}{$n}"],
-               'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
-               "present_kensahyou" => 0,
-             );
+
+           $connection = ConnectionManager::get('DB_ikou_test');
+           $table = TableRegistry::get('shotdata_sensors');
+           $table->setConnection($connection);
+
+           //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
+           $sql = "SELECT lot_num FROM shotdata_sensors".
+                 " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
+           $connection = ConnectionManager::get('DB_ikou_test');
+           ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
+
+           $connection = ConnectionManager::get('default');
+           $table->setConnection($connection);
+
+           if(isset(${"shotdata_sensors".$j.$n}[0])){
+
+             $count = count(${"shotdata_sensors".$j.$n}) - 1;
+             ${"first_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[0]["lot_num"];
+             ${"last_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[$count]["lot_num"];
+
+           }else{
+             ${"first_lot_num".$j.$n} = "";
+             ${"last_lot_num".$j.$n} = "";
+           }
+
+           $Product = $this->Products->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+           if(($Product[0]->torisu) > 0){
+             $torisu = $Product[0]->torisu;
+             $Konpou = $this->Konpous->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+
+               if(($Konpou[0]->irisu) > 0){
+                 $irisu = $Konpou[0]->irisu;
+
+                 $sum_predict_lot_num = ceil(($_POST["amount_shot{$j}{$n}"] * $torisu) / $irisu);
+
+               }else{
+
+                 echo "<pre>";
+                 print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                 echo "</pre>";
+
+               }
+
+           }else{
+
+             echo "<pre>";
+             print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+             echo "</pre>";
+
+             $sum_predict_lot_num = "";
+           }
+
+
+           $_SESSION['kadouseikei'][$m] = array(
+             'product_code' => $_POST["product_code{$j}{$n}"],
+             'seikeiki' => $_POST["seikeiki{$j}{$n}"],
+             'seikeiki_code' => ${"seikeiki_code".$j.$n},
+             'starting_tm' => ${"starting_tm".$j.$n},
+             'finishing_tm' => ${"finishing_tm".$j.$n},
+             'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
+             'amount_shot' => $_POST["amount_shot{$j}{$n}"],
+             'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
+             'present_kensahyou' => 0,
+             "first_lot_num" => ${"first_lot_num".$j.$n},
+             "last_lot_num" => ${"last_lot_num".$j.$n},
+             "sum_predict_lot_num" => $sum_predict_lot_num,
+           );
 
 
             $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
-
 
            }
            $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
@@ -241,17 +362,73 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
             }else{
               ${"seikeiki_code".$j.$n} = "";
             }
-              $_SESSION['kadouseikei'][$m] = array(
-                'product_code' => $_POST["product_code{$j}{$n}"],
-                'seikeiki' => $_POST["seikeiki{$j}{$n}"],
-                'seikeiki_code' => ${"seikeiki_code".$j.$n},
-                'starting_tm' => ${"starting_tm".$j.$n},
-                'finishing_tm' => ${"finishing_tm".$j.$n},
-                'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
-                'amount_shot' => $_POST["amount_shot{$j}{$n}"],
-                'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
-                "present_kensahyou" => 0,
-              );
+
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('shotdata_sensors');
+            $table->setConnection($connection);
+
+            //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
+            $sql = "SELECT lot_num FROM shotdata_sensors".
+                  " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
+            $connection = ConnectionManager::get('DB_ikou_test');
+            ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
+
+            $connection = ConnectionManager::get('default');
+            $table->setConnection($connection);
+
+            if(isset(${"shotdata_sensors".$j.$n}[0])){
+
+              $count = count(${"shotdata_sensors".$j.$n}) - 1;
+              ${"first_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[0]["lot_num"];
+              ${"last_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[$count]["lot_num"];
+
+            }else{
+              ${"first_lot_num".$j.$n} = "";
+              ${"last_lot_num".$j.$n} = "";
+            }
+
+            $Product = $this->Products->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+            if(($Product[0]->torisu) > 0){
+              $torisu = $Product[0]->torisu;
+              $Konpou = $this->Konpous->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+
+                if(($Konpou[0]->irisu) > 0){
+                  $irisu = $Konpou[0]->irisu;
+
+                  $sum_predict_lot_num = ceil(($_POST["amount_shot{$j}{$n}"] * $torisu) / $irisu);
+
+                }else{
+
+                  echo "<pre>";
+                  print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                  echo "</pre>";
+
+                }
+
+            }else{
+
+              echo "<pre>";
+              print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+              echo "</pre>";
+
+              $sum_predict_lot_num = "";
+            }
+
+
+            $_SESSION['kadouseikei'][$m] = array(
+              'product_code' => $_POST["product_code{$j}{$n}"],
+              'seikeiki' => $_POST["seikeiki{$j}{$n}"],
+              'seikeiki_code' => ${"seikeiki_code".$j.$n},
+              'starting_tm' => ${"starting_tm".$j.$n},
+              'finishing_tm' => ${"finishing_tm".$j.$n},
+              'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
+              'amount_shot' => $_POST["amount_shot{$j}{$n}"],
+              'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
+              'present_kensahyou' => 0,
+              "first_lot_num" => ${"first_lot_num".$j.$n},
+              "last_lot_num" => ${"last_lot_num".$j.$n},
+              "sum_predict_lot_num" => $sum_predict_lot_num,
+            );
 
             $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
@@ -320,17 +497,72 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
              }else{
                ${"seikeiki_code".$j.$n} = "";
              }
-               $_SESSION['kadouseikei'][$m] = array(
-                 'product_code' => $_POST["product_code{$j}{$n}"],
-                 'seikeiki' => $_POST["seikeiki{$j}{$n}"],
-                 'seikeiki_code' => ${"seikeiki_code".$j.$n},
-                 'starting_tm' => ${"starting_tm".$j.$n},
-                 'finishing_tm' => ${"finishing_tm".$j.$n},
-                 'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
-                 'amount_shot' => $_POST["amount_shot{$j}{$n}"],
-                 'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
-                 "present_kensahyou" => 0,
-               );
+             $connection = ConnectionManager::get('DB_ikou_test');
+             $table = TableRegistry::get('shotdata_sensors');
+             $table->setConnection($connection);
+
+             //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
+             $sql = "SELECT lot_num FROM shotdata_sensors".
+                   " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
+             $connection = ConnectionManager::get('DB_ikou_test');
+             ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
+
+             $connection = ConnectionManager::get('default');
+             $table->setConnection($connection);
+
+             if(isset(${"shotdata_sensors".$j.$n}[0])){
+
+               $count = count(${"shotdata_sensors".$j.$n}) - 1;
+               ${"first_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[0]["lot_num"];
+               ${"last_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[$count]["lot_num"];
+
+             }else{
+               ${"first_lot_num".$j.$n} = "";
+               ${"last_lot_num".$j.$n} = "";
+             }
+
+             $Product = $this->Products->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+             if(($Product[0]->torisu) > 0){
+               $torisu = $Product[0]->torisu;
+               $Konpou = $this->Konpous->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+
+                 if(($Konpou[0]->irisu) > 0){
+                   $irisu = $Konpou[0]->irisu;
+
+                   $sum_predict_lot_num = ceil(($_POST["amount_shot{$j}{$n}"] * $torisu) / $irisu);
+
+                 }else{
+
+                   echo "<pre>";
+                   print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                   echo "</pre>";
+
+                 }
+
+             }else{
+
+               echo "<pre>";
+               print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+               echo "</pre>";
+
+               $sum_predict_lot_num = "";
+             }
+
+
+             $_SESSION['kadouseikei'][$m] = array(
+               'product_code' => $_POST["product_code{$j}{$n}"],
+               'seikeiki' => $_POST["seikeiki{$j}{$n}"],
+               'seikeiki_code' => ${"seikeiki_code".$j.$n},
+               'starting_tm' => ${"starting_tm".$j.$n},
+               'finishing_tm' => ${"finishing_tm".$j.$n},
+               'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
+               'amount_shot' => $_POST["amount_shot{$j}{$n}"],
+               'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
+               'present_kensahyou' => 0,
+               "first_lot_num" => ${"first_lot_num".$j.$n},
+               "last_lot_num" => ${"last_lot_num".$j.$n},
+               "sum_predict_lot_num" => $sum_predict_lot_num,
+             );
 
             $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
@@ -399,17 +631,72 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
               }else{
                 ${"seikeiki_code".$j.$n} = "";
               }
-                $_SESSION['kadouseikei'][$m] = array(
-                  'product_code' => $_POST["product_code{$j}{$n}"],
-                  'seikeiki' => $_POST["seikeiki{$j}{$n}"],
-                  'seikeiki_code' => ${"seikeiki_code".$j.$n},
-                  'starting_tm' => ${"starting_tm".$j.$n},
-                  'finishing_tm' => ${"finishing_tm".$j.$n},
-                  'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
-                  'amount_shot' => $_POST["amount_shot{$j}{$n}"],
-                  'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
-                  "present_kensahyou" => 0,
-                );
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('shotdata_sensors');
+              $table->setConnection($connection);
+
+              //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
+              $sql = "SELECT lot_num FROM shotdata_sensors".
+                    " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
+              $connection = ConnectionManager::get('DB_ikou_test');
+              ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
+
+              $connection = ConnectionManager::get('default');
+              $table->setConnection($connection);
+
+              if(isset(${"shotdata_sensors".$j.$n}[0])){
+
+                $count = count(${"shotdata_sensors".$j.$n}) - 1;
+                ${"first_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[0]["lot_num"];
+                ${"last_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[$count]["lot_num"];
+
+              }else{
+                ${"first_lot_num".$j.$n} = "";
+                ${"last_lot_num".$j.$n} = "";
+              }
+
+              $Product = $this->Products->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+              if(($Product[0]->torisu) > 0){
+                $torisu = $Product[0]->torisu;
+                $Konpou = $this->Konpous->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+
+                  if(($Konpou[0]->irisu) > 0){
+                    $irisu = $Konpou[0]->irisu;
+
+                    $sum_predict_lot_num = ceil(($_POST["amount_shot{$j}{$n}"] * $torisu) / $irisu);
+
+                  }else{
+
+                    echo "<pre>";
+                    print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                    echo "</pre>";
+
+                  }
+
+              }else{
+
+                echo "<pre>";
+                print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                echo "</pre>";
+
+                $sum_predict_lot_num = "";
+              }
+
+
+              $_SESSION['kadouseikei'][$m] = array(
+                'product_code' => $_POST["product_code{$j}{$n}"],
+                'seikeiki' => $_POST["seikeiki{$j}{$n}"],
+                'seikeiki_code' => ${"seikeiki_code".$j.$n},
+                'starting_tm' => ${"starting_tm".$j.$n},
+                'finishing_tm' => ${"finishing_tm".$j.$n},
+                'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
+                'amount_shot' => $_POST["amount_shot{$j}{$n}"],
+                'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
+                'present_kensahyou' => 0,
+                "first_lot_num" => ${"first_lot_num".$j.$n},
+                "last_lot_num" => ${"last_lot_num".$j.$n},
+                "sum_predict_lot_num" => $sum_predict_lot_num,
+              );
 
               $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
@@ -478,17 +765,72 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                }else{
                  ${"seikeiki_code".$j.$n} = "";
                }
-                 $_SESSION['kadouseikei'][$m] = array(
-                   'product_code' => $_POST["product_code{$j}{$n}"],
-                   'seikeiki' => $_POST["seikeiki{$j}{$n}"],
-                   'seikeiki_code' => ${"seikeiki_code".$j.$n},
-                   'starting_tm' => ${"starting_tm".$j.$n},
-                   'finishing_tm' => ${"finishing_tm".$j.$n},
-                   'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
-                   'amount_shot' => $_POST["amount_shot{$j}{$n}"],
-                   'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
-                   "present_kensahyou" => 0,
-                 );
+               $connection = ConnectionManager::get('DB_ikou_test');
+               $table = TableRegistry::get('shotdata_sensors');
+               $table->setConnection($connection);
+
+               //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
+               $sql = "SELECT lot_num FROM shotdata_sensors".
+                     " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
+               $connection = ConnectionManager::get('DB_ikou_test');
+               ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
+
+               $connection = ConnectionManager::get('default');
+               $table->setConnection($connection);
+
+               if(isset(${"shotdata_sensors".$j.$n}[0])){
+
+                 $count = count(${"shotdata_sensors".$j.$n}) - 1;
+                 ${"first_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[0]["lot_num"];
+                 ${"last_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[$count]["lot_num"];
+
+               }else{
+                 ${"first_lot_num".$j.$n} = "";
+                 ${"last_lot_num".$j.$n} = "";
+               }
+
+               $Product = $this->Products->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+               if(($Product[0]->torisu) > 0){
+                 $torisu = $Product[0]->torisu;
+                 $Konpou = $this->Konpous->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+
+                   if(($Konpou[0]->irisu) > 0){
+                     $irisu = $Konpou[0]->irisu;
+
+                     $sum_predict_lot_num = ceil(($_POST["amount_shot{$j}{$n}"] * $torisu) / $irisu);
+
+                   }else{
+
+                     echo "<pre>";
+                     print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                     echo "</pre>";
+
+                   }
+
+               }else{
+
+                 echo "<pre>";
+                 print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                 echo "</pre>";
+
+                 $sum_predict_lot_num = "";
+               }
+
+
+               $_SESSION['kadouseikei'][$m] = array(
+                 'product_code' => $_POST["product_code{$j}{$n}"],
+                 'seikeiki' => $_POST["seikeiki{$j}{$n}"],
+                 'seikeiki_code' => ${"seikeiki_code".$j.$n},
+                 'starting_tm' => ${"starting_tm".$j.$n},
+                 'finishing_tm' => ${"finishing_tm".$j.$n},
+                 'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
+                 'amount_shot' => $_POST["amount_shot{$j}{$n}"],
+                 'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
+                 'present_kensahyou' => 0,
+                 "first_lot_num" => ${"first_lot_num".$j.$n},
+                 "last_lot_num" => ${"last_lot_num".$j.$n},
+                 "sum_predict_lot_num" => $sum_predict_lot_num,
+               );
 
               $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
@@ -557,17 +899,72 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                }else{
                  ${"seikeiki_code".$j.$n} = "";
                }
-                 $_SESSION['kadouseikei'][$m] = array(
-                   'product_code' => $_POST["product_code{$j}{$n}"],
-                   'seikeiki' => $_POST["seikeiki{$j}{$n}"],
-                   'seikeiki_code' => ${"seikeiki_code".$j.$n},
-                   'starting_tm' => ${"starting_tm".$j.$n},
-                   'finishing_tm' => ${"finishing_tm".$j.$n},
-                   'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
-                   'amount_shot' => $_POST["amount_shot{$j}{$n}"],
-                   'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
-                   "present_kensahyou" => 0,
-                 );
+               $connection = ConnectionManager::get('DB_ikou_test');
+               $table = TableRegistry::get('shotdata_sensors');
+               $table->setConnection($connection);
+
+               //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
+               $sql = "SELECT lot_num FROM shotdata_sensors".
+                     " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
+               $connection = ConnectionManager::get('DB_ikou_test');
+               ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
+
+               $connection = ConnectionManager::get('default');
+               $table->setConnection($connection);
+
+               if(isset(${"shotdata_sensors".$j.$n}[0])){
+
+                 $count = count(${"shotdata_sensors".$j.$n}) - 1;
+                 ${"first_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[0]["lot_num"];
+                 ${"last_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[$count]["lot_num"];
+
+               }else{
+                 ${"first_lot_num".$j.$n} = "";
+                 ${"last_lot_num".$j.$n} = "";
+               }
+
+               $Product = $this->Products->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+               if(($Product[0]->torisu) > 0){
+                 $torisu = $Product[0]->torisu;
+                 $Konpou = $this->Konpous->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+
+                   if(($Konpou[0]->irisu) > 0){
+                     $irisu = $Konpou[0]->irisu;
+
+                     $sum_predict_lot_num = ceil(($_POST["amount_shot{$j}{$n}"] * $torisu) / $irisu);
+
+                   }else{
+
+                     echo "<pre>";
+                     print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                     echo "</pre>";
+
+                   }
+
+               }else{
+
+                 echo "<pre>";
+                 print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                 echo "</pre>";
+
+                 $sum_predict_lot_num = "";
+               }
+
+
+               $_SESSION['kadouseikei'][$m] = array(
+                 'product_code' => $_POST["product_code{$j}{$n}"],
+                 'seikeiki' => $_POST["seikeiki{$j}{$n}"],
+                 'seikeiki_code' => ${"seikeiki_code".$j.$n},
+                 'starting_tm' => ${"starting_tm".$j.$n},
+                 'finishing_tm' => ${"finishing_tm".$j.$n},
+                 'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
+                 'amount_shot' => $_POST["amount_shot{$j}{$n}"],
+                 'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
+                 'present_kensahyou' => 0,
+                 "first_lot_num" => ${"first_lot_num".$j.$n},
+                 "last_lot_num" => ${"last_lot_num".$j.$n},
+                 "sum_predict_lot_num" => $sum_predict_lot_num,
+               );
 
               $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 
@@ -636,20 +1033,79 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
              }else{
                ${"seikeiki_code".$j.$n} = "";
              }
-               $_SESSION['kadouseikei'][$m] = array(
-                 'product_code' => $_POST["product_code{$j}{$n}"],
-                 'seikeiki' => $_POST["seikeiki{$j}{$n}"],
-                 'seikeiki_code' => ${"seikeiki_code".$j.$n},
-                 'starting_tm' => ${"starting_tm".$j.$n},
-                 'finishing_tm' => ${"finishing_tm".$j.$n},
-                 'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
-                 'amount_shot' => $_POST["amount_shot{$j}{$n}"],
-                 'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
-                 "present_kensahyou" => 0,
-               );
+             $connection = ConnectionManager::get('DB_ikou_test');
+             $table = TableRegistry::get('shotdata_sensors');
+             $table->setConnection($connection);
+
+             //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
+             $sql = "SELECT lot_num FROM shotdata_sensors".
+                   " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
+             $connection = ConnectionManager::get('DB_ikou_test');
+             ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
+
+             $connection = ConnectionManager::get('default');
+             $table->setConnection($connection);
+
+             if(isset(${"shotdata_sensors".$j.$n}[0])){
+
+               $count = count(${"shotdata_sensors".$j.$n}) - 1;
+               ${"first_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[0]["lot_num"];
+               ${"last_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[$count]["lot_num"];
+
+             }else{
+               ${"first_lot_num".$j.$n} = "";
+               ${"last_lot_num".$j.$n} = "";
+             }
+
+             $Product = $this->Products->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+             if(($Product[0]->torisu) > 0){
+               $torisu = $Product[0]->torisu;
+               $Konpou = $this->Konpous->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+
+                 if(($Konpou[0]->irisu) > 0){
+                   $irisu = $Konpou[0]->irisu;
+
+                   $sum_predict_lot_num = ceil(($_POST["amount_shot{$j}{$n}"] * $torisu) / $irisu);
+
+                 }else{
+
+                   echo "<pre>";
+                   print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                   echo "</pre>";
+
+                 }
+
+             }else{
+
+               echo "<pre>";
+               print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+               echo "</pre>";
+
+               $sum_predict_lot_num = "";
+             }
+
+
+             $_SESSION['kadouseikei'][$m] = array(
+               'product_code' => $_POST["product_code{$j}{$n}"],
+               'seikeiki' => $_POST["seikeiki{$j}{$n}"],
+               'seikeiki_code' => ${"seikeiki_code".$j.$n},
+               'starting_tm' => ${"starting_tm".$j.$n},
+               'finishing_tm' => ${"finishing_tm".$j.$n},
+               'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
+               'amount_shot' => $_POST["amount_shot{$j}{$n}"],
+               'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
+               'present_kensahyou' => 0,
+               "first_lot_num" => ${"first_lot_num".$j.$n},
+               "last_lot_num" => ${"last_lot_num".$j.$n},
+               "sum_predict_lot_num" => $sum_predict_lot_num,
+             );
 
               $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
-
+/*
+              echo "<pre>";
+              print_r($_SESSION['kadouseikei']);
+              echo "</pre>";
+*/
 
              }
              $this->set('m',$m);//1行上の$roleをctpで使えるようにセット
@@ -715,17 +1171,72 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
               }else{
                 ${"seikeiki_code".$j.$n} = "";
               }
-                $_SESSION['kadouseikei'][$m] = array(
-                  'product_code' => $_POST["product_code{$j}{$n}"],
-                  'seikeiki' => $_POST["seikeiki{$j}{$n}"],
-                  'seikeiki_code' => ${"seikeiki_code".$j.$n},
-                  'starting_tm' => ${"starting_tm".$j.$n},
-                  'finishing_tm' => ${"finishing_tm".$j.$n},
-                  'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
-                  'amount_shot' => $_POST["amount_shot{$j}{$n}"],
-                  'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
-                  "present_kensahyou" => 0,
-                );
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('shotdata_sensors');
+              $table->setConnection($connection);
+
+              //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
+              $sql = "SELECT lot_num FROM shotdata_sensors".
+                    " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
+              $connection = ConnectionManager::get('DB_ikou_test');
+              ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
+
+              $connection = ConnectionManager::get('default');
+              $table->setConnection($connection);
+
+              if(isset(${"shotdata_sensors".$j.$n}[0])){
+
+                $count = count(${"shotdata_sensors".$j.$n}) - 1;
+                ${"first_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[0]["lot_num"];
+                ${"last_lot_num".$j.$n} = ${"shotdata_sensors".$j.$n}[$count]["lot_num"];
+
+              }else{
+                ${"first_lot_num".$j.$n} = "";
+                ${"last_lot_num".$j.$n} = "";
+              }
+
+              $Product = $this->Products->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+              if(($Product[0]->torisu) > 0){
+                $torisu = $Product[0]->torisu;
+                $Konpou = $this->Konpous->find()->where(['product_code' => $_POST["product_code{$j}{$n}"]])->toArray();
+
+                  if(($Konpou[0]->irisu) > 0){
+                    $irisu = $Konpou[0]->irisu;
+
+                    $sum_predict_lot_num = ceil(($_POST["amount_shot{$j}{$n}"] * $torisu) / $irisu);
+
+                  }else{
+
+                    echo "<pre>";
+                    print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                    echo "</pre>";
+
+                  }
+
+              }else{
+
+                echo "<pre>";
+                print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                echo "</pre>";
+
+                $sum_predict_lot_num = "";
+              }
+
+
+              $_SESSION['kadouseikei'][$m] = array(
+                'product_code' => $_POST["product_code{$j}{$n}"],
+                'seikeiki' => $_POST["seikeiki{$j}{$n}"],
+                'seikeiki_code' => ${"seikeiki_code".$j.$n},
+                'starting_tm' => ${"starting_tm".$j.$n},
+                'finishing_tm' => ${"finishing_tm".$j.$n},
+                'cycle_shot' => $_POST["cycle_shot{$j}{$n}"],
+                'amount_shot' => $_POST["amount_shot{$j}{$n}"],
+                'accomp_rate' => $_POST["accomp_rate{$j}{$n}"],
+                'present_kensahyou' => 0,
+                "first_lot_num" => ${"first_lot_num".$j.$n},
+                "last_lot_num" => ${"last_lot_num".$j.$n},
+                "sum_predict_lot_num" => $sum_predict_lot_num,
+              );
 
                 $_SESSION['kadouseikeiId'][$m] = $_POST["id{$j}{$n}"];
 

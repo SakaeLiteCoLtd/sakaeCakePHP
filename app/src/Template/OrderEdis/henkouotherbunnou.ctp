@@ -282,7 +282,7 @@ echo "</pre>";
   <br><br><br>
 
 <?php else: //分納追加（削除）を押された場合?>
-  <form method="post" action="henkou5otherbunnou" enctype="multipart/form-data">
+  <form method="post" action="henkouotherbunnou" enctype="multipart/form-data">
 
       <?php
         $data = $this->request->getData();

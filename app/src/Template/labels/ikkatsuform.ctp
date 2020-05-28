@@ -15,7 +15,7 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($KadouSeikeis, ['url' => ['action' => 'form']]);
+          echo $this->Form->create($KadouSeikeis, ['url' => ['action' => 'ikkatsuform']]);
 ?>
 <?php
  use App\myClass\Labelmenus\htmlLabelmenu;//myClassフォルダに配置したクラスを使用

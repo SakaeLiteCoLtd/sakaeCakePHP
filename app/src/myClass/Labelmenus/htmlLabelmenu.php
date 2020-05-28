@@ -19,10 +19,10 @@ class htmlLabelmenu extends AppController
      public function Labelmenus()
   	{
         $html =
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/index1'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/labelhakkoumenu'>\n".
                   "<img src='/img/Labelimg/label_hakkou.gif' width=115 height=40>\n".
                   "</a></td>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/index2'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/lotmenu'>\n".
                   "<img src='/img/Labelimg/label_lot.gif' width=115 height=40>\n".
                   "</a>\n".
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/index'>\n".
@@ -40,13 +40,13 @@ class htmlLabelmenu extends AppController
     public function LabelLabelsubmenus()
    {
        $html =
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/preform'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/ikkatsupreform'>\n".
                  "<img src='/img/Labelimg/label_ikkatsu.gif' width=85 height=36>\n".
                  "</a></td>\n".
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/kobetuform'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/kobetujikanform'>\n".
                  "<img src='/img/Labelimg/label_kobetsu_seikei_t.gif' width=85 height=36>\n".
                  "</a>\n".
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/kobetuform2'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/kobetuform'>\n".
                  "<img src='/img/Labelimg/label_kobetsu.gif' width=85 height=36>\n".
                  "</a></td>\n".
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/hasuform'>\n".
@@ -85,7 +85,7 @@ class htmlLabelmenu extends AppController
   public function Labelshinkisubmenus()
  {
    $html =
-             "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/layoutform1'>\n".
+             "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/layouttypeform'>\n".
              "<img src='/img/Labelimg/label_layout.gif' width=85 height=36>\n".
              "</a></td>\n".
              "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/placeform'>\n".

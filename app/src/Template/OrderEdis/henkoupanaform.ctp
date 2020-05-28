@@ -13,7 +13,7 @@
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
    $this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
-//   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkou5pana']]);
+//   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkoupanaform']]);
 ?>
 <?php
 header('Expires:-1');
@@ -37,7 +37,7 @@ header('Pragma:');
 
 <?php if(isset($data["nouki"]) && $bunnoucheck==0)://日付変更を押したとき ?>
 
-<form method="post" action="henkou6dnp" enctype="multipart/form-data">
+<form method="post" action="henkoupanaconfirm" enctype="multipart/form-data">
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -129,7 +129,7 @@ header('Pragma:');
 
 <?php elseif(isset($data["bunnnou"]))://分納を押したとき ?>
 
-<form method="post" action="henkou5dnpbunnou" enctype="multipart/form-data">
+<form method="post" action="henkoupanabunnou" enctype="multipart/form-data">
 
     <?php
       $data = $this->request->getData();
@@ -164,21 +164,15 @@ header('Pragma:');
                 		$product_name = $Product[0]->product_name;
                   ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
-                <?php
-                  $product_code = ${"orderEdis".$i}->product_code;
-                  $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
-                  $Dnpdate_deliver = $DnpTotalAmount[0]->date_deliver;
-                ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($Dnpdate_deliver) ?></td>
               <?php
               echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
               ?>
-              <?php
-                $product_code = ${"orderEdis".$i}->product_code;
-                $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
-                $TotalAmount = $DnpTotalAmount[0]->amount;
-              ?>
-                <td width="150" colspan="20" nowrap="nowrap"><?= h($TotalAmount) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($Totalamount) ?></td>
+                <?php
+                echo $this->Form->hidden("Dnpdate_deliver" ,['value'=>$Dnpdate_deliver]);
+                echo $this->Form->hidden("Totalamount" ,['value'=>$Totalamount]);
+                ?>
               </tr>
               <?php endforeach; ?>
             <?php endfor;?>
@@ -186,7 +180,6 @@ header('Pragma:');
           </tbody>
       </table>
   <br><br>
-
 
   <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
@@ -268,7 +261,7 @@ header('Pragma:');
 
 <?php elseif($bunnoucheck==0): ?>
 
-  <form method="post" action="henkou6dnp" enctype="multipart/form-data">
+  <form method="post" action="henkoupanaconfirm" enctype="multipart/form-data">
 
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">

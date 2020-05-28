@@ -13,7 +13,7 @@
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
    $this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
-//   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkou5pana']]);
+//   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkouotherform']]);
 ?>
 <?php
 header('Expires:-1');
@@ -37,7 +37,7 @@ header('Pragma:');
 
 <?php if(isset($data["nouki"]) && $bunnoucheck==0)://日付変更を押したとき ?>
 
-<form method="post" action="henkou6pana" enctype="multipart/form-data">
+<form method="post" action="henkouotherconfirm" enctype="multipart/form-data">
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -57,7 +57,7 @@ header('Pragma:');
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr>
 <br>
-<td style="border-style: none;"><div align="center"><?= $this->Form->submit('一括変更２', array('name' => 'ikkatsu')); ?></div></td>
+<td style="border-style: none;"><div align="center"><?= $this->Form->submit('一括変更', array('name' => 'ikkatsu')); ?></div></td>
 </tr>
 </table>
 <br><br><br>
@@ -129,7 +129,7 @@ header('Pragma:');
 
 <?php elseif(isset($data["bunnnou"]))://分納を押したとき ?>
 
-<form method="post" action="henkou5panabunnou" enctype="multipart/form-data">
+<form method="post" action="henkouotherbunnou" enctype="multipart/form-data">
 
     <?php
       $data = $this->request->getData();
@@ -205,34 +205,18 @@ header('Pragma:');
               <tr style="border-bottom: solid;border-width: 1px">
                 <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
                 <?php
-                if(${"kannou".$j} == 0){
-                  $meskannou = "変更可";
-                  echo "<td width='200' colspan='20'><div align='center'>\n";
-                  echo "<input type='date' value=${"date_deliver".$j} name=date_deliver_{$j} empty=Please select size='6'/>\n";
-                  echo "</div></td>\n";
-                  echo "<td width='200' colspan='20'><div align='center'>\n";
-                  echo "<input type='text' value=${"amount".$j} name=amount_{$j} empty=Please select size='6'/>\n";
-                  echo "<input type='hidden' value=${"kannou".$j} name=kannou_{$j} empty=Please select size='6'/>\n";
-                  echo "<input type='hidden' value=${"id".$j} name=orderEdis_{$j} empty=Please select size='6'/>\n";
-                  echo "</div></td>\n";
-                }else{
-                  $meskannou = "変更不可";
-                  echo "<td width='200' colspan='20'><div align='center'>\n";
-                  echo ${"date_deliver".$j};
-                  echo "<input type='hidden' value=${"date_deliver".$j} name=date_deliver_{$j} empty=Please select size='6'/>\n";
-                  echo "</div></td>\n";
-                  echo "<td width='200' colspan='20'><div align='center'>\n";
-                  echo ${"amount".$j};
-                  echo "<input type='hidden' value=${"amount".$j} name=amount_{$j} empty=Please select size='6'/>\n";
-                  echo "<input type='hidden' value=${"kannou".$j} name=kannou_{$j} empty=Please select size='6'/>\n";
-                  echo "<input type='hidden' value=${"id".$j} name=orderEdis_{$j} empty=Please select size='6'/>\n";
-                  echo "</div></td>\n";
-                }
                  $dateYMD = date('Y-m-d');
           //       $date_deliver = ${"orderEdis".$j}->date_deliver->format('Y-m-d');
           //       $amount = ${"orderEdis".$j}->amount;
+                 echo "<td width='200' colspan='20'><div align='center'>\n";
+                 echo "<input type='date' value=${"date_deliver".$j} name=date_deliver_{$j} empty=Please select size='6'/>\n";
+                 echo "</div></td>\n";
+                 echo "<td width='200' colspan='20'><div align='center'>\n";
+                 echo "<input type='text' value=${"amount".$j} name=amount_{$j} empty=Please select size='6'/>\n";
+                 echo "<input type='hidden' value=${"id".$j} name=orderEdis_{$j} empty=Please select size='6'/>\n";
+                 echo "</div></td>\n";
                 ?>
-                <td width="200" colspan="20" nowrap="nowrap"><?= h($meskannou) ?></td>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h("変更可") ?></td>
               </tr>
             <?php endfor;?>
           </tbody>
@@ -261,7 +245,7 @@ header('Pragma:');
 
 <?php elseif($bunnoucheck==0): ?>
 
-  <form method="post" action="henkou6pana" enctype="multipart/form-data">
+  <form method="post" action="henkouotherconfirm" enctype="multipart/form-data">
 
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -281,7 +265,7 @@ header('Pragma:');
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr>
   <br>
-  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('一括変更１', array('name' => 'ikkatsu')); ?></div></td>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('一括変更', array('name' => 'ikkatsu')); ?></div></td>
   </tr>
   </table>
   <br><br><br><br>

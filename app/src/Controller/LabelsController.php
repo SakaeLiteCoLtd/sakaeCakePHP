@@ -53,16 +53,16 @@ class LabelsController extends AppController
      {
        $this->request->session()->destroy(); // セッションの破棄
      }
-     public function index1()
+     public function labelhakkoumenu()
      {
        $this->request->session()->destroy(); // セッションの破棄
      }
-     public function index2()
+     public function lotmenu()
      {
        $this->request->session()->destroy(); // セッションの破棄
      }
 
-   public function layoutform1()//レイアウト入力
+   public function layouttypeform()//レイアウト入力
    {
      $this->request->session()->destroy(); // セッションの破棄
      $labelTypeProducts = $this->LabelTypeProducts->newEntity();
@@ -75,7 +75,7 @@ class LabelsController extends AppController
      	$this->set('arrLabelType',$arrLabelType);
    }
 
-   public function layoutform2()//レイアウト入力
+   public function layoutform()//レイアウト入力
    {
      $labelTypeProducts = $this->LabelTypeProducts->newEntity();
      $this->set('labelTypeProducts',$labelTypeProducts);
@@ -633,7 +633,7 @@ class LabelsController extends AppController
        }//トランザクション10
      }
    }
-   public function preform()//一括ラベル発行
+   public function ikkatsupreform()//一括ラベル発行
    {
      $this->request->session()->destroy(); // セッションの破棄
      $scheduleKouteis = $this->ScheduleKouteis->newEntity();
@@ -650,7 +650,7 @@ class LabelsController extends AppController
 	fclose($f);
 */
    }
-   public function form()//一括ラベル発行
+   public function ikkatsuform()//一括ラベル発行
    {
      session_start();
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
@@ -1387,7 +1387,7 @@ class LabelsController extends AppController
     }
   }
 
-  public function kobetuform2()//個別成形（時間なし）
+  public function kobetuform()//個別成形（時間なし）
   {
     session_start();
     $labelCsvs = $this->LabelCsvs->newEntity();
@@ -1802,7 +1802,7 @@ class LabelsController extends AppController
        $this->set('scheduleKouteis',$scheduleKouteis);
      }
 
-     public function kobetuform()//個別成形時間
+     public function kobetujikanform()//個別成形時間
      {
        session_start();
        $KadouSeikeis = $this->KadouSeikeis->newEntity();
@@ -2663,7 +2663,7 @@ class LabelsController extends AppController
        }
      }
 
-     public function fushiyoudo()//ラベル不使用//新DBを見る➝データがある場合ダブル更新、データがない場合旧DBのみ更新
+     public function fushiyoudo()//ラベル不使用//新DBを見る?データがある場合ダブル更新、データがない場合旧DBのみ更新
      {
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);

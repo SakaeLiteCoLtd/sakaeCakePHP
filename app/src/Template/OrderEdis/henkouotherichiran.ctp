@@ -12,7 +12,7 @@
    $username = $this->request->Session()->read('Auth.User.username');
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
-   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkou5dnp']]);
+   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkouotherform']]);
    $i = 1 ;
 ?>
 <?php
@@ -23,14 +23,6 @@ header('Pragma:');
   $data = $this->request->getData();
   $Data=$this->request->query();
 
-  if(isset($Data["s"]["Pro"])){
-    $Pro=$Data["s"]["Pro"];
-    echo $this->Form->hidden('Pro' ,['value'=>$Data["s"]["Pro"]]);
-  }else{
-    $Pro=$data["Pro"];
-    echo $this->Form->hidden('Pro' ,['value'=>$data["Pro"]]);
-  }
-
 ?>
 
  </table>
@@ -38,49 +30,15 @@ header('Pragma:');
  <br>
  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
              <tr style="background-color: #E6FFFF">
-               <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/edi_henkou_order.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'OrderEdis','action'=>'henkou1sentaku')));?></td>
+               <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/edi_henkou_order.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'OrderEdis','action'=>'henkousentakucustomer')));?></td>
              </tr>
  </table>
  <br><br>
  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
              <tr style="background-color: #E6FFFF">
-               <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_dnp.gif',array('width'=>'85','height'=>'33','url'=>array('controller'=>'OrderEdis','action'=>'henkou2dnp')));?></td>
+               <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_others.gif',array('width'=>'85','height'=>'33','url'=>array('controller'=>'OrderEdis','action'=>'henkouothersearch')));?></td>
              </tr>
  </table>
-<br><br>
-
-<?php if($Pro == "BON"): ?>
-
-<table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-            <tr style="background-color: #E6FFFF">
-              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/push_button_bon.gif',array('width'=>'85','height'=>'33','url'=>array('controller'=>'OrderEdis','action'=>'henkou3dnp','Pro'=>'BON')));?></td>
-              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_cas.gif',array('width'=>'85','height'=>'33','url'=>array('controller'=>'OrderEdis','action'=>'henkou3dnp','Pro'=>'CAS')));?></td>
-              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_mld.gif',array('width'=>'85','height'=>'33','url'=>array('controller'=>'OrderEdis','action'=>'henkou3dnp','Pro'=>'MLD')));?></td>
-            </tr>
-</table>
-
-<?php elseif($Pro == "CAS"): ?>
-
-  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-              <tr style="background-color: #E6FFFF">
-                <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_bon.gif',array('width'=>'85','height'=>'33','url'=>array('controller'=>'OrderEdis','action'=>'henkou3dnp','Pro'=>'BON')));?></td>
-                <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/push_button_cas.gif',array('width'=>'85','height'=>'33','url'=>array('controller'=>'OrderEdis','action'=>'henkou3dnp','Pro'=>'CAS')));?></td>
-                <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_mld.gif',array('width'=>'85','height'=>'33','url'=>array('controller'=>'OrderEdis','action'=>'henkou3dnp','Pro'=>'MLD')));?></td>
-              </tr>
-  </table>
-
-<?php else: ?>
-
-  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-              <tr style="background-color: #E6FFFF">
-                <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_bon.gif',array('width'=>'85','height'=>'33','url'=>array('controller'=>'OrderEdis','action'=>'henkou3dnp','Pro'=>'BON')));?></td>
-                <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_cas.gif',array('width'=>'85','height'=>'33','url'=>array('controller'=>'OrderEdis','action'=>'henkou3dnp','Pro'=>'CAS')));?></td>
-                <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/push_button_mld.gif',array('width'=>'85','height'=>'33','url'=>array('controller'=>'OrderEdis','action'=>'henkou3dnp','Pro'=>'MLD')));?></td>
-              </tr>
-  </table>
-
-<?php endif; ?>
-
 <br>
 <hr size="5" style="margin: 0.5rem">
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -133,7 +91,7 @@ header('Pragma:');
 <br><br><br><br>
 
 <?php if(isset($data["subete"])): ?>
-  <form method="post" action="henkou4pana" enctype="multipart/form-data">
+  <form method="post" action="henkou4other" enctype="multipart/form-data">
 
   <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr>
@@ -204,7 +162,7 @@ header('Pragma:');
 </form>
 
 <?php else: ?>
-  <form method="post" action="henkou4pana" enctype="multipart/form-data">
+  <form method="post" action="henkou4other" enctype="multipart/form-data">
 
   <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr>

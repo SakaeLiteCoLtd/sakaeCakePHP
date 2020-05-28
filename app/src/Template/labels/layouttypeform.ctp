@@ -12,7 +12,7 @@
           header('Pragma:');
 ?>
 
-<?=$this->Form->create($labelTypeProducts, ['url' => ['action' => 'layoutform2']]) ?>
+<?=$this->Form->create($labelTypeProducts, ['url' => ['action' => 'layoutform']]) ?>
 <?php
  use App\myClass\Labelmenus\htmlLabelmenu;//myClassフォルダに配置したクラスを使用
  $htmlLabelmenu = new htmlLabelmenu();

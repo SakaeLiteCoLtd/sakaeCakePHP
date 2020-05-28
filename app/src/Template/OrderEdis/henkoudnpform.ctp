@@ -13,7 +13,7 @@
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
    $this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
-//   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkou5other']]);
+//   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkou5pana']]);
 ?>
 <?php
 header('Expires:-1');
@@ -37,7 +37,7 @@ header('Pragma:');
 
 <?php if(isset($data["nouki"]) && $bunnoucheck==0)://日付変更を押したとき ?>
 
-<form method="post" action="henkou6other" enctype="multipart/form-data">
+<form method="post" action="henkoudnpconfirm" enctype="multipart/form-data">
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -129,7 +129,7 @@ header('Pragma:');
 
 <?php elseif(isset($data["bunnnou"]))://分納を押したとき ?>
 
-<form method="post" action="henkou5otherbunnou" enctype="multipart/form-data">
+<form method="post" action="henkoudnpbunnou" enctype="multipart/form-data">
 
     <?php
       $data = $this->request->getData();
@@ -164,15 +164,21 @@ header('Pragma:');
                 		$product_name = $Product[0]->product_name;
                   ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
+                <?php
+                  $product_code = ${"orderEdis".$i}->product_code;
+                  $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
+                  $Dnpdate_deliver = $DnpTotalAmount[0]->date_deliver;
+                ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($Dnpdate_deliver) ?></td>
               <?php
               echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
               ?>
-                <td width="150" colspan="20" nowrap="nowrap"><?= h($Totalamount) ?></td>
-                <?php
-                echo $this->Form->hidden("Dnpdate_deliver" ,['value'=>$Dnpdate_deliver]);
-                echo $this->Form->hidden("Totalamount" ,['value'=>$Totalamount]);
-                ?>
+              <?php
+                $product_code = ${"orderEdis".$i}->product_code;
+                $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
+                $TotalAmount = $DnpTotalAmount[0]->amount;
+              ?>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($TotalAmount) ?></td>
               </tr>
               <?php endforeach; ?>
             <?php endfor;?>
@@ -180,6 +186,7 @@ header('Pragma:');
           </tbody>
       </table>
   <br><br>
+
 
   <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
@@ -205,18 +212,34 @@ header('Pragma:');
               <tr style="border-bottom: solid;border-width: 1px">
                 <td width="150" colspan="20" nowrap="nowrap"><?= h($j+1) ?></td>
                 <?php
+                if(${"kannou".$j} == 0){
+                  $meskannou = "変更可";
+                  echo "<td width='200' colspan='20'><div align='center'>\n";
+                  echo "<input type='date' value=${"date_deliver".$j} name=date_deliver_{$j} empty=Please select size='6'/>\n";
+                  echo "</div></td>\n";
+                  echo "<td width='200' colspan='20'><div align='center'>\n";
+                  echo "<input type='text' value=${"amount".$j} name=amount_{$j} empty=Please select size='6'/>\n";
+                  echo "<input type='hidden' value=${"kannou".$j} name=kannou_{$j} empty=Please select size='6'/>\n";
+                  echo "<input type='hidden' value=${"id".$j} name=orderEdis_{$j} empty=Please select size='6'/>\n";
+                  echo "</div></td>\n";
+                }else{
+                  $meskannou = "変更不可";
+                  echo "<td width='200' colspan='20'><div align='center'>\n";
+                  echo ${"date_deliver".$j};
+                  echo "<input type='hidden' value=${"date_deliver".$j} name=date_deliver_{$j} empty=Please select size='6'/>\n";
+                  echo "</div></td>\n";
+                  echo "<td width='200' colspan='20'><div align='center'>\n";
+                  echo ${"amount".$j};
+                  echo "<input type='hidden' value=${"amount".$j} name=amount_{$j} empty=Please select size='6'/>\n";
+                  echo "<input type='hidden' value=${"kannou".$j} name=kannou_{$j} empty=Please select size='6'/>\n";
+                  echo "<input type='hidden' value=${"id".$j} name=orderEdis_{$j} empty=Please select size='6'/>\n";
+                  echo "</div></td>\n";
+                }
                  $dateYMD = date('Y-m-d');
           //       $date_deliver = ${"orderEdis".$j}->date_deliver->format('Y-m-d');
           //       $amount = ${"orderEdis".$j}->amount;
-                 echo "<td width='200' colspan='20'><div align='center'>\n";
-                 echo "<input type='date' value=${"date_deliver".$j} name=date_deliver_{$j} empty=Please select size='6'/>\n";
-                 echo "</div></td>\n";
-                 echo "<td width='200' colspan='20'><div align='center'>\n";
-                 echo "<input type='text' value=${"amount".$j} name=amount_{$j} empty=Please select size='6'/>\n";
-                 echo "<input type='hidden' value=${"id".$j} name=orderEdis_{$j} empty=Please select size='6'/>\n";
-                 echo "</div></td>\n";
                 ?>
-                <td width="200" colspan="20" nowrap="nowrap"><?= h("変更可") ?></td>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h($meskannou) ?></td>
               </tr>
             <?php endfor;?>
           </tbody>
@@ -245,7 +268,7 @@ header('Pragma:');
 
 <?php elseif($bunnoucheck==0): ?>
 
-  <form method="post" action="henkou6other" enctype="multipart/form-data">
+  <form method="post" action="henkoudnpconfirm" enctype="multipart/form-data">
 
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">

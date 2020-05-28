@@ -46,11 +46,11 @@ $data = $this->request->getData();
     $num_order_moto = $OrderEdi[0]->num_order;
     $product_code_moto = $OrderEdi[0]->product_code;
     $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['date_order' => $date_order_moto, 'num_order' => $num_order_moto, 'product_code' => $product_code_moto])->toArray();
-//    $amount_moto = $DnpTotalAmount[0]->amount;
-//    $DnpTotalAmountId = $DnpTotalAmount[0]->id;
-//    $DnpTotalAmountNameOrder = $DnpTotalAmount[0]->name_order;
-//    $DenpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $data['orderEdis_0']])->toArray();
-//    $DenpyouDnpMinoukannousPlaceDeliver = $DenpyouDnpMinoukannous[0]->place_deliver;
+    $amount_moto = $DnpTotalAmount[0]->amount;
+    $DnpTotalAmountId = $DnpTotalAmount[0]->id;
+    $DnpTotalAmountNameOrder = $DnpTotalAmount[0]->name_order;
+    $DenpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $data['orderEdis_0']])->toArray();
+    $DenpyouDnpMinoukannousPlaceDeliver = $DenpyouDnpMinoukannous[0]->place_deliver;
 
     //納期がかぶっているかチェック
     $uniquearrdate_deliver = array_unique($arrdate_deliver, SORT_REGULAR);//重複削除
@@ -71,11 +71,11 @@ $data = $this->request->getData();
   ?>
 
 
-<?php if((isset($data["touroku"]))&&($amount_total == $Totalamount)&&($cntdate_deliver == $cntuniquearrdate_deliver)&&($deliver_check == 0)): //分納伝票登録を押されて、合計数量が合っていて、納期がかぶっていない場合?>
+<?php if((isset($data["touroku"]))&&($amount_total == $amount_moto)&&($cntdate_deliver == $cntuniquearrdate_deliver)&&($deliver_check == 0)): //分納伝票登録を押されて、合計数量が合っていて、納期がかぶっていない場合?>
   <?php
   $data = $this->request->getData();
   ?>
-  <form method="post" action="henkoupanabunnnoupreadd" enctype="multipart/form-data">
+  <form method="post" action="henkoudnpbunnnoupreadd" enctype="multipart/form-data">
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
           <thead>
@@ -101,16 +101,16 @@ $data = $this->request->getData();
                   ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
                 <?php
-          //        $product_code = ${"orderEdis".$i}->product_code;
-          //        $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
-          //        $Dnpdate_deliver = $DnpTotalAmount[0]->date_deliver;
+                  $product_code = ${"orderEdis".$i}->product_code;
+                  $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
+                  $Dnpdate_deliver = $DnpTotalAmount[0]->date_deliver;
                 ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($Dnpdate_deliver) ?></td>
               <?php
                echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
               ?>
-                <td width="150" colspan="20" nowrap="nowrap"><?= h($Totalamount) ?></td>
 
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($amount_moto) ?></td>
               </tr>
               <?php endforeach; ?>
             <?php endfor;?>
@@ -157,17 +157,17 @@ $data = $this->request->getData();
               'amount' => $data["amount_".$j]
             );
           }
-    //      $_SESSION['total_amount'] = array(
-    //        'id' => $DnpTotalAmountId,
-    //        'name_order' => $DnpTotalAmountNameOrder
-    //      );
-    //      $_SESSION['minoukannou'] = array(
-    //        'name_order' => $DnpTotalAmountNameOrder,
-    //        'place_deliver' => $DenpyouDnpMinoukannousPlaceDeliver,
-    //        'conf_print' => 0,
-    //        'minoukannou' => 0,
-    //        'delete_flag' =>  0
-    //      );
+          $_SESSION['total_amount'] = array(
+            'id' => $DnpTotalAmountId,
+            'name_order' => $DnpTotalAmountNameOrder
+          );
+          $_SESSION['minoukannou'] = array(
+            'name_order' => $DnpTotalAmountNameOrder,
+            'place_deliver' => $DenpyouDnpMinoukannousPlaceDeliver,
+            'conf_print' => 0,
+            'minoukannou' => 0,
+            'delete_flag' =>  0
+          );
 /*
           $_SESSION['orderEdis'][$j] = array(
             'id' => $data["orderEdis_".$j],
@@ -253,15 +253,15 @@ echo "</pre>";
 
 <?php elseif(isset($data["touroku"])): //分納伝票登録を押されて、合計数量が合わないまたは納期がかぶっている場合?>
   <?php
-  if(($cntdate_deliver == $cntuniquearrdate_deliver) && ($amount_total != $Totalamount) && ($deliver_check == 0)){
+  if(($cntdate_deliver == $cntuniquearrdate_deliver) && ($amount_total != $amount_moto) && ($deliver_check == 0)){
     $errmesdeliver1 = "";
     $errmesdeliver2 = "";
     $errmesamount = "合計数量が合いません！";
-  }elseif(($cntdate_deliver != $cntuniquearrdate_deliver) && ($amount_total == $Totalamount) && ($deliver_check == 0)){
+  }elseif(($cntdate_deliver != $cntuniquearrdate_deliver) && ($amount_total == $amount_moto) && ($deliver_check == 0)){
     $errmesdeliver1 = "納期が被っているものがあります。納期を変更してください。";
     $errmesdeliver2 = "";
     $errmesamount = "";
-  }elseif(($cntdate_deliver == $cntuniquearrdate_deliver) && ($amount_total == $Totalamount) && ($deliver_check == 1)){
+  }elseif(($cntdate_deliver == $cntuniquearrdate_deliver) && ($amount_total == $amount_moto) && ($deliver_check == 1)){
     $errmesdeliver1 = "";
     $errmesdeliver2 = "納期は日程の若い順に入力してください";
     $errmesamount = "";
@@ -282,7 +282,7 @@ echo "</pre>";
   <br><br><br>
 
 <?php else: //分納追加（削除）を押された場合?>
-  <form method="post" action="henkou5panabunnou" enctype="multipart/form-data">
+  <form method="post" action="henkoudnpbunnou" enctype="multipart/form-data">
 
       <?php
         $data = $this->request->getData();
@@ -291,8 +291,8 @@ echo "</pre>";
         $date_order_moto = $OrderEdi[0]->date_order;
         $num_order_moto = $OrderEdi[0]->num_order;
         $product_code_moto = $OrderEdi[0]->product_code;
-    //    $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['date_order' => $date_order_moto, 'num_order' => $num_order_moto, 'product_code' => $product_code_moto])->toArray();
-    //    $amount_moto = $DnpTotalAmount[0]->amount;
+        $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['date_order' => $date_order_moto, 'num_order' => $num_order_moto, 'product_code' => $product_code_moto])->toArray();
+        $amount_moto = $DnpTotalAmount[0]->amount;
 
       ?>
 
@@ -320,15 +320,17 @@ echo "</pre>";
                   		$product_name = $Product[0]->product_name;
                     ?>
                   <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
+                  <?php
+                    $product_code = ${"orderEdis".$i}->product_code;
+                    $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
+                    $Dnpdate_deliver = $DnpTotalAmount[0]->date_deliver;
+                  ?>
                   <td width="200" colspan="20" nowrap="nowrap"><?= h($Dnpdate_deliver) ?></td>
                 <?php
                 echo $this->Form->hidden("orderEdis_".$i ,['value'=>$data["orderEdis_".$i]]);
+//                echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
                 ?>
-                  <td width="150" colspan="20" nowrap="nowrap"><?= h($Totalamount) ?></td>
-                  <?php
-                  echo $this->Form->hidden("Dnpdate_deliver" ,['value'=>$Dnpdate_deliver]);
-                  echo $this->Form->hidden("Totalamount" ,['value'=>$Totalamount]);
-                  ?>
+                  <td width="150" colspan="20" nowrap="nowrap"><?= h($amount_moto) ?></td>
                 </tr>
                 <?php endforeach; ?>
               <?php endfor;?>

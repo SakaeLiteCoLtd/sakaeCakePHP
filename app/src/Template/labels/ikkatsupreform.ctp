@@ -12,7 +12,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($scheduleKouteis, ['url' => ['action' => 'form']]);
+          echo $this->Form->create($scheduleKouteis, ['url' => ['action' => 'ikkatsuform']]);
 ?>
 <?php
  use App\myClass\Labelmenus\htmlLabelmenu;//myClassフォルダに配置したクラスを使用

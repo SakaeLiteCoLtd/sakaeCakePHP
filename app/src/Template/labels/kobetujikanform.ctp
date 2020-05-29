@@ -59,9 +59,11 @@ ${"n".$j} = 1;
         echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
         echo "開始";
         echo "</strong></div></td>\n";
+
         echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
         echo "<input type='datetime-local' value=${"starting_tm".$j.$i} name=starting_tm".$j.$i.">\n";
         echo "</div></td>\n";
+
         echo "<td rowspan='2' colspan='20' nowrap='nowrap'><div align='center'>\n";
         echo "自動で計算されます";
         echo "</div></td>\n";

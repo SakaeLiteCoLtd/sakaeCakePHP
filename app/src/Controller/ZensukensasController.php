@@ -136,7 +136,9 @@ class ZensukensasController extends AppController
        $arr1 = array_merge($arr1,array('delete_flag'=>0));
        $arr1 = array_merge($arr1,array('created_staff'=>$created_staff));
        $arr1touroku[] = $arr1;
+
        $ResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code1, 'lot_num' => $lot_num, 'datetime_finish IS' => Null])->toArray();
+
        if(isset($ResultZensuHead[0])){
          $ResultZensuHead = $ResultZensuHead;//既にResultZensuHeadsテーブルにあって、検査済みではない場合（検査中にもう一度検査しようとした場合）
        }else{
@@ -146,6 +148,24 @@ class ZensukensasController extends AppController
          $connection->begin();//トランザクション3
          try {//トランザクション4
            if ($this->ResultZensuHeads->saveMany($ResultZensuHead)) {
+
+             //insert 旧DB
+             $connection = ConnectionManager::get('DB_ikou_test');
+             $table = TableRegistry::get('result_zensu_head');
+             $table->setConnection($connection);
+
+             for($k=0; $k<count($arr1touroku); $k++){
+               $connection->insert('result_zensu_head', [
+                   'product_id' => $arr1touroku[$k]["product_code"],
+                   'lot_num' => $arr1touroku[$k]["lot_num"],
+                   'emp_id' => $arr1touroku[$k]["created_staff"],
+                   'datetime_start' => date("Y-m-d H:i:s")
+               ]);
+             }
+
+             $connection = ConnectionManager::get('default');//新DBに戻る
+             $table->setConnection($connection);
+
              $connection->commit();// コミット5
            } else {
              $this->Flash->error(__('The data could not be saved. Please, try again.'));
@@ -176,6 +196,24 @@ class ZensukensasController extends AppController
             $connection->begin();//トランザクション3
             try {//トランザクション4
               if ($this->ResultZensuHeads->saveMany($ResultZensuHead)) {
+
+                //insert 旧DB
+                $connection = ConnectionManager::get('DB_ikou_test');
+                $table = TableRegistry::get('result_zensu_head');
+                $table->setConnection($connection);
+
+                for($k=0; $k<count($arr2touroku); $k++){
+                  $connection->insert('result_zensu_head', [
+                      'product_id' => $arr2touroku[$k]["product_code"],
+                      'lot_num' => $arr2touroku[$k]["lot_num"],
+                      'emp_id' => $arr2touroku[$k]["created_staff"],
+                      'datetime_start' => date("Y-m-d H:i:s")
+                  ]);
+                }
+
+                $connection = ConnectionManager::get('default');//新DBに戻る
+                $table->setConnection($connection);
+
                 $connection->commit();// コミット5
               } else {
                 $this->Flash->error(__('The data could not be saved. Please, try again.'));
@@ -427,7 +465,11 @@ class ZensukensasController extends AppController
        $this->set('ResultZensuFooders',$ResultZensuFooders);
        $CheckLots = $this->CheckLots->newEntity();
        $this->set('CheckLots',$CheckLots);
-
+/*
+       echo "<pre>";
+       print_r($_SESSION['zensufooder']);
+       echo "</pre>";
+*/
        $ResultZensuFooders = $this->ResultZensuFooders->patchEntities($ResultZensuFooders, $_SESSION['zensufooder']);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
        $connection = ConnectionManager::get('default');//トランザクション1
        // トランザクション開始2
@@ -435,10 +477,42 @@ class ZensukensasController extends AppController
        try {//トランザクション4
            if ($this->ResultZensuFooders->saveMany($ResultZensuFooders)) {//saveManyで一括登録
 
+             //insert 旧DB
+             $connection = ConnectionManager::get('DB_ikou_test');
+             $table = TableRegistry::get('result_zensu_fooder');
+             $table->setConnection($connection);
+
+             for($k=0; $k<count($_SESSION['zensufooder']); $k++){
+               $connection->insert('result_zensu_fooder', [
+                   'result_zensu_head_id' => $_SESSION['zensufooder'][$k]["result_zensu_head_id"],
+                   'cont_rejection_id' => $_SESSION['zensufooder'][$k]["cont_rejection_id"],
+                   'amount' => $_SESSION['zensufooder'][$k]["amount"],
+                   'bik' => $_SESSION['zensufooder'][$k]["bik"],
+                   'datetime_finish' => date("Y-m-d H:i:s")
+               ]);
+             }
+
+             $connection = ConnectionManager::get('default');//新DBに戻る
+             $table->setConnection($connection);
+
              if ($this->ResultZensuHeads->updateAll(
                ['datetime_finish' => $_SESSION['zensuhead']['datetime_finish'], 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
                ['id'  => $_SESSION['result_zensu_head_id']['result_zensu_head_id']]
              )){
+
+
+               //insert 旧DB
+               $connection = ConnectionManager::get('DB_ikou_test');
+               $table = TableRegistry::get('result_zensu_head');
+               $table->setConnection($connection);
+
+               $updater = "UPDATE result_zensu_head set datetime_finish = '".date('Y-m-d H:i:s')."'
+                 where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id']['lot_num']."' and datetime_finish IS NULL";//もとのDBも更新
+               $connection->execute($updater);
+
+               $connection = ConnectionManager::get('default');//新DBに戻る
+               $table->setConnection($connection);
+
 
                $CheckLot = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num' => $_SESSION['result_zensu_head_id']['lot_num']])->toArray();
                $CheckLotId = $CheckLot[0]->id;
@@ -454,6 +528,19 @@ class ZensukensasController extends AppController
                    ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
                    ['id'  => $CheckLotId]
                  )){
+
+                   //insert 旧DB
+                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $table = TableRegistry::get('check_lots');
+                   $table->setConnection($connection);
+
+                   $updater = "UPDATE check_lots set flag_used = 0
+                     where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id']['lot_num']."'";//もとのDBも更新
+                   $connection->execute($updater);
+
+                   $connection = ConnectionManager::get('default');//新DBに戻る
+                   $table->setConnection($connection);
+
 
                    //INだった場合親ロットの'flag_used' => 0にするかどうかをチェックする。
                    $lot_in = substr($_SESSION['result_zensu_head_id']['lot_num'], 0, 3);
@@ -526,6 +613,18 @@ class ZensukensasController extends AppController
                        $this->CheckLots->updateAll(
                         ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
                         ['id'  => $arrCheckLotoya[$bangou_arr_oya_lot]['id']]);
+
+                        //insert 旧DB
+                        $connection = ConnectionManager::get('DB_ikou_test');
+                        $table = TableRegistry::get('check_lots');
+                        $table->setConnection($connection);
+
+                        $updater = "UPDATE check_lots set flag_used = 0 , updated_at = '".date('Y-m-d H:i:s')."'
+                          where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id']['lot_num']."'";//もとのDBも更新
+                        $connection->execute($updater);
+
+                        $connection = ConnectionManager::get('default');//新DBに戻る
+                        $table->setConnection($connection);
 
                         $mes = "登録されました。親ロットも検査済みに変更しました。";
                         $this->set('mes',$mes);

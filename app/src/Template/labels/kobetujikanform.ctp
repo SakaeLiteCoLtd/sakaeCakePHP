@@ -60,9 +60,15 @@ ${"n".$j} = 1;
         echo "開始";
         echo "</strong></div></td>\n";
 
-        echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
-        echo "<input type='datetime-local' value=${"starting_tm".$j.$i} name=starting_tm".$j.$i.">\n";
-        echo "</div></td>\n";
+    //    echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
+    //    echo "<input type='datetime-local' value=${"starting_tm".$j.$i} name=starting_tm".$j.$i.">\n";
+    //    echo "</div></td>\n";
+
+  ?>
+
+  <td bgcolor="#FFFFCC" colspan="37" style="border-bottom: 0px"><?= $this->Form->input("starting_tm".$j.$i."", array('type'=>'datetime', 'monthNames' => false,  'value'=>${"starting_tm".$j.$i}, 'label'=>false)) ?></td>
+
+  <?php
 
         echo "<td rowspan='2' colspan='20' nowrap='nowrap'><div align='center'>\n";
         echo "自動で計算されます";
@@ -75,9 +81,18 @@ ${"n".$j} = 1;
         echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
         echo "終了";
         echo "</strong></div></td>\n";
-        echo "<td colspan='37'><div align='center'>\n";
-        echo "<input type='datetime-local' value=${"finishing_tm".$j.$i} name=finishing_tm".$j.$i.">\n";
-        echo "</div></td>\n";
+
+    //    echo "<td colspan='37'><div align='center'>\n";
+    //    echo "<input type='datetime-local' value=${"finishing_tm".$j.$i} name=finishing_tm".$j.$i.">\n";
+    //    echo "</div></td>\n";
+
+        ?>
+
+        <td bgcolor="#FFFFCC" colspan="37"><?= $this->Form->input("finishing_tm".$j.$i."", array('type'=>'datetime', 'monthNames' => false,  'value'=>${"finishing_tm".$j.$i}, 'label'=>false)) ?></td>
+
+        <?php
+
+
         echo "</tr>\n";
       }
     }
@@ -106,9 +121,17 @@ ${"n".$j} = 1;
         echo "<td colspan='3' nowrap='nowrap' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
         echo "開始";
         echo "</strong></div></td>\n";
-        echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
-        echo "<input type='datetime-local' value=${"starting_tm".$j.$i} name=starting_tm".$j.$i.">\n";
-        echo "</div></td>\n";
+
+      //  echo "<td colspan='37' nowrap='nowrap' style='border-bottom: 0px'><div align='center'>\n";
+      //  echo "<input type='datetime-local' value=${"starting_tm".$j.$i} name=starting_tm".$j.$i.">\n";
+      //  echo "</div></td>\n";
+
+      ?>
+
+      <td bgcolor="#FFFFCC" colspan="37" style="border-bottom: 0px"><?= $this->Form->input("starting_tm".$j.$i."", array('type'=>'datetime', 'monthNames' => false,  'value'=>${"starting_tm".$j.$i}, 'label'=>false)) ?></td>
+
+      <?php
+
         echo "<td rowspan='2' colspan='20' nowrap='nowrap'><div align='center'>\n";
         echo "自動で計算されます";
         echo "</div></td>\n";
@@ -120,9 +143,17 @@ ${"n".$j} = 1;
         echo "<td colspan='3' nowrap='nowrap'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
         echo "終了";
         echo "</strong></div></td>\n";
-        echo "<td colspan='37'><div align='center'>\n";
-        echo "<input type='datetime-local' value=${"finishing_tm".$j.$i} name=finishing_tm".$j.$i.">\n";
-        echo "</div></td>\n";
+
+  //      echo "<td colspan='37'><div align='center'>\n";
+  //      echo "<input type='datetime-local' value=${"finishing_tm".$j.$i} name=finishing_tm".$j.$i.">\n";
+  //      echo "</div></td>\n";
+
+  ?>
+
+  <td bgcolor="#FFFFCC" colspan="37"><?= $this->Form->input("finishing_tm".$j.$i."", array('type'=>'datetime', 'monthNames' => false,  'value'=>${"finishing_tm".$j.$i}, 'label'=>false)) ?></td>
+
+  <?php
+
         echo "</tr>\n";
       }
     }
@@ -172,6 +203,7 @@ ${"n".$j} = 1;
  ${"n".$j} = 1;
  $countj = 0;
  $m = 0;
+ $data = $this->request->getData();//200531追加
  $nij = ${"n".$j} + $this->request->getData("ntuika{$j}");
  for($i=1; $i<=$nij; $i++){//１号機
    if(!empty($this->request->getData("product_code{$j}{$i}"))){
@@ -190,17 +222,26 @@ ${"n".$j} = 1;
        $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
        $irisu = $Konpou[0]->irisu;
      if((int)$cycle*$irisu > 0){
-       ${"hyoujistarting_tm".$j.$i} = substr($this->request->getData("starting_tm{$j}{$i}"), 0, 10)." ".substr($this->request->getData("starting_tm{$j}{$i}"), 11, 5);
-       ${"hyoujifinishing_tm".$j.$i} = substr($this->request->getData("finishing_tm{$j}{$i}"), 0, 10)." ".substr($this->request->getData("finishing_tm{$j}{$i}"), 11, 5);
+  //     ${"hyoujistarting_tm".$j.$i} = substr($this->request->getData("starting_tm{$j}{$i}"), 0, 10)." ".substr($this->request->getData("starting_tm{$j}{$i}"), 11, 5);//200531削除
+  //     ${"hyoujifinishing_tm".$j.$i} = substr($this->request->getData("finishing_tm{$j}{$i}"), 0, 10)." ".substr($this->request->getData("finishing_tm{$j}{$i}"), 11, 5);//200531削除
+       ${"hyoujistarting_tm".$j.$i} = $data["starting_tm".$j.$i]['year']."-".$data["starting_tm".$j.$i]['month']."-".$data["starting_tm".$j.$i]['day'].//200531追加
+       " ".$data["starting_tm".$j.$i]['hour'].":".$data["starting_tm".$j.$i]['minute'];//200531追加
+       ${"hyoujifinishing_tm".$j.$i} = $data["finishing_tm".$j.$i]['year']."-".$data["finishing_tm".$j.$i]['month']."-".$data["finishing_tm".$j.$i]['day'].//200531追加
+       " ".$data["finishing_tm".$j.$i]['hour'].":".$data["finishing_tm".$j.$i]['minute'];//200531追加
        ${"kadoujikan".$i} = (strtotime(${"hyoujifinishing_tm".$j.$i}) - strtotime(${"hyoujistarting_tm".$j.$i}));
+
        ${"yoteimaisu".$i} = round((${"kadoujikan".$i}*$torisu)/($cycle*$irisu), 0);
      }else{
        ${"yoteimaisu".$i} = "0";
      }
 
      $countj = $countj + 1;
-     ${"hyoujistarting_tm".$j.$i} = substr($this->request->getData("starting_tm{$j}{$i}"), 0, 10)." ".substr($this->request->getData("starting_tm{$j}{$i}"), 11, 5);
-     ${"hyoujifinishing_tm".$j.$i} = substr($this->request->getData("finishing_tm{$j}{$i}"), 0, 10)." ".substr($this->request->getData("finishing_tm{$j}{$i}"), 11, 5);
+  //   ${"hyoujistarting_tm".$j.$i} = substr($this->request->getData("starting_tm{$j}{$i}"), 0, 10)." ".substr($this->request->getData("starting_tm{$j}{$i}"), 11, 5);
+  //   ${"hyoujifinishing_tm".$j.$i} = substr($this->request->getData("finishing_tm{$j}{$i}"), 0, 10)." ".substr($this->request->getData("finishing_tm{$j}{$i}"), 11, 5);
+      ${"hyoujistarting_tm".$j.$i} = $data["starting_tm".$j.$i]['year']."-".$data["starting_tm".$j.$i]['month']."-".$data["starting_tm".$j.$i]['day'].//200531追加
+      " ".$data["starting_tm".$j.$i]['hour'].":".$data["starting_tm".$j.$i]['minute'];//200531追加
+      ${"hyoujifinishing_tm".$j.$i} = $data["finishing_tm".$j.$i]['year']."-".$data["finishing_tm".$j.$i]['month']."-".$data["finishing_tm".$j.$i]['day'].//200531追加
+      " ".$data["finishing_tm".$j.$i]['hour'].":".$data["finishing_tm".$j.$i]['minute'];//200531追加
      ${"hakoNo".$i} = $this->request->getData("hakoNo{$j}{$i}");
        echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
        echo "<td rowspan='2'  height='10' colspan='20' nowrap='nowrap' style='font-size: 18pt'><div align='center'>\n";

@@ -21,7 +21,7 @@ class htmlLogin extends AppController
                 "<legend align='center'><strong style='font-size: 11pt; color:blue'><?= __('社員ID登録') ?></strong></legend>\n".
                 "<fieldset><table align='center' border='2' bordercolor='#E6FFFF' cellpadding='0' cellspacing='0' style='border-bottom: solid;border-width: 1px'>\n"./////////////////////////////////////////////
                 "<tr><td bgcolor='#FFFFCC' style='font-size: 12pt'><strong style='font-size: 11pt; color:blue'>社員ID</strong></td>\n".
-        		    "<td  width='150' bgcolor='#FFFFCC'style='font-size: 12pt;'><input type='text' name=username size='6'/></td></tr></table></fieldset>\n";
+        		    "<td  width='150' bgcolor='#FFFFCC'style='font-size: 12pt;'><input type='text' name=username size='6' autofocus/></td></tr></table></fieldset>\n";
 
     		return $html;
     		$this->html = $html;

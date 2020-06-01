@@ -45,7 +45,7 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
 <?php
         echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
         echo "<td rowspan='2'  height='6' colspan='20' nowrap='nowrap'>\n";
-        echo "<input type='text' name=product_code size='6'/>\n";
+        echo "<input type='text' name=product_code size='6'  autofocus/>\n";
         echo "</td>\n";
         ?>
         <td colspan="40" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("kobetudate", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></div></td>

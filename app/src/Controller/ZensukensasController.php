@@ -136,8 +136,12 @@ class ZensukensasController extends AppController
        $arr1 = array_merge($arr1,array('delete_flag'=>0));
        $arr1 = array_merge($arr1,array('created_staff'=>$created_staff));
        $arr1touroku[] = $arr1;
-
-       $ResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code1, 'lot_num' => $lot_num, 'datetime_finish IS' => Null])->toArray();
+/*
+       echo "<pre>";
+       print_r($created_staff);
+       echo "</pre>";
+*/
+       $ResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code1, 'created_staff' => $created_staff, 'lot_num' => $lot_num, 'datetime_finish IS' => Null])->toArray();
 
        if(isset($ResultZensuHead[0])){
          $ResultZensuHead = $ResultZensuHead;//既にResultZensuHeadsテーブルにあって、検査済みではない場合（検査中にもう一度検査しようとした場合）
@@ -150,7 +154,7 @@ class ZensukensasController extends AppController
            if ($this->ResultZensuHeads->saveMany($ResultZensuHead)) {
 
              //insert 旧DB
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('result_zensu_head');
              $table->setConnection($connection);
 
@@ -186,7 +190,7 @@ class ZensukensasController extends AppController
          $arr2 = array_merge($arr2,array('delete_flag'=>0));
          $arr2 = array_merge($arr2,array('created_staff'=>$created_staff));
          $arr2touroku[] = $arr2;
-          $ResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code2, 'lot_num' => $lot_num, 'datetime_finish IS' => Null])->toArray();
+          $ResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code2, 'created_staff' => $created_staff, 'lot_num' => $lot_num, 'datetime_finish IS' => Null])->toArray();
           if(isset($ResultZensuHead[0])){
             $ResultZensuHead = $ResultZensuHead;//既にResultZensuHeadsテーブルにあって、検査済みではない場合（検査中にもう一度検査しようとした場合）
           }else{
@@ -198,7 +202,7 @@ class ZensukensasController extends AppController
               if ($this->ResultZensuHeads->saveMany($ResultZensuHead)) {
 
                 //insert 旧DB
-                $connection = ConnectionManager::get('DB_ikou_test');
+                $connection = ConnectionManager::get('sakaeMotoDB');
                 $table = TableRegistry::get('result_zensu_head');
                 $table->setConnection($connection);
 
@@ -230,7 +234,7 @@ class ZensukensasController extends AppController
        print_r($arrdata);
        echo "</pre>";
 */
-      $ResultZensuHead = $this->ResultZensuHeads->find()->where(['datetime_finish IS' => Null])->toArray();
+      $ResultZensuHead = $this->ResultZensuHeads->find()->where(['datetime_finish IS' => Null, 'created_staff' => $created_staff])->toArray();
       $cnt = count($ResultZensuHead);//配列の個数
       $this->set('cnt',$cnt);
 
@@ -293,7 +297,7 @@ class ZensukensasController extends AppController
        $Staffid = $staffData[0]->id;
        $this->set('Staffid',$Staffid);
 
-       $ResultZensuHead = $this->ResultZensuHeads->find()->where(['datetime_finish IS' => Null])->toArray();
+       $ResultZensuHead = $this->ResultZensuHeads->find()->where(['datetime_finish IS' => Null, 'created_staff' => $staffData[0]->staff_code])->toArray();
        $cnt = count($ResultZensuHead);//配列の個数
        $this->set('cnt',$cnt);
 
@@ -478,7 +482,7 @@ class ZensukensasController extends AppController
            if ($this->ResultZensuFooders->saveMany($ResultZensuFooders)) {//saveManyで一括登録
 
              //insert 旧DB
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('result_zensu_fooder');
              $table->setConnection($connection);
 
@@ -502,7 +506,7 @@ class ZensukensasController extends AppController
 
 
                //insert 旧DB
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('result_zensu_head');
                $table->setConnection($connection);
 
@@ -530,11 +534,11 @@ class ZensukensasController extends AppController
                  )){
 
                    //insert 旧DB
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('check_lots');
                    $table->setConnection($connection);
 
-                   $updater = "UPDATE check_lots set flag_used = 0
+                   $updater = "UPDATE check_lots set flag_used = 0, updated_at = '".date('Y-m-d H:i:s')."'
                      where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id']['lot_num']."'";//もとのDBも更新
                    $connection->execute($updater);
 
@@ -615,7 +619,7 @@ class ZensukensasController extends AppController
                         ['id'  => $arrCheckLotoya[$bangou_arr_oya_lot]['id']]);
 
                         //insert 旧DB
-                        $connection = ConnectionManager::get('DB_ikou_test');
+                        $connection = ConnectionManager::get('sakaeMotoDB');
                         $table = TableRegistry::get('check_lots');
                         $table->setConnection($connection);
 

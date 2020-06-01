@@ -42,7 +42,7 @@
 
       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
       echo "<td rowspan='2'  height='6' colspan='20'>\n";
-      echo "<input type='text' name=product_code size='6'/>\n";
+      echo "<input type='text' name=product_code size='6' autofocus/>\n";
       echo "</td>\n";
       echo "<td rowspan='2' height='6' colspan='20'>\n";
       echo "<input type='text' name=lot_num size='6'/>\n";

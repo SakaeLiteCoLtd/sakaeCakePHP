@@ -31,7 +31,7 @@
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
 		<td bgcolor="#FFFFCC" style="width: 60px"><strong style="font-size: 13pt; color:blue">単位</strong></td>
-		<td bgcolor="#FFFFCC" style="width: 300px"><?= $this->Form->control('unit', array('type'=>'text', 'label'=>false)) ?></td>
+		<td bgcolor="#FFFFCC" style="width: 300px"><?= $this->Form->control('unit', array('type'=>'text', 'label'=>false,'autofocus'=>true)) ?></td>
 	</tr>
 </table>
 <br>

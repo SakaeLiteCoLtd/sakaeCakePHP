@@ -31,7 +31,7 @@
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
 		<td bgcolor="#FFFFCC" style="width: 100px">納品場所１</td>
-		<td bgcolor="#FFFFCC" style="width: 700px"><?= $this->Form->control('place1', array('type'=>'text', 'label'=>false)) ?></td>
+		<td bgcolor="#FFFFCC" style="width: 700px"><?= $this->Form->control('place1', array('type'=>'text', 'label'=>false,'autofocus'=>true)) ?></td>
 	</tr>
   <tr>
 		<td bgcolor="#FFFFCC">納品場所２</td>

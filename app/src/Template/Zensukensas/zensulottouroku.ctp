@@ -33,7 +33,7 @@
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td  width="150" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">製品ロットNo.</strong></td>
-		<td bgcolor="#FFFFCC"><?= $this->Form->control('text', array('type'=>'text', 'label'=>false, 'maxlength' => 100)) ?></td>
+		<td bgcolor="#FFFFCC"><?= $this->Form->control('text', array('type'=>'text', 'label'=>false, 'maxlength' => 100,'autofocus'=>true)) ?></td>
 	</tr>
 </table>
     </fieldset>

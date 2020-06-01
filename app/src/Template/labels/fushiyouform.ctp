@@ -40,7 +40,7 @@
 		<td bgcolor="#FFFFCC" style="width: 300px"><strong style="font-size: 13pt; color:blue">ロットNo．</strong></td>
 	</tr>
   <tr>
-		<td bgcolor="#FFFFCC"><?= $this->Form->control('place1', array('type'=>'text', 'label'=>false)) ?></td>
+		<td bgcolor="#FFFFCC"><?= $this->Form->control('place1', array('type'=>'text', 'label'=>false ,'autofocus'=>true)) ?></td>
 	</tr>
 </table>
 <br>

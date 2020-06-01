@@ -789,6 +789,12 @@ class LabelsController extends AppController
           }
           //セット取りのINラベルのmaisuの調整ここまで
 
+          if($_SESSION['labeljunbi'][$i]['product_code'] === "MLD-NDS-20001" || $_SESSION['labeljunbi'][$i]['product_code'] === "MLD-NDS-20002"){
+            $InsideFuyou = 9999;
+          }else{
+            $InsideFuyou = 0;
+          }
+
           if($Layout == "C"){//〇タイプCの場合は１行に２製品の表示//OK
 
             if(isset($LabelSetikkatsu1[0])){
@@ -845,7 +851,7 @@ class LabelsController extends AppController
               'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
               'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-              if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+              if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
         //        echo "<pre>";
         //        print_r($_SESSION['labeljunbi'][$i]['product_code']."=pro1にINラベルが必要");
         //        echo "</pre>";
@@ -908,7 +914,7 @@ class LabelsController extends AppController
                       'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
                       'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-                      if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+                      if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
                   //      echo "<pre>";
                 //        print_r($product_id2."セット取りのもう片方にもINラベルが必要な場合1");
                   //      echo "</pre>";
@@ -966,7 +972,7 @@ class LabelsController extends AppController
                       'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
                       'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-                      if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+                      if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
                         $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
                         $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $product_id2])->toArray();
                         if(isset($LabelInsideout1[0])){
@@ -1013,7 +1019,7 @@ class LabelsController extends AppController
               'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
               'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-              if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+              if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
 
                 $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
                 //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
@@ -1047,8 +1053,7 @@ class LabelsController extends AppController
 
         }
 
-           //$fp = fopen('\\192.168.4.1\Public\Downloads\label_csv\label_hakkou_test.csv', 'w');
-  //      $fp = fopen('labels/label_ikkatu_200512.csv', 'w');
+  //      $fp = fopen('labels/label_ikkatu_200601.csv', 'w');
         $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
 
         foreach ($arrCsv as $line) {
@@ -1079,10 +1084,6 @@ class LabelsController extends AppController
                    $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('label_csv');
                    $table->setConnection($connection);
-
-                   echo "<pre>";
-                   print_r($arrCsvtouroku);
-                   echo "</pre>";
 
                    for($k=0; $k<count($arrCsvtouroku); $k++){
                      $connection->insert('label_csv', [
@@ -1457,6 +1458,13 @@ class LabelsController extends AppController
          $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $_SESSION['labeljunbi']['product_code']])->toArray();
          $LabelInsideout1 = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['labeljunbi']['product_code']])->toArray();
 
+
+         if($_SESSION['labeljunbi']['product_code'] === "MLD-NDS-20001" || $_SESSION['labeljunbi']['product_code'] === "MLD-NDS-20002"){
+           $InsideFuyou = 9999;
+         }else{
+           $InsideFuyou = 0;
+         }
+
          if($LabelTypeProduct[0]->type == "C"){//〇タイプCの場合は１行に２製品の表示
 
            if(isset($LabelSetikkatsu1[0])){
@@ -1509,7 +1517,7 @@ class LabelsController extends AppController
                'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-               if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+               if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
          //        echo "<pre>";
          //        print_r($_SESSION['labeljunbi']['product_code']."=pro1にINラベルが必要");
          //        echo "</pre>";
@@ -1570,7 +1578,7 @@ class LabelsController extends AppController
                        'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
                        'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-                       if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+                       if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
            //              echo "<pre>";
            //              print_r($product_id2."セット取りのもう片方にもINラベルが必要な場合1");
            //              echo "</pre>";
@@ -1626,7 +1634,7 @@ class LabelsController extends AppController
                        'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
                        'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-                       if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+                       if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
        //                  echo "<pre>";
        //                  print_r($product_id2."セット取りのもう片方にもINラベルが必要な場合2");
        //                  echo "</pre>";
@@ -1673,7 +1681,7 @@ class LabelsController extends AppController
              'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-             if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+             if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
 
                $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
                //maisu=$_SESSION['labeljunbi'][$i]['yoteimaisu']*num_inside
@@ -1710,7 +1718,7 @@ class LabelsController extends AppController
       print_r($arrCsvtouroku);
       echo "</pre>";
 */
-  //     $fp = fopen('labels/label_hakkou_kobetu200427.csv', 'w');
+  //     $fp = fopen('labels/label_kobetu200601.csv', 'w');
        $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
        foreach ($arrCsv as $line) {
          $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -1735,11 +1743,7 @@ class LabelsController extends AppController
                   $connection = ConnectionManager::get('sakaeMotoDB');
                   $table = TableRegistry::get('label_csv');
                   $table->setConnection($connection);
- /*
-                  echo "<pre>";
-                  print_r($arrCsvtouroku);
-                  echo "</pre>";
- */
+
                   for($k=0; $k<count($arrCsvtouroku); $k++){
                     $connection->insert('label_csv', [
                         'number_sheet' => $arrCsvtouroku[$k]["number_sheet"],
@@ -1938,16 +1942,12 @@ class LabelsController extends AppController
           $maisu1 = $_SESSION['labeljunbi'][$i]['yoteimaisu'];
         }
 
-        /*
-        echo "<pre>";
-        print_r('pro_total---');
-        print_r($pro_total);
-        print_r('  maisu1---');
-        print_r($maisu1);
-        print_r('  maisu2---');
-        print_r($maisu2);
-        echo "</pre>";
-        */
+        if($_SESSION['labeljunbi'][$i]['product_code'] === "MLD-NDS-20001" || $_SESSION['labeljunbi'][$i]['product_code'] === "MLD-NDS-20002"){
+          $InsideFuyou = 9999;
+        }else{
+          $InsideFuyou = 0;
+        }
+
         //セット取りのINラベルのmaisuの調整ここまで
 
             if($Layout == "C"){//〇タイプCの場合は１行に２製品の表示//OK
@@ -2006,7 +2006,7 @@ class LabelsController extends AppController
                 'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
                 'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-                if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+                if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
           //        echo "<pre>";
           //        print_r($_SESSION['labeljunbi'][$i]['product_code']."=pro1にINラベルが必要");
           //        echo "</pre>";
@@ -2070,7 +2070,7 @@ class LabelsController extends AppController
                         'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
                         'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-                        if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//INラベルが必要な場合
+                        if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])) && $InsideFuyou == 0){//INラベルが必要な場合
             //              echo "<pre>";
             //              print_r($product_id2."セット取りのもう片方にもINラベルが必要な場合1");
             //              echo "</pre>";
@@ -2129,7 +2129,7 @@ class LabelsController extends AppController
                         'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
                         'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-                        if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+                        if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])) && $InsideFuyou == 0){//mb_substrだと文字化けしない//修正変更
         //                  echo "<pre>";
         //                  print_r($product_id2."セット取りのもう片方にもINラベルが必要な場合2");
         //                  echo "</pre>";
@@ -2177,7 +2177,7 @@ class LabelsController extends AppController
                 'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
                 'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
 
-                if(mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])){//mb_substrだと文字化けしない//修正変更
+                if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])) && $InsideFuyou == 0){//mb_substrだと文字化けしない//修正変更
 
                   $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
                   //maisu=$_SESSION['labeljunbi'][$i][$i]['yoteimaisu']*num_inside
@@ -2211,7 +2211,7 @@ class LabelsController extends AppController
 
           }
 
-        $fp = fopen('labels/label_kobetu0512.csv', 'w');
+    //    $fp = fopen('labels/label_kobetu0601.csv', 'w');
         $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
           foreach ($arrCsv as $line) {
             $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -3518,7 +3518,7 @@ class LabelsController extends AppController
         try {//トランザクション4
           if ($this->MotoLots->saveMany($motoLots)) {
             $this->CheckLots->updateAll(
-            ['flag_used' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],
+            ['flag_used' => 0 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],
             ['id'   => $_SESSION['check_lot_id']["check_lot_id"] ]
             );
 
@@ -3543,7 +3543,7 @@ class LabelsController extends AppController
 
             $table = TableRegistry::get('check_lots');
             $table->setConnection($connection);
-            $updater = "UPDATE check_lots set flag_used = 1, updated_at = '".date('Y-m-d H:i:s')."'
+            $updater = "UPDATE check_lots set flag_used = 0, updated_at = '".date('Y-m-d H:i:s')."'
              where product_id ='".$product_code1."' and lot_num = '".$lot_num."'";//もとのDBも更新
             $connection->execute($updater);
 

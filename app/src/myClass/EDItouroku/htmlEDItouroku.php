@@ -111,7 +111,7 @@ class htmlEDItouroku extends AppController
             );
 
             //update KariOrderToSupplierする（旧DB）
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('kari_order_to_supplier');
             $table->setConnection($connection);
 
@@ -173,7 +173,7 @@ class htmlEDItouroku extends AppController
                    $this->OrderToSupplier->save($OrderToSuppliers);
 
                    //insert into OrderToSupplierする（旧DB）
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('order_to_supplier');
                    $table->setConnection($connection);
 
@@ -234,7 +234,7 @@ class htmlEDItouroku extends AppController
                    $this->OrderToSupplier->save($OrderToSuppliers);
 
                    //insert into OrderToSupplierする（旧DB）
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('order_to_supplier');
                    $table->setConnection($connection);
 
@@ -296,7 +296,7 @@ class htmlEDItouroku extends AppController
              $this->OrderToSupplier->save($OrderToSuppliers);
 
              //insert into OrderToSupplierする（旧DB）
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('order_to_supplier');
              $table->setConnection($connection);
 
@@ -357,7 +357,7 @@ class htmlEDItouroku extends AppController
 
                    //insert into AttachOrderToSupplierする（旧DB）
 
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
@@ -386,7 +386,7 @@ class htmlEDItouroku extends AppController
 
                    //insert into AttachOrderToSupplierする（旧DB）
 
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
@@ -418,7 +418,7 @@ class htmlEDItouroku extends AppController
 
                    //insert into AttachOrderToSupplierする（旧DB）
 
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
@@ -448,7 +448,7 @@ class htmlEDItouroku extends AppController
 
                    //insert into AttachOrderToSupplierする（旧DB）
 
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
@@ -525,7 +525,7 @@ class htmlEDItouroku extends AppController
             $this->set('mes',$mes);
 
             //insert into KariOrderToSupplierする（旧DB）
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('kari_order_to_supplier');
             $table->setConnection($connection);
 
@@ -611,7 +611,7 @@ class htmlEDItouroku extends AppController
                $this->set('mes',$mes);
 
                //insert into KariOrderToSupplierする（旧DB）
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('kari_order_to_supplier');
                $table->setConnection($connection);
 

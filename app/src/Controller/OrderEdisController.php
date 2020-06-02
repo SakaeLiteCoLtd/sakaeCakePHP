@@ -203,7 +203,7 @@ class OrderEdisController extends AppController
                        $arrFp = $_SESSION['order_edi_kumitate'];
 
                        //insert into order_ediする（旧DB）
-                       $connection = ConnectionManager::get('sakaeMotoDB');
+                       $connection = ConnectionManager::get('DB_ikou_test');
                        $table = TableRegistry::get('order_edi');
                        $table->setConnection($connection);
 
@@ -251,7 +251,7 @@ class OrderEdisController extends AppController
                  $connection->commit();// コミット5
 
                  //insert into order_ediする（旧DB）
-                 $connection = ConnectionManager::get('sakaeMotoDB');
+                 $connection = ConnectionManager::get('DB_ikou_test');
                  $table = TableRegistry::get('order_edi');
                  $table->setConnection($connection);
 
@@ -572,7 +572,7 @@ echo "</pre>";
 //ここからDenpyouDnpMinoukannousへ登録用
 
             //insert into order_ediする（旧DB）
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('order_edi');
             $table->setConnection($connection);
 
@@ -596,7 +596,7 @@ echo "</pre>";
               ]);
             }
 
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('denpyou_dnp');
             $table->setConnection($connection);
 
@@ -688,7 +688,7 @@ echo "</pre>";
               $mikanamount = $OrderEdi[0]['amount'];
               $mikanminoukannou = 0;
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_dnp_kannous');
               $table->setConnection($connection);
 
@@ -797,7 +797,7 @@ echo "</pre>";
                       $mikanamount = $OrderEdi[0]['amount'];
                       $mikanminoukannou = 0;
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_dnp_kannous');
                       $table->setConnection($connection);
 
@@ -822,7 +822,7 @@ echo "</pre>";
                       $mikandate_deliver = $OrderEdi[0]['date_deliver'];
                       $mikanamount = $OrderEdi[0]['amount'];
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_edi');
                       $table->setConnection($connection);
 
@@ -847,14 +847,14 @@ echo "</pre>";
                       $mikanamount = $OrderEdi[0]['amount'];
                       $m1 = $m + 1;
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_edi');
                       $table->setConnection($connection);
 
                       $updater = "UPDATE order_edi set bunnou = '".$m1."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
                       $connection->execute($updater);
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_dnp_kannous');
                       $table->setConnection($connection);
 
@@ -1019,7 +1019,7 @@ echo "</pre>";
                $connection->commit();// コミット5
 
                //insert into label_csvする（旧DB）
-               $connection = ConnectionManager::get('sakaeMotoDB');
+               $connection = ConnectionManager::get('DB_ikou_test');
                $table = TableRegistry::get('syoyou_keikaku');
                $table->setConnection($connection);
 /*
@@ -1368,7 +1368,7 @@ echo "</pre>";
           $mikanline_code = $OrderEdi[0]['line_code'];
           //$mikandate_deliver = $OrderEdi[0]['date_deliver'];
 
-          $connection = ConnectionManager::get('sakaeMotoDB');
+          $connection = ConnectionManager::get('DB_ikou_test');
           $table = TableRegistry::get('order_edi');
           $table->setConnection($connection);
 
@@ -1476,7 +1476,7 @@ echo "</pre>";
               $mikanproduct_code = $OrderEdi[0]['product_code'];
               $mikanline_code = $OrderEdi[0]['line_code'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -1507,7 +1507,7 @@ echo "</pre>";
               $mikanproduct_code = $OrderEdi[0]['product_code'];
               $mikanline_code = $OrderEdi[0]['line_code'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -1552,7 +1552,7 @@ echo "</pre>";
 
 
               //旧DB更新
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -1846,7 +1846,7 @@ echo "</pre>";
             $mikanline_code = $OrderEdi[0]['line_code'];
             //$mikandate_deliver = $OrderEdi[0]['date_deliver'];
 
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('order_edi');
             $table->setConnection($connection);
 
@@ -1952,7 +1952,7 @@ echo "</pre>";
               $mikanline_code = $OrderEdi[0]['line_code'];
               $mikandate_deliver = $OrderEdi[0]['date_deliver'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -1986,7 +1986,7 @@ echo "</pre>";
               $mikandate_deliver = $OrderEdi[0]['date_deliver'];
               $mikanamount = $OrderEdi[0]['amount'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -2012,7 +2012,7 @@ echo "</pre>";
               $mikanamount = $OrderEdi[0]['amount'];
               $mikanminoukannou = 0;
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_dnp_kannous');
               $table->setConnection($connection);
 
@@ -2059,7 +2059,7 @@ echo "</pre>";
 
 
               //旧DB更新
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -2114,7 +2114,7 @@ echo "</pre>";
                   $mikanamount = $OrderEdi[0]['amount'];
                   $mikanminoukannou = 0;
 
-                  $connection = ConnectionManager::get('sakaeMotoDB');
+                  $connection = ConnectionManager::get('DB_ikou_test');
                   $table = TableRegistry::get('order_dnp_kannous');
                   $table->setConnection($connection);
 
@@ -2178,7 +2178,7 @@ echo "</pre>";
                       $mikanamount = $OrderEdi[0]['amount'];
                       $mikanminoukannou = 0;
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_dnp_kannous');
                       $table->setConnection($connection);
 
@@ -2206,7 +2206,7 @@ echo "</pre>";
                       $mikanamount = $OrderEdi[0]['amount'];
                       $mikanminoukannou = 0;
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_dnp_kannous');
                       $table->setConnection($connection);
 
@@ -2283,7 +2283,7 @@ echo "</pre>";
                 $mikanamount = $OrderEdi[0]['amount'];
                 $mikanminoukannou = 0;
 
-                $connection = ConnectionManager::get('sakaeMotoDB');
+                $connection = ConnectionManager::get('DB_ikou_test');
                 $table = TableRegistry::get('order_dnp_kannous');
                 $table->setConnection($connection);
 
@@ -2310,7 +2310,7 @@ echo "</pre>";
                 $mikanamount = $OrderEdi[0]['amount'];
                 $mikanminoukannou = 0;
 
-                $connection = ConnectionManager::get('sakaeMotoDB');
+                $connection = ConnectionManager::get('DB_ikou_test');
                 $table = TableRegistry::get('order_dnp_kannous');
                 $table->setConnection($connection);
 
@@ -2566,7 +2566,7 @@ echo "</pre>";
             $mikanline_code = $OrderEdi[0]['line_code'];
             //$mikandate_deliver = $OrderEdi[0]['date_deliver'];
 
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('order_edi');
             $table->setConnection($connection);
 
@@ -2676,7 +2676,7 @@ echo "</pre>";
               $mikanproduct_code = $OrderEdi[0]['product_code'];
               $mikanline_code = $OrderEdi[0]['line_code'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -2709,7 +2709,7 @@ echo "</pre>";
               $mikanproduct_code = $OrderEdi[0]['product_code'];
               $mikanline_code = $OrderEdi[0]['line_code'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -2754,7 +2754,7 @@ echo "</pre>";
 
 
               //旧DB更新
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -3055,7 +3055,7 @@ echo "</pre>";
           echo "</pre>";
   */
           //旧DB登録
-          $connection = ConnectionManager::get('sakaeMotoDB');
+          $connection = ConnectionManager::get('DB_ikou_test');
           $table = TableRegistry::get('order_edi');
           $table->setConnection($connection);
 
@@ -3102,7 +3102,7 @@ echo "</pre>";
               if ($this->OrderEdis->saveMany($OrderEdis)) {
 
                 //旧DB登録
-                $connection = ConnectionManager::get('sakaeMotoDB');
+                $connection = ConnectionManager::get('DB_ikou_test');
                 $table = TableRegistry::get('order_edi');
                 $table->setConnection($connection);
 
@@ -3360,7 +3360,7 @@ echo "</pre>";
           echo "</pre>";
   */
           //旧DB登録
-          $connection = ConnectionManager::get('sakaeMotoDB');
+          $connection = ConnectionManager::get('DB_ikou_test');
           $table = TableRegistry::get('order_edi');
           $table->setConnection($connection);
 
@@ -3382,7 +3382,7 @@ echo "</pre>";
                 'created_at' => date("Y-m-d H:i:s")
             ]);
 
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('order_dnp_kannous');
             $table->setConnection($connection);
 
@@ -3398,7 +3398,7 @@ echo "</pre>";
                   'created_at' => date("Y-m-d H:i:s")
               ]);
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('denpyou_dnp');
               $table->setConnection($connection);
 
@@ -3476,7 +3476,7 @@ echo "</pre>";
               if ($this->OrderEdis->saveMany($OrderEdis)) {
 
                 //旧DB登録
-                $connection = ConnectionManager::get('sakaeMotoDB');
+                $connection = ConnectionManager::get('DB_ikou_test');
                 $table = TableRegistry::get('order_edi');
                 $table->setConnection($connection);
 

@@ -12,6 +12,7 @@
    $username = $this->request->Session()->read('Auth.User.username');
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
+   $this->PlaceDelivers = TableRegistry::get('placeDelivers');
    $this->OrderEdis = TableRegistry::get('orderEdis');
    echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkoupanapreadd']]);
 ?>
@@ -61,7 +62,13 @@ header('Pragma:');
               <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
               <td width="100" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
               <td width="200" colspan="20" nowrap="nowrap"><?= h(${"date_deliver_".$i}) ?></td>
-              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->place_line) ?></td>
+
+              <?php
+               ${"PlaceDeliver".$i} = $this->PlaceDelivers->find()->where(['id_from_order' => ${"orderEdis".$i}->place_deliver_code])->toArray();
+               ${"place".$i} = ${"PlaceDeliver".$i}[0]->name;
+              ?>
+
+              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"place".$i}) ?></td>
             </tr>
             <?php
             $session = $this->request->getSession();
@@ -131,7 +138,13 @@ header('Pragma:');
               <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
               <td width="100" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->amount) ?></td>
               <td width="200" colspan="20" nowrap="nowrap"><?= h(${"date_deliver_".$i}) ?></td>
-              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->place_line) ?></td>
+
+              <?php
+               ${"PlaceDeliver".$i} = $this->PlaceDelivers->find()->where(['id_from_order' => ${"orderEdis".$i}->place_deliver_code])->toArray();
+               ${"place".$i} = ${"PlaceDeliver".$i}[0]->name;
+              ?>
+
+              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"place".$i}) ?></td>
             </tr>
             <?php
             $session = $this->request->getSession();

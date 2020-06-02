@@ -11,7 +11,8 @@
  <?php
    $username = $this->request->Session()->read('Auth.User.username');
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
-   $this->Products = TableRegistry::get('products');//productsテーブルを使う
+   $this->Products = TableRegistry::get('products');
+   $this->PlaceDelivers = TableRegistry::get('placeDelivers');
    echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkoudnpform']]);
    $i = 1 ;
 ?>
@@ -182,8 +183,11 @@ header('Pragma:');
                     echo "<td width='200' colspan='20'><div align='center'>\n";
                     echo "<input type='date' value=$date_deliver name=date_deliver empty=Please select size='6'/>\n";
                     echo "</div></td>\n";
+
+                    $PlaceDeliver = $this->PlaceDelivers->find()->where(['id_from_order' => $orderEdis->place_deliver_code])->toArray();
+                    $place = $PlaceDeliver[0]->name;
                ?>
-                <td width="150" colspan="20" nowrap="nowrap"><?= h($orderEdis->place_line) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($place) ?></td>
               </tr>
               <?php endforeach; ?>
 
@@ -252,8 +256,11 @@ header('Pragma:');
                     echo "<td width='200' colspan='20'><div align='center'>\n";
                     echo "<input type='date' value=$date_deliver name=date_deliver empty=Please select size='6'/>\n";
                     echo "</div></td>\n";
+
+                    $PlaceDeliver = $this->PlaceDelivers->find()->where(['id_from_order' => $orderEdis->place_deliver_code])->toArray();
+                    $place = $PlaceDeliver[0]->name;
                ?>
-                <td width="150" colspan="20" nowrap="nowrap"><?= h($orderEdis->place_line) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($place) ?></td>
               </tr>
               <?php endforeach; ?>
 

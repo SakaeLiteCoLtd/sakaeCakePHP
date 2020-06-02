@@ -12,6 +12,7 @@
    $username = $this->request->Session()->read('Auth.User.username');
    use Cake\ORM\TableRegistry;//独立したテーブルを扱う
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
+   $this->PlaceDelivers = TableRegistry::get('placeDelivers');
    $this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
 //   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkou5pana']]);
 ?>
@@ -101,9 +102,13 @@ header('Pragma:');
              $i_count = $i;
              echo $this->Form->hidden('i_count' ,['value'=>$i_count]);
              echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
+
+             ${"PlaceDeliver".$i} = $this->PlaceDelivers->find()->where(['id_from_order' => ${"orderEdis".$i}->place_deliver_code])->toArray();
+             ${"place".$i} = ${"PlaceDeliver".$i}[0]->name;
+
             ?>
 
-              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"orderEdis".$i}->place_line) ?></td>
+              <td width="150" colspan="20" nowrap="nowrap"><?= h(${"place".$i}) ?></td>
             </tr>
             <?php endforeach; ?>
           <?php endfor;?>

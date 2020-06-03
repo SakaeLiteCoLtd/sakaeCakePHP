@@ -35,7 +35,7 @@ class htmlzensumenu extends AppController
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Zensukensas/misakusei'>\n".
                  "<img src='/img/Labelimg/seihin_touroku.gif' width=85 height=36>\n".
                  "</a></td>\n".
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Zensukensas/misakusei'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Zensukensas/zensukensakuform'>\n".
                  "<img src='/img/Labelimg/sub_touroku_kensaku.gif' width=85 height=36>\n".
                  "</a>\n";
 

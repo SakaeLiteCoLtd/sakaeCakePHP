@@ -10,7 +10,7 @@
   header('Expires:-1');
   header('Cache-Control:');
   header('Pragma:');
-  echo $this->Form->create($syoyouKeikakus, ['url' => ['action' => 'keikakucsvdo']]);
+  echo $this->Form->create($syoyouKeikakus, ['url' => ['action' => 'keikakucsvpreadd']]);
 ?>
 <br><br>
 <legend align="center"><font color="red"><?= __($mes) ?></font></legend>

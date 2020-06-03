@@ -726,4 +726,69 @@ class ZensukensasController extends AppController
        }//トランザクション10
      }
 
+     public function zensukensakuform()
+     {
+       $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
+       $this->set('ResultZensuHeads',$ResultZensuHeads);
+
+       $arrStaffs = $this->Staffs->find('all', ['conditions' => ['delete_flag' => '0']])->order(['staff_code' => 'ASC']);
+   		 $arrStaff = array();
+       $arrStaff[] = array("");
+   			foreach ($arrStaffs as $value) {
+   				$arrStaff[] = array($value->id=>$value->f_name.$value->l_name);
+   			}
+ 	 		 $this->set('arrStaff',$arrStaff);
+
+       $arrContRejection = [
+         '11111' => '',
+         '10000' => '異常なし',
+         '0' => '異物（点）',
+         '1' => '異物（マーブル）',
+         '2' => '異物（樹脂袋）',
+         '3' => 'ガスヤケ',
+         '4' => '汚れ',
+         '5' => 'ショート',
+         '6' => 'フラッシュ',
+         '7' => '気泡',
+         '8' => '変形',
+         '9' => '寸法不良',
+         '10' => '混入',
+         '11' => '糸ひき',
+         '12' => '因数不足',
+         '13' => '過剰因数',
+         '9999' => 'その他'
+               ];
+       $this->set('arrContRejection',$arrContRejection);
+
+       $arrKensakuday = [
+         '1' => '検査年月日',
+         '2' => 'ラベル発行年月日'
+               ];
+       $this->set('arrKensakuday',$arrKensakuday);
+
+       $dateYMDf0 = date('Y-m-d');
+       $dateYMDf1 = strtotime($dateYMDf0);
+       $dateYMDf2 = date('Y-m-d', strtotime('+1 day', $dateYMDf1));
+       $dateYMDf12 = strtotime($dateYMDf2);
+       $dateYMDf1 = date('Y-m-d', strtotime('-1 day', $dateYMDf12));
+       $dateHI = date("08:00");
+       $dateTo = $dateYMDf1."T".$dateHI;
+       $this->set('dateTo',$dateTo);
+       $dateTomo = $dateYMDf2."T".$dateHI;
+       $this->set('dateTomo',$dateTomo);
+     }
+
+     public function zensukensakuichiran()
+     {
+       $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
+       $this->set('ResultZensuHeads',$ResultZensuHeads);
+
+       $data = $this->request->getData();
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+
+     }
+
+
 }

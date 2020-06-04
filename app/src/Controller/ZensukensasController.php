@@ -788,6 +788,60 @@ class ZensukensasController extends AppController
        print_r($data);
        echo "</pre>";
 
+       $product_code = $data['product'];
+       $this->set('product_code',$product_code);
+
+       if($data['staff'] == 0){
+         $Staff = "";
+         $this->set('Staff',$Staff);
+       }else{
+         $staffData = $this->Staffs->find()->where(['id' => $data['staff']])->toArray();
+         $Staff = $staffData[0]->f_name." ".$staffData[0]->l_name;
+         $this->set('Staff',$Staff);
+       }
+
+       if($data['Kensakuday'] == 1){
+         $Kensakuday = "：　検査年月日";
+         $this->set('Kensakuday',$Kensakuday);
+       }else{
+         $Kensakuday = "：　ラベル発行年月日";
+         $this->set('Kensakuday',$Kensakuday);
+       }
+
+       $datesta = $data['datesta']['year']."-".$data['datesta']['month']."-".$data['datesta']['day']." ".$data['datesta']['hour'].":".$data['datesta']['minute'];
+       $this->set('datesta',$datesta);
+       $datefin = $data['datefin']['year']."-".$data['datefin']['month']."-".$data['datefin']['day']." ".$data['datefin']['hour'].":".$data['datefin']['minute'];
+       $this->set('datefin',$datefin);
+
+       if($data['ContRejection'] == 11111){
+         $ContRejection = "";
+         $this->set('ContRejection',$ContRejection);
+       }else{
+         $ContRejections = $this->ContRejections->find()->where(['id' => $data['ContRejection']])->toArray();
+         $ContRejection = $ContRejections[0]->cont;
+         $this->set('ContRejection',$ContRejection);
+       }
+
+       if($data['amount'] > 0){
+         $amount = $data['amount'];
+         $this->set('amount',$amount);
+       }else{
+         $amount = "";
+         $this->set('amount',$amount);
+       }
+
+       if($data['check'] == 0){
+         $check = "不良数ゼロ検索";
+         $this->set('check',$check);
+       }else{
+         $check = "不良数ゼロを省いて検索";
+         $this->set('check',$check);
+       }
+
+       $bik = $data['bik'];
+       $this->set('bik',$bik);
+
+
      }
 
 

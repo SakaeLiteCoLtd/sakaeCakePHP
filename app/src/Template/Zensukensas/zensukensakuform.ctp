@@ -53,7 +53,7 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('登録確認', array('name' => 'kakunin')); ?></div></td>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('呼出', array('name' => 'yobidasi')); ?></div></td>
   </tr>
   </table>
 <br><br><br>

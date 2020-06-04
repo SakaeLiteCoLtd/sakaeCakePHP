@@ -36,11 +36,11 @@ class OrderEdisController extends AppController
        $this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
        $this->PlaceDelivers = TableRegistry::get('placeDelivers');
        $this->AssembleProducts = TableRegistry::get('assembleProducts');
-       $this->ProductGaityu = TableRegistry::get('productGaityu');
+       $this->ProductGaityus = TableRegistry::get('productGaityus');
        $this->KariOrderToSuppliers = TableRegistry::get('kariOrderToSuppliers');
        $this->UnitOrderToSuppliers = TableRegistry::get('unitOrderToSuppliers');
-       $this->OrderToSupplier = TableRegistry::get('orderToSupplier');
-       $this->AttachOrderToSupplier = TableRegistry::get('attachOrderToSupplier');
+       $this->OrderToSuppliers = TableRegistry::get('orderToSuppliers');
+       $this->AttachOrderToSuppliers = TableRegistry::get('attachOrderToSuppliers');
      }
 
      public function indexmenu()
@@ -173,7 +173,7 @@ class OrderEdisController extends AppController
                  $data = $htmlgaityutouroku->htmlgaityutouroku();
 
                  for($k=0; $k<count($arrFp); $k++){//組み立て品登録
-                   $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $arrFp[$k]['product_code']])->toArray();
+                   $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $arrFp[$k]['product_code']])->toArray();
                    if(count($AssembleProduct) > 0){
                      for($n=0; $n<count($AssembleProduct); $n++){
                        $child_pid = $AssembleProduct[$n]->child_pid;
@@ -527,7 +527,7 @@ echo "</pre>";
 
 
             for($k=0; $k<count($arrEDI); $k++){//組み立て品登録
-              $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $arrEDI[$k]['product_code']])->toArray();
+              $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $arrEDI[$k]['product_code']])->toArray();
               if(count($AssembleProduct) > 0){
                 for($n=0; $n<count($AssembleProduct); $n++){
                   $child_pid = $AssembleProduct[$n]->child_pid;
@@ -2989,7 +2989,7 @@ echo "</pre>";
       $data = $session->read();
 
       //外注の対応
-      $ProductGaityu = $this->ProductGaityu->find()->where(['product_id' => $data['order_edi']['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
+      $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $data['order_edi']['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
       if(count($ProductGaityu) > 0){
       $id_supplier = $ProductGaityu[0]->id_supplier;
         $_SESSION['ProductGaityu'] = array(
@@ -3013,7 +3013,7 @@ echo "</pre>";
 */
         }
 
-      $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $data['order_edi']['product_code']])->toArray();
+      $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $data['order_edi']['product_code']])->toArray();
       if(count($AssembleProduct) > 0){
         for($n=0; $n<count($AssembleProduct); $n++){
           $child_pid = $AssembleProduct[$n]->child_pid;
@@ -3038,7 +3038,7 @@ echo "</pre>";
           );
 
           //外注の対応（組み立て）
-          $ProductGaityukumitate = $this->ProductGaityu->find()->where(['product_id' => $child_pid, 'flag_denpyou' => 1,  'status' => 0])->toArray();
+          $ProductGaityukumitate = $this->ProductGaityus->find()->where(['product_code' => $child_pid, 'flag_denpyou' => 1,  'status' => 0])->toArray();
           if(count($ProductGaityukumitate) > 0){
             $id_supplier = $ProductGaityukumitate[0]->id_supplier;
               $_SESSION['ProductGaityu_kumitate'] = array(
@@ -3343,7 +3343,7 @@ echo "</pre>";
       $session = $this->request->getSession();
       $data = $session->read();
 
-      $AssembleProduct = $this->AssembleProducts->find()->where(['product_id' => $data['order_edi']['product_code']])->toArray();
+      $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $data['order_edi']['product_code']])->toArray();
       if(count($AssembleProduct) > 0){
         for($n=0; $n<count($AssembleProduct); $n++){
           $child_pid = $AssembleProduct[$n]->child_pid;

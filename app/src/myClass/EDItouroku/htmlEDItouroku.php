@@ -12,11 +12,11 @@ class htmlEDItouroku extends AppController
      public function initialize()
     {
         parent::initialize();
-        $this->ProductGaityu = TableRegistry::get('productGaityu');
+        $this->ProductGaityus = TableRegistry::get('productGaityus');
         $this->KariOrderToSuppliers = TableRegistry::get('kariOrderToSuppliers');
         $this->UnitOrderToSuppliers = TableRegistry::get('unitOrderToSuppliers');
-        $this->OrderToSupplier = TableRegistry::get('orderToSupplier');
-        $this->AttachOrderToSupplier = TableRegistry::get('attachOrderToSupplier');
+        $this->OrderToSuppliers = TableRegistry::get('orderToSuppliers');
+        $this->AttachOrderToSuppliers = TableRegistry::get('attachOrderToSuppliers');
     }
 
     public function htmlgaityutouroku()
@@ -169,8 +169,8 @@ class htmlEDItouroku extends AppController
                    echo "</pre>";
 */
                    //OrderToSupplierの登録
-                   $OrderToSuppliers = $this->OrderToSupplier->patchEntity($this->OrderToSupplier->newEntity(), $arrOrderToSuppliers[0]);
-                   $this->OrderToSupplier->save($OrderToSuppliers);
+                   $OrderToSuppliers = $this->OrderToSuppliers->patchEntity($this->OrderToSuppliers->newEntity(), $arrOrderToSuppliers[0]);
+                   $this->OrderToSuppliers->save($OrderToSuppliers);
 
                    //insert into OrderToSupplierする（旧DB）
                    $connection = ConnectionManager::get('sakaeMotoDB');
@@ -230,8 +230,8 @@ class htmlEDItouroku extends AppController
                    echo "</pre>";
 */
                    //OrderToSupplierの登録
-                   $OrderToSuppliers = $this->OrderToSupplier->patchEntity($this->OrderToSupplier->newEntity(), $arrOrderToSuppliers[0]);
-                   $this->OrderToSupplier->save($OrderToSuppliers);
+                   $OrderToSuppliers = $this->OrderToSuppliers->patchEntity($this->OrderToSuppliers->newEntity(), $arrOrderToSuppliers[0]);
+                   $this->OrderToSuppliers->save($OrderToSuppliers);
 
                    //insert into OrderToSupplierする（旧DB）
                    $connection = ConnectionManager::get('sakaeMotoDB');
@@ -292,8 +292,8 @@ class htmlEDItouroku extends AppController
               echo "</pre>";
 */
              //OrderToSupplierの登録
-             $OrderToSuppliers = $this->OrderToSupplier->patchEntity($this->OrderToSupplier->newEntity(), $arrOrderToSuppliers[0]);
-             $this->OrderToSupplier->save($OrderToSuppliers);
+             $OrderToSuppliers = $this->OrderToSuppliers->patchEntity($this->OrderToSuppliers->newEntity(), $arrOrderToSuppliers[0]);
+             $this->OrderToSuppliers->save($OrderToSuppliers);
 
              //insert into OrderToSupplierする（旧DB）
              $connection = ConnectionManager::get('sakaeMotoDB');
@@ -352,18 +352,27 @@ class htmlEDItouroku extends AppController
                    print_r($arrAttach);
                    echo "</pre>";
 */
-                 $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
-                   $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);
+                 $AttachOrderToSuppliers = $this->AttachOrderToSuppliers->patchEntity($this->AttachOrderToSuppliers->newEntity(), $arrAttach[0]);
+                   $this->AttachOrderToSuppliers->save($AttachOrderToSuppliers);
 
                    //insert into AttachOrderToSupplierする（旧DB）
+
+                   $KariOrderToSupplier = $this->KariOrderToSuppliers->find()->where(['id' => $arrAttach[0]["kari_order_to_supplier_id"]])->toArray();
+                   $product_code = $KariOrderToSupplier[0]->product_code;
+                   $id_order = $KariOrderToSupplier[0]->id_order;
 
                    $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
+                   $sql = "SELECT id FROM kari_order_to_supplier".
+                         " where product_id ='".$product_code."' and id_order = '".$id_order."'";
+                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $kari_order_to_supplier_id_moto = $connection->execute($sql)->fetchAll('assoc');
+
                      $connection->insert('attach_order_to_supplier', [
                          'id_order' => $arrAttach[0]["id_order"],
-                         'kari_order_to_supplier_id' => $arrAttach[0]["kari_order_to_supplier_id"]
+                         'kari_order_to_supplier_id' => $kari_order_to_supplier_id_moto[0]['id']
                      ]);
 
                    $connection = ConnectionManager::get('default');
@@ -381,18 +390,27 @@ class htmlEDItouroku extends AppController
                    print_r($arrAttach);
                    echo "</pre>";
 */
-                   $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
-                   $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);
+                   $AttachOrderToSuppliers = $this->AttachOrderToSuppliers->patchEntity($this->AttachOrderToSuppliers->newEntity(), $arrAttach[0]);
+                   $this->AttachOrderToSuppliers->save($AttachOrderToSuppliers);
 
                    //insert into AttachOrderToSupplierする（旧DB）
+
+                   $KariOrderToSupplier = $this->KariOrderToSuppliers->find()->where(['id' => $arrAttach[0]["kari_order_to_supplier_id"]])->toArray();
+                   $product_code = $KariOrderToSupplier[0]->product_code;
+                   $id_order = $KariOrderToSupplier[0]->id_order;
 
                    $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
+                   $sql = "SELECT id FROM kari_order_to_supplier".
+                         " where product_id ='".$product_code."' and id_order = '".$id_order."'";
+                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $kari_order_to_supplier_id_moto = $connection->execute($sql)->fetchAll('assoc');
+
                      $connection->insert('attach_order_to_supplier', [
                          'id_order' => $arrAttach[0]["id_order"],
-                         'kari_order_to_supplier_id' => $arrAttach[0]["kari_order_to_supplier_id"]
+                         'kari_order_to_supplier_id' => $kari_order_to_supplier_id_moto[0]['id']
                      ]);
 
                    $connection = ConnectionManager::get('default');
@@ -413,18 +431,27 @@ class htmlEDItouroku extends AppController
                      'id_order' => $arrAttachnum[$m],
                      'kari_order_to_supplier_id' => $arrKariIds[$m]
                    ];
-                   $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
-                   $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);//saveManyで一括登録
+                   $AttachOrderToSuppliers = $this->AttachOrderToSuppliers->patchEntity($this->AttachOrderToSuppliers->newEntity(), $arrAttach[0]);
+                   $this->AttachOrderToSuppliers->save($AttachOrderToSuppliers);//saveManyで一括登録
 
                    //insert into AttachOrderToSupplierする（旧DB）
+
+                   $KariOrderToSupplier = $this->KariOrderToSuppliers->find()->where(['id' => $arrAttach[0]["kari_order_to_supplier_id"]])->toArray();
+                   $product_code = $KariOrderToSupplier[0]->product_code;
+                   $id_order = $KariOrderToSupplier[0]->id_order;
 
                    $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
+                   $sql = "SELECT id FROM kari_order_to_supplier".
+                         " where product_id ='".$product_code."' and id_order = '".$id_order."'";
+                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $kari_order_to_supplier_id_moto = $connection->execute($sql)->fetchAll('assoc');
+
                      $connection->insert('attach_order_to_supplier', [
                          'id_order' => $arrAttach[0]["id_order"],
-                         'kari_order_to_supplier_id' => $arrAttach[0]["kari_order_to_supplier_id"]
+                         'kari_order_to_supplier_id' => $kari_order_to_supplier_id_moto[0]['id']
                      ]);
 
                    $connection = ConnectionManager::get('default');
@@ -443,18 +470,27 @@ class htmlEDItouroku extends AppController
                    print_r($arrAttach);
                    echo "</pre>";
 */
-                   $AttachOrderToSuppliers = $this->AttachOrderToSupplier->patchEntity($this->AttachOrderToSupplier->newEntity(), $arrAttach[0]);
-                   $this->AttachOrderToSupplier->save($AttachOrderToSuppliers);//saveManyで一括登録
+                   $AttachOrderToSuppliers = $this->AttachOrderToSuppliers->patchEntity($this->AttachOrderToSuppliers->newEntity(), $arrAttach[0]);
+                   $this->AttachOrderToSuppliers->save($AttachOrderToSuppliers);//saveManyで一括登録
 
                    //insert into AttachOrderToSupplierする（旧DB）
+
+                   $KariOrderToSupplier = $this->KariOrderToSuppliers->find()->where(['id' => $arrAttach[0]["kari_order_to_supplier_id"]])->toArray();
+                   $product_code = $KariOrderToSupplier[0]->product_code;
+                   $id_order = $KariOrderToSupplier[0]->id_order;
 
                    $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
+                   $sql = "SELECT id FROM kari_order_to_supplier".
+                         " where product_id ='".$product_code."' and id_order = '".$id_order."'";
+                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $kari_order_to_supplier_id_moto = $connection->execute($sql)->fetchAll('assoc');
+
                      $connection->insert('attach_order_to_supplier', [
                          'id_order' => $arrAttach[0]["id_order"],
-                         'kari_order_to_supplier_id' => $arrAttach[0]["kari_order_to_supplier_id"]
+                         'kari_order_to_supplier_id' => $kari_order_to_supplier_id_moto[0]['id']
                      ]);
 
                    $connection = ConnectionManager::get('default');
@@ -481,7 +517,7 @@ class htmlEDItouroku extends AppController
 */
     for($k=0; $k<count($arrFp); $k++){//外注仮登録
 
-      $ProductGaityu = $this->ProductGaityu->find()->where(['product_id' => $arrFp[$k]['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
+      $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $arrFp[$k]['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
       if(count($ProductGaityu) > 0){//外注製品であればkari_order_to_suppliersに登録
 
         $datenouki = strtotime($arrFp[$k]["date_deliver"]);
@@ -567,7 +603,7 @@ class htmlEDItouroku extends AppController
     */
        for($k=0; $k<count($arrFp); $k++){//外注仮登録
 
-         $ProductGaityu = $this->ProductGaityu->find()->where(['product_id' => $arrFp[$k]['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
+         $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $arrFp[$k]['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
          if(count($ProductGaityu) > 0){//外注製品であればkari_order_to_suppliersに登録
 
            $datenouki = strtotime($arrFp[$k]["date_deliver"]);

@@ -38,7 +38,9 @@ class htmlEDItouroku extends AppController
         $date_deliver = $KariOrderToSupplier[$k]->date_deliver->format('Y-m-d');
         $amount = $KariOrderToSupplier[$k]->amount;
         $id_supplier = $KariOrderToSupplier[$k]->id_supplier;
-        $price = $KariOrderToSupplier[$k]->price;
+
+        $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $product_code])->toArray();
+        $price = $ProductGaityu[0]->price_shiire;
 
         $_SESSION['KariOrderToSuppliers'][$k] = array(
           'id' => $id,
@@ -509,12 +511,7 @@ class htmlEDItouroku extends AppController
 
    public function htmlgaityukaritouroku($arrFp)
   {
-/*
-    echo "<pre>";
-    print_r("kurasu");
-    print_r($arrFp);
-    echo "</pre>";
-*/
+
     for($k=0; $k<count($arrFp); $k++){//外注仮登録
 
       $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $arrFp[$k]['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
@@ -535,11 +532,14 @@ class htmlEDItouroku extends AppController
           'date_deliver' => $kari_datenouki
         );
 
+        $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $arrFp[$k]['product_code']])->toArray();
+        $price = $ProductGaityu[0]->price_shiire;
+
         $id_supplier = $ProductGaityu[0]->id_supplier;
           $_SESSION['ProductGaityu'] = array(
             'id_order' => $arrFp[$k]['num_order'],
             'product_code' => $arrFp[$k]['product_code'],
-            'price' => $arrFp[$k]["price"],
+            'price' => $price,
             'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
             'amount' => $arrFp[$k]["amount"],
             'id_supplier' => $id_supplier,
@@ -568,7 +568,7 @@ class htmlEDItouroku extends AppController
               $connection->insert('kari_order_to_supplier', [
                 'id_order' => $arrFp[$k]['num_order'],
                 'product_id' => $arrFp[$k]['product_code'],
-                'price' => $arrFp[$k]["price"],
+                'price' => $price,
                 'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
                 'amount' => $arrFp[$k]["amount"],
                 'id_supplier' => $id_supplier,
@@ -595,18 +595,21 @@ class htmlEDItouroku extends AppController
 
       public function htmlgaityukaritourokuAssemble($arrFp)
      {
-    /*
-       echo "<pre>";
-       print_r("kurasu");
-       print_r($arrFp);
-       echo "</pre>";
-    */
-       for($k=0; $k<count($arrFp); $k++){//外注仮登録
 
-         $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $arrFp[$k]['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
+       if(isset($arrFp[0][0])){//組み立てのデータを登録できる型に変更する。
+         $arrFp[0] = $arrFp[0];
+       }else{
+         $arrFFp = $arrFp;
+         $arrFp = array();
+         $arrFp[] = $arrFFp;
+       }
+
+       for($k=0; $k<count($arrFp[0]); $k++){//外注仮登録
+
+         $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $arrFp[0][$k]['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
          if(count($ProductGaityu) > 0){//外注製品であればkari_order_to_suppliersに登録
 
-           $datenouki = strtotime($arrFp[$k]["date_deliver"]);
+           $datenouki = strtotime($arrFp[0][$k]["date_deliver"]);
            $datenoukiye = date('Y-m-d', strtotime("-1 day", $datenouki));
            $w = date("w", strtotime($datenoukiye));//納期の前日の曜日を取得
            if($w == 0){//前日が日曜日なら３日前の金曜日に変更
@@ -623,11 +626,11 @@ class htmlEDItouroku extends AppController
 
            $id_supplier = $ProductGaityu[0]->id_supplier;
              $_SESSION['ProductGaityu'] = array(
-               'id_order' => $arrFp[$k]['num_order'],
-               'product_code' => $arrFp[$k]['product_code'],
+               'id_order' => $arrFp[0][$k]['num_order'],
+               'product_code' => $arrFp[0][$k]['product_code'],
                'price' => 0,
                'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
-               'amount' => $arrFp[$k]["amount"],
+               'amount' => $arrFp[0][$k]["amount"],
                'id_supplier' => $id_supplier,
                'tourokubi' => date("Y-m-d"),
                'flag_attach' => 0,
@@ -635,12 +638,7 @@ class htmlEDItouroku extends AppController
                'created_at' => date("Y-m-d H:i:s"),
                'created_staff' => $this->Auth->user('staff_id')
              );
-    /*
-             echo "<pre>";
-             print_r('ProductGaityu');
-             print_r($_SESSION['ProductGaityu']);
-             echo "</pre>";
-    */
+
              $KariOrderToSuppliers = $this->KariOrderToSuppliers->patchEntity($this->KariOrderToSuppliers->newEntity(), $_SESSION['ProductGaityu']);
              if ($this->KariOrderToSuppliers->save($KariOrderToSuppliers)) {
                $mes = "※登録されました";
@@ -652,11 +650,11 @@ class htmlEDItouroku extends AppController
                $table->setConnection($connection);
 
                  $connection->insert('kari_order_to_supplier', [
-                   'id_order' => $arrFp[$k]['num_order'],
-                   'product_id' => $arrFp[$k]['product_code'],
+                   'id_order' => $arrFp[0][$k]['num_order'],
+                   'product_id' => $arrFp[0][$k]['product_code'],
                    'price' => 0,
                    'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
-                   'amount' => $arrFp[$k]["amount"],
+                   'amount' => $arrFp[0][$k]["amount"],
                    'id_supplier' => $id_supplier,
                    'tourokubi' => date("Y-m-d"),
                    'flag_attach' => 0,

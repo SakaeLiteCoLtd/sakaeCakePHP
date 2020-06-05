@@ -450,10 +450,11 @@ echo "</pre>";
            $keys[array_search('11',$keys)]='price';
            $keys[array_search('13',$keys)]='date_deliver';
            $keys[array_search('14',$keys)]='place_deliver_code';
+           $keys[array_search('15',$keys)]='place_deliver';
            $sample = array_combine( $keys, $sample );
 
            unset($sample['0'],$sample['1'],$sample['4'],$sample['5'],$sample['6'],$sample['8']);
-           unset($sample['12'],$sample['15'],$sample['16'],$sample['17'],$sample['18']);//最後の改行も削除
+           unset($sample['12'],$sample['16'],$sample['17'],$sample['18']);//最後の改行も削除
 
            if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき（カンマのみの行が出てきたら配列への追加を終了）
              $arrEDI[] = $sample;//配列に追加する
@@ -467,7 +468,14 @@ echo "</pre>";
             $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
     				$customer_code = $Customer[0]->customer_code;
 
-            $arrEDI[$n] = array_merge($arrEDI[$n],array('place_line'=>"-"));
+            if(mb_substr($arrEDI[$n]["place_deliver"], 0, 1) === "弊"){
+              $place_deliver = str_replace("弊社","",$arrEDI[$n]["place_deliver"]);
+            }else{
+              $place_deliver = $arrEDI[$n]["place_deliver"];
+            }
+            unset($arrEDI[$n]['place_deliver']);
+
+            $arrEDI[$n] = array_merge($arrEDI[$n],array('place_line'=>$place_deliver));
             $arrEDI[$n] = array_merge($arrEDI[$n],array('check_denpyou'=>0));
             $arrEDI[$n] = array_merge($arrEDI[$n],array('customer_code'=>$customer_code));
             $arrEDI[$n] = array_merge($arrEDI[$n],array('first_date_deliver'=>$arrEDI[$n]['date_deliver']));
@@ -2066,20 +2074,17 @@ echo "</pre>";
             $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);//$arrOrderEdisnewを登録
             if ($this->OrderEdis->saveMany($OrderEdis)) {//minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
 
-
               $arrFp = array();//空の配列を作る
               $arrFp = $arrOrderEdisnew;
+/*
+              //外注仮登録クラス
+              $htmlgaityukaritouroku = new htmlEDItouroku();
+              $data = $htmlgaityukaritouroku->htmlgaityukaritouroku($arrFp);
 
-                               //外注仮登録クラス
-                               $htmlgaityukaritouroku = new htmlEDItouroku();
-                               $data = $htmlgaityukaritouroku->htmlgaityukaritouroku($arrFp);
-
-                               //外注登録クラス（紐づけ、kari_orderの更新も）
-                               $htmlgaityutouroku = new htmlEDItouroku();
-                               $data = $htmlgaityutouroku->htmlgaityutouroku();
-
-
-
+              //外注登録クラス（紐づけ、kari_orderの更新も）
+              $htmlgaityutouroku = new htmlEDItouroku();
+              $data = $htmlgaityutouroku->htmlgaityutouroku();
+*/
               //旧DB更新
               $connection = ConnectionManager::get('sakaeMotoDB');
               $table = TableRegistry::get('order_edi');
@@ -2868,7 +2873,7 @@ echo "</pre>";
       echo "</pre>";
 */
       $PlaceDelivers = $this->PlaceDelivers->find()
-        ->where(['cs_id not like' => '%'."20".'%'])->toArray();
+        ->where(['cs_code not like' => '%'."20".'%'])->toArray();
         $arrPlaceDeliver = array();//配列の初期化
       	foreach ($PlaceDelivers as $value) {
       		$arrPlaceDeliver[] = array($value->id=>$value->name);
@@ -3123,30 +3128,34 @@ echo "</pre>";
               $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $_SESSION['order_edi_kumitate']);
               if ($this->OrderEdis->saveMany($OrderEdis)) {
 
+                for($n=0; $n<count($_SESSION['order_edi_kumitate']); $n++){
+
                 //旧DB登録
                 $connection = ConnectionManager::get('sakaeMotoDB');
                 $table = TableRegistry::get('order_edi');
                 $table->setConnection($connection);
 
                   $connection->insert('order_edi', [
-                      'date_order' => $_SESSION['order_edi_kumitate']["date_order"],
-                      'num_order' => $_SESSION['order_edi_kumitate']["num_order"],
-                      'product_id' => $_SESSION['order_edi_kumitate']["product_code"],
-                      'price' => $_SESSION['order_edi_kumitate']["price"],
-                      'date_deliver' => $_SESSION['order_edi_kumitate']["date_deliver"],
-                      'amount' => $_SESSION['order_edi_kumitate']["amount"],
-                      'cs_id' => $_SESSION['order_edi_kumitate']["customer_code"],
-                      'place_deliver_id' => $_SESSION['order_edi_kumitate']["place_deliver_code"],
-                      'place_line' => $_SESSION['order_edi_kumitate']["place_line"],
-                      'line_code' => $_SESSION['order_edi_kumitate']["line_code"],
-                      'check_denpyou' => $_SESSION['order_edi_kumitate']["check_denpyou"],
-                      'bunnou' => $_SESSION['order_edi_kumitate']["bunnou"],
-                      'kannou' => $_SESSION['order_edi_kumitate']["kannou"],
-                      'delete_flg' => $_SESSION['order_edi_kumitate']["delete_flag"],
+                      'date_order' => $_SESSION['order_edi_kumitate'][$n]["date_order"],
+                      'num_order' => $_SESSION['order_edi_kumitate'][$n]["num_order"],
+                      'product_id' => $_SESSION['order_edi_kumitate'][$n]["product_code"],
+                      'price' => $_SESSION['order_edi_kumitate'][$n]["price"],
+                      'date_deliver' => $_SESSION['order_edi_kumitate'][$n]["date_deliver"],
+                      'amount' => $_SESSION['order_edi_kumitate'][$n]["amount"],
+                      'cs_id' => $_SESSION['order_edi_kumitate'][$n]["customer_code"],
+                      'place_deliver_id' => $_SESSION['order_edi_kumitate'][$n]["place_deliver_code"],
+                      'place_line' => $_SESSION['order_edi_kumitate'][$n]["place_line"],
+                      'line_code' => $_SESSION['order_edi_kumitate'][$n]["line_code"],
+                      'check_denpyou' => $_SESSION['order_edi_kumitate'][$n]["check_denpyou"],
+                      'bunnou' => $_SESSION['order_edi_kumitate'][$n]["bunnou"],
+                      'kannou' => $_SESSION['order_edi_kumitate'][$n]["kannou"],
+                      'delete_flg' => $_SESSION['order_edi_kumitate'][$n]["delete_flag"],
                       'created_at' => date("Y-m-d H:i:s")
                   ]);
                 $connection = ConnectionManager::get('default');
                 //ここまで
+
+                }
 
                 $arrFp = array();//空の配列を作る
                 $arrFp[] = $_SESSION['order_edi_kumitate'];
@@ -3196,7 +3205,7 @@ echo "</pre>";
       $this->set("product_name",$product_name);
 
       $PlaceDelivers = $this->PlaceDelivers->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
-        ->where(['cs_id like' => '%'."20".'%'])->toArray();
+        ->where(['cs_code like' => '%'."20".'%'])->toArray();
         $arrPlaceDeliver = array();//配列の初期化
       	foreach ($PlaceDelivers as $value) {//2行上のCustomersテーブルのデータそれぞれに対して
       		$arrPlaceDeliver[] = array($value->id=>$value->name);//配列に3行上のCustomersテーブルのデータそれぞれのcustomer_code:name
@@ -3497,31 +3506,34 @@ echo "</pre>";
               $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $_SESSION['order_edi_kumitate']);
               if ($this->OrderEdis->saveMany($OrderEdis)) {
 
+                for($n=0; $n<count($_SESSION['order_edi_kumitate']); $n++){
+
                 //旧DB登録
                 $connection = ConnectionManager::get('sakaeMotoDB');
                 $table = TableRegistry::get('order_edi');
                 $table->setConnection($connection);
 
                   $connection->insert('order_edi', [
-                      'date_order' => $_SESSION['order_edi_kumitate']["date_order"],
-                      'num_order' => $_SESSION['order_edi_kumitate']["num_order"],
-                      'product_id' => $_SESSION['order_edi_kumitate']["product_code"],
-                      'price' => $_SESSION['order_edi_kumitate']["price"],
-                      'date_deliver' => $_SESSION['order_edi_kumitate']["date_deliver"],
-                      'amount' => $_SESSION['order_edi_kumitate']["amount"],
-                      'cs_id' => $_SESSION['order_edi_kumitate']["customer_code"],
-                      'place_deliver_id' => $_SESSION['order_edi_kumitate']["place_deliver_code"],
-                      'place_line' => $_SESSION['order_edi_kumitate']["place_line"],
-                      'line_code' => $_SESSION['order_edi_kumitate']["line_code"],
-                      'check_denpyou' => $_SESSION['order_edi_kumitate']["check_denpyou"],
-                      'bunnou' => $_SESSION['order_edi_kumitate']["bunnou"],
-                      'kannou' => $_SESSION['order_edi_kumitate']["kannou"],
-                      'delete_flg' => $_SESSION['order_edi_kumitate']["delete_flag"],
+                      'date_order' => $_SESSION['order_edi_kumitate'][$n]["date_order"],
+                      'num_order' => $_SESSION['order_edi_kumitate'][$n]["num_order"],
+                      'product_id' => $_SESSION['order_edi_kumitate'][$n]["product_code"],
+                      'price' => $_SESSION['order_edi_kumitate'][$n]["price"],
+                      'date_deliver' => $_SESSION['order_edi_kumitate'][$n]["date_deliver"],
+                      'amount' => $_SESSION['order_edi_kumitate'][$n]["amount"],
+                      'cs_id' => $_SESSION['order_edi_kumitate'][$n]["customer_code"],
+                      'place_deliver_id' => $_SESSION['order_edi_kumitate'][$n]["place_deliver_code"],
+                      'place_line' => $_SESSION['order_edi_kumitate'][$n]["place_line"],
+                      'line_code' => $_SESSION['order_edi_kumitate'][$n]["line_code"],
+                      'check_denpyou' => $_SESSION['order_edi_kumitate'][$n]["check_denpyou"],
+                      'bunnou' => $_SESSION['order_edi_kumitate'][$n]["bunnou"],
+                      'kannou' => $_SESSION['order_edi_kumitate'][$n]["kannou"],
+                      'delete_flg' => $_SESSION['order_edi_kumitate'][$n]["delete_flag"],
                       'created_at' => date("Y-m-d H:i:s")
                   ]);
                 $connection = ConnectionManager::get('default');
                 //ここまで
 
+              }
 
                 $arrFp = array();//空の配列を作る
                 $arrFp[] = $_SESSION['order_edi_kumitate'];

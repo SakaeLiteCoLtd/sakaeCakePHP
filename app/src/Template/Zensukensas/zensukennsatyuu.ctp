@@ -40,4 +40,11 @@
 <legend align="left"><strong style="font-size: 12pt; color:blue"><?= __(${"mess".$i}) ?></strong></legend>
 <?php endfor;?>
 
+<?php
+echo "<pre>";
+print_r($data);
+echo "</pre>";
+?>
+
+
     <?= $this->Form->end() ?>

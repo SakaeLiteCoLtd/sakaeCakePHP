@@ -99,4 +99,11 @@
 <?= $this->Form->control('datetime_finish', array('type'=>'hidden', 'value'=>date('Y-m-d h:m:s'), 'label'=>false)) ?>
 
 <br><br><br><br><br><br><br><br><br><br>
+
+<?php
+echo "<pre>";
+print_r($data);
+echo "</pre>";
+?>
+
 <?= $this->Form->end() ?>

@@ -94,6 +94,8 @@ class ZensukensasController extends AppController
        $this->set('ResultZensuHeads',$ResultZensuHeads);
 
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $this->set('data',$data);
+
        $str = implode(',', $data);//配列データをカンマ区切りの文字列にする
        $ary = explode(',', $str);//$strを配列に変換
        $product_code1 = $ary[0];//入力したデータをカンマ区切りの最初のデータを$product_code1とする（以下同様）
@@ -134,14 +136,14 @@ class ZensukensasController extends AppController
        $arr1 = array_merge($arr1,array('staff_id'=>$staff_id));
        $arr1 = array_merge($arr1,array('datetime_start'=> date("Y-m-d H:i:s")));
        $arr1 = array_merge($arr1,array('delete_flag'=>0));
-       $arr1 = array_merge($arr1,array('created_staff'=>$created_staff));
+       $arr1 = array_merge($arr1,array('created_staff'=>$staff_id));
        $arr1touroku[] = $arr1;
 /*
        echo "<pre>";
        print_r($arr1touroku);
        echo "</pre>";
 */
-       $ResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code1, 'created_staff' => $created_staff, 'lot_num' => $lot_num, 'datetime_finish IS' => Null])->toArray();
+       $ResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code1, 'staff_id' => $staff_id, 'lot_num' => $lot_num, 'datetime_finish IS' => Null])->toArray();
 
        if(isset($ResultZensuHead[0])){
          $ResultZensuHead = $ResultZensuHead;//既にResultZensuHeadsテーブルにあって、検査済みではない場合（検査中にもう一度検査しようとした場合）
@@ -162,7 +164,7 @@ class ZensukensasController extends AppController
                $connection->insert('result_zensu_head', [
                    'product_id' => $arr1touroku[$k]["product_code"],
                    'lot_num' => $arr1touroku[$k]["lot_num"],
-                   'emp_id' => $arr1touroku[$k]["created_staff"],
+                   'emp_id' => $created_staff,
                    'datetime_start' => date("Y-m-d H:i:s")
                ]);
              }
@@ -188,9 +190,9 @@ class ZensukensasController extends AppController
          $arr2 = array_merge($arr2,array('staff_id'=>$staff_id));
          $arr2 = array_merge($arr2,array('datetime_start'=> date("Y-m-d H:i:s")));
          $arr2 = array_merge($arr2,array('delete_flag'=>0));
-         $arr2 = array_merge($arr2,array('created_staff'=>$created_staff));
+         $arr2 = array_merge($arr2,array('created_staff'=>$staff_id));
          $arr2touroku[] = $arr2;
-          $ResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code2, 'created_staff' => $created_staff, 'lot_num' => $lot_num, 'datetime_finish IS' => Null])->toArray();
+          $ResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code2, 'staff_id' => $staff_id, 'lot_num' => $lot_num, 'datetime_finish IS' => Null])->toArray();
           if(isset($ResultZensuHead[0])){
             $ResultZensuHead = $ResultZensuHead;//既にResultZensuHeadsテーブルにあって、検査済みではない場合（検査中にもう一度検査しようとした場合）
           }else{
@@ -210,7 +212,7 @@ class ZensukensasController extends AppController
                   $connection->insert('result_zensu_head', [
                       'product_id' => $arr2touroku[$k]["product_code"],
                       'lot_num' => $arr2touroku[$k]["lot_num"],
-                      'emp_id' => $arr2touroku[$k]["created_staff"],
+                      'emp_id' => $created_staff,
                       'datetime_start' => date("Y-m-d H:i:s")
                   ]);
                 }
@@ -234,7 +236,7 @@ class ZensukensasController extends AppController
        print_r($arrdata);
        echo "</pre>";
 */
-      $ResultZensuHead = $this->ResultZensuHeads->find()->where(['datetime_finish IS' => Null, 'created_staff' => $created_staff])->toArray();
+      $ResultZensuHead = $this->ResultZensuHeads->find()->where(['datetime_finish IS' => Null, 'staff_id' => $staff_id])->toArray();
       $cnt = count($ResultZensuHead);//配列の個数
       $this->set('cnt',$cnt);
 
@@ -286,6 +288,7 @@ class ZensukensasController extends AppController
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
        $Data=$this->request->query('s');
+       $this->set('Data',$Data);
 
        $username = $Data['username'];
        $UserData = $this->Users->find()->where(['username' => $username])->toArray();
@@ -297,7 +300,7 @@ class ZensukensasController extends AppController
        $Staffid = $staffData[0]->id;
        $this->set('Staffid',$Staffid);
 
-       $ResultZensuHead = $this->ResultZensuHeads->find()->where(['datetime_finish IS' => Null, 'created_staff' => $staffData[0]->staff_code])->toArray();
+       $ResultZensuHead = $this->ResultZensuHeads->find()->where(['datetime_finish IS' => Null, 'staff_id' => $Staffid])->toArray();
        $cnt = count($ResultZensuHead);//配列の個数
        $this->set('cnt',$cnt);
 
@@ -317,6 +320,8 @@ class ZensukensasController extends AppController
      public function zensufinishpre()
      {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $this->set('data',$data);
+
        $Staff = $data['Staff'];
        $this->set('Staff',$Staff);
        $staff_id = $data['staff_id'];
@@ -381,6 +386,7 @@ class ZensukensasController extends AppController
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       $this->set('data',$data);
        $Staff = $data['Staff'];
        $this->set('Staff',$Staff);
        $staff_id = $data['staff_id'];
@@ -494,12 +500,12 @@ class ZensukensasController extends AppController
            'amount' => $data["amount{$n}"],
            'bik' => $data["bik{$n}"],
            "delete_flag" => 0,
-           "created_staff" => $staff_code
+           "created_staff" => $staff_id
          );
         }
         $_SESSION['zensuhead'] = array(
           'datetime_finish' => date('Y-m-d H:i:s'),
-          'updated_staff' => $staff_code
+          'updated_staff' => $staff_id
         );
         $_SESSION['result_zensu_head_id'] = array(
           'product_code' => $product_code,

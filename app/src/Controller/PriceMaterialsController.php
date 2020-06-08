@@ -21,14 +21,217 @@ class PriceMaterialsController extends AppController
 		'conditions' => ['delete_flag' => '0']//'delete_flag' => '0'を満たすものだけ表示する
 	];
 
-     public function initialize()
-     {
-			 parent::initialize();
-		 	$this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
-		 	$this->Materials = TableRegistry::get('materials');//materialsテーブルを使う
-		 	$this->Suppliers = TableRegistry::get('suppliers');//suppliersテーブルを使う
-			$this->Users = TableRegistry::get('users');//staffsテーブルを使う
-     }
+
+	     public function initialize()
+	     {
+				 parent::initialize();
+			 	$this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
+			 	$this->Materials = TableRegistry::get('materials');//materialsテーブルを使う
+			 	$this->Suppliers = TableRegistry::get('suppliers');//suppliersテーブルを使う
+				$this->Users = TableRegistry::get('users');//staffsテーブルを使う
+				$this->DenpyouDnpMinoukannous = TableRegistry::get('denpyouDnpMinoukannous');
+				$this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
+				$this->DnpTotalAmounts = TableRegistry::get('dnpTotalAmounts');
+				$this->OrderEdis = TableRegistry::get('orderEdis');
+				$this->PlaceDelivers = TableRegistry::get('placeDelivers');
+	     }
+
+	     public function confirmcsv()
+	    {
+				$priceMaterial = $this->PriceMaterials->newEntity();//newentityに$priceMaterialという名前を付ける
+				$this->set('priceMaterial',$priceMaterial);//1行上の$priceMaterialをctpで使えるようにセット
+	    }
+
+	     public function docsv()
+	    {
+				$priceMaterial = $this->PriceMaterials->newEntity();//newentityに$priceMaterialという名前を付ける
+				$this->set('priceMaterial',$priceMaterial);//1行上の$priceMaterialをctpで使えるようにセット
+
+		//		$fp = fopen("price_material.csv", "r");//csvファイルはwebrootに入れる
+				$fp = fopen("minoukannou2020~.csv", "r");//csvファイルはwebrootに入れる
+				$this->set('fp',$fp);
+
+		//		$fpcount = fopen("order_edis_2019~.csv", 'r' );
+				$fpcount = fopen("minoukannou2020~.csv", 'r' );
+				for( $count = 0; fgets( $fpcount ); $count++ );
+				$this->set('count',$count);
+
+				$arrFp = array();//空の配列を作る
+		//		$arrTotal = array();//空の配列を作る
+				$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目はカラム名なので先に取っておく）
+				for ($k=1; $k<=$count-1; $k++) {
+					$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+					$sample = explode(',',$line);//$lineを","毎に配列に入れる
+/*
+					$keys=array_keys($sample);
+					$keys[array_search('0',$keys)]='id';
+					$keys[array_search('1',$keys)]='place_deliver_code';
+					$keys[array_search('2',$keys)]='date_order';
+		//			$keys[array_search('3',$keys)]='price';
+					$keys[array_search('3',$keys)]='name_order';
+					$keys[array_search('4',$keys)]='amount';
+					$keys[array_search('5',$keys)]='product_code';
+					$keys[array_search('6',$keys)]='line_code';
+					$keys[array_search('7',$keys)]='date_deliver';
+					$keys[array_search('8',$keys)]='num_order';
+					$keys[array_search('9',$keys)]='first_date_deliver';
+					$keys[array_search('10',$keys)]='customer_code';
+					$keys[array_search('11',$keys)]='place_line';
+					$keys[array_search('12',$keys)]='check_denpyou';
+					$keys[array_search('13',$keys)]='gaityu';
+					$keys[array_search('14',$keys)]='bunnou';
+					$keys[array_search('15',$keys)]='kannou';
+					$keys[array_search('16',$keys)]='date_bunnou';
+					$keys[array_search('17',$keys)]='check_kannou';
+					$keys[array_search('18',$keys)]='delete_flag';
+					$keys[array_search('19',$keys)]='created_at';
+					$keys[array_search('20',$keys)]='created_staff';
+					$keys[array_search('21',$keys)]='updated_at';
+					$keys[array_search('22',$keys)]='updated_staff';
+*/
+
+					$keys=array_keys($sample);
+					$keys[array_search('0',$keys)]='order_edi_id';//もともとdate_order
+					$keys[array_search('1',$keys)]='num_order';
+					$keys[array_search('2',$keys)]='product_code';
+					$keys[array_search('3',$keys)]='code';
+					$keys[array_search('4',$keys)]='place_deliver';
+					$keys[array_search('5',$keys)]='date_deliver';
+					$keys[array_search('6',$keys)]='amount';
+					$keys[array_search('7',$keys)]='minoukannou';
+					$keys[array_search('8',$keys)]='delete_flag';
+					$keys[array_search('9',$keys)]='created_at';
+					$keys[array_search('10',$keys)]='updated_at';
+
+					$sample = array_combine($keys, $sample);
+
+					${"orderEdis".$k} = $this->OrderEdis->find()->where(['line_code' => $sample['code'], 'num_order' => $sample['num_order'],
+					 'product_code' => $sample['product_code'], 'date_order' => $sample['order_edi_id']])->toArray();//同一の注文
+
+					if(isset(${"orderEdis".$k}[0])){
+
+						$order_edi_id = ${"orderEdis".$k}[0]->id;
+
+						$replacements = array('order_edi_id' => $order_edi_id);//配列のデータの置き換え
+						$sample = array_replace($sample, $replacements);//配列のデータの置き換え
+
+						$place_code = ${"orderEdis".$k}[0]->place_deliver_code;
+
+						${"PlaceDeliver".$k} = $this->PlaceDelivers->find()->where(['id_from_order' => $place_code])->toArray();
+
+						$place_deliver = ${"PlaceDeliver".$k}[0]->name;
+
+						$replacements = array('place_deliver' => $place_deliver);//配列のデータの置き換え
+						$sample = array_replace($sample, $replacements);//配列のデータの置き換え
+
+					}else{
+
+						$order_edi_id = "-";
+
+						$replacements = array('order_edi_id' => $order_edi_id);//配列のデータの置き換え
+						$sample = array_replace($sample, $replacements);//配列のデータの置き換え
+
+						$place_deliver = "-";
+
+						$replacements = array('place_deliver' => $place_deliver);//配列のデータの置き換え
+						$sample = array_replace($sample, $replacements);//配列のデータの置き換え
+
+					}
+
+
+					$connection = ConnectionManager::get('DB_ikou_test');
+					$table = TableRegistry::get('denpyou_dnp');
+					$table->setConnection($connection);
+
+					$sql = "SELECT name_order FROM denpyou_dnp".
+								" where product_id ='".$sample['product_code']."' and num_order = '".$sample['num_order']."'";
+					$connection = ConnectionManager::get('DB_ikou_test');
+					${"denpyou_dnp_moto".$k} = $connection->execute($sql)->fetchAll('assoc');
+
+					if(isset(${"denpyou_dnp_moto".$k}[0]['name_order'])){
+
+						${"name_order".$k} = ${"denpyou_dnp_moto".$k}[0]['name_order'];
+
+					}else{
+
+						${"name_order".$k} = "-";
+
+					}
+
+					$connection = ConnectionManager::get('default');//新DBに戻る
+					$table->setConnection($connection);
+
+					$replacements = array('name_order' => ${"name_order".$k});//配列のデータの置き換え
+					$sample = array_replace($sample, $replacements);//配列のデータの置き換え
+/*
+					$replacements = array('place_deliver' => $place_deliver);//配列のデータの置き換え
+					$sample = array_replace($sample, $replacements);//配列のデータの置き換え
+
+					$replacements = array('place_deliver' => $place_deliver);//配列のデータの置き換え
+					$sample = array_replace($sample, $replacements);//配列のデータの置き換え
+*/
+					unset($sample['updated_at']);//削除
+
+					$arrFp[] = $sample;//配列に追加する
+
+/*
+					unset($sample['id']);//削除
+					unset($sample['place_deliver_code']);//削除
+		//			unset($sample['price']);//削除
+					unset($sample['first_date_deliver']);//削除
+					unset($sample['customer_code']);//削除
+					unset($sample['place_line']);//削除
+					unset($sample['check_denpyou']);//削除
+					unset($sample['bunnou']);//削除
+					unset($sample['gaityu']);//削除
+					unset($sample['kannou']);//削除
+					unset($sample['date_bunnou']);//削除
+					unset($sample['check_kannou']);//削除
+					unset($sample['updated_at']);//削除
+					unset($sample['updated_at']);//削除
+					unset($sample['updated_staff']);//削除
+
+					if($sample['delete_flag'] == 0){
+						$arrFp[] = $sample;//配列に追加する
+					}
+					*/
+				}
+
+				$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
+				echo "<pre>";
+				print_r($arrFp[0]);
+				echo "<br>";
+				echo "<pre>";
+				print_r($arrFp);
+				echo "<br>";
+/*
+				echo "<pre>";
+				print_r($arrFp);
+				echo "<br>";
+*/
+
+
+/*
+				if ($this->request->is('post')) {//postなら登録
+					$DenpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($this->DenpyouDnpMinoukannous->newEntity(), $arrFp);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+					$connection = ConnectionManager::get('default');//トランザクション1
+					// トランザクション開始2
+					$connection->begin();//トランザクション3
+					try {//トランザクション4
+							if ($this->PriceMaterials->saveMany($DenpyouDnpMinoukannous)) {//saveManyで一括登録
+								$connection->commit();// コミット5
+							} else {
+								$this->Flash->error(__('The PriceMaterials could not be saved. Please, try again.'));
+								throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+							}
+					} catch (Exception $e) {//トランザクション7
+					//ロールバック8
+						$connection->rollback();//トランザクション9
+					}//トランザクション10
+				}
+*/
+	    }
+
 
     /**
      * Index method
@@ -218,97 +421,8 @@ class PriceMaterialsController extends AppController
 	}
     }
 
-     public function confirmcsv()
-    {
-	$priceMaterial = $this->PriceMaterials->newEntity();//newentityに$priceMaterialという名前を付ける
-	$this->set('priceMaterial',$priceMaterial);//1行上の$priceMaterialをctpで使えるようにセット
-    }
 
-     public function docsv()
-    {
-	$staff_id = $this->Auth->user('staff_id');
-	$this->set('staff_id',$staff_id);//1行上の$staff_idをctpで使えるようにセット
 
-	$fp = fopen("price_material.csv", "r");//csvファイルはwebrootに入れる
-	$this->set('fp',$fp);
-
-	$fpcount = fopen("price_material.csv", 'r' );
-	for( $count = 0; fgets( $fpcount ); $count++ );
-	$this->set('count',$count);
-
-	$arrFp = array();//空の配列を作る
-	$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目はカラム名なので先に取っておく）
-	for ($k=1; $k<=$count-1; $k++) {//行数分160~170あたりにいけないのがあった（修正済み）
-		$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
-		$sample = explode(',',$line);//$lineを","毎に配列に入れる
-
-		array_push($sample, '0', $staff_id);//配列に追加
-
-		$keys=array_keys($sample);
-		$keys[array_search('0',$keys)]='material_id';//名前の変更
-		$keys[array_search('3',$keys)]='start';//名前の変更
-		$keys[array_search('4',$keys)]='price';
-		$keys[array_search('6',$keys)]='lot_low';
-		$keys[array_search('7',$keys)]='lot_upper';
-		$keys[array_search('8',$keys)]='supplier_id';//supplier_id=9999となるデータが入っていなかったので、「仮登録」というデータを入れておいた
-		$keys[array_search('10',$keys)]='delete_flag';//追加した配列の値
-		$keys[array_search('13',$keys)]='status';//追加した配列の値
-		$keys[array_search('14',$keys)]='created_staff';//追加した配列の値
-
-		$sample = array_combine($keys, $sample );
-
-		$Material = $this->Materials->find()->where([['grade' => $sample[1]], ['color' => $sample[2]]])->toArray();//'grade' => $sample[1]、'color' => $sample[2]となるデータをMaterialsテーブルから配列で取得
-		$material_id = $Material[0]->id;//配列の0番目（0番目しかない）のidに$material_idと名前を付ける
-
-		$replacements = array('material_id' => $material_id);//配列のデータの置き換え（material_idを$material_idに変更）
-		$sample = array_replace($sample, $replacements);//配列のデータの置き換え（material_idを$material_idに変更）
-
-		$Supplier = $this->Suppliers->find()->where(['supplier_code' => $sample['supplier_id']])->toArray();//'supplier_code' => $sample['supplier_id']となるデータをSuppliersテーブルから配列で取得
-		$supplier_id = $Supplier[0]->id;//配列の0番目（0番目しかない）のidに$supplier_idと名前を付ける
-
-		$replacements = array('supplier_id' => $supplier_id);//配列のデータの置き換え（supplier_idを$supplier_idに変更）
-		$sample = array_replace($sample, $replacements);//配列のデータの置き換え（supplier_idを$supplier_idに変更）
-
-		$replacements = array('created_staff' => 9999);//配列のデータの置き換え（supplier_idを$supplier_idに変更）
-		$sample = array_replace($sample, $replacements);//配列のデータの置き換え（supplier_idを$supplier_idに変更）
-
- 		unset($sample['1']);//削除
-		unset($sample['2']);//削除
-		unset($sample['5']);//削除
-		unset($sample['8']);//削除
-		unset($sample['9']);//削除
-		unset($sample['11']);//削除
-		unset($sample['12']);//削除
-
-		$arrFp[] = $sample;//配列に追加する
-	}
-	$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
-//	echo "<pre>";
-//	print_r($arrFp[0]);
-//	print_r($arrFp);
-//	echo "<br>";
-
-	$priceMaterial = $this->PriceMaterials->newEntity();//newentityに$priceMaterialという名前を付ける
-	$this->set('priceMaterial',$priceMaterial);//1行上の$priceMaterialをctpで使えるようにセット
-
-	if ($this->request->is('post')) {//postなら登録
-		$priceMaterial = $this->PriceMaterials->patchEntities($priceMaterial, $arrFp);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-		$connection = ConnectionManager::get('default');//トランザクション1
-		// トランザクション開始2
-		$connection->begin();//トランザクション3
-		try {//トランザクション4
-				if ($this->PriceMaterials->saveMany($priceMaterial)) {//saveManyで一括登録
-					$connection->commit();// コミット5
-				} else {
-					$this->Flash->error(__('The PriceMaterials could not be saved. Please, try again.'));
-					throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-				}
-		} catch (Exception $e) {//トランザクション7
-		//ロールバック8
-			$connection->rollback();//トランザクション9
-		}//トランザクション10
-	}
-    }
 
     /**
      * Edit method

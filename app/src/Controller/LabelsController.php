@@ -2961,10 +2961,10 @@ class LabelsController extends AppController
        }
 
        $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-         ->where(['delete_flag' => '0', 'date_deliver' => $data_yobidashi]
+         ->where(['delete_flag' => '0', 'date_deliver' => $data_yobidashi, 'place_deliver_code !=' => '00000']
          ));//対象の製品を絞り込む
 
-      $arrorderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0', 'date_deliver' => $data_yobidashi])->toArray();
+      $arrorderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0', 'date_deliver' => $data_yobidashi, 'place_deliver_code !=' => '00000'])->toArray();
 
       $arrProcode = array();
       for($n=0; $n<count($arrorderEdis); $n++){

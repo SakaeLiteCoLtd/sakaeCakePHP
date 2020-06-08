@@ -9,10 +9,12 @@
           $username = $this->request->Session()->read('Auth.User.username');
 ?>
                 <?php
-            	    echo "<pre>";
+/*
+              	    echo "<pre>";
                     print_r('以下のデータが登録されました。');
                     echo "<br>";
                     print_r($arrFp);
                     echo "<br>";
+*/
                 ?>
 <?= $this->Form->end() ?>

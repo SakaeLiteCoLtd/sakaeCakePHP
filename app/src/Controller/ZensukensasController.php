@@ -782,6 +782,7 @@ class ZensukensasController extends AppController
        $this->set('dateTo',$dateTo);
        $dateTomo = $dateYMDf2."T".$dateHI;
        $this->set('dateTomo',$dateTomo);
+
      }
 
      public function zensukensakuichiran()

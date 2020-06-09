@@ -25,7 +25,7 @@ class htmlLabelmenu extends AppController
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/lotmenu'>\n".
                   "<img src='/img/Labelimg/label_lot.gif' width=115 height=40>\n".
                   "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/index'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/genzaijoukyoumenu'>\n".
                   "<img src='/img/Labelimg/label_genzai.gif' width=115 height=40>\n".
                   "</a>\n".
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/indexShinki'>\n".//ctpの名前は、index_shinki.ctp
@@ -109,14 +109,30 @@ class htmlLabelmenu extends AppController
      $this->data = $labelshinkisubmenus;
  }
 
-     public function Labelhasulotmenus()
+      public function Labelhasulotmenus()
+     {
+       $html =
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/hasulotstafftouroku'>\n".
+                 "<img src='/img/Labelimg/label_touroku.gif' width=85 height=36>\n".
+                 "</a></td>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/hasukensakuform'>\n".
+                 "<img src='/img/Labelimg/label_kensaku.gif' width=85 height=36>\n".
+                 "</a>\n";
+
+         return $html;
+         $this->html = $html;
+         $this->data = $labelshinkisubmenus;
+     }
+
+
+     public function Labelgenzaijoukyoumenus()
     {
       $html =
-                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/hasulotstafftouroku'>\n".
-                "<img src='/img/Labelimg/label_touroku.gif' width=85 height=36>\n".
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/genzaijoukyouform'>\n".
+                "<img src='/img/Labelimg/label_jyoukyou.gif' width=85 height=36>\n".
                 "</a></td>\n".
-                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/hasukensakuform'>\n".
-                "<img src='/img/Labelimg/label_kensaku.gif' width=85 height=36>\n".
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/genzaijoukyouform'>\n".
+                "<img src='/img/Labelimg/label_kannou.gif' width=85 height=36>\n".
                 "</a>\n";
 
         return $html;

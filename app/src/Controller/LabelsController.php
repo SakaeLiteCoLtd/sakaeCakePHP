@@ -43,6 +43,7 @@ class LabelsController extends AppController
        $this->ZensuProducts = TableRegistry::get('zensuProducts');
        $this->OrderEdis = TableRegistry::get('orderEdis');
        $this->MotoLots = TableRegistry::get('motoLots');
+       $this->PlaceDelivers = TableRegistry::get('placeDelivers');
   //     $this->ScheduleKoutei = TableRegistry::get('scheduleKoutei');//sakaeMotoDB必要なし
  }
      public function indexMenu()
@@ -3607,6 +3608,191 @@ class LabelsController extends AppController
       }
     }
   }
+
+      public function genzaijoukyoumenu()
+     {
+       $this->request->session()->destroy();// セッションの破棄
+     }
+
+     public function genzaijoukyouform()
+    {
+      $this->request->session()->destroy();// セッションの破棄
+      $checkLots = $this->CheckLots->newEntity();
+      $this->set('checkLots',$checkLots);
+    }
+
+    public function genzaijoukyouichiran()
+   {
+     $checkLots = $this->CheckLots->newEntity();
+     $this->set('checkLots',$checkLots);
+
+     $data = $this->request->getData();
+
+     $datesta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
+     $datefin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
+     $dif_days = ((strtotime($datefin) - strtotime($datesta)) / 86400);//日時の差を取る
+     $this->set('dif_days',$dif_days);
+
+     $date0 = $datesta;
+
+     for($i=0; $i<=$dif_days; $i++){//それぞれのdate_deliverについて
+
+       ${"arrPlace_kannou".$i} =  array();
+       ${"arrPlace_minou".$i} =  array();
+
+       $this->set('date'.$i,${"date".$i});
+
+       ${"arrCheckLots".$i} = $this->CheckLots->find()->where(['date_deliver' => ${"date".$i}, 'delete_flag' => '0'])->toArray();
+       ${"arrOrderEdis".$i} = $this->OrderEdis->find()->where(['date_deliver' => ${"date".$i}, 'delete_flag' => '0'])->toArray();
+
+       ${"arrPro_c".$i} =  array();//同じdate_deliverのデータから品番を一意に取り出す
+       if(count(${"arrOrderEdis".$i}) > 0){
+         for($j=0; $j<count(${"arrOrderEdis".$i}); $j++){
+           ${"arrPro_c".$i}[] = ${"arrOrderEdis".$i}[$j]->product_code;
+         }
+       }
+/*
+       echo "<pre>";
+       print_r(count(${"arrPro_c".$i}));
+       echo "</pre>";
+*/
+       ${"arrPro_c".$i} = array_unique(${"arrPro_c".$i}, SORT_REGULAR);//重複削除
+       ${"arrPro_c".$i} = array_values(${"arrPro_c".$i});//連番振り直し
+
+       if(count(${"arrPro_c".$i}) > 0){
+
+         for($m=0; $m<count(${"arrPro_c".$i}); $m++){//それぞれのproduct_codeについて
+           $amount_c = 0;
+           $amount_o = 0;
+
+           ${"arrCheckdouitu".$m} = $this->CheckLots->find()->where(['date_deliver' => ${"date".$i}, 'product_code' => ${"arrPro_c".$i}[$m], 'delete_flag' => '0'])->toArray();
+
+           if(isset(${"arrCheckdouitu".$m}[0])){
+
+             for($n=0; $n<count(${"arrCheckdouitu".$m}); $n++){
+               $amount_c = $amount_c + ${"arrCheckdouitu".$m}[$n]->amount;
+             }
+           }
+
+           ${"arrOrderdouitu".$m} = $this->OrderEdis->find()->where(['date_deliver' => ${"date".$i}, 'product_code' => ${"arrPro_c".$i}[$m], 'delete_flag' => '0'])->toArray();
+
+           if(isset(${"arrOrderdouitu".$m}[0])){
+             for($n=0; $n<count(${"arrOrderdouitu".$m}); $n++){
+               $amount_o = $amount_o + ${"arrOrderdouitu".$m}[$n]->amount;
+             }
+           }
+
+           if($amount_c == $amount_o){//date_deliver,product_codeが同じもののamount合計が同じ（$amount_c == $amount_o）場合は完納チェックする（update）
+
+             for($p=0; $p<count(${"arrOrderdouitu".$m}); $p++){
+
+                $connection = ConnectionManager::get('default');//トランザクション1
+                // トランザクション開始2
+                $connection->begin();//トランザクション3
+                try {//トランザクション4
+
+                  if ($this->OrderEdis->updateAll(//新DBをupdate
+                   ['kannou' => 1, 'check_kannou' => date('Y-m-d H:i:s')],
+                   ['id'  => ${"arrOrderdouitu".$m}[$p]->id])) {
+
+                     $connection->commit();// コミット5ここに持ってくる//これを旧DBの登録の後に持ってきたら新DBに登録されない（トランザクションが途中で途切れる？）
+
+                     //insert 旧update
+                     $connection = ConnectionManager::get('DB_ikou_test');
+                     $table = TableRegistry::get('order_edi');
+                     $table->setConnection($connection);
+
+                     $num_order = ${"arrOrderdouitu".$m}[$p]->num_order;
+                     $updater = "UPDATE order_edi set kannou = 1 , check_kannou = '".date('Y-m-d H:i:s')."'
+                       where product_id ='".${"arrPro_c".$i}[$m]."' and date_deliver = '".${"date".$i}."' and num_order = '".$num_order."'";//もとのDBも更新
+                     $connection->execute($updater);
+
+                     $connection = ConnectionManager::get('default');//新DBに戻る
+                     $table->setConnection($connection);
+
+                  } else {
+                    $this->Flash->error(__('The product could not be saved. Please, try again.'));
+                    throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                  }
+                } catch (Exception $e) {//トランザクション7
+                //ロールバック8
+                  $connection->rollback();//トランザクション9
+                }//トランザクション10
+
+
+               $arrPlaceDelivers = $this->PlaceDelivers->find()->where(['id_from_order' => ${"arrOrderdouitu".$m}[$p]->place_deliver_code])->toArray();
+               if(${"arrOrderdouitu".$m}[$p]->place_deliver_code == "199969" || ${"arrOrderdouitu".$m}[$p]->place_deliver_code == "199929" || ${"arrOrderdouitu".$m}[$p]->place_deliver_code == "199999" || ${"arrOrderdouitu".$m}[$p]->place_deliver_code == "100360"){
+                 ${"arrPlaceDelivers_kannou".$i}[] = "DNP".$arrPlaceDelivers[0]->name;
+               }else{
+                 ${"arrPlaceDelivers_kannou".$i}[] = $arrPlaceDelivers[0]->name;
+               }
+
+             }
+
+           }else{
+
+             for($p=0; $p<count(${"arrOrderdouitu".$m}); $p++){
+
+                if(${"arrOrderdouitu".$m}[$p]->place_deliver_code !== "00000"){
+
+                  $arrPlaceDelivers = $this->PlaceDelivers->find()->where(['id_from_order' => ${"arrOrderdouitu".$m}[$p]->place_deliver_code])->toArray();
+                  if(${"arrOrderdouitu".$m}[$p]->place_deliver_code == "199969" || ${"arrOrderdouitu".$m}[$p]->place_deliver_code == "199929" || ${"arrOrderdouitu".$m}[$p]->place_deliver_code == "199999" || ${"arrOrderdouitu".$m}[$p]->place_deliver_code == "100360"){
+                    ${"arrPlaceDelivers_minou".$i}[] = "DNP".$arrPlaceDelivers[0]->name;
+                  }else{
+                    ${"arrPlaceDelivers_minou".$i}[] = $arrPlaceDelivers[0]->name;
+                  }
+
+                }
+
+             }
+
+           }
+
+         }
+
+       }
+
+       if(isset(${"arrPlaceDelivers_kannou".$i}[0])){//完納のものがある場合
+         ${"arrPlaceDelivers_kannou".$i} = array_unique(${"arrPlaceDelivers_kannou".$i}, SORT_REGULAR);//重複削除
+         ${"arrPlaceDelivers_kannou".$i} = array_values(${"arrPlaceDelivers_kannou".$i});//連番振り直し
+         $this->set('arrPlaceDelivers_kannou'.$i,${"arrPlaceDelivers_kannou".$i});
+
+         ${"arrPlaceDelivers_kannou_hyouji".$i} = "";
+         for($r=0; $r<count(${"arrPlaceDelivers_kannou".$i}); $r++){
+           ${"arrPlaceDelivers_kannou_hyouji".$i} = ${"arrPlaceDelivers_kannou_hyouji".$i}."　".${"arrPlaceDelivers_kannou".$i}[$r];
+         }
+
+         $this->set('arrPlaceDelivers_kannou_hyouji'.$i,${"arrPlaceDelivers_kannou_hyouji".$i});
+
+       }else{//完納のものがない場合
+         ${"arrPlaceDelivers_kannou_hyouji".$i} = "";
+         $this->set('arrPlaceDelivers_kannou_hyouji'.$i,${"arrPlaceDelivers_kannou_hyouji".$i});
+       }
+
+       if(isset(${"arrPlaceDelivers_minou".$i}[0])){//未納のものがある場合
+         ${"arrPlaceDelivers_minou".$i} = array_unique(${"arrPlaceDelivers_minou".$i}, SORT_REGULAR);//重複削除
+         ${"arrPlaceDelivers_minou".$i} = array_values(${"arrPlaceDelivers_minou".$i});//連番振り直し
+
+         ${"arrPlaceDelivers_minou_hyouji".$i} = "";
+         for($r=0; $r<count(${"arrPlaceDelivers_minou".$i}); $r++){
+           ${"arrPlaceDelivers_minou_hyouji".$i} = ${"arrPlaceDelivers_minou_hyouji".$i}."　".${"arrPlaceDelivers_minou".$i}[$r];
+         }
+
+         $this->set('arrPlaceDelivers_minou_hyouji'.$i,${"arrPlaceDelivers_minou_hyouji".$i});
+
+       }else{//未納のものがない場合
+         ${"arrPlaceDelivers_minou_hyouji".$i} = "";
+         $this->set('arrPlaceDelivers_minou_hyouji'.$i,${"arrPlaceDelivers_minou_hyouji".$i});
+       }
+
+       $k = $i +1;//最後に、次の日に変更
+       ${"date".$k} = strtotime(${"date".$i});
+       ${"date".$k} = date('Y-m-d', strtotime('+1 day', ${"date".$k}));
+
+     }
+
+   }
+
 
      public function confirmcsv()
     {

@@ -1967,6 +1967,11 @@ echo "</pre>";
         for($n=0; $n<=count($_SESSION['orderEdis'])+100; $n++){
           if(isset($_SESSION['orderEdis'][$n]['id']) && ($_SESSION['orderEdis'][$n]['amount'] > 0)){//amount>0の時
             $bunnnou = $bunnnou +1;//登録するものの$bunnnouを振り直し
+
+            $arrOrderEdis = $this->OrderEdis->find()->where(['id' => $_SESSION['orderEdis'][$n]['id']])->toArray();
+
+            $bunnnoumoto = $arrOrderEdis[0]->bunnou;
+
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
             ,'bunnou' => $bunnnou ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
@@ -1987,7 +1992,7 @@ echo "</pre>";
               $table->setConnection($connection);
 
               $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."', amount = '".$newamount."', bunnou = '".$bunnnou."' , date_bunnou = '".date('Y-m-d')."' ,
-               updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";//もとのDBも更新
+               updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and bunnou = '".$bunnnoumoto."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";//もとのDBも更新
               $connection->execute($updater);
 
               $connection = ConnectionManager::get('default');
@@ -2046,7 +2051,7 @@ echo "</pre>";
               $table = TableRegistry::get('order_dnp_kannous');
               $table->setConnection($connection);
 
-              $updater = "UPDATE order_dnp_kannous set amount = $mikanamount, delete_flg = 1 , updated_at = '".date('Y-m-d H:i:s')."' 　where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
+              $updater = "UPDATE order_dnp_kannous set amount = $mikanamount, delete_flg = 1 , updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
               $connection->execute($updater);
 
               $connection = ConnectionManager::get('default');

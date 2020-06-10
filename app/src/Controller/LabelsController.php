@@ -3698,7 +3698,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5ここに持ってくる//これを旧DBの登録の後に持ってきたら新DBに登録されない（トランザクションが途中で途切れる？）
 
                      //insert 旧update
-                     $connection = ConnectionManager::get('DB_ikou_test');
+                     $connection = ConnectionManager::get('sakaeMotoDB');
                      $table = TableRegistry::get('order_edi');
                      $table->setConnection($connection);
 
@@ -3792,6 +3792,200 @@ class LabelsController extends AppController
      }
 
    }
+
+
+        public function syukkajoukyouform()
+       {
+         $this->request->session()->destroy();// セッションの破棄
+         $orderEdis = $this->OrderEdis->newEntity();
+         $this->set('orderEdis',$orderEdis);
+       }
+
+       public function syukkajoukyouselect()
+      {
+        $orderEdis = $this->OrderEdis->newEntity();
+        $this->set('orderEdis',$orderEdis);
+
+        $data = $this->request->getData();
+
+        $inputdate = $data['inputday']['year']."-".$data['inputday']['month']."-".$data['inputday']['day'];
+        $this->set('inputdate',$inputdate);
+
+        $arrPlace =  array();
+        $arrPlacecode =  array();
+
+        $arrOrderEdis = $this->OrderEdis->find()->where(['date_deliver' => $inputdate, 'delete_flag' => '0'])->toArray();
+
+        if(count($arrOrderEdis) > 0){
+          for($j=0; $j<count($arrOrderEdis); $j++){
+            ${"place_deliver_code".$j} = $arrOrderEdis[$j]->place_deliver_code;
+            if(${"place_deliver_code".$j} !== "00000"){
+              ${"arrPlaceDelivers".$j} = $this->PlaceDelivers->find()->where(['id_from_order' => ${"place_deliver_code".$j}])->toArray();
+              if(${"place_deliver_code".$j} == "199969" || ${"place_deliver_code".$j} == "199929" || ${"place_deliver_code".$j} == "199999" || ${"place_deliver_code".$j} == "100360"){
+                $arrPlace[] = "DNP".${"arrPlaceDelivers".$j}[0]->name;
+                $arrPlacecode[] = ${"place_deliver_code".$j};
+              }else{
+                $arrPlace[] = ${"arrPlaceDelivers".$j}[0]->name;
+                $arrPlacecode[] = ${"place_deliver_code".$j};
+              }
+            }
+          }
+        }
+
+        $arrPlace = array_unique($arrPlace, SORT_REGULAR);//重複削除
+        $arrPlace = array_values($arrPlace);//連番振り直し
+        $this->set('arrPlace',$arrPlace);
+
+        $arrPlacecode = array_unique($arrPlacecode, SORT_REGULAR);//重複削除
+        $arrPlacecode = array_values($arrPlacecode);//連番振り直し
+        $this->set('arrPlacecode',$arrPlacecode);
+/*
+        echo "<pre>";
+        print_r($arrPlace);
+        echo "</pre>";
+*/
+      }
+
+      public function syukkajoukyouichiran()
+     {
+       $orderEdis = $this->OrderEdis->newEntity();
+       $this->set('orderEdis',$orderEdis);
+
+       $data = $this->request->getData();
+       $inputdate = $data['inputdate'];
+       $this->set('inputdate',$inputdate);
+/*
+             echo "<pre>";
+             print_r($data);
+             echo "</pre>";
+*/
+       $arrOrderEdis = $this->OrderEdis->find()->where(['date_deliver' => $inputdate, 'place_deliver_code' => array_keys($data)[0], 'delete_flag' => '0'])->toArray();
+
+       $place_deliver = $data[array_keys($data)[0]];
+       $this->set('place_deliver',$place_deliver);
+
+       $arrPro =  array();
+       $arrPlace =  array();
+
+       if(count($arrOrderEdis) > 0){
+
+         for($j=0; $j<count($arrOrderEdis); $j++){
+
+           $arrPro[] = $arrOrderEdis[$j]->product_code;
+           $Product = $this->Products->find()->where(['product_code' => $arrOrderEdis[$j]->product_code])->toArray();
+           $product_name = $Product[0]->product_name;
+           $arrPlace[] = ['product_code' => $arrOrderEdis[$j]->product_code, 'product_name' => $product_name, 'amount' => $arrOrderEdis[$j]->amount, 'check' => $arrOrderEdis[$j]->kannou];
+
+         }
+
+       }
+
+       $this->set('arrPlace',$arrPlace);
+/*
+       echo "<pre>";
+       print_r($arrPlace);
+       echo "</pre>";
+*/
+       $arrPro = array_unique($arrPro, SORT_REGULAR);//重複削除
+       $arrPro = array_values($arrPro);//連番振り直し
+
+       $this->set('arrPro',$arrPro);
+
+       if(count($arrPro) > 0){
+
+         for($j=0; $j<count($arrPro); $j++){//それぞれの品番に対して
+
+           ${"product_code".$j} = $arrPro[$j];
+           ${"total_amount".$j} = 0;
+           ${"check_amount".$j} = 0;
+
+           for($k=0; $k<count($arrPlace); $k++){
+
+             if($arrPlace[$k]['product_code'] == ${"product_code".$j}){//その品番に一致する場合
+
+               ${"total_amount".$j} = ${"total_amount".$j} + $arrPlace[$k]['amount'];
+
+               if($arrPlace[$j]['check'] == 1){
+
+                 ${"check_amount".$j} = ${"check_amount".$j} + $arrPlace[$k]['amount'];
+
+               }else{
+
+                 ${"check_amount".$j} = ${"check_amount".$j};
+
+               }
+
+             }
+
+           }
+
+         }
+
+       }
+
+       for($j=0; $j<count($arrPro); $j++){
+
+         ${"Products".$j} = $this->Products->find()->where(['product_code' => ${"product_code".$j}])->toArray();
+         ${"product_name".$j} = ${"Products".$j}[0]->product_name;
+
+         $this->set('product_code'.$j,${"product_code".$j});
+         $this->set('product_name'.$j,${"product_name".$j});
+         $this->set('total_amount'.$j,${"total_amount".$j});
+         $this->set('check_amount'.$j,${"check_amount".$j});
+
+       }
+
+
+
+
+     }
+
+     public function syukkajoukyousyousai()
+    {
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $data = $this->request->getData();
+      $inputdate = $data['inputdate'];
+      $this->set('inputdate',$inputdate);
+      $place_deliver = $data['place_deliver'];
+      $this->set('place_deliver',$place_deliver);
+
+      $pro_amount = explode('_', array_keys($data)[0]);
+      $product_code = $pro_amount[0];
+      $this->set('product_code',$product_code);
+
+      $Products = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $product_name = $Products[0]->product_name;
+      $this->set('product_name',$product_name);
+
+      $total_amount = $pro_amount[1];
+      $this->set('total_amount',$total_amount);
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $arrCheckLots = $this->CheckLots->find()->where(['date_deliver' => $inputdate, 'product_code' => $product_code, 'delete_flag' => '0'])->toArray();
+
+      if(count($arrCheckLots) > 0){
+
+        for($j=0; $j<count($arrCheckLots); $j++){
+
+          $arrPlace[] = ['lot_num' => $arrCheckLots[$j]->lot_num, 'amount' => $arrCheckLots[$j]->amount];
+
+        }
+
+        $this->set('arrPlace',$arrPlace);
+
+      }
+/*
+      echo "<pre>";
+      print_r($arrPlace);
+      echo "</pre>";
+*/
+    }
+
 
 
      public function confirmcsv()

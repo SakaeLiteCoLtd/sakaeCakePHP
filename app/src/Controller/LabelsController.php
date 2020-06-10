@@ -3931,12 +3931,23 @@ class LabelsController extends AppController
          $this->set('product_code'.$j,${"product_code".$j});
          $this->set('product_name'.$j,${"product_name".$j});
          $this->set('total_amount'.$j,${"total_amount".$j});
-         $this->set('check_amount'.$j,${"check_amount".$j});
+
+         ${"arrCheckLots".$j} = $this->CheckLots->find()->where(['date_deliver' => $inputdate, 'product_code' => ${"product_code".$j}, 'delete_flag' => '0'])->toArray();
+
+         if(count(${"arrCheckLots".$j}) > 0){
+
+          ${"check_amount".$j} = 0;
+
+           for($k=0; $k<count(${"arrCheckLots".$j}); $k++){
+
+             ${"check_amount".$j} = ${"check_amount".$j} + ${"arrCheckLots".$j}[$k]->amount;
+             $this->set('check_amount'.$j,${"check_amount".$j});
+
+           }
+
+         }
 
        }
-
-
-
 
      }
 

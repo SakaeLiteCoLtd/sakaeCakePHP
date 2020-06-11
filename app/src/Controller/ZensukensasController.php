@@ -164,7 +164,7 @@ class ZensukensasController extends AppController
                $connection->insert('result_zensu_head', [
                    'product_id' => $arr1touroku[$k]["product_code"],
                    'lot_num' => $arr1touroku[$k]["lot_num"],
-                   'emp_id' => $created_staff,
+                   'emp_id' => $staff_id,
                    'datetime_start' => date("Y-m-d H:i:s")
                ]);
              }
@@ -212,7 +212,7 @@ class ZensukensasController extends AppController
                   $connection->insert('result_zensu_head', [
                       'product_id' => $arr2touroku[$k]["product_code"],
                       'lot_num' => $arr2touroku[$k]["lot_num"],
-                      'emp_id' => $created_staff,
+                      'emp_id' => $staff_id,
                       'datetime_start' => date("Y-m-d H:i:s")
                   ]);
                 }
@@ -480,7 +480,7 @@ class ZensukensasController extends AppController
        $table->setConnection($connection);
 
        $sql = "SELECT id FROM result_zensu_head".
-             " where product_id ='".$product_code."' and lot_num = '".$lot_num."' and emp_id = '".$staff_code."' and datetime_finish IS NULL";
+             " where product_id ='".$product_code."' and lot_num = '".$lot_num."' and emp_id = '".$staff_id."' and datetime_finish IS NULL";
        $connection = ConnectionManager::get('DB_ikou_test');
        $result_zensu_head_id_moto = $connection->execute($sql)->fetchAll('assoc');
 /*
@@ -566,7 +566,6 @@ class ZensukensasController extends AppController
                ['id'  => $_SESSION['result_zensu_head_id']['result_zensu_head_id']]
              )){
 
-
                //insert 旧DB
                $connection = ConnectionManager::get('DB_ikou_test');
                $table = TableRegistry::get('result_zensu_head');
@@ -585,7 +584,7 @@ class ZensukensasController extends AppController
                $CheckLotcreated_at = $CheckLot[0]->created_at;
 
                if($CheckLotflag_used == 0){//更新する必要がないとき
-                 $mes = "登録されました。";
+               $mes = "登録されました。";
                  $this->set('mes',$mes);
                  $connection->commit();// コミット5
                }else{
@@ -605,7 +604,6 @@ class ZensukensasController extends AppController
 
                    $connection = ConnectionManager::get('default');//新DBに戻る
                    $table->setConnection($connection);
-
 
                    //INだった場合親ロットの'flag_used' => 0にするかどうかをチェックする。
                    $lot_in = substr($_SESSION['result_zensu_head_id']['lot_num'], 0, 3);
@@ -656,11 +654,7 @@ class ZensukensasController extends AppController
                        $arrCheckLotkodomotati[] = $CheckLotkodomo[$m]->flag_used;
                        $flag_used_total = $flag_used_total + $CheckLotkodomo[$m]->flag_used;
                      }
-  /*
-                     echo "<pre>";
-                     print_r($flag_used_total);
-                     echo "</pre>";
-  */
+
                     if($flag_used_total == 0){//子ロットが全部検査済みの場合は親ロットのflag_usedを０に変更
                       $arrCheckLotoya = array();//空の配列を作る　$lot_oyaの仲間を全部集める
                       foreach ((array)$CheckLotoya as $key => $value) {//lot_numで並び替え
@@ -669,11 +663,7 @@ class ZensukensasController extends AppController
                       }
                       array_multisort(array_map("strtotime", array_column($arrCheckLotoya, "lot_num" ) ), SORT_ASC, $arrCheckLotoya);
                 //      array_multisort($sort , SORT_ASC, $CheckLotoya);
-  /*
-                      echo "<pre>";
-                      print_r($arrCheckLotoya);
-                      echo "</pre>";
-  */
+
                        $bangou_arr_oya_lot = $bangou_oya_lot - 1;
                        $this->CheckLots->updateAll(
                         ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
@@ -694,7 +684,9 @@ class ZensukensasController extends AppController
                         $mes = "登録されました。親ロットも検査済みに変更しました。";
                         $this->set('mes',$mes);
                         $connection->commit();// コミット5
+
                     }else{
+                      $connection->commit();// コミット5
                       $mes = "登録されました。";
                       $this->set('mes',$mes);
                     }

@@ -3945,6 +3945,11 @@ class LabelsController extends AppController
 
            }
 
+         }else{
+
+           ${"check_amount".$j} = 0;
+           $this->set('check_amount'.$j,${"check_amount".$j});
+
          }
 
        }
@@ -3995,6 +4000,7 @@ class LabelsController extends AppController
       print_r($arrPlace);
       echo "</pre>";
 */
+
     }
 
 

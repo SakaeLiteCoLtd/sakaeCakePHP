@@ -46,18 +46,7 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
 	</tr>
 </table>
 
-<?= $this->Form->control('product', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
-<?= $this->Form->control('staff', array('type'=>'hidden', 'value'=>$Staff, 'label'=>false)) ?>
-<?= $this->Form->control('Kensakuday', array('type'=>'hidden', 'value'=>$Kensakuday_num, 'label'=>false)) ?>
-<?= $this->Form->control('datesta', array('type'=>'hidden', 'value'=>$datesta, 'label'=>false)) ?>
-<?= $this->Form->control('datefin', array('type'=>'hidden', 'value'=>$datefin, 'label'=>false)) ?>
-<?= $this->Form->control('ContRejection', array('type'=>'hidden', 'value'=>$cont, 'label'=>false)) ?>
-<?= $this->Form->control('amount', array('type'=>'hidden', 'value'=>$amount, 'label'=>false)) ?>
-<?= $this->Form->control('check', array('type'=>'hidden', 'value'=>$check, 'label'=>false)) ?>
-<?= $this->Form->control('bik', array('type'=>'hidden', 'value'=>$bik, 'label'=>false)) ?>
-
-
-<br><br><br><br>
+<br><br><br><br><br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr>
   <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')); ?></div></td>

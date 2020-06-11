@@ -675,7 +675,7 @@ class ZensukensasController extends AppController
                         $table->setConnection($connection);
 
                         $updater = "UPDATE check_lots set flag_used = 0 , updated_at = '".date('Y-m-d H:i:s')."'
-                          where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id']['lot_num']."'";//もとのDBも更新
+                          where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$arrCheckLotoya[$bangou_arr_oya_lot]['lot_num']."'";//もとのDBも更新
                         $connection->execute($updater);
 
                         $connection = ConnectionManager::get('default');//新DBに戻る
@@ -781,67 +781,363 @@ class ZensukensasController extends AppController
      {
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
-
        $data = $this->request->getData();
-       echo "<pre>";
-       print_r($data);
-       echo "</pre>";
+/*
+echo "<pre>";
+print_r($data);
+echo "</pre>";
+*/
+         $product_code = $data['product'];
+         $this->set('product_code',$product_code);
 
-       $product_code = $data['product'];
-       $this->set('product_code',$product_code);
+         if($data['staff'] == 0){
+           $Staff = "";
+           $this->set('Staff',$Staff);
+         }else{
+           $staffData = $this->Staffs->find()->where(['id' => $data['staff']])->toArray();
+           $Staff = $staffData[0]->f_name." ".$staffData[0]->l_name;
+           $this->set('Staff',$Staff);
+         }
 
-       if($data['staff'] == 0){
-         $Staff = "";
-         $this->set('Staff',$Staff);
-       }else{
-         $staffData = $this->Staffs->find()->where(['id' => $data['staff']])->toArray();
-         $Staff = $staffData[0]->f_name." ".$staffData[0]->l_name;
-         $this->set('Staff',$Staff);
+         $Kensakuday_num = $data['Kensakuday'];
+         $this->set('Kensakuday_num',$Kensakuday_num);
+         if($data['Kensakuday'] == 1){
+           $Kensakuday = "：　検査年月日";
+           $this->set('Kensakuday',$Kensakuday);
+         }else{
+           $Kensakuday = "：　ラベル発行年月日";
+           $this->set('Kensakuday',$Kensakuday);
+         }
+
+
+         if(isset($data['datesta']['year'])){
+           $datesta = $data['datesta']['year']."-".$data['datesta']['month']."-".$data['datesta']['day']." ".$data['datesta']['hour'].":".$data['datesta']['minute'];
+           $this->set('datesta',$datesta);
+           $datefin = $data['datefin']['year']."-".$data['datefin']['month']."-".$data['datefin']['day']." ".$data['datefin']['hour'].":".$data['datefin']['minute'];
+           $this->set('datefin',$datefin);
+         }else{
+           $datesta = $data['datesta'];
+           $this->set('datesta',$datesta);
+           $datefin = $data['datefin'];
+           $this->set('datefin',$datefin);
+         }
+
+         if($data['ContRejection'] == 11111){
+           $ContRejection = "";
+           $this->set('ContRejection',$ContRejection);
+           $cont = "11111";
+           $this->set('cont',$cont);
+         }else{
+           $ContRejections = $this->ContRejections->find()->where(['id' => $data['ContRejection']])->toArray();
+           $ContRejection = $ContRejections[0]->cont;
+           $this->set('ContRejection',$ContRejection);
+           $cont = $data['ContRejection'];
+           $this->set('cont',$cont);
+         }
+
+         if($data['amount'] > 0){
+           $amount = $data['amount'];
+           $this->set('amount',$amount);
+         }else{
+           $amount = "";
+           $this->set('amount',$amount);
+         }
+
+         if($data['check'] == 0){
+           $check = "不良数ゼロ検索";
+           $this->set('check',$check);
+         }else{
+           $check = "不良数ゼロを省いて検索";
+           $this->set('check',$check);
+         }
+
+         $bik = $data['bik'];
+         $this->set('bik',$bik);
+
+         //以下入力内容に合わせてデータを取り出す
+
+         $arrFooder =  array();
+         $arrZensuHeads =  array();
+         $ResultZensuHeads = $this->ResultZensuHeads->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+          ->where(['delete_flag' => '0','datetime_start >=' => $datesta, 'datetime_start <=' => $datefin])->toArray();
+
+
+          if(isset($ResultZensuHeads[0])){
+
+            for($j=0; $j<count($ResultZensuHeads); $j++){
+
+              $arrZensuHeads[] = $ResultZensuHeads[$j]->id;
+
+            }
+
+          }
+
+          $arrZensuproduct =  array();
+         if(!empty($data['product'])){//productの入力がある場合
+
+           $ResultZensuHeads = $this->ResultZensuHeads->find()
+            ->where(['product_code' => $data['product'],'delete_flag' => '0','datetime_start >=' => $datesta, 'datetime_start <=' => $datefin])->toArray();
+
+            if(isset($ResultZensuHeads[0])){//絞り込んだ結果が存在する場合
+
+              for($j=0; $j<count($ResultZensuHeads); $j++){
+
+                $arrZensuproduct[] = $ResultZensuHeads[$j]->id;
+
+              }
+
+            }else{//絞り込んだ結果が存在しない場合
+
+              $arrZensuproduct = [];
+
+            }
+
+            $arrZensuHeads = array_intersect($arrZensuHeads, $arrZensuproduct);//共通部分だけを取り出す
+
+         }else{//productの入力がない場合
+
+           $arrZensuHeads = $arrZensuHeads;
+
+         }
+
+
+         $arrZensustaff =  array();
+         if($data['staff'] !== "0"){//staffの入力がある場合
+
+           $ResultZensuHeads = $this->ResultZensuHeads->find()
+            ->where(['staff_id' => $data['staff'],'delete_flag' => '0','datetime_start >=' => $datesta, 'datetime_start <=' => $datefin])->toArray();
+
+            if(isset($ResultZensuHeads[0])){//絞り込んだ結果が存在する場合
+
+              for($j=0; $j<count($ResultZensuHeads); $j++){
+
+                $arrZensustaff[] = $ResultZensuHeads[$j]->id;
+
+              }
+
+            }else{//絞り込んだ結果が存在しない場合
+
+              $arrZensustaff = [];
+
+            }
+
+            $arrZensuHeads = array_intersect($arrZensuHeads, $arrZensustaff);//共通部分だけを取り出す
+
+         }else{//staffの入力がない場合
+
+           $arrZensuHeads = $arrZensuHeads;
+
+         }
+
+
+         if(isset($arrZensuHeads[0])){
+
+           for($j=0; $j<count($arrZensuHeads); $j++){
+
+             ${"ResultZensuFooders".$j} = $this->ResultZensuFooders->find()
+              ->where(['result_zensu_head_id' => $arrZensuHeads[$j],'delete_flag' => '0'])->toArray();
+
+              if(isset($arrZensuHeads[0])){
+
+                for($k=0; $k<count(${"ResultZensuFooders".$j}); $k++){
+
+                  $arrFooder[] = ${"ResultZensuFooders".$j}[$k]->id;
+
+                }
+
+             }
+
+           }
+
+         }
+
+         $arrZensuContRejection =  array();
+         if($data['ContRejection'] !== "11111"){//ContRejectionの入力がある場合
+
+           $ResultZensuFooders = $this->ResultZensuFooders->find()
+            ->where(['cont_rejection_id' => $data['ContRejection'],'delete_flag' => '0'])->toArray();
+
+            if(isset($ResultZensuFooders[0])){//絞り込んだ結果が存在する場合
+
+              for($j=0; $j<count($ResultZensuFooders); $j++){
+
+                $arrZensuContRejection[] = $ResultZensuFooders[$j]->id;
+
+              }
+
+            }else{//絞り込んだ結果が存在しない場合
+
+              $arrZensuContRejection = [];
+
+            }
+
+            $arrFooder = array_intersect($arrFooder, $arrZensuContRejection);//共通部分だけを取り出す
+
+         }else{//ContRejectionの入力がない場合
+
+           $arrZensuHeads = $arrZensuHeads;
+           $arrFooder = $arrFooder;
+
+         }
+
+
+         $arrZensuamount =  array();
+         if(!empty($data['amount'])){//amountの入力がある場合
+
+           $ResultZensuFooders = $this->ResultZensuFooders->find()
+            ->where(['amount >=' => $data['amount'],'delete_flag' => '0'])->toArray();
+
+            if(isset($ResultZensuFooders[0])){//絞り込んだ結果が存在する場合
+
+              for($j=0; $j<count($ResultZensuFooders); $j++){
+
+                $arrZensuamount[] = $ResultZensuFooders[$j]->id;
+
+              }
+
+            }else{//絞り込んだ結果が存在しない場合
+
+              $arrZensuamount = [];
+
+            }
+
+            $arrFooder = array_intersect($arrFooder, $arrZensuamount);//共通部分だけを取り出す
+
+         }else{//amountの入力がない場合
+
+           $arrZensuHeads = $arrZensuHeads;
+           $arrFooder = $arrFooder;
+
+         }
+
+
+         $arrZensucheck =  array();
+         if($data['check'] == 1){//checkがある場合
+
+           $ResultZensuFooders = $this->ResultZensuFooders->find()
+            ->where(['amount >' => '0','delete_flag' => '0'])->toArray();
+
+            if(isset($ResultZensuFooders[0])){//絞り込んだ結果が存在する場合
+
+              for($j=0; $j<count($ResultZensuFooders); $j++){
+
+                $arrZensucheck[] = $ResultZensuFooders[$j]->id;
+
+              }
+
+            }else{//絞り込んだ結果が存在しない場合
+
+              $arrZensucheck = [];
+
+            }
+
+            $arrFooder = array_intersect($arrFooder, $arrZensucheck);//共通部分だけを取り出す
+
+         }else{//checkがない場合
+
+           $arrZensuHeads = $arrZensuHeads;
+           $arrFooder = $arrFooder;
+
+         }
+
+
+         $arrZensubik =  array();
+         if(!empty($data['bik'])){//bikの入力がある場合
+
+           $ResultZensuFooders = $this->ResultZensuFooders->find()
+            ->where(['bik' => $data['bik'],'delete_flag' => '0'])->toArray();
+
+            if(isset($ResultZensuFooders[0])){//絞り込んだ結果が存在する場合
+
+              for($j=0; $j<count($ResultZensuFooders); $j++){
+
+                $arrZensubik[] = $ResultZensuFooders[$j]->id;
+
+              }
+
+            }else{//絞り込んだ結果が存在しない場合
+
+              $arrZensubik = [];
+
+            }
+
+            $arrFooder = array_intersect($arrFooder, $arrZensubik);//共通部分だけを取り出す
+
+         }else{//bikの入力がない場合
+
+           $arrZensuHeads = $arrZensuHeads;
+           $arrFooder = $arrFooder;
+
+         }
+
+         $arrFooder = array_values($arrFooder);//連番振り直し
+
+        //セットする
+        $arrichiran =  array();
+         if(isset($arrFooder[0])){
+           for($j=0; $j<count($arrFooder); $j++){
+             $ResultZensuFooders = $this->ResultZensuFooders->find()
+              ->where(['id' => $arrFooder[$j],'delete_flag' => '0'])->toArray();
+
+              $amount = $ResultZensuFooders[0]->amount;
+              $bik = $ResultZensuFooders[0]->bik;
+
+              $ContRejections = $this->ContRejections->find()
+               ->where(['id' => $ResultZensuFooders[0]->cont_rejection_id])->toArray();
+              $cont_rejection = $ContRejections[0]->cont;
+
+              $ResultZensuHeads = $this->ResultZensuHeads->find()
+               ->where(['id' => $ResultZensuFooders[0]->result_zensu_head_id])->toArray();
+
+              $product_code = $ResultZensuHeads[0]->product_code;
+              $lot_num = $ResultZensuHeads[0]->lot_num;
+              $date_sta = $ResultZensuHeads[0]->datetime_start->format('Y-m-d H:i:s');
+              $date_fin = $ResultZensuHeads[0]->datetime_finish->format('Y-m-d H:i:s');
+
+              $from = strtotime($date_sta);
+              $to   = strtotime($date_fin);
+
+              $diff = $to - $from;//差分を求める
+
+              $diff = gmdate("i分s秒", $diff);// フォーマットする
+
+              $staffData = $this->Staffs->find()->where(['id' => $ResultZensuHeads[0]->staff_id])->toArray();
+              $staff = $staffData[0]->f_name." ".$staffData[0]->l_name;
+
+              $arrichiran[] = ['product_code' => $product_code, 'lot_num' => $lot_num,
+               'date_sta' => $date_sta, 'date_fin' => $date_fin, 'cont_rejection' => $cont_rejection,
+                'diff' => $diff, 'amount' => $amount, 'bik' => $bik, 'staff' => $staff];
+
+           }
+
+         }
+
+         $this->set('arrichiran',$arrichiran);
+
+
+       if(isset($data['kakunin'])){//並び変え
+
+         return $this->redirect(['action' => 'zensukensakuichiran',//以下のデータを持ってhasulotconfirmに移動
+         's' => ['data' => $data]]);//登録するデータを全部配列に入れておく
+
        }
-
-       if($data['Kensakuday'] == 1){
-         $Kensakuday = "：　検査年月日";
-         $this->set('Kensakuday',$Kensakuday);
-       }else{
-         $Kensakuday = "：　ラベル発行年月日";
-         $this->set('Kensakuday',$Kensakuday);
-       }
-
-       $datesta = $data['datesta']['year']."-".$data['datesta']['month']."-".$data['datesta']['day']." ".$data['datesta']['hour'].":".$data['datesta']['minute'];
-       $this->set('datesta',$datesta);
-       $datefin = $data['datefin']['year']."-".$data['datefin']['month']."-".$data['datefin']['day']." ".$data['datefin']['hour'].":".$data['datefin']['minute'];
-       $this->set('datefin',$datefin);
-
-       if($data['ContRejection'] == 11111){
-         $ContRejection = "";
-         $this->set('ContRejection',$ContRejection);
-       }else{
-         $ContRejections = $this->ContRejections->find()->where(['id' => $data['ContRejection']])->toArray();
-         $ContRejection = $ContRejections[0]->cont;
-         $this->set('ContRejection',$ContRejection);
-       }
-
-       if($data['amount'] > 0){
-         $amount = $data['amount'];
-         $this->set('amount',$amount);
-       }else{
-         $amount = "";
-         $this->set('amount',$amount);
-       }
-
-       if($data['check'] == 0){
-         $check = "不良数ゼロ検索";
-         $this->set('check',$check);
-       }else{
-         $check = "不良数ゼロを省いて検索";
-         $this->set('check',$check);
-       }
-
-       $bik = $data['bik'];
-       $this->set('bik',$bik);
 
 
      }
+
+
+     public function zensukensakuichirannarabikae()//ラベル不使用qr
+     {
+       $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
+       $this->set('ResultZensuHeads',$ResultZensuHeads);
+
+       $Data = $this->request->query('s');
+
+       echo "<pre>";
+       print_r($Data);
+       echo "</pre>";
+     }
+
 
 
 }

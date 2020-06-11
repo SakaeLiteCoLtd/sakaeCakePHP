@@ -105,6 +105,9 @@ class ZensukensasController extends AppController
        $created_staff = $ary[8];
   //     $datetime_start = $ary[9];
 
+       $staffData = $this->Staffs->find()->where(['id' => $staff_id])->toArray();
+       $staff_code = $staffData[0]->staff_code;
+
        if($product_code1 != null){
          $product_code = $product_code1;
          $htmlProductcheck = new htmlProductcheck();//クラスを使用
@@ -164,7 +167,7 @@ class ZensukensasController extends AppController
                $connection->insert('result_zensu_head', [
                    'product_id' => $arr1touroku[$k]["product_code"],
                    'lot_num' => $arr1touroku[$k]["lot_num"],
-                   'emp_id' => $staff_id,
+                   'emp_id' => $staff_code,
                    'datetime_start' => date("Y-m-d H:i:s")
                ]);
              }
@@ -212,7 +215,7 @@ class ZensukensasController extends AppController
                   $connection->insert('result_zensu_head', [
                       'product_id' => $arr2touroku[$k]["product_code"],
                       'lot_num' => $arr2touroku[$k]["lot_num"],
-                      'emp_id' => $staff_id,
+                      'emp_id' => $staff_code,
                       'datetime_start' => date("Y-m-d H:i:s")
                   ]);
                 }
@@ -1126,7 +1129,7 @@ echo "</pre>";
      }
 
 
-     public function zensukensakuichirannarabikae()//ラベル不使用qr
+     public function zensukensakuichirannarabikae()
      {
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);

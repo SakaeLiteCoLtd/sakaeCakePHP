@@ -159,7 +159,7 @@ class ZensukensasController extends AppController
            if ($this->ResultZensuHeads->saveMany($ResultZensuHead)) {
 
              //insert 旧DB
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('result_zensu_head');
              $table->setConnection($connection);
 
@@ -207,7 +207,7 @@ class ZensukensasController extends AppController
               if ($this->ResultZensuHeads->saveMany($ResultZensuHead)) {
 
                 //insert 旧DB
-                $connection = ConnectionManager::get('DB_ikou_test');
+                $connection = ConnectionManager::get('sakaeMotoDB');
                 $table = TableRegistry::get('result_zensu_head');
                 $table->setConnection($connection);
 
@@ -478,13 +478,13 @@ class ZensukensasController extends AppController
        //旧DBのresult_zensu_head_idが必要
        //新DBの$result_zensu_head_idのデータと同じ$product_code、$lot_num、created_staff、'datetime_finish IS' => Nullのものを拾ってくる
 
-       $connection = ConnectionManager::get('DB_ikou_test');
+       $connection = ConnectionManager::get('sakaeMotoDB');
        $table = TableRegistry::get('result_zensu_head');
        $table->setConnection($connection);
 
        $sql = "SELECT id FROM result_zensu_head".
-             " where product_id ='".$product_code."' and lot_num = '".$lot_num."' and emp_id = '".$staff_id."' and datetime_finish IS NULL";
-       $connection = ConnectionManager::get('DB_ikou_test');
+             " where product_id ='".$product_code."' and lot_num = '".$lot_num."' and emp_id = '".$staff_code."' and datetime_finish IS NULL";
+       $connection = ConnectionManager::get('sakaeMotoDB');
        $result_zensu_head_id_moto = $connection->execute($sql)->fetchAll('assoc');
 /*
        echo "<pre>";
@@ -547,7 +547,7 @@ class ZensukensasController extends AppController
            if ($this->ResultZensuFooders->saveMany($ResultZensuFooders)) {//saveManyで一括登録
 
              //insert 旧DB
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('result_zensu_fooder');
              $table->setConnection($connection);
 
@@ -570,7 +570,7 @@ class ZensukensasController extends AppController
              )){
 
                //insert 旧DB
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('result_zensu_head');
                $table->setConnection($connection);
 
@@ -597,7 +597,7 @@ class ZensukensasController extends AppController
                  )){
 
                    //insert 旧DB
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('check_lots');
                    $table->setConnection($connection);
 
@@ -673,7 +673,7 @@ class ZensukensasController extends AppController
                         ['id'  => $arrCheckLotoya[$bangou_arr_oya_lot]['id']]);
 
                         //insert 旧DB
-                        $connection = ConnectionManager::get('DB_ikou_test');
+                        $connection = ConnectionManager::get('sakaeMotoDB');
                         $table = TableRegistry::get('check_lots');
                         $table->setConnection($connection);
 
@@ -785,13 +785,15 @@ class ZensukensasController extends AppController
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
        $data = $this->request->getData();
-/*
-echo "<pre>";
-print_r($data);
-echo "</pre>";
+       /*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
 */
-         $product_code = $data['product'];
-         $this->set('product_code',$product_code);
+       $product_code = $data['product'];
+       $this->set('product_code',$product_code);
+       $staff_moto = $data['staff'];
+       $this->set('staff_moto',$staff_moto);
 
          if($data['staff'] == 0){
            $Staff = "";
@@ -863,7 +865,6 @@ echo "</pre>";
          $arrZensuHeads =  array();
          $ResultZensuHeads = $this->ResultZensuHeads->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
           ->where(['delete_flag' => '0','datetime_start >=' => $datesta, 'datetime_start <=' => $datefin])->toArray();
-
 
           if(isset($ResultZensuHeads[0])){
 
@@ -1100,16 +1101,26 @@ echo "</pre>";
               $from = strtotime($date_sta);
               $to   = strtotime($date_fin);
 
-              $diff = $to - $from;//差分を求める
+              $diff_time = $to - $from;//差分を求める
 
-              $diff = gmdate("i分s秒", $diff);// フォーマットする
+              $diff = gmdate("i分s秒", $diff_time);// フォーマットする
 
               $staffData = $this->Staffs->find()->where(['id' => $ResultZensuHeads[0]->staff_id])->toArray();
               $staff = $staffData[0]->f_name." ".$staffData[0]->l_name;
 
               $arrichiran[] = ['product_code' => $product_code, 'lot_num' => $lot_num,
                'date_sta' => $date_sta, 'date_fin' => $date_fin, 'cont_rejection' => $cont_rejection,
-                'diff' => $diff, 'amount' => $amount, 'bik' => $bik, 'staff' => $staff];
+                'diff' => $diff, 'amount' => $amount, 'bik' => $bik, 'staff' => $staff, 'cont_rejection_num' => $ResultZensuFooders[0]->cont_rejection_id];
+
+              $difftime_csv = round($diff_time/60,1);
+              $staffData = $this->Staffs->find()->where(['id' => $ResultZensuHeads[0]->staff_id])->toArray();
+              $staff_csv = $staffData[0]->f_name."　".$staffData[0]->l_name;
+              $staffData = $this->Staffs->find()->where(['id' => $ResultZensuHeads[0]->staff_id])->toArray();
+              $staffcode_csv = $staffData[0]->staff_code;
+
+              $arrichiran_csv[] = ['product_code' => $product_code, 'lot_num' => $lot_num,
+               'date_sta' => $date_sta, 'diff' => $difftime_csv, 'date_fin' => $date_fin, 'cont_rejection' => $cont_rejection,
+                'amount' => $amount, 'bik' => $bik, 'staff_code' => $staffcode_csv, 'staff' => $staff_csv];
 
            }
 
@@ -1117,30 +1128,59 @@ echo "</pre>";
 
          $this->set('arrichiran',$arrichiran);
 
+       if(isset($data['product_sort'])){//並び変え
 
-       if(isset($data['kakunin'])){//並び変え
+         foreach($arrichiran as $value) {
+           $tmp_product_id_array[] = $value["product_code"];
+           $tmp_lot_num_array[] = $value["lot_num"];
+         }
 
-         return $this->redirect(['action' => 'zensukensakuichiran',//以下のデータを持ってhasulotconfirmに移動
-         's' => ['data' => $data]]);//登録するデータを全部配列に入れておく
+         array_multisort($tmp_product_id_array,$tmp_lot_num_array, SORT_ASC, SORT_NUMERIC, $arrichiran);
+         $this->set('arrichiran',$arrichiran);
+
+       }elseif(isset($data['furyou_sort'])){
+
+         foreach($arrichiran as $value) {
+           $tmp_product_id_array[] = $value["cont_rejection_num"];
+           $tmp_lot_num_array[] = $value["lot_num"];
+         }
+
+         array_multisort($tmp_product_id_array,$tmp_lot_num_array, SORT_ASC, SORT_NUMERIC, $arrichiran);
+         $this->set('arrichiran',$arrichiran);
+
+       }elseif(isset($data['kensajikan_sort'])){
+
+         foreach($arrichiran as $value) {
+           $tmp_product_id_array[] = $value["date_sta"];
+           $tmp_lot_num_array[] = $value["lot_num"];
+         }
+
+         array_multisort($tmp_product_id_array,$tmp_lot_num_array, SORT_ASC, SORT_NUMERIC, $arrichiran);
+         $this->set('arrichiran',$arrichiran);
 
        }
-
-
-     }
-
-
-     public function zensukensakuichirannarabikae()
-     {
-       $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
-       $this->set('ResultZensuHeads',$ResultZensuHeads);
-
-       $Data = $this->request->query('s');
-
+/*
        echo "<pre>";
-       print_r($Data);
+       print_r($arrichiran);
        echo "</pre>";
-     }
+*/
 
+        if(isset($data['csv'])){//csv出力
+        //    $fp = fopen('zensu_csv/zenken_test.csv', 'w');
+            $fp = fopen('/home/centosuser/zensu_csv/zenken_test.csv', 'w');
+              foreach ($arrichiran_csv as $line) {
+                $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+                fputcsv($fp, $line);
+              }
+              fclose($fp);
+              $mes = "\\192.168.4.246\centosuser\zensu_csv にＣＳＶファイルが出力されました";
+              $this->set('mes',$mes);
+        }else{
+          $mes = "";
+          $this->set('mes',$mes);
+        }
+
+     }
 
 
 }

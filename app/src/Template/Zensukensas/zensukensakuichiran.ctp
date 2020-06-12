@@ -14,7 +14,14 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
     <?= $this->Flash->render() ?>
     <?= $this->Form->create($ResultZensuHeads, ['url' => ['action' => 'zensukensakuichiran']]) ?>
     <fieldset>
-<br><br>
+
+<table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+   <tr style="background-color: #E6FFFF">
+     <td bgcolor="#E6FFFF"><strong style="font-size: 11pt; color:red"><?= h($mes) ?></strong></td>
+   </tr>
+ </table>
+ <br>
+
 <table width="900"  align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td width="150" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">検査員</strong></td>
@@ -35,7 +42,7 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
     <td width="150" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">内容</strong></td>
     <td width="150" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">総数</strong></td>
     <td  width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">数量ゼロ</strong></td>
-    <td  width="400" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">備考</strong></td>
+    <td  width="340" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">備考</strong></td>
 	</tr>
   <tr>
     <td  width="200" bgcolor="#FFFFCC"><?= h($ContRejection) ?></td>
@@ -47,7 +54,7 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
 </table>
 
 <?= $this->Form->control('product', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
-<?= $this->Form->control('staff', array('type'=>'hidden', 'value'=>$Staff, 'label'=>false)) ?>
+<?= $this->Form->control('staff', array('type'=>'hidden', 'value'=>$staff_moto, 'label'=>false)) ?>
 <?= $this->Form->control('Kensakuday', array('type'=>'hidden', 'value'=>$Kensakuday_num, 'label'=>false)) ?>
 <?= $this->Form->control('datesta', array('type'=>'hidden', 'value'=>$datesta, 'label'=>false)) ?>
 <?= $this->Form->control('datefin', array('type'=>'hidden', 'value'=>$datefin, 'label'=>false)) ?>
@@ -57,7 +64,14 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
 <?= $this->Form->control('bik', array('type'=>'hidden', 'value'=>$bik, 'label'=>false)) ?>
 
 
-<br><br><br><br>
+<br><br><br>
+<table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="left"><?= $this->Form->submit(__('品番順'), array('name' => 'product_sort')); ?></div></td>
+  <td style="border-style: none;"><div align="left"><?= $this->Form->submit(__('不良項目順'), array('name' => 'furyou_sort')); ?></div></td>
+  <td style="border-style: none;"><div align="left"><?= $this->Form->submit(__('検査時間順'), array('name' => 'kensajikan_sort')); ?></div></td>
+</tr>
+</table>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
@@ -67,7 +81,7 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
               <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">ロットNO.</strong></div></td>
               <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">検査開始</strong></div></td>
               <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">検査終了</strong></div></td>
-              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">所要時間（分）</strong></div></td>
+              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">所要時間</strong></div></td>
               <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">次検査所要時間</strong></div></td>
               <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">不良内容</strong></div></td>
               <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">数量</strong></div></td>
@@ -109,5 +123,7 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
       <td style="border-style: none;"><div align="center"><?= $this->Form->submit('csv出力', array('name' => 'csv')); ?></div></td>
   </tr>
   </table>
-<br><br><br>
+
+<br>
+<br><br>
     <?= $this->Form->end() ?>

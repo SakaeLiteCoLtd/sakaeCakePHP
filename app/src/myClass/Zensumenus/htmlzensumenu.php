@@ -45,7 +45,7 @@ class htmlzensumenu extends AppController
    public function zensustartend()
   {
       $html =
-                "<td style='padding: 0.1rem 0.1rem;'>\n".
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Zensukensas/zensustafftouroku'>\n".
                 "<img src='/img/Labelimg/sub_kensa_start.gif' width=85 height=36>\n".
                 "</a></td>\n".
                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Zensukensas/zensuendstaff'>\n".

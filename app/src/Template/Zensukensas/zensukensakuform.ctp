@@ -15,10 +15,10 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
     <?= $this->Form->create($ResultZensuHeads, ['url' => ['action' => 'zensukensakuichiran']]) ?>
     <fieldset>
 
-<table width="900"  align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+<table width="1000"  align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="150" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">検査員</strong></td>
-    <td width="150" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品番</strong></td>
+    <td width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">検査員</strong></td>
+    <td width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品番</strong></td>
     <td colspan="2" bgcolor="#FFFFCC" style="text-align:right;font-size: 12pt;border-right-style: none"><strong style="font-size: 11pt; color:blue">検索日時の種類</strong></td>
     <td bgcolor="#FFFFCC" style="border-right-style: none;border-left-style: none"><?= $this->Form->input('Kensakuday', ["type"=>"select", "options"=>$arrKensakuday, 'label'=>false, 'width'=>200]); ?></td>
     <td bgcolor="#FFFFCC"  width="100" style="border-left-style: none"></td>
@@ -33,10 +33,10 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
 <br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="150" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">内容</strong></td>
-    <td width="150" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">総数</strong></td>
+    <td width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">内容</strong></td>
+    <td width="200" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">総数</strong></td>
     <td  width="200" colspan="4" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">数量ゼロ</strong></td>
-    <td  width="400" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">備考</strong></td>
+    <td  width="200" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">備考</strong></td>
 	</tr>
   <tr>
     <td  width="200" bgcolor="#FFFFCC"><?= $this->Form->input('ContRejection', ["type"=>"select", "options"=>$arrContRejection, 'label'=>false]); ?></td>
@@ -46,7 +46,7 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
     <td width="30"  bgcolor="#FFFFCC" style="border-left-style: none;border-right-style: none"><?= $this->Form->control('check', array('type'=>'checkbox', 'label'=>false)) ?></td>
     <td width="200"  bgcolor="#FFFFCC" style="border-left-style: none;border-right-style: none"><strong style="font-size: 11pt">不良登録ゼロを除く</strong></td>
     <td width="30"  bgcolor="#FFFFCC" style="border-left-style: none"></td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input("bik", array('type' => 'text', 'label'=>false)); ?></td>
+    <td width="240" bgcolor="#FFFFCC"><?= $this->Form->input("bik", array('type' => 'text', 'label'=>false)); ?></td>
 	</tr>
 </table>
 

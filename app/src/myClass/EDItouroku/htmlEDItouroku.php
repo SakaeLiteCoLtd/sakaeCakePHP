@@ -21,6 +21,7 @@ class htmlEDItouroku extends AppController
 
     public function htmlgaityutouroku()
    {
+
     //ここから外注登録（insert into order_to_supplier）
     $KariOrderToSupplier = $this->KariOrderToSuppliers->find()->where(['flag_attach' => 0])->toArray();
     if(count($KariOrderToSupplier) > 0){//KariOrderToSuppliersテーブルの'flag_attach' => 0のデータを取り出す。
@@ -113,7 +114,7 @@ class htmlEDItouroku extends AppController
             );
 
             //update KariOrderToSupplierする（旧DB）
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('kari_order_to_supplier');
             $table->setConnection($connection);
 
@@ -175,7 +176,7 @@ class htmlEDItouroku extends AppController
                    $this->OrderToSuppliers->save($OrderToSuppliers);
 
                    //insert into OrderToSupplierする（旧DB）
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $table = TableRegistry::get('order_to_supplier');
                    $table->setConnection($connection);
 
@@ -236,7 +237,7 @@ class htmlEDItouroku extends AppController
                    $this->OrderToSuppliers->save($OrderToSuppliers);
 
                    //insert into OrderToSupplierする（旧DB）
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $table = TableRegistry::get('order_to_supplier');
                    $table->setConnection($connection);
 
@@ -298,7 +299,7 @@ class htmlEDItouroku extends AppController
              $this->OrderToSuppliers->save($OrderToSuppliers);
 
              //insert into OrderToSupplierする（旧DB）
-             $connection = ConnectionManager::get('sakaeMotoDB');
+             $connection = ConnectionManager::get('DB_ikou_test');
              $table = TableRegistry::get('order_to_supplier');
              $table->setConnection($connection);
 
@@ -363,13 +364,13 @@ class htmlEDItouroku extends AppController
                    $product_code = $KariOrderToSupplier[0]->product_code;
                    $id_order = $KariOrderToSupplier[0]->id_order;
 
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
                    $sql = "SELECT id FROM kari_order_to_supplier".
                          " where product_id ='".$product_code."' and id_order = '".$id_order."'";
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $kari_order_to_supplier_id_moto = $connection->execute($sql)->fetchAll('assoc');
 
                      $connection->insert('attach_order_to_supplier', [
@@ -401,13 +402,13 @@ class htmlEDItouroku extends AppController
                    $product_code = $KariOrderToSupplier[0]->product_code;
                    $id_order = $KariOrderToSupplier[0]->id_order;
 
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
                    $sql = "SELECT id FROM kari_order_to_supplier".
                          " where product_id ='".$product_code."' and id_order = '".$id_order."'";
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $kari_order_to_supplier_id_moto = $connection->execute($sql)->fetchAll('assoc');
 
                      $connection->insert('attach_order_to_supplier', [
@@ -442,13 +443,13 @@ class htmlEDItouroku extends AppController
                    $product_code = $KariOrderToSupplier[0]->product_code;
                    $id_order = $KariOrderToSupplier[0]->id_order;
 
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
                    $sql = "SELECT id FROM kari_order_to_supplier".
                          " where product_id ='".$product_code."' and id_order = '".$id_order."'";
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $kari_order_to_supplier_id_moto = $connection->execute($sql)->fetchAll('assoc');
 
                      $connection->insert('attach_order_to_supplier', [
@@ -481,13 +482,13 @@ class htmlEDItouroku extends AppController
                    $product_code = $KariOrderToSupplier[0]->product_code;
                    $id_order = $KariOrderToSupplier[0]->id_order;
 
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $table = TableRegistry::get('attach_order_to_supplier');
                    $table->setConnection($connection);
 
                    $sql = "SELECT id FROM kari_order_to_supplier".
                          " where product_id ='".$product_code."' and id_order = '".$id_order."'";
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $kari_order_to_supplier_id_moto = $connection->execute($sql)->fetchAll('assoc');
 
                      $connection->insert('attach_order_to_supplier', [
@@ -551,7 +552,7 @@ class htmlEDItouroku extends AppController
           );
 /*
           echo "<pre>";
-          print_r('ProductGaityu');
+          print_r('KariOrderToSuppliers1');
           print_r($_SESSION['ProductGaityu']);
           echo "</pre>";
 */
@@ -561,7 +562,7 @@ class htmlEDItouroku extends AppController
             $this->set('mes',$mes);
 
             //insert into KariOrderToSupplierする（旧DB）
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('kari_order_to_supplier');
             $table->setConnection($connection);
 
@@ -645,7 +646,7 @@ class htmlEDItouroku extends AppController
                $this->set('mes',$mes);
 
                //insert into KariOrderToSupplierする（旧DB）
-               $connection = ConnectionManager::get('sakaeMotoDB');
+               $connection = ConnectionManager::get('DB_ikou_test');
                $table = TableRegistry::get('kari_order_to_supplier');
                $table->setConnection($connection);
 

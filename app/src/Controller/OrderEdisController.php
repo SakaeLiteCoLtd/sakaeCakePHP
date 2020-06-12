@@ -154,7 +154,7 @@ class OrderEdisController extends AppController
 /*
         echo "<pre>";
         print_r("登録内容表示");
-        print_r($arrFp);
+        print_r(count($arrFp));
         echo "</pre>";
 */
            $orderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrFp);//patchEntitiesで一括登録
@@ -172,12 +172,17 @@ class OrderEdisController extends AppController
                  $htmlgaityutouroku = new htmlEDItouroku();
                  $data = $htmlgaityutouroku->htmlgaityutouroku();
 
+                 $num = 0;
                  for($k=0; $k<count($arrFp); $k++){//組み立て品登録
+                   $num = $num + 1;
+
                    $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $arrFp[$k]['product_code']])->toArray();
                    if(count($AssembleProduct) > 0){
                      for($n=0; $n<count($AssembleProduct); $n++){
+                       $num = $num + 1;
                        $child_pid = $AssembleProduct[$n]->child_pid;
-                       $_SESSION['order_edi_kumitate'][$n] = array(
+
+                       $_SESSION['order_edi_kumitate'][$num] = array(
                          'place_deliver_code' => "00000",
                          'date_order' => $arrFp[$k]["date_order"],
                          'price' => 0,
@@ -196,54 +201,65 @@ class OrderEdisController extends AppController
                          'created_staff' => $this->Auth->user('staff_id')
                        );
                      }
-                     $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $_SESSION['order_edi_kumitate']);
-                     if($this->OrderEdis->saveMany($orderEdis)){
 
-                       $arrFp = array();//空の配列を作る
-                       $arrFp = $_SESSION['order_edi_kumitate'];
+                   }
 
-                       //insert into order_ediする（旧DB）
-                       $connection = ConnectionManager::get('sakaeMotoDB');
-                       $table = TableRegistry::get('order_edi');
-                       $table->setConnection($connection);
+                 }
 
-                       for($k=0; $k<count($arrFp); $k++){
-                         $connection->insert('order_edi', [
-                             'date_order' => $arrFp[$k]["date_order"],
-                             'num_order' => $arrFp[$k]["num_order"],
-                             'product_id' => $arrFp[$k]["product_code"],
-                             'price' => $arrFp[$k]["price"],
-                             'date_deliver' => $arrFp[$k]["date_deliver"],
-                          //   'first_date_deliver' => $arrFp[$k]["first_date_deliver"],
-                             'amount' => $arrFp[$k]["amount"],
-                             'cs_id' => $arrFp[$k]["customer_code"],
-                             'place_deliver_id' => $arrFp[$k]["place_deliver_code"],
-                             'place_line' => $arrFp[$k]["place_line"],
-                             'line_code' => $arrFp[$k]["line_code"],
-                             'check_denpyou' => $arrFp[$k]["check_denpyou"],
-                          //   'gaityu' => $arrFp[$k]["gaityu"],
-                             'bunnou' => $arrFp[$k]["bunnou"],
-                             'kannou' => $arrFp[$k]["kannou"],
-                          //   'date_bunnou' => $arrFp[$k]["date_bunnou"],
-                          //   'check_kannou' => $arrFp[$k]["check_kannou"],
-                             'delete_flg' => $arrFpold[$k]["delete_flag"],
-                             'created_at' => date("Y-m-d H:i:s")
-                         ]);
-                       }
-                       $connection = ConnectionManager::get('default');
-                       $table->setConnection($connection);
+                 if(isset($_SESSION['order_edi_kumitate'])){
 
-                       //組み立て外注仮登録クラス
-                       $htmlgaityukaritouroku = new htmlEDItouroku();
-                       $data = $htmlgaityukaritouroku->htmlgaityukaritourokuAssemble($arrFp);
+                   $_SESSION['order_edi_kumitate'] = array_values($_SESSION['order_edi_kumitate']);//添え字の振り直し
 
-                       //組み立て外注登録クラス（紐づけ、kari_orderの更新も）
-                       $htmlgaityutouroku = new htmlEDItouroku();
-                       $data = $htmlgaityutouroku->htmlgaityutouroku();
+                 }
 
-                     }
+               if(isset($_SESSION['order_edi_kumitate'][0])){
+                 $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $_SESSION['order_edi_kumitate']);
+                 if($this->OrderEdis->saveMany($orderEdis)){
 
-                  }
+                   $arrFp = array();//空の配列を作る
+                   $arrFp = $_SESSION['order_edi_kumitate'];
+
+                   //insert into order_ediする（旧DB）
+                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $table = TableRegistry::get('order_edi');
+                   $table->setConnection($connection);
+
+                   for($k=0; $k<count($arrFp); $k++){
+                     $connection->insert('order_edi', [
+                         'date_order' => $arrFp[$k]["date_order"],
+                         'num_order' => $arrFp[$k]["num_order"],
+                         'product_id' => $arrFp[$k]["product_code"],
+                         'price' => $arrFp[$k]["price"],
+                         'date_deliver' => $arrFp[$k]["date_deliver"],
+                      //   'first_date_deliver' => $arrFp[$k]["first_date_deliver"],
+                         'amount' => $arrFp[$k]["amount"],
+                         'cs_id' => $arrFp[$k]["customer_code"],
+                         'place_deliver_id' => $arrFp[$k]["place_deliver_code"],
+                         'place_line' => $arrFp[$k]["place_line"],
+                         'line_code' => $arrFp[$k]["line_code"],
+                         'check_denpyou' => $arrFp[$k]["check_denpyou"],
+                      //   'gaityu' => $arrFp[$k]["gaityu"],
+                         'bunnou' => $arrFp[$k]["bunnou"],
+                         'kannou' => $arrFp[$k]["kannou"],
+                      //   'date_bunnou' => $arrFp[$k]["date_bunnou"],
+                      //   'check_kannou' => $arrFp[$k]["check_kannou"],
+                         'delete_flg' => $arrFp[$k]["delete_flag"],
+                         'created_at' => date("Y-m-d H:i:s")
+                     ]);
+                   }
+                   $connection = ConnectionManager::get('default');
+                   $table->setConnection($connection);
+
+                   //組み立て外注仮登録クラス
+                   $htmlgaityukaritouroku = new htmlEDItouroku();
+                   $data = $htmlgaityukaritouroku->htmlgaityukaritourokuAssemble($arrFp);
+
+                   //組み立て外注登録クラス（紐づけ、kari_orderの更新も）
+                   $htmlgaityutouroku = new htmlEDItouroku();
+                   $data = $htmlgaityutouroku->htmlgaityutouroku();
+
+                 }
+
                }
 
                  $mes = "※登録されました";
@@ -297,6 +313,7 @@ class OrderEdisController extends AppController
 
      public function hattyucsvpreadd()
  		{
+      $this->request->session()->destroy();// セッションの破棄
       session_start();//セッションの開始
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
@@ -329,7 +346,8 @@ class OrderEdisController extends AppController
 
     public function dnpcsvpreadd()
     {
-     session_start();
+      $this->request->session()->destroy();// セッションの破棄
+      session_start();//セッションの開始
      $orderEdis = $this->OrderEdis->newEntity();
      $this->set('orderEdis',$orderEdis);
      $data = $this->request->getData();
@@ -533,36 +551,83 @@ echo "</pre>";
             $htmlgaityutouroku = new htmlEDItouroku();
             $data = $htmlgaityutouroku->htmlgaityutouroku();
 
+                $num = 0;
+                for($k=0; $k<count($arrEDI); $k++){//組み立て品登録
+                  $num = $num + 1;
+                  $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $arrEDI[$k]['product_code']])->toArray();
+                  if(count($AssembleProduct) > 0){
+                    for($n=0; $n<count($AssembleProduct); $n++){
+                      $num = $num + 1;
+                      $child_pid = $AssembleProduct[$n]->child_pid;
+/*
+                      echo "<pre>";
+                      print_r("count");
+                      print_r(count($AssembleProduct));
+                      echo "</pre>";
+*/
+                      $_SESSION['order_edi_kumitate'][$num] = array(
+                        'place_deliver_code' => "00000",
+                        'date_order' => $arrEDI[$k]["date_order"],
+                        'price' => 0,
+                        'amount' => $arrEDI[$k]["amount"],
+                        'product_code' => $child_pid,
+                        'line_code' => $arrEDI[$k]["line_code"],
+                        'date_deliver' => $arrEDI[$k]["date_deliver"],
+                        'num_order' => $arrEDI[$k]["num_order"],
+             //           'first_date_deliver' => $data['order_edi']["first_date_deliver"],
+                        'customer_code' => $arrEDI[$k]["customer_code"],
+                        'place_line' => $arrEDI[$k]["place_line"],
+                        'check_denpyou' => 0,
+                        'bunnou' => $arrEDI[$k]["bunnou"],
+                        'kannou' => $arrEDI[$k]["kannou"],
+                        'delete_flag' => 0,
+                        'created_staff' => $this->Auth->user('staff_id')
+                      );
+                    }
 
-            for($k=0; $k<count($arrEDI); $k++){//組み立て品登録
-              $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $arrEDI[$k]['product_code']])->toArray();
-              if(count($AssembleProduct) > 0){
-                for($n=0; $n<count($AssembleProduct); $n++){
-                  $child_pid = $AssembleProduct[$n]->child_pid;
-                  $_SESSION['order_edi_kumitate'][$n] = array(
-                    'place_deliver_code' => "00000",
-                    'date_order' => $arrEDI[$k]["date_order"],
-                    'price' => 0,
-                    'amount' => $arrEDI[$k]["amount"],
-                    'product_code' => $child_pid,
-                    'line_code' => $arrEDI[$k]["line_code"],
-                    'date_deliver' => $arrEDI[$k]["date_deliver"],
-                    'num_order' => $arrEDI[$k]["num_order"],
-         //           'first_date_deliver' => $data['order_edi']["first_date_deliver"],
-                    'customer_code' => $arrEDI[$k]["customer_code"],
-                    'place_line' => $arrEDI[$k]["place_line"],
-                    'check_denpyou' => 0,
-                    'bunnou' => $arrEDI[$k]["bunnou"],
-                    'kannou' => $arrEDI[$k]["kannou"],
-                    'delete_flag' => 0,
-                    'created_staff' => $this->Auth->user('staff_id')
-                  );
+                  }
+
                 }
+
+                if(isset($_SESSION['order_edi_kumitate'])){
+
+                  $_SESSION['order_edi_kumitate'] = array_values($_SESSION['order_edi_kumitate']);//添え字の振り直し
+
+                }
+
+              if(isset($_SESSION['order_edi_kumitate'][0])){
                 $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $_SESSION['order_edi_kumitate']);
                 if($this->OrderEdis->saveMany($orderEdis)){
 
                   $arrFp = array();//空の配列を作る
                   $arrFp = $_SESSION['order_edi_kumitate'];
+
+                  //insert into order_ediする（旧DB）
+                  $connection = ConnectionManager::get('sakaeMotoDB');
+                  $table = TableRegistry::get('order_edi');
+                  $table->setConnection($connection);
+
+                  for($m=0; $m<count($arrFp); $m++){
+                    $connection->insert('order_edi', [
+                        'date_order' => $arrFp[$m]["date_order"],
+                        'num_order' => $arrFp[$m]["num_order"],
+                        'product_id' => $arrFp[$m]["product_code"],
+                        'price' => $arrFp[$m]["price"],
+                        'date_deliver' => $arrFp[$m]["date_deliver"],
+                        'amount' => $arrFp[$m]["amount"],
+                        'cs_id' => $arrFp[$m]["customer_code"],
+                        'place_deliver_id' => $arrFp[$m]["place_deliver_code"],
+                        'place_line' => $arrFp[$m]["place_line"],
+                        'line_code' => $arrFp[$m]["line_code"],
+                        'check_denpyou' => $arrFp[$m]["check_denpyou"],
+                        'bunnou' => $arrFp[$m]["bunnou"],
+                        'kannou' => $arrFp[$m]["kannou"],
+                        'delete_flg' => $arrFp[$m]["delete_flag"],
+                        'created_at' => date("Y-m-d H:i:s")
+                    ]);
+                  }
+                  $connection = ConnectionManager::get('default');
+                  $table->setConnection($connection);
 
                   //組み立て外注仮登録クラス
                   $htmlgaityukaritouroku = new htmlEDItouroku();
@@ -574,8 +639,8 @@ echo "</pre>";
 
                 }
 
-             }
-          }
+              }
+
 
 //ここからDenpyouDnpMinoukannousへ登録用
 
@@ -1083,7 +1148,8 @@ echo "</pre>";
 
     public function keikakucsvpreadd()
     {
-     session_start();
+      $this->request->session()->destroy();// セッションの破棄
+      session_start();//セッションの開始
      $orderEdis = $this->OrderEdis->newEntity();
      $this->set('orderEdis',$orderEdis);
     }
@@ -1571,15 +1637,13 @@ echo "</pre>";
               $arrFp = array();//空の配列を作る
               $arrFp = $arrOrderEdisnew;
 
-                               //外注仮登録クラス
-                               $htmlgaityukaritouroku = new htmlEDItouroku();
-                               $data = $htmlgaityukaritouroku->htmlgaityukaritouroku($arrFp);
+              //外注仮登録クラス
+              $htmlgaityukaritouroku = new htmlEDItouroku();
+              $data = $htmlgaityukaritouroku->htmlgaityukaritouroku($arrFp);
 
-                               //外注登録クラス（紐づけ、kari_orderの更新も）
-                               $htmlgaityutouroku = new htmlEDItouroku();
-                               $data = $htmlgaityutouroku->htmlgaityutouroku();
-
-
+              //外注登録クラス（紐づけ、kari_orderの更新も）
+              $htmlgaityutouroku = new htmlEDItouroku();
+              $data = $htmlgaityutouroku->htmlgaityutouroku();
 
               //旧DB更新
               $connection = ConnectionManager::get('sakaeMotoDB');

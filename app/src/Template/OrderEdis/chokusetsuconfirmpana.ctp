@@ -59,6 +59,9 @@
 	</tr>
 </table>
 <br><br>
+
+<?php if($price_check == 1): ?>
+
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">単価</strong></td>
@@ -67,6 +70,13 @@
 		<td bgcolor="#FFFFCC"><?= $this->Form->control('price', array('type'=>'text', 'label'=>false)) ?></td>
 	</tr>
 </table>
+
+<?php else: //csv押したとき ?>
+
+  <?= $this->Form->control('price', array('type'=>'hidden', 'value'=>$price, 'label'=>false)) ?>
+
+<?php endif; ?>
+
 <?= $this->Form->control('date_order', array('type'=>'hidden', 'value'=>$date_order, 'label'=>false)) ?>
 <?= $this->Form->control('num_order', array('type'=>'hidden', 'value'=>$num_order, 'label'=>false)) ?>
 <?= $this->Form->control('place_deliver_code', array('type'=>'hidden', 'value'=>$place_deliver_code, 'label'=>false)) ?>

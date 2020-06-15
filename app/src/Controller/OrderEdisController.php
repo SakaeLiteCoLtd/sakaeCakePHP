@@ -41,6 +41,8 @@ class OrderEdisController extends AppController
        $this->UnitOrderToSuppliers = TableRegistry::get('unitOrderToSuppliers');
        $this->OrderToSuppliers = TableRegistry::get('orderToSuppliers');
        $this->AttachOrderToSuppliers = TableRegistry::get('attachOrderToSuppliers');
+       $this->AccountPriceProducts = TableRegistry::get('accountPriceProducts');
+
      }
 
      public function indexmenu()
@@ -2982,6 +2984,33 @@ echo "</pre>";
       $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
       $customer_code = $Customer[0]->customer_code;
       $this->set("customer_code",$customer_code);
+
+//単価の表示をするかチェック
+      $PlaceDeliver = $this->PlaceDelivers->find()->where(['id' => $place_deliver])->toArray();
+      $place_deliver_cs_code = $PlaceDeliver[0]->cs_code;
+
+      if($place_deliver_cs_code == $customer_code){
+        $AccountPriceProduct = $this->AccountPriceProducts->find()->where(['product_code' => $product_code])->toArray();
+
+        if(isset($AccountPriceProduct[0])){
+          $price_check = 0;
+          $this->set("price_check",$price_check);
+          $price = $AccountPriceProduct[0]->price;
+          $this->set("price",$price);
+        }else{
+          echo "<pre>";
+          print_r("AccountPriceProductsテーブルに単価が登録されていません");
+          echo "</pre>";
+          $price_check = 1;
+          $this->set("price_check",$price_check);
+        }
+
+      }else{
+        $price_check = 1;
+        $this->set("price_check",$price_check);
+
+      }
+
     }
 
     public function chokusetsupanapreadd()
@@ -2991,6 +3020,10 @@ echo "</pre>";
       $this->set('orderEdis',$orderEdis);
 
       $data = $this->request->getData();
+
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
 
       $_SESSION['order_edi'] = array(
         'place_deliver_code' => $data["place_deliver_code"],
@@ -3175,7 +3208,6 @@ echo "</pre>";
           $connection = ConnectionManager::get('default');
           //ここまで
 
-
           if(isset($_SESSION['ProductGaityu'])){//外注がある場合はKariOrderToSuppliersに登録
 
               $arrFp = array();//空の配列を作る
@@ -3330,6 +3362,33 @@ echo "</pre>";
       }
       $this->set("hyoujikannou",$hyoujikannou);
       $this->set("kannou",$kannou);
+
+      //単価の表示をするかチェック
+      $PlaceDeliver = $this->PlaceDelivers->find()->where(['id' => $place_deliver])->toArray();
+      $place_deliver_cs_code = $PlaceDeliver[0]->cs_code;
+
+      if($place_deliver_cs_code == $customer_code){
+        $AccountPriceProduct = $this->AccountPriceProducts->find()->where(['product_code' => $product_code])->toArray();
+
+        if(isset($AccountPriceProduct[0])){
+          $price_check = 0;
+          $this->set("price_check",$price_check);
+          $price = $AccountPriceProduct[0]->price;
+          $this->set("price",$price);
+        }else{
+          echo "<pre>";
+          print_r("AccountPriceProductsテーブルに単価が登録されていません");
+          echo "</pre>";
+          $price_check = 1;
+          $this->set("price_check",$price_check);
+        }
+
+      }else{
+        $price_check = 1;
+        $this->set("price_check",$price_check);
+
+      }
+
     }
 
     public function chokusetsudnppreadd()

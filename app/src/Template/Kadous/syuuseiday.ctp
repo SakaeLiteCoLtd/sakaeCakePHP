@@ -47,9 +47,14 @@
       echo "<td width='50' colspan='3' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
       echo "開始";
       echo "</strong></div></td>\n";
-      echo "<td width='350' colspan='37' style='border-bottom: 0px'><div align='center'>\n";
-      echo "<input type='date' value=$dayye name=date_sta empty=Please select size='6'/>\n";
-      echo "</div></td>\n";
+
+      ?>
+      <td width="350" colspan="37" style="border-bottom: 0px;border-width: 1px"><div align="center"><?= $this->Form->input("date_sta", array('type' => 'date', 'value' => $dayye, 'monthNames' => false, 'label'=>false)); ?></div></td>
+      <?php
+      
+  //    echo "<td width='350' colspan='37' style='border-bottom: 0px'><div align='center'>\n";
+  //    echo "<input type='date' value=$dayye name=date_sta empty=Please select size='6'/>\n";
+  //    echo "</div></td>\n";
       echo "<td rowspan='2' height='6' colspan='20'>\n";
       echo "<input type='text' name=seikeiki size='6'/>\n";
       echo "</td>\n";
@@ -58,9 +63,14 @@
       echo "<td colspan='3'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
       echo "終了";
       echo "</strong></div></td>\n";
-      echo "<td colspan='37'><div align='center'>\n";
-      echo "<input type='date' value=$dateYMD name=date_fin size='6'/>\n";
-      echo "</div></td>\n";
+
+      ?>
+      <td colspan="37" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date_fin", array('type' => 'date', 'value' => $dateYMD, 'monthNames' => false, 'label'=>false)); ?></div></td>
+      <?php
+
+  //    echo "<td colspan='37'><div align='center'>\n";
+  //    echo "<input type='date' value=$dateYMD name=date_fin size='6'/>\n";
+  //    echo "</div></td>\n";
       echo "</tr>\n";
 
  ?>

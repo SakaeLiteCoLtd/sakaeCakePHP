@@ -564,7 +564,7 @@ class ZensukensasController extends AppController
              $connection = ConnectionManager::get('default');//新DBに戻る
              $table->setConnection($connection);
 
-             if ($this->ResultZensuHeads->updateAll(
+             if ($this->ResultZensuHeads->updateAll(//検査終了時間の更新
                ['datetime_finish' => $_SESSION['zensuhead']['datetime_finish'], 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
                ['id'  => $_SESSION['result_zensu_head_id']['result_zensu_head_id']]
              )){
@@ -590,7 +590,7 @@ class ZensukensasController extends AppController
                $mes = "登録されました。";
                  $this->set('mes',$mes);
                  $connection->commit();// コミット5
-               }else{
+               }else{//check_lotsの更新
                  if ($this->CheckLots->updateAll(
                    ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
                    ['id'  => $CheckLotId]
@@ -688,19 +688,19 @@ class ZensukensasController extends AppController
                         $this->set('mes',$mes);
                         $connection->commit();// コミット5
 
-                    }else{
+                    }else{//親ロットのflag_usedを０に変更しなくていい場合
                       $connection->commit();// コミット5
                       $mes = "登録されました。";
                       $this->set('mes',$mes);
                     }
 
-                  }else{
+                  }else{//INではない場合
                     $mes = "登録されました。";
                     $this->set('mes',$mes);
                     $connection->commit();// コミット5
                   }
 
-                 }else{
+                }else{//check_lotsの更新ができなかった場合
                    $mes = "登録されませんでした。";
                    $this->set('mes',$mes);
                    $this->Flash->error(__('The CheckLots could not be saved. Please, try again.'));
@@ -708,14 +708,14 @@ class ZensukensasController extends AppController
                  }
              }
 
-             }else{
+           }else{//検査終了時間の更新ができなかった場合
                $mes = "登録されませんでした。";
                $this->set('mes',$mes);
                $this->Flash->error(__('The ResultZensuHeads could not be saved. Please, try again.'));
                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
              }
 
-           } else {
+           } else {//ResultZensuFoodersへの登録ができないとき
              $mes = "登録されませんでした。";
              $this->set('mes',$mes);
              $this->Flash->error(__('The ResultZensuFooders could not be saved. Please, try again.'));

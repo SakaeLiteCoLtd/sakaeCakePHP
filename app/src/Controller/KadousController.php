@@ -26,6 +26,7 @@ class KadousController extends AppController
        $this->Users = TableRegistry::get('users');
        $this->Products = TableRegistry::get('products');//productsテーブルを使う
        $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
+       $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
 
        $this->Auth->allow();
      }
@@ -110,10 +111,11 @@ class KadousController extends AppController
                    ${"cycle_shot".$j.$i} = "";
                    $this->set('cycle_shot'.$j.$i,${"cycle_shot".$j.$i});
 
-                   ${"arrP".$j}[] = ['id' => ${"ScheduleKoutei_id".$i}, 'datetime' => ${"datetime".$i},
-                    'product_code' => ${"product_code".$i},'seikeiki' => ${"seikeiki".$i},
-                    'present_kensahyou' => ${"present_kensahyou".$i},'product_name' => ${"product_name".$i},
-                    'finishing_tm' => ${"finishing_tm".$i}];
+                     ${"arrP".$j}[] = ['id' => ${"ScheduleKoutei_id".$i}, 'datetime' => ${"datetime".$i},
+                      'product_code' => ${"product_code".$i},'seikeiki' => ${"seikeiki".$i},
+                      'present_kensahyou' => ${"present_kensahyou".$i},'product_name' => ${"product_name".$i},
+                      'finishing_tm' => ${"finishing_tm".$i}];
+
                  }
                 }
                 ${"ScheduleKouteisarry".$j} = array();//空の配列を作る
@@ -332,9 +334,9 @@ class KadousController extends AppController
        $connection->begin();//トランザクション3
        try {//トランザクション4
          if ($this->KariKadouSeikeis->saveMany($KariKadouSeikeis)) {
+           $connection->commit();// コミット5
 
-//旧DBに登録
-
+            //旧DBに登録
             $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('kari_kadou_seikei');
             $table->setConnection($connection);
@@ -354,10 +356,8 @@ class KadousController extends AppController
             $connection = ConnectionManager::get('default');
             $table->setConnection($connection);
 
-
            $mes = "※登録されました";
            $this->set('mes',$mes);
-           $connection->commit();// コミット5
 
          } else {
 
@@ -410,6 +410,8 @@ class KadousController extends AppController
 
       for($j=1; $j<=9; $j++){
       $KariKadouSeikei = $this->KariKadouSeikeis->find()->where(['starting_tm >=' => $dateYMDs, 'starting_tm <' => $dateYMDf, 'seikeiki' => $j, 'present_kensahyou' => 0])->toArray();
+      $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
+      $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
 
       ${"n".$j} = 0;
       $this->set('n'.$j,${"n".$j});
@@ -419,7 +421,7 @@ class KadousController extends AppController
              ${"KariKadouSeikei_id".$i} = $KariKadouSeikei[$i-1]->id;
              ${"product_code".$i} = $KariKadouSeikei[$i-1]->product_code;
              ${"seikeiki".$i} = $KariKadouSeikei[$i-1]->seikeiki;
-             ${"seikeiki_code".$i} = $KariKadouSeikei[$i-1]->seikeiki_code;
+             ${"seikeiki_code".$i} = $seikeiki_code;
              ${"starting_tm".$i} = $KariKadouSeikei[$i-1]->starting_tm->format('Y-m-d H:i:s');
              ${"finishing_tm".$i} = $KariKadouSeikei[$i-1]->finishing_tm->format('Y-m-d H:i:s');
              ${"cycle_shot".$i} = $KariKadouSeikei[$i-1]->cycle_shot;
@@ -440,7 +442,7 @@ class KadousController extends AppController
              $this->set('n'.$j,${"n".$j});//セット
 
            }
-          }
+        }
       }
    }
 
@@ -522,7 +524,6 @@ class KadousController extends AppController
         if ($this->KadouSeikeis->saveMany($KadouSeikeis)) {
 
           //旧DBに登録
-
           $connection = ConnectionManager::get('DB_ikou_test');
           $table = TableRegistry::get('kadou_seikei');
           $table->setConnection($connection);
@@ -530,7 +531,8 @@ class KadousController extends AppController
           for($k=1; $k<=count($_SESSION['kadouseikei']); $k++){
             $connection->insert('kadou_seikei', [
               'pro_num' => $_SESSION['kadouseikei'][$k]["product_code"],
-              'seikeiki_id' => $_SESSION['kadouseikei'][$k]["seikeiki"],
+              'seikeiki' => $_SESSION['kadouseikei'][$k]["seikeiki"],
+              'seikeiki_id' => $_SESSION['kadouseikei'][$k]["seikeiki_code"],
               'starting_tm' => $_SESSION['kadouseikei'][$k]["starting_tm"],
               'finishing_tm' => $_SESSION['kadouseikei'][$k]["finishing_tm"],
               'cycle_shot' => $_SESSION['kadouseikei'][$k]["cycle_shot"],
@@ -636,10 +638,16 @@ class KadousController extends AppController
     $this->set('KadouSeikeis',$KadouSeikeis);
     $data = $this->request->getData();
 
-    $product_code = $data['product_code'];
-    $seikeiki = $data['seikeiki'];
     $date_sta = $data['date_sta'];
     $date_fin = $data['date_fin'];
+
+    $date_sta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
+    $date_fin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
+
+    $product_code = $data['product_code'];
+    $seikeiki = $data['seikeiki'];
+//    $date_sta = $data['date_sta'];
+//    $date_fin = $data['date_fin'];
     $date_fin = strtotime($date_fin);
     $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
 
@@ -685,15 +693,21 @@ class KadousController extends AppController
       $KadouSeikeis = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikeis',$KadouSeikeis);
       $data = $this->request->getData();
-  /*
+/*
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-  */
-      $product_code = $data['product_code'];
-      $seikeiki = $data['seikeiki'];
+*/
       $date_sta = $data['date_sta'];
       $date_fin = $data['date_fin'];
+
+      $date_sta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
+      $date_fin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
+
+      $product_code = $data['product_code'];
+      $seikeiki = $data['seikeiki'];
+  //    $date_sta = $data['date_sta'];
+  //    $date_fin = $data['date_fin'];
       $date_fin = strtotime($date_fin);
       $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
 
@@ -917,8 +931,9 @@ class KadousController extends AppController
          ['id'   => $_SESSION['kadouseikeiid']['id'] ]
          )) {
 
-           //旧DBも更新
+           $connection->commit();// コミット5
 
+           //旧DBも更新
            $connection = ConnectionManager::get('DB_ikou_test');
            $table = TableRegistry::get('kadou_seikei');
            $table->setConnection($connection);
@@ -926,7 +941,7 @@ class KadousController extends AppController
            $updater = "UPDATE kadou_seikei set starting_tm = '".$_SESSION['kadouseikeisyuusei']['starting_tm']."', finishing_tm = '".$_SESSION['kadouseikeisyuusei']['finishing_tm']."'
            , cycle_shot = '".$_SESSION['kadouseikeisyuusei']['cycle_shot']."', amount_shot = '".$_SESSION['kadouseikeisyuusei']['cycle_shot']."', accomp_rate = '".$_SESSION['kadouseikeisyuusei']['accomp_rate']."'
            , first_lot_num = '".$_SESSION['kadouseikeisyuusei']['first_lot_num']."', last_lot_num = '".$_SESSION['kadouseikeisyuusei']['last_lot_num']."', sum_predict_lot_num = '".$_SESSION['kadouseikeisyuusei']['sum_predict_lot_num']."'
-           where pro_num ='".$_SESSION['kadouseikeisyuusei']['product_code']."' and seikeiki_id = '".$_SESSION['kadouseikeisyuusei']['seikeiki']."' and starting_tm = '".$_SESSION['kadouseikeiid']['starting_tm_moto']."'";//もとのDBも更新
+           where pro_num ='".$_SESSION['kadouseikeisyuusei']['product_code']."' and seikeiki ='".$_SESSION['kadouseikeisyuusei']['seikeiki']."' and starting_tm ='".$_SESSION['kadouseikeiid']['starting_tm_moto']."'";//もとのDBも更新
            $connection->execute($updater);
 
            $connection = ConnectionManager::get('default');
@@ -941,7 +956,7 @@ class KadousController extends AppController
            $updater = "UPDATE kadou_seikei set starting_tm = '".$_SESSION['kadouseikeisyuusei']['starting_tm']."', finishing_tm = '".$_SESSION['kadouseikeisyuusei']['finishing_tm']."'
            , cycle_shot = '".$_SESSION['kadouseikeisyuusei']['cycle_shot']."', amount_shot = '".$_SESSION['kadouseikeisyuusei']['cycle_shot']."', accomp_rate = '".$_SESSION['kadouseikeisyuusei']['accomp_rate']."'
            , first_lot_num = '".$_SESSION['kadouseikeisyuusei']['first_lot_num']."', last_lot_num = '".$_SESSION['kadouseikeisyuusei']['last_lot_num']."', sum_predict_lot_num = '".$_SESSION['kadouseikeisyuusei']['sum_predict_lot_num']."'
-           where pro_num ='".$_SESSION['kadouseikeisyuusei']['product_code']."' and seikeiki_id = '".$_SESSION['kadouseikeisyuusei']['seikeiki']."' and starting_tm = '".$_SESSION['kadouseikeiid']['starting_tm_moto']."'";//もとのDBも更新
+           where pro_num ='".$_SESSION['kadouseikeisyuusei']['product_code']."' and seikeiki ='".$_SESSION['kadouseikeisyuusei']['seikeiki']."' and starting_tm ='".$_SESSION['kadouseikeiid']['starting_tm_moto']."'";//もとのDBも更新
            $connection->execute($updater);
 
            $connection = ConnectionManager::get('default');
@@ -951,7 +966,6 @@ class KadousController extends AppController
            $mes = "※登録されました";
            $this->set('mes',$mes);
 
-           $connection->commit();// コミット5
          } else {
            $mes = "※登録されませんでした";
            $this->set('mes',$mes);

@@ -5,6 +5,8 @@
  */
 use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 
+$this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
+
 //$this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
 
 ?>
@@ -87,10 +89,13 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
      ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
      $m = $i;
 
+     $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
+     $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
+
      $_SESSION["karikadouseikei"][$i] = array(
        'product_code' => ${"product_code".$j.$i},
        'seikeiki' => $j,
-       'seikeiki_code' => "",
+       'seikeiki_code' => $seikeiki_code,
        'starting_tm' => ${"starting_tm".$j.$i},
        'finishing_tm' => ${"finishing_tm".$j.$i},
        'cycle_shot' => ${"cycle_shot".$j.$i},
@@ -159,10 +164,13 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
 
+       $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
+       $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
+
        $_SESSION["karikadouseikei"][$m] = array(
          'product_code' => ${"product_code".$j.$i},
          'seikeiki' => $j,
-         'seikeiki_code' => "",
+         'seikeiki_code' => $seikeiki_code,
          'starting_tm' => ${"starting_tm".$j.$i},
          'finishing_tm' => ${"finishing_tm".$j.$i},
          'cycle_shot' => ${"cycle_shot".$j.$i},
@@ -232,10 +240,13 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
 
+       $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
+       $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
+
        $_SESSION["karikadouseikei"][$m] = array(
          'product_code' => ${"product_code".$j.$i},
          'seikeiki' => $j,
-         'seikeiki_code' => "",
+         'seikeiki_code' => $seikeiki_code,
          'starting_tm' => ${"starting_tm".$j.$i},
          'finishing_tm' => ${"finishing_tm".$j.$i},
          'cycle_shot' => ${"cycle_shot".$j.$i},
@@ -305,10 +316,13 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
 
+       $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
+       $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
+
        $_SESSION["karikadouseikei"][$m] = array(
          'product_code' => ${"product_code".$j.$i},
          'seikeiki' => $j,
-         'seikeiki_code' => "",
+         'seikeiki_code' => $seikeiki_code,
          'starting_tm' => ${"starting_tm".$j.$i},
          'finishing_tm' => ${"finishing_tm".$j.$i},
          'cycle_shot' => ${"cycle_shot".$j.$i},
@@ -378,10 +392,13 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
 
+       $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
+       $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
+
        $_SESSION["karikadouseikei"][$m] = array(
          'product_code' => ${"product_code".$j.$i},
          'seikeiki' => $j,
-         'seikeiki_code' => "",
+         'seikeiki_code' => $seikeiki_code,
          'starting_tm' => ${"starting_tm".$j.$i},
          'finishing_tm' => ${"finishing_tm".$j.$i},
          'cycle_shot' => ${"cycle_shot".$j.$i},
@@ -451,10 +468,13 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
 
+       $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
+       $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
+
        $_SESSION["karikadouseikei"][$m] = array(
          'product_code' => ${"product_code".$j.$i},
          'seikeiki' => $j,
-         'seikeiki_code' => "",
+         'seikeiki_code' => $seikeiki_code,
          'starting_tm' => ${"starting_tm".$j.$i},
          'finishing_tm' => ${"finishing_tm".$j.$i},
          'cycle_shot' => ${"cycle_shot".$j.$i},
@@ -524,10 +544,13 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
 
+       $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
+       $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
+
        $_SESSION["karikadouseikei"][$m] = array(
          'product_code' => ${"product_code".$j.$i},
          'seikeiki' => $j,
-         'seikeiki_code' => "",
+         'seikeiki_code' => $seikeiki_code,
          'starting_tm' => ${"starting_tm".$j.$i},
          'finishing_tm' => ${"finishing_tm".$j.$i},
          'cycle_shot' => ${"cycle_shot".$j.$i},
@@ -597,10 +620,13 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
 
+       $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
+       $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
+
        $_SESSION["karikadouseikei"][$m] = array(
          'product_code' => ${"product_code".$j.$i},
          'seikeiki' => $j,
-         'seikeiki_code' => "",
+         'seikeiki_code' => $seikeiki_code,
          'starting_tm' => ${"starting_tm".$j.$i},
          'finishing_tm' => ${"finishing_tm".$j.$i},
          'cycle_shot' => ${"cycle_shot".$j.$i},
@@ -670,10 +696,13 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
 
+       $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
+       $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
+
        $_SESSION["karikadouseikei"][$m] = array(
          'product_code' => ${"product_code".$j.$i},
          'seikeiki' => $j,
-         'seikeiki_code' => "",
+         'seikeiki_code' => $seikeiki_code,
          'starting_tm' => ${"starting_tm".$j.$i},
          'finishing_tm' => ${"finishing_tm".$j.$i},
          'cycle_shot' => ${"cycle_shot".$j.$i},

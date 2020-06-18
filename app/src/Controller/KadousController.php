@@ -350,6 +350,8 @@ class KadousController extends AppController
                 'cycle_shot' => $data['karikadouseikei'][$k]["cycle_shot"],
                 'amount_shot' => $data['karikadouseikei'][$k]["amount_shot"],
                 'present_kensahyou' => $data['karikadouseikei'][$k]["present_kensahyou"],
+                'first_lot_num' => $data['karikadouseikei'][$k]["first_lot_num"],
+                'last_lot_num' => $data['karikadouseikei'][$k]["last_lot_num"],
               ]);
             }
 
@@ -386,6 +388,8 @@ class KadousController extends AppController
 
    public function form()
    {
+     $this->request->session()->destroy(); // セッションの破棄
+
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);
 
@@ -549,30 +553,47 @@ class KadousController extends AppController
           $table->setConnection($connection);
 
           //big_DBに登録
-          /*
           $connection = ConnectionManager::get('big_DB');
-          $table = TableRegistry::get('kadou_seikei');
+          $table = TableRegistry::get('ruby_kadou_seikeikis');
           $table->setConnection($connection);
 
-          for($k=1; $k<=count($_SESSION['kadouseikei']); $k++){
-            $connection->insert('kadou_seikei', [
-              'pro_num' => $_SESSION['kadouseikei'][$k]["product_code"],
-              'seikeiki_id' => $_SESSION['kadouseikei'][$k]["seikeiki"],
-              'starting_tm' => $_SESSION['kadouseikei'][$k]["starting_tm"],
-              'finishing_tm' => $_SESSION['kadouseikei'][$k]["finishing_tm"],
-              'cycle_shot' => $_SESSION['kadouseikei'][$k]["cycle_shot"],
-              'amount_shot' => $_SESSION['kadouseikei'][$k]["amount_shot"],
-              'accomp_rate' => $_SESSION['kadouseikei'][$k]["accomp_rate"],
-              'present_kensahyou' => 0,
-              'first_lot_num' => $_SESSION['kadouseikei'][$k]["first_lot_num"],
-              'last_lot_num' => $_SESSION['kadouseikei'][$k]["last_lot_num"],
-              'sum_predict_lot_num' => $_SESSION['kadouseikei'][$k]["sum_predict_lot_num"],
-            ]);
-          }
+            for($k=1; $k<=count($_SESSION['kadouseikei']); $k++){
+
+              $sql = "SELECT product_code FROM ruby_kadou_seikeikis".
+                    " where seikeiki = '".$_SESSION['kadouseikei'][$k]["seikeiki"]."' and starting_tm = '".$_SESSION['kadouseikei'][$k]["starting_tm"]."'";
+              $connection = ConnectionManager::get('big_DB');
+              $bigkadouSeikei = $connection->execute($sql)->fetchAll('assoc');
+
+              if(isset($bigkadouSeikei[0])){//既に存在するデータの場合は登録しない
+
+                $k = $k;
+
+              }else{
+
+/*//kadou_seikeikisは今は使っていない？
+                $connection->insert('kadou_seikeikis', [
+                  'seikeiki_id' => $_SESSION['kadouseikei'][$k]["seikeiki"],
+                  'product_code' => $_SESSION['kadouseikei'][$k]["product_code"],
+                  'starting_tm' => $_SESSION['kadouseikei'][$k]["starting_tm"],
+                  'finishing_tm' => $_SESSION['kadouseikei'][$k]["finishing_tm"],
+                  'created_at' => date("Y-m-d H:i:s"),
+                  'updated_at' => date("Y-m-d H:i:s")
+                ]);
+*/
+                $connection->insert('ruby_kadou_seikeikis', [
+                  'seikeiki' => $_SESSION['kadouseikei'][$k]["seikeiki"],
+                  'product_code' => $_SESSION['kadouseikei'][$k]["product_code"],
+                  'starting_tm' => $_SESSION['kadouseikei'][$k]["starting_tm"],
+                  'finishing_tm' => $_SESSION['kadouseikei'][$k]["finishing_tm"],
+                  'delete_flag' => 0
+                ]);
+
+              }
+
+            }
 
           $connection = ConnectionManager::get('default');
           $table->setConnection($connection);
-*/
 
           for($n=1; $n<=100; $n++){
             if(isset($_SESSION['kadouseikei'][$n])){
@@ -590,7 +611,7 @@ class KadousController extends AppController
 
 //旧DBを更新
               $connection = ConnectionManager::get('DB_ikou_test');
-              $table = TableRegistry::get('kadou_seikei');
+              $table = TableRegistry::get('kari_kadou_seikei');
               $table->setConnection($connection);
 
               $product_id = $_SESSION['kadouseikei'][$n]["product_code"];
@@ -711,34 +732,69 @@ class KadousController extends AppController
       $date_fin = strtotime($date_fin);
       $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
 
+      $connection = ConnectionManager::get('DB_ikou_test');//旧DBを参照
+      $table = TableRegistry::get('kadou_seikei');
+      $table->setConnection($connection);
+
+      $num_0 = 0;
+
       if(empty($data['product_code'])){//product_codeの入力がないとき
         $product_code = "no";
         if(empty($data['seikeiki'])){//seikeikiの入力がないとき　product_code×　seikeiki×　date〇
           $seikeiki = "no";//日にちだけで絞り込み
-          $KadouSeikeis = $this->KadouSeikeis->find()
-          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
-          $this->set('KadouSeikeis',$KadouSeikeis);
+
+      //    $KadouSeikeis = $this->KadouSeikeis->find()
+      //    ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
+      //    $this->set('KadouSeikeis',$KadouSeikeis);
+
+          $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
+                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and present_kensahyou = ".$num_0." order by pro_num asc";
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
         }else{//seikeikiの入力があるとき　product_code×　seikeiki〇　date〇//seikeikiと日にちで絞り込み
-          $KadouSeikeis = $this->KadouSeikeis->find()
-          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
-          $this->set('KadouSeikeis',$KadouSeikeis);
+
+      //    $KadouSeikeis = $this->KadouSeikeis->find()
+      //    ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
+      //    $this->set('KadouSeikeis',$KadouSeikeis);
+
+          $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
+                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and present_kensahyou = ".$num_0." and seikeiki = '".$seikeiki."' order by pro_num asc";
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
         }
       }else{//product_codeの入力があるとき
         if(empty($data['seikeiki'])){//seikeikiの入力がないとき　product_code〇　seikeiki×　date〇
           $seikeiki = "no";//プロダクトコードと日にちで絞り込み
-          $KadouSeikeis = $this->KadouSeikeis->find()
-          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
-          $this->set('KadouSeikeis',$KadouSeikeis);
+
+    //      $KadouSeikeis = $this->KadouSeikeis->find()
+    //      ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
+    //      $this->set('KadouSeikeis',$KadouSeikeis);
+
+          $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
+                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and present_kensahyou = ".$num_0." and pro_num = '".$product_code."' order by pro_num asc";
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
+
 
         }else{//seikeikiの入力があるとき　product_code〇　seikeiki〇　date〇//プロダクトコードとseikeikiと日にちで絞り込み
-          $KadouSeikeis = $this->KadouSeikeis->find()
-          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
-          $this->set('KadouSeikeis',$KadouSeikeis);
+
+    //      $KadouSeikeis = $this->KadouSeikeis->find()
+    //      ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
+    //      $this->set('KadouSeikeis',$KadouSeikeis);
+
+          $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
+                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and present_kensahyou = ".$num_0." and pro_num = '".$product_code."' and seikeiki = '".$seikeiki."' order by pro_num asc";
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
         }
       }
+
+      $this->set('kadouSeikei',$kadouSeikei);
+      $this->set('countkadouSeikei',count($kadouSeikei));
+
     }
 
     public function syuuseiform()//ロット検索
@@ -948,20 +1004,17 @@ class KadousController extends AppController
            $table->setConnection($connection);
 
            //big_DBも更新
-           /*
            $connection = ConnectionManager::get('big_DB');
-           $table = TableRegistry::get('kadou_seikei');
+           $table = TableRegistry::get('kadou_seikeikis');
            $table->setConnection($connection);
 
-           $updater = "UPDATE kadou_seikei set starting_tm = '".$_SESSION['kadouseikeisyuusei']['starting_tm']."', finishing_tm = '".$_SESSION['kadouseikeisyuusei']['finishing_tm']."'
-           , cycle_shot = '".$_SESSION['kadouseikeisyuusei']['cycle_shot']."', amount_shot = '".$_SESSION['kadouseikeisyuusei']['cycle_shot']."', accomp_rate = '".$_SESSION['kadouseikeisyuusei']['accomp_rate']."'
-           , first_lot_num = '".$_SESSION['kadouseikeisyuusei']['first_lot_num']."', last_lot_num = '".$_SESSION['kadouseikeisyuusei']['last_lot_num']."', sum_predict_lot_num = '".$_SESSION['kadouseikeisyuusei']['sum_predict_lot_num']."'
-           where pro_num ='".$_SESSION['kadouseikeisyuusei']['product_code']."' and seikeiki ='".$_SESSION['kadouseikeisyuusei']['seikeiki']."' and starting_tm ='".$_SESSION['kadouseikeiid']['starting_tm_moto']."'";//もとのDBも更新
+           $updater = "UPDATE kadou_seikeikis set starting_tm = '".$_SESSION['kadouseikeisyuusei']['starting_tm']."', finishing_tm = '".$_SESSION['kadouseikeisyuusei']['finishing_tm']."', updated_at = '".date('Y-m-d H:i:s')."'
+           where product_code ='".$_SESSION['kadouseikeisyuusei']['product_code']."' and seikeiki ='".$_SESSION['kadouseikeisyuusei']['seikeiki']."' and starting_tm ='".$_SESSION['kadouseikeiid']['starting_tm_moto']."'";
            $connection->execute($updater);
 
            $connection = ConnectionManager::get('default');
            $table->setConnection($connection);
- */
+
 
            $mes = "※登録されました";
            $this->set('mes',$mes);

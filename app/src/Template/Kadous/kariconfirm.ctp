@@ -3,9 +3,12 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Staff[]|\Cake\Collection\CollectionInterface $staffs
  */
-use Cake\ORM\TableRegistry;//独立したテーブルを扱う
+ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
+ use Cake\Datasource\ConnectionManager;//トランザクション
 
 $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
+$this->Products = TableRegistry::get('products');//productsテーブルを使う
+$this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
 
 //$this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
 
@@ -89,6 +92,61 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
      ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
      $m = $i;
 
+     //ビッグDB参照
+     $connection = ConnectionManager::get('big_DB');
+     $table = TableRegistry::get('shotdata_sensors');
+     $table->setConnection($connection);
+
+     $sql = "SELECT lot_num FROM shotdata_sensors".
+           " where datetime >= '".${"starting_tm".$j.$i}."' and datetime <= '".${"finishing_tm".$j.$i}."' and seikeiki =".$j." and product_code ='".${"product_code".$j.$i}."' order by datetime asc";
+     $connection = ConnectionManager::get('big_DB');
+     ${"shotdata_sensors".$j.$i} = $connection->execute($sql)->fetchAll('assoc');
+
+     if(isset(${"shotdata_sensors".$j.$i}[0])){
+       ${"count_lot".$j.$i} = count(${"shotdata_sensors".$j.$i}) - 1;
+       ${"first_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[0]['lot_num'];
+       ${"last_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[${"count_lot".$j.$i}]['lot_num'];
+     }else{
+       ${"first_lot_num".$j.$i} = "";
+       ${"last_lot_num".$j.$i} = "";
+     }
+
+     $connection = ConnectionManager::get('default');
+     $table->setConnection($connection);
+
+     $Product = $this->Products->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+     if(($Product[0]->torisu) > 0){
+       $torisu = $Product[0]->torisu;
+       $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+
+         if(($Konpou[0]->irisu) > 0){
+           $irisu = $Konpou[0]->irisu;
+
+           ${"sum_predict_lot_num".$j.$i} = ceil((${"amount_shot".$j.$i} * $torisu) / $irisu);//kadou\Select_yobidashi.class.php　$sumLot参照
+/*
+           echo "<pre>";
+           print_r("sum_predict_lot_num =".${"amount_shot".$j.$i}." * ".$torisu." / ".$irisu);
+           echo "</pre>";
+*/
+         }else{
+
+           echo "<pre>";
+           print_r(${"product_code".$j.$i}."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+           echo "</pre>";
+           ${"sum_predict_lot_num".$j.$i} = "";
+
+         }
+
+     }else{
+
+       echo "<pre>";
+       print_r(${"product_code".$j.$i}."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+       echo "</pre>";
+
+       ${"sum_predict_lot_num".$j.$i} = "";
+     }
+
+
      $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
      $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
 
@@ -102,6 +160,9 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
        'amount_shot' => ${"amount_shot".$j.$i},
        'accomp_rate' => ${"accomp_rate".$j.$i},
        "present_kensahyou" => 0,
+       'first_lot_num' => ${"first_lot_num".$j.$i},
+       "last_lot_num" => ${"last_lot_num".$j.$i},
+       "sum_predict_lot_num" => ${"sum_predict_lot_num".$j.$i},
      );
    }
 /*
@@ -164,6 +225,57 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
 
+       //ビッグDB参照
+       $connection = ConnectionManager::get('big_DB');
+       $table = TableRegistry::get('shotdata_sensors');
+       $table->setConnection($connection);
+
+       $sql = "SELECT lot_num FROM shotdata_sensors".
+             " where datetime >= '".${"starting_tm".$j.$i}."' and datetime <= '".${"finishing_tm".$j.$i}."' and seikeiki =".$j." and product_code ='".${"product_code".$j.$i}."' order by datetime asc";
+       $connection = ConnectionManager::get('big_DB');
+       ${"shotdata_sensors".$j.$i} = $connection->execute($sql)->fetchAll('assoc');
+
+       if(isset(${"shotdata_sensors".$j.$i}[0])){
+         ${"count_lot".$j.$i} = count(${"shotdata_sensors".$j.$i}) - 1;
+         ${"first_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[0]['lot_num'];
+         ${"last_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[${"count_lot".$j.$i}]['lot_num'];
+       }else{
+         ${"first_lot_num".$j.$i} = "";
+         ${"last_lot_num".$j.$i} = "";
+       }
+
+       $connection = ConnectionManager::get('default');
+       $table->setConnection($connection);
+
+       $Product = $this->Products->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+       if(($Product[0]->torisu) > 0){
+         $torisu = $Product[0]->torisu;
+         $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+
+           if(($Konpou[0]->irisu) > 0){
+             $irisu = $Konpou[0]->irisu;
+
+             ${"sum_predict_lot_num".$j.$i} = ceil((${"amount_shot".$j.$i} * $torisu) / $irisu);
+
+           }else{
+
+             echo "<pre>";
+             print_r(${"product_code".$j.$i}."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+             echo "</pre>";
+             ${"sum_predict_lot_num".$j.$i} = "";
+
+           }
+
+       }else{
+
+         echo "<pre>";
+         print_r(${"product_code".$j.$i}."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+         echo "</pre>";
+
+         ${"sum_predict_lot_num".$j.$i} = "";
+       }
+
+
        $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
        $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
 
@@ -177,6 +289,9 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
          'amount_shot' => ${"amount_shot".$j.$i},
          'accomp_rate' => ${"accomp_rate".$j.$i},
          "present_kensahyou" => 0,
+         'first_lot_num' => ${"first_lot_num".$j.$i},
+         "last_lot_num" => ${"last_lot_num".$j.$i},
+         "sum_predict_lot_num" => ${"sum_predict_lot_num".$j.$i},
        );
 
      }
@@ -239,6 +354,56 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
        ${"starting_tm".$j.$i} = substr(${"starting_tm".$j.$i}, 0, 10)." ".substr(${"starting_tm".$j.$i}, 11, 5);
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
+       //ビッグDB参照
+       $connection = ConnectionManager::get('big_DB');
+       $table = TableRegistry::get('shotdata_sensors');
+       $table->setConnection($connection);
+
+       $sql = "SELECT lot_num FROM shotdata_sensors".
+             " where datetime >= '".${"starting_tm".$j.$i}."' and datetime <= '".${"finishing_tm".$j.$i}."' and seikeiki =".$j." and product_code ='".${"product_code".$j.$i}."' order by datetime asc";
+       $connection = ConnectionManager::get('big_DB');
+       ${"shotdata_sensors".$j.$i} = $connection->execute($sql)->fetchAll('assoc');
+
+       if(isset(${"shotdata_sensors".$j.$i}[0])){
+         ${"count_lot".$j.$i} = count(${"shotdata_sensors".$j.$i}) - 1;
+         ${"first_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[0]['lot_num'];
+         ${"last_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[${"count_lot".$j.$i}]['lot_num'];
+       }else{
+         ${"first_lot_num".$j.$i} = "";
+         ${"last_lot_num".$j.$i} = "";
+       }
+
+       $connection = ConnectionManager::get('default');
+       $table->setConnection($connection);
+
+       $Product = $this->Products->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+       if(($Product[0]->torisu) > 0){
+         $torisu = $Product[0]->torisu;
+         $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+
+           if(($Konpou[0]->irisu) > 0){
+             $irisu = $Konpou[0]->irisu;
+
+             ${"sum_predict_lot_num".$j.$i} = ceil((${"amount_shot".$j.$i} * $torisu) / $irisu);
+
+           }else{
+
+             echo "<pre>";
+             print_r(${"product_code".$j.$i}."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+             echo "</pre>";
+             ${"sum_predict_lot_num".$j.$i} = "";
+
+           }
+
+       }else{
+
+         echo "<pre>";
+         print_r(${"product_code".$j.$i}."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+         echo "</pre>";
+
+         ${"sum_predict_lot_num".$j.$i} = "";
+       }
+
 
        $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
        $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
@@ -253,6 +418,9 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
          'amount_shot' => ${"amount_shot".$j.$i},
          'accomp_rate' => ${"accomp_rate".$j.$i},
          "present_kensahyou" => 0,
+         'first_lot_num' => ${"first_lot_num".$j.$i},
+         "last_lot_num" => ${"last_lot_num".$j.$i},
+         "sum_predict_lot_num" => ${"sum_predict_lot_num".$j.$i},
        );
 
      }
@@ -315,6 +483,56 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
        ${"starting_tm".$j.$i} = substr(${"starting_tm".$j.$i}, 0, 10)." ".substr(${"starting_tm".$j.$i}, 11, 5);
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
+       //ビッグDB参照
+       $connection = ConnectionManager::get('big_DB');
+       $table = TableRegistry::get('shotdata_sensors');
+       $table->setConnection($connection);
+
+       $sql = "SELECT lot_num FROM shotdata_sensors".
+             " where datetime >= '".${"starting_tm".$j.$i}."' and datetime <= '".${"finishing_tm".$j.$i}."' and seikeiki =".$j." and product_code ='".${"product_code".$j.$i}."' order by datetime asc";
+       $connection = ConnectionManager::get('big_DB');
+       ${"shotdata_sensors".$j.$i} = $connection->execute($sql)->fetchAll('assoc');
+
+       if(isset(${"shotdata_sensors".$j.$i}[0])){
+         ${"count_lot".$j.$i} = count(${"shotdata_sensors".$j.$i}) - 1;
+         ${"first_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[0]['lot_num'];
+         ${"last_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[${"count_lot".$j.$i}]['lot_num'];
+       }else{
+         ${"first_lot_num".$j.$i} = "";
+         ${"last_lot_num".$j.$i} = "";
+       }
+
+       $connection = ConnectionManager::get('default');
+       $table->setConnection($connection);
+
+       $Product = $this->Products->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+       if(($Product[0]->torisu) > 0){
+         $torisu = $Product[0]->torisu;
+         $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+
+           if(($Konpou[0]->irisu) > 0){
+             $irisu = $Konpou[0]->irisu;
+
+             ${"sum_predict_lot_num".$j.$i} = ceil((${"amount_shot".$j.$i} * $torisu) / $irisu);
+
+           }else{
+
+             echo "<pre>";
+             print_r(${"product_code".$j.$i}."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+             echo "</pre>";
+             ${"sum_predict_lot_num".$j.$i} = "";
+
+           }
+
+       }else{
+
+         echo "<pre>";
+         print_r(${"product_code".$j.$i}."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+         echo "</pre>";
+
+         ${"sum_predict_lot_num".$j.$i} = "";
+       }
+
 
        $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
        $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
@@ -329,7 +547,10 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
          'amount_shot' => ${"amount_shot".$j.$i},
          'accomp_rate' => ${"accomp_rate".$j.$i},
          "present_kensahyou" => 0,
-       );
+         'first_lot_num' => ${"first_lot_num".$j.$i},
+         "last_lot_num" => ${"last_lot_num".$j.$i},
+         "sum_predict_lot_num" => ${"sum_predict_lot_num".$j.$i},
+   );
 
      }
 /*
@@ -391,6 +612,56 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
        ${"starting_tm".$j.$i} = substr(${"starting_tm".$j.$i}, 0, 10)." ".substr(${"starting_tm".$j.$i}, 11, 5);
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
+       //ビッグDB参照
+       $connection = ConnectionManager::get('big_DB');
+       $table = TableRegistry::get('shotdata_sensors');
+       $table->setConnection($connection);
+
+       $sql = "SELECT lot_num FROM shotdata_sensors".
+             " where datetime >= '".${"starting_tm".$j.$i}."' and datetime <= '".${"finishing_tm".$j.$i}."' and seikeiki =".$j." and product_code ='".${"product_code".$j.$i}."' order by datetime asc";
+       $connection = ConnectionManager::get('big_DB');
+       ${"shotdata_sensors".$j.$i} = $connection->execute($sql)->fetchAll('assoc');
+
+       if(isset(${"shotdata_sensors".$j.$i}[0])){
+         ${"count_lot".$j.$i} = count(${"shotdata_sensors".$j.$i}) - 1;
+         ${"first_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[0]['lot_num'];
+         ${"last_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[${"count_lot".$j.$i}]['lot_num'];
+       }else{
+         ${"first_lot_num".$j.$i} = "";
+         ${"last_lot_num".$j.$i} = "";
+       }
+
+       $connection = ConnectionManager::get('default');
+       $table->setConnection($connection);
+
+       $Product = $this->Products->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+       if(($Product[0]->torisu) > 0){
+         $torisu = $Product[0]->torisu;
+         $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+
+           if(($Konpou[0]->irisu) > 0){
+             $irisu = $Konpou[0]->irisu;
+
+             ${"sum_predict_lot_num".$j.$i} = ceil((${"amount_shot".$j.$i} * $torisu) / $irisu);
+
+           }else{
+
+             echo "<pre>";
+             print_r(${"product_code".$j.$i}."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+             echo "</pre>";
+             ${"sum_predict_lot_num".$j.$i} = "";
+
+           }
+
+       }else{
+
+         echo "<pre>";
+         print_r(${"product_code".$j.$i}."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+         echo "</pre>";
+
+         ${"sum_predict_lot_num".$j.$i} = "";
+       }
+
 
        $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
        $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
@@ -405,7 +676,10 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
          'amount_shot' => ${"amount_shot".$j.$i},
          'accomp_rate' => ${"accomp_rate".$j.$i},
          "present_kensahyou" => 0,
-       );
+         'first_lot_num' => ${"first_lot_num".$j.$i},
+         "last_lot_num" => ${"last_lot_num".$j.$i},
+         "sum_predict_lot_num" => ${"sum_predict_lot_num".$j.$i},
+     );
 
      }
 /*
@@ -467,6 +741,56 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
        ${"starting_tm".$j.$i} = substr(${"starting_tm".$j.$i}, 0, 10)." ".substr(${"starting_tm".$j.$i}, 11, 5);
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
+       //ビッグDB参照
+       $connection = ConnectionManager::get('big_DB');
+       $table = TableRegistry::get('shotdata_sensors');
+       $table->setConnection($connection);
+
+       $sql = "SELECT lot_num FROM shotdata_sensors".
+             " where datetime >= '".${"starting_tm".$j.$i}."' and datetime <= '".${"finishing_tm".$j.$i}."' and seikeiki =".$j." and product_code ='".${"product_code".$j.$i}."' order by datetime asc";
+       $connection = ConnectionManager::get('big_DB');
+       ${"shotdata_sensors".$j.$i} = $connection->execute($sql)->fetchAll('assoc');
+
+       if(isset(${"shotdata_sensors".$j.$i}[0])){
+         ${"count_lot".$j.$i} = count(${"shotdata_sensors".$j.$i}) - 1;
+         ${"first_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[0]['lot_num'];
+         ${"last_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[${"count_lot".$j.$i}]['lot_num'];
+       }else{
+         ${"first_lot_num".$j.$i} = "";
+         ${"last_lot_num".$j.$i} = "";
+       }
+
+       $connection = ConnectionManager::get('default');
+       $table->setConnection($connection);
+
+       $Product = $this->Products->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+       if(($Product[0]->torisu) > 0){
+         $torisu = $Product[0]->torisu;
+         $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+
+           if(($Konpou[0]->irisu) > 0){
+             $irisu = $Konpou[0]->irisu;
+
+             ${"sum_predict_lot_num".$j.$i} = ceil((${"amount_shot".$j.$i} * $torisu) / $irisu);
+
+           }else{
+
+             echo "<pre>";
+             print_r(${"product_code".$j.$i}."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+             echo "</pre>";
+             ${"sum_predict_lot_num".$j.$i} = "";
+
+           }
+
+       }else{
+
+         echo "<pre>";
+         print_r(${"product_code".$j.$i}."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+         echo "</pre>";
+
+         ${"sum_predict_lot_num".$j.$i} = "";
+       }
+
 
        $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
        $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
@@ -481,7 +805,10 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
          'amount_shot' => ${"amount_shot".$j.$i},
          'accomp_rate' => ${"accomp_rate".$j.$i},
          "present_kensahyou" => 0,
-       );
+         'first_lot_num' => ${"first_lot_num".$j.$i},
+         "last_lot_num" => ${"last_lot_num".$j.$i},
+         "sum_predict_lot_num" => ${"sum_predict_lot_num".$j.$i},
+     );
 
      }
 /*
@@ -543,6 +870,56 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
        ${"starting_tm".$j.$i} = substr(${"starting_tm".$j.$i}, 0, 10)." ".substr(${"starting_tm".$j.$i}, 11, 5);
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
+       //ビッグDB参照
+       $connection = ConnectionManager::get('big_DB');
+       $table = TableRegistry::get('shotdata_sensors');
+       $table->setConnection($connection);
+
+       $sql = "SELECT lot_num FROM shotdata_sensors".
+             " where datetime >= '".${"starting_tm".$j.$i}."' and datetime <= '".${"finishing_tm".$j.$i}."' and seikeiki =".$j." and product_code ='".${"product_code".$j.$i}."' order by datetime asc";
+       $connection = ConnectionManager::get('big_DB');
+       ${"shotdata_sensors".$j.$i} = $connection->execute($sql)->fetchAll('assoc');
+
+       if(isset(${"shotdata_sensors".$j.$i}[0])){
+         ${"count_lot".$j.$i} = count(${"shotdata_sensors".$j.$i}) - 1;
+         ${"first_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[0]['lot_num'];
+         ${"last_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[${"count_lot".$j.$i}]['lot_num'];
+       }else{
+         ${"first_lot_num".$j.$i} = "";
+         ${"last_lot_num".$j.$i} = "";
+       }
+
+       $connection = ConnectionManager::get('default');
+       $table->setConnection($connection);
+
+       $Product = $this->Products->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+       if(($Product[0]->torisu) > 0){
+         $torisu = $Product[0]->torisu;
+         $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+
+           if(($Konpou[0]->irisu) > 0){
+             $irisu = $Konpou[0]->irisu;
+
+             ${"sum_predict_lot_num".$j.$i} = ceil((${"amount_shot".$j.$i} * $torisu) / $irisu);
+
+           }else{
+
+             echo "<pre>";
+             print_r(${"product_code".$j.$i}."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+             echo "</pre>";
+             ${"sum_predict_lot_num".$j.$i} = "";
+
+           }
+
+       }else{
+
+         echo "<pre>";
+         print_r(${"product_code".$j.$i}."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+         echo "</pre>";
+
+         ${"sum_predict_lot_num".$j.$i} = "";
+       }
+
 
        $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
        $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
@@ -557,7 +934,10 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
          'amount_shot' => ${"amount_shot".$j.$i},
          'accomp_rate' => ${"accomp_rate".$j.$i},
          "present_kensahyou" => 0,
-       );
+         'first_lot_num' => ${"first_lot_num".$j.$i},
+         "last_lot_num" => ${"last_lot_num".$j.$i},
+         "sum_predict_lot_num" => ${"sum_predict_lot_num".$j.$i},
+     );
 
      }
 /*
@@ -619,6 +999,56 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
        ${"starting_tm".$j.$i} = substr(${"starting_tm".$j.$i}, 0, 10)." ".substr(${"starting_tm".$j.$i}, 11, 5);
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
+       //ビッグDB参照
+       $connection = ConnectionManager::get('big_DB');
+       $table = TableRegistry::get('shotdata_sensors');
+       $table->setConnection($connection);
+
+       $sql = "SELECT lot_num FROM shotdata_sensors".
+             " where datetime >= '".${"starting_tm".$j.$i}."' and datetime <= '".${"finishing_tm".$j.$i}."' and seikeiki =".$j." and product_code ='".${"product_code".$j.$i}."' order by datetime asc";
+       $connection = ConnectionManager::get('big_DB');
+       ${"shotdata_sensors".$j.$i} = $connection->execute($sql)->fetchAll('assoc');
+
+       if(isset(${"shotdata_sensors".$j.$i}[0])){
+         ${"count_lot".$j.$i} = count(${"shotdata_sensors".$j.$i}) - 1;
+         ${"first_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[0]['lot_num'];
+         ${"last_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[${"count_lot".$j.$i}]['lot_num'];
+       }else{
+         ${"first_lot_num".$j.$i} = "";
+         ${"last_lot_num".$j.$i} = "";
+       }
+
+       $connection = ConnectionManager::get('default');
+       $table->setConnection($connection);
+
+       $Product = $this->Products->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+       if(($Product[0]->torisu) > 0){
+         $torisu = $Product[0]->torisu;
+         $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+
+           if(($Konpou[0]->irisu) > 0){
+             $irisu = $Konpou[0]->irisu;
+
+             ${"sum_predict_lot_num".$j.$i} = ceil((${"amount_shot".$j.$i} * $torisu) / $irisu);
+
+           }else{
+
+             echo "<pre>";
+             print_r(${"product_code".$j.$i}."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+             echo "</pre>";
+             ${"sum_predict_lot_num".$j.$i} = "";
+
+           }
+
+       }else{
+
+         echo "<pre>";
+         print_r(${"product_code".$j.$i}."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+         echo "</pre>";
+
+         ${"sum_predict_lot_num".$j.$i} = "";
+       }
+
 
        $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
        $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
@@ -633,7 +1063,10 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
          'amount_shot' => ${"amount_shot".$j.$i},
          'accomp_rate' => ${"accomp_rate".$j.$i},
          "present_kensahyou" => 0,
-       );
+         'first_lot_num' => ${"first_lot_num".$j.$i},
+         "last_lot_num" => ${"last_lot_num".$j.$i},
+         "sum_predict_lot_num" => ${"sum_predict_lot_num".$j.$i},
+   );
 
      }
 /*
@@ -695,6 +1128,55 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
        ${"starting_tm".$j.$i} = substr(${"starting_tm".$j.$i}, 0, 10)." ".substr(${"starting_tm".$j.$i}, 11, 5);
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
        $m = $m + 1;
+       //ビッグDB参照
+       $connection = ConnectionManager::get('big_DB');
+       $table = TableRegistry::get('shotdata_sensors');
+       $table->setConnection($connection);
+
+       $sql = "SELECT lot_num FROM shotdata_sensors".
+             " where datetime >= '".${"starting_tm".$j.$i}."' and datetime <= '".${"finishing_tm".$j.$i}."' and seikeiki =".$j." and product_code ='".${"product_code".$j.$i}."' order by datetime asc";
+       $connection = ConnectionManager::get('big_DB');
+       ${"shotdata_sensors".$j.$i} = $connection->execute($sql)->fetchAll('assoc');
+
+       if(isset(${"shotdata_sensors".$j.$i}[0])){
+         ${"count_lot".$j.$i} = count(${"shotdata_sensors".$j.$i}) - 1;
+         ${"first_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[0]['lot_num'];
+         ${"last_lot_num".$j.$i} = ${"shotdata_sensors".$j.$i}[${"count_lot".$j.$i}]['lot_num'];
+       }else{
+         ${"first_lot_num".$j.$i} = "";
+         ${"last_lot_num".$j.$i} = "";
+       }
+
+       $connection = ConnectionManager::get('default');
+       $table->setConnection($connection);
+
+       $Product = $this->Products->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+       if(($Product[0]->torisu) > 0){
+         $torisu = $Product[0]->torisu;
+         $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+
+           if(($Konpou[0]->irisu) > 0){
+             $irisu = $Konpou[0]->irisu;
+
+             ${"sum_predict_lot_num".$j.$i} = ceil((${"amount_shot".$j.$i} * $torisu) / $irisu);
+
+           }else{
+
+             echo "<pre>";
+             print_r(${"product_code".$j.$i}."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+             echo "</pre>";
+             ${"sum_predict_lot_num".$j.$i} = "";
+
+           }
+
+       }else{
+
+         echo "<pre>";
+         print_r(${"product_code".$j.$i}."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+         echo "</pre>";
+
+         ${"sum_predict_lot_num".$j.$i} = "";
+       }
 
        $GenjyouSeikeiki= $this->GenjyouSeikeikis->find()->where(['seikeiki' => $j])->toArray();
        $seikeiki_code = $GenjyouSeikeiki[0]->seikeiki_code;
@@ -709,6 +1191,9 @@ $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
          'amount_shot' => ${"amount_shot".$j.$i},
          'accomp_rate' => ${"accomp_rate".$j.$i},
          "present_kensahyou" => 0,
+         'first_lot_num' => ${"first_lot_num".$j.$i},
+         "last_lot_num" => ${"last_lot_num".$j.$i},
+         "sum_predict_lot_num" => ${"sum_predict_lot_num".$j.$i},
        );
 
      }

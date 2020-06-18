@@ -2484,8 +2484,12 @@ class LabelsController extends AppController
         $count = $count + count($CheckLottourokuzumi);
       }
 
-      $mes = "登録されました。";
-      $this->set('mes',$mes);
+      echo "<pre>";
+      print_r("元々データベースに存在する個数　＝　".$count);
+      echo "</pre>";
+
+      $mes = "";
+
       if($count != 0){
         $mes = "※以下のロットは既に登録されています。";
         $this->set('mes',$mes);
@@ -2515,6 +2519,15 @@ class LabelsController extends AppController
           $arrLot = $arrLotmitouroku;
         }
       }
+
+      echo "<pre>";
+      print_r("登録されるデータの個数　＝　".count($arrLot));
+      echo "</pre>";
+      echo "<pre>";
+      print_r($arrLot);
+      echo "</pre>";
+
+/*
            $checkLots = $this->CheckLots->newEntity();
            $this->set('checkLots',$checkLots);
            $checkLots = $this->CheckLots->patchEntities($checkLots, $arrLot);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
@@ -2523,16 +2536,15 @@ class LabelsController extends AppController
            $connection->begin();//トランザクション3
            try {//トランザクション4
              if ($this->CheckLots->saveMany($checkLots)) {//saveManyで一括登録
+               $mes = "登録されました。";
+               $this->set('mes',$mes);
+
                $connection->commit();// コミット5
 
                //$arrLotをinsert into check_lotsする
                $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('check_lots');
                $table->setConnection($connection);
-
-      //         echo "<pre>";
-      //         print_r($arrLot);
-      //         echo "</pre>";
 
                for($k=0; $k<count($arrLot); $k++){
                  $connection->insert('check_lots', [
@@ -2545,6 +2557,10 @@ class LabelsController extends AppController
                }
 
              } else {
+
+               $mes = "登録できませんでした。".$mes;
+               $this->set('mes',$mes);
+
       //         $this->Flash->error(__('The data could not be saved. Please, try again.'));
                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
              }
@@ -2552,7 +2568,11 @@ class LabelsController extends AppController
            //ロールバック8
              $connection->rollback();//トランザクション9
            }//トランザクション10
+
+           */
         }
+
+
      }
 
      public function torikomipreadd()

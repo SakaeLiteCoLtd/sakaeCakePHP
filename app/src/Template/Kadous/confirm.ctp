@@ -78,14 +78,14 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
               ${"seikeiki_code".$j.$n} = "";
             }
 
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('big_DB');
             $table = TableRegistry::get('shotdata_sensors');
             $table->setConnection($connection);
 
 //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
             $sql = "SELECT lot_num FROM shotdata_sensors".
                   " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('big_DB');
             ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
 
             $connection = ConnectionManager::get('default');
@@ -120,13 +120,14 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                 if(($Konpou[0]->irisu) > 0){
                   $irisu = $Konpou[0]->irisu;
 
-                  $sum_predict_lot_num = ceil(($_POST["amount_shot{$j}{$n}"] * $torisu) / $irisu);
+                  $sum_predict_lot_num = ceil(($_POST["amount_shot{$j}{$n}"] * $torisu) / $irisu);//kadou\Select_yobidashi.class.php　$sumLot参照
 
                 }else{
 
                   echo "<pre>";
                   print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
                   echo "</pre>";
+                  $sum_predict_lot_num = "";
 
                 }
 
@@ -228,14 +229,14 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
              ${"seikeiki_code".$j.$n} = "";
            }
 
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('big_DB');
            $table = TableRegistry::get('shotdata_sensors');
            $table->setConnection($connection);
 
            //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
            $sql = "SELECT lot_num FROM shotdata_sensors".
                  " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('big_DB');
            ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
 
            $connection = ConnectionManager::get('default');
@@ -267,6 +268,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                  echo "<pre>";
                  print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
                  echo "</pre>";
+                 $sum_predict_lot_num = "";
 
                }
 
@@ -363,14 +365,14 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
               ${"seikeiki_code".$j.$n} = "";
             }
 
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('big_DB');
             $table = TableRegistry::get('shotdata_sensors');
             $table->setConnection($connection);
 
             //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
             $sql = "SELECT lot_num FROM shotdata_sensors".
                   " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('big_DB');
             ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
 
             $connection = ConnectionManager::get('default');
@@ -402,6 +404,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                   echo "<pre>";
                   print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
                   echo "</pre>";
+                  $sum_predict_lot_num = "";
 
                 }
 
@@ -410,8 +413,8 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
               echo "<pre>";
               print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
               echo "</pre>";
-
               $sum_predict_lot_num = "";
+
             }
 
 
@@ -497,14 +500,14 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
              }else{
                ${"seikeiki_code".$j.$n} = "";
              }
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('big_DB');
              $table = TableRegistry::get('shotdata_sensors');
              $table->setConnection($connection);
 
              //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
              $sql = "SELECT lot_num FROM shotdata_sensors".
                    " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('big_DB');
              ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
 
              $connection = ConnectionManager::get('default');
@@ -536,6 +539,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                    echo "<pre>";
                    print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
                    echo "</pre>";
+                   $sum_predict_lot_num = "";
 
                  }
 
@@ -631,14 +635,14 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
               }else{
                 ${"seikeiki_code".$j.$n} = "";
               }
-              $connection = ConnectionManager::get('DB_ikou_test');
+              $connection = ConnectionManager::get('big_DB');
               $table = TableRegistry::get('shotdata_sensors');
               $table->setConnection($connection);
 
               //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
               $sql = "SELECT lot_num FROM shotdata_sensors".
                     " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
-              $connection = ConnectionManager::get('DB_ikou_test');
+              $connection = ConnectionManager::get('big_DB');
               ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
 
               $connection = ConnectionManager::get('default');
@@ -670,6 +674,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                     echo "<pre>";
                     print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
                     echo "</pre>";
+                    $sum_predict_lot_num = "";
 
                   }
 
@@ -765,14 +770,14 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                }else{
                  ${"seikeiki_code".$j.$n} = "";
                }
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('big_DB');
                $table = TableRegistry::get('shotdata_sensors');
                $table->setConnection($connection);
 
                //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
                $sql = "SELECT lot_num FROM shotdata_sensors".
                      " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('big_DB');
                ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
 
                $connection = ConnectionManager::get('default');
@@ -804,6 +809,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                      echo "<pre>";
                      print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
                      echo "</pre>";
+                     $sum_predict_lot_num = "";
 
                    }
 
@@ -899,14 +905,14 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                }else{
                  ${"seikeiki_code".$j.$n} = "";
                }
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('big_DB');
                $table = TableRegistry::get('shotdata_sensors');
                $table->setConnection($connection);
 
                //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
                $sql = "SELECT lot_num FROM shotdata_sensors".
                      " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('big_DB');
                ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
 
                $connection = ConnectionManager::get('default');
@@ -938,6 +944,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                      echo "<pre>";
                      print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
                      echo "</pre>";
+                     $sum_predict_lot_num = "";
 
                    }
 
@@ -1033,14 +1040,14 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
              }else{
                ${"seikeiki_code".$j.$n} = "";
              }
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('big_DB');
              $table = TableRegistry::get('shotdata_sensors');
              $table->setConnection($connection);
 
              //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
              $sql = "SELECT lot_num FROM shotdata_sensors".
                    " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('big_DB');
              ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
 
              $connection = ConnectionManager::get('default');
@@ -1072,6 +1079,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                    echo "<pre>";
                    print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
                    echo "</pre>";
+                   $sum_predict_lot_num = "";
 
                  }
 
@@ -1171,14 +1179,14 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
               }else{
                 ${"seikeiki_code".$j.$n} = "";
               }
-              $connection = ConnectionManager::get('DB_ikou_test');
+              $connection = ConnectionManager::get('big_DB');
               $table = TableRegistry::get('shotdata_sensors');
               $table->setConnection($connection);
 
               //first_lot_num,last_lot_num,sum_predict_lot_numを取り出す
               $sql = "SELECT lot_num FROM shotdata_sensors".
                     " where datetime >= '".${"starting_tm".$j.$n}."' and datetime <= '".${"finishing_tm".$j.$n}."' and seikeiki = ".$_POST["seikeiki{$j}{$n}"]."  and product_code = '".$_POST["product_code{$j}{$n}"]."' order by datetime asc";
-              $connection = ConnectionManager::get('DB_ikou_test');
+              $connection = ConnectionManager::get('big_DB');
               ${"shotdata_sensors".$j.$n} = $connection->execute($sql)->fetchAll('assoc');
 
               $connection = ConnectionManager::get('default');
@@ -1210,6 +1218,7 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                     echo "<pre>";
                     print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
                     echo "</pre>";
+                    $sum_predict_lot_num = "";
 
                   }
 

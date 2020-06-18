@@ -45,19 +45,19 @@
             </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <?php for($i=0; $i<$countkadouSeikei; $i++): ?>
+          <?php foreach ($KadouSeikeis as $KadouSeikeis): ?>
           <tr style="border-bottom: solid;border-width: 1px">
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["pro_num"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["seikeiki"]." 号機") ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["starting_tm"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["finishing_tm"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["cycle_shot"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["amount_shot"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="red"><?= h($kadouSeikei[$i]["accomp_rate"] * 100) ?></font><font color="blue"><?= h(" ％") ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["first_lot_num"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["last_lot_num"]) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->product_code) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->seikeiki." 号機") ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->starting_tm->format('Y-m-d H:i:s')) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->finishing_tm->format('Y-m-d H:i:s')) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->cycle_shot) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->amount_shot) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="red"><?= h($KadouSeikeis->accomp_rate * 100) ?></font><font color="blue"><?= h(" ％") ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->first_lot_num) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->last_lot_num) ?></font></td>
           </tr>
-        <?php endfor;?>
+          <?php endforeach; ?>
         </tbody>
     </table>
 <br><br>

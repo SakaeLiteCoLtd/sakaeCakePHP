@@ -57,7 +57,7 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
 ?>
 <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr bgcolor="#E6FFFF" >
-  <td align="right" rowspan="2" width="30" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'confirm', 'value'=>"1")); ?></div></td>
+  <td align="right" rowspan="2" width="30" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->button(__('確認'), array('name' => 'confirm', 'value'=>"1")); ?></div></td>
 </tr>
 </table>
 

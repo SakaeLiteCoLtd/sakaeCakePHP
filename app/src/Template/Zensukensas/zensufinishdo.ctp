@@ -29,3 +29,9 @@
  <br>
  <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
  <br><br>
+ 
+ <?php
+ echo "<pre>";
+ print_r($data);
+ echo "</pre>";
+ ?>

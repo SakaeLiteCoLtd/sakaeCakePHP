@@ -518,7 +518,7 @@ class ZensukensasController extends AppController
         );
 /*
         echo "<pre>";
-        print_r($_SESSION['result_zensu_head_id']);
+        print_r($_SESSION);
         echo "</pre>";
 */
      }
@@ -527,9 +527,10 @@ class ZensukensasController extends AppController
      {
        $session = $this->request->getSession();
        $data = $session->read();
+       $this->set('data',$data);
 /*
        echo "<pre>";
-       print_r($_SESSION);
+       print_r($_SESSION['zensufooder']);
        echo "</pre>";
 */
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();

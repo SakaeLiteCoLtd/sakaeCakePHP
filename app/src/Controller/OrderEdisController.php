@@ -1536,7 +1536,7 @@ echo "</pre>";
         }
     }
 
-    public function henkoupanabunnnoudo()//分納
+    public function henkoupanabunnnoudo()//パナ分納
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
@@ -1647,14 +1647,6 @@ echo "</pre>";
 
               $arrFp = array();//空の配列を作る
               $arrFp = $arrOrderEdisnew;
-
-              //外注仮登録クラス
-              $htmlgaityukaritouroku = new htmlEDItouroku();
-              $data = $htmlgaityukaritouroku->htmlgaityukaritouroku($arrFp);
-
-              //外注登録クラス（紐づけ、kari_orderの更新も）
-              $htmlgaityutouroku = new htmlEDItouroku();
-              $data = $htmlgaityutouroku->htmlgaityutouroku();
 
               //旧DB更新
               $connection = ConnectionManager::get('DB_ikou_test');
@@ -2156,15 +2148,7 @@ echo "</pre>";
 
               $arrFp = array();//空の配列を作る
               $arrFp = $arrOrderEdisnew;
-/*
-              //外注仮登録クラス
-              $htmlgaityukaritouroku = new htmlEDItouroku();
-              $data = $htmlgaityukaritouroku->htmlgaityukaritouroku($arrFp);
 
-              //外注登録クラス（紐づけ、kari_orderの更新も）
-              $htmlgaityutouroku = new htmlEDItouroku();
-              $data = $htmlgaityutouroku->htmlgaityutouroku();
-*/
               //旧DB更新
               $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
@@ -2849,16 +2833,6 @@ echo "</pre>";
 
               $arrFp = array();//空の配列を作る
               $arrFp = $arrOrderEdisnew;
-
-                               //外注仮登録クラス
-                               $htmlgaityukaritouroku = new htmlEDItouroku();
-                               $data = $htmlgaityukaritouroku->htmlgaityukaritouroku($arrFp);
-
-                               //外注登録クラス（紐づけ、kari_orderの更新も）
-                               $htmlgaityutouroku = new htmlEDItouroku();
-                               $data = $htmlgaityutouroku->htmlgaityutouroku();
-
-
 
               //旧DB更新
               $connection = ConnectionManager::get('DB_ikou_test');

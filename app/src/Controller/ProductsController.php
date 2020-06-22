@@ -29,6 +29,7 @@ class ProductsController extends AppController
 			$this->Customers = TableRegistry::get('customers');//customersテーブルを使う
 			$this->Materials = TableRegistry::get('materials');//materialsテーブルを使う
 			$this->Users = TableRegistry::get('users');//staffsテーブルを使う
+			$this->Konpous = TableRegistry::get('konpous');
     }
 
     /**

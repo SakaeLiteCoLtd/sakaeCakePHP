@@ -223,7 +223,12 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
      for($i=1; $i<=${"n".$j}; $i++){
        ${"starting_tm".$j.$i} = substr(${"starting_tm".$j.$i}, 0, 10)." ".substr(${"starting_tm".$j.$i}, 11, 5);
        ${"finishing_tm".$j.$i} = substr(${"finishing_tm".$j.$i}, 0, 10)." ".substr(${"finishing_tm".$j.$i}, 11, 5);
-       $m = $m + 1;
+
+       if(isset($m)){
+         $m = $m + 1;
+       }else{
+         $m = 1;
+       }
 
        //ビッグDB参照
        $connection = ConnectionManager::get('big_DB');

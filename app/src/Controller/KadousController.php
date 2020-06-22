@@ -629,7 +629,7 @@ class KadousController extends AppController
               break;
             }
           }
-          $mes = "※登録されました";
+          $mes = "※登録されました（/home/centosuser/kadouseikei_csvにCSVファイルが出力されました）";
           $this->set('mes',$mes);
 
           $connection->commit();// コミット5
@@ -654,7 +654,7 @@ class KadousController extends AppController
           'cycle_shot' => $_SESSION['kadouseikei'][$k]["cycle_shot"], 'amount_shot' => $_SESSION['kadouseikei'][$k]["amount_shot"], 'accomp_rate' => $_SESSION['kadouseikei'][$k]["accomp_rate"]];
     }
 
-      $fp = fopen('/home/centosuser/kadouseikei_csv/kadou_test.csv', 'w');
+      $fp = fopen('/home/centosuser/kadouseikei_csv/kadouseikei.csv', 'w');
     //  $fp = fopen('kadouseikei_csv/kadou_test.csv', 'w');
         foreach ($arrkadouseikei_csv as $line) {
           $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -699,8 +699,8 @@ class KadousController extends AppController
 
 //   $fp = fopen('192.168.1.220/backup/testcsv/kadou_test0622.csv', 'w');
 //   $fp = fopen('\\C:\Users\Public\Downloads\kadouSeikei\kadou_test0622.csv', 'w');//エラーは出ないがcsv出力されない
-   $fp = fopen('.\\192.168.1.220\backup\testcsv\kadou_test0622.csv', 'w');//エラーは出ないがcsv出力されない
-//    $fp = fopen('/home/centosuser/kadouseikei_csv/kadou_test0622.csv', 'w');//OK（centosuser）
+//   $fp = fopen('.\\192.168.1.220\backup\testcsv\kadou_test0622.csv', 'w');//エラーは出ないがcsv出力されない
+    $fp = fopen('/home/centosuser/kadouseikei_csv/kadou_test0622.csv', 'w');//OK（centosuser）
 //      $fp = fopen('/hirokawa/kadou_test0622.csv', 'w');//OK
 //     $fp = fopen('kadouseikei_csv/kadou_test0622.csv', 'w');//OK(local)
        foreach ($arrkadouseikei_csv as $line) {
@@ -710,7 +710,6 @@ class KadousController extends AppController
        fclose($fp);
 
  }
-
 
   public function syuuseiday()//ロット検索
   {
@@ -743,12 +742,13 @@ class KadousController extends AppController
       if(empty($data['seikeiki'])){//seikeikiの入力がないとき　product_code×　seikeiki×　date〇
         $seikeiki = "no";//日にちだけで絞り込み
         $KadouSeikeis = $this->KadouSeikeis->find()
-        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);//品番順に並び変える
+  //      ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);//品番順に並び変える
+        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin])->order(["product_code"=>"ASC"]);//品番順に並び変える
         $this->set('KadouSeikeis',$KadouSeikeis);
 
       }else{//seikeikiの入力があるとき　product_code×　seikeiki〇　date〇//seikeikiと日にちで絞り込み
         $KadouSeikeis = $this->KadouSeikeis->find()
-        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
+        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki])->order(["product_code"=>"ASC"]);
         $this->set('KadouSeikeis',$KadouSeikeis);
 
       }
@@ -756,12 +756,12 @@ class KadousController extends AppController
       if(empty($data['seikeiki'])){//seikeikiの入力がないとき　product_code〇　seikeiki×　date〇
         $seikeiki = "no";//プロダクトコードと日にちで絞り込み
         $KadouSeikeis = $this->KadouSeikeis->find()
-        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
+        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'product_code' => $product_code])->order(["product_code"=>"ASC"]);
         $this->set('KadouSeikeis',$KadouSeikeis);
 
       }else{//seikeikiの入力があるとき　product_code〇　seikeiki〇　date〇//プロダクトコードとseikeikiと日にちで絞り込み
         $KadouSeikeis = $this->KadouSeikeis->find()
-        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["product_code"=>"ASC"]);
+        ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'product_code' => $product_code])->order(["product_code"=>"ASC"]);
         $this->set('KadouSeikeis',$KadouSeikeis);
 
       }
@@ -802,7 +802,7 @@ class KadousController extends AppController
       $table = TableRegistry::get('kadou_seikei');
       $table->setConnection($connection);
 
-      $num_0 = 0;
+//      $num_0 = 0;
 
       if(empty($data['product_code'])){//product_codeの入力がないとき
         $product_code = "no";
@@ -814,7 +814,8 @@ class KadousController extends AppController
       //    $this->set('KadouSeikeis',$KadouSeikeis);
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
-                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and present_kensahyou = ".$num_0." order by pro_num asc";
+    //      " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and present_kensahyou = ".$num_0." order by pro_num asc";
+          " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' order by pro_num asc";
           $connection = ConnectionManager::get('DB_ikou_test');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
@@ -825,7 +826,7 @@ class KadousController extends AppController
       //    $this->set('KadouSeikeis',$KadouSeikeis);
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
-                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and present_kensahyou = ".$num_0." and seikeiki = '".$seikeiki."' order by pro_num asc";
+                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and seikeiki = '".$seikeiki."' order by pro_num asc";
           $connection = ConnectionManager::get('DB_ikou_test');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
@@ -839,7 +840,7 @@ class KadousController extends AppController
     //      $this->set('KadouSeikeis',$KadouSeikeis);
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
-                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and present_kensahyou = ".$num_0." and pro_num = '".$product_code."' order by pro_num asc";
+                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and pro_num = '".$product_code."' order by pro_num asc";
           $connection = ConnectionManager::get('DB_ikou_test');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
@@ -851,7 +852,7 @@ class KadousController extends AppController
     //      $this->set('KadouSeikeis',$KadouSeikeis);
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
-                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and present_kensahyou = ".$num_0." and pro_num = '".$product_code."' and seikeiki = '".$seikeiki."' order by pro_num asc";
+                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and pro_num = '".$product_code."' and seikeiki = '".$seikeiki."' order by pro_num asc";
           $connection = ConnectionManager::get('DB_ikou_test');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 

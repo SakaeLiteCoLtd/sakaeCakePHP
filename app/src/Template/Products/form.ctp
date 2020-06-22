@@ -34,6 +34,9 @@
         <legend align="center"><strong style="font-size: 15pt; color:blue"><?= __("製品登録") ?></strong></legend>
     <?= $this->Form->create($product, ['url' => ['action' => 'confirm']]) ?>
     <fieldset>
+
+      <?php
+/*
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
             <th scope="row"><?= __('品番') ?></th>
@@ -80,12 +83,47 @@
 		<td><?= $this->Form->input("status", array('type' => 'value', 'label'=>false)); ?></td>
 	</tr>
 </table>
+*/
+?>
+
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品番</strong></td>
+    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品名</strong></td>
+	</tr>
+  <tr>
+    <td bgcolor="#FFFFCC"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
+	</tr>
+</table>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">グレード：色番号</strong></td>
+    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">原料の種類</strong></td>
+	</tr>
+  <tr>
+    <td bgcolor="#FFFFCC"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
+	</tr>
+</table>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">単重</strong></td>
+    <td width="180" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">単価（円/kg）</strong></td>
+	</tr>
+  <tr>
+    <td bgcolor="#FFFFCC"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="130" bgcolor="#FFFFCC" style="border-right-style: none"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="62" bgcolor="#FFFFCC" style="border-left-style: none">円/kg</td>
+	</tr>
+</table>
 
         <?php
             echo $this->Form->hidden('delete_flag');
             echo $this->Form->hidden('created_staff', ['empty' => true]);
             echo $this->Form->hidden('updated_staff');
         ?>
+
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>

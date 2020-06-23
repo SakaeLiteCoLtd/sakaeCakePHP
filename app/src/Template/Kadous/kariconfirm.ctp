@@ -1202,11 +1202,11 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
        );
 
      }
-/*
+
      echo "<pre>";
      print_r($_SESSION["karikadouseikei"]);
      echo "</pre>";
-*/
+
     ?>
 
 <?php   /*ここまで9号機*/    ?>

@@ -96,7 +96,8 @@ class ProductsTable extends Table
             ->notEmpty('product_name');
 
         $validator
-            ->integer('multiple_cs')
+            ->maxLength('multiple_cs', 255)
+//            ->integer('multiple_cs')
 //            ->requirePresence('multiple_cs', 'create')
 //            ->notEmpty('multiple_cs');
             ->allowEmpty('multiple_cs');

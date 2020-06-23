@@ -13,6 +13,8 @@
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
+
+          $mes = "　修正する行の品番を選択してください。";
         ?>
 
         <?php
@@ -28,7 +30,11 @@
          </table>
          <hr size="5" style="margin: 0.5rem">
 <?=$this->Form->create($KadouSeikeis, ['url' => ['action' => 'syuuseiform']]) ?>
-<br><br>
+<br>
+
+<div align="left"><font color="red" size="3"><?= __($mes) ?></font></div>
+
+<br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
         <thead>
@@ -55,7 +61,7 @@
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->finishing_tm->format('Y-m-d H:i:s')) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->cycle_shot) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->amount_shot) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="red"><?= h($KadouSeikeis->accomp_rate * 100) ?></font><font color="blue"><?= h(" ％") ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="red"><?= h($KadouSeikeis->accomp_rate) ?></font><font color="blue"><?= h(" ％") ?></font></td>
           </tr>
           <?php endforeach; ?>
         </tbody>

@@ -11,22 +11,7 @@
 <?= $this->Form->create($product, ['url' => ['action' => 'preadd']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
-/*
-            echo $this->Form->hidden('product_code' ,['value'=>$_POST['product_code'] ]) ;
-            echo $this->Form->hidden('product_name' ,['value'=>$_POST['product_name'] ]) ;
-            echo $this->Form->hidden('customer_id' ,['value'=>$_POST['customer_id'] ]) ;
-            echo $this->Form->hidden('multiple_cs' ,['value'=>$_POST['multiple_cs'] ]) ;
-            echo $this->Form->hidden('material_id' ,['value'=>$_POST['material_id'] ]) ;
-            echo $this->Form->hidden('weight' ,['value'=>$_POST['weight'] ]) ;
-            echo $this->Form->hidden('torisu' ,['value'=>$_POST['torisu'] ]) ;
-            echo $this->Form->hidden('cycle' ,['value'=>$_POST['cycle'] ]) ;
-            echo $this->Form->hidden('primary_p' ,['value'=>$_POST['primary_p'] ]) ;
-            echo $this->Form->hidden('gaityu' ,['value'=>$_POST['gaityu'] ]) ;
-            echo $this->Form->hidden('status' ,['value'=>$_POST['status'] ]) ;
-            echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
-            echo $this->Form->hidden('created_staff' ,['value'=>$_POST['created_staff'] ]) ;
-            echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
-*/
+
             $session = $this->request->getSession();
             $session->write('productdata.product_code', $_POST['product_code']);
             $session->write('productdata.product_name', $_POST['product_name']);
@@ -34,14 +19,22 @@
             $session->write('productdata.multiple_cs', $_POST['multiple_cs']);
             $session->write('productdata.material_id', $_POST['material_id']);
             $session->write('productdata.weight', $_POST['weight']);
-            $session->write('productdata.torisu', $_POST['torisu']);
-            $session->write('productdata.cycle', $_POST['cycle']);
-            $session->write('productdata.primary_p', $_POST['primary_p']);
-            $session->write('productdata.gaityu', $_POST['gaityu']);
-            $session->write('productdata.status', $_POST['status']);
-            $session->write('productdata.delete_flag', $_POST['delete_flag']);
+    //        $session->write('productdata.torisu', $_POST['torisu']);
+    //        $session->write('productdata.cycle', $_POST['cycle']);
+            $session->write('productdata.primary_p', 0);
+            $session->write('productdata.gaityu', 0);
+            $session->write('productdata.status', 0);
+            $session->write('productdata.delete_flag', 0);
             $session->write('productdata.created_staff', $_POST['created_staff']);
-            $session->write('productdata.updated_staff', null);
+    //        $session->write('productdata.updated_staff', null);
+
+            $session->write('pricedata.product_code', $_POST['product_code']);
+            $session->write('pricedata.price', $_POST['price']);
+            $session->write('pricedata.date_koushin', date('Y-m-d'));
+            $session->write('pricedata.tourokubi', date('Y-m-d H:i:s'));
+            $session->write('pricedata.delete_flag', 0);
+            $session->write('pricedata.created_staff', $_POST['created_staff']);
+            $session->write('pricedata.created_at', date('Y-m-d H:i:s'));
         ?>
         <hr size="5">
         <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">

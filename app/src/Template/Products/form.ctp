@@ -88,33 +88,41 @@
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品番</strong></td>
-    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品名</strong></td>
+    <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品番</strong></td>
+    <td width="282" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品名</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
-	</tr>
-</table>
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-  <tr>
-    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">グレード：色番号</strong></td>
-    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">原料の種類</strong></td>
-	</tr>
-  <tr>
-    <td bgcolor="#FFFFCC"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->control('product_name', array('type'=>'text', 'label'=>false)) ?></td>
 	</tr>
 </table>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="180" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">単重</strong></td>
-    <td width="180" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">単価（円/kg）</strong></td>
+    <td width="260" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">グレード：色番号</strong></td>
+    <td width="255" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">原料の種類</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
-    <td width="130" bgcolor="#FFFFCC" style="border-right-style: none"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input("material_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrMaterial, 'label'=>false]) ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input("multiple_cs", ["type"=>"select","empty"=>"選択してください", "options"=>$arrMultipleCs, 'label'=>false]) ?></td>
+	</tr>
+</table>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="250" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">単重</strong></td>
+    <td width="250" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">単価（円/kg）</strong></td>
+	</tr>
+  <tr>
+    <td  width="280" bgcolor="#FFFFCC"><?= $this->Form->control('weight', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="220" bgcolor="#FFFFCC" style="border-right-style: none"><?= $this->Form->control('price', array('type'=>'text', 'label'=>false)) ?></td>
     <td width="62" bgcolor="#FFFFCC" style="border-left-style: none">円/kg</td>
+	</tr>
+</table>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="560" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">顧客</strong></td>
+	</tr>
+  <tr>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input("customer_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrCustomer, 'label'=>false]) ?></td>
 	</tr>
 </table>
 

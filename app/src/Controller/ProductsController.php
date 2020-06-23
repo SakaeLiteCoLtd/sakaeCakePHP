@@ -30,6 +30,7 @@ class ProductsController extends AppController
 			$this->Materials = TableRegistry::get('materials');//materialsテーブルを使う
 			$this->Users = TableRegistry::get('users');//staffsテーブルを使う
 			$this->Konpous = TableRegistry::get('konpous');
+			$this->AccountPriceProducts = TableRegistry::get('accountPriceProducts');
     }
 
     /**
@@ -63,6 +64,8 @@ class ProductsController extends AppController
 */
     public function form()
     {
+			$this->request->session()->destroy(); // セッションの破棄
+
 			$product = $this->Products->newEntity();//newentityに$productという名前を付ける
 			$this->set('product',$product);//1行上の$productをctpで使えるようにセット
 
@@ -80,12 +83,25 @@ class ProductsController extends AppController
 			}
 			$this->set('arrMaterial',$arrMaterial);//4行上$arrMaterialをctpで使えるようにセット
 
+			$arrMultipleCs = [
+				'PP' => 'PP',
+				'POM' => 'POM',
+				'PS' => 'PS',
+				'ABS' => 'ABS',
+				'PBT' => 'PBT',
+				'PA' => 'PA',
+				'PC' => 'PC',
+				'PET' => 'PET'
+							];
+			$this->set('arrMultipleCs',$arrMultipleCs);
+
 			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 			$product['created_staff'] = $staff_id;//$productのcreated_staffを$staff_idにする
     }
 
      public function confirm()
     {
+			session_start();
 			$product = $this->Products->newEntity();//newentityに$productという名前を付ける
 			$this->set('product',$product);//1行上の$productをctpで使えるようにセット
 
@@ -100,6 +116,10 @@ class ProductsController extends AppController
 			$MaterialData = $this->Materials->find()->where(['id' => $material_id])->toArray();//'id' => $material_idとなるデータをMaterialsテーブルから配列で取得
 			$Material = $MaterialData[0]->grade.":".$MaterialData[0]->color;//配列の0番目（0番目しかない）のnameに$Materialと名前を付ける
 			$this->set('Material',$Material);//登録者の表示のため1行上の$Materialをctpで使えるようにセット
+
+
+
+
     }
 
 		public function preadd()
@@ -144,6 +164,9 @@ class ProductsController extends AppController
     {
 			$product = $this->Products->newEntity();//newentityに$productという名前を付ける
 			$this->set('product',$product);//1行上の$productをctpで使えるようにセット
+			$AccountPriceProducts = $this->AccountPriceProducts->newEntity();//newentityに$productという名前を付ける
+			$this->set('AccountPriceProducts',$AccountPriceProducts);//1行上の$productをctpで使えるようにセット
+
 
 		//	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
@@ -152,6 +175,7 @@ class ProductsController extends AppController
 
 			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 			$data['productdata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+			$data['pricedata']['created_staff'] = $staff_id;
 
 			$customer_id = $data['productdata']['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
 			$CustomerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $customer_idとなるデータをStaffsテーブルから配列で取得
@@ -171,6 +195,9 @@ class ProductsController extends AppController
 			echo "<pre>";
 	    print_r($data['productdata']);
 	    echo "</pre>";
+			echo "<pre>";
+	    print_r($data['pricedata']);
+	    echo "</pre>";
 
 			if ($this->request->is('get')) {//postの場合
 				$product = $this->Products->patchEntity($product, $data['productdata']);//$productデータ（空の行）を$this->request->getData()に更新する
@@ -179,6 +206,48 @@ class ProductsController extends AppController
 				$connection->begin();//トランザクション3
 				try {//トランザクション4
 					if ($this->Products->save($product)) {
+
+						//旧DBに製品登録
+						$connection = ConnectionManager::get('DB_ikou_test');
+						$table = TableRegistry::get('product');
+						$table->setConnection($connection);
+
+							$connection->insert('product', [
+									'product_id' => $data['productdata']["product_code"],
+									'product_name' => $data['productdata']["product_name"],
+									'basic_weight' => $data['productdata']["weight"],
+									'price' => $data['pricedata']["price"],
+									'cs_id' => $data['productdata']["customer_id"],
+									'gaityu' => 0,
+									'genjyou' => 0
+							]);
+
+						$connection = ConnectionManager::get('default');//新DBに戻る
+						$table->setConnection($connection);
+
+
+						//単価登録
+						$AccountPriceProduct = $this->AccountPriceProducts->patchEntity($AccountPriceProducts, $data['pricedata']);
+						$this->AccountPriceProducts->save($AccountPriceProduct);
+
+						//旧DBに単価登録
+						$connection = ConnectionManager::get('DB_ikou_test');
+						$table = TableRegistry::get('account_price_product');
+						$table->setConnection($connection);
+
+							$connection->insert('account_price_product', [
+								'product_id' => $data['pricedata']["product_code"],
+								'price' => $data['pricedata']["price"],
+								'date_koushin' => $data['pricedata']["date_koushin"],
+								'emp_id' => $data['pricedata']["created_staff"],
+								'tourokubi' => $data['pricedata']["tourokubi"],
+								'delete_flag' => 0,
+								'created_at' => $data['pricedata']["created_at"]
+							]);
+
+						$connection = ConnectionManager::get('default');//新DBに戻る
+						$table->setConnection($connection);
+
 						$mes = "※下記のように登録されました";
 						$this->set('mes',$mes);
 						$connection->commit();// コミット5

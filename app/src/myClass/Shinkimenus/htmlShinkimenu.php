@@ -20,46 +20,15 @@ class htmlShinkimenu extends AppController
 	public function Shinkimenus()
 	{
         $html =
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/staffs/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/shinki_staff.gif' width=105 height=36>\n".
-                  "</a></td>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/users/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/shinki_user.gif' width=105 height=36>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/TourokuCustomer.gif' width=105 height=36>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/delivers/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/teikyougif.gif' width=105 height=36>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/customers-handy/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/kanikakyaku.gif' width=105 height=36>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/suppliers/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/touroku_supplier.gif' width=105 height=36>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/supplier-sections/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/gaityuukubungif.gif' width=105 height=36>\n".
-                  "</a></tr>\n".
-                  "<tr style='background-color: #E6FFFF'>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/material-types/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/genryoutaipu.gif' width=105 height=36>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/materials/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/touroku_genryou.gif' width=105 height=36>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/price-materials/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/genryoukakaku.gif' width=105 height=36>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/products/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/seihinntouroku.gif' width=105 height=36>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/price-products/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/seihinnkakaku.gif' width=105 height=36>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/roles/index'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/kenngenntouroku.gif' width=105 height=36>\n".
-                  "</a>\n";
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/products/form'>\n".
+        "<img src='/img/ShinkiTourokuMenu/seihinntouroku.gif' width=105 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/products/konpouyobidasiform'>\n".
+        "<img src='/img/ShinkiTourokuMenu/konpou_irisu.gif' width=105 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/products/priceyobidasiform'>\n".
+        "<img src='/img/ShinkiTourokuMenu/shinki_tanka.gif' width=105 height=36>\n".
+        "</a>\n";
 
 		return $html;
 		$this->html = $html;

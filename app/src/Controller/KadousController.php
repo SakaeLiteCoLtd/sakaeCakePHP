@@ -463,6 +463,13 @@ class KadousController extends AppController
 		{
       $KadouSeikei = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikei',$KadouSeikei);
+/*
+      $session = $this->request->getSession();
+      $data = $session->read();
+      echo "<pre>";
+      print_r($_SESSION['kadouseikei']);
+      echo "</pre>";
+*/
 		}
 
 		public function login()
@@ -572,16 +579,6 @@ class KadousController extends AppController
 
               }else{
 
-/*//kadou_seikeikisは今は使っていない？
-                $connection->insert('kadou_seikeikis', [
-                  'seikeiki_id' => $_SESSION['kadouseikei'][$k]["seikeiki"],
-                  'product_code' => $_SESSION['kadouseikei'][$k]["product_code"],
-                  'starting_tm' => $_SESSION['kadouseikei'][$k]["starting_tm"],
-                  'finishing_tm' => $_SESSION['kadouseikei'][$k]["finishing_tm"],
-                  'created_at' => date("Y-m-d H:i:s"),
-                  'updated_at' => date("Y-m-d H:i:s")
-                ]);
-*/
                 $connection->insert('ruby_kadou_seikeikis', [
                   'seikeiki' => $_SESSION['kadouseikei'][$k]["seikeiki"],
                   'product_code' => $_SESSION['kadouseikei'][$k]["product_code"],
@@ -599,11 +596,7 @@ class KadousController extends AppController
 
           for($n=1; $n<=100; $n++){
             if(isset($_SESSION['kadouseikei'][$n])){
-/*
-              echo "<pre>";
-              print_r($_SESSION['kadouseikeiId']);
-              echo "</pre>";
-*/
+
               $KariKadouSeikeiData = $this->KariKadouSeikeis->find()->where(['id' => $_SESSION['kadouseikeiId'][$n]])->toArray();//'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
 
               $this->KariKadouSeikeis->updateAll(
@@ -655,17 +648,18 @@ class KadousController extends AppController
     for($k=1; $k<=count($_SESSION['kadouseikei']); $k++){
       ${"starting_tm".$k} = $_SESSION['kadouseikei'][$k]["starting_tm"].":00";
       ${"finishing_tm".$k} = $_SESSION['kadouseikei'][$k]["finishing_tm"].":00";
+      $day = mb_substr($_SESSION['kadouseikei'][1]["starting_tm"], 0, 10);
 
       $arrkadouseikei_csv[] = ['product_code' => $_SESSION['kadouseikei'][$k]["product_code"], 'seikeiki' => $_SESSION['kadouseikei'][$k]["seikeiki"],
       'seikeiki_code' => $_SESSION['kadouseikei'][$k]["seikeiki_code"], 'starting_tm' => ${"starting_tm".$k}, 'finishing_tm' => ${"finishing_tm".$k},
       'cycle_shot' => $_SESSION['kadouseikei'][$k]["cycle_shot"], 'amount_shot' => $_SESSION['kadouseikei'][$k]["amount_shot"], 'accomp_rate' => sprintf('%.2f',$_SESSION['kadouseikei'][$k]["accomp_rate"])];
     }
 
-    $today = date('Y-m-d');
-    $file_name = "kadou_seikeis".$today.".csv";
+    $day = date('Y-n-j',strtotime($day));
+    $file_name = "kadou_seikeis".$day.".csv";
 
-    $fp = fopen('/home/centosuser/kadouseikei_csv/'.$file_name, 'w');
-  //  $fp = fopen('kadouseikei_csv/'.$file_name, 'w');
+  //  $fp = fopen('/home/centosuser/kadouseikei_csv/'.$file_name, 'w');
+    $fp = fopen('kadouseikei_csv/'.$file_name, 'w');
       foreach ($arrkadouseikei_csv as $line) {
         $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
         fputcsv($fp, $line);
@@ -704,10 +698,9 @@ class KadousController extends AppController
     'cycle_shot' => "cycle_shot", 'amount_shot' => "amount_shot", 'accomp_rate' => "accomp_rate"];
 
    for($k=1; $k<=count($_SESSION['kadouseikei']); $k++){
-     ${"starting_tm_day".$k} = mb_substr($_SESSION['kadouseikei'][$k]["starting_tm"], 0, 10);
-     ${"starting_tm_time".$k} = mb_substr($_SESSION['kadouseikei'][$k]["starting_tm"], 12, 6);
-     ${"starting_tm".$k} = ${"starting_tm_day".$k}." ".${"starting_tm_time".$k}.":00";
+     ${"starting_tm".$k} = $_SESSION['kadouseikei'][$k]["starting_tm"].":00";
      ${"finishing_tm".$k} = $_SESSION['kadouseikei'][$k]["finishing_tm"].":00";
+     $day = mb_substr($_SESSION['kadouseikei'][1]["starting_tm"], 0, 10);
 
      $arrkadouseikei_csv[] = ['product_code' => $_SESSION['kadouseikei'][$k]["product_code"], 'seikeiki' => $_SESSION['kadouseikei'][$k]["seikeiki"],
      'seikeiki_code' => $_SESSION['kadouseikei'][$k]["seikeiki_code"], 'starting_tm' => "${"starting_tm".$k}", 'finishing_tm' => ${"finishing_tm".$k},
@@ -718,8 +711,25 @@ class KadousController extends AppController
    print_r($arrkadouseikei_csv);
    echo "</pre>";
 
-   $today = date('Y-m-d');
-   $file_name_moto = "kadou_seikeis.csv";
+   $day = date('Y-n-j',strtotime($day));
+
+   echo "<pre>";
+   print_r($day);
+   echo "</pre>";
+
+   $file_name = "kadou_seikeis".$day.".csv";
+
+  // $fp = fopen('/home/centosuser/kadouseikei_csv/'.$file_name, 'w');
+   $fp = fopen('kadouseikei_csv/'.$file_name, 'w');
+     foreach ($arrkadouseikei_csv as $line) {
+       $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+       fputcsv($fp, $line);
+     }
+     fclose($fp);
+
+/*
+   $today = $_SESSION['kadouseikei'][$k]["seikeiki_code"];
+//   $file_name_moto = "kadou_seikeis.csv";
    $file_name = "kadou_seikeis".$today.".csv";
 
 //    $fp = fopen('/home/centosuser/kadouseikei_csv/kadou_test0622.csv', 'w');//OK（centosuser）
@@ -753,7 +763,7 @@ class KadousController extends AppController
           fputcsv($fp, $line);
         }
         fclose($fp);
-
+*/
 //スペースで分けて、３つにして、区切り文字をスペースにする
 
  }

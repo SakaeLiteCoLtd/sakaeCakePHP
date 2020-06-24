@@ -3680,4 +3680,59 @@ echo "</pre>";
     }
 
 
+    public function ordertosuppliershenkouday()
+    {
+
+    }
+
+    public function ordertosuppliershenkouichiran()
+    {
+
+    }
+
+    public function ordertosuppliershenkouform()
+    {
+
+    }
+
+    public function ordertosuppliershenkoupreadd()
+    {
+
+    }
+
+    public function ordertosuppliershenkoulogin()
+    {
+
+    }
+
+    public function ordertosuppliershenkoudo()
+    {
+
+    }
+
+    public function ordertosuppliersyobiprelogin()
+    {
+
+    }
+
+    public function ordertosuppliersyobilogin()
+    {
+
+    }
+
+    public function ordertosuppliersyobiform()
+    {
+
+    }
+
+    public function ordertosuppliersyobiconfirm()
+    {
+
+    }
+
+    public function ordertosuppliersyobido()
+    {
+
+    }
+
 }

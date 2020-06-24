@@ -40,6 +40,7 @@ class ZensukensasController extends AppController
      {
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
+       $this->request->session()->destroy();// セッションの破棄
      }
 
      public function zensustafflogin()
@@ -258,6 +259,7 @@ class ZensukensasController extends AppController
      {
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
+       $this->request->session()->destroy();// セッションの破棄
      }
 
      public function zensuendstafflogin()

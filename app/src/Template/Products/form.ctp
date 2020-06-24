@@ -1,138 +1,118 @@
 <?php
 /**
- * AuthHelper: Authの変数にアクセスできる
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Deliver $product
  */
-?>
+ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置したクラスを使用
+
+ $htmlShinkimenu = new htmlShinkimenu();
+ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
+ ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
         ?>
-        <hr size="5">
+
+        <hr size="5" style="margin: 0.5rem">
         <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-                  <tr style="background-color: #E6FFFF">
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/shinki_staff.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'staffs','action'=>'index')));?></td>
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/shinki_user.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'users','action'=>'index')));?></td>
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/TourokuCustomer.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'customers','action'=>'index')));?></td>
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/teikyougif.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'delivers','action'=>'index')));?></td>
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/kanikakyaku.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'customers-handy','action'=>'index')));?></td>
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku_supplier.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'suppliers','action'=>'index')));?></td>
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/gaityuukubungif.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'supplier-sections','action'=>'index')));?></td>
-                  </tr>
-                  <tr style="background-color: #E6FFFF">
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/genryoutaipu.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'material-types','action'=>'index')));?></td>
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku_genryou.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'materials','action'=>'form')));?></td>
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/genryoukakaku.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'price-materials','action'=>'index')));?></td>
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/seihinntouroku.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'products','action'=>'form')));?></td>
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/seihinnkakaku.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'price-products','action'=>'index')));?></td>
-                    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('ShinkiTourokuMenu/kenngenntouroku.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'roles','action'=>'index')));?></td>
-                  </tr>
+        <?php
+           echo $htmlShinkis;
+        ?>
         </table>
-        <hr size="5">
+        <hr size="5" style="margin: 0.5rem">
         <br>
 
-        <legend align="center"><strong style="font-size: 15pt; color:blue"><?= __("製品登録") ?></strong></legend>
+        <legend align="center"><strong style="font-size: 14pt; color:blue"><?= __("製品登録") ?></strong></legend>
     <?= $this->Form->create($product, ['url' => ['action' => 'confirm']]) ?>
     <fieldset>
 
       <?php
-/*
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('品番') ?></th>
-		<td><?= $this->Form->input("product_code", array('type' => 'value', 'label'=>false)); ?></td>
-	</tr>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('品名') ?></th>
-		<td><?= $this->Form->input("product_name", array('type' => 'value', 'label'=>false)); ?></td>
-	</tr>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('customer_id') ?></th>
-		<td><?= $this->Form->input("customer_id", ["type"=>"select","empty"=>"Please select", "options"=>$arrCustomer, 'label'=>false]); ?></td>
-	</tr>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('multiple_cs') ?></th>
-		<td><?= $this->Form->input("multiple_cs", array('type' => 'value', 'label'=>false)); ?></td>
-	</tr>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('material_id') ?></th>
-		<td><?= $this->Form->input("material_id", ["type"=>"select","empty"=>"Please select", "options"=>$arrMaterial, 'label'=>false]); ?></td>
-	</tr>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('weight') ?></th>
-		<td><?= $this->Form->input("weight", array('type' => 'value', 'label'=>false)); ?></td>
-	</tr>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('torisu') ?></th>
-		<td><?= $this->Form->input("torisu", array('type' => 'value', 'label'=>false)); ?></td>
-	</tr>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('cycle') ?></th>
-		<td><?= $this->Form->input("cycle", array('type' => 'value', 'label'=>false)); ?></td>
-	</tr>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('primary_p') ?></th>
-		<td><?= $this->Form->input("primary_p", array('type' => 'value', 'label'=>false)); ?></td>
-	</tr>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('gaityu') ?></th>
-		<td><?= $this->Form->input("gaityu", array('type' => 'value', 'label'=>false)); ?></td>
-	</tr>
-        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <th scope="row"><?= __('status') ?></th>
-		<td><?= $this->Form->input("status", array('type' => 'value', 'label'=>false)); ?></td>
-	</tr>
-</table>
-*/
-?>
+          echo $this->Form->hidden('delete_flag');
+          echo $this->Form->hidden('created_staff', ['empty' => true]);
+          echo $this->Form->hidden('updated_staff');
+      ?>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品番</strong></td>
-    <td width="282" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">品名</strong></td>
+    <td width="280" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">品番</strong></td>
+    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">品名</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->control('product_name', array('type'=>'text', 'label'=>false)) ?></td>
-	</tr>
-</table>
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-  <tr>
-    <td width="260" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">グレード：色番号</strong></td>
-    <td width="255" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">原料の種類</strong></td>
-	</tr>
-  <tr>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input("material_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrMaterial, 'label'=>false]) ?></td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input("multiple_cs", ["type"=>"select","empty"=>"選択してください", "options"=>$arrMultipleCs, 'label'=>false]) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_name', array('type'=>'text', 'label'=>false)) ?></td>
 	</tr>
 </table>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="250" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">単重</strong></td>
-    <td width="250" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">単価（円/kg）</strong></td>
+    <td width="270" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">グレード：色番号</strong></td>
+    <td width="270" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色調</strong></td>
 	</tr>
   <tr>
-    <td  width="280" bgcolor="#FFFFCC"><?= $this->Form->control('weight', array('type'=>'text', 'label'=>false)) ?></td>
-    <td width="220" bgcolor="#FFFFCC" style="border-right-style: none"><?= $this->Form->control('price', array('type'=>'text', 'label'=>false)) ?></td>
-    <td width="62" bgcolor="#FFFFCC" style="border-left-style: none">円/kg</td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("material_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrMaterial, 'label'=>false]) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("color", ["type"=>"select","empty"=>"選択してください", "options"=>$arrColor, 'label'=>false]) ?></td>
 	</tr>
 </table>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="560" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">顧客</strong></td>
+    <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">原料の種類</strong></td>
+    <td width="280" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">単価（円/kg）</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input("customer_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrCustomer, 'label'=>false]) ?></td>
+    <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("material_kind", ["type"=>"select","empty"=>"選択してください", "options"=>$arrMultipleCs, 'label'=>false]) ?></td>
+    <td width="220" bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><?= $this->Form->control('price', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="62" bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">円/kg</strong></td>
+	</tr>
+</table>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="250" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">単重</strong></td>
+    <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">金型No.</strong></td>
+	</tr>
+  <tr>
+    <td  width="220" bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><?= $this->Form->control('weight', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="62" bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 13pt; color:blue">g</strong></td>
+    <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("kataban", ["type"=>"select","empty"=>"選択してください", "options"=>$arrKanagata, 'label'=>false]) ?></td>
+	</tr>
+</table>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="280" colspan="4" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">SET取り</strong></td>
+    <td width="250" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">金型取数</strong></td>
+	</tr>
+  <tr>
+    <td bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><strong style="font-size: 13pt; color:blue"></strong></td>
+    <td bgcolor="#FFFFCC" style="border-right-style: none;border-left-style: none;padding: 0.2rem"><input type="radio" name="set_tori" value="0"><strong style="font-size: 11pt; color:blue">NO</strong></td>
+    <td bgcolor="#FFFFCC" style="border-left-style: none;border-right-style: none;padding: 0.2rem"><input type="radio" name="set_tori" value="1"><strong style="font-size: 11pt; color:blue">YES</strong></td>
+    <td bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 13pt; color:blue"></strong></td>
+    <td  width="220" bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><?= $this->Form->control('torisu', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="62" bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 13pt; color:blue">ヶ取</strong></td>
+	</tr>
+</table>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="250" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">入数</strong></td>
+    <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">箱No.</strong></td>
+	</tr>
+  <tr>
+    <td  width="220" bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><?= $this->Form->control('irisu', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="62" bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 13pt; color:blue">ケ</strong></td>
+    <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("id_box", ["type"=>"select","empty"=>"選択してください", "options"=>$arrBox, 'label'=>false]) ?></td>
+	</tr>
+</table>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="560" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">顧客</strong></td>
+	</tr>
+  <tr>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("customer_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrCustomer, 'label'=>false]) ?></td>
 	</tr>
 </table>
 
-        <?php
-            echo $this->Form->hidden('delete_flag');
-            echo $this->Form->hidden('created_staff', ['empty' => true]);
-            echo $this->Form->hidden('updated_staff');
-        ?>
 
     </fieldset>
+
+    <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
+    <br>
+
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
       <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')); ?></div></td>

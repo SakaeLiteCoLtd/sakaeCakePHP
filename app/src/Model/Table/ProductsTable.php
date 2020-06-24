@@ -96,17 +96,21 @@ class ProductsTable extends Table
             ->notEmpty('product_name');
 
         $validator
-            ->maxLength('multiple_cs', 255)
+            ->maxLength('material_kind', 255)
 //            ->integer('multiple_cs')
 //            ->requirePresence('multiple_cs', 'create')
 //            ->notEmpty('multiple_cs');
-            ->allowEmpty('multiple_cs');
+            ->allowEmpty('material_kind');
 
         $validator
             ->decimal('weight')
       //      ->maxLength('weight', 255)
             ->requirePresence('weight', 'create')
             ->notEmpty('weight');
+
+            $validator
+                ->maxLength('color', 20)
+                ->allowEmpty('color');
 
         $validator
 //            ->scalar('torisu')

@@ -11,7 +11,7 @@
 
 <br>
     <?= $this->Flash->render() ?>
-    <?= $this->Form->create($product, ['url' => ['action' => 'login']]) ?>
+    <?= $this->Form->create($AccountPriceProducts, ['url' => ['action' => 'pricesyuuseilogin']]) ?>
     <br><br>
     <legend align="center"><strong style="font-size: 11pt; color:blue"><?= __("社員ID登録") ?></strong></legend>
 

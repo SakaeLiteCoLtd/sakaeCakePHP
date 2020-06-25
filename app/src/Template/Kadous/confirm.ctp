@@ -125,19 +125,19 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                 }else{
 
                   echo "<pre>";
-                  print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                  print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません。担当者に報告してください。。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                   echo "</pre>";
-                  $sum_predict_lot_num = "";
+                  $sum_predict_lot_num = 0;
 
                 }
 
             }else{
 
               echo "<pre>";
-              print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+              print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
               echo "</pre>";
 
-              $sum_predict_lot_num = "";
+              $sum_predict_lot_num = 0;
             }
 
 
@@ -266,19 +266,19 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                }else{
 
                  echo "<pre>";
-                 print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                 print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                  echo "</pre>";
-                 $sum_predict_lot_num = "";
+                 $sum_predict_lot_num = 0;
 
                }
 
            }else{
 
              echo "<pre>";
-             print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+             print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
              echo "</pre>";
 
-             $sum_predict_lot_num = "";
+             $sum_predict_lot_num = 0;
            }
 
 
@@ -402,18 +402,18 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                 }else{
 
                   echo "<pre>";
-                  print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                  print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                   echo "</pre>";
-                  $sum_predict_lot_num = "";
+                  $sum_predict_lot_num = 0;
 
                 }
 
             }else{
 
               echo "<pre>";
-              print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+              print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
               echo "</pre>";
-              $sum_predict_lot_num = "";
+              $sum_predict_lot_num = 0;
 
             }
 
@@ -537,19 +537,19 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                  }else{
 
                    echo "<pre>";
-                   print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                   print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                    echo "</pre>";
-                   $sum_predict_lot_num = "";
+                   $sum_predict_lot_num = 0;
 
                  }
 
              }else{
 
                echo "<pre>";
-               print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+               print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                echo "</pre>";
 
-               $sum_predict_lot_num = "";
+               $sum_predict_lot_num = 0;
              }
 
 
@@ -672,19 +672,19 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                   }else{
 
                     echo "<pre>";
-                    print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                    print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                     echo "</pre>";
-                    $sum_predict_lot_num = "";
+                    $sum_predict_lot_num = 0;
 
                   }
 
               }else{
 
                 echo "<pre>";
-                print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                 echo "</pre>";
 
-                $sum_predict_lot_num = "";
+                $sum_predict_lot_num = 0;
               }
 
 
@@ -807,19 +807,19 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                    }else{
 
                      echo "<pre>";
-                     print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                     print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                      echo "</pre>";
-                     $sum_predict_lot_num = "";
+                     $sum_predict_lot_num = 0;
 
                    }
 
                }else{
 
                  echo "<pre>";
-                 print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                 print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                  echo "</pre>";
 
-                 $sum_predict_lot_num = "";
+                 $sum_predict_lot_num = 0;
                }
 
 
@@ -942,19 +942,19 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                    }else{
 
                      echo "<pre>";
-                     print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                     print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                      echo "</pre>";
-                     $sum_predict_lot_num = "";
+                     $sum_predict_lot_num = 0;
 
                    }
 
                }else{
 
                  echo "<pre>";
-                 print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                 print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                  echo "</pre>";
 
-                 $sum_predict_lot_num = "";
+                 $sum_predict_lot_num = 0;
                }
 
 
@@ -1077,19 +1077,19 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                  }else{
 
                    echo "<pre>";
-                   print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                   print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                    echo "</pre>";
-                   $sum_predict_lot_num = "";
+                   $sum_predict_lot_num = 0;
 
                  }
 
              }else{
 
                echo "<pre>";
-               print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+               print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                echo "</pre>";
 
-               $sum_predict_lot_num = "";
+               $sum_predict_lot_num = 0;
              }
 
 
@@ -1216,19 +1216,19 @@ for($i=1; $i<=$this->request->getData('n'.$j); $i++){
                   }else{
 
                     echo "<pre>";
-                    print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                    print_r($_POST["product_code{$j}{$n}"]."のirisuがKonpousテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                     echo "</pre>";
-                    $sum_predict_lot_num = "";
+                    $sum_predict_lot_num = 0;
 
                   }
 
               }else{
 
                 echo "<pre>";
-                print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません※sum_predict_lot_num以外はこのまま登録できます");
+                print_r($_POST["product_code{$j}{$n}"]."のtorisuがProductsテーブルに登録されていません。担当者に報告してください。※sum_predict_lot_num以外はこのまま登録できます");
                 echo "</pre>";
 
-                $sum_predict_lot_num = "";
+                $sum_predict_lot_num = 0;
               }
 
 

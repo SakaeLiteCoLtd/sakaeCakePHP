@@ -95,12 +95,26 @@ class ProductsTable extends Table
             ->requirePresence('product_name', 'create')
             ->notEmpty('product_name');
 
-        $validator
-            ->maxLength('material_kind', 255)
-//            ->integer('multiple_cs')
-//            ->requirePresence('multiple_cs', 'create')
-//            ->notEmpty('multiple_cs');
-            ->allowEmpty('material_kind');
+            $validator
+                ->maxLength('material_kind', 255)
+    //            ->integer('multiple_cs')
+    //            ->requirePresence('multiple_cs', 'create')
+    //            ->notEmpty('multiple_cs');
+                ->allowEmpty('material_kind');
+
+                $validator
+                    ->maxLength('m_grade', 255)
+        //            ->integer('multiple_cs')
+        //            ->requirePresence('multiple_cs', 'create')
+        //            ->notEmpty('multiple_cs');
+                    ->allowEmpty('m_grade');
+
+                    $validator
+                        ->maxLength('col_num', 255)
+            //            ->integer('multiple_cs')
+            //            ->requirePresence('multiple_cs', 'create')
+            //            ->notEmpty('multiple_cs');
+                        ->allowEmpty('col_num');
 
         $validator
             ->decimal('weight')

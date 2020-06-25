@@ -18,7 +18,9 @@
             $session->write('productdata.product_name', $_POST['product_name']);
             $session->write('productdata.customer_id', $_POST['customer_id']);
             $session->write('productdata.material_kind', $_POST['material_kind']);
-            $session->write('productdata.material_id', $_POST['material_id']);
+    //        $session->write('productdata.material_id', $_POST['material_id']);
+            $session->write('productdata.m_grade', $_POST['m_grade']);
+            $session->write('productdata.col_num', $_POST['col_num']);
             $session->write('productdata.color', $_POST['color']);
             $session->write('productdata.weight', $_POST['weight']);
             $session->write('productdata.torisu', $_POST['torisu']);
@@ -90,12 +92,13 @@
     </table>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
       <tr>
-        <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">グレード：色番号</strong></td>
+        <td width="280" bgcolor="#FFFFCC"  colspan="2" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">グレード　　　　　　色番号</strong></td>
         <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色調</strong></td>
     	</tr>
       <tr>
-        <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($Material) ?></td>
-        <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($this->request->getData('color')) ?></td>
+        <td  width="140" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($this->request->getData('m_grade')) ?></td>
+        <td width="140"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($this->request->getData('col_num')) ?></td>
+        <td  width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($this->request->getData('color')) ?></td>
     	</tr>
     </table>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">

@@ -74,12 +74,14 @@ class ProductsController extends AppController
 			}
 			$this->set('arrCustomer',$arrCustomer);//4行上$arrCustomerをctpで使えるようにセット
 
+/*
 			$arrMaterials = $this->Materials->find('all', ['conditions' => ['delete_flag' => '0']])->order(['grade' => 'ASC']);//Materialsテーブルの'delete_flag' => '0'となるものを見つけ、grade順に並べる
 			$arrMaterial = array();//配列の初期化
 			foreach ($arrMaterials as $value) {//2行上のMaterialsテーブルのデータそれぞれに対して
 				$arrMaterial[] = array($value->id=>$value->grade.':'.$value->color);//配列に3行上のMaterialsテーブルのデータそれぞれのgrade:color
 			}
 			$this->set('arrMaterial',$arrMaterial);//4行上$arrMaterialをctpで使えるようにセット
+*/
 
 			$arrMultipleCs = [
 				'PP' => 'PP',
@@ -155,10 +157,12 @@ class ProductsController extends AppController
 			$Customer = $CustomerData[0]->customer_code.":".$CustomerData[0]->name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
 			$this->set('Customer',$Customer);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
+/*
 			$material_id = $data['material_id'];//$dataのmaterial_idに$material_idという名前を付ける
 			$MaterialData = $this->Materials->find()->where(['id' => $material_id])->toArray();//'id' => $material_idとなるデータをMaterialsテーブルから配列で取得
 			$Material = $MaterialData[0]->grade.":".$MaterialData[0]->color;//配列の0番目（0番目しかない）のnameに$Materialと名前を付ける
 			$this->set('Material',$Material);//登録者の表示のため1行上の$Materialをctpで使えるようにセット
+*/
 
 			$id_box = $data['id_box'];
 			$BoxKonpousData = $this->BoxKonpous->find()->where(['id_box' => $id_box])->toArray();
@@ -235,10 +239,12 @@ class ProductsController extends AppController
 			$Customer = $CustomerData[0]->customer_code.":".$CustomerData[0]->name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
 			$this->set('Customer',$Customer);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
+/*
 			$material_id = $data['productdata']['material_id'];//$dataのmaterial_idに$material_idという名前を付ける
 			$MaterialData = $this->Materials->find()->where(['id' => $material_id])->toArray();//'id' => $material_idとなるデータをMaterialsテーブルから配列で取得
 			$Material = $MaterialData[0]->grade.":".$MaterialData[0]->color;//配列の0番目（0番目しかない）のnameに$Materialと名前を付ける
 			$this->set('Material',$Material);//登録者の表示のため1行上の$Materialをctpで使えるようにセット
+*/
 
 			$id_box = $data['konpoudata']['id_box'];
 			$BoxKonpousData = $this->BoxKonpous->find()->where(['id_box' => $id_box])->toArray();
@@ -303,6 +309,9 @@ class ProductsController extends AppController
 									'product_name' => $data['productdata']["product_name"],
 									'basic_weight' => $data['productdata']["weight"],
 									'price' => $data['pricedata']["price"],
+									'm_grade' => $data['productdata']["m_grade"],
+									'col_num' => $data['productdata']["col_num"],
+									'color' => $data['productdata']["color"],
 									'cs_id' => $data['productdata']["customer_id"],
 									'gaityu' => 0,
 									'genjyou' => 0

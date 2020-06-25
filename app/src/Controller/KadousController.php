@@ -493,8 +493,8 @@ class KadousController extends AppController
 						$user = $this->Auth->identify();
 					if ($user) {
 						$this->Auth->setUser($user);
-        //    return $this->redirect(['action' => 'do']);
-            return $this->redirect(['action' => 'docsvtest']);
+            return $this->redirect(['action' => 'do']);
+        //    return $this->redirect(['action' => 'docsvtest']);
 					}
 				}
 		}
@@ -658,8 +658,8 @@ class KadousController extends AppController
     $day = date('Y-n-j',strtotime($day));
     $file_name = "kadou_seikeis".$day.".csv";
 
-  //  $fp = fopen('/home/centosuser/kadouseikei_csv/'.$file_name, 'w');
-    $fp = fopen('kadouseikei_csv/'.$file_name, 'w');
+    $fp = fopen('/home/centosuser/kadouseikei_csv/'.$file_name, 'w');
+  //  $fp = fopen('kadouseikei_csv/'.$file_name, 'w');
       foreach ($arrkadouseikei_csv as $line) {
         $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
         fputcsv($fp, $line);

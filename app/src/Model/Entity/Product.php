@@ -45,6 +45,8 @@ class Product extends Entity
         'product_name' => true,
         'customer_id' => true,
         'material_kind' => true,
+        'm_grade' => true,
+        'col_num' => true,
         'material_id' => true,
         'weight' => true,
         'color' => true,

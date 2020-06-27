@@ -35,16 +35,13 @@
  <legend align="center"><strong style="font-size: 13pt; color:blue"><?= __("単価修正") ?></strong></legend>
 <br>
 
-<legend align="center"><font color="red"><?= __($mes) ?></font></legend>
-<br>
-
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
     <tr style="border-bottom: 0px;border-width: 0px">
       <td width="300" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">品番</strong></div></td>
     </tr>
     <tr style="border-bottom: 0px;border-width: 0px">
-      <td bgcolor="#FFFFCC"><?= h($data['pricedata']['product_code']) ?></td>
+      <td bgcolor="#FFFFCC"><?= h($this->request->getData('product_code')) ?></td>
     </tr>
   </table>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -54,7 +51,7 @@
         <td width="300" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt"><strong style="font-size: 11pt; color:blue">単価（円/kg）</strong></td>
       </tr>
       <tr style="border-bottom: 0px;border-width: 0px">
-        <td width="140" bgcolor="#FFFFCC" style="text-align: right;border-right-style: none"><?= h($data['pricedata']['price']) ?></td>
+        <td width="140" bgcolor="#FFFFCC" style="text-align: right;border-right-style: none"><?= h($price) ?></td>
         <td width="140" bgcolor="#FFFFCC" style="text-align: left;border-left-style: none"><strong style="font-size: 11pt; color:blue">円/kg</strong></td>
       </tr>
     </table>

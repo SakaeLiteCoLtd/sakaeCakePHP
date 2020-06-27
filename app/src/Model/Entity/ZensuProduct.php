@@ -38,7 +38,7 @@ class ZensuProduct extends Entity
         'shot_cycle' => true,
         'kijyun' => true,
         'status' => true,
-        'staff_id' => true,
+        'staff_code' => true,
         'datetime_touroku' => true,
         'delete_flag' => true,
         'created_at' => true,

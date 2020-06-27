@@ -43,12 +43,13 @@
 </table>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="280"  colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">グレード　　　　　　色番号</strong></td>
+    <td width="140" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">グレード</strong></td>
+    <td width="140"  bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色番号</strong></td>
     <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色調</strong></td>
 	</tr>
   <tr>
-    <td width="141" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('m_grade', array('type'=>'text', 'label'=>false)) ?></td>
-    <td width="141"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('col_num', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="140" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('m_grade', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="140"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('col_num', array('type'=>'text', 'label'=>false)) ?></td>
     <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("color", ["type"=>"select","empty"=>"選択してください", "options"=>$arrColor, 'label'=>false]) ?></td>
 	</tr>
 </table>
@@ -99,12 +100,39 @@
     <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("id_box", ["type"=>"select","empty"=>"選択してください", "options"=>$arrBox, 'label'=>false]) ?></td>
 	</tr>
 </table>
+
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">ショットサイクル</strong></td>
+    <td width="280"  bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">基準</strong></td>
+	</tr>
+  <tr>
+    <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('shot_cycle', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('kijyun', array('type'=>'text', 'label'=>false)) ?></td>
+	</tr>
+</table>
+
+<?php
+/*
+
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td width="560" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">顧客</strong></td>
 	</tr>
   <tr>
     <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("customer_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrCustomer, 'label'=>false]) ?></td>
+	</tr>
+</table>
+*/
+    ?>
+
+
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="560" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">出荷先</strong></td>
+	</tr>
+  <tr>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("place_deliver_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrPlaceDeliver, 'label'=>false]) ?></td>
 	</tr>
 </table>
 

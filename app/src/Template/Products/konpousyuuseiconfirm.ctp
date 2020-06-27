@@ -14,7 +14,7 @@
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($Konpous, ['url' => ['action' => 'konpousyuuseiconfirm']]);
+          echo $this->Form->create($Konpous, ['url' => ['action' => 'konpousyuuseipreadd']]);
 
 ?>
 
@@ -38,25 +38,21 @@
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
-    <tr style="border-bottom: 0px;border-width: 0px">
-      <td width="280" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">品番</strong></div></td>
+    <tr>
+      <td width="280" colspan="40" nowrap="nowrap" style="padding: 0.2rem"><div align="center"><strong style="font-size: 11pt; color:blue">品番</strong></div></td>
     </tr>
-
-<?php
-echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-?>
-<td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
-<?php
-echo "</tr>\n";
-?>
+    <tr style="border-bottom: 0px;border-width: 0px">
+      <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($this->request->getData('product_code')) ?></td>
+    </tr>
+  </table>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td width="280" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">入数</strong></td>
   </tr>
   <tr>
-    <td  width="220" bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><?= $this->Form->control('irisu', array('type'=>'text', 'label'=>false)) ?></td>
-    <td width="62" bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 13pt; color:blue">ケ</strong></td>
+    <td  width="140" bgcolor="#FFFFCC" style="text-align: right;border-right-style: none;padding: 0.2rem"><?= h($this->request->getData('irisu')) ?></td>
+    <td width="140" bgcolor="#FFFFCC" style="text-align: left;border-left-style: none;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">ケ</strong></td>
 	</tr>
 </table>
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
@@ -64,20 +60,20 @@ echo "</tr>\n";
     <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">箱No.</strong></td>
   </tr>
     <tr>
-    <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("id_box", ["type"=>"select","empty"=>"選択してください", "options"=>$arrBox, 'label'=>false]) ?></td>
+    <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($name_box) ?></td>
 	</tr>
 </table>
   <br>
 
   <?php
   echo $this->Form->hidden('product_code' ,['value'=>$this->request->getData('product_code')]);
-  echo $this->Form->hidden('KonpouId' ,['value'=>$KonpouId]);
+  echo $this->Form->hidden('KonpouId' ,['value'=>$this->request->getData('KonpouId')]);
   ?>
 
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr bgcolor="#E6FFFF" >
-      <td align="center" rowspan="2" width="30" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'confirm', 'value'=>"1")); ?></div></td>
+      <td align="center" rowspan="2" width="30" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('登録'), array('name' => 'confirm', 'value'=>"1")); ?></div></td>
     </tr>
-  </table>
+    </table>
 
 <br><br><br>

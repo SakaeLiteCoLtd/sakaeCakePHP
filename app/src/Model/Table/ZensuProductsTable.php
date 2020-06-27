@@ -35,12 +35,12 @@ class ZensuProductsTable extends Table
         $this->setTable('zensu_products');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
-
+/*
         $this->belongsTo('Staffs', [
             'foreignKey' => 'staff_id',
             'joinType' => 'INNER'
         ]);
-
+*/
         $this->addBehavior('Timestamp', [
           'events' => [
             'Model.beforeSave' => [
@@ -82,6 +82,11 @@ class ZensuProductsTable extends Table
             ->requirePresence('status', 'create')
             ->notEmpty('status');
 
+            $validator
+                ->integer('staff_code')
+                ->requirePresence('staff_code', 'create')
+                ->notEmpty('staff_code');
+
         $validator
             ->dateTime('datetime_touroku')
             ->requirePresence('datetime_touroku', 'create')
@@ -120,10 +125,11 @@ class ZensuProductsTable extends Table
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules)
+/*    public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['staff_id'], 'Staffs'));
 
         return $rules;
     }
+*/
 }

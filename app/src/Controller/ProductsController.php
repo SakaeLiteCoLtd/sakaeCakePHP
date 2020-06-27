@@ -29,6 +29,8 @@ class ProductsController extends AppController
 			$this->Katakouzous = TableRegistry::get('katakouzous');
 			$this->AccountPriceProducts = TableRegistry::get('accountPriceProducts');
 			$this->BoxKonpous = TableRegistry::get('boxKonpous');
+			$this->PlaceDelivers = TableRegistry::get('placeDelivers');
+			$this->ZensuProducts = TableRegistry::get('zensuProducts');
     }
 
     /**
@@ -74,6 +76,13 @@ class ProductsController extends AppController
 			}
 			$this->set('arrCustomer',$arrCustomer);//4行上$arrCustomerをctpで使えるようにセット
 
+			$arrPlaceDelivers = $this->PlaceDelivers->find('all')->order(['id_from_order' => 'ASC']);//Customersテーブルの'delete_flag' => '0'となるものを見つけ、customer_code順に並べる
+			$arrPlaceDeliver = array();//配列の初期化
+			foreach ($arrPlaceDelivers as $value) {//2行上のCustomersテーブルのデータそれぞれに対して
+				$arrPlaceDeliver[] = array($value->id=>$value->id_from_order.':'.$value->name);//配列に3行上のCustomersテーブルのデータそれぞれのcustomer_code:name
+			}
+			$this->set('arrPlaceDeliver',$arrPlaceDeliver);//4行上$arrCustomerをctpで使えるようにセット
+
 /*
 			$arrMaterials = $this->Materials->find('all', ['conditions' => ['delete_flag' => '0']])->order(['grade' => 'ASC']);//Materialsテーブルの'delete_flag' => '0'となるものを見つけ、grade順に並べる
 			$arrMaterial = array();//配列の初期化
@@ -114,9 +123,9 @@ class ProductsController extends AppController
 				'2' => 'No.2',
 				'3' => 'No.3',
 				'4' => 'No.4',
-				'5' => 'No.5',
-				'6' => 'No.6',
-				'7' => 'No.7',
+		//		'5' => 'No.5',
+		//		'6' => 'No.6',
+		//		'7' => 'No.7',
 				'8' => 'No.8',
 				'9' => 'No.9',
 				'10' => 'No.10',
@@ -152,10 +161,17 @@ class ProductsController extends AppController
 
 			$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
-			$customer_id = $data['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
-			$CustomerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $customer_idとなるデータをStaffsテーブルから配列で取得
-			$Customer = $CustomerData[0]->customer_code.":".$CustomerData[0]->name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
-			$this->set('Customer',$Customer);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+			$place_deliver_id = $data['place_deliver_id'];
+			$PlaceDeliversData = $this->PlaceDelivers->find()->where(['id' => $place_deliver_id])->toArray();
+			$PlaceDeliver = $PlaceDeliversData[0]->id_from_order.":".$PlaceDeliversData[0]->name;
+			$this->set('PlaceDeliver',$PlaceDeliver);
+
+			$Customer_code = $PlaceDeliversData[0]->cs_code;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
+			$this->set('Customer_code',$Customer_code);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+
+			$CustomerData = $this->Customers->find()->where(['customer_code' => $Customer_code])->toArray();
+			$customer_id = $CustomerData[0]->id;
+			$this->set('customer_id',$customer_id);
 
 /*
 			$material_id = $data['material_id'];//$dataのmaterial_idに$material_idという名前を付ける
@@ -224,6 +240,8 @@ class ProductsController extends AppController
 			$this->set('Konpous',$Konpous);
 			$Katakouzous = $this->Katakouzous->newEntity();
 			$this->set('Katakouzous',$Katakouzous);
+			$ZensuProducts = $this->ZensuProducts->newEntity();
+			$this->set('ZensuProducts',$ZensuProducts);
 
 			$session = $this->request->getSession();
 			$data = $session->read();//postデータ取得し、$dataと名前を付ける
@@ -233,11 +251,17 @@ class ProductsController extends AppController
 			$data['pricedata']['created_staff'] = $staff_id;
 			$data['konpoudata']['created_staff'] = $staff_id;
 			$data['katakouzoudata']['created_staff'] = $staff_id;
+			$data['zensudata']['created_staff'] = $staff_id;
 
 			$customer_id = $data['productdata']['customer_id'];//$dataのcustomer_idに$customer_idという名前を付ける
 			$CustomerData = $this->Customers->find()->where(['id' => $customer_id])->toArray();//'id' => $customer_idとなるデータをStaffsテーブルから配列で取得
 			$Customer = $CustomerData[0]->customer_code.":".$CustomerData[0]->name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
 			$this->set('Customer',$Customer);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
+
+			$place_deliver_id = $data['productdata']['place_deliver_id'];
+			$PlaceDeliversData = $this->PlaceDelivers->find()->where(['id' => $place_deliver_id])->toArray();
+			$PlaceDeliver = $PlaceDeliversData[0]->id_from_order.":".$PlaceDeliversData[0]->name;
+			$this->set('PlaceDeliver',$PlaceDeliver);
 
 /*
 			$material_id = $data['productdata']['material_id'];//$dataのmaterial_idに$material_idという名前を付ける
@@ -261,27 +285,14 @@ class ProductsController extends AppController
 			$CreatedStaff = $Created[0]->f_name.$Created[0]->l_name;//配列の0番目（0番目しかない）のf_nameとl_nameをつなげたものに$CreatedStaffと名前を付ける
 			$this->set('CreatedStaff',$CreatedStaff);//登録者の表示のため1行上の$CreatedStaffをctpで使えるようにセット
 
+			$staff_code = $Created[0]->staff_code;
+			$data['zensudata']['staff_code'] = $staff_code;
+
 /*
 			echo "<pre>";
-	    print_r($data['productdata']);
+	    print_r($data['zensudata']);
 	    echo "</pre>";
-			echo "<pre>";
-	    print_r($data['pricedata']);
-	    echo "</pre>";
-			echo "<pre>";
-			print_r($data['konpoudata']);
-			echo "</pre>";
-			echo "<pre>";
-	    print_r($data['katakouzoudata']);
-	    echo "</pre>";
-
-			if(!empty($data['pricedata']['price'])){
-				echo "<pre>";
-				print_r($data['pricedata']['price']);
-				echo "</pre>";
-			}
 */
-
 
 			if ($this->request->is('get')) {
 				$product = $this->Products->patchEntity($product, $data['productdata']);//$productデータ（空の行）を$this->request->getData()に更新する
@@ -299,6 +310,10 @@ class ProductsController extends AppController
 						$Katakouzous = $this->Katakouzous->patchEntity($Katakouzous, $data['katakouzoudata']);
 						$this->Katakouzous->save($Katakouzous);
 
+						//zensu_product登録
+						$ZensuProducts = $this->ZensuProducts->patchEntity($ZensuProducts, $data['zensudata']);
+						$this->ZensuProducts->save($ZensuProducts);
+
 						//旧DBに製品登録
 						$connection = ConnectionManager::get('DB_ikou_test');
 						$table = TableRegistry::get('product');
@@ -309,10 +324,11 @@ class ProductsController extends AppController
 									'product_name' => $data['productdata']["product_name"],
 									'basic_weight' => $data['productdata']["weight"],
 									'price' => $data['pricedata']["price"],
+									'm_name' => $data['productdata']["material_kind"],
 									'm_grade' => $data['productdata']["m_grade"],
 									'col_num' => $data['productdata']["col_num"],
 									'color' => $data['productdata']["color"],
-									'cs_id' => $data['productdata']["customer_id"],
+									'cs_id' => $data['customerdata']["customer_code"],
 									'gaityu' => 0,
 									'genjyou' => 0
 							]);
@@ -331,6 +347,16 @@ class ProductsController extends AppController
 									'status' => $data['katakouzoudata']["status"],
 									'torisu' => $data['katakouzoudata']["torisu"],
 									'set_tori' => $data['katakouzoudata']["set_tori"]
+							]);
+
+						//旧DBにzensu_product登録
+							$connection->insert('zensu_product', [
+									'product_id' => $data['zensudata']["product_code"],
+									'shot_cycle' => $data['zensudata']["shot_cycle"],
+									'kijyun' => $data['zensudata']["kijyun"],
+									'status' => $data['zensudata']["status"],
+									'emp_id' => $data['zensudata']["staff_code"],
+									'datetime_touroku' => $data['zensudata']["datetime_touroku"]
 							]);
 
 						$connection = ConnectionManager::get('default');//新DBに戻る
@@ -384,13 +410,28 @@ class ProductsController extends AppController
 	 {
 		 $Konpous = $this->Konpous->newEntity();
 		 $this->set('Konpous',$Konpous);
-
 	 }
 
 		 public function konpouyobidasiview()
 		{
 			$Konpous = $this->Konpous->newEntity();
- 		 $this->set('Konpous',$Konpous);
+			$this->set('Konpous',$Konpous);
+
+		 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+		 $Konpous = $this->Konpous->find()->where(['product_code' => $data['product_code']])->toArray();
+		 if(isset($Konpous[0])){
+			 $irisu = $Konpous[0]->irisu;
+			 $this->set('irisu',$irisu);
+			 $id_box = $Konpous[0]->id_box;
+			 $BoxKonpous = $this->BoxKonpous->find()->where(['id_box' => $id_box])->toArray();
+			 $name_box = $BoxKonpous[0]->name_box;
+			 $this->set('name_box',$name_box);
+			}else{
+				echo "<pre>";
+				print_r("その製品はデータベースに存在しません。");
+				echo "</pre>";
+			}
 
 		}
 
@@ -408,9 +449,35 @@ class ProductsController extends AppController
 
 		 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
-		 echo "<pre>";
-		 print_r($data);
-		 echo "</pre>";
+		 $Konpous = $this->Konpous->find()->where(['product_code' => $data['product_code']])->toArray();
+		 if(isset($Konpous[0])){
+				$KonpouId = $Konpous[0]->id;
+				$this->set('KonpouId',$KonpouId);
+			}else{
+				echo "<pre>";
+				print_r("その製品はデータベースに存在しません。");
+				echo "</pre>";
+			}
+
+			$arrBox = [
+				'0' => 'その他',
+				'1' => 'No.1',
+				'2' => 'No.2',
+				'3' => 'No.3',
+				'4' => 'No.4',
+		//		'5' => 'No.5',
+		//		'6' => 'No.6',
+		//		'7' => 'No.7',
+				'8' => 'No.8',
+				'9' => 'No.9',
+				'10' => 'No.10',
+				'a' => '折りコンNo.3',
+				'b' => '折りコンNo.4',
+				'c' => '折りコンNo.6',
+				'd' => '折りコンNo.9',
+				'e' => '折りコンNo.10'
+							];
+			$this->set('arrBox',$arrBox);
 
 		}
 
@@ -419,6 +486,27 @@ class ProductsController extends AppController
 		 $Konpous = $this->Konpous->newEntity();
 		 $this->set('Konpous',$Konpous);
 
+		 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+		 $BoxKonpous = $this->BoxKonpous->find()->where(['id_box' => $data['id_box']])->toArray();
+		 $name_box = $BoxKonpous[0]->name_box;
+		 $this->set('name_box',$name_box);
+
+		 $session = $this->request->getSession();
+		 session_start();
+		 $_SESSION['konpoudata'] = array(
+			 'id' => $data['KonpouId'],
+			 'product_code' => $data['product_code'],
+			 'irisu' => $data['irisu'],
+			 'id_box' => $data['id_box'],
+			 'updated_staff' => "",
+			 'updated_at' => date('Y-m-d H:i:s')
+		 );
+/*
+		 echo "<pre>";
+		 print_r($_SESSION);
+		 echo "</pre>";
+*/
 	 }
 
 	 public function konpousyuuseipreadd()
@@ -430,15 +518,91 @@ class ProductsController extends AppController
 
 		public function konpousyuuseilogin()
 	 {
-		 $Konpous = $this->Konpous->newEntity();
-		 $this->set('Konpous',$Konpous);
+		 if ($this->request->is('post')) {
+			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+			 $this->set('data',$data);//セット
+			 $userdata = $data['username'];
+			 $this->set('userdata',$userdata);//セット
 
+			 $htmllogin = new htmlLogin();//クラスを使用
+			 $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
+
+			 $username = $arraylogindate[0];
+			 $delete_flag = $arraylogindate[1];
+			 $this->set('username',$username);
+			 $this->set('delete_flag',$delete_flag);
+
+			 $user = $this->Auth->identify();
+
+				if ($user) {
+					$this->Auth->setUser($user);
+					return $this->redirect(['action' => 'konpousyuuseido',//以下のデータを持ってzensulottourokuに移動
+					's' => ['username' => $username]]);
+				}
+			}
 	 }
 
 	 		public function konpousyuuseido()
 	 	 {
 			 $Konpous = $this->Konpous->newEntity();
 			 $this->set('Konpous',$Konpous);
+
+			 $session = $this->request->getSession();
+       $data = $session->read();
+       $this->set('data',$data);
+
+			 $staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+			 $data['konpoudata']['updated_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+/*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+*/
+			 $BoxKonpous = $this->BoxKonpous->find()->where(['id_box' => $data['konpoudata']['id_box']])->toArray();
+			 $name_box = $BoxKonpous[0]->name_box;
+			 $this->set('name_box',$name_box);
+
+			 if ($this->request->is('get')) {
+				 $Konpous = $this->Konpous->patchEntity($Konpous, $data['konpoudata']);
+				 $connection = ConnectionManager::get('default');//トランザクション1
+  				// トランザクション開始2
+  				$connection->begin();//トランザクション3
+  				try {//トランザクション4
+						if ($this->Konpous->updateAll(//検査終了時間の更新
+							['irisu' => $data['konpoudata']['irisu'], 'id_box' => $data['konpoudata']['id_box'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data['konpoudata']['updated_staff']],
+							['id'  => $data['konpoudata']['id']]
+						)){
+
+ 							//旧DBに単価登録
+ 							$connection = ConnectionManager::get('DB_ikou_test');
+ 							$table = TableRegistry::get('konpou');
+ 							$table->setConnection($connection);
+
+							$updater = "UPDATE konpou set irisu ='".$data['konpoudata']['irisu']."' , id_box ='".$data['konpoudata']['id_box']."'
+              where product_id ='".$data['konpoudata']['product_code']."'";
+              $connection->execute($updater);
+
+ 							$connection = ConnectionManager::get('default');//新DBに戻る
+ 							$table->setConnection($connection);
+
+ 						$mes = "※下記のように登録されました";
+ 						$this->set('mes',$mes);
+ 						$connection->commit();// コミット5
+
+ 					} else {
+
+ 						$mes = "※登録されませんでした";
+ 						$this->set('mes',$mes);
+ 						$this->Flash->error(__('The product could not be saved. Please, try again.'));
+ 						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+ 					}
+
+ 				} catch (Exception $e) {//トランザクション7
+ 				//ロールバック8
+ 					$connection->rollback();//トランザクション9
+ 				}//トランザクション10
+ 			}
 
 	 	 }
 
@@ -451,8 +615,20 @@ class ProductsController extends AppController
 
 		 public function priceyobidasiview()
 		{
-			$AccountPriceProducts = $this->AccountPriceProducts->newEntity();
+		 $AccountPriceProducts = $this->AccountPriceProducts->newEntity();
  		 $this->set('AccountPriceProducts',$AccountPriceProducts);
+
+		 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+		 $AccountPriceProducts = $this->AccountPriceProducts->find()->where(['product_code' => $data['product_code']])->toArray();
+		 if(isset($AccountPriceProducts[0])){
+				$price = $AccountPriceProducts[0]->price;
+				$this->set('price',$price);
+			}else{
+				echo "<pre>";
+				print_r("その製品はデータベースに存在しません。");
+				echo "</pre>";
+			}
 
 		}
 
@@ -470,11 +646,7 @@ class ProductsController extends AppController
 			$this->set('AccountPriceProducts',$AccountPriceProducts);
 
 			$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-/*
-  		 echo "<pre>";
-  		 print_r($data);
-  		 echo "</pre>";
-*/
+
 			 $AccountPriceProducts = $this->AccountPriceProducts->find()->where(['product_code' => $data['product_code']])->toArray();
 			 if(isset($AccountPriceProducts[0])){
   				$AccountPriceProductId = $AccountPriceProducts[0]->id;
@@ -568,25 +740,20 @@ class ProductsController extends AppController
 							['price' => $data['pricedata']['price'], 'date_koushin' => date('Y-m-d'), 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $_SESSION['pricedata']['updated_staff']],
 							['id'  => $data['pricedata']['id']]
 						)){
-/*
+
  							//旧DBに単価登録
  							$connection = ConnectionManager::get('DB_ikou_test');
  							$table = TableRegistry::get('account_price_product');
  							$table->setConnection($connection);
 
- 								$connection->insert('account_price_product', [
- 									'product_id' => $data['pricedata']["product_code"],
- 									'price' => $data['pricedata']["price"],
- 									'date_koushin' => $data['pricedata']["date_koushin"],
- 									'emp_id' => $data['pricedata']["created_staff"],
- 									'tourokubi' => $data['pricedata']["tourokubi"],
- 									'delete_flag' => 0,
- 									'created_at' => $data['pricedata']["created_at"]
- 								]);
+							$updater = "UPDATE account_price_product set price = '".$data['pricedata']['price']."' , date_koushin ='".date('Y-m-d')."'
+							, updated_at = '".date('Y-m-d H:i:s')."' , updated_emp_id = '".$_SESSION['pricedata']['updated_staff']."'
+              where product_id ='".$_SESSION['pricedata']['product_code']."'";
+              $connection->execute($updater);
 
  							$connection = ConnectionManager::get('default');//新DBに戻る
  							$table->setConnection($connection);
-*/
+
  						$mes = "※下記のように登録されました";
  						$this->set('mes',$mes);
  						$connection->commit();// コミット5
@@ -607,137 +774,6 @@ class ProductsController extends AppController
 
  			}
 
-
 	 	 }
-
-
-     public function confirmcsv()
-    {
-			$product = $this->Products->newEntity();//newentityに$productという名前を付ける
-			$this->set('product',$product);//1行上の$productをctpで使えるようにセット
-    }
-
-     public function docsv()
-    {
-			$staff_id = $this->Auth->user('staff_id');
-			$this->set('staff_id',$staff_id);//1行上の$staff_idをctpで使えるようにセット
-
-			$fp = fopen("product191106.csv", "r");//csvファイルはwebrootに入れる
-			$this->set('fp',$fp);
-
-			$fpcount = fopen("product191106.csv", 'r' );
-			for( $count = 0; fgets( $fpcount ); $count++ );
-			$this->set('count',$count);
-
-			$arrFp = array();//空の配列を作る
-			$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目はカラム名なので先に取っておく）
-			for ($k=1; $k<=$count-1; $k++) {//行数分
-				$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
-				$sample = explode(',',$line);//$lineを","毎に配列に入れる
-
-				array_push($sample, '0', '0', $staff_id);//配列に追加
-
-				$keys=array_keys($sample);
-				$keys[array_search('0',$keys)]='product_code';//名前の変更
-				$keys[array_search('1',$keys)]='product_name';
-				$keys[array_search('2',$keys)]='weight';
-				$keys[array_search('4',$keys)]='customer_id';
-				$keys[array_search('9',$keys)]='torisu';
-				$keys[array_search('10',$keys)]='cycle';
-				$keys[array_search('12',$keys)]='primary_p';
-				$keys[array_search('13',$keys)]='gaityu';
-				$keys[array_search('16',$keys)]='delete_flag';//追加した配列の値(値は0)
-				$keys[array_search('17',$keys)]='status';//追加した配列の値(値は0)
-				$keys[array_search('18',$keys)]='created_staff';//追加した配列の値(値は$staff_id)
-
-				$sample = array_combine($keys, $sample );
-
-				$Customer = $this->Customers->find()->where(['customer_code' => $sample['customer_id']])->toArray();//'customer_code' => $sample['customer_id']となるデータをCustomersテーブルから配列で取得
-				$customer_id = $Customer[0]->id;//配列の0番目（0番目しかない）のidに$customer_idと名前を付ける
-				$replacements = array('customer_id' => $customer_id);//配列のデータの置き換え（customer_idを$customer_idに変更）
-				$sample = array_replace($sample, $replacements);//配列のデータの置き換え（customer_idを$customer_idに変更）
-
-				unset($sample['3']);//削除
-				unset($sample['5']);//削除
-				unset($sample['6']);//削除
-				unset($sample['7']);//削除
-				unset($sample['8']);//削除
-				unset($sample['11']);//削除
-				unset($sample['14']);//削除
-				unset($sample['15']);//削除
-
-				$arrFp[] = $sample;//配列に追加する
-			}
-			$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
-		//	echo "<pre>";
-		//	print_r($arrFp[0]);
-		//	print_r($arrFp);
-		//	echo "<br>";
-
-			$product = $this->Products->newEntity();//newentityに$productという名前を付ける
-			$this->set('product',$product);//1行上の$productをctpで使えるようにセット
-
-			if ($this->request->is('post')) {//postなら登録
-				$product = $this->Products->patchEntities($product, $arrFp);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-				$connection = ConnectionManager::get('default');//トランザクション1
-				// トランザクション開始2
-				$connection->begin();//トランザクション3
-				try {//トランザクション4
-						if ($this->Products->saveMany($product)) {//saveManyで一括登録
-							$connection->commit();// コミット5
-						} else {
-							$this->Flash->error(__('The Products could not be saved. Please, try again.'));
-							throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-						}
-				} catch (Exception $e) {//トランザクション7
-				//ロールバック8
-					$connection->rollback();//トランザクション9
-				}//トランザクション10
-			}
-    }
-
-
-    public function edit($id = null)
-    {
-			$product = $this->Products->get($id);//選んだidに関するProductsテーブルのデータに$productと名前を付ける
-			$this->set('product',$product);//1行上の$productをctpで使えるようにセット
-
-			$arrCustomers = $this->Customers->find('all', ['conditions' => ['delete_flag' => '0']])->order(['customer_code' => 'ASC']);//Customersテーブルの'delete_flag' => '0'となるものを見つけ、customer_code順に並べる
-			$arrCustomer = array();//配列の初期化
-			foreach ($arrCustomers as $value) {//2行上のCustomersテーブルのデータそれぞれに対して
-				$arrCustomer[] = array($value->id=>$value->customer_code.':'.$value->name);//配列に3行上のCustomersテーブルのデータそれぞれのcustomer_code:name
-			}
-			$this->set('arrCustomer',$arrCustomer);//4行上$arrCustomerをctpで使えるようにセット
-
-			$arrMaterials = $this->Materials->find('all', ['conditions' => ['delete_flag' => '0']])->order(['grade' => 'ASC']);//Materialsテーブルの'delete_flag' => '0'となるものを見つけ、id順に並べる
-			$arrMaterial = array();//配列の初期化
-			foreach ($arrMaterials as $value) {//2行上のMaterialsテーブルのデータそれぞれに対して
-				$arrMaterial[] = array($value->id=>$value->grade.':'.$value->color);//配列に3行上のMaterialsテーブルのデータそれぞれのgrade:color
-			}
-			$this->set('arrMaterial',$arrMaterial);//4行上$arrMaterialをctpで使えるようにセット
-
-			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-			$product['updated_staff'] = $staff_id;//$productのupdated_staffを$staff_idにする
-
-			if ($this->request->is(['patch', 'post', 'put'])) {//'patch', 'post', 'put'の場合
-				$product = $this->Products->patchEntity($product, $this->request->getData());//131行目でとったもともとの$priceProductデータを$this->request->getData()に更新する
-				$connection = ConnectionManager::get('default');//トランザクション1
-					// トランザクション開始2
-				$connection->begin();//トランザクション3
-				try {//トランザクション4
-					if ($this->Products->save($product)) {
-						$this->Flash->success(__('The product has been updated.'));
-						$connection->commit();// コミット5
-						return $this->redirect(['action' => 'index']);
-					} else {
-						$this->Flash->error(__('The product could not be updated. Please, try again.'));
-						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-					}
-				} catch (Exception $e) {//トランザクション7
-				//ロールバック8
-					$connection->rollback();//トランザクション9
-				}//トランザクション10
-			}
-    }
 
 }

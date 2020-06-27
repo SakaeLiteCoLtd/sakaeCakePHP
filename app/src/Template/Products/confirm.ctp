@@ -16,7 +16,8 @@
 
             $session->write('productdata.product_code', $_POST['product_code']);
             $session->write('productdata.product_name', $_POST['product_name']);
-            $session->write('productdata.customer_id', $_POST['customer_id']);
+            $session->write('productdata.customer_id', $customer_id);
+            $session->write('productdata.place_deliver_id', $_POST['place_deliver_id']);
             $session->write('productdata.material_kind', $_POST['material_kind']);
     //        $session->write('productdata.material_id', $_POST['material_id']);
             $session->write('productdata.m_grade', $_POST['m_grade']);
@@ -30,6 +31,8 @@
             $session->write('productdata.status', 0);
             $session->write('productdata.delete_flag', 0);
             $session->write('productdata.created_staff', $_POST['created_staff']);
+
+            $session->write('customerdata.customer_code', $Customer_code);
 
             if(!empty($_POST['price'])){
               $price = $_POST['price'];
@@ -61,6 +64,22 @@
             $session->write('katakouzoudata.created_staff', $_POST['created_staff']);
             $session->write('katakouzoudata.created_at', date('Y-m-d H:i:s'));
 
+            $session->write('zensudata.product_code', $_POST['product_code']);
+            $session->write('zensudata.shot_cycle', $_POST['shot_cycle']);
+            $session->write('zensudata.kijyun', $_POST['kijyun']);
+            $session->write('zensudata.kariunyou', 1);
+            $session->write('zensudata.status', 0);
+            $session->write('zensudata.staff_code', $_POST['created_staff']);
+            $session->write('zensudata.datetime_touroku', date('Y-m-d H:i:s'));
+            $session->write('zensudata.delete_flag', 0);
+            $session->write('zensudata.created_at', date('Y-m-d H:i:s'));
+            $session->write('zensudata.created_staff', $_POST['created_staff']);
+/*
+            $data = $session->read();
+            echo "<pre>";
+      	    print_r($data);
+      	    echo "</pre>";
+*/
         ?>
         <hr size="5" style="margin: 0.5rem">
         <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
@@ -78,6 +97,13 @@
       $set = "YES";
     }
     $mes = "※SET取のときは、1SETの合計重量を単重として考えてください！";
+/*
+    if($_POST['kariunyou'] == 0){
+      $kariunyou = "運用";
+    }else{
+      $kariunyou = "仮運用";
+    }
+*/
     ?>
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
@@ -147,12 +173,35 @@
         <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($BoxKonpous) ?></td>
     	</tr>
     </table>
+    <?php
+/*
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
       <tr>
         <td width="560" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">顧客</strong></td>
     	</tr>
       <tr>
         <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($Customer) ?></td>
+    	</tr>
+    </table>
+*/
+    ?>
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+      <tr>
+        <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">ショットサイクル</strong></td>
+        <td width="280"  bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">基準</strong></td>
+    	</tr>
+      <tr>
+        <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($this->request->getData('shot_cycle')) ?></td>
+        <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($this->request->getData('kijyun')) ?></td>
+    	</tr>
+    </table>
+
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+      <tr>
+        <td width="560" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">出荷先</strong></td>
+    	</tr>
+      <tr>
+        <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($PlaceDeliver) ?></td>
     	</tr>
     </table>
 

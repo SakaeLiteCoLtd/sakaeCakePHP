@@ -42,20 +42,33 @@
       <td width="300" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">品番</strong></div></td>
     </tr>
 
-<?php
-echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-?>
-<td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
-<?php
-echo "</tr>\n";
-?>
+    <tr style="border-bottom: 0px;border-width: 0px">
+      <td bgcolor="#FFFFCC"><?= h($this->request->getData('product_code')) ?></td>
+    </tr>
 
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-  <br>
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+      <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+          <tr style="border-bottom: 0px;border-width: 0px">
+            <td width="300" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">入数</strong></div></td>
+          </tr>
 
-<tr bgcolor="#E6FFFF" >
-  <td align="center" rowspan="2" width="30" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('次へ'), array('name' => 'confirm', 'value'=>"1")); ?></div></td>
-</tr>
-</table>
+          <tr style="border-bottom: 0px;border-width: 0px">
+            <td bgcolor="#FFFFCC"><?= h($irisu) ?></td>
+          </tr>
+
+    </table>
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+      <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+          <tr style="border-bottom: 0px;border-width: 0px">
+            <td width="300" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">箱No.</strong></div></td>
+          </tr>
+
+          <tr style="border-bottom: 0px;border-width: 0px">
+            <td bgcolor="#FFFFCC"><?= h($name_box) ?></td>
+          </tr>
+
+    </table>
 
 <br><br><br>

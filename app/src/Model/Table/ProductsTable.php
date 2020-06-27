@@ -49,10 +49,16 @@ class ProductsTable extends Table
             'joinType' => 'LEFT'//
         ]);
 
-        $this->belongsTo('Customers', [
-            'foreignKey' => 'customer_id',
-            'joinType' => 'INNER'
-        ]);
+                $this->belongsTo('Customers', [
+                    'foreignKey' => 'customer_id',
+                    'joinType' => 'INNER'
+                ]);
+
+                        $this->belongsTo('PlaceDelivers', [
+                            'foreignKey' => 'place_deliver_id',
+                            'joinType' => 'INNER'
+                        ]);
+
         $this->belongsTo('Materials', [
             'foreignKey' => 'material_id',
             'joinType' => 'INNER'

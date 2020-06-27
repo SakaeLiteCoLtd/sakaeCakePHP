@@ -11,25 +11,28 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 
             $htmlShinkimenu = new htmlShinkimenu();
             $htmlShinkis = $htmlShinkimenu->Shinkimenus();
+            $htmlcustomers = $htmlShinkimenu->customermenus();
         ?>
-<hr size="5">
-<table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-  <?php
-       echo $htmlShinkis;
-  ?>
-</table>
-<hr size="5">
-
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
-
-<hr size="5">
+        <hr size="5" style="margin: 0.5rem">
+        <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+          <?php
+               echo $htmlShinkis;
+          ?>
+        </table>
+        <hr size="5" style="margin: 0.5rem">
+        <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+          <?php
+               echo $htmlcustomers;
+          ?>
+        </table>
+        <hr size="5" style="margin: 0.5rem">
 
     <?= $this->Form->create($customer, ['url' => ['action' => 'confirm']]) ?>
     <fieldset>
       <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
               <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
                 <td><div align="center"><strong style="font-size: 12pt; color:blue">顧客コード</strong></div></td>
-                <td style="border-left-style: none;"><div align="center"><strong style="font-size: 12pt; color:blue">社名</strong></div></td>
+                <td style="border-left-style: none;"><div align="center"><strong style="font-size: 12pt; color:blue">顧客名</strong></div></td>
               <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
                 <td><?= $this->Form->input("customer_code", array('type' => 'value', 'label'=>false)); ?></td>
             		<td style="border-left-style: none;"><?= $this->Form->input("name", array('type' => 'value', 'label'=>false)); ?></td>
@@ -44,11 +47,11 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
                 <td><?= $this->Form->input("tel", array('type' => 'value', 'label'=>false)); ?></td>
       		      <td style="border-left-style: none;"><?= $this->Form->input("fax", array('type' => 'value', 'label'=>false)); ?></td>
               <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-                <td><div align="center"><strong style="font-size: 12pt; color:blue">ZIP</strong></div></td>
-                <td style="border-left-style: none;"><div align="center"><strong style="font-size: 12pt; color:blue">Status</strong></div></td>
+                <td><div align="center"><strong style="font-size: 12pt; color:blue">納入先ID</strong></div></td>
+                <td style="border-left-style: none;"><div align="center"><strong style="font-size: 12pt; color:blue">ハンディ表示名</strong></div></td>
               <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-                <td><?= $this->Form->input("zip", array('type' => 'value', 'label'=>false)); ?></td>
-                <td style="border-left-style: none;"><?= $this->Form->input("status", array('type' => 'value', 'label'=>false)); ?></td>
+                <td><?= $this->Form->input("place_deliver_code", array('type' => 'value', 'label'=>false)); ?></td>
+                <td style="border-left-style: none;"><?= $this->Form->input("name_handy", array('type' => 'value', 'label'=>false)); ?></td>
       </table>
 
         <?php

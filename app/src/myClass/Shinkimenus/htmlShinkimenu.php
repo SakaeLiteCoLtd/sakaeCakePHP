@@ -20,6 +20,9 @@ class htmlShinkimenu extends AppController
 	public function Shinkimenus()
 	{
         $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/form'>\n".
+        "<img src='/img/ShinkiTourokuMenu/TourokuCustomer.gif' width=105 height=36>\n".
+        "</a>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/products/form'>\n".
         "<img src='/img/ShinkiTourokuMenu/seihinntouroku.gif' width=105 height=36>\n".
         "</a>\n".
@@ -35,6 +38,23 @@ class htmlShinkimenu extends AppController
 		$this->data = $shinkimenus;
 	}
 
+  public function customermenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/form'>\n".
+        "<img src='/img/Labelimg/subTouroku.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/konpouyobidasiform'>\n".
+        "<img src='/img/Labelimg/subYobidashi.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/priceyobidasiform'>\n".
+        "<img src='/img/Labelimg/subDeliverToutoku.gif' width=85 height=36>\n".
+        "</a>\n";
+
+		return $html;
+		$this->html = $html;
+		$this->data = $shinkimenus;
+	}
 
 	public function get_data(){
 		return $this->data;

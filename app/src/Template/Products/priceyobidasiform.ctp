@@ -14,7 +14,7 @@
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($AccountPriceProducts, ['url' => ['action' => 'syukkajoukyouselect']]);
+          echo $this->Form->create($AccountPriceProducts, ['url' => ['action' => 'priceyobidasiview']]);
 
 ?>
 <hr size="5" style="margin: 0.5rem">

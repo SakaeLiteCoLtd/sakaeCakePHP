@@ -44,6 +44,7 @@ class Product extends Entity
         'product_code' => true,
         'product_name' => true,
         'customer_id' => true,
+        'place_deliver_id' => true,
         'material_kind' => true,
         'm_grade' => true,
         'col_num' => true,

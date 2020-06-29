@@ -776,4 +776,94 @@ class ProductsController extends AppController
 
 	 	 }
 
+		 public function productyobidasiform()
+ 	 {
+		 $product = $this->Products->newEntity();//newentityに$productという名前を付ける
+		 $this->set('product',$product);//1行上の$productをctpで使えるようにセット
+ 	 }
+
+ 		 public function productyobidasiview()
+ 		{
+			$product = $this->Products->newEntity();//newentityに$productという名前を付ける
+			$this->set('product',$product);//1行上の$productをctpで使えるようにセット
+
+ 		 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+ 		 $Products = $this->Products->find()->where(['product_code' => $data['product_code']])->toArray();
+ 		 if(isset($Products[0])){
+			 $product_code = $Products[0]->product_code;
+			 $this->set('product_code',$product_code);
+			 $product_name  = $Products[0]->product_name ;
+			 $this->set('product_name',$product_name);
+			 $m_grade = $Products[0]->m_grade ;
+			 $this->set('m_grade',$m_grade);
+			 $col_num = $Products[0]->col_num;
+			 $this->set('col_num',$col_num);
+			 $color = $Products[0]->color ;
+			 $this->set('color',$color);
+			 $material_kind = $Products[0]->material_kind ;
+			 $this->set('material_kind',$material_kind);
+			 $weight = $Products[0]->weight ;
+			 $this->set('weight',$weight);
+			 $torisu = $Products[0]->torisu ;
+			 $this->set('torisu',$torisu);
+			 $shot_cycle = $Products[0]->cycle ;
+			 $this->set('shot_cycle',$shot_cycle);
+
+			 $place_deliver = $Products[0]->place_deliver_id ;
+			 $PlaceDeliversData = $this->PlaceDelivers->find()->where(['id_from_order' => $place_deliver])->toArray();
+			 if(isset($PlaceDeliversData[0])){
+				 $PlaceDeliver = $PlaceDeliversData[0]->name;
+	       $this->set('PlaceDeliver',$PlaceDeliver);
+			 }else{
+				 $customer_id = $Products[0]->customer_id ;
+				 $CustomersData = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+	       $PlaceDeliver = $CustomersData[0]->customer_code.":".$CustomersData[0]->name;
+				 $this->set('PlaceDeliver',$PlaceDeliver);
+			 }
+
+			 $Konpous = $this->Konpous->find()->where(['product_code' => $product_code])->toArray();
+			 $irisu = $Konpous[0]->irisu;
+			 $this->set('irisu',$irisu);
+			 $id_box = $Konpous[0]->id_box;
+			 $BoxKonpous = $this->BoxKonpous->find()->where(['id_box' => $id_box])->toArray();
+			 $name_box = $BoxKonpous[0]->name_box;
+			 $this->set('name_box',$name_box);
+
+			 $AccountPriceProducts = $this->AccountPriceProducts->find()->where(['product_code' => $product_code])->toArray();
+			 $price = $AccountPriceProducts[0]->price;
+			 $this->set('price',$price);
+
+			 $Katakouzous = $this->Katakouzous->find()->where(['product_code' => $product_code])->toArray();
+			 $kataban = $Katakouzous[0]->kataban;
+			 $this->set('kataban',$kataban);
+			 $torisu = $Katakouzous[0]->torisu;
+			 $this->set('torisu',$torisu);
+			 $set_tori = $Katakouzous[0]->set_tori;
+			 if($set_tori == 0){
+				 $set = "NO";
+				 $this->set('set',$set);
+			 }else{
+				 $set = "YES";
+				 $this->set('set',$set);
+			 }
+
+			 $ZensuProducts = $this->ZensuProducts->find()->where(['product_code' => $product_code])->toArray();
+			 if(isset($ZensuProducts[0])){
+				 $kijyun = $ZensuProducts[0]->kijyun;
+				 $this->set('kijyun',$kijyun);
+			 }else{
+				 $kijyun = "";
+				 $this->set('kijyun',$kijyun);
+			 }
+
+ 			}else{
+ 				echo "<pre>";
+ 				print_r("その製品はデータベースに存在しません。");
+ 				echo "</pre>";
+ 			}
+
+ 		}
+
+
 }

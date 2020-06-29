@@ -26,6 +26,9 @@ class htmlShinkimenu extends AppController
         "<td style='padding: 0.1rem 0.1rem;'><a href='/products/form'>\n".
         "<img src='/img/ShinkiTourokuMenu/seihinntouroku.gif' width=105 height=36>\n".
         "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/products/productyobidasiform'>\n".
+        "<img src='/img/ShinkiTourokuMenu/yobidashi_seihin.gif' width=105 height=36>\n".
+        "</a>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/products/konpouyobidasiform'>\n".
         "<img src='/img/ShinkiTourokuMenu/konpou_irisu.gif' width=105 height=36>\n".
         "</a>\n".
@@ -44,10 +47,10 @@ class htmlShinkimenu extends AppController
         "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/form'>\n".
         "<img src='/img/Labelimg/subTouroku.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/konpouyobidasiform'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/yobidashi'>\n".
         "<img src='/img/Labelimg/subYobidashi.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/priceyobidasiform'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/deliverform'>\n".
         "<img src='/img/Labelimg/subDeliverToutoku.gif' width=85 height=36>\n".
         "</a>\n";
 

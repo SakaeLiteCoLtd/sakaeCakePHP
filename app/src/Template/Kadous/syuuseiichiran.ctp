@@ -61,7 +61,7 @@
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->finishing_tm->format('Y-m-d H:i:s')) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->cycle_shot) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis->amount_shot) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="red"><?= h($KadouSeikeis->accomp_rate) ?></font><font color="blue"><?= h(" ％") ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="red"><?= h($KadouSeikeis->accomp_rate*100) ?></font><font color="blue"><?= h(" ％") ?></font></td>
           </tr>
           <?php endforeach; ?>
         </tbody>

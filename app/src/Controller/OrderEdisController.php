@@ -65,12 +65,12 @@ class OrderEdisController extends AppController
         for($count = 0; fgets( $fpcount ); $count++ );//$fpcountの行数を数え、$countと名付ける
         $arrFp = array();//空の配列を作る
         $created_staff = $this->Auth->user('staff_id');
-        for ($k=1; $k<=$count-1; $k++) {//最後の行まで
+        for ($k=1; $k<=$count; $k++) {//最後の行まで
           $line = fgets($fp);//ファイル$fpの上の１行（カラム名が並んでいるため）を取る（２行目から読み込み開始）
           $sample = explode(',',$line);//$lineを','毎に配列に入れる
 
            $keys=array_keys($sample);
-           $keys[array_search('3',$keys)]='place_deliver_code';//名前の変更（3➝place_deliver_code）
+           $keys[array_search('3',$keys)]='place_deliver_code';//名前の変更（3?place_deliver_code）
            $keys[array_search('10',$keys)]='date_order';
            $keys[array_search('12',$keys)]='price';
            $keys[array_search('14',$keys)]='amount';
@@ -419,7 +419,7 @@ class OrderEdisController extends AppController
       $arrDnpdouitutyuumon = array();//空の配列を作る
       $created_staff = $this->Auth->user('staff_id');
 
-        for ($k=1; $k<=$count-1; $k++) {//最後の行まで
+        for ($k=1; $k<=$count; $k++) {//最後の行まで
           $line = fgets($fpmoto);//ファイル$fpの上の１行を取る（２行目から）
           $sample = explode(',',$line);//$lineを','毎に配列に入れる
 
@@ -466,7 +466,7 @@ echo "</pre>";
       $arrDnpdouitutyuumon = array();//空の配列を作る
       $created_staff = $this->Auth->user('staff_id');
 
-        for ($k=1; $k<=$count-1; $k++) {//最後の行まで
+        for ($k=1; $k<=$count; $k++) {//最後の行まで
           $line = fgets($fp1);//ファイル$fpの上の１行を取る（２行目から）
           $sample = explode(',',$line);//$lineを','毎に配列に入れる
 
@@ -707,7 +707,7 @@ echo "</pre>";
             $connection = ConnectionManager::get('default');
 //新DBに戻す
 
-            for ($k=1; $k<=$count-1; $k++) {//最後の行まで
+            for ($k=1; $k<=$count; $k++) {//最後の行まで
               $line = fgets($fp2);//ファイル$fpの上の１行を取る（２行目から）
               $sample = explode(',',$line);//$lineを','毎に配列に入れる
 
@@ -792,7 +792,7 @@ echo "</pre>";
               $connection = ConnectionManager::get('default');
               //旧DBここまで
 
-              for ($k=1; $k<=$count-1; $k++) {//最後の行まで
+              for ($k=1; $k<=$count; $k++) {//最後の行まで
                 $line = fgets($fp3);//ファイル$fpの上の１行を取る（２行目から）
                 $sample = explode(',',$line);//$lineを','毎に配列に入れる
 
@@ -1028,7 +1028,7 @@ echo "</pre>";
       for($count = 0; fgets( $fpcount ); $count++ );
       $arrSyoyouKeikaku = array();//空の配列を作る
       $created_staff = $this->Auth->user('staff_id');
-      for ($k=1; $k<=$count-1; $k++) {//最後の行まで
+      for ($k=1; $k<=$count; $k++) {//最後の行まで
         $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
         $sample = explode(',',$line);//$lineを','毎に配列に入れる
 
@@ -2456,8 +2456,9 @@ echo "</pre>";
         'AND' => [['customer_code !=' => '10001'], ['customer_code !=' => '10002'], ['customer_code !=' => '10003'], ['customer_code !=' => '20001']]]));
       }else{//product_codeの入力があるとき
         $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-        ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code,
-        'AND' => [['customer_code !=' => '10001'], ['customer_code !=' => '10002'], ['customer_code !=' => '10003'], ['customer_code !=' => '20001']]]));
+        ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code
+    //    'AND' => [['customer_code !=' => '10001'], ['customer_code !=' => '10002'], ['customer_code !=' => '10003'], ['customer_code !=' => '20001']]
+        ]));
       }
     }
 

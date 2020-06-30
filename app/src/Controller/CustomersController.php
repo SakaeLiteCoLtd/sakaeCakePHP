@@ -20,6 +20,7 @@ class CustomersController extends AppController
 				 $this->Users = TableRegistry::get('users');
          $this->PlaceDelivers = TableRegistry::get('placeDelivers');
          $this->Customers = TableRegistry::get('customers');
+         $this->CustomersHandys = TableRegistry::get('customersHandys');
 		 }
 
     public function index()
@@ -204,8 +205,10 @@ class CustomersController extends AppController
 
      public function deliverdo()
     {
-			$PlaceDeliver = $this->PlaceDelivers->newEntity();//newEntityを作成
+      $PlaceDeliver = $this->PlaceDelivers->newEntity();//newEntityを作成
 			$this->set('PlaceDeliver', $PlaceDeliver);//1行上の$customerをctpで使えるようにセット
+      $CustomersHandys = $this->CustomersHandys->newEntity();//newEntityを作成
+			$this->set('CustomersHandys', $CustomersHandys);//1行上の$customerをctpで使えるようにセット
 
 			$session = $this->request->getSession();
 			$data = $session->read();//postデータ取得し、$dataと名前を付ける
@@ -214,10 +217,9 @@ class CustomersController extends AppController
 			$data['placedata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
 /*
       echo "<pre>";
-	    print_r($data['customerdata']);
+	    print_r($data['cs_handydata']);
 	    echo "</pre>";
 */
-
       $customer_code = $data['placedata']['cs_code'];
       $CustomersData = $this->Customers->find()->where(['customer_code' => $customer_code])->toArray();
       $Customer = $CustomersData[0]->customer_code.":".$CustomersData[0]->name;
@@ -231,6 +233,10 @@ class CustomersController extends AppController
 				try {//トランザクション4
 					if ($this->PlaceDelivers->save($PlaceDeliver)) {
 
+          //CustomersHandys登録
+          $CustomersHandys = $this->CustomersHandys->patchEntity($CustomersHandys, $data['cs_handydata']);
+          $this->CustomersHandys->save($CustomersHandys);
+
             //旧DBに製品登録
 						$connection = ConnectionManager::get('DB_ikou_test');
 						$table = TableRegistry::get('placedeliver');
@@ -241,6 +247,13 @@ class CustomersController extends AppController
                 'name' => $data['placedata']["name"],
                 'cs_id' => $data['placedata']["cs_code"]
             ]);
+
+            //旧DBにcustomers_handy登録
+							$connection->insert('customers_handy', [
+									'place_deliver_id' => $data['cs_handydata']["place_deliver_code"],
+									'name' => $data['cs_handydata']["name"],
+									'flag' => $data['cs_handydata']["flag"]
+							]);
 
             $connection = ConnectionManager::get('default');//新DBに戻る
             $table->setConnection($connection);
@@ -259,6 +272,7 @@ class CustomersController extends AppController
 					$connection->rollback();//トランザクション9
 				}//トランザクション10
 			}
+
     }
 
     public function yobidashi()

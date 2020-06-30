@@ -42,7 +42,8 @@ class OrderEdisController extends AppController
        $this->OrderToSuppliers = TableRegistry::get('orderToSuppliers');
        $this->AttachOrderToSuppliers = TableRegistry::get('attachOrderToSuppliers');
        $this->AccountPriceProducts = TableRegistry::get('accountPriceProducts');
-
+       $this->ProductSuppliers = TableRegistry::get('productSuppliers');
+       $this->OrderYobistockSuppliers = TableRegistry::get('orderYobistockSuppliers');
      }
 
      public function indexmenu()
@@ -3679,60 +3680,484 @@ echo "</pre>";
       }//トランザクション10
     }
 
-
-    public function ordertosuppliershenkouday()
+    public function denpyouindex()
     {
+      $this->request->session()->destroy(); // セッションの破棄
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+    }
+
+    public function denpyouhattyu()
+    {
+      $this->request->session()->destroy(); // セッションの破棄
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+    }
+
+    public function denpyouhenkoukensaku()
+    {
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+    }
+
+    public function denpyouhenkouichiran()
+    {
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $date_sta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
+      $date_fin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
+      $product_code = $data['product_code'];
+/*
+      echo "<pre>";
+      print_r($date_sta."---".$date_fin);
+      echo "</pre>";
+*/
+      if(empty($product_code)){//product_codeの入力がないとき
+        $product_code = "no";
+        $this->set('OrderToSuppliers',$this->OrderToSuppliers->find()
+          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin]
+          ));//対象の製品を絞り込む
+      }else{//product_codeの入力があるとき
+        $this->set('OrderToSuppliers',$this->OrderToSuppliers->find()
+          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code]
+          ));//対象の製品を絞り込む
+      }
 
     }
 
-    public function ordertosuppliershenkouichiran()
+    public function denpyouhenkouform()
     {
+      $this->request->session()->destroy(); // セッションの破棄
+
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $array = array();
+      $checknum = 0;
+      for ($k=1; $k<=$data["nummax"]; $k++){
+        if(isset($data["subete"])){
+          $array[] = $data["$k"];
+        }elseif(isset($data["check".$k])){//checkがついているもののidをキープ
+          $array[] = $data["$k"];
+          $checknum = $checknum + 1;
+        }else{
+        }
+      }
+
+      $count = count($array);
+      $this->set('count',$count);
+
+      $arrOrderToSupplier = array();
+      for ($k=0; $k<$count; $k++){
+        $OrderToSuppliers = $this->OrderToSuppliers->find()->where(['id' => $array[$k]])->toArray();
+        $id = $OrderToSuppliers[0]->id;
+        $id_order = $OrderToSuppliers[0]->id_order;
+        $product_code = $OrderToSuppliers[0]->product_code;
+
+        $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+        $product_name = $Product[0]->product_name;
+
+        $date_deliver = $OrderToSuppliers[0]->date_deliver;
+        $amount = $OrderToSuppliers[0]->amount;
+        $id_supplier = $OrderToSuppliers[0]->id_supplier;
+
+        $ProductSuppliers = $this->ProductSuppliers->find()->where(['id' => $id_supplier])->toArray();
+        $Supplier = $ProductSuppliers[0]->name;
+
+        $arrOrderToSupplier[] = ["id" => $id, "id_order" => $id_order, "product_code" => $product_code, "product_name" => $product_name,
+        "date_deliver" => $date_deliver, "amount" => $amount, "Supplier" => $Supplier];
+      }
+
+      $this->set('arrOrderToSupplier',$arrOrderToSupplier);
 
     }
 
-    public function ordertosuppliershenkouform()
+    public function denpyouhenkouconfirm()
     {
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $data = $this->request->getData();
+
+      session_start();
+      for($k=0; $k<$data["num"]; $k++){
+        $_SESSION['orderToSuppliers'][$k] = array(
+          'id' => $data["id{$k}"],
+          'amount' => $data["amount_{$k}"],
+          'date_deliver' => $data["date_deliver_{$k}"]
+        );
+      }
+      $this->set('count',$data["num"]);
+/*
+      echo "<pre>";
+      print_r($_SESSION);
+      echo "</pre>";
+*/
+      for ($k=0; $k<$data["num"]; $k++){
+        $OrderToSuppliers = $this->OrderToSuppliers->find()->where(['id' => $data["id{$k}"]])->toArray();
+        $id = $OrderToSuppliers[0]->id;
+        $id_order = $OrderToSuppliers[0]->id_order;
+        $product_code = $OrderToSuppliers[0]->product_code;
+
+        $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+        $product_name = $Product[0]->product_name;
+
+        $date_deliver = $data["date_deliver_{$k}"];
+        $amount = $data["amount_{$k}"];
+        $id_supplier = $OrderToSuppliers[0]->id_supplier;
+
+        $ProductSuppliers = $this->ProductSuppliers->find()->where(['id' => $id_supplier])->toArray();
+        $Supplier = $ProductSuppliers[0]->name;
+
+        $arrOrderToSupplier[] = ["id" => $id, "id_order" => $id_order, "product_code" => $product_code, "product_name" => $product_name,
+        "date_deliver" => $date_deliver, "amount" => $amount, "Supplier" => $Supplier];
+      }
+      $this->set('arrOrderToSupplier',$arrOrderToSupplier);
 
     }
 
-    public function ordertosuppliershenkoupreadd()
+    public function denpyouhenkoupreadd()
     {
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+    }
+
+    public function denpyouhenkoulogin()
+    {
+      if ($this->request->is('post')) {
+ 			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+ 			 $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+ 			 $ary = explode(',', $str);//$strを配列に変換
+
+ 			 $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+ 			 //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+ 			 $this->set('username', $username);
+ 			 $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+ 				 if(empty($Userdata)){
+ 					 $delete_flag = "";
+ 				 }else{
+ 					 $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+ 					 $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+ 				 }
+ 					 $user = $this->Auth->identify();
+ 				 if ($user) {
+ 					 $this->Auth->setUser($user);
+ 					 return $this->redirect(['action' => 'denpyouhenkoudo']);
+ 				 }
+ 			 }
+    }
+
+    public function denpyouhenkoudo()
+    {
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+			$session = $this->request->getSession();
+			$data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+/*
+      echo "<pre>";
+	    print_r($data);
+	    echo "</pre>";
+*/
+      if ($this->request->is('get')) {
+        $OrderToSuppliers = $this->OrderToSuppliers->patchEntity($OrderToSuppliers, $data['orderToSuppliers']);
+        $connection = ConnectionManager::get('default');//トランザクション1
+         // トランザクション開始2
+         $connection->begin();//トランザクション3
+         try {//トランザクション4
+           for($k=0; $k<count($data['orderToSuppliers']); $k++){
+
+               if ($this->OrderToSuppliers->updateAll(//検査終了時間の更新
+                 ['amount' => $data['orderToSuppliers'][$k]['amount'], 'date_deliver' => $data['orderToSuppliers'][$k]['date_deliver'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $staff_id],
+                 ['id'  => $data['orderToSuppliers'][$k]['id']]
+               )){
+
+                 $OrderToSuppliers = $this->OrderToSuppliers->find()->where(['id' => $data['orderToSuppliers'][$k]['id']])->toArray();
+                 $id_order = $OrderToSuppliers[0]->id_order;
+                 $product_code = $OrderToSuppliers[0]->product_code;
+
+                 //旧DBに単価登録
+                 $connection = ConnectionManager::get('DB_ikou_test');
+                 $table = TableRegistry::get('order_to_supplier');
+                 $table->setConnection($connection);
+
+                 $updater = "UPDATE order_to_supplier set amount = '".$data['orderToSuppliers'][$k]['amount']."' , date_deliver ='".$data['orderToSuppliers'][$k]['date_deliver']."'
+                 , updated_at = '".date('Y-m-d H:i:s')."' , updated_emp_id = '".$staff_id."'
+                 where product_id ='".$product_code."' and id_order = '".$id_order."'";
+                 $connection->execute($updater);
+
+                 $connection = ConnectionManager::get('default');//新DBに戻る
+                 $table->setConnection($connection);
+
+               $mes = "※更新されました";
+               $this->set('mes',$mes);
+               $connection->commit();// コミット5
+
+             } else {
+
+               $mes = "※更新されませんでした";
+               $this->set('mes',$mes);
+               $this->Flash->error(__('The product could not be saved. Please, try again.'));
+               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+             }
+
+           }
+
+       } catch (Exception $e) {//トランザクション7
+       //ロールバック8
+         $connection->rollback();//トランザクション9
+       }//トランザクション10
+
+     }
+
 
     }
 
-    public function ordertosuppliershenkoulogin()
+    public function yobizaikopreadd()
     {
+      $this->request->session()->destroy(); // セッションの破棄
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+    }
+
+    public function yobizaikologin()
+    {
+      if ($this->request->is('post')) {
+ 			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+ 			 $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+ 			 $ary = explode(',', $str);//$strを配列に変換
+
+ 			 $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+ 			 //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+ 			 $this->set('username', $username);
+ 			 $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+ 				 if(empty($Userdata)){
+ 					 $delete_flag = "";
+ 				 }else{
+ 					 $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+ 					 $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+ 				 }
+ 					 $user = $this->Auth->identify();
+ 				 if ($user) {
+ 					 $this->Auth->setUser($user);
+ 					 return $this->redirect(['action' => 'yobizaikoproduct']);
+ 				 }
+ 			 }
+    }
+
+    public function yobizaikoproduct()
+    {
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+    }
+
+    public function yobizaikoform()
+    {
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+      $this->set('staff_id',$staff_id);
+
+      $data = $this->request->getData();
+
+      $staffData = $this->Staffs->find()->where(['id' => $staff_id])->toArray();
+      $Staff = $staffData[0]->staff_code." : ".$staffData[0]->f_name." ".$staffData[0]->l_name;
+      $this->set('Staff',$Staff);
+
+      $product_code = $data["product_code"];
+      $this->set('product_code',$product_code);
+
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $product_name = $Product[0]->product_name;
+      $this->set('product_name',$product_name);
+
+      $ProductGaityus = $this->ProductGaityus->find()->where(['product_code' => $product_code])->toArray();
+      $id_supplier = $ProductGaityus[0]->id_supplier;
+
+      $ProductSuppliers = $this->ProductSuppliers->find()->where(['id' => $id_supplier])->toArray();
+      $Supplier = $ProductSuppliers[0]->name;
+      $this->set('Supplier',$Supplier);
 
     }
 
-    public function ordertosuppliershenkoudo()
+    public function yobizaikoformtuika()
     {
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $data = $this->request->getData();
+
+      $staff_id = $data['staff_id'];
+      $this->set('staff_id',$staff_id);
+
+      $Staff = $data["Staff"];
+      $this->set('Staff',$Staff);
+
+      $product_code = $data["product_code"];
+      $this->set('product_code',$product_code);
+
+      $product_name = $data["product_name"];
+      $this->set('product_name',$product_name);
+
+      $Supplier = $data["Supplier"];
+      $this->set('Supplier',$Supplier);
+
+      if(isset($data['tuika'])){
+        $tuika = $data['num'] + 1;
+        $this->set('tuika',$tuika);
+      }elseif(isset($data['sakujo'])){
+        if($data['num'] == 0){
+          $tuika = 0;
+          $this->set('tuika',$tuika);
+        }else{
+          $tuika = $data['num'] - 1;
+          $this->set('tuika',$tuika);
+        }
+      }elseif(isset($data['kakunin'])){
+        $tuika = $data['num'];
+        $this->set('tuika',$tuika);
+        return $this->redirect(['action' => 'yobizaikoconfirm',//以下のデータを持ってzensufinishconfirmに移動
+        's' => ['data' => $data]]);//登録するデータを全部配列に入れておく
+      }
 
     }
 
-    public function ordertosuppliersyobiprelogin()
+    public function yobizaikoconfirm()
     {
+      $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
+      $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $Data = $this->request->query('s');
+      $data = $Data['data'];//postデータ取得し、$dataと名前を付ける
+
+      $this->set('data',$data);
+      $tuika = $data['num'];
+      $this->set('tuika',$tuika);
+      $Staff = $data['Staff'];
+      $this->set('Staff',$Staff);
+      $staff_id = $data['staff_id'];
+      $this->set('staff_id',$staff_id);
+      $Supplier = $data['Supplier'];
+      $this->set('Supplier',$Supplier);
+      $product_code = $data["product_code"];
+      $this->set('product_code',$product_code);
+      $product_name = $data["product_name"];
+      $this->set('product_name',$product_name);
+/*
+      echo "<pre>";
+	    print_r($data);
+	    echo "</pre>";
+*/
+      for ($k=0; $k<=$data["num"]; $k++){
+        $date_deliver = $data["date_deliver{$k}"]['year']."-".$data["date_deliver{$k}"]['month']."-".$data["date_deliver{$k}"]['day'];
+        $amount = $data["amount{$k}"];
+
+        $ProductGaityus = $this->ProductGaityus->find()->where(['product_code' => $product_code])->toArray();
+        $id_supplier = $ProductGaityus[0]->id_supplier;
+
+        $ProductSuppliers = $this->ProductSuppliers->find()->where(['id' => $id_supplier])->toArray();
+        $Supplier = $ProductSuppliers[0]->name;
+
+        $AccountPriceProducts = $this->AccountPriceProducts->find()->where(['product_code' => $product_code])->toArray();
+        $price = $AccountPriceProducts[0]->price;
+
+        $k1 = $k+1;
+        $arrOrderToSupplier[] = ["num_order" => $k1, "product_code" => $product_code, "price" => $price,
+        "id_supplier" => $id_supplier, "date_deliver" => $date_deliver, "amount" => $amount, "date_order" => date('Y-m-d'),
+        "first_date_deliver" => $date_deliver, "first_amount" => $amount,
+        "kanou_flag" => 0, "delete_flag" => 0, "created_staff" => $staff_id, "created_at" => date('Y-m-d H:i:s')];
+      }
+      $this->set('arrOrderToSupplier',$arrOrderToSupplier);
+
+      $this->request->session()->destroy(); // セッションの破棄
+      session_start();
+      $_SESSION['orderyobistock'] = $arrOrderToSupplier;
+/*
+      echo "<pre>";
+	    print_r($_SESSION['orderToSuppliers']);
+	    echo "</pre>";
+*/
+    }
+
+    public function yobizaikodo()
+    {
+      $OrderYobistockSuppliers = $this->OrderYobistockSuppliers->newEntity();
+      $this->set('OrderYobistockSuppliers',$OrderYobistockSuppliers);
+
+      $session = $this->request->getSession();
+			$data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+        $OrderYobistockSuppliers = $this->OrderYobistockSuppliers->patchEntities($OrderYobistockSuppliers, $data['orderyobistock']);
+        $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+        $connection->begin();//トランザクション3
+        try {//トランザクション4
+            if ($this->OrderYobistockSuppliers->saveMany($OrderYobistockSuppliers)) {//saveManyで一括登録
+
+              //旧DBに単価登録
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('order_yobistock_suppliers');
+              $table->setConnection($connection);
+
+              for($k=0; $k<count($data['orderyobistock']); $k++){
+                $connection->insert('order_yobistock_suppliers', [
+                    'product_id' => $data['orderyobistock'][$k]["product_code"],
+                    'num_order' => $data['orderyobistock'][$k]["num_order"],
+                    'price' => $data['orderyobistock'][$k]["price"],
+                    'first_date_deliver' => $data['orderyobistock'][$k]["date_deliver"],
+                    'date_deliver' => $data['orderyobistock'][$k]["date_deliver"],
+                    'first_amount' => $data['orderyobistock'][$k]["amount"],
+                    'amount' => $data['orderyobistock'][$k]["amount"],
+                    'supplier_id' => $data['orderyobistock'][$k]["id_supplier"],
+                    'date_order' => $data['orderyobistock'][$k]["date_order"],
+                    'kanou_flag' => $data['orderyobistock'][$k]["kanou_flag"],
+                    'delete_flag' => $data['orderyobistock'][$k]["delete_flag"],
+                    'created_emp_id' => $data['orderyobistock'][$k]["created_staff"],
+                    'created_at' => $data['orderyobistock'][$k]["created_at"]
+                ]);
+              }
+
+              $connection = ConnectionManager::get('default');//新DBに戻る
+              $table->setConnection($connection);
+
+              $mes = "※登録されました";
+              $this->set('mes',$mes);
+              $connection->commit();// コミット5
+
+             } else {
+
+               $mes = "※登録されませんでした";
+               $this->set('mes',$mes);
+               $this->Flash->error(__('The product could not be saved. Please, try again.'));
+               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+             }
+
+       } catch (Exception $e) {//トランザクション7
+       //ロールバック8
+         $connection->rollback();//トランザクション9
+       }//トランザクション10
 
     }
 
-    public function ordertosuppliersyobilogin()
-    {
-
-    }
-
-    public function ordertosuppliersyobiform()
-    {
-
-    }
-
-    public function ordertosuppliersyobiconfirm()
-    {
-
-    }
-
-    public function ordertosuppliersyobido()
-    {
-
-    }
 
 }

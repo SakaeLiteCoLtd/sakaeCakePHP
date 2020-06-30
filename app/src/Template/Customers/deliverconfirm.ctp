@@ -27,6 +27,11 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         $session->write('placedata.created_staff', $_POST['created_staff']);
         $session->write('placedata.created_at', date('Y-m-d H:i:s'));
         $session->write('placedata.updated_staff', null);
+
+        $session->write('cs_handydata.place_deliver_code', $_POST['id_from_order']);
+        $session->write('cs_handydata.name', $_POST['name']);
+        $session->write('cs_handydata.flag', 0);
+
 /*
         $data = $session->read();
         echo "<pre>";

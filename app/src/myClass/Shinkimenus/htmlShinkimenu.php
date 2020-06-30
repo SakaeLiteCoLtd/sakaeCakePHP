@@ -59,6 +59,18 @@ class htmlShinkimenu extends AppController
 		$this->data = $shinkimenus;
 	}
 
+  public function denpyomenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/orderEdis/denpyouhattyu'>\n".
+        "<img src='/img/Labelimg/order.gif' width=105 height=36>\n".
+        "</a>\n";
+
+		return $html;
+		$this->html = $html;
+		$this->data = $shinkimenus;
+	}
+
 	public function get_data(){
 		return $this->data;
 		}

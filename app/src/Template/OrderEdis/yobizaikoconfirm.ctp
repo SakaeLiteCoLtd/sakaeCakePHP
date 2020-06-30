@@ -6,7 +6,7 @@
  use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置したクラスを使用
 
  $htmlShinkimenu = new htmlShinkimenu();
- $htmlShinkis = $htmlShinkimenu->Shinkimenus();
+ $htmldenpyomenus = $htmlShinkimenu->denpyomenus();
 ?>
 <?php
   $username = $this->request->Session()->read('Auth.User.username');
@@ -16,24 +16,44 @@
   header('Pragma:');
   echo $this->Form->create($OrderToSuppliers, ['url' => ['action' => 'yobizaikodo']]);
 ?>
+<?php
+//納期のかぶりをチェック
+$arrdate_deliver = array();//空の配列を作る
+for ($j=0;$j<=$tuika;$j++){
+  $arrdate_deliver[] = $arrOrderToSupplier[$j]['date_deliver'];//配列に追加する
+}
+
+$uniquearrdate_deliver = array_unique($arrdate_deliver, SORT_REGULAR);//重複削除
+$cntuniquearrdate_deliver = count($uniquearrdate_deliver);
+
+  if($cntuniquearrdate_deliver == $tuika){
+    $deliver_check = 1;
+  }else{
+    $deliver_check = 0;
+  }
+
+?>
 
 <hr size="5" style="margin: 0.5rem">
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
 <?php
-   echo $htmlShinkis;
+echo $htmldenpyomenus;
 ?>
 </table>
  <hr size="5" style="margin: 0.5rem">
  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
  <tr style="background-color: #E6FFFF">
-   <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/konpou_yobidashi.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'products','action'=>'konpouyobidasiform')));?></td>
-   <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/konpou_syusei.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'products','action'=>'konpousyuuseikensaku')));?></td>
+   <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hattyusumi.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'orderEdis','action'=>'denpyouhenkoukensaku')));?></td>
+   <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/yobizaiko.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'orderEdis','action'=>'yobizaikopreadd')));?></td>
  </tr>
  </table>
  <hr size="5" style="margin: 0.5rem">
  <br>
  <legend align="center"><strong style="font-size: 13pt; color:blue"><?= __("予備在庫発注") ?></strong></legend>
 <br>
+
+<?php if($deliver_check == 0): //納期がかぶっていない場合 ?>
+
 <table width="200" align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">担当者</strong></td>
@@ -99,3 +119,11 @@
 <br><br><br><br>
 <br><br><br><br>
 <br><br><br>
+
+<?php else: //分納追加（削除）を押された場合?>
+
+  <br>
+    <legend align="center"><strong style="font-size: 11pt; color:red"><?= "※納期が被っています。納期を変更してください。" ?></strong></legend>
+  <br><br><br>
+
+<?php endif; ?>

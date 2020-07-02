@@ -916,10 +916,47 @@ class KadousController extends AppController
         }
       }
 
+      echo "<pre>";
+      print_r($kadouSeikei[0]);
+      echo "</pre>";
+
+      $connection = ConnectionManager::get('default');
+      $table->setConnection($connection);
+
+
+      $KadouSeikeis = $this->KadouSeikeis->find()->where(['starting_tm' => $kadouSeikei[0]["starting_tm"], 'seikeiki' => $kadouSeikei[0]["seikeiki"], 'product_code' => $kadouSeikei[0]["pro_num"]])->toArray();
+      $id = $KadouSeikeis[0]->id;
+
+      
+
+      echo "<pre>";
+      print_r($id);
+      echo "</pre>";
+
       $this->set('kadouSeikei',$kadouSeikei);
       $this->set('countkadouSeikei',count($kadouSeikei));
 
     }
+
+    public function kensakusyousai()
+    {
+      $this->request->session()->destroy(); // セッションの破棄
+      $KadouSeikeis = $this->KadouSeikeis->newEntity();
+      $this->set('KadouSeikeis',$KadouSeikeis);
+
+      $data = $this->request->getData();
+
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+
+      $data = array_keys($data, '詳細');
+
+      echo "<pre>";
+      print_r($data[0]);
+      echo "</pre>";
+    }
+
 
     public function syuuseiform()//ロット検索
     {

@@ -27,7 +27,7 @@
          ?>
          </table>
          <hr size="5" style="margin: 0.5rem">
-<?=$this->Form->create($KadouSeikeis, ['url' => ['action' => 'kensakusyousai']]) ?>
+<?=$this->Form->create($KadouSeikeis, ['url' => ['action' => 'kensakuview']]) ?>
 <br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
@@ -61,7 +61,7 @@
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["last_lot_num"]) ?></font></td>
             <?php
             echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
-            echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $kadouSeikei[$i]["pro_num"]]) ;
+            echo $this->Form->submit("詳細" , ['action'=>'syuuseiform', 'name' => "select", 'id' => $kadouSeikei[$i]["pro_num"]]) ;
             echo "</div></td>";
             ?>
           </tr>

@@ -48,9 +48,11 @@ $this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
 <br>
 
 <?php
+/*
 echo "<pre>";
 print_r($data);
 echo "</pre>";
+*/
 ?>
 
 

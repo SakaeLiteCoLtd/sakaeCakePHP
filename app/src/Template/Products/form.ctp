@@ -45,7 +45,7 @@
   <tr>
     <td width="140" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">グレード</strong></td>
     <td width="140"  bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色番号</strong></td>
-    <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色調</strong></td>
+    <td width="282" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色調</strong></td>
 	</tr>
   <tr>
     <td width="140" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('m_grade', array('type'=>'text', 'label'=>false)) ?></td>
@@ -104,11 +104,12 @@
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">ショットサイクル</strong></td>
-    <td width="280"  bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">基準</strong></td>
+    <td width="280"  colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">外観検査基準時間</strong></td>
 	</tr>
   <tr>
     <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('shot_cycle', array('type'=>'text', 'label'=>false)) ?></td>
-    <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('kijyun', array('type'=>'text', 'label'=>false)) ?></td>
+    <td  width="220" bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><?= $this->Form->control('kijyun', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="62" bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 13pt; color:blue">分</strong></td>
 	</tr>
 </table>
 
@@ -129,7 +130,7 @@
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="560" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">出荷先</strong></td>
+    <td width="562" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">出荷先</strong></td>
 	</tr>
   <tr>
     <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("place_deliver_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrPlaceDeliver, 'label'=>false]) ?></td>

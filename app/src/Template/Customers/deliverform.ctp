@@ -52,9 +52,6 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         ?>
     </fieldset>
 
-    <legend align="center"><font color="red"><?= __("※住所、電話番号、FAXは空のままでも登録できます。") ?></font></legend>
-    <br>
-
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
       <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')); ?></div></td>

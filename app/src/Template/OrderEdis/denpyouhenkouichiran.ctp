@@ -46,6 +46,7 @@ $i = 0;
   <td style="border-style: none;"><div align="center"><?= $this->Form->submit('全て選択', array('name' => 'subete')); ?></div></td>
   </tr>
   </table>
+<br><br>
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
           <thead>

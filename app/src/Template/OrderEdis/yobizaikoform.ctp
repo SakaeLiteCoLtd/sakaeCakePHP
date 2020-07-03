@@ -80,7 +80,7 @@
   <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('不良内容登録確認'), array('name' => 'kakunin')); ?></div></td>
 </tr>
 </table>
-
+<br><br>
 <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr style="border-bottom: solid;border-width: 1px">
     <td width='100'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">No.</strong></td>

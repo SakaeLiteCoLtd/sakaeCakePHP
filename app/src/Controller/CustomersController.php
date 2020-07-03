@@ -242,6 +242,7 @@ class CustomersController extends AppController
 						$table = TableRegistry::get('placedeliver');
 						$table->setConnection($connection);
 
+
             $connection->insert('placedeliver', [
                 'id_from_order' => $data['placedata']["id_from_order"],
                 'name' => $data['placedata']["name"],

@@ -9,7 +9,7 @@
     echo $htmlEDIs;
  ?>
  <?php
-   echo $this->Form->create($orderEdis, ['url' => ['action' => 'index']]);
+   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkousentakucustomer']]);
 ?>
 
 </table>

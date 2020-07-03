@@ -27,45 +27,86 @@
          ?>
          </table>
          <hr size="5" style="margin: 0.5rem">
-<?=$this->Form->create($KadouSeikeis, ['url' => ['action' => 'kensakuview']]) ?>
+
 <br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
         <thead>
             <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">品番</strong></div></td>
-              <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF">成型機</strong></div></td>
-              <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">開始時刻</strong></div></td>
-              <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">終了時刻</strong></div></td>
-              <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF">ショットサイクル</strong></div></td>
-              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 8pt; color:#FF66FF">日報ショット数</strong></div></td>
-              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 8pt; color:#FF66FF">PRGショット数</strong></div></td>
-              <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF">達成率</strong></div></td>
-              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">開始ロット</strong></div></td>
-              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">最終ロット</strong></div></td>
-              <td width="60" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF"></strong></div></td>
+              <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF66FF">成型機</strong></div></td>
+              <td width="180" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF66FF">品番</strong></div></td>
+              <td width="180" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF66FF">品名</strong></div></td>
+              <td width="300" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF66FF">ロットコード</strong></div></td>
             </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <?php for($i=0; $i<$countkadouSeikei; $i++): ?>
           <tr style="border-bottom: solid;border-width: 1px">
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["pro_num"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["seikeiki"]." 号機") ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["starting_tm"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["finishing_tm"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["cycle_shot"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["amount_shot"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["amount_shot"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="red"><?= h($kadouSeikei[$i]["accomp_rate"]*100) ?></font><font color="blue"><?= h(" ％") ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["first_lot_num"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["last_lot_num"]) ?></font></td>
-            <?php
-            echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
-            echo $this->Form->submit("詳細" , ['action'=>'syuuseiform', 'name' => "select", 'id' => $kadouSeikei[$i]["pro_num"]]) ;
-            echo "</div></td>";
-            ?>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($seikeiki." 号機") ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($product_code) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($product_name) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($lot_code) ?></font></td>
           </tr>
-        <?php endfor;?>
         </tbody>
     </table>
-<br><br>
+
+    <br><br>
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+            <thead>
+                <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+                  <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF0000">開始ロット</strong></div></td>
+                  <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF0000">終了ロット</strong></div></td>
+                </tr>
+            </thead>
+            <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+              <tr style="border-bottom: solid;border-width: 1px">
+                <td colspan="20" nowrap="nowrap"><font><?= h($first_lot_num) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($last_lot_num) ?></font></td>
+              </tr>
+            </tbody>
+        </table>
+
+        <br><br>
+
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+            <thead>
+                <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#228B22">日報開始時刻</strong></div></td>
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#228B22">日報終了時刻</strong></div></td>
+                  <td width="180" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#228B22">日報ショット数</strong></div></td>
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#228B22">日報ショットサイクル</strong></div></td>
+                </tr>
+            </thead>
+            <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+              <tr style="border-bottom: solid;border-width: 1px">
+                <td colspan="20" nowrap="nowrap"><font><?= h($starting_tm_nippou) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($finishing_tm_nippou) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($amount_nippou) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($shot_cycle_nippou) ?></font></td>
+              </tr>
+            </tbody>
+    </table>
+
+    <br><br>
+
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+            <thead>
+                <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#5507FF">プログラム探索開始時刻</strong></div></td>
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#5507FF">プログラム探索終了時刻</strong></div></td>
+                  <td width="180" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#5507FF">プログラム計算ショット数</strong></div></td>
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#5507FF">プログラムショットサイクル</strong></div></td>
+                </tr>
+            </thead>
+            <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+              <tr style="border-bottom: solid;border-width: 1px">
+                <td colspan="20" nowrap="nowrap"><font><?= h($starting_tm_program) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($finishing_tm_program) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($amount_programming) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($shot_cycle_mode) ?></font></td>
+              </tr>
+            </tbody>
+    </table>
+<br><br><br><br><br><br>

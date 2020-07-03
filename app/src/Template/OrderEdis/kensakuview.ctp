@@ -55,13 +55,13 @@
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["finishing_tm"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["cycle_shot"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["amount_shot"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["amount_programming"]) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["amount_shot"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="red"><?= h($kadouSeikei[$i]["accomp_rate"]*100) ?></font><font color="blue"><?= h(" ％") ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["first_lot_num"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["last_lot_num"]) ?></font></td>
             <?php
             echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
-            echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $kadouSeikei[$i]["id"]]) ;
+            echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $kadouSeikei[$i]["pro_num"]]) ;
             echo "</div></td>";
             ?>
           </tr>

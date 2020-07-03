@@ -928,28 +928,34 @@ class KadousController extends AppController
 
       for ($k=0; $k<count($kadouSeikei); $k++){
 
-      $KadouSeikeis = $this->KadouSeikeis->find()->where(['starting_tm' => $kadouSeikei[$k]["starting_tm"], 'seikeiki' => $kadouSeikei[$k]["seikeiki"], 'product_code' => $kadouSeikei[$k]["pro_num"]])->toArray();
-      $id = $KadouSeikeis[0]->id;
+        $KadouSeikeis = $this->KadouSeikeis->find()->where(['starting_tm' => $kadouSeikei[$k]["starting_tm"], 'seikeiki' => $kadouSeikei[$k]["seikeiki"], 'product_code' => $kadouSeikei[$k]["pro_num"]])->toArray();
+        $id = $KadouSeikeis[0]->id;
 
-      $arrid = array('id'=>$id);
-      $kadouSeikei[$k] = array_merge($kadouSeikei[$k], $arrid);
+        $arrid = array('id'=>$id);
+        $kadouSeikei[$k] = array_merge($kadouSeikei[$k], $arrid);
 
-      $connection = ConnectionManager::get('big_DB');//旧DBを参照
-      $table = TableRegistry::get('log_confirm_kadou_seikeikis');
-      $table->setConnection($connection);
+        $connection = ConnectionManager::get('big_DB');//旧DBを参照
+        $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+        $table->setConnection($connection);
 
-      $sql = "SELECT amount_programming FROM log_confirm_kadou_seikeikis".
-      " where starting_tm_nippou = '".$kadouSeikei[$k]["starting_tm"]."' and product_code = '".$kadouSeikei[$k]["pro_num"]."' and seikeiki = '".$kadouSeikei[$k]["seikeiki"]."' order by product_code asc";
-      $connection = ConnectionManager::get('big_DB');
-      $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
+        $sql = "SELECT amount_programming FROM log_confirm_kadou_seikeikis".
+        " where starting_tm_nippou = '".$kadouSeikei[$k]["starting_tm"]."' and product_code = '".$kadouSeikei[$k]["pro_num"]."' and seikeiki = '".$kadouSeikei[$k]["seikeiki"]."' order by product_code asc";
+        $connection = ConnectionManager::get('big_DB');
+        $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
 
-      $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
+        $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
 
-      $connection = ConnectionManager::get('default');
-      $table->setConnection($connection);
+        $connection = ConnectionManager::get('default');
+        $table->setConnection($connection);
 
-      $arramount_programming = array('amount_programming'=>$amount_programming);
-      $kadouSeikei[$k] = array_merge($kadouSeikei[$k], $arramount_programming);
+        $arramount_programming = array('amount_programming'=>$amount_programming);
+        $kadouSeikei[$k] = array_merge($kadouSeikei[$k], $arramount_programming);
+
+        if($kadouSeikei[$k]["pro_num"] === "W002"){
+
+          $kadouSeikei[$k]['amount_shot'] = $kadouSeikei[$k]['amount_shot'] * 2;
+
+        }
 
       }
 /*
@@ -1028,6 +1034,13 @@ class KadousController extends AppController
       $this->set('finishing_tm_program',$finishing_tm_program);
       $shot_cycle_nippou = $log_confirm_kadou_seikeikis[0]["shot_cycle_nippou"];
       $this->set('shot_cycle_nippou',$shot_cycle_nippou);
+
+      if($product_code === "W002"){
+
+        $log_confirm_kadou_seikeikis[0]["amount_nippou"] = $log_confirm_kadou_seikeikis[0]["amount_nippou"] * 2;
+
+      }
+
       $amount_nippou = $log_confirm_kadou_seikeikis[0]["amount_nippou"];
       $this->set('amount_nippou',$amount_nippou);
       $shot_cycle_mode = $log_confirm_kadou_seikeikis[0]["shot_cycle_mode"];

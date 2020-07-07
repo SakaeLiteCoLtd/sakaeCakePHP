@@ -7,6 +7,9 @@ use Cake\Datasource\ConnectionManager;//トランザクション
 use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 
+ use App\myClass\Productcheck\htmlProductcheck;
+
+
 /**
  * Roles Controller
  *
@@ -242,6 +245,17 @@ class KadousController extends AppController
 
           ${"product_code".$j.$i} = $Data["data"]["product_code".$j.$i];
           $this->set('product_code'.$j.$i,${"product_code".$j.$i});
+
+          $htmlProductcheck = new htmlProductcheck();//クラスを使用
+          $product_code_check = $htmlProductcheck->Productcheck(${"product_code".$j.$i});
+          if($product_code_check == 1){
+            return $this->redirect(
+             ['controller' => 'Products', 'action' => 'producterror', 's' => ['product_code' => ${"product_code".$j.$i}]]
+            );
+          }else{
+            $product_code_check = $product_code_check;
+          }
+
           ${"amount_shot".$j.$i} = $Data["data"]["amount_shot".$j.$i];
           $this->set('amount_shot'.$j.$i,${"amount_shot".$j.$i});
           ${"cycle_shot".$j.$i} = $Data["data"]["cycle_shot".$j.$i];
@@ -919,45 +933,50 @@ class KadousController extends AppController
       $connection = ConnectionManager::get('default');
       $table->setConnection($connection);
 
-      foreach( $kadouSeikei as $key => $row ) {
-        $tmp_seikeiki[$key] = $row["seikeiki"];
-        $tmp_starting_tm[$key] = $row["starting_tm"];
-      }
+      if(isset($kadouSeikei[0])){
 
-      array_multisort( $tmp_seikeiki, $tmp_starting_tm, SORT_ASC, SORT_NUMERIC, $kadouSeikei);
+        foreach( $kadouSeikei as $key => $row ) {
+          $tmp_seikeiki[$key] = $row["seikeiki"];
+          $tmp_starting_tm[$key] = $row["starting_tm"];
+        }
 
-      for ($k=0; $k<count($kadouSeikei); $k++){
+        array_multisort( $tmp_seikeiki, $tmp_starting_tm, SORT_ASC, SORT_NUMERIC, $kadouSeikei);
 
-        $KadouSeikeis = $this->KadouSeikeis->find()->where(['starting_tm' => $kadouSeikei[$k]["starting_tm"], 'seikeiki' => $kadouSeikei[$k]["seikeiki"], 'product_code' => $kadouSeikei[$k]["pro_num"]])->toArray();
-        $id = $KadouSeikeis[0]->id;
+        for ($k=0; $k<count($kadouSeikei); $k++){
 
-        $arrid = array('id'=>$id);
-        $kadouSeikei[$k] = array_merge($kadouSeikei[$k], $arrid);
+          $KadouSeikeis = $this->KadouSeikeis->find()->where(['starting_tm' => $kadouSeikei[$k]["starting_tm"], 'seikeiki' => $kadouSeikei[$k]["seikeiki"], 'product_code' => $kadouSeikei[$k]["pro_num"]])->toArray();
+          $id = $KadouSeikeis[0]->id;
 
-        $connection = ConnectionManager::get('big_DB');//旧DBを参照
-        $table = TableRegistry::get('log_confirm_kadou_seikeikis');
-        $table->setConnection($connection);
+          $arrid = array('id'=>$id);
+          $kadouSeikei[$k] = array_merge($kadouSeikei[$k], $arrid);
 
-        $sql = "SELECT amount_programming FROM log_confirm_kadou_seikeikis".
-        " where starting_tm_nippou = '".$kadouSeikei[$k]["starting_tm"]."' and product_code = '".$kadouSeikei[$k]["pro_num"]."' and seikeiki = '".$kadouSeikei[$k]["seikeiki"]."' order by product_code asc";
-        $connection = ConnectionManager::get('big_DB');
-        $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
+          $connection = ConnectionManager::get('big_DB');//旧DBを参照
+          $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+          $table->setConnection($connection);
 
-        $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
+          $sql = "SELECT amount_programming FROM log_confirm_kadou_seikeikis".
+          " where starting_tm_nippou = '".$kadouSeikei[$k]["starting_tm"]."' and product_code = '".$kadouSeikei[$k]["pro_num"]."' and seikeiki = '".$kadouSeikei[$k]["seikeiki"]."' order by product_code asc";
+          $connection = ConnectionManager::get('big_DB');
+          $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
 
-        $connection = ConnectionManager::get('default');
-        $table->setConnection($connection);
+          $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
 
-        $arramount_programming = array('amount_programming'=>$amount_programming);
-        $kadouSeikei[$k] = array_merge($kadouSeikei[$k], $arramount_programming);
+          $connection = ConnectionManager::get('default');
+          $table->setConnection($connection);
 
-        if($kadouSeikei[$k]["pro_num"] === "W002"){
+          $arramount_programming = array('amount_programming'=>$amount_programming);
+          $kadouSeikei[$k] = array_merge($kadouSeikei[$k], $arramount_programming);
 
-          $kadouSeikei[$k]['amount_shot'] = $kadouSeikei[$k]['amount_shot'] * 2;
+          if($kadouSeikei[$k]["pro_num"] === "W002"){
+
+            $kadouSeikei[$k]['amount_shot'] = $kadouSeikei[$k]['amount_shot'] * 2;
+
+          }
 
         }
 
       }
+
 /*
       echo "<pre>";
       print_r($kadouSeikei);

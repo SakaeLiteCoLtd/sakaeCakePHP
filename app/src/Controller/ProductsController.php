@@ -865,5 +865,16 @@ class ProductsController extends AppController
 
  		}
 
+		public function producterror()
+	{
+		$product = $this->Products->newEntity();//newentityに$productという名前を付ける
+		$this->set('product',$product);//1行上の$productをctpで使えるようにセット
+
+		$Data = $this->request->query('s');//1度henkou5panaへ行って戻ってきたとき（検索を押したとき）
+
+		$product_code = $Data["product_code"];
+		$this->set('product_code',$product_code);
+	}
+
 
 }

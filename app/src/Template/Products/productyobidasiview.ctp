@@ -41,7 +41,8 @@
 </table>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="280" bgcolor="#FFFFCC"  colspan="2" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">グレード　　　　　　色番号</strong></td>
+    <td width="140" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">グレード</strong></td>
+    <td width="140"  bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色番号</strong></td>
     <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色調</strong></td>
   </tr>
   <tr>
@@ -99,11 +100,12 @@
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">ショットサイクル</strong></td>
-    <td width="280"  bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">基準</strong></td>
+    <td width="280" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">外観検査基準時間</strong></td>
   </tr>
   <tr>
     <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($shot_cycle) ?></td>
-    <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($kijyun) ?></td>
+    <td width="140"  bgcolor="#FFFFCC"  style="text-align: right;border-right-style: none;padding: 0.2rem"><?= h($kijyun) ?></td>
+    <td width="140" bgcolor="#FFFFCC" style="text-align: left;border-left-style: none;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">分</strong></td>
   </tr>
 </table>
 

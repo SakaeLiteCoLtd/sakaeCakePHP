@@ -115,6 +115,7 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
      $table->setConnection($connection);
 
      $Product = $this->Products->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();
+
      if(($Product[0]->torisu) > 0){
        $torisu = $Product[0]->torisu;
        $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$j.$i}])->toArray();

@@ -78,6 +78,23 @@ class LabelsController extends AppController
 
    public function layoutform()//レイアウト入力
    {
+
+     $data = $this->request->getData();
+     /*
+     echo "<pre>";
+     print_r($data["product_code"]);
+     echo "</pre>";
+*/
+     $htmlProductcheck = new htmlProductcheck();//クラスを使用
+     $product_code_check = $htmlProductcheck->Productcheck($data["product_code"]);
+     if($product_code_check == 1){
+       return $this->redirect(
+        ['controller' => 'Products', 'action' => 'producterror', 's' => ['product_code' => $data["product_code"]]]
+       );
+     }else{
+       $product_code_check = $product_code_check;
+     }
+
      $labelTypeProducts = $this->LabelTypeProducts->newEntity();
      $this->set('labelTypeProducts',$labelTypeProducts);
      $arrLabelElementUnits = $this->LabelElementUnits->find('all', ['conditions' => ['delete_flag' => '0']])->order(['unit' => 'ASC']);
@@ -289,6 +306,19 @@ class LabelsController extends AppController
    {
      $labelNashies = $this->LabelNashies->newEntity();
      $this->set('labelNashies',$labelNashies);
+
+     $data = $this->request->getData();
+
+     $htmlProductcheck = new htmlProductcheck();//クラスを使用
+     $product_code_check = $htmlProductcheck->Productcheck($data["product_code"]);
+     if($product_code_check == 1){
+       return $this->redirect(
+        ['controller' => 'Products', 'action' => 'producterror', 's' => ['product_code' => $data["product_code"]]]
+       );
+     }else{
+       $product_code_check = $product_code_check;
+     }
+
    }
 
    public function nashipreadd()//ラベル無しログイン
@@ -378,6 +408,31 @@ class LabelsController extends AppController
    {
      $labelSetikkatsues = $this->LabelSetikkatsues->newEntity();
      $this->set('labelSetikkatsues',$labelSetikkatsues);
+     $data = $this->request->getData();
+/*
+     echo "<pre>";
+     print_r($data);
+     echo "</pre>";
+*/
+     $htmlProductcheck = new htmlProductcheck();//クラスを使用
+     $product_code_check = $htmlProductcheck->Productcheck($data["product_id1"]);
+     if($product_code_check == 1){
+       return $this->redirect(
+        ['controller' => 'Products', 'action' => 'producterror', 's' => ['product_code' => $data["product_id1"]]]
+       );
+     }else{
+       $product_code_check = $product_code_check;
+     }
+
+     $product_code_check = $htmlProductcheck->Productcheck($data["product_id2"]);
+     if($product_code_check == 1){
+       return $this->redirect(
+        ['controller' => 'Products', 'action' => 'producterror', 's' => ['product_code' => $data["product_id2"]]]
+       );
+     }else{
+       $product_code_check = $product_code_check;
+     }
+
    }
 
    public function setikkatsupreadd()//セット取りログイン
@@ -468,6 +523,22 @@ class LabelsController extends AppController
    {
      $labelInsideouts = $this->LabelInsideouts->newEntity();
      $this->set('labelInsideouts',$labelInsideouts);
+     $data = $this->request->getData();
+/*
+     echo "<pre>";
+     print_r($data["product_code"]);
+     echo "</pre>";
+*/
+     $htmlProductcheck = new htmlProductcheck();//クラスを使用
+     $product_code_check = $htmlProductcheck->Productcheck($data["product_code"]);
+     if($product_code_check == 1){
+       return $this->redirect(
+        ['controller' => 'Products', 'action' => 'producterror', 's' => ['product_code' => $data["product_code"]]]
+       );
+     }else{
+       $product_code_check = $product_code_check;
+     }
+
    }
 
    public function insideoutpreadd()//外箱中身ログイン
@@ -1784,9 +1855,19 @@ class LabelsController extends AppController
         "lotnum" => $data['kobetudate']['year'].$data['kobetudate']['month'].$data['kobetudate']['day']
       );
 
-//      $data = $this->request->getData();//postデータを$dataに
       $product_code = mb_strtoupper($data["product_code"]);
       $this->set('product_code',$product_code);
+
+      $htmlProductcheck = new htmlProductcheck();//クラスを使用
+      $product_code_check = $htmlProductcheck->Productcheck($product_code);
+      if($product_code_check == 1){
+        return $this->redirect(
+         ['controller' => 'Products', 'action' => 'producterror', 's' => ['product_code' => $product_code]]
+        );
+      }else{
+        $product_code_check = $product_code_check;
+      }
+
 /*
       echo "<pre>";
       print_r($product_code);//大文字に変換
@@ -2279,11 +2360,19 @@ class LabelsController extends AppController
       //      "lotnum" => substr($data['finishing_tm11'],2,2).substr($data['finishing_tm11'],5,2).substr($data['finishing_tm11'],8,2)//200531削除
             "lotnum" => substr($data['finishing_tm11']['year'],2,2).substr($data['finishing_tm11']['month'],0,2).substr($data['finishing_tm11']['day'],0,2)//200531追加
           );
-/*
-          echo "<pre>";
-          print_r($_SESSION['lotdate']);
-          echo "</pre>";
-*/
+
+          $product_code = mb_strtoupper($data["product_code11"]);
+
+          $htmlProductcheck = new htmlProductcheck();//クラスを使用
+          $product_code_check = $htmlProductcheck->Productcheck($product_code);
+          if($product_code_check == 1){
+            return $this->redirect(
+             ['controller' => 'Products', 'action' => 'producterror', 's' => ['product_code' => $product_code]]
+            );
+          }else{
+            $product_code_check = $product_code_check;
+          }
+
          $this->set('confirm',$data['confirm']);
          $dateto = $data['dateto'];
          $this->set('dateto',$dateto);
@@ -3280,7 +3369,7 @@ class LabelsController extends AppController
         $product_code_check = $htmlProductcheck->Productcheck($product_code1);
         if($product_code_check == 1){
           return $this->redirect(
-           ['controller' => 'Products', 'action' => 'index']
+            ['controller' => 'Products', 'action' => 'producterror', 's' => ['product_code' => $product_code1]]
           );
         }else{
           $product_code_check = $product_code_check;

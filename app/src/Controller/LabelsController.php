@@ -44,6 +44,7 @@ class LabelsController extends AppController
        $this->OrderEdis = TableRegistry::get('orderEdis');
        $this->MotoLots = TableRegistry::get('motoLots');
        $this->PlaceDelivers = TableRegistry::get('placeDelivers');
+       $this->CheckLotsDoubles = TableRegistry::get('checkLotsDoubles');
   //     $this->ScheduleKoutei = TableRegistry::get('scheduleKoutei');//sakaeMotoDB必要なし
  }
      public function indexMenu()
@@ -2572,33 +2573,49 @@ class LabelsController extends AppController
         $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[$k]["datetime_hakkou"], 'product_code' => $arrLot[$k]["product_code"], 'lot_num' => $arrLot[$k]["lot_num"], 'amount' => $arrLot[$k]["amount"]])->toArray();
         $count = $count + count($CheckLottourokuzumi);
       }
-
+/*
       echo "<pre>";
       print_r("元々データベースに存在する個数　＝　".$count);
       echo "</pre>";
-
+*/
       $mes = "";
 
       if($count != 0){
         $mes = "※以下のロットは既に登録されています。";
         $this->set('mes',$mes);
         $counttourokuzumi = 0;
+        $j = 0;
         for($k=0; $k<count($arrLot); $k++){
-          $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[$k]["datetime_hakkou"], 'product_code' => $arrLot[$k]["product_code"], 'lot_num' => $arrLot[$k]["lot_num"], 'amount' => $arrLot[$k]["amount"]])->toArray();
+    //      $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[$k]["datetime_hakkou"], 'product_code' => $arrLot[$k]["product_code"], 'lot_num' => $arrLot[$k]["lot_num"], 'amount' => $arrLot[$k]["amount"]])->toArray();
+          $CheckLottourokuzumi = $this->CheckLots->find()->where(['product_code' => $arrLot[$k]["product_code"], 'lot_num' => $arrLot[$k]["lot_num"]])->toArray();
           if(isset($CheckLottourokuzumi[0])){
-            ${"CheckLottourokuzumiproduct_code".$k} = $CheckLottourokuzumi[0]->product_code;
-            $this->set('CheckLottourokuzumiproduct_code'.$k,${"CheckLottourokuzumiproduct_code".$k});
-            ${"CheckLottourokuzumilot_num".$k} = $CheckLottourokuzumi[0]->lot_num;
-            $this->set('CheckLottourokuzumilot_num'.$k,${"CheckLottourokuzumilot_num".$k});
+            ${"CheckLottourokuzumiproduct_code".$j} = $CheckLottourokuzumi[0]->product_code;
+            $this->set('CheckLottourokuzumiproduct_code'.$j,${"CheckLottourokuzumiproduct_code".$j});
+            ${"CheckLottourokuzumilot_num".$j} = $CheckLottourokuzumi[0]->lot_num;
+            $this->set('CheckLottourokuzumilot_num'.$j,${"CheckLottourokuzumilot_num".$j});
             $counttourokuzumi = $counttourokuzumi + 1;
             $this->set('counttourokuzumi',$counttourokuzumi);
+            $j = $j + 1;
+            $mes = "※以下のロットは既に登録されています。他のロットは登録されました。";
+            $this->set('mes',$mes);
+
+//ダブっているデータを２つともデータベースに登録する//いつ、誰が登録したどのロットがダブったかわかるようにする
+            $check_lot_id = $CheckLottourokuzumi[0]->id;
+            $first_created_staff = $CheckLottourokuzumi[0]->created_staff;
+            $first_created_at = $CheckLottourokuzumi[0]->created_at->format('Y-m-d H:i:s');
+            $arrLotdouble[] =  ['check_lot_id' => $check_lot_id,'product_code' => $arrLot[$k]["product_code"],'lot_num' => $arrLot[$k]["lot_num"],
+            'first_created_time' => $first_created_at,'first_created_staff' => $first_created_staff,
+            'second_created_time' => date('Y-m-d H:i:s'),'second_created_staff' => $arrLot[$k]["created_staff"]];
+
           }else{
+            /*
             ${"CheckLottourokuzumiproduct_code".$k} = "";
             $this->set('CheckLottourokuzumiproduct_code'.$k,${"CheckLottourokuzumiproduct_code".$k});
             ${"CheckLottourokuzumilot_num".$k} = "";
             $this->set('CheckLottourokuzumilot_num'.$k,${"CheckLottourokuzumilot_num".$k});
             $counttourokuzumi = $counttourokuzumi + 1;
             $this->set('counttourokuzumi',$counttourokuzumi);
+            */
             $arrLotmitouroku[] = $arrLot[$k];
             $mes = "※以下のロットは既に登録されています。他のロットは登録されました。";
             $this->set('mes',$mes);
@@ -2609,29 +2626,32 @@ class LabelsController extends AppController
         }
       }
 
+/*
       echo "<pre>";
       print_r("登録されるデータの個数　＝　".count($arrLot));
       echo "</pre>";
       echo "<pre>";
       print_r($arrLot);
       echo "</pre>";
+      echo "<pre>";
+      print_r($arrLotdouble);
+      echo "</pre>";
+      */
 
-/*
+
            $checkLots = $this->CheckLots->newEntity();
            $this->set('checkLots',$checkLots);
-           $checkLots = $this->CheckLots->patchEntities($checkLots, $arrLot);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+           $checkLots = $this->CheckLots->patchEntities($this->CheckLots->newEntity(), $arrLot);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
            $connection = ConnectionManager::get('default');//トランザクション1
            // トランザクション開始2
            $connection->begin();//トランザクション3
            try {//トランザクション4
              if ($this->CheckLots->saveMany($checkLots)) {//saveManyで一括登録
-               $mes = "登録されました。";
+               $mes = "登録されました。".$mes;
                $this->set('mes',$mes);
 
-               $connection->commit();// コミット5
-
                //$arrLotをinsert into check_lotsする
-               $connection = ConnectionManager::get('sakaeMotoDB');
+               $connection = ConnectionManager::get('DB_ikou_test');
                $table = TableRegistry::get('check_lots');
                $table->setConnection($connection);
 
@@ -2644,6 +2664,13 @@ class LabelsController extends AppController
                      'flag_used' => $arrLot[$k]["flag_used"]
                  ]);
                }
+
+               if(isset($arrLotdouble[0])){
+                $CheckLotsDoubles = $this->CheckLotsDoubles->patchEntities($this->CheckLotsDoubles->newEntity(), $arrLotdouble);
+     						$this->CheckLotsDoubles->saveMany($CheckLotsDoubles);
+               }
+
+               $connection->commit();// コミット5
 
              } else {
 
@@ -2658,7 +2685,6 @@ class LabelsController extends AppController
              $connection->rollback();//トランザクション9
            }//トランザクション10
 
-           */
         }
 
 

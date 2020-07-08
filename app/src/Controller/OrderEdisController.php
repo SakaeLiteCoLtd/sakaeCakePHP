@@ -2975,7 +2975,7 @@ echo "</pre>";
       $place_deliver_cs_code = $PlaceDeliver[0]->cs_code;
 
       if($place_deliver_cs_code == $customer_code){
-        $AccountPriceProduct = $this->AccountPriceProducts->find()->where(['product_code' => $product_code])->toArray();
+        $AccountPriceProduct = $this->AccountPriceProducts->find()->where(['product_code' => $product_code, 'delete_flag' => 0])->order(["date_koushin"=>"DESC"])->toArray();
 
         if(isset($AccountPriceProduct[0])){
           $price_check = 0;
@@ -3101,7 +3101,7 @@ echo "</pre>";
 */
         }
 
-      $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $data['order_edi']['product_code']])->toArray();
+      $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $data['order_edi']['product_code'], 'delete_flag' => 0])->order(["date_koushin"=>"DESC"])->toArray();
       if(count($AssembleProduct) > 0){
         for($n=0; $n<count($AssembleProduct); $n++){
           $child_pid = $AssembleProduct[$n]->child_pid;

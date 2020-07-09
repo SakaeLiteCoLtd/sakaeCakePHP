@@ -293,6 +293,7 @@ class ProductsController extends AppController
 	    print_r($data['zensudata']);
 	    echo "</pre>";
 */
+			$_SESSION['hyoujitourokudata'] = $data['productdata'];
 
 			if ($this->request->is('get')) {
 				$product = $this->Products->patchEntity($product, $data['productdata']);//$productデータ（空の行）を$this->request->getData()に更新する

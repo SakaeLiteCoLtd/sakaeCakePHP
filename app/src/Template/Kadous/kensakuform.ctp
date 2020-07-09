@@ -29,9 +29,9 @@
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
     <tr style="border-bottom: 0px;border-width: 0px">
-      <td width="250" height="60" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">品番</strong></div></td>
+      <td width="250" height="40" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">品番</strong></div></td>
       <td width="500" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">成形時間</strong></div></td>
-      <td width="250" height="60" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">成型機</strong></div></td>
+      <td width="250" height="40" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">成型機</strong></div></td>
     </tr>
 
 

@@ -97,6 +97,8 @@ class CustomersController extends AppController
 	    echo "</pre>";
 */
 
+      $_SESSION['hyoujitourokudata'] = $data['customerdata'];
+
 			if ($this->request->is('get')) {//getの場合
 				$customer = $this->Customers->patchEntity($customer, $data['customerdata']);//$customerデータ（空の行）を$this->request->getData()に更新する
 				$connection = ConnectionManager::get('default');//トランザクション1

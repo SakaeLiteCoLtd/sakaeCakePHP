@@ -3079,6 +3079,7 @@ echo "</pre>";
       //外注の対応
       $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $data['order_edi']['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
       if(count($ProductGaityu) > 0){
+
       $id_supplier = $ProductGaityu[0]->id_supplier;
         $_SESSION['ProductGaityu'] = array(
           'id_order' => $data['order_edi']["num_order"],
@@ -3093,12 +3094,7 @@ echo "</pre>";
           'created_at' => date("Y-m-d H:i:s"),
           'created_staff' => $this->Auth->user('staff_id')
           );
-/*
-          echo "<pre>";
-          print_r('ProductGaityu');
-          print_r(($_SESSION['ProductGaityu']));
-          echo "</pre>";
-*/
+
         }
 
       $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $data['order_edi']['product_code'], 'delete_flag' => 0])->order(["date_koushin"=>"DESC"])->toArray();
@@ -3142,15 +3138,14 @@ echo "</pre>";
                 'created_at' => date("Y-m-d H:i:s"),
                 'created_staff' => $this->Auth->user('staff_id')
               );
-/*
-              echo "<pre>";
-              print_r('ProductGaityu_kumitate');
-              print_r(($_SESSION['ProductGaityu_kumitate']));
-              echo "</pre>";
-*/
+
           }
+
         }
+
       }
+
+      $_SESSION['hyoujitourokudata'] = $data['order_edi'];
 
       $orderEdis = $this->OrderEdis->patchEntity($orderEdis, $data['order_edi']);//$productデータ（空の行）を$this->request->getData()に更新する
       $connection = ConnectionManager::get('default');//トランザクション1
@@ -3269,7 +3264,6 @@ echo "</pre>";
       //ロールバック8
         $connection->rollback();//トランザクション9
       }//トランザクション10
-
 
     }
 
@@ -3486,6 +3480,8 @@ echo "</pre>";
           );
         }
       }
+
+      $_SESSION['hyoujitourokudata'] = $data['order_edi'];
 
       $orderEdis = $this->OrderEdis->patchEntity($orderEdis, $data['order_edi']);//$productデータ（空の行）を$this->request->getData()に更新する
       $connection = ConnectionManager::get('default');//トランザクション1

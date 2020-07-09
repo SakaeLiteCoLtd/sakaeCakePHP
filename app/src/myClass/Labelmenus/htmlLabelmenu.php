@@ -75,6 +75,9 @@ class htmlLabelmenu extends AppController
                 "</a>\n".
                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/kensakuform'>\n".
                 "<img src='/img/Labelimg/label_kensaku_lot.gif' width=85 height=36>\n".
+                "</a>\n".
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/doubletourokuform'>\n".
+                "<img src='/img/Labelimg/lot_double_kensaku.gif' width=85 height=36>\n".
                 "</a>\n";
 
       return $html;

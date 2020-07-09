@@ -342,6 +342,9 @@ class KadousController extends AppController
      print_r($data["karikadouseikei"]);
      echo "</pre>";
 */
+
+      $_SESSION['hyoujitourokudata'] = $data['karikadouseikei'];
+
      if ($this->request->is('get')) {
        $KariKadouSeikeis = $this->KariKadouSeikeis->patchEntities($this->KariKadouSeikeis->newEntity(), $data['karikadouseikei']);//$roleデータ（空の行）を$this->request->getData()に更新する
        $connection = ConnectionManager::get('default');//トランザクション1
@@ -380,7 +383,7 @@ class KadousController extends AppController
 
            $mes = "※登録されませんでした";
            $this->set('mes',$mes);
-           $this->Flash->error(__('The data could not be saved. Please, try again.'));
+           $this->Flash->error(__('データベースに登録できません。登録済のデータでないか確認してください。'));
            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
 
          }
@@ -644,7 +647,7 @@ class KadousController extends AppController
         } else {
           $mes = "※登録されませんでした";
           $this->set('mes',$mes);
-          $this->Flash->error(__('The data could not be saved. Please, try again.'));
+          $this->Flash->error(__('データベースに登録できません。登録済のデータでないか確認してください。'));
           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
         }
       } catch (Exception $e) {//トランザクション7
@@ -959,7 +962,11 @@ class KadousController extends AppController
           $connection = ConnectionManager::get('big_DB');
           $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
 
-          $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
+          if(isset($log_confirm_kadou_seikeikis[0])){
+            $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
+          }else{
+            $amount_programming = "データベースに存在しません";
+          }
 
           $connection = ConnectionManager::get('default');
           $table->setConnection($connection);
@@ -1041,31 +1048,57 @@ class KadousController extends AppController
       print_r($log_confirm_kadou_seikeikis[0]);
       echo "</pre>";
 */
-      $lot_code = $log_confirm_kadou_seikeikis[0]["lot_code"];
-      $this->set('lot_code',$lot_code);
-      $starting_tm_nippou = $log_confirm_kadou_seikeikis[0]["starting_tm_nippou"];
-      $this->set('starting_tm_nippou',$starting_tm_nippou);
-      $starting_tm_program = $log_confirm_kadou_seikeikis[0]["starting_tm_program"];
-      $this->set('starting_tm_program',$starting_tm_program);
-      $finishing_tm_nippou = $log_confirm_kadou_seikeikis[0]["finishing_tm_nippou"];
-      $this->set('finishing_tm_nippou',$finishing_tm_nippou);
-      $finishing_tm_program = $log_confirm_kadou_seikeikis[0]["finishing_tm_program"];
-      $this->set('finishing_tm_program',$finishing_tm_program);
-      $shot_cycle_nippou = $log_confirm_kadou_seikeikis[0]["shot_cycle_nippou"];
-      $this->set('shot_cycle_nippou',$shot_cycle_nippou);
 
-      if($product_code === "W002"){
+      if(isset($log_confirm_kadou_seikeikis[0])){
 
-        $log_confirm_kadou_seikeikis[0]["amount_nippou"] = $log_confirm_kadou_seikeikis[0]["amount_nippou"] * 2;
+        $lot_code = $log_confirm_kadou_seikeikis[0]["lot_code"];
+        $this->set('lot_code',$lot_code);
+        $starting_tm_nippou = $log_confirm_kadou_seikeikis[0]["starting_tm_nippou"];
+        $this->set('starting_tm_nippou',$starting_tm_nippou);
+        $starting_tm_program = $log_confirm_kadou_seikeikis[0]["starting_tm_program"];
+        $this->set('starting_tm_program',$starting_tm_program);
+        $finishing_tm_nippou = $log_confirm_kadou_seikeikis[0]["finishing_tm_nippou"];
+        $this->set('finishing_tm_nippou',$finishing_tm_nippou);
+        $finishing_tm_program = $log_confirm_kadou_seikeikis[0]["finishing_tm_program"];
+        $this->set('finishing_tm_program',$finishing_tm_program);
+        $shot_cycle_nippou = $log_confirm_kadou_seikeikis[0]["shot_cycle_nippou"];
+        $this->set('shot_cycle_nippou',$shot_cycle_nippou);
+
+        if($product_code === "W002"){
+
+          $log_confirm_kadou_seikeikis[0]["amount_nippou"] = $log_confirm_kadou_seikeikis[0]["amount_nippou"] * 2;
+
+        }
+
+        $amount_nippou = $log_confirm_kadou_seikeikis[0]["amount_nippou"];
+        $this->set('amount_nippou',$amount_nippou);
+        $shot_cycle_mode = $log_confirm_kadou_seikeikis[0]["shot_cycle_mode"];
+        $this->set('shot_cycle_mode',$shot_cycle_mode);
+        $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
+        $this->set('amount_programming',$amount_programming);
+
+      }else{
+
+        $lot_code = "";
+        $this->set('lot_code',$lot_code);
+        $starting_tm_nippou = "";
+        $this->set('starting_tm_nippou',$starting_tm_nippou);
+        $starting_tm_program = "";
+        $this->set('starting_tm_program',$starting_tm_program);
+        $finishing_tm_nippou = "";
+        $this->set('finishing_tm_nippou',$finishing_tm_nippou);
+        $finishing_tm_program = "";
+        $this->set('finishing_tm_program',$finishing_tm_program);
+        $shot_cycle_nippou = "";
+        $this->set('shot_cycle_nippou',$shot_cycle_nippou);
+        $amount_nippou = "";
+        $this->set('amount_nippou',$amount_nippou);
+        $shot_cycle_mode = "";
+        $this->set('shot_cycle_mode',$shot_cycle_mode);
+        $amount_programming = "";
+        $this->set('amount_programming',$amount_programming);
 
       }
-
-      $amount_nippou = $log_confirm_kadou_seikeikis[0]["amount_nippou"];
-      $this->set('amount_nippou',$amount_nippou);
-      $shot_cycle_mode = $log_confirm_kadou_seikeikis[0]["shot_cycle_mode"];
-      $this->set('shot_cycle_mode',$shot_cycle_mode);
-      $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
-      $this->set('amount_programming',$amount_programming);
 
     }
 

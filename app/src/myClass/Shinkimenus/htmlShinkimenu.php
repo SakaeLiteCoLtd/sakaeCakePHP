@@ -71,6 +71,33 @@ class htmlShinkimenu extends AppController
 		$this->data = $shinkimenus;
 	}
 
+  public function accountmenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/form'>\n".
+        "<img src='/img/Labelimg/account_menu_urikake.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountMenuProductKaikake.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountMenuMaterialKaikake.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountMenuYusyouzai.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountMenuSouko.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<img src='/img/Labelimg/accountMenuPrice.gif' width=85 height=36>\n".
+        "</a>\n";
+
+		return $html;
+		$this->html = $html;
+		$this->data = $shinkimenus;
+	}
+
 	public function get_data(){
 		return $this->data;
 		}

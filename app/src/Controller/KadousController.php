@@ -227,6 +227,7 @@ class KadousController extends AppController
 
     public function kariconfirm()
     {
+      $this->request->session()->destroy(); // セッションの破棄
       session_start();
       $KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
 			$this->set('KariKadouSeikeis',$KariKadouSeikeis);

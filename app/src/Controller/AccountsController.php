@@ -8,73 +8,76 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 use Cake\Auth\DefaultPasswordHasher;//
 
-/**
- * Users Controller
- *
- * @property \App\Model\Table\UsersTable $Users
- *
- * @method \App\Model\Entity\User[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
- */
-class UsersController extends AppController
+class AccountsController extends AppController
 {
-
-	public $paginate = [//ページネーションを定義（indexで使う）
-		'limit' => 20,//データを1ページに20個ずつ表示する
-		'conditions' => ['delete_flag' => '1']//'delete_flag' => '1'を満たすものだけ表示する
-	];
 
      public function initialize()
      {
 			parent::initialize();
-			$this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
-			$this->Roles = TableRegistry::get('roles');//rolesテーブルを使う
+			$this->Users = TableRegistry::get('users');
+			$this->Staffs = TableRegistry::get('staffs');
+			$this->AccountKaikakeElements = TableRegistry::get('account_kaikake_elements');
+			$this->AccountPriceProducts = TableRegistry::get('accountPriceProducts');
      }
 
-		 public function preadd()
+		 public function index()
      {
-			$user = $this->Users->newEntity();//newentityに$userという名前を付ける
-		 	$this->set('user',$user);//1行上の$userをctpで使えるようにセット
+ 			$this->request->session()->destroy(); // セッションの破棄
+			$user = $this->Users->newEntity();
+			$this->set('user',$user);
      }
 
     public function login()
     {
 			if ($this->request->is('post')) {
 				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-				$ary = explode(',', $str);//$strを配列に変換
+/*
+				echo "<pre>";
+				print_r($data);
+				echo "</pre>";
+*/
+				$username = $data['username'];
+				$userData = $this->Users->find()->where(['username' => $username])->toArray();
 
-				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-				$this->set('username', $username);
-				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+				if(isset($userData[0])){
+					$pass = $userData[0]->password;
+					$hasher = new DefaultPasswordHasher();
+					if($hasher->check($data['password'], $pass)){
+						$passCheck = 1;
 
-					if(empty($Userdata)){
-						$delete_flag = "";
+						session_start();
+						$staffData = $this->Staffs->find()->where(['id' => $userData[0]->staff_id])->toArray();
+						$Staff = $staffData[0]->f_name.$staffData[0]->l_name;
+						$_SESSION['login'] = array(
+							'username' => $username,
+							'staffname' => $Staff
+						);
+
 					}else{
-						$delete_flag = $Userdata[0]->delete_flag;
-						$this->set('delete_flag',$delete_flag);
+						$passCheck = 2;
 					}
-						$user = $this->Auth->identify();
-					if ($user) {
-						$this->Auth->setUser($user);
-						return $this->redirect(['action' => 'do']);
-					}
+				}else{
+					$passCheck = 3;
 				}
+				$this->set('passCheck',$passCheck);
+
+			}
+
     }
 
-    public function logout()
-    {
-			$this->request->session()->destroy(); // セッションの破棄
-			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
-    }
+		public function menu()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
 
-    public function index()
-    {
-			$this->request->session()->destroy(); // セッションの破棄
-
-			$this->set('users', $this->Users->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
-			$this->set('users', $this->paginate());//定義したページネーションを使用
-    }
+		 $session = $this->request->getSession();
+		 $data = $session->read();
+/*
+		 echo "<pre>";
+		 print_r($data);
+		 echo "</pre>";
+*/
+		}
 
     public function form()
     {
@@ -88,10 +91,10 @@ class UsersController extends AppController
 			}
 			$this->set('arrStaff',$arrStaff);//4行上$arrStaffをctpで使えるようにセット
 
-			$arrRoles = $this->Roles->find('all', ['conditions' => ['delete_flag' => '0']])->order(['id' => 'ASC']);//Rolesテーブルの'delete_flag' => '0'となるものを見つけ、role_code順に並べる
+			$arrRoles = $this->Roles->find('all', ['conditions' => ['delete_flag' => '0']])->order(['role_code' => 'ASC']);//Rolesテーブルの'delete_flag' => '0'となるものを見つけ、role_code順に並べる
 			$arrRole = array();
 			foreach ($arrRoles as $value) {//2行上のRolesテーブルのデータそれぞれに対して
-				$arrRole[] = array($value->id=>$value->id.':'.$value->name);//配列に3行上のRolesテーブルのデータそれぞれのrole_code:name
+				$arrRole[] = array($value->id=>$value->role_code.':'.$value->name);//配列に3行上のRolesテーブルのデータそれぞれのrole_code:name
 			}
 			$this->set('arrRole',$arrRole);//4行上$arrRoleをctpで使えるようにセット
 
@@ -248,10 +251,10 @@ class UsersController extends AppController
 			}
 			$this->set('arrStaff',$arrStaff);//4行上$arrStaffをctpで使えるようにセット
 
-			$arrRoles = $this->Roles->find('all', ['conditions' => ['delete_flag' => '0']])->order(['id' => 'ASC']);//Rolesテーブルの'delete_flag' => '0'となるものを見つけ、role_code順に並べる
+			$arrRoles = $this->Roles->find('all', ['conditions' => ['delete_flag' => '0']])->order(['role_code' => 'ASC']);//Rolesテーブルの'delete_flag' => '0'となるものを見つけ、role_code順に並べる
 			$arrRole = array();
 			foreach ($arrRoles as $value) {//2行上のRolesテーブルのデータそれぞれに対して
-				$arrRole[] = array($value->id=>$value->id.':'.$value->name);//配列に3行上のRolesテーブルのデータそれぞれのrole_code:name
+				$arrRole[] = array($value->id=>$value->role_code.':'.$value->name);//配列に3行上のRolesテーブルのデータそれぞれのrole_code:name
 			}
 			$this->set('arrRole',$arrRole);//4行上$arrRoleをctpで使えるようにセット
 

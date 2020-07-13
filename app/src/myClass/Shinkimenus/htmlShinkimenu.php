@@ -74,23 +74,131 @@ class htmlShinkimenu extends AppController
   public function accountmenus()
 	{
         $html =
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/form'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/urikakemenu'>\n".
         "<img src='/img/Labelimg/account_menu_urikake.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/kaikakemenu'>\n".
         "<img src='/img/Labelimg/accountMenuProductKaikake.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/materialkaikakemenu'>\n".
         "<img src='/img/Labelimg/accountMenuMaterialKaikake.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yusyouzaimenu'>\n".
         "<img src='/img/Labelimg/accountMenuYusyouzai.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/soukomenu'>\n".
         "<img src='/img/Labelimg/accountMenuSouko.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/pricemenu'>\n".
         "<img src='/img/Labelimg/accountMenuPrice.gif' width=85 height=36>\n".
+        "</a>\n";
+
+		return $html;
+		$this->html = $html;
+		$this->data = $shinkimenus;
+	}
+
+  public function urikakemenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/urikakeform'>\n".
+        "<img src='/img/Labelimg/account_urikake_touroku.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/urikakekensakuform'>\n".
+        "<img src='/img/Labelimg/account_urikake_kensaku.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountGenryouUrikake.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<img src='/img/Labelimg/accountGenryouKensaku.gif' width=85 height=36>\n".
+        "</a>\n";
+
+		return $html;
+		$this->html = $html;
+		$this->data = $shinkimenus;
+	}
+
+  public function kaikakemenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountProductKaikakeTouroku.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<img src='/img/Labelimg/accountProductKaikakeKensaku.gif' width=85 height=36>\n".
+        "</a>\n";
+
+		return $html;
+		$this->html = $html;
+		$this->data = $shinkimenus;
+	}
+
+  public function materialkaikakemenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountMaterialKaikakeTouroku.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<img src='/img/Labelimg/accountMaterialKaikakeKensaku.gif' width=85 height=36>\n".
+        "</a>\n";
+
+		return $html;
+		$this->html = $html;
+		$this->data = $shinkimenus;
+	}
+
+  public function yusyouzaimenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountYusyouzaiUkeire.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountYusyouzaiUkeireKensaku.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountYusyouzaiMaster.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountYusyouzaiMasterKensaku.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<img src='/img/Labelimg/accountYusyouzaiGaityu.gif' width=85 height=36>\n".
+        "</a>\n";
+
+		return $html;
+		$this->html = $html;
+		$this->data = $shinkimenus;
+	}
+
+  public function soukomenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<img src='/img/Labelimg/subSubKensaku.gif' width=85 height=36>\n".
+        "</a>\n";
+
+		return $html;
+		$this->html = $html;
+		$this->data = $shinkimenus;
+	}
+
+  public function pricemenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountProductPriceMaster.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountProductPriceOrder.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<img src='/img/Labelimg/accountMaterialPriceMaster.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<img src='/img/Labelimg/accountMaterialPriceOrder.gif' width=85 height=36>\n".
         "</a>\n";
 
 		return $html;

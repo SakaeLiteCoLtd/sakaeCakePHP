@@ -52,19 +52,21 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
           <tr style="border-style: none; background-color: #E6FFFF">
             <td bgcolor="#E6FFFF">
               <div style="float:right">
+                <body link="#ff0000" vlink="#ff0000" alink="#ff0000">
                 <?php echo $user; ?>
               <?php
                 if ($user == 'ログインしてください。') {
                     // ログインしているとき
                     // ログアウトへのリンクをだす
-  //                  echo $this->Html->link('　ログイン', array('controller'=>'users','action'=>'preadd'));
+                    echo $this->Html->link('　ログイン', array('controller'=>'accounts','action'=>'index'));
                 } else {
                     // ログインしていないとき
                     // ログインへのリンクをだす
-                    echo $this->Html->link('　ログアウト', array('controller'=>'accounts','action'=>'index'));
+                    echo $this->Html->link('　ログアウト', array('controller'=>'accounts','action'=>'index','alink'=>'#E6FFFF'));
                 }
               ?>
               </div>
+            </body>
               <div align="left"><p><?php echo $this->Html->image('logo.gif',array('width'=>'157','height'=>'22'));?></p></div>
             </td>
           </tr>

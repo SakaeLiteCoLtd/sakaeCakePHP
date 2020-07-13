@@ -890,7 +890,7 @@ class KadousController extends AppController
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
     //      " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and present_kensahyou = ".$num_0." order by pro_num asc";
-          " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' order by seikeiki asc";
+          " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' order by seikeiki asc, starting_tm asc";
           $connection = ConnectionManager::get('DB_ikou_test');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
@@ -901,7 +901,7 @@ class KadousController extends AppController
       //    $this->set('KadouSeikeis',$KadouSeikeis);
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
-                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and seikeiki = '".$seikeiki."' order by seikeiki asc";
+                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and seikeiki = '".$seikeiki."' order by seikeiki asc, starting_tm asc";
           $connection = ConnectionManager::get('DB_ikou_test');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
@@ -915,7 +915,7 @@ class KadousController extends AppController
     //      $this->set('KadouSeikeis',$KadouSeikeis);
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
-                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and pro_num = '".$product_code."' order by seikeiki asc";
+                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and pro_num = '".$product_code."' order by seikeiki asc, starting_tm asc";
           $connection = ConnectionManager::get('DB_ikou_test');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
@@ -927,7 +927,7 @@ class KadousController extends AppController
     //      $this->set('KadouSeikeis',$KadouSeikeis);
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
-                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and pro_num = '".$product_code."' and seikeiki = '".$seikeiki."' order by seikeiki asc";
+                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and pro_num = '".$product_code."' and seikeiki = '".$seikeiki."' order by order by seikeiki asc, starting_tm asc";
           $connection = ConnectionManager::get('DB_ikou_test');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
@@ -944,7 +944,7 @@ class KadousController extends AppController
           $tmp_starting_tm[$key] = $row["starting_tm"];
         }
 
-        array_multisort( $tmp_seikeiki, $tmp_starting_tm, SORT_ASC, SORT_NUMERIC, $kadouSeikei);
+        array_multisort( $tmp_seikeiki, SORT_ASC, $tmp_starting_tm, SORT_ASC, $kadouSeikei);
 
         for ($k=0; $k<count($kadouSeikei); $k++){
 

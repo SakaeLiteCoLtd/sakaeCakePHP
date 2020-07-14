@@ -77,7 +77,7 @@ class htmlShinkimenu extends AppController
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/urikakemenu'>\n".
         "<img src='/img/Labelimg/account_menu_urikake.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/kaikakemenu'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/productkaikakemenu'>\n".
         "<img src='/img/Labelimg/accountMenuProductKaikake.gif' width=85 height=36>\n".
         "</a>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/materialkaikakemenu'>\n".
@@ -107,10 +107,10 @@ class htmlShinkimenu extends AppController
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/urikakekensakuform'>\n".
         "<img src='/img/Labelimg/account_urikake_kensaku.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/materialurikakeform'>\n".
         "<img src='/img/Labelimg/accountGenryouUrikake.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/materialurikakekensakuform'>\n".
         "<img src='/img/Labelimg/accountGenryouKensaku.gif' width=85 height=36>\n".
         "</a>\n";
 
@@ -122,10 +122,10 @@ class htmlShinkimenu extends AppController
   public function kaikakemenus()
 	{
         $html =
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/productkaikakeform'>\n".
         "<img src='/img/Labelimg/accountProductKaikakeTouroku.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/productkaikakekensakuform'>\n".
         "<img src='/img/Labelimg/accountProductKaikakeKensaku.gif' width=85 height=36>\n".
         "</a>\n";
 
@@ -137,10 +137,10 @@ class htmlShinkimenu extends AppController
   public function materialkaikakemenus()
 	{
         $html =
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/materialkaikakeform'>\n".
         "<img src='/img/Labelimg/accountMaterialKaikakeTouroku.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/materialkaikakekensakuform'>\n".
         "<img src='/img/Labelimg/accountMaterialKaikakeKensaku.gif' width=85 height=36>\n".
         "</a>\n";
 
@@ -188,12 +188,13 @@ class htmlShinkimenu extends AppController
   public function pricemenus()
 	{
         $html =
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+/*        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
         "<img src='/img/Labelimg/accountProductPriceMaster.gif' width=85 height=36>\n".
         "</a>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
         "<img src='/img/Labelimg/accountProductPriceOrder.gif' width=85 height=36>\n".
         "</a>\n".
+*/
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
         "<img src='/img/Labelimg/accountMaterialPriceMaster.gif' width=85 height=36>\n".
         "</a>\n".

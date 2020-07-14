@@ -58,7 +58,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
                 if ($user == 'ログインしてください。') {
                     // ログインしているとき
                     // ログアウトへのリンクをだす
-                    echo $this->Html->link('　ログイン', array('controller'=>'accounts','action'=>'index'));
+            //        echo $this->Html->link('　ログイン', array('controller'=>'accounts','action'=>'index'));
                 } else {
                     // ログインしていないとき
                     // ログインへのリンクをだす

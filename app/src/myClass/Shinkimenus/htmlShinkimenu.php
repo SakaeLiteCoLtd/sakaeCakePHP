@@ -155,13 +155,13 @@ class htmlShinkimenu extends AppController
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
         "<img src='/img/Labelimg/accountYusyouzaiUkeire.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/ukeirekensakuform'>\n".
         "<img src='/img/Labelimg/accountYusyouzaiUkeireKensaku.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yusyouzaiform'>\n".
         "<img src='/img/Labelimg/accountYusyouzaiMaster.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yusyouzaiichiran'>\n".
         "<img src='/img/Labelimg/accountYusyouzaiMasterKensaku.gif' width=85 height=36>\n".
         "</a>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
@@ -176,7 +176,7 @@ class htmlShinkimenu extends AppController
   public function soukomenus()
 	{
         $html =
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/soukokensakuform'>\n".
         "<img src='/img/Labelimg/subSubKensaku.gif' width=85 height=36>\n".
         "</a>\n";
 
@@ -194,11 +194,11 @@ class htmlShinkimenu extends AppController
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
         "<img src='/img/Labelimg/accountProductPriceOrder.gif' width=85 height=36>\n".
         "</a>\n".
-*/
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
         "<img src='/img/Labelimg/accountMaterialPriceMaster.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+        */
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/pricematerialkensakuform'>\n".
         "<img src='/img/Labelimg/accountMaterialPriceOrder.gif' width=85 height=36>\n".
         "</a>\n";
 

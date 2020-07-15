@@ -3097,7 +3097,7 @@ echo "</pre>";
 
         }
 
-      $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $data['order_edi']['product_code'], 'delete_flag' => 0])->order(["date_koushin"=>"DESC"])->toArray();
+      $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $data['order_edi']['product_code'], 'flag' => 0])->toArray();
       if(count($AssembleProduct) > 0){
         for($n=0; $n<count($AssembleProduct); $n++){
           $child_pid = $AssembleProduct[$n]->child_pid;

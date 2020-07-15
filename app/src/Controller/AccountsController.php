@@ -30,6 +30,12 @@ class AccountsController extends AppController
       $this->AccountProductKaikakes = TableRegistry::get('accountProductKaikakes');
       $this->Suppliers = TableRegistry::get('suppliers');
       $this->AccountMaterialKaikakes = TableRegistry::get('accountMaterialKaikakes');
+      $this->StockInoutWorklogs = TableRegistry::get('stockInoutWorklogs');
+      $this->OutsourceHandys = TableRegistry::get('outsourceHandys');
+      $this->OrderMaterials = TableRegistry::get('orderMaterials');
+      $this->AccountYusyouzaiUkeires = TableRegistry::get('accountYusyouzaiUkeires');
+      $this->AccountYusyouzaiMasters = TableRegistry::get('accountYusyouzaiMasters');
+      $this->Products = TableRegistry::get('products');
      }
 
 		 public function index()
@@ -1653,22 +1659,1053 @@ class AccountsController extends AppController
 
 		}
 
+    public function soukomenu()
+    {
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+    }
+
+    public function soukokensakuform()
+    {
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $data = $session->read();
+
+     if(!isset($data['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $staff_id = $data['login']['staff_id'];
+     $htmlRolecheck = new htmlRolecheck();//クラスを使用
+     $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+     $this->set('roleCheck',$roleCheck);
+
+     $arrType = [
+       '1' => '入庫',
+       '2' => '出荷'
+     ];
+      $this->set('arrType',$arrType);
+
+    }
+
+    public function soukokensakuichiran()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $date_sta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
+      $date_fin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
+
+      $date_fin = strtotime($date_fin);
+      $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
+
+      if(empty($data['type'])){//typeの入力がないとき
+
+        if(empty($data['product_code'])){//product_codeの入力がないとき
+
+          $StockInoutWorklogs = $this->StockInoutWorklogs->find()
+          ->where(['date_work >=' => $date_sta, 'date_work <=' => $date_fin, 'delete_flag' => 0])->order(["date_work"=>"ASC"])->toArray();
+          $this->set('StockInoutWorklogs',$StockInoutWorklogs);
+
+        }else{//product_codeの入力があるとき
+
+          $StockInoutWorklogs = $this->StockInoutWorklogs->find()
+          ->where(['date_work >=' => $date_sta, 'date_work <=' => $date_fin, 'product_code' => $data['product_code'], 'delete_flag' => 0])->order(["date_work"=>"ASC"])->toArray();
+          $this->set('StockInoutWorklogs',$StockInoutWorklogs);
+
+        }
+
+      }else{//typeの入力があるとき
+
+        if(empty($data['product_code'])){//typeの入力がないとき
+
+          $StockInoutWorklogs = $this->StockInoutWorklogs->find()
+          ->where(['date_work >=' => $date_sta, 'date_work <=' => $date_fin, 'type' => $data['type'], 'delete_flag' => 0])->order(["date_work"=>"ASC"])->toArray();
+          $this->set('StockInoutWorklogs',$StockInoutWorklogs);
+
+        }else{//product_codeの入力があるとき
+
+          $StockInoutWorklogs = $this->StockInoutWorklogs->find()
+          ->where(['date_work >=' => $date_sta, 'date_work <=' => $date_fin, 'type' => $data['type'], 'product_code' => $data['product_code'], 'delete_flag' => 0])->order(["date_work"=>"ASC"])->toArray();
+          $this->set('StockInoutWorklogs',$StockInoutWorklogs);
+
+        }
+      }
+
+    }
+
+    public function soukosyusei()
+    {
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      if(!isset($data['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $staff_id = $data['login']['staff_id'];
+      $htmlRolecheck = new htmlRolecheck();//クラスを使用
+      $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+      $this->set('roleCheck',$roleCheck);
+
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $data = $this->request->getData();
+
+     $data = array_keys($data, '編集');
+
+     $Id = $data[0];
+     $this->set('Id',$Id);
+     $StockInoutWorklogs = $this->StockInoutWorklogs->find()->where(['id' => $data[0]])->toArray();
+     $type = $StockInoutWorklogs[0]['type'];
+     $this->set('type',$type);
+     $outsource_name = $StockInoutWorklogs[0]['outsource_name'];
+     $OutsourceHandys = $this->OutsourceHandys->find()->where(['name' => $outsource_name])->toArray();
+     $sup_id = $OutsourceHandys[0]['id'];
+     $this->set('sup_id',$sup_id);
+     $product_code = $StockInoutWorklogs[0]['product_code'];
+     $this->set('product_code',$product_code);
+     $amount = $StockInoutWorklogs[0]['amount'];
+     $this->set('amount',$amount);
+     $date_work = $StockInoutWorklogs[0]['date_work']->format('Y-m-d');
+     $this->set('date_work',$date_work);
+
+     $arrType = [
+       '1' => '入庫',
+       '2' => '出荷'
+     ];
+      $this->set('arrType',$arrType);
+
+      $arrOutsourceHandys = $this->OutsourceHandys->find('all', ['conditions' => ['flag' => '0']])->order(['id' => 'ASC']);
+      $arrOutsourceHandy = array();
+      foreach ($arrOutsourceHandys as $value) {
+        $arrOutsourceHandy[] = array($value->id=>$value->name);
+      }
+      $this->set('arrOutsourceHandy',$arrOutsourceHandy);
+
+    }
+
+    public function soukosyuseiconfirm()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      if($data['type'] == 1){
+        $type = "入庫";
+      }else{
+        $type = "出庫";
+      }
+      $this->set('type',$type);
+
+      $OutsourceHandys = $this->OutsourceHandys->find()->where(['id' => $data['sup_id']])->toArray();
+      $Supplier = $OutsourceHandys[0]['name'];
+      $this->set('Supplier',$Supplier);
+
+      $dateYMD = $data['date']['year']."-".$data['date']['month']."-".$data['date']['day'];
+      $this->set('dateYMD',$dateYMD);
+
+      $product_code = $data['product_code'];
+      $this->set('product_code',$product_code);
+      $amount = $data['amount'];
+      $this->set('amount',$amount);
+    }
+
+    public function soukosyuseido()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $StockInoutWorklogs = $this->StockInoutWorklogs->newEntity();
+      $this->set('StockInoutWorklogs',$StockInoutWorklogs);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      if($data['type'] == 1){
+        $type = "入庫";
+      }else{
+        $type = "出庫";
+      }
+      $this->set('type',$type);
+
+      $OutsourceHandys = $this->OutsourceHandys->find()->where(['id' => $data['sup_id']])->toArray();
+      $Supplier = $OutsourceHandys[0]['name'];
+      $this->set('Supplier',$Supplier);
+
+      $dateYMD = $data['date'];
+      $this->set('dateYMD',$dateYMD);
+
+      $product_code = $data['product_code'];
+      $this->set('product_code',$product_code);
+      $amount = $data['amount'];
+      $this->set('amount',$amount);
+
+      $StockInoutWorklogs = $this->StockInoutWorklogs->find()->where(['id' => $data['Id']])->toArray();
+      $mototype = $StockInoutWorklogs[0]->type;
+      $motodate_work = $StockInoutWorklogs[0]->date_work->format('Y-m-d');
+      $motooutsource_name = $StockInoutWorklogs[0]->outsource_name;
+      $motoproduct_id = $StockInoutWorklogs[0]->product_code;
+      $motoamount = $StockInoutWorklogs[0]->amount;
+
+      $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->StockInoutWorklogs->updateAll(
+          ['type' => $data['type'], 'date_work' => $data['date'], 'outsource_code' => $data['sup_id'], 'outsource_name' => $Supplier, 'product_code' => $data['product_code'], 'amount' => $data['amount'],
+           'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
+          ['id'  => $data['Id']]
+        )){
+
+          //旧DBも更新
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $table = TableRegistry::get('stock_inout_worklog');
+          $table->setConnection($connection);
+
+          $updater = "UPDATE stock_inout_worklog set type ='".$data['type']."', outsource_id ='".$data['sup_id']."', outsource_name ='".$Supplier."', date_work ='".$data['date']."',
+          product_id ='".$data['product_code']."', amount ='".$data['amount']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
+          where type ='".$mototype."' and  date_work = '".$motodate_work."' and product_id = '".$motoproduct_id."' and amount = '".$motoamount."'";
+          $connection->execute($updater);
+
+          $connection = ConnectionManager::get('default');//新DBに戻る
+          $table->setConnection($connection);
+
+          $mes = "※下記のように更新されました";
+          $this->set('mes',$mes);
+          $connection->commit();// コミット5
+        } else {
+          $mes = "※更新されませんでした";
+          $this->set('mes',$mes);
+          $this->Flash->error(__('The data could not be saved. Please, try again.'));
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+    }
+
+
     public function yusyouzaimenu()
 		{
 		 $user = $this->Users->newEntity();
 		 $this->set('user',$user);
 		}
 
-    public function soukomenu()
+    public function yusyouzaiform()
 		{
 		 $user = $this->Users->newEntity();
 		 $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $data = $session->read();
+
+     if(!isset($data['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $staff_id = $data['login']['staff_id'];
+     $htmlRolecheck = new htmlRolecheck();//クラスを使用
+     $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+     $this->set('roleCheck',$roleCheck);
+
+     $arrCustomers = $this->Customers->find('all', ['conditions' => ['delete_flag' => '0']])->order(['customer_code' => 'ASC']);
+     $arrCustomer = array();
+     foreach ($arrCustomers as $value) {
+       $arrCustomer[] = array($value->customer_code=>$value->name);
+     }
+     $this->set('arrCustomer',$arrCustomer);
+
+     $arrType = [
+       '0' => '製品',
+       '1' => '原料'
+     ];
+      $this->set('arrType',$arrType);
+
 		}
+
+    public function yusyouzaiconfirm()
+		{
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+
+      $Customers = $this->Customers->find()->where(['customer_code' => $data['customer']])->toArray();
+      $customer_name = $Customers[0]['name'];
+      $this->set('customer_name',$customer_name);
+
+      if($data['flag_product_material'] == 1){
+        $Type = "原料";
+      }else{
+        $Type = "製品";
+      }
+      $this->set('Type',$Type);
+
+      $price = $data['price'];
+      $this->set('price',$price);
+		}
+
+    public function yusyouzaido()
+		{
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+
+      $Customers = $this->Customers->find()->where(['customer_code' => $data['customer']])->toArray();
+      $customer_name = $Customers[0]['name'];
+      $this->set('customer_name',$customer_name);
+
+      $product_code = $data['product_code'];
+      $this->set('product_code',$product_code);
+      $product_name = $data['product_name'];
+      $this->set('product_name',$product_name);
+      $price = $data['price'];
+      $this->set('price',$price);
+
+      if($data['flag_product_material'] == 1){
+        $Type = "原料";
+      }else{
+        $Type = "製品";
+      }
+      $this->set('Type',$Type);
+
+      $arrtouroku = array();
+      $arrtouroku[] = array(
+        'product_code' => $data['product_code'],
+        'product_name' => $data['product_name'],
+        'customer_code' => $data['customer_code'],
+        'flag_product_material' => $data['flag_product_material'],
+        'price' => $data['price'],
+        'delete_flag' => 0,
+        'created_staff' => $sessionData['login']['staff_id'],
+        'created_at' => date('Y-m-d H:i:s')
+      );
+/*
+      echo "<pre>";
+      print_r($arrtouroku[0]);
+      echo "</pre>";
+*/
+      $AccountYusyouzaiMasters = $this->AccountYusyouzaiMasters->patchEntity($this->AccountYusyouzaiMasters->newEntity(), $arrtouroku[0]);
+      $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->AccountYusyouzaiMasters->save($AccountYusyouzaiMasters)) {
+
+          //旧DBに製品登録
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $table = TableRegistry::get('account_yusyouzai_master');
+          $table->setConnection($connection);
+
+          $connection->insert('account_yusyouzai_master', [
+              'product_id' => $arrtouroku[0]["product_code"],
+              'product_name' => $arrtouroku[0]["product_name"],
+              'cs_id' => $arrtouroku[0]["customer_code"],
+              'price' => $arrtouroku[0]["price"],
+              'flag_product_material' => $arrtouroku[0]["flag_product_material"],
+              'delete_flag' => $arrtouroku[0]["delete_flag"],
+              'emp_id' => $arrtouroku[0]["created_staff"],
+              'created_at' => date('Y-m-d H:i:s')
+          ]);
+
+          $connection = ConnectionManager::get('default');//新DBに戻る
+          $table->setConnection($connection);
+
+          $mes = "※下記のように登録されました";
+          $this->set('mes',$mes);
+          $connection->commit();// コミット5
+        } else {
+          $mes = "※登録されませんでした";
+          $this->set('mes',$mes);
+          $this->Flash->error(__('The data could not be saved. Please, try again.'));
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+		}
+
+    public function yusyouzaiichiran()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $AccountYusyouzaiMasters = $this->AccountYusyouzaiMasters->find()
+      ->where(['delete_flag' => 0])->order(["customer_code"=>"ASC"])->toArray();
+      $this->set('AccountYusyouzaiMasters',$AccountYusyouzaiMasters);
+
+    }
+
+    public function yusyouzaisyusei()
+    {
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      if(!isset($data['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $staff_id = $data['login']['staff_id'];
+      $htmlRolecheck = new htmlRolecheck();//クラスを使用
+      $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+      $this->set('roleCheck',$roleCheck);
+
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $data = $this->request->getData();
+
+     $data = array_keys($data, '編集');
+
+     $Id = $data[0];
+     $this->set('Id',$Id);
+     $AccountYusyouzaiMasters = $this->AccountYusyouzaiMasters->find()->where(['id' => $data[0]])->toArray();
+     $product_code = $AccountYusyouzaiMasters[0]['product_code'];
+     $this->set('product_code',$product_code);
+     $product_name = $AccountYusyouzaiMasters[0]['product_name'];
+     $this->set('product_name',$product_name);
+     $customer_code = $AccountYusyouzaiMasters[0]['customer_code'];
+     $this->set('customer_code',$customer_code);
+     $price = $AccountYusyouzaiMasters[0]['price'];
+     $this->set('price',$price);
+     $flag_product_material = $AccountYusyouzaiMasters[0]['flag_product_material'];
+     $this->set('flag_product_material',$flag_product_material);
+
+     $arrCustomers = $this->Customers->find('all', ['conditions' => ['delete_flag' => '0']])->order(['customer_code' => 'ASC']);
+     $arrCustomer = array();
+     foreach ($arrCustomers as $value) {
+       $arrCustomer[] = array($value->customer_code=>$value->name);
+     }
+     $this->set('arrCustomer',$arrCustomer);
+
+     $arrType = [
+       '0' => '製品',
+       '1' => '原料'
+     ];
+      $this->set('arrType',$arrType);
+
+    }
+
+    public function yusyouzaisyuseiconfirm()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $Customers = $this->Customers->find()->where(['customer_code' => $data['customer']])->toArray();
+      $customer_name = $Customers[0]['name'];
+      $this->set('customer_name',$customer_name);
+
+      if($data['flag_product_material'] == 1){
+        $Type = "原料";
+      }else{
+        $Type = "製品";
+      }
+      $this->set('Type',$Type);
+    }
+
+    public function yusyouzaisyuseido()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $AccountYusyouzaiMasters = $this->AccountYusyouzaiMasters->newEntity();
+      $this->set('AccountYusyouzaiMasters',$AccountYusyouzaiMasters);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $Customers = $this->Customers->find()->where(['customer_code' => $data['customer']])->toArray();
+      $customer_name = $Customers[0]['name'];
+      $this->set('customer_name',$customer_name);
+
+      if($data['flag_product_material'] == 1){
+        $Type = "原料";
+      }else{
+        $Type = "製品";
+      }
+      $this->set('Type',$Type);
+
+      $product_code = $data['product_code'];
+      $this->set('product_code',$product_code);
+      $product_name = $data['product_name'];
+      $this->set('product_name',$product_name);
+      $customer_code = $data['customer_code'];
+      $this->set('customer_code',$customer_code);
+      $price = $data['price'];
+      $this->set('price',$price);
+      $flag_product_material = $data['flag_product_material'];
+      $this->set('flag_product_material',$flag_product_material);
+
+      $AccountYusyouzaiMasters = $this->AccountYusyouzaiMasters->find()->where(['id' => $data['Id']])->toArray();
+      $motoproduct_code = $AccountYusyouzaiMasters[0]->product_code;
+      $motoproduct_name = $AccountYusyouzaiMasters[0]->product_name;
+      $motocustomer_code = $AccountYusyouzaiMasters[0]->customer_code;
+      $motoprice = $AccountYusyouzaiMasters[0]->price;
+      $motoflag_product_material = $AccountYusyouzaiMasters[0]->flag_product_material;
+
+      $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->AccountYusyouzaiMasters->updateAll(
+          ['product_code' => $data['product_code'], 'product_name' => $data['product_name'], 'customer_code' => $data['customer_code'],
+           'price' => $data['price'], 'flag_product_material' => $data['flag_product_material'],
+           'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
+          ['id'  => $data['Id']]
+        )){
+
+          //旧DBも更新
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $table = TableRegistry::get('account_yusyouzai_master');
+          $table->setConnection($connection);
+
+          $updater = "UPDATE account_yusyouzai_master set product_id ='".$data['product_code']."', product_name ='".$data['product_name']."', cs_id ='".$data['customer_code']."', price ='".$data['price']."',
+          flag_product_material ='".$data['flag_product_material']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
+          where product_id ='".$motoproduct_code."' and product_name = '".$motoproduct_name."' and cs_id = '".$motocustomer_code."' and price = '".$motoprice."' and flag_product_material = '".$motoflag_product_material."' ";
+          $connection->execute($updater);
+
+          $connection = ConnectionManager::get('default');//新DBに戻る
+          $table->setConnection($connection);
+
+          $mes = "※下記のように更新されました";
+          $this->set('mes',$mes);
+          $connection->commit();// コミット5
+        } else {
+          $mes = "※更新されませんでした";
+          $this->set('mes',$mes);
+          $this->Flash->error(__('The data could not be saved. Please, try again.'));
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+    }
 
     public function pricemenu()
 		{
 		 $user = $this->Users->newEntity();
 		 $this->set('user',$user);
+		}
+
+    public function pricematerialkensakuform()
+    {
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $data = $session->read();
+
+     if(!isset($data['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $staff_id = $data['login']['staff_id'];
+     $htmlRolecheck = new htmlRolecheck();//クラスを使用
+     $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+     $this->set('roleCheck',$roleCheck);
+    }
+
+    public function pricematerialkensakuichiran()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $date_sta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
+      $date_fin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
+
+      $date_fin = strtotime($date_fin);
+      $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
+
+      if(empty($data['grade'])){//gradeの入力がないとき
+
+        if(empty($data['color'])){//colorの入力がないとき
+
+          $OrderMaterials = $this->OrderMaterials->find()
+          ->where(['date_order >=' => $date_sta, 'date_order <=' => $date_fin, 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
+          $this->set('OrderMaterials',$OrderMaterials);
+
+        }else{//product_codeの入力があるとき
+
+          $OrderMaterials = $this->OrderMaterials->find()
+          ->where(['date_order >=' => $date_sta, 'date_order <=' => $date_fin, 'color' => $data['color'], 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
+          $this->set('OrderMaterials',$OrderMaterials);
+
+        }
+
+      }else{//gradeの入力があるとき
+
+        if(empty($data['color'])){//colorの入力がないとき
+
+          $OrderMaterials = $this->OrderMaterials->find()
+          ->where(['date_order >=' => $date_sta, 'date_order <=' => $date_fin, 'grade' => $data['grade'], 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
+          $this->set('OrderMaterials',$OrderMaterials);
+
+        }else{//product_codeの入力があるとき
+
+          $OrderMaterials = $this->OrderMaterials->find()
+          ->where(['date_order >=' => $date_sta, 'date_order <=' => $date_fin, 'grade' => $data['grade'], 'color' => $data['color'], 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
+          $this->set('OrderMaterials',$OrderMaterials);
+
+        }
+      }
+
+    }
+
+    public function pricematerialsyusei()
+    {
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      if(!isset($data['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $staff_id = $data['login']['staff_id'];
+      $htmlRolecheck = new htmlRolecheck();//クラスを使用
+      $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+      $this->set('roleCheck',$roleCheck);
+
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $data = $this->request->getData();
+
+     $data = array_keys($data, '編集');
+
+     $Id = $data[0];
+     $this->set('Id',$Id);
+     $OrderMaterials = $this->OrderMaterials->find()->where(['id' => $data[0]])->toArray();
+     $id_order = $OrderMaterials[0]['id_order'];
+     $this->set('id_order',$id_order);
+     $grade = $OrderMaterials[0]['grade'];
+     $this->set('grade',$grade);
+     $color = $OrderMaterials[0]['color'];
+     $this->set('color',$color);
+     $price = $OrderMaterials[0]['price'];
+     $this->set('price',$price);
+     $amount = $OrderMaterials[0]['amount'];
+     $this->set('amount',$amount);
+     $date_order = $OrderMaterials[0]['date_order']->format('Y-m-d');
+     $this->set('date_order',$date_order);
+
+    }
+
+    public function pricematerialsyuseiconfirm()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $dateYMD = $data['date']['year']."-".$data['date']['month']."-".$data['date']['day'];
+      $this->set('dateYMD',$dateYMD);
+
+      $id_order = $data['id_order'];
+      $this->set('id_order',$id_order);
+      $grade = $data['grade'];
+      $this->set('grade',$grade);
+      $color = $data['color'];
+      $this->set('color',$color);
+      $price = $data['price'];
+      $this->set('price',$price);
+      $amount = $data['amount'];
+      $this->set('amount',$amount);
+      $price = $data['price'];
+      $this->set('price',$price);
+    }
+
+    public function pricematerialsyuseido()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $OrderMaterials = $this->OrderMaterials->newEntity();
+      $this->set('OrderMaterials',$OrderMaterials);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $dateYMD = $data['date'];
+      $this->set('dateYMD',$dateYMD);
+
+      $id_order = $data['id_order'];
+      $this->set('id_order',$id_order);
+      $grade = $data['grade'];
+      $this->set('grade',$grade);
+      $color = $data['color'];
+      $this->set('color',$color);
+      $price = $data['price'];
+      $this->set('price',$price);
+      $amount = $data['amount'];
+      $this->set('amount',$amount);
+      $price = $data['price'];
+      $this->set('price',$price);
+
+      $OrderMaterials = $this->OrderMaterials->find()->where(['id' => $data['Id']])->toArray();
+      $motoid_order = $OrderMaterials[0]->id_order;
+
+      $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->OrderMaterials->updateAll(
+          ['date_order' => $data['date'], 'price' => $data['price'], 'amount' => $data['amount'],
+           'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
+          ['id'  => $data['Id']]
+        )){
+
+          //旧DBも更新
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $table = TableRegistry::get('order_material');
+          $table->setConnection($connection);
+
+          $updater = "UPDATE order_material set date_order ='".$data['date']."', price ='".$data['price']."',
+          amount ='".$data['amount']."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$sessionData['login']['staff_id']."'
+          where id ='".$motoid_order."'";
+          $connection->execute($updater);
+
+          $connection = ConnectionManager::get('default');//新DBに戻る
+          $table->setConnection($connection);
+
+          $mes = "※下記のように更新されました";
+          $this->set('mes',$mes);
+          $connection->commit();// コミット5
+        } else {
+          $mes = "※更新されませんでした";
+          $this->set('mes',$mes);
+          $this->Flash->error(__('The data could not be saved. Please, try again.'));
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+    }
+
+    public function ukeirekensakuform()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $data = $session->read();
+
+     if(!isset($data['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $staff_id = $data['login']['staff_id'];
+     $htmlRolecheck = new htmlRolecheck();//クラスを使用
+     $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+     $this->set('roleCheck',$roleCheck);
+
+     $arrCustomers = $this->Customers->find('all', ['conditions' => ['delete_flag' => '0']])->order(['customer_code' => 'ASC']);
+     $arrCustomer = array();
+     foreach ($arrCustomers as $value) {
+       $arrCustomer[] = array($value->customer_code=>$value->name);
+     }
+     $this->set('arrCustomer',$arrCustomer);
+		}
+
+    public function ukeirekensakuichiran()
+		{
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+
+      $date_sta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
+      $date_fin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
+
+      $date_fin = strtotime($date_fin);
+      $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
+
+        if(empty($data['customer_code'])){
+
+          $AccountYusyouzaiUkeires = $this->AccountYusyouzaiUkeires->find()
+          ->where(['date_ukeire >=' => $date_sta, 'date_ukeire <=' => $date_fin, 'delete_flag' => 0])->order(["date_ukeire"=>"ASC"])->toArray();
+          $this->set('AccountYusyouzaiUkeires',$AccountYusyouzaiUkeires);
+
+        }else{
+
+          $AccountYusyouzaiUkeires = $this->AccountYusyouzaiUkeires->find()
+          ->where(['date_ukeire >=' => $date_sta, 'date_ukeire <=' => $date_fin, 'delete_flag' => 0])->order(["date_ukeire"=>"ASC"])->toArray();
+
+          $customer_code = $data['customer_code'];
+
+          for($i=0; $i<count($AccountYusyouzaiUkeires); $i++){
+
+            $product_code = $AccountYusyouzaiUkeires[$i]->product_code;
+            $AccountYusyouzaiMasters = $this->AccountYusyouzaiMasters->find()->where(['product_code' => $product_code, 'customer_code' => $customer_code])->toArray();
+
+            if(isset($AccountYusyouzaiMasters[0])){
+              $product_code = $product_code;
+            }else{
+              unset($AccountYusyouzaiUkeires[$i]);
+            }
+
+          }
+
+          $AccountYusyouzaiUkeires = array_values($AccountYusyouzaiUkeires);
+          $this->set('AccountYusyouzaiUkeires',$AccountYusyouzaiUkeires);
+
+        }
+
+		}
+
+    public function ukeiresyusei()
+		{
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      if(!isset($data['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $staff_id = $data['login']['staff_id'];
+      $htmlRolecheck = new htmlRolecheck();//クラスを使用
+      $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+      $this->set('roleCheck',$roleCheck);
+
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $data = $this->request->getData();
+
+     $data = array_keys($data, '編集');
+
+     $Id = $data[0];
+     $this->set('Id',$Id);
+     $AccountYusyouzaiUkeires = $this->AccountYusyouzaiUkeires->find()->where(['id' => $data[0]])->toArray();
+     $product_code = $AccountYusyouzaiUkeires[0]['product_code'];
+     $this->set('product_code',$product_code);
+     $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+     $product_name = $Product[0]->product_name;
+     $this->set('product_name',$product_name);
+     $date = $AccountYusyouzaiUkeires[0]['date_ukeire']->format('Y-m-d');
+     $this->set('date',$date);
+     $amount = $AccountYusyouzaiUkeires[0]['amount'];
+     $this->set('amount',$amount);
+     $tanka = $AccountYusyouzaiUkeires[0]['tanka'];
+     $this->set('tanka',$tanka);
+		}
+
+    public function ukeiresyuseiconfirm()
+		{
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+      /*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $dateYMD = $data['date']['year']."-".$data['date']['month']."-".$data['date']['day'];
+      $this->set('dateYMD',$dateYMD);
+		}
+
+    public function ukeiresyuseido()
+		{
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $AccountYusyouzaiUkeires = $this->AccountYusyouzaiUkeires->newEntity();
+      $this->set('AccountYusyouzaiUkeires',$AccountYusyouzaiUkeires);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $dateYMD = $data['date'];
+      $this->set('dateYMD',$dateYMD);
+
+      $product_code = $data['product_code'];
+
+      $amount = $data['amount'];
+      $this->set('amount',$amount);
+      $tanka = $data['tanka'];
+      $this->set('tanka',$tanka);
+
+      $AccountUrikakeMaterials = $this->AccountYusyouzaiUkeires->find()->where(['id' => $data['Id']])->toArray();
+      $motoproduct_code = $AccountUrikakeMaterials[0]->product_code;
+      $motodate_ukeire = $AccountUrikakeMaterials[0]->date_ukeire->format('Y-m-d');
+      $motoamount = $AccountUrikakeMaterials[0]->amount;
+      $mototanka = $AccountUrikakeMaterials[0]->tanka;
+
+      $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->AccountYusyouzaiUkeires->updateAll(
+          ['date_ukeire' => $data['date'], 'amount' => $data['amount'], 'tanka' => $data['tanka'],
+           'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
+          ['id'  => $data['Id']]
+        )){
+
+          //旧DBも更新
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $table = TableRegistry::get('account_yusyouzai_ukeire');
+          $table->setConnection($connection);
+
+          $updater = "UPDATE account_yusyouzai_ukeire set date_ukeire ='".$data['date']."', amount ='".$data['amount']."', tanka ='".$data['tanka']."',
+           updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
+          where product_id ='".$motoproduct_code."' and date_ukeire = '".$motodate_ukeire."' and amount = '".$motoamount."' and tanka = '".$mototanka."' ";
+          $connection->execute($updater);
+
+          $connection = ConnectionManager::get('default');//新DBに戻る
+          $table->setConnection($connection);
+
+          $mes = "※下記のように更新されました";
+          $this->set('mes',$mes);
+          $connection->commit();// コミット5
+        } else {
+          $mes = "※更新されませんでした";
+          $this->set('mes',$mes);
+          $this->Flash->error(__('The data could not be saved. Please, try again.'));
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
 		}
 
     public function form()

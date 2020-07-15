@@ -65,9 +65,9 @@
 <br><br>
 
 <?php
-echo "<pre>";
-print_r($Data);
-echo "</pre>";
+//echo "<pre>";
+//print_r($Data);
+//echo "</pre>";
 ?>
 
     <?= $this->Form->end() ?>

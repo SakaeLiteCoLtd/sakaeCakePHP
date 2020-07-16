@@ -33,7 +33,7 @@ header('Pragma:');
 
 <?php else : ?>
   <br><br>
-  <legend align="center"><font color="red"><?= __("※入力されたIDは存在しません。") ?></font></legend>
+  <legend align="center"><font color="red"><?= __("※そのIDはログインする権限がありません。") ?></font></legend>
   <br><br>
   <br><br>
 <?php endif; ?>

@@ -152,7 +152,7 @@ class htmlShinkimenu extends AppController
   public function yusyouzaimenus()
 	{
         $html =
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yusyouzaiukeireform'>\n".
         "<img src='/img/Labelimg/accountYusyouzaiUkeire.gif' width=85 height=36>\n".
         "</a>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/ukeirekensakuform'>\n".
@@ -163,9 +163,9 @@ class htmlShinkimenu extends AppController
         "</a>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yusyouzaiichiran'>\n".
         "<img src='/img/Labelimg/accountYusyouzaiMasterKensaku.gif' width=85 height=36>\n".
-        "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
-        "<img src='/img/Labelimg/accountYusyouzaiGaityu.gif' width=85 height=36>\n".
+    //    "</a>\n".
+    //    "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/deliverform'>\n".
+    //    "<img src='/img/Labelimg/accountYusyouzaiGaityu.gif' width=85 height=36>\n".
         "</a>\n";
 
 		return $html;
@@ -194,10 +194,10 @@ class htmlShinkimenu extends AppController
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
         "<img src='/img/Labelimg/accountProductPriceOrder.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/yobidashi'>\n".
+        */
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/pricematerialmasterkensakuform'>\n".
         "<img src='/img/Labelimg/accountMaterialPriceMaster.gif' width=85 height=36>\n".
         "</a>\n".
-        */
         "<td style='padding: 0.1rem 0.1rem;'><a href='/accounts/pricematerialkensakuform'>\n".
         "<img src='/img/Labelimg/accountMaterialPriceOrder.gif' width=85 height=36>\n".
         "</a>\n";

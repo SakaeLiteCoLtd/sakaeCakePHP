@@ -36,6 +36,7 @@ class AccountsController extends AppController
       $this->AccountYusyouzaiUkeires = TableRegistry::get('accountYusyouzaiUkeires');
       $this->AccountYusyouzaiMasters = TableRegistry::get('accountYusyouzaiMasters');
       $this->Products = TableRegistry::get('products');
+      $this->PriceMaterials = TableRegistry::get('priceMaterials');
      }
 
 		 public function index()
@@ -54,10 +55,16 @@ class AccountsController extends AppController
 				print_r($data);
 				echo "</pre>";
 */
-				$username = $data['username'];
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+        $ary = explode(',', $str);//$strを配列に変換
+        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+	//			$username = $data['username'];
 				$userData = $this->Users->find()->where(['username' => $username])->toArray();
+        $staff = $userData[0]->staff_id;
+        $StatusRolesData = $this->StatusRoles->find()->where(['staff_id' => $staff])->toArray();
 
-				if(isset($userData[0])){
+				if(isset($StatusRolesData[0])){
 					$pass = $userData[0]->password;
 					$hasher = new DefaultPasswordHasher();
 					if($hasher->check($data['password'], $pass)){
@@ -2498,6 +2505,196 @@ class AccountsController extends AppController
 
     }
 
+    public function pricematerialmasterkensakuform()
+    {
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $data = $session->read();
+
+     if(!isset($data['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $staff_id = $data['login']['staff_id'];
+     $htmlRolecheck = new htmlRolecheck();//クラスを使用
+     $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+     $this->set('roleCheck',$roleCheck);
+    }
+
+    public function pricematerialmasterkensakuichiran()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+
+      if(empty($data['grade'])){//gradeの入力がないとき
+
+          $PriceMaterials = $this->PriceMaterials->find()
+          ->where(['color' => $data['color'], 'delete_flag' => 0])->order(["grade"=>"ASC"])->toArray();
+          $this->set('PriceMaterials',$PriceMaterials);
+
+      }else{//gradeの入力があるとき
+
+        if(empty($data['color'])){//colorの入力がないとき
+
+          $PriceMaterials = $this->PriceMaterials->find()
+          ->where(['grade' => $data['grade'], 'delete_flag' => 0])->order(["color"=>"ASC"])->toArray();
+          $this->set('PriceMaterials',$PriceMaterials);
+
+        }else{//colorの入力があるとき
+
+          $PriceMaterials = $this->PriceMaterials->find()
+          ->where(['grade' => $data['grade'], 'color' => $data['color'], 'delete_flag' => 0])->order(["grade"=>"ASC"])->toArray();
+          $this->set('PriceMaterials',$PriceMaterials);
+
+        }
+
+      }
+
+    }
+
+    public function pricematerialmastersyusei()
+    {
+      $session = $this->request->getSession();
+      $data = $session->read();
+
+      if(!isset($data['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $staff_id = $data['login']['staff_id'];
+      $htmlRolecheck = new htmlRolecheck();//クラスを使用
+      $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+      $this->set('roleCheck',$roleCheck);
+
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $data = $this->request->getData();
+
+     $data = array_keys($data, '編集');
+
+     $Id = $data[0];
+     $this->set('Id',$Id);
+     $PriceMaterials = $this->PriceMaterials->find()->where(['id' => $data[0]])->toArray();
+     $grade = $PriceMaterials[0]['grade'];
+     $this->set('grade',$grade);
+     $color = $PriceMaterials[0]['color'];
+     $this->set('color',$color);
+     $price = $PriceMaterials[0]['price'];
+     $this->set('price',$price);
+
+    }
+
+    public function pricematerialmastersyuseiconfirm()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $grade = $data['grade'];
+      $this->set('grade',$grade);
+      $color = $data['color'];
+      $this->set('color',$color);
+      $price = $data['price'];
+      $this->set('price',$price);
+    }
+
+    public function pricematerialmastersyuseido()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $PriceMaterials = $this->PriceMaterials->newEntity();
+      $this->set('PriceMaterials',$PriceMaterials);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $grade = $data['grade'];
+      $this->set('grade',$grade);
+      $color = $data['color'];
+      $this->set('color',$color);
+      $price = $data['price'];
+      $this->set('price',$price);
+
+      $PriceMaterials = $this->PriceMaterials->find()->where(['id' => $data['Id']])->toArray();
+      $motograde = $PriceMaterials[0]->grade;
+      $motocolor = $PriceMaterials[0]->color;
+
+      $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->PriceMaterials->updateAll(
+          ['price' => $data['price'],
+           'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
+          ['id'  => $data['Id']]
+        )){
+
+          //旧DBも更新
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $table = TableRegistry::get('price_material');
+          $table->setConnection($connection);
+
+          $updater = "UPDATE price_material set price ='".$data['price']."',
+          updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$sessionData['login']['staff_id']."'
+          where grade ='".$motograde."' and color = '".$motocolor."'";
+          $connection->execute($updater);
+
+          $connection = ConnectionManager::get('default');//新DBに戻る
+          $table->setConnection($connection);
+
+          $mes = "※下記のように更新されました";
+          $this->set('mes',$mes);
+          $connection->commit();// コミット5
+        } else {
+          $mes = "※更新されませんでした";
+          $this->set('mes',$mes);
+          $this->Flash->error(__('The data could not be saved. Please, try again.'));
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+    }
+
     public function ukeirekensakuform()
 		{
 		 $user = $this->Users->newEntity();
@@ -2707,6 +2904,24 @@ class AccountsController extends AppController
       }//トランザクション10
 
 		}
+
+    public function yusyouzaiukeireform()
+    {
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $data = $session->read();
+
+     if(!isset($data['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $staff_id = $data['login']['staff_id'];
+     $htmlRolecheck = new htmlRolecheck();//クラスを使用
+     $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+     $this->set('roleCheck',$roleCheck);
+    }
 
     public function form()
     {

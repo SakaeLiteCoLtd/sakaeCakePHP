@@ -41,10 +41,10 @@
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
           <tr style="border-bottom: solid;border-width: 1px">
-            <td colspan="20" nowrap="nowrap"><font><?= h($seikeiki." 号機") ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font><?= h($product_code) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font><?= h($product_name) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><font><?= h($lot_code) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($seikeiki." 号機") ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($product_code) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($product_name) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($lot_code) ?></font></td>
           </tr>
         </tbody>
     </table>
@@ -72,29 +72,40 @@
       <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
             <thead>
                 <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-                  <td width="100" height="30" colspan="10" nowrap="nowrap"><div align="center"></div></td>
-                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#0000FF">開始時刻</strong></div></td>
-                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#0000FF">終了時刻</strong></div></td>
-                  <td width="180" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#0000FF">ショット数</strong></div></td>
-                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#0000FF">ショットサイクル</strong></div></td>
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#228B22">日報開始時刻</strong></div></td>
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#228B22">日報終了時刻</strong></div></td>
+                  <td width="180" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#228B22">日報ショット数</strong></div></td>
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#228B22">日報ショットサイクル</strong></div></td>
                 </tr>
             </thead>
-            <tbody border="2" bordercolor="#FFFF88" bgcolor="#E9FFA5">
+            <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
               <tr style="border-bottom: solid;border-width: 1px">
-                <td colspan="10" nowrap="nowrap"><strong style="font-size: 11pt; color:#111111">日報</strong></div></td>
-                <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($starting_tm_nippou) ?></font></td>
-                <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($finishing_tm_nippou) ?></font></td>
-                <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($amount_nippou) ?></font></td>
-                <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($shot_cycle_nippou) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($starting_tm_nippou) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($finishing_tm_nippou) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($amount_nippou) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($shot_cycle_nippou) ?></font></td>
               </tr>
             </tbody>
-            <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFF99">
+    </table>
+
+    <br><br>
+
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+            <thead>
+                <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#5507FF">プログラム探索開始時刻</strong></div></td>
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#5507FF">プログラム探索終了時刻</strong></div></td>
+                  <td width="180" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#5507FF">プログラム計算ショット数</strong></div></td>
+                  <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#5507FF">プログラムショットサイクル</strong></div></td>
+                </tr>
+            </thead>
+            <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
               <tr style="border-bottom: solid;border-width: 1px">
-                <td colspan="10" nowrap="nowrap"><strong style="font-size: 11pt; color:#111111">プログラム</strong></div></td>
-                <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($starting_tm_program) ?></font></td>
-                <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($finishing_tm_program) ?></font></td>
-                <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($amount_programming) ?></font></td>
-                <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($shot_cycle_mode) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($starting_tm_program) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($finishing_tm_program) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($amount_programming) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($shot_cycle_mode) ?></font></td>
               </tr>
             </tbody>
     </table>

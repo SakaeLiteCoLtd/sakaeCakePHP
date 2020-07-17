@@ -20,6 +20,7 @@ header('Pragma:');
 <body oncontextmenu='return false' onload="document.all.OK.click();" >
 
   <?= $this->Form->create($user, ['url' => ['action' => 'menu']]) ?>
+  <br><br><br>
     <center><input type="submit" value="ログインしています…" name="OK" style="background-color:#E6FFFF; border-width: 0px"></center>
     <br><br><br>
 </body>

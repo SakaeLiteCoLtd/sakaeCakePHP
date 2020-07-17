@@ -18,7 +18,7 @@ class htmlRolecheck extends AppController
     public function Rolecheck($staff_id)
    {
      $StatusRoles = $this->StatusRoles->find()->where(['staff_id' => $staff_id,
-     'OR' => [['role_id' => 1], ['role_id' => 2], ['role_id' => 3]]])->toArray();
+     'OR' => [['role_id' => 1], ['role_id' => 2]]])->toArray();
 
      if(count($StatusRoles) == 0){
        $roleCheck = 1;

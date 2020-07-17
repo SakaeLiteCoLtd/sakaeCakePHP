@@ -59,7 +59,11 @@ $this->AccountKaikakeElements = TableRegistry::get('accountKaikakeElements');
               <?php
 
               $ProductSupplierData = $this->ProductSuppliers->find()->where(['id' => $AccountProductKaikakes[$i]->sup_id])->toArray();
-              $ProductSupplier = $ProductSupplierData[0]->name;
+              if(isset($ProductSupplierData[0])){
+                $ProductSupplier = $ProductSupplierData[0]->name;
+              }else{
+                $ProductSupplier = "ProductSuppliersテーブルに登録されていません。";
+              }
 
               $AccountKaikakeElementData = $this->AccountKaikakeElements->find()->where(['id' => $AccountProductKaikakes[$i]->kaikake_element_id])->toArray();
               $AccountKaikakeElement = $AccountKaikakeElementData[0]->element;

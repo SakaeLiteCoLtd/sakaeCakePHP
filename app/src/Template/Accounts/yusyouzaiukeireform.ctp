@@ -31,7 +31,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
  </table>
 <br><br>
 
-  <?= $this->Form->create($user, ['url' => ['action' => 'pricematerialmasterkensakuichiran']]) ?>
+  <?= $this->Form->create($user, ['url' => ['action' => 'yusyouzaiukeireformsyousai']]) ?>
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
       <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">

@@ -48,11 +48,12 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
       <tr style="border-bottom: 0px;border-width: 0px">
         <td width="180" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">オーダーID</strong></div></td>
-        <td width="180" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">グレード</strong></div></td>
-        <td width="180" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">色番号</strong></div></td>
-        <td width="180" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">数量</strong></div></td>
+        <td width="160" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">グレード</strong></div></td>
+        <td width="160" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">色番号</strong></div></td>
+        <td width="160" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">数量</strong></div></td>
         <td width="300" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">受入日</strong></div></td>
-        <td width="180" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">単価</strong></div></td>
+        <td width="160" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">単価</strong></div></td>
+        <td width="70" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">削除</strong></div></td>
       </tr>
       <tr style="border-bottom: 0px;border-width: 0px">
         <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($id_order) ?></td>
@@ -61,6 +62,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('amount', array('type'=>'text', 'value' => $amount, 'label'=>false)) ?></td>
         <td style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date", array('type' => 'date', 'value' => $date_order, 'monthNames' => false, 'label'=>false)); ?></div></td>
         <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('price', array('type'=>'text', 'value' => $price, 'label'=>false)) ?></td>
+        <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('check', array('type'=>'checkbox', 'label'=>false)) ?></td>
       </tr>
 
   <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

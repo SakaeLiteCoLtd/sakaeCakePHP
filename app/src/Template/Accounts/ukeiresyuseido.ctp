@@ -8,7 +8,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 <?php
     $htmlShinkimenu = new htmlShinkimenu();
     $htmlaccountmenus = $htmlShinkimenu->accountmenus();
-    $htmlurikakemenus = $htmlShinkimenu->urikakemenus();
+    $htmlyusyouzaimenus = $htmlShinkimenu->yusyouzaimenus();
 ?>
 <hr size="5" style="margin: 0.5rem">
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
@@ -19,14 +19,14 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 <hr size="5" style="margin: 0.5rem">
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
   <?php
-       echo $htmlurikakemenus;
+       echo $htmlyusyouzaimenus;
   ?>
 </table>
 <hr size="5" style="margin: 0.5rem">
 <br>
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
    <tr style="background-color: #E6FFFF">
-     <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image('Labelimg/accountGenryouKensaku.gif');?></td>
+     <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image('Labelimg/accountYusyouzaiUkeireKensaku.gif');?></td>
    </tr>
  </table>
 <br><br>

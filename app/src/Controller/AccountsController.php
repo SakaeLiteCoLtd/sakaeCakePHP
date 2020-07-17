@@ -407,6 +407,23 @@ class AccountsController extends AppController
       $this->set('user',$user);
 
       $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+
+      $delete_flag = $data['check'];
+      $this->set('delete_flag',$delete_flag);
+      if($delete_flag == 1){
+        $mes = "以下のデータを削除します。";
+        $button = "削除";
+      }else{
+        $mes = "";
+        $button = "更新";
+      }
+      $this->set('mes',$mes);
+      $this->set('button',$button);
 
       $CustomerData = $this->Customers->find()->where(['customer_code' => $data['customer']])->toArray();
       $customer = $CustomerData[0]->name;
@@ -450,6 +467,8 @@ class AccountsController extends AppController
 
       $price = $data['price'];
       $this->set('price',$price);
+      $delete_flag = $data['delete_flag'];
+      $this->set('delete_flag',$delete_flag);
 
       $AccountUrikakes = $this->AccountUrikakes->find()->where(['id' => $data['UrikakeId']])->toArray();
       $motocustomer = $AccountUrikakes[0]->customer_code;
@@ -462,7 +481,7 @@ class AccountsController extends AppController
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->AccountUrikakes->updateAll(
-          ['customer_code' => $data['customer'], 'kingaku' => $data['price'], 'date' => $data['date'], 'urikake_element_id' => $data['urikakeelement'],
+          ['customer_code' => $data['customer'], 'kingaku' => $data['price'], 'date' => $data['date'], 'urikake_element_id' => $data['urikakeelement'], 'delete_flag' => $data['delete_flag'],
            'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
           ['id'  => $data['UrikakeId']]
         )){
@@ -473,14 +492,18 @@ class AccountsController extends AppController
           $table->setConnection($connection);
 
           $updater = "UPDATE account_urikake set cs_id ='".$data['customer']."', kingaku ='".$data['price']."', date ='".$data['date']."',
-          urikake_element_id ='".$data['urikakeelement']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
+          urikake_element_id ='".$data['urikakeelement']."', delete_flag ='".$data['delete_flag']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
           where cs_id ='".$motocustomer."' and urikake_element_id = '".$motourikake_element_id."' and date = '".$motodate."' and kingaku = '".$motoprice."' ";
           $connection->execute($updater);
 
           $connection = ConnectionManager::get('default');//新DBに戻る
           $table->setConnection($connection);
 
-          $mes = "※下記のように更新されました";
+          if($delete_flag == 1){
+            $mes = "※以下のデータを削除しました。";
+          }else{
+            $mes = "※下記のように更新されました";
+          }
           $this->set('mes',$mes);
           $connection->commit();// コミット5
         } else {
@@ -777,6 +800,22 @@ class AccountsController extends AppController
       $this->set('user',$user);
 
       $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $delete_flag = $data['check'];
+      $this->set('delete_flag',$delete_flag);
+      if($delete_flag == 1){
+        $mes = "以下のデータを削除します。";
+        $button = "削除";
+      }else{
+        $mes = "";
+        $button = "更新";
+      }
+      $this->set('mes',$mes);
+      $this->set('button',$button);
 
       $SupplierData = $this->ProductSuppliers->find()->where(['id' => $data['sup_id']])->toArray();
       $Supplier = $SupplierData[0]->name;
@@ -829,6 +868,9 @@ class AccountsController extends AppController
       $tanka = $data['tanka'];
       $this->set('tanka',$tanka);
 
+      $delete_flag = $data['delete_flag'];
+      $this->set('delete_flag',$delete_flag);
+
       $AccountUrikakeMaterials = $this->AccountUrikakeMaterials->find()->where(['id' => $data['Id']])->toArray();
       $motosup_id = $AccountUrikakeMaterials[0]->sup_id;
       $motodate = $AccountUrikakeMaterials[0]->date->format('Y-m-d');
@@ -842,7 +884,8 @@ class AccountsController extends AppController
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->AccountUrikakeMaterials->updateAll(
-          ['sup_id' => $data['sup_id'], 'date' => $data['date'], 'grade' => $data['grade'], 'color' => $data['color'], 'amount' => $data['amount'], 'tanka' => $data['tanka'],
+          ['sup_id' => $data['sup_id'], 'date' => $data['date'], 'grade' => $data['grade'], 'color' => $data['color'],
+           'amount' => $data['amount'], 'tanka' => $data['tanka'], 'delete_flag' => $data['delete_flag'],
            'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
           ['id'  => $data['Id']]
         )){
@@ -853,14 +896,18 @@ class AccountsController extends AppController
           $table->setConnection($connection);
 
           $updater = "UPDATE account_urikake_material set sup_id ='".$data['sup_id']."', date ='".$data['date']."', grade ='".$data['grade']."',
-          color ='".$data['color']."', amount ='".$data['amount']."', tanka ='".$data['tanka']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
+          color ='".$data['color']."', amount ='".$data['amount']."', tanka ='".$data['tanka']."',  delete_flag ='".$data['delete_flag']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
           where sup_id ='".$motosup_id."' and grade = '".$motograde."' and date = '".$motodate."' and color = '".$motocolor."' and amount = '".$motoamount."' and tanka = '".$mototanka."' ";
           $connection->execute($updater);
 
           $connection = ConnectionManager::get('default');//新DBに戻る
           $table->setConnection($connection);
 
-          $mes = "※下記のように更新されました";
+          if($delete_flag == 1){
+            $mes = "※以下のデータを削除しました。";
+          }else{
+            $mes = "※下記のように更新されました";
+          }
           $this->set('mes',$mes);
           $connection->commit();// コミット5
         } else {
@@ -1196,6 +1243,19 @@ class AccountsController extends AppController
 
       $kingaku = $data['kingaku'];
       $this->set('kingaku',$kingaku);
+
+      $delete_flag = $data['check'];
+      $this->set('delete_flag',$delete_flag);
+      if($delete_flag == 1){
+        $mes = "以下のデータを削除します。";
+        $button = "削除";
+      }else{
+        $mes = "";
+        $button = "更新";
+      }
+      $this->set('mes',$mes);
+      $this->set('button',$button);
+
 		}
 
     public function productkaikakesyuseido()
@@ -1225,6 +1285,8 @@ class AccountsController extends AppController
 
       $kingaku = $data['kingaku'];
       $this->set('kingaku',$kingaku);
+      $delete_flag = $data['delete_flag'];
+      $this->set('delete_flag',$delete_flag);
 
       $AccountProductKaikakes = $this->AccountProductKaikakes->find()->where(['id' => $data['Id']])->toArray();
       $motosup_id = $AccountProductKaikakes[0]->sup_id;
@@ -1237,7 +1299,7 @@ class AccountsController extends AppController
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->AccountProductKaikakes->updateAll(
-          ['sup_id' => $data['sup_id'], 'kingaku' => $data['kingaku'], 'date' => $data['date'], 'kaikake_element_id' => $data['element'],
+          ['sup_id' => $data['sup_id'], 'kingaku' => $data['kingaku'], 'date' => $data['date'], 'kaikake_element_id' => $data['element'], 'delete_flag' => $data['delete_flag'],
            'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
           ['id'  => $data['Id']]
         )){
@@ -1248,14 +1310,18 @@ class AccountsController extends AppController
           $table->setConnection($connection);
 
           $updater = "UPDATE account_product_kaikake set sup_id ='".$data['sup_id']."', kingaku ='".$data['kingaku']."', date ='".$data['date']."',
-          kaikake_element_id ='".$data['element']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
+          kaikake_element_id ='".$data['element']."', delete_flag ='".$data['delete_flag']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
           where sup_id ='".$motosup_id."' and kaikake_element_id = '".$motokaikake_element_id."' and date = '".$motodate."' and kingaku = '".$motokingaku."' ";
           $connection->execute($updater);
 
           $connection = ConnectionManager::get('default');//新DBに戻る
           $table->setConnection($connection);
 
-          $mes = "※下記のように更新されました";
+          if($delete_flag == 1){
+            $mes = "※以下のデータを削除しました。";
+          }else{
+            $mes = "※下記のように更新されました";
+          }
           $this->set('mes',$mes);
           $connection->commit();// コミット5
         } else {
@@ -1591,6 +1657,19 @@ class AccountsController extends AppController
 
       $kingaku = $data['kingaku'];
       $this->set('kingaku',$kingaku);
+
+      $delete_flag = $data['check'];
+      $this->set('delete_flag',$delete_flag);
+      if($delete_flag == 1){
+        $mes = "以下のデータを削除します。";
+        $button = "削除";
+      }else{
+        $mes = "";
+        $button = "更新";
+      }
+      $this->set('mes',$mes);
+      $this->set('button',$button);
+
 		}
 
     public function materialkaikakesyuseido()
@@ -1620,6 +1699,8 @@ class AccountsController extends AppController
 
       $kingaku = $data['kingaku'];
       $this->set('kingaku',$kingaku);
+      $delete_flag = $data['delete_flag'];
+      $this->set('delete_flag',$delete_flag);
 
       $AccountMaterialKaikakes = $this->AccountMaterialKaikakes->find()->where(['id' => $data['Id']])->toArray();
       $motosup_id = $AccountMaterialKaikakes[0]->sup_id;
@@ -1632,7 +1713,8 @@ class AccountsController extends AppController
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->AccountMaterialKaikakes->updateAll(
-          ['sup_id' => $data['sup_id'], 'kingaku' => $data['kingaku'], 'date' => $data['date'], 'kaikake_element_id' => $data['element'],
+          ['sup_id' => $data['sup_id'], 'kingaku' => $data['kingaku'], 'date' => $data['date'],
+           'kaikake_element_id' => $data['element'], 'delete_flag' => $data['delete_flag'],
            'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
           ['id'  => $data['Id']]
         )){
@@ -1643,14 +1725,18 @@ class AccountsController extends AppController
           $table->setConnection($connection);
 
           $updater = "UPDATE account_material_kaikake set sup_id ='".$data['sup_id']."', kingaku ='".$data['kingaku']."', date ='".$data['date']."',
-          kaikake_element_id ='".$data['element']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
+          kaikake_element_id ='".$data['element']."', delete_flag ='".$data['delete_flag']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
           where sup_id ='".$motosup_id."' and kaikake_element_id = '".$motokaikake_element_id."' and date = '".$motodate."' and kingaku = '".$motokingaku."' ";
           $connection->execute($updater);
 
           $connection = ConnectionManager::get('default');//新DBに戻る
           $table->setConnection($connection);
 
-          $mes = "※下記のように更新されました";
+          if($delete_flag == 1){
+            $mes = "※以下のデータを削除しました。";
+          }else{
+            $mes = "※下記のように更新されました";
+          }
           $this->set('mes',$mes);
           $connection->commit();// コミット5
         } else {
@@ -1844,6 +1930,19 @@ class AccountsController extends AppController
       $this->set('product_code',$product_code);
       $amount = $data['amount'];
       $this->set('amount',$amount);
+
+      $delete_flag = $data['check'];
+      $this->set('delete_flag',$delete_flag);
+      if($delete_flag == 1){
+        $mes = "以下のデータを削除します。";
+        $button = "削除";
+      }else{
+        $mes = "";
+        $button = "更新";
+      }
+      $this->set('mes',$mes);
+      $this->set('button',$button);
+
     }
 
     public function soukosyuseido()
@@ -1882,6 +1981,8 @@ class AccountsController extends AppController
       $this->set('product_code',$product_code);
       $amount = $data['amount'];
       $this->set('amount',$amount);
+      $delete_flag = $data['delete_flag'];
+      $this->set('delete_flag',$delete_flag);
 
       $StockInoutWorklogs = $this->StockInoutWorklogs->find()->where(['id' => $data['Id']])->toArray();
       $mototype = $StockInoutWorklogs[0]->type;
@@ -1895,7 +1996,8 @@ class AccountsController extends AppController
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->StockInoutWorklogs->updateAll(
-          ['type' => $data['type'], 'date_work' => $data['date'], 'outsource_code' => $data['sup_id'], 'outsource_name' => $Supplier, 'product_code' => $data['product_code'], 'amount' => $data['amount'],
+          ['type' => $data['type'], 'date_work' => $data['date'], 'outsource_code' => $data['sup_id'], 'outsource_name' => $Supplier,
+           'product_code' => $data['product_code'], 'amount' => $data['amount'], 'delete_flag' => $data['delete_flag'],
            'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
           ['id'  => $data['Id']]
         )){
@@ -1906,14 +2008,18 @@ class AccountsController extends AppController
           $table->setConnection($connection);
 
           $updater = "UPDATE stock_inout_worklog set type ='".$data['type']."', outsource_id ='".$data['sup_id']."', outsource_name ='".$Supplier."', date_work ='".$data['date']."',
-          product_id ='".$data['product_code']."', amount ='".$data['amount']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
+          product_id ='".$data['product_code']."', amount ='".$data['amount']."',  delete_flag ='".$data['delete_flag']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
           where type ='".$mototype."' and  date_work = '".$motodate_work."' and product_id = '".$motoproduct_id."' and amount = '".$motoamount."'";
           $connection->execute($updater);
 
           $connection = ConnectionManager::get('default');//新DBに戻る
           $table->setConnection($connection);
 
-          $mes = "※下記のように更新されました";
+          if($delete_flag == 1){
+            $mes = "※以下のデータを削除しました。";
+          }else{
+            $mes = "※下記のように更新されました";
+          }
           $this->set('mes',$mes);
           $connection->commit();// コミット5
         } else {
@@ -2427,6 +2533,19 @@ class AccountsController extends AppController
       $this->set('amount',$amount);
       $price = $data['price'];
       $this->set('price',$price);
+
+      $delete_flag = $data['check'];
+      $this->set('delete_flag',$delete_flag);
+      if($delete_flag == 1){
+        $mes = "以下のデータを削除します。";
+        $button = "削除";
+      }else{
+        $mes = "";
+        $button = "更新";
+      }
+      $this->set('mes',$mes);
+      $this->set('button',$button);
+
     }
 
     public function pricematerialsyuseido()
@@ -2462,6 +2581,8 @@ class AccountsController extends AppController
       $this->set('amount',$amount);
       $price = $data['price'];
       $this->set('price',$price);
+      $delete_flag = $data['delete_flag'];
+      $this->set('delete_flag',$delete_flag);
 
       $OrderMaterials = $this->OrderMaterials->find()->where(['id' => $data['Id']])->toArray();
       $motoid_order = $OrderMaterials[0]->id_order;
@@ -2471,7 +2592,7 @@ class AccountsController extends AppController
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->OrderMaterials->updateAll(
-          ['date_order' => $data['date'], 'price' => $data['price'], 'amount' => $data['amount'],
+          ['date_order' => $data['date'], 'price' => $data['price'], 'amount' => $data['amount'], 'delete_flag' => $data['delete_flag'],
            'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
           ['id'  => $data['Id']]
         )){
@@ -2481,7 +2602,7 @@ class AccountsController extends AppController
           $table = TableRegistry::get('order_material');
           $table->setConnection($connection);
 
-          $updater = "UPDATE order_material set date_order ='".$data['date']."', price ='".$data['price']."',
+          $updater = "UPDATE order_material set date_order ='".$data['date']."', price ='".$data['price']."', delete_flg ='".$data['delete_flag']."',
           amount ='".$data['amount']."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$sessionData['login']['staff_id']."'
           where id ='".$motoid_order."'";
           $connection->execute($updater);
@@ -2489,7 +2610,11 @@ class AccountsController extends AppController
           $connection = ConnectionManager::get('default');//新DBに戻る
           $table->setConnection($connection);
 
-          $mes = "※下記のように更新されました";
+          if($delete_flag == 1){
+            $mes = "※以下のデータを削除しました。";
+          }else{
+            $mes = "※下記のように更新されました";
+          }
           $this->set('mes',$mes);
           $connection->commit();// コミット5
         } else {
@@ -2823,13 +2948,26 @@ class AccountsController extends AppController
       $this->set('user',$user);
 
       $data = $this->request->getData();
-      /*
+/*
       echo "<pre>";
       print_r($data);
       echo "</pre>";
 */
       $dateYMD = $data['date']['year']."-".$data['date']['month']."-".$data['date']['day'];
       $this->set('dateYMD',$dateYMD);
+
+      $delete_flag = $data['check'];
+      $this->set('delete_flag',$delete_flag);
+      if($delete_flag == 1){
+        $mes = "以下のデータを削除します。";
+        $button = "削除";
+      }else{
+        $mes = "";
+        $button = "更新";
+      }
+      $this->set('mes',$mes);
+      $this->set('button',$button);
+
 		}
 
     public function ukeiresyuseido()
@@ -2859,6 +2997,8 @@ class AccountsController extends AppController
       $this->set('amount',$amount);
       $tanka = $data['tanka'];
       $this->set('tanka',$tanka);
+      $delete_flag = $data['delete_flag'];
+      $this->set('delete_flag',$delete_flag);
 
       $AccountUrikakeMaterials = $this->AccountYusyouzaiUkeires->find()->where(['id' => $data['Id']])->toArray();
       $motoproduct_code = $AccountUrikakeMaterials[0]->product_code;
@@ -2871,7 +3011,7 @@ class AccountsController extends AppController
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->AccountYusyouzaiUkeires->updateAll(
-          ['date_ukeire' => $data['date'], 'amount' => $data['amount'], 'tanka' => $data['tanka'],
+          ['date_ukeire' => $data['date'], 'amount' => $data['amount'], 'tanka' => $data['tanka'], 'delete_flag' => $data['delete_flag'],
            'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
           ['id'  => $data['Id']]
         )){
@@ -2881,7 +3021,7 @@ class AccountsController extends AppController
           $table = TableRegistry::get('account_yusyouzai_ukeire');
           $table->setConnection($connection);
 
-          $updater = "UPDATE account_yusyouzai_ukeire set date_ukeire ='".$data['date']."', amount ='".$data['amount']."', tanka ='".$data['tanka']."',
+          $updater = "UPDATE account_yusyouzai_ukeire set date_ukeire ='".$data['date']."', amount ='".$data['amount']."', tanka ='".$data['tanka']."', delete_flag ='".$data['delete_flag']."',
            updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$sessionData['login']['staff_id']."'
           where product_id ='".$motoproduct_code."' and date_ukeire = '".$motodate_ukeire."' and amount = '".$motoamount."' and tanka = '".$mototanka."' ";
           $connection->execute($updater);
@@ -2889,7 +3029,11 @@ class AccountsController extends AppController
           $connection = ConnectionManager::get('default');//新DBに戻る
           $table->setConnection($connection);
 
-          $mes = "※下記のように更新されました";
+          if($delete_flag == 1){
+            $mes = "※以下のデータを削除しました。";
+          }else{
+            $mes = "※下記のように更新されました";
+          }
           $this->set('mes',$mes);
           $connection->commit();// コミット5
         } else {
@@ -2922,6 +3066,144 @@ class AccountsController extends AppController
      $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
      $this->set('roleCheck',$roleCheck);
     }
+
+    public function yusyouzaiukeireformsyousai()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+      $product_code = substr($data['product'], 3, -1);
+      $this->set('product_code',$product_code);
+
+      $AccountYusyouzaiMasters = $this->AccountYusyouzaiMasters->find()->where(['product_code' => $product_code])->toArray();
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $product_name = $Product[0]->product_name;
+      $this->set('product_name',$product_name);
+      $tanka = $AccountYusyouzaiMasters[0]['price'];
+      $this->set('tanka',$tanka);
+
+    }
+
+    public function yusyouzaiukeireconfirm()
+		{
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $product_code = $data['product_code'];
+      $this->set('product_code',$product_code);
+      $product_name = $data['product_name'];
+      $this->set('product_name',$product_name);
+      $tanka = $data['tanka'];
+      $this->set('tanka',$tanka);
+      $amount = $data['amount'];
+      $this->set('amount',$amount);
+
+      $dateYMD = $data['date']['year']."-".$data['date']['month']."-".$data['date']['day'];
+      $this->set('dateYMD',$dateYMD);
+		}
+
+    public function yusyouzaiukeiredo()
+		{
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['action' => 'index']);
+      }
+
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $data = $this->request->getData();
+
+      $product_code = $data['product_code'];
+      $this->set('product_code',$product_code);
+      $product_name = $data['product_name'];
+      $this->set('product_name',$product_name);
+      $tanka = $data['tanka'];
+      $this->set('tanka',$tanka);
+      $date = $data['date'];
+      $this->set('date',$date);
+      $amount = $data['amount'];
+      $this->set('amount',$amount);
+
+      $arrtouroku = array();
+      $arrtouroku[] = array(
+        'product_code' => $data['product_code'],
+        'tanka' => $data['tanka'],
+        'date_ukeire' => $data['date'],
+        'amount' => $data['amount'],
+        'delete_flag' => 0,
+        'created_staff' => $sessionData['login']['staff_id'],
+        'created_at' => date('Y-m-d H:i:s')
+      );
+/*
+      echo "<pre>";
+      print_r($arrtouroku[0]);
+      echo "</pre>";
+*/
+      $AccountYusyouzaiUkeires = $this->AccountYusyouzaiUkeires->patchEntity($this->AccountYusyouzaiUkeires->newEntity(), $arrtouroku[0]);
+      $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->AccountYusyouzaiUkeires->save($AccountYusyouzaiUkeires)) {
+
+          //旧DBに製品登録
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $table = TableRegistry::get('account_yusyouzai_ukeire');
+          $table->setConnection($connection);
+
+          $connection->insert('account_yusyouzai_ukeire', [
+              'product_id' => $arrtouroku[0]["product_code"],
+              'tanka' => $arrtouroku[0]["tanka"],
+              'date_ukeire' => $arrtouroku[0]["date_ukeire"],
+              'amount' => $arrtouroku[0]["amount"],
+              'delete_flag' => $arrtouroku[0]["delete_flag"],
+              'emp_id' => $arrtouroku[0]["created_staff"],
+              'created_at' => date('Y-m-d H:i:s')
+          ]);
+
+          $connection = ConnectionManager::get('default');//新DBに戻る
+          $table->setConnection($connection);
+
+          $mes = "※下記のように登録されました";
+          $this->set('mes',$mes);
+          $connection->commit();// コミット5
+        } else {
+          $mes = "※登録されませんでした";
+          $this->set('mes',$mes);
+          $this->Flash->error(__('The data could not be saved. Please, try again.'));
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+		}
+
 
     public function form()
     {

@@ -53,6 +53,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         <td width="170" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">色</strong></div></td>
         <td width="170" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">数量</strong></div></td>
         <td width="170" height="30" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">単価</strong></div></td>
+        <td width="70" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">削除</strong></div></td>
       </tr>
       <tr style="border-bottom: 0px;border-width: 0px">
         <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("sup_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrProductSupplier, 'value' => $sup_id, 'label'=>false]) ?></td>
@@ -61,6 +62,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('color', array('type'=>'text', 'value' => $color, 'label'=>false)) ?></td>
         <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('amount', array('type'=>'text', 'value' => $amount, 'label'=>false)) ?></td>
         <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('tanka', array('type'=>'text', 'value' => $tanka, 'label'=>false)) ?></td>
+        <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('check', array('type'=>'checkbox', 'label'=>false)) ?></td>
       </tr>
 
   <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

@@ -62,7 +62,11 @@ $this->AccountYusyouzaiMasters = TableRegistry::get('accountYusyouzaiMasters');
               <?php
               $product_code = $AccountYusyouzaiUkeires[$i]->product_code;
               $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
-              $product_name = $Product[0]->product_name;
+              if(isset($Product[0])){
+                $product_name = $Product[0]->product_name;
+              }else{
+                $product_name = "Productsテーブルに登録されていません。";
+              }
 
               $AccountYusyouzaiMasters = $this->AccountYusyouzaiMasters->find()->where(['product_code' => $product_code])->toArray();
               $customer_code = $AccountYusyouzaiMasters[0]->customer_code;

@@ -52,12 +52,14 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         <td width="200" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">項目</strong></div></td>
         <td width="300" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">受入日</strong></div></td>
         <td width="200" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">受入金額</strong></div></td>
+        <td width="70" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">削除</strong></div></td>
       </tr>
       <tr style="border-bottom: 0px;border-width: 0px">
         <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("sup_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrSupplier, 'value' => $sup_id, 'label'=>false]) ?></td>
         <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("element", ["type"=>"select","empty"=>"選択してください", "options"=>$arrAccountKaikakeElement, 'value' => $element_id, 'label'=>false]) ?></td>
         <td style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date", array('type' => 'date', 'value' => $date, 'monthNames' => false, 'label'=>false)); ?></div></td>
         <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('kingaku', array('type'=>'text', 'value' => $kingaku, 'label'=>false)) ?></td>
+        <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('check', array('type'=>'checkbox', 'label'=>false)) ?></td>
       </tr>
 
   <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

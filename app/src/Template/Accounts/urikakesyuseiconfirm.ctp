@@ -33,6 +33,9 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 
   <?= $this->Form->create($user, ['url' => ['action' => 'urikakesyuseido']]) ?>
 
+  <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
+<br>
+
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
       <tr style="border-bottom: 0px;border-width: 0px">
@@ -51,7 +54,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
   <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <br>
   <tr bgcolor="#E6FFFF" >
-    <td align="left" rowspan="2" width="30" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('更新'), array('name' => 'do')); ?></div></td>
+    <td align="left" rowspan="2" width="30" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__($button), array('name' => 'do')); ?></div></td>
   </tr>
   </table>
 
@@ -59,6 +62,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 	<?= $this->Form->control('urikakeelement', array('type'=>'hidden', 'value'=>$this->request->getData('urikakeelement'), 'label'=>false)) ?>
   <?= $this->Form->control('date', array('type'=>'hidden', 'value'=>$dateYMD, 'label'=>false)) ?>
   <?= $this->Form->control('price', array('type'=>'hidden', 'value'=>$this->request->getData('price'), 'label'=>false)) ?>
+  <?= $this->Form->control('delete_flag', array('type'=>'hidden', 'value'=>$this->request->getData('check'), 'label'=>false)) ?>
   <?= $this->Form->control('UrikakeId', array('type'=>'hidden', 'value'=>$this->request->getData('UrikakeId'), 'label'=>false)) ?>
 
 

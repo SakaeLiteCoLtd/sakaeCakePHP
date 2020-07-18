@@ -28,6 +28,8 @@
          </table>
          <hr size="5" style="margin: 0.5rem">
 
+         <?=$this->Form->create($KadouSeikeis, ['url' => ['action' => 'imgkensakuform']]) ?>
+
 <br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
@@ -98,4 +100,15 @@
               </tr>
             </tbody>
     </table>
-<br><br><br><br><br><br>
+<br><br><br>
+
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('グラフ呼出', array('name' => 'yobidasi')); ?></div></td>
+</tr>
+</table>
+
+<?= $this->Form->control('product', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
+<?= $this->Form->control('start_tm', array('type'=>'hidden', 'value'=>$starting_tm_nippou, 'label'=>false)) ?>
+
+<br><br><br>

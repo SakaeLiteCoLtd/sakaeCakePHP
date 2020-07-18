@@ -1322,7 +1322,6 @@ class KadousController extends AppController
            $connection = ConnectionManager::get('default');
            $table->setConnection($connection);
 
-
            $mes = "※登録されました";
            $this->set('mes',$mes);
 
@@ -1338,6 +1337,80 @@ class KadousController extends AppController
        }//トランザクション10
 
      }
+
+   }
+
+   public function imgkensakuform()
+   {
+     $KadouSeikei = $this->KadouSeikeis->newEntity();
+     $this->set('KadouSeikei',$KadouSeikei);
+
+     $data = $this->request->getData();
+
+     $date_sta = substr($data['start_tm'], 0, 10);
+     $this->set('date_sta',$date_sta);
+     $product_code = $data['product'];
+     $date_y = substr($data['start_tm'], 2, 2);
+     $date_m = substr($data['start_tm'], 5, 2);
+     $date_d = substr($data['start_tm'], 8, 2);
+
+     $arrImgtype = ['test1' => 'test1','test2' => 'test2'];
+     $this->set('arrImgtype',$arrImgtype);
+
+     $dirName = "img/kadouimg/$product_code/$date_y/$date_m/$date_d/";
+     if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
+       $mes = "";
+       $this->set('mes',$mes);
+     }else{
+       $mes = "品番：".$product_code."　日付：".$date_sta." のグラフデータはありません。";
+       $this->set('mes',$mes);
+     }
+
+     $file_name1 = $product_code."_".$date_y.$date_m.$date_d."_test1.gif";
+     $file_name2 = $product_code."_".$date_y.$date_m.$date_d."_test2.gif";
+
+     $gif1 = "kadouimg/$product_code/$date_y/$date_m/$date_d/$file_name1";
+     $this->set('gif1',$gif1);
+     $gif2 = "kadouimg/$product_code/$date_y/$date_m/$date_d/$file_name2";
+     $this->set('gif2',$gif2);
+   }
+
+   public function imgkensakuichiran()
+   {
+     $KadouSeikei = $this->KadouSeikeis->newEntity();
+     $this->set('KadouSeikei',$KadouSeikei);
+
+     $data = $this->request->getData();
+/*
+     echo "<pre>";
+     print_r($data);
+     echo "</pre>";
+*/
+     $product_code = $data['product'];
+     $date_y = substr($data['date']["year"], 2, 2);
+     $date_m = $data['date']['month'];
+     $date_d = $data['date']['day'];
+
+     $date_sta = $date_y."-".$date_m."-".$date_d;
+
+     $type = $data['type'];
+
+     $arrImgtype = ['test1' => 'test1','test2' => 'test2'];
+     $this->set('arrImgtype',$arrImgtype);
+
+     $dirName = "img/kadouimg/$product_code/$date_y/$date_m/$date_d/";
+     if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
+       $mes = "";
+       $this->set('mes',$mes);
+     }else{
+       $mes = "品番：".$product_code."　日付：".$date_sta." のグラフデータはありません。";
+       $this->set('mes',$mes);
+     }
+
+     $file_name = $product_code."_".$date_y.$date_m.$date_d."_".$type.".gif";
+
+     $gif = "kadouimg/$product_code/$date_y/$date_m/$date_d/$file_name";
+     $this->set('gif',$gif);
 
    }
 

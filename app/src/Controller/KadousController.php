@@ -1371,8 +1371,22 @@ class KadousController extends AppController
 
      $gif1 = "kadouimg/$product_code/$date_y/$date_m/$date_d/$file_name1";
      $this->set('gif1',$gif1);
-     $gif2 = "kadouimg/$product_code/$date_y/$date_m/$date_d/$file_name2";
+  //   $gif2 = "kadouimg/$product_code/$date_y/$date_m/$date_d/$file_name2";
+  //   $this->set('gif2',$gif2);
+
+  //$gif2 = "C:/Users/info/Desktop/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";//0702.RF51-B471HHの画像
+//  $gif2 = "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";
+  $gif2 = "/img/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";
      $this->set('gif2',$gif2);
+/*
+     $fp = fopen('C:/Users/info/Desktop/kadouimg/RF51-B471HH/20/07/02/furiwake.txt', 'r');//ファイル表示テスト
+     $line = fgets($fp);
+       echo "<pre>";
+       print_r($line);
+       echo "</pre>";
+
+       fclose($fp);
+*/
    }
 
    public function imgkensakuichiran()

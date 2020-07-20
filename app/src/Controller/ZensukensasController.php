@@ -542,6 +542,9 @@ class ZensukensasController extends AppController
        $CheckLots = $this->CheckLots->newEntity();
        $this->set('CheckLots',$CheckLots);
 
+       $staffData = $this->Staffs->find()->where(['id' =>  $_SESSION['zensuhead']['updated_staff']])->toArray();
+       $staff_code = $staffData[0]->staff_code;
+
        $ResultZensuFooders = $this->ResultZensuFooders->patchEntities($ResultZensuFooders, $_SESSION['zensufooder']);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
        $connection = ConnectionManager::get('default');//トランザクション1
        // トランザクション開始2
@@ -578,7 +581,7 @@ class ZensukensasController extends AppController
                $table->setConnection($connection);
 
                $updater = "UPDATE result_zensu_head set datetime_finish = '".date('Y-m-d H:i:s')."'
-                 where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id']['lot_num']."' and datetime_finish IS NULL";//もとのDBも更新
+                 where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id']['lot_num']."' and emp_id = '".$staff_code."' and datetime_finish IS NULL";//もとのDBも更新
                $connection->execute($updater);
 
                $connection = ConnectionManager::get('default');//新DBに戻る

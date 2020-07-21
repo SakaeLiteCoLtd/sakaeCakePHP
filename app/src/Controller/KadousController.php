@@ -1346,18 +1346,32 @@ class KadousController extends AppController
      $this->set('KadouSeikei',$KadouSeikei);
 
      $data = $this->request->getData();
-
+/*
+     echo "<pre>";
+     print_r($data);
+     echo "</pre>";
+*/
      $date_sta = substr($data['start_tm'], 0, 10);
      $this->set('date_sta',$date_sta);
      $product_code = $data['product'];
-     $date_y = substr($data['start_tm'], 2, 2);
+     $this->set('product_code',$product_code);
+     $seikeiki = $data['seikeiki'];
+     $this->set('seikeiki',$seikeiki);
+     $date_y = substr($data['start_tm'], 0, 4);
      $date_m = substr($data['start_tm'], 5, 2);
      $date_d = substr($data['start_tm'], 8, 2);
 
-     $arrImgtype = ['test1' => 'test1','test2' => 'test2'];
+     $arrImgtype = ['1' => '選択なし','hist_place_cushion' => 'hist_place_cushion','hist_time_injection' => 'hist_time_injection',
+     'hist_time_measure' => 'hist_time_measure','hist_pressure_injection' => 'hist_pressure_injection',
+      'plot_place_cushion' => 'plot_place_cushion','plot_time_injection' => 'plot_time_injection',
+      'plot_time_measure' => 'plot_time_measure','plot_pressure_injection' => 'plot_pressure_injection'];
      $this->set('arrImgtype',$arrImgtype);
 
+     $arrImgpriority = ['1' => '1','2' => 'その他'];
+     $this->set('arrImgpriority',$arrImgpriority);
+
      $dirName = "img/kadouimg/$product_code/$date_y/$date_m/$date_d/";
+  //   $dirName = "/home/centosuser/kadouimg/$product_code/$date_y/$date_m/$date_d/";
      if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
        $mes = "";
        $this->set('mes',$mes);
@@ -1366,27 +1380,52 @@ class KadousController extends AppController
        $this->set('mes',$mes);
      }
 
-     $file_name1 = $product_code."_".$date_y.$date_m.$date_d."_test1.gif";
-     $file_name2 = $product_code."_".$date_y.$date_m.$date_d."_test2.gif";
+     $file_name1 = $seikeiki."_hist_place_cushion.png";
 
-     $gif1 = "kadouimg/$product_code/$date_y/$date_m/$date_d/$file_name1";
+  //   $gif1 = "kadouimg/$product_code/$date_y/$date_m/$date_d/$file_name1";
+  //   $this->set('gif1',$gif1);
+     $gif1 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_hist_place_cushion.png";
      $this->set('gif1',$gif1);
-  //   $gif2 = "kadouimg/$product_code/$date_y/$date_m/$date_d/$file_name2";
+     $gif2 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_hist_time_injection.png";
+     $this->set('gif2',$gif2);
+     $gif3 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_hist_time_measure.png";
+     $this->set('gif3',$gif3);
+     $gif4 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_hist_pressure_injection.png";
+     $this->set('gif4',$gif4);
+     $gif5 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_plot_place_cushion.png";
+     $this->set('gif5',$gif5);
+     $gif6 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_plot_time_injection.png";
+     $this->set('gif6',$gif6);
+     $gif7 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_plot_time_measure.png";
+     $this->set('gif7',$gif7);
+     $gif8 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_plot_pressure_injection.png";
+     $this->set('gif8',$gif8);
+
+     //$gif2 = "C:/Users/info/Desktop/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";//0702.RF51-B471HHの画像
+//    $gif2 = "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";
+ //  $gif2 = '//192.168.4.246/centosuser/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif';
+//  $gif2 = "/img/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";
+//  $gif2 = "/home/centosuser/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_hist_time_injection.png";
   //   $this->set('gif2',$gif2);
 
-  //$gif2 = "C:/Users/info/Desktop/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";//0702.RF51-B471HHの画像
-//  $gif2 = "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";
-  $gif2 = "/img/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";
-     $this->set('gif2',$gif2);
 /*
-     $fp = fopen('C:/Users/info/Desktop/kadouimg/RF51-B471HH/20/07/02/furiwake.txt', 'r');//ファイル表示テスト
-     $line = fgets($fp);
-       echo "<pre>";
-       print_r($line);
-       echo "</pre>";
+//   $fp = fopen('C:/Users/info/Desktop/kadouimg/RF51-B471HH/2020/07/02/test.txt', 'r');//ファイル表示テスト
+   $fp = fopen('/home/centosuser/kadouimg/RF51-B471HH/20/07/02/test.txt', 'r');//ファイル表示テスト
+//   $fp = fopen('\\192.168.1.220\社内共通\hirokawa\kadouimg\RF51-B471HH\20\07\02\test.txt', 'r');//ファイル表示テスト
+//   $fp = fopen('//192.168.1.220/社内共通/hirokawa/kadouimg/RF51-B471HH/20/07/02/test.txt', 'r');//ファイル表示テスト
+        $line = fgets($fp);
+          echo "<pre>";
+          print_r($line);
+          echo "</pre>";
 
-       fclose($fp);
+          fclose($fp);
 */
+
+    //ファイル名変更
+    //      rename( "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/test_old.txt", "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/test_new.txt" );
+      //    rename( "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.png", "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test22.png" );
+          //ファイルのパーミッション
+
    }
 
    public function imgkensakuichiran()
@@ -1400,32 +1439,106 @@ class KadousController extends AppController
      print_r($data);
      echo "</pre>";
 */
-     $product_code = $data['product'];
-     $date_y = substr($data['date']["year"], 2, 2);
+     $product_code = $data['product_code'];
+     $this->set('product_code',$product_code);
+     $seikeiki = $data['seikeiki'];
+     $this->set('seikeiki',$seikeiki);
+     $date_y = substr($data['date']["year"], 0, 4);
      $date_m = $data['date']['month'];
      $date_d = $data['date']['day'];
 
      $date_sta = $date_y."-".$date_m."-".$date_d;
 
+     $priority = $data['priority'];
      $type = $data['type'];
 
-     $arrImgtype = ['test1' => 'test1','test2' => 'test2'];
+     $arrImgtype = ['1' => '選択なし','hist_place_cushion' => 'hist_place_cushion','hist_time_injection' => 'hist_time_injection',
+      'hist_time_measure' => 'hist_time_measure','hist_pressure_injection' => 'hist_pressure_injection',
+      'plot_place_cushion' => 'plot_place_cushion','plot_time_injection' => 'plot_time_injection',
+      'plot_time_measure' => 'plot_time_measure','plot_pressure_injection' => 'plot_pressure_injection'];
      $this->set('arrImgtype',$arrImgtype);
+
+     $arrImgpriority = ['1' => '1', '2' => 'その他'];
+     $this->set('arrImgpriority',$arrImgpriority);
 
      $dirName = "img/kadouimg/$product_code/$date_y/$date_m/$date_d/";
      if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
        $mes = "";
        $this->set('mes',$mes);
      }else{
-       $mes = "品番：".$product_code."　日付：".$date_sta." のグラフデータはありません。";
+       $mes = "成型機：".$seikeiki."、品番：".$product_code."、日付：".$date_sta."、グラフタイプ：".$type." のグラフデータはありません。";
        $this->set('mes',$mes);
      }
 
-     $file_name = $product_code."_".$date_y.$date_m.$date_d."_".$type.".gif";
 
-     $gif = "kadouimg/$product_code/$date_y/$date_m/$date_d/$file_name";
-     $this->set('gif',$gif);
+     if($priority == 2){//その他を選択した場合
 
+       $typecheck = 1;
+       $this->set('typecheck',$typecheck);
+
+       $arrAllfiles = glob("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/*");
+
+       $countfile = count($arrAllfiles);
+
+       $arrPngfiles = array();
+       for($k=0; $k<$countfile; $k++){
+
+         ${"file".$k} = explode("/",$arrAllfiles[$k]);
+         ${"pngcheck".$k} = substr(${"file".$k}[7], -3, 3);
+
+         if(${"pngcheck".$k} == "png"){
+
+           $arrPngfiles[] = ${"file".$k}[7];
+           $this->set('arrPngfiles',$arrPngfiles);
+
+           $file_name = ${"file".$k}[7];
+           ${"gif".$k} = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
+           $this->set('gif'.$k,${"gif".$k});
+
+         }
+
+       }
+
+     }elseif($type == 1){//$priority=1で、種類を選択していない場合
+
+       $typecheck = 2;
+       $this->set('typecheck',$typecheck);
+
+       $gif1 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_hist_place_cushion.png";
+       $this->set('gif1',$gif1);
+       $gif2 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_hist_time_injection.png";
+       $this->set('gif2',$gif2);
+       $gif3 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_hist_time_measure.png";
+       $this->set('gif3',$gif3);
+       $gif4 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_hist_pressure_injection.png";
+       $this->set('gif4',$gif4);
+       $gif5 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_plot_place_cushion.png";
+       $this->set('gif5',$gif5);
+       $gif6 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_plot_time_injection.png";
+       $this->set('gif6',$gif6);
+       $gif7 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_plot_time_measure.png";
+       $this->set('gif7',$gif7);
+       $gif8 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_plot_pressure_injection.png";
+       $this->set('gif8',$gif8);
+
+     }else{//$priority=1で、種類を選択している場合
+
+       $typecheck = 3;
+       $this->set('typecheck',$typecheck);
+
+       $seikeiki = 5;
+
+       $file_name = $seikeiki."_".$type.".png";
+
+       $gif = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
+       $this->set('gif',$gif);
+
+     }
+/*
+     echo "<pre>";
+     print_r($arrPngfiles);
+     echo "</pre>";
+*/
    }
 
 

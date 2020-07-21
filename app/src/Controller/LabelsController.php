@@ -3980,16 +3980,18 @@ class LabelsController extends AppController
        $data = $this->request->getData();
        $inputdate = $data['inputdate'];
        $this->set('inputdate',$inputdate);
-/*
-             echo "<pre>";
-             print_r($data);
-             echo "</pre>";
-*/
+
        $arrOrderEdis = $this->OrderEdis->find()->where(['date_deliver' => $inputdate, 'place_deliver_code' => array_keys($data)[0], 'delete_flag' => '0'])->toArray();
 
        $place_deliver = $data[array_keys($data)[0]];
        $this->set('place_deliver',$place_deliver);
+       $place_deliver_code = array_keys($data)[0];
 
+/*
+       echo "<pre>";
+       print_r(array_keys($data)[0]);
+       echo "</pre>";
+*/
        $arrPro =  array();
        $arrPlace =  array();
 
@@ -4058,7 +4060,7 @@ class LabelsController extends AppController
          $this->set('product_name'.$j,${"product_name".$j});
          $this->set('total_amount'.$j,${"total_amount".$j});
 
-         ${"arrCheckLots".$j} = $this->CheckLots->find()->where(['date_deliver' => $inputdate, 'product_code' => ${"product_code".$j}, 'delete_flag' => '0'])->toArray();
+         ${"arrCheckLots".$j} = $this->CheckLots->find()->where(['date_deliver' => $inputdate, 'product_code' => ${"product_code".$j},  'place_deliver_code' => $place_deliver_code, 'delete_flag' => '0'])->toArray();
 
          if(count(${"arrCheckLots".$j}) > 0){
 

@@ -108,6 +108,7 @@
 </tr>
 </table>
 
+<?= $this->Form->control('seikeiki', array('type'=>'hidden', 'value'=>$seikeiki, 'label'=>false)) ?>
 <?= $this->Form->control('product', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
 <?= $this->Form->control('start_tm', array('type'=>'hidden', 'value'=>$starting_tm_nippou, 'label'=>false)) ?>
 

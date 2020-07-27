@@ -61,11 +61,16 @@ $roop = floor(count($arrPngfiles) / 4);
 
   <table style="margin-bottom:0px" width="1350" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
     <tr style="background-color: #E6FFFF">
-      <td style="padding: 0.1rem 0.1rem; text-align: center">
+      <td style="padding: 0.1rem 0.1rem; text-align: right">
         <?php
-        echo $this->Html->image($gif,array('width'=>'600','height'=>'500'));
+        echo $this->Html->image($gif,array('width'=>'550','height'=>'500'));
         ?>
        </td>
+       <td style="padding: 0.1rem 0.1rem; text-align: left">
+         <?php
+         echo $this->Html->image($gif,array('width'=>'550','height'=>'500'));
+         ?>
+        </td>
     </tr>
    </table>
 

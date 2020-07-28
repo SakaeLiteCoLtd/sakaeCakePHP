@@ -3084,11 +3084,25 @@ class AccountsController extends AppController
       $this->set('product_code',$product_code);
 
       $AccountYusyouzaiMasters = $this->AccountYusyouzaiMasters->find()->where(['product_code' => $product_code])->toArray();
-      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
-      $product_name = $Product[0]->product_name;
-      $this->set('product_name',$product_name);
-      $tanka = $AccountYusyouzaiMasters[0]['price'];
-      $this->set('tanka',$tanka);
+      if(isset($AccountYusyouzaiMasters[0])){
+        $product_name = $AccountYusyouzaiMasters[0]->product_name;
+        $this->set('product_name',$product_name);
+        $tanka = $AccountYusyouzaiMasters[0]['price'];
+        $this->set('tanka',$tanka);
+
+        $product_check = 0;
+        $this->set('product_check',$product_check);
+      }else{
+        $product_name = "登録されていません";
+        $this->set('product_name',$product_name);
+        $tanka = "登録されていません";
+        $this->set('tanka',$tanka);
+        $mes = "製品「".$product_code."」はAccountYusyouzaiMastersテーブルに存在しません。";
+        $this->set('mes',$mes);
+
+        $product_check = 1;
+        $this->set('product_check',$product_check);
+      }
 
     }
 

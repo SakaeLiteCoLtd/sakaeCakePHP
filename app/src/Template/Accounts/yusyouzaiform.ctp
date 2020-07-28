@@ -26,7 +26,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 <br>
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
    <tr style="background-color: #E6FFFF">
-     <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image('Labelimg/accountYusyouzaiMasterKensaku.gif');?></td>
+     <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image('Labelimg/accountYusyouzaiMaster.gif');?></td>
    </tr>
  </table>
 <br><br>
@@ -39,7 +39,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
     <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">品名</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false, 'autofocus'=>true)) ?></td>
     <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_name', array('type'=>'text', 'label'=>false)) ?></td>
 	</tr>
 </table>

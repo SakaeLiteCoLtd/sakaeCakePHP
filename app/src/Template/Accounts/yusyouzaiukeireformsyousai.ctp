@@ -54,12 +54,22 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('amount', array('type'=>'text', 'label'=>false)) ?></td>
       </tr>
 
-  <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-    <br>
-  <tr bgcolor="#E6FFFF" >
-    <td align="left" rowspan="2" width="30" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'confirm')); ?></div></td>
-  </tr>
-  </table>
+      <?php if($product_check == 1): ?>
+        <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
+<br>
+        <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="border-style: none;"><div align="left"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+      </tr>
+    </table>
+      <?php else:?>
+        <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="left" rowspan="2" width="30" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'confirm')); ?></div></td>
+      </tr>
+    </table>
+      <?php endif; ?>
+
   <br><br>
 
   <?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>

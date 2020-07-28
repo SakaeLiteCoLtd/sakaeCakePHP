@@ -96,7 +96,7 @@
         <tr>
           <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
       </tr>
-      <?php else: //csv押したとき ?>
+      <?php else:?>
         <tr>
           <td style="border-style: none;"><div align="center"><?= $this->Form->submit('登録', array('name' => 'kakunin')); ?></div></td>
       </tr>

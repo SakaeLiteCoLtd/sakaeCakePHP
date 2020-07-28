@@ -812,7 +812,7 @@ class ProductsController extends AppController
 			 $this->set('shot_cycle',$shot_cycle);
 
 			 $place_deliver = $Products[0]->place_deliver_id ;
-			 $PlaceDeliversData = $this->PlaceDelivers->find()->where(['id_from_order' => $place_deliver])->toArray();
+			 $PlaceDeliversData = $this->PlaceDelivers->find()->where(['id' => $place_deliver])->toArray();
 			 if(isset($PlaceDeliversData[0])){
 				 $PlaceDeliver = $PlaceDeliversData[0]->name;
 	       $this->set('PlaceDeliver',$PlaceDeliver);

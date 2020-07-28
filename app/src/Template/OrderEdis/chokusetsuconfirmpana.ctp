@@ -90,9 +90,19 @@
 <?= $this->Form->control('customer_code', array('type'=>'hidden', 'value'=>$customer_code, 'label'=>false)) ?>
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-    <tr>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('登録', array('name' => 'kakunin')); ?></div></td>
-  </tr>
+
+      <?php if($line_code_check == 1): ?>
+        <legend align="center"><font color="red"><?= __("環境依存文字「㈱」は使用できません。納入ラインを入力し直してください。") ?></font></legend>
+        <tr>
+          <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+      </tr>
+      <?php else: //csv押したとき ?>
+        <tr>
+          <td style="border-style: none;"><div align="center"><?= $this->Form->submit('登録', array('name' => 'kakunin')); ?></div></td>
+      </tr>
+      <?php endif; ?>
+
+
   </table>
 <br><br><br>
     <?= $this->Form->end() ?>

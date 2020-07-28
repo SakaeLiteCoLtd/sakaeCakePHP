@@ -1406,7 +1406,7 @@ class KadousController extends AppController
 
      //ローカル
      //存在するならファイルをコピー
-/*
+
      for($k=1; $k<9; $k++){
        $file_name = "file_name".$k;
        if (file_exists("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
@@ -1414,26 +1414,26 @@ class KadousController extends AppController
        }
      }
 
-     $gif1 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
+     $gif1 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
      $this->set('gif1',$gif1);
-     $gif2 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
+     $gif2 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
      $this->set('gif2',$gif2);
-     $gif3 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name3";
+     $gif3 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name3";
      $this->set('gif3',$gif3);
-     $gif4 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name4";
+     $gif4 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name4";
      $this->set('gif4',$gif4);
-     $gif5 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name5";
+     $gif5 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name5";
      $this->set('gif5',$gif5);
-     $gif6 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name6";
+     $gif6 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name6";
      $this->set('gif6',$gif6);
-     $gif7 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name7";
+     $gif7 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name7";
      $this->set('gif7',$gif7);
-     $gif8 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
+     $gif8 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
      $this->set('gif8',$gif8);
-*/
+
 
      //192.168.4.246
-
+/*
      for($k=1; $k<9; $k++){
        $file_name = ${"file_name".$k};
        if (file_exists("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
@@ -1457,9 +1457,10 @@ class KadousController extends AppController
      $this->set('gif7',$gif7);
      $gif8 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
      $this->set('gif8',$gif8);
+*/
 
-      //$arrAllfiles = glob("img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
-      $arrAllfiles = glob("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
+      $arrAllfiles = glob("img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
+      //$arrAllfiles = glob("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
       $countfile = count($arrAllfiles);
 
       if($countfile == 0){//フォルダが空の場合
@@ -1518,25 +1519,28 @@ class KadousController extends AppController
        $typecheck = 1;
        $this->set('typecheck',$typecheck);
 
-    //   $arrAllfiles = glob("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
-       $arrAllfiles = glob("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
+       $arrAllfiles = glob("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
+    //   $arrAllfiles = glob("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
 
        $countfile = count($arrAllfiles);
        $arrPngfiles = array();
        for($k=0; $k<$countfile; $k++){
 
          ${"file".$k} = explode("/",$arrAllfiles[$k]);
-         ${"pngcheck".$k} = substr(${"file".$k}[9], -3, 3);
+         ${"pngcheck".$k} = substr(${"file".$k}[7], -3, 3);//ローカル
+    //     ${"pngcheck".$k} = substr(${"file".$k}[9], -3, 3);//192
 
          if(${"pngcheck".$k} == "png"){
 
-           $arrPngfiles[] = ${"file".$k}[9];
+           $arrPngfiles[] = ${"file".$k}[7];//ローカル
+    //       $arrPngfiles[] = ${"file".$k}[9];//192
            $this->set('arrPngfiles',$arrPngfiles);
 
-           $file_name = ${"file".$k}[9];
+           $file_name = ${"file".$k}[7];//ローカル
+      //     $file_name = ${"file".$k}[9];//192
 
-      //     copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");//ローカル
-           copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
+           copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");//ローカル
+      //     copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");//192
 
            ${"gif".$k} = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
            $this->set('gif'.$k,${"gif".$k});
@@ -1594,8 +1598,8 @@ class KadousController extends AppController
 
      }
 
-     //$arrAllfiles = glob("img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
-     $arrAllfiles = glob("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
+     $arrAllfiles = glob("img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
+     //$arrAllfiles = glob("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
      $countfile = count($arrAllfiles);
 
      if($countfile == 0){//フォルダが空の場合

@@ -2039,6 +2039,7 @@ echo "</pre>";
             $arrOrderEdis = $this->OrderEdis->find()->where(['id' => $_SESSION['orderEdis'][$n]['id']])->toArray();
 
             $bunnnoumoto = $arrOrderEdis[0]->bunnou;
+            $amountmoto = $arrOrderEdis[0]->amount;
 
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => $_SESSION['orderEdis'][$n]['amount']
             ,'bunnou' => $bunnnou ,'date_bunnou' => date('Y-m-d') ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
@@ -2067,7 +2068,7 @@ echo "</pre>";
               $table->setConnection($connection);
 
               $updater = "UPDATE order_dnp_kannous set updated_at = '".date('Y-m-d H:i:s')."', amount = $newamount, date_deliver = '".$newdate_deliver."'
-              where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."'";//もとのDBも更新
+              where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and amount = '".$amountmoto."'";//もとのDBも更新
               $connection->execute($updater);
 
               $connection = ConnectionManager::get('default');
@@ -2951,6 +2952,16 @@ echo "</pre>";
 
       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
+      if(preg_match('/㈱/',$data["line_code"])){//$subjectのなかに㈱が含まれている場合
+        $line_code = "入力し直してください";
+        $line_code_check = 1;
+        $this->set('line_code_check',$line_code_check);
+      }else{
+        $line_code = $data["line_code"];
+        $line_code_check = 2;
+        $this->set('line_code_check',$line_code_check);
+      }
+
       $date_order = $data["date_order"]["year"]."-".$data["date_order"]["month"]."-".$data["date_order"]["day"];
       $this->set('date_order',$date_order);
       $num_order = $data["num_order"];
@@ -2961,7 +2972,7 @@ echo "</pre>";
       $this->set('place_deliver_name',$place_deliver_name);
       $place_deliver_code = $PlaceDeliver[0]->id_from_order;
       $this->set('place_deliver_code',$place_deliver_code);
-      $line_code = $data["line_code"];
+  //    $line_code = $data["line_code"];
       $this->set('line_code',$line_code);
       $product_code = $data["product_code"];
       $this->set('product_code',$product_code);
@@ -3165,7 +3176,7 @@ echo "</pre>";
           print_r('旧DB登録');
           print_r($data['order_edi']);
           echo "</pre>";
-  */
+*/
           //旧DB登録
           $connection = ConnectionManager::get('DB_ikou_test');
           $table = TableRegistry::get('order_edi');

@@ -214,10 +214,6 @@ class AccountsController extends AppController
 
       $price = $data['price'];
       $this->set('price',$price);
-      $productGrade = $data['productGrade'];
-      $this->set('productGrade',$productGrade);
-      $suryouKg = $data['suryouKg'];
-      $this->set('suryouKg',$suryouKg);
       $zaiko_check = $data['zaiko_check'];
       $this->set('zaiko_check',$zaiko_check);
 
@@ -278,6 +274,11 @@ class AccountsController extends AppController
 
 
       if($zaiko_check == 1){
+
+        $productGrade = $data['productGrade'];
+        $this->set('productGrade',$productGrade);
+        $suryouKg = $data['suryouKg'];
+        $this->set('suryouKg',$suryouKg);
 
         $AccountUrikakesData = $this->AccountUrikakes->find()->where(['customer_code' => $CustomerData[0]->customer_code, 'date' => $dateYMD, 'kingaku' => $price])->toArray();
         $AccountUrikakesId = $AccountUrikakesData[0]->id;

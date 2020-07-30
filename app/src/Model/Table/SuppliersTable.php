@@ -79,6 +79,7 @@ class SuppliersTable extends Table
             ->maxLength('supplier_section_id', 255)
             ->requirePresence('supplier_section_id', 'create')
             ->notEmpty('supplier_section_id');
+        //    ->allowEmpty('supplier_section_id');
 
         $validator
 //            ->scalar('supplier_code')
@@ -157,7 +158,7 @@ class SuppliersTable extends Table
 
         return $validator;
     }
-
+/*
     public function buildRules(RulesChecker $rules)
     {
 //        $rules->add($rules->isUnique(['username']));
@@ -165,5 +166,5 @@ class SuppliersTable extends Table
 
         return $rules;
     }
-
+*/
 }

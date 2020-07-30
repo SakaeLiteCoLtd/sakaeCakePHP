@@ -1367,11 +1367,10 @@ class KadousController extends AppController
       'plot_time_measure' => 'plot_time_measure','plot_pressure_injection' => 'plot_pressure_injection'];
      $this->set('arrImgtype',$arrImgtype);
 
-     $arrImgpriority = ['1' => '0','2' => 'その他'];
+     $arrImgpriority = ['1' => '主要グラフ','2' => 'その他'];
      $this->set('arrImgpriority',$arrImgpriority);
 
-     $dirName = "img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/";
-  //   $dirName = "/img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/";
+     $dirName = "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/";
      if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
        $dirName = $dirName;
      }else{
@@ -1408,27 +1407,27 @@ class KadousController extends AppController
      //存在するならファイルをコピー
 
      for($k=1; $k<9; $k++){
-       $file_name = "file_name".$k;
+       $file_name = ${"file_name".$k};
        if (file_exists("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
-         copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
+         copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
        }
      }
 
-     $gif1 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
+     $gif1 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
      $this->set('gif1',$gif1);
-     $gif2 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
+     $gif2 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
      $this->set('gif2',$gif2);
-     $gif3 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name3";
+     $gif3 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name3";
      $this->set('gif3',$gif3);
-     $gif4 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name4";
+     $gif4 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name4";
      $this->set('gif4',$gif4);
-     $gif5 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name5";
+     $gif5 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name5";
      $this->set('gif5',$gif5);
-     $gif6 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name6";
+     $gif6 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name6";
      $this->set('gif6',$gif6);
-     $gif7 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name7";
+     $gif7 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name7";
      $this->set('gif7',$gif7);
-     $gif8 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
+     $gif8 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
      $this->set('gif8',$gif8);
 
 
@@ -1437,29 +1436,29 @@ class KadousController extends AppController
      for($k=1; $k<9; $k++){
        $file_name = ${"file_name".$k};
        if (file_exists("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
-         copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
+         copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
        }
      }
 
-     $gif1 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
+     $gif1 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
      $this->set('gif1',$gif1);
-     $gif2 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
+     $gif2 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
      $this->set('gif2',$gif2);
-     $gif3 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name3";
+     $gif3 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name3";
      $this->set('gif3',$gif3);
-     $gif4 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name4";
+     $gif4 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name4";
      $this->set('gif4',$gif4);
-     $gif5 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name5";
+     $gif5 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name5";
      $this->set('gif5',$gif5);
-     $gif6 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name6";
+     $gif6 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name6";
      $this->set('gif6',$gif6);
-     $gif7 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name7";
+     $gif7 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name7";
      $this->set('gif7',$gif7);
-     $gif8 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
+     $gif8 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
      $this->set('gif8',$gif8);
 */
 
-      $arrAllfiles = glob("img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
+      $arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
       //$arrAllfiles = glob("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
       $countfile = count($arrAllfiles);
 
@@ -1503,11 +1502,10 @@ class KadousController extends AppController
       'plot_time_measure' => 'plot_time_measure','plot_pressure_injection' => 'plot_pressure_injection'];
      $this->set('arrImgtype',$arrImgtype);
 
-     $arrImgpriority = ['1' => '0', '2' => 'その他'];
+     $arrImgpriority = ['1' => '主要グラフ', '2' => 'その他'];
      $this->set('arrImgpriority',$arrImgpriority);
 
-     $dirName = "img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/";
-  //   $dirName = "/img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/";
+     $dirName = "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/";
      if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
        $dirName = $dirName;
      }else{
@@ -1524,35 +1522,57 @@ class KadousController extends AppController
 
        $countfile = count($arrAllfiles);
        $arrPngfiles = array();
+
+       if($countfile == 0){
+         $this->set('arrPngfiles',$arrPngfiles);
+       }
+
        for($k=0; $k<$countfile; $k++){
 
          ${"file".$k} = explode("/",$arrAllfiles[$k]);
          ${"pngcheck".$k} = substr(${"file".$k}[7], -3, 3);//ローカル
-    //     ${"pngcheck".$k} = substr(${"file".$k}[9], -3, 3);//192
-
-         if(${"pngcheck".$k} == "png"){
+         ${"seikeikicheck".$k} = substr(${"file".$k}[7], 0, 1);
+    //     ${"seikeikicheck".$k} = substr(${"file".$k}[9], 0, 1);
+    //     ${"pngcheck".$k} = substr(${"file".$k}[9], -3, 3);
+/*
+         echo "<pre>";
+         print_r(${"seikeikicheck".$k}.${"pngcheck".$k});
+         echo "</pre>";
+*/
+         if(${"pngcheck".$k} == "png" && ${"seikeikicheck".$k} == $seikeiki){
 
            $arrPngfiles[] = ${"file".$k}[7];//ローカル
-    //       $arrPngfiles[] = ${"file".$k}[9];//192
+    //       $arrPngfiles[] = ${"file".$k}[9];
            $this->set('arrPngfiles',$arrPngfiles);
 
            $file_name = ${"file".$k}[7];//ローカル
-      //     $file_name = ${"file".$k}[9];//192
+    //       $file_name = ${"file".$k}[9];
 
-           copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");//ローカル
-      //     copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");//192
+           copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");//ローカル
+      //     copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
 
-           ${"gif".$k} = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
+           ${"gif".$k} = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
            $this->set('gif'.$k,${"gif".$k});
 
          }
 
+         if(count($arrPngfiles) == 0){
+           $this->set('arrPngfiles',$arrPngfiles);
+         }
+
        }
 
-     }elseif($type == 1){//$priority=1で、種類を選択していない場合
+     }elseif($type == 1){//$priority=主要グラフで、種類を選択していない場合
 
        $typecheck = 2;
        $this->set('typecheck',$typecheck);
+
+       $dirName = "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/";
+       if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
+         $dirName = $dirName;
+       }else{
+         mkdir($dirName, 0777, TRUE);//フォルダ作成　※２階層以上の深さを一度に作成するときには、第３引数にTRUEを付ける
+       }
 
        $file_name1 = $seikeiki."_hist_peak_value.png";
        $file_name2 = $seikeiki."_hist_time_injection.png";
@@ -1563,42 +1583,60 @@ class KadousController extends AppController
        $file_name7 = $seikeiki."_plot_time_measure.png";
        $file_name8 = $seikeiki."_plot_place_cushion.png";
 
-       $gif1 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
+       for($k=1; $k<9; $k++){
+
+         $file_name = ${"file_name".$k};
+
+    //     if (file_exists("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
+    //       copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
+         if (file_exists("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
+           copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
+         }
+
+       }
+
+       $gif1 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
        $this->set('gif1',$gif1);
-       $gif2 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
+       $gif2 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
        $this->set('gif2',$gif2);
-       $gif3 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name3";
+       $gif3 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name3";
        $this->set('gif3',$gif3);
-       $gif4 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name4";
+       $gif4 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name4";
        $this->set('gif4',$gif4);
-       $gif5 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name5";
+       $gif5 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name5";
        $this->set('gif5',$gif5);
-       $gif6 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name6";
+       $gif6 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name6";
        $this->set('gif6',$gif6);
-       $gif7 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name7";
+       $gif7 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name7";
        $this->set('gif7',$gif7);
-       $gif8 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
+       $gif8 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
        $this->set('gif8',$gif8);
 
-     }else{//$priority=1で、種類を選択している場合
+     }else{//$priority=主要グラフで、種類を選択している場合
 
        $typecheck = 3;
        $this->set('typecheck',$typecheck);
 
-       $file_name = $seikeiki."_".$type.".png";
-       $file_name1 = $seikeiki."_hist_".$type.".png";
-       $file_name2 = $seikeiki."_plot_".$type.".png";
+        $dirName = "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/";
+        if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
+          $dirName = $dirName;
+        }else{
+          mkdir($dirName, 0777, TRUE);//フォルダ作成　※２階層以上の深さを一度に作成するときには、第３引数にTRUEを付ける
+        }
 
-       $gif = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
-       $this->set('gif',$gif);
-       $gif1 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
-       $this->set('gif1',$gif1);
-       $gif2 = "kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
-       $this->set('gif2',$gif2);
+        $file_name = $seikeiki."_".$type.".png";
+        if (file_exists("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
+          copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
+    //    if (file_exists("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
+    //      copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
+        }
+
+        $gif = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
+        $this->set('gif',$gif);
 
      }
 
-     $arrAllfiles = glob("img/kadoucopy/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
+     $arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
      //$arrAllfiles = glob("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
      $countfile = count($arrAllfiles);
 

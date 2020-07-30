@@ -71,7 +71,7 @@
 	</tr>
 </table>
 
-<?php else: //csv押したとき ?>
+<?php else:?>
 
   <?= $this->Form->control('price', array('type'=>'hidden', 'value'=>$price, 'label'=>false)) ?>
 

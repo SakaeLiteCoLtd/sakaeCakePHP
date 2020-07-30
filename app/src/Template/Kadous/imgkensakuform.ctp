@@ -46,7 +46,7 @@ $this->layout = 'defaultkadous';
     <tr>
       <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">品番</strong></div></td>
       <td width="300" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">日報開始日時絞込</strong></div></td>
-      <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">プリオリティ</strong></div></td>
+      <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">プライオリティ</strong></div></td>
       <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">グラフ種類</strong></div></td>
     </tr>
     <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><?= h($this->request->getData('product')) ?></div></td>

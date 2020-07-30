@@ -8,28 +8,29 @@
  $htmlShinkimenu = new htmlShinkimenu();
  $htmlShinkis = $htmlShinkimenu->Shinkimenus();
  ?>
-        <?php
-            $username = $this->request->Session()->read('Auth.User.username');
-        ?>
 
-        <hr size="5" style="margin: 0.5rem">
-        <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-        <?php
-           echo $htmlShinkis;
-        ?>
-        </table>
-        <hr size="5" style="margin: 0.5rem">
-        <br>
+ <?php
+     $username = $this->request->Session()->read('Auth.User.username');
+ ?>
 
-        <legend align="center"><strong style="font-size: 14pt; color:blue"><?= __("製品登録") ?></strong></legend>
-    <?= $this->Form->create($product, ['url' => ['action' => 'confirm']]) ?>
-    <fieldset>
+ <hr size="5" style="margin: 0.5rem">
+ <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <?php
+    echo $htmlShinkis;
+ ?>
+ </table>
+ <hr size="5" style="margin: 0.5rem">
+ <br>
 
-      <?php
-          echo $this->Form->hidden('delete_flag');
-          echo $this->Form->hidden('created_staff', ['empty' => true]);
-          echo $this->Form->hidden('updated_staff');
-      ?>
+ <legend align="center"><strong style="font-size: 14pt; color:blue"><?= __("製品登録") ?></strong></legend>
+<?= $this->Form->create($product, ['url' => ['action' => 'confirm']]) ?>
+<fieldset>
+
+<?php
+   echo $this->Form->hidden('delete_flag');
+   echo $this->Form->hidden('created_staff', ['empty' => true]);
+   echo $this->Form->hidden('updated_staff');
+?>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>

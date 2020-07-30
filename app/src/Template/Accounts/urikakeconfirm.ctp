@@ -48,6 +48,29 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($price) ?></td>
       </tr>
 
+      <?php if($zaiko_check == 1): ?>
+
+      <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+        <br><br>
+        <tr>
+          <td width="280" bgcolor="#FFFFCC" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">製品番号、または原料グレード</strong></div></td>
+          <td width="300" bgcolor="#FFFFCC" colspan="2" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">数量（ヶ、kg）</strong></div></td>
+      	</tr>
+        <tr>
+          <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('productGrade', array('type'=>'text', 'label'=>false)) ?></td>
+          <td  width="220" bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><?= $this->Form->control('suryouKg', array('type'=>'text', 'label'=>false)) ?></td>
+          <td width="82" bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">（ヶ、kg）</strong></td>
+      	</tr>
+      </table>
+
+      <?= $this->Form->control('zaiko_check', array('type'=>'hidden', 'value'=>$zaiko_check, 'label'=>false)) ?>
+
+      <?php else:?>
+
+        <?= $this->Form->control('zaiko_check', array('type'=>'hidden', 'value'=>$zaiko_check, 'label'=>false)) ?>
+
+      <?php endif; ?>
+
   <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <br>
   <tr bgcolor="#E6FFFF" >

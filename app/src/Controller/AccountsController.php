@@ -37,6 +37,7 @@ class AccountsController extends AppController
       $this->AccountYusyouzaiMasters = TableRegistry::get('accountYusyouzaiMasters');
       $this->Products = TableRegistry::get('products');
       $this->PriceMaterials = TableRegistry::get('priceMaterials');
+      $this->AccountUrikakeZaikohosyous = TableRegistry::get('accountUrikakeZaikohosyous');
      }
 
 		 public function index()
@@ -61,8 +62,10 @@ class AccountsController extends AppController
         $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
 	//			$username = $data['username'];
 				$userData = $this->Users->find()->where(['username' => $username])->toArray();
-        $staff = $userData[0]->staff_id;
-        $StatusRolesData = $this->StatusRoles->find()->where(['staff_id' => $staff])->toArray();
+        if(isset($userData[0])){
+          $staff = $userData[0]->staff_id;
+          $StatusRolesData = $this->StatusRoles->find()->where(['staff_id' => $staff])->toArray();
+        }
 
 				if(isset($StatusRolesData[0])){
 					$pass = $userData[0]->password;
@@ -146,6 +149,7 @@ class AccountsController extends AppController
 
     public function urikakeconfirm()
 		{
+
       $session = $this->request->getSession();
       $sessionData = $session->read();
 
@@ -171,6 +175,15 @@ class AccountsController extends AppController
 
       $price = $data['price'];
       $this->set('price',$price);
+
+      if($data['customer'] == 37 && $data['urikakeelement'] == 9){
+        $zaiko_check = 1;
+        $this->set('zaiko_check',$zaiko_check);
+      }else{
+        $zaiko_check = 2;
+        $this->set('zaiko_check',$zaiko_check);
+      }
+
 		}
 
     public function urikakedo()
@@ -198,8 +211,15 @@ class AccountsController extends AppController
       $dateYMD = $data['date'];
       $this->set('dateYMD',$dateYMD);
 
+
       $price = $data['price'];
       $this->set('price',$price);
+      $productGrade = $data['productGrade'];
+      $this->set('productGrade',$productGrade);
+      $suryouKg = $data['suryouKg'];
+      $this->set('suryouKg',$suryouKg);
+      $zaiko_check = $data['zaiko_check'];
+      $this->set('zaiko_check',$zaiko_check);
 
       $arrtouroku = array();
       $arrtouroku[] = array(
@@ -216,6 +236,7 @@ class AccountsController extends AppController
       print_r($arrtouroku[0]);
       echo "</pre>";
 */
+
       $AccountUrikakes = $this->AccountUrikakes->patchEntity($this->AccountUrikakes->newEntity(), $arrtouroku[0]);
       $connection = ConnectionManager::get('default');//トランザクション1
       // トランザクション開始2
@@ -254,6 +275,71 @@ class AccountsController extends AppController
       //ロールバック8
         $connection->rollback();//トランザクション9
       }//トランザクション10
+
+
+      if($zaiko_check == 1){
+
+        $AccountUrikakesData = $this->AccountUrikakes->find()->where(['customer_code' => $CustomerData[0]->customer_code, 'date' => $dateYMD, 'kingaku' => $price])->toArray();
+        $AccountUrikakesId = $AccountUrikakesData[0]->id;
+
+        $arrtourokuzaikohosyou = array();
+        $arrtourokuzaikohosyou[] = array(
+          'urikake_id' => $AccountUrikakesId,
+          'zaikohosyou' => $productGrade."_".$suryouKg,
+          'delete_flag' => 0
+        );
+
+/*
+        echo "<pre>";
+        print_r($arrtourokuzaikohosyou[0]);
+        echo "</pre>";
+        echo "<pre>";
+        print_r($arrtourokuneg[0]);
+        echo "</pre>";
+*/
+        $AccountUrikakeZaikohosyous = $this->AccountUrikakeZaikohosyous->patchEntity($this->AccountUrikakeZaikohosyous->newEntity(), $arrtourokuzaikohosyou[0]);
+        $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+        $connection->begin();//トランザクション3
+        try {//トランザクション4
+          if ($this->AccountUrikakeZaikohosyous->save($AccountUrikakeZaikohosyous)) {
+
+            //旧DBに製品登録
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('account_urikake');
+            $table->setConnection($connection);
+
+            $sql = "SELECT id FROM account_urikake".
+            " where cs_id = '".$CustomerData[0]->customer_code."' and kingaku = '".$price."' and date = '".$dateYMD."'";
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $account_urikake = $connection->execute($sql)->fetchAll('assoc');
+            $id = $account_urikake[0]['id'];
+
+            $connection->insert('account_urikake_zaikohosyou', [
+                'urikake_id' => $id,
+                'zaikohosyou' => $arrtourokuzaikohosyou[0]["zaikohosyou"],
+                'delete_flag' => $arrtourokuzaikohosyou[0]["delete_flag"]
+            ]);
+
+            $connection = ConnectionManager::get('default');//新DBに戻る
+            $table->setConnection($connection);
+
+            $mes = "※下記のように登録されました";
+            $this->set('mes',$mes);
+            $connection->commit();// コミット5
+          } else {
+            $mes = "※登録されませんでした";
+            $this->set('mes',$mes);
+            $this->Flash->error(__('The data could not be saved. Please, try again.'));
+            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+          }
+        } catch (Exception $e) {//トランザクション7
+        //ロールバック8
+          $connection->rollback();//トランザクション9
+        }//トランザクション10
+
+
+      }
 
 		}
 

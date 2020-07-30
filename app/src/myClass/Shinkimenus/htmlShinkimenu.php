@@ -20,6 +20,9 @@ class htmlShinkimenu extends AppController
 	public function Shinkimenus()
 	{
         $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/materialsform'>\n".
+        "<img src='/img/ShinkiTourokuMenu/touroku_genryou.gif' width=105 height=36>\n".
+        "</a>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/form'>\n".
         "<img src='/img/ShinkiTourokuMenu/TourokuCustomer.gif' width=105 height=36>\n".
         "</a>\n".

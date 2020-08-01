@@ -1,11 +1,14 @@
 <?php
+$this->layout = 'defaultshinki';
+?>
+<?php
 /**
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Customer $customer
  */
 use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置したクラスを使用
 ?>
-<?= $this->Form->create($customer, ['url' => ['action' => 'deliverpreadd']]) ?>
+<?= $this->Form->create($customer, ['url' => ['action' => 'deliverdo']]) ?>
         <?php
         $username = $this->request->Session()->read('Auth.User.username');
 
@@ -19,19 +22,20 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 
         $session = $this->request->getSession();
-//        $session->write('placedata.customer', $_POST['customer']);
+
+        $data = $session->read();
+
         $session->write('placedata.id_from_order', $_POST['id_from_order']);
         $session->write('placedata.name', $_POST['name']);
         $session->write('placedata.cs_code', $cs_code);
         $session->write('placedata.delete_flag', $_POST['delete_flag']);
-        $session->write('placedata.created_staff', $_POST['created_staff']);
+        $session->write('placedata.created_staff', $data['login']['staff_id']);
         $session->write('placedata.created_at', date('Y-m-d H:i:s'));
         $session->write('placedata.updated_staff', null);
 
         $session->write('cs_handydata.place_deliver_code', $_POST['id_from_order']);
         $session->write('cs_handydata.name', $_POST['name']);
         $session->write('cs_handydata.flag', 0);
-
 /*
         $data = $session->read();
         echo "<pre>";

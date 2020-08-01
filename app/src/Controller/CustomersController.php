@@ -30,7 +30,12 @@ class CustomersController extends AppController
 
     public function form()
     {
-			$this->request->session()->destroy(); // セッションの破棄
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
+      }
 
 			$customer = $this->Customers->newEntity();//newentityに$customerという名前を付ける
 			$this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
@@ -89,17 +94,18 @@ class CustomersController extends AppController
 			$session = $this->request->getSession();
 			$data = $session->read();//postデータ取得し、$dataと名前を付ける
 
-			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-			$data['customerdata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+	//		$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+	//		$data['customerdata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
 /*
       echo "<pre>";
 	    print_r($data['customerdata']);
 	    echo "</pre>";
 */
 
+      $_SESSION['hyoujitourokudata'] = array();
       $_SESSION['hyoujitourokudata'] = $data['customerdata'];
 
-			if ($this->request->is('get')) {//getの場合
+			if ($this->request->is('post')) {//getの場合
 				$customer = $this->Customers->patchEntity($customer, $data['customerdata']);//$customerデータ（空の行）を$this->request->getData()に更新する
 				$connection = ConnectionManager::get('default');//トランザクション1
 				// トランザクション開始2
@@ -142,7 +148,14 @@ class CustomersController extends AppController
 
     public function deliverform()
     {
-			$this->request->session()->destroy(); // セッションの破棄
+	//		$this->request->session()->destroy(); // セッションの破棄
+
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
+      }
 
 			$customer = $this->Customers->newEntity();//newentityに$customerという名前を付ける
 			$this->set('customer', $customer);//1行上の$customerをctpで使えるようにセット
@@ -215,8 +228,8 @@ class CustomersController extends AppController
 			$session = $this->request->getSession();
 			$data = $session->read();//postデータ取得し、$dataと名前を付ける
 
-			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-			$data['placedata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+	//		$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+	//		$data['placedata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
 /*
       echo "<pre>";
 	    print_r($data['cs_handydata']);
@@ -227,7 +240,7 @@ class CustomersController extends AppController
       $Customer = $CustomersData[0]->customer_code.":".$CustomersData[0]->name;
       $this->set('Customer',$Customer);
 
-			if ($this->request->is('get')) {//getの場合
+			if ($this->request->is('post')) {//postの場合
 				$PlaceDeliver = $this->PlaceDelivers->patchEntity($PlaceDeliver, $data['placedata']);//$customerデータ（空の行）を$this->request->getData()に更新する
 				$connection = ConnectionManager::get('default');//トランザクション1
 				// トランザクション開始2

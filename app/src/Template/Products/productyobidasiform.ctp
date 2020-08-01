@@ -1,4 +1,7 @@
 <?php
+$this->layout = 'defaultshinki';
+?>
+<?php
 /**
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Deliver $product
@@ -38,7 +41,7 @@
 <?php
 echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
 ?>
-<td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
+<td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false, 'autofocus'=>true)) ?></td>
 <?php
 echo "</tr>\n";
 ?>

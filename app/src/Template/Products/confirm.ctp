@@ -1,4 +1,7 @@
 <?php
+$this->layout = 'defaultshinki';
+?>
+<?php
 /**
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Deliver $product
@@ -8,7 +11,7 @@
  $htmlShinkimenu = new htmlShinkimenu();
  $htmlShinkis = $htmlShinkimenu->Shinkimenus();
  ?>
-<?= $this->Form->create($product, ['url' => ['action' => 'preadd']]) ?>
+<?= $this->Form->create($product, ['url' => ['action' => 'do']]) ?>
         <?php
             $username = $this->request->Session()->read('Auth.User.username');
 

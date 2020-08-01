@@ -1,4 +1,7 @@
 <?php
+$this->layout = 'defaultshinki';
+?>
+<?php
 /**
  * AuthHelper: Authの変数にアクセスできる
  * @var \App\View\AppView $this
@@ -9,7 +12,7 @@
  $htmlShinkimenu = new htmlShinkimenu();
  $htmlShinkis = $htmlShinkimenu->Shinkimenus();
  ?>
-<?= $this->Form->create($product, ['url' => ['action' => 'index']]) ?>
+<?= $this->Form->create($product, ['url' => ['action' => 'form']]) ?>
 
 <?php
 $username = $this->request->Session()->read('Auth.User.username');
@@ -141,7 +144,7 @@ if($session->read('katakouzoudata.set_tori') == 0){
     <br>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('トップ'), array('name' => 'top')); ?></div></td>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('登録画面へ'), array('name' => 'top')); ?></div></td>
     </tr>
     </table>
     <br>

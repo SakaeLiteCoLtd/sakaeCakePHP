@@ -64,7 +64,12 @@ class ProductsController extends AppController
 */
     public function form()
     {
-			$this->request->session()->destroy(); // セッションの破棄
+			$session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
+      }
 
 			$product = $this->Products->newEntity();//newentityに$productという名前を付ける
 			$this->set('product',$product);//1行上の$productをctpで使えるようにセット
@@ -156,6 +161,9 @@ class ProductsController extends AppController
     {
 
 			session_start();
+			$session = $this->request->getSession();
+      $sessionData = $session->read();
+
 			$product = $this->Products->newEntity();//newentityに$productという名前を付ける
 			$this->set('product',$product);//1行上の$productをctpで使えるようにセット
 
@@ -189,6 +197,7 @@ class ProductsController extends AppController
 				$BoxKonpous = "";
 				$this->set('BoxKonpous',$BoxKonpous);
 			}
+
 
     }
 
@@ -246,7 +255,7 @@ class ProductsController extends AppController
 			$session = $this->request->getSession();
 			$data = $session->read();//postデータ取得し、$dataと名前を付ける
 
-			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+			$staff_id = $data['login']['staff_id'];//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 			$data['productdata']['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
 			$data['pricedata']['created_staff'] = $staff_id;
 			$data['konpoudata']['created_staff'] = $staff_id;
@@ -287,15 +296,14 @@ class ProductsController extends AppController
 
 			$staff_code = $Created[0]->staff_code;
 			$data['zensudata']['staff_code'] = $staff_code;
-
 /*
 			echo "<pre>";
-	    print_r($data['zensudata']);
+	    print_r($data['konpoudata']);
 	    echo "</pre>";
 */
 			$_SESSION['hyoujitourokudata'] = $data['productdata'];
 
-			if ($this->request->is('get')) {
+			if ($this->request->is('post')) {
 				$product = $this->Products->patchEntity($product, $data['productdata']);//$productデータ（空の行）を$this->request->getData()に更新する
 				$connection = ConnectionManager::get('default');//トランザクション1
 				// トランザクション開始2
@@ -495,7 +503,7 @@ class ProductsController extends AppController
 
 		 $session = $this->request->getSession();
 		 session_start();
-		 $_SESSION['konpoudata'] = array(
+		 $_SESSION['konpoudatasyuusei'] = array(
 			 'id' => $data['KonpouId'],
 			 'product_code' => $data['product_code'],
 			 'irisu' => $data['irisu'],
@@ -552,26 +560,26 @@ class ProductsController extends AppController
        $data = $session->read();
        $this->set('data',$data);
 
-			 $staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-			 $data['konpoudata']['updated_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+			 $staff_id = $data['login']['staff_id'];//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+			 $data['konpoudatasyuusei']['updated_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
 /*
        echo "<pre>";
        print_r($data);
        echo "</pre>";
 */
-			 $BoxKonpous = $this->BoxKonpous->find()->where(['id_box' => $data['konpoudata']['id_box']])->toArray();
+			 $BoxKonpous = $this->BoxKonpous->find()->where(['id_box' => $data['konpoudatasyuusei']['id_box']])->toArray();
 			 $name_box = $BoxKonpous[0]->name_box;
 			 $this->set('name_box',$name_box);
 
-			 if ($this->request->is('get')) {
-				 $Konpous = $this->Konpous->patchEntity($Konpous, $data['konpoudata']);
+			 if ($this->request->is('post')) {
+				 $Konpous = $this->Konpous->patchEntity($Konpous, $data['konpoudatasyuusei']);
 				 $connection = ConnectionManager::get('default');//トランザクション1
   				// トランザクション開始2
   				$connection->begin();//トランザクション3
   				try {//トランザクション4
 						if ($this->Konpous->updateAll(//検査終了時間の更新
-							['irisu' => $data['konpoudata']['irisu'], 'id_box' => $data['konpoudata']['id_box'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data['konpoudata']['updated_staff']],
-							['id'  => $data['konpoudata']['id']]
+							['irisu' => $data['konpoudatasyuusei']['irisu'], 'id_box' => $data['konpoudatasyuusei']['id_box'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data['konpoudatasyuusei']['updated_staff']],
+							['id'  => $data['konpoudatasyuusei']['id']]
 						)){
 
  							//旧DBに単価登録
@@ -579,8 +587,8 @@ class ProductsController extends AppController
  							$table = TableRegistry::get('konpou');
  							$table->setConnection($connection);
 
-							$updater = "UPDATE konpou set irisu ='".$data['konpoudata']['irisu']."' , id_box ='".$data['konpoudata']['id_box']."'
-              where product_id ='".$data['konpoudata']['product_code']."'";
+							$updater = "UPDATE konpou set irisu ='".$data['konpoudatasyuusei']['irisu']."' , id_box ='".$data['konpoudatasyuusei']['id_box']."'
+              where product_id ='".$data['konpoudatasyuusei']['product_code']."'";
               $connection->execute($updater);
 
  							$connection = ConnectionManager::get('default');//新DBに戻る
@@ -641,7 +649,12 @@ class ProductsController extends AppController
 
 		 public function pricesyuuseiform()
 		{
-			$this->request->session()->destroy();// セッションの破棄
+			$session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
+      }
 
 			$AccountPriceProducts = $this->AccountPriceProducts->newEntity();
 			$this->set('AccountPriceProducts',$AccountPriceProducts);
@@ -669,7 +682,7 @@ class ProductsController extends AppController
 
 			$session = $this->request->getSession();
 			session_start();
-			$_SESSION['pricedata'] = array(
+			$_SESSION['pricedatasyuusei'] = array(
 				'id' => $data['AccountPriceProductId'],
 				'product_code' => $data['product_code'],
 				'price' => $data['price'],
@@ -724,22 +737,22 @@ class ProductsController extends AppController
        $data = $session->read();
        $this->set('data',$data);
 
-			 $updated_staff = array('updated_staff'=>$this->Auth->user('staff_id'));
-			 $_SESSION['pricedata'] = array_merge($_SESSION['pricedata'],$updated_staff);
+			 $updated_staff = array('updated_staff'=>$data['login']['staff_id']);
+			 $_SESSION['pricedatasyuusei'] = array_merge($_SESSION['pricedatasyuusei'],$updated_staff);
 /*
        echo "<pre>";
        print_r($data);
        echo "</pre>";
 */
-			 if ($this->request->is('get')) {
-				 $AccountPriceProduct = $this->AccountPriceProducts->patchEntity($AccountPriceProducts, $data['pricedata']);
+			 if ($this->request->is('post')) {
+				 $AccountPriceProduct = $this->AccountPriceProducts->patchEntity($AccountPriceProducts, $data['pricedatasyuusei']);
 				 $connection = ConnectionManager::get('default');//トランザクション1
   				// トランザクション開始2
   				$connection->begin();//トランザクション3
   				try {//トランザクション4
 						if ($this->AccountPriceProducts->updateAll(//検査終了時間の更新
-							['price' => $data['pricedata']['price'], 'date_koushin' => date('Y-m-d'), 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $_SESSION['pricedata']['updated_staff']],
-							['id'  => $data['pricedata']['id']]
+							['price' => $data['pricedatasyuusei']['price'], 'date_koushin' => date('Y-m-d'), 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $_SESSION['pricedatasyuusei']['updated_staff']],
+							['id'  => $data['pricedatasyuusei']['id']]
 						)){
 
  							//旧DBに単価登録
@@ -747,9 +760,9 @@ class ProductsController extends AppController
  							$table = TableRegistry::get('account_price_product');
  							$table->setConnection($connection);
 
-							$updater = "UPDATE account_price_product set price = '".$data['pricedata']['price']."' , date_koushin ='".date('Y-m-d')."'
-							, updated_at = '".date('Y-m-d H:i:s')."' , updated_emp_id = '".$_SESSION['pricedata']['updated_staff']."'
-              where product_id ='".$_SESSION['pricedata']['product_code']."'";
+							$updater = "UPDATE account_price_product set price = '".$data['pricedatasyuusei']['price']."' , date_koushin ='".date('Y-m-d')."'
+							, updated_at = '".date('Y-m-d H:i:s')."' , updated_emp_id = '".$_SESSION['pricedatasyuusei']['updated_staff']."'
+              where product_id ='".$_SESSION['pricedatasyuusei']['product_code']."'";
               $connection->execute($updater);
 
  							$connection = ConnectionManager::get('default');//新DBに戻る

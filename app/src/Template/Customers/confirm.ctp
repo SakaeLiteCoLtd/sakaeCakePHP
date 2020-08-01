@@ -1,4 +1,7 @@
 <?php
+$this->layout = 'defaultshinki';
+?>
+<?php
 /**
  * AuthHelper: Authの変数にアクセスできる
  * @var \App\View\AppView $this
@@ -30,12 +33,14 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 
         <legend align="center"><strong style="font-size: 14pt; color:blue"><?= __("顧客登録") ?></strong></legend>
 
-    <?= $this->Form->create($customer, ['url' => ['action' => 'preadd']]) ?>
+    <?= $this->Form->create($customer, ['url' => ['action' => 'do']]) ?>
 
     <?php
         $username = $this->request->Session()->read('Auth.User.username');
 
         $session = $this->request->getSession();
+
+        $data = $session->read();
 
         $session->write('customerdata.customer_code', $_POST['customer_code']);
         $session->write('customerdata.name', $_POST['name']);
@@ -44,9 +49,10 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         $session->write('customerdata.fax', $_POST['fax']);
         $session->write('customerdata.status', 0);
         $session->write('customerdata.delete_flag', 0);
-        $session->write('customerdata.created_staff', $_POST['created_staff']);
-/*
+        $session->write('customerdata.created_staff', $data['login']['staff_id']);
+
         $data = $session->read();
+        /*
         echo "<pre>";
         print_r($data);
         echo "</pre>";
@@ -91,7 +97,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')); ?></div></td>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('登録'), array('name' => 'kakunin')); ?></div></td>
     </tr>
   </table>
 <br>

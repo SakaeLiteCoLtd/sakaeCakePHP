@@ -1,4 +1,7 @@
 <?php
+$this->layout = 'defaultshinki';
+?>
+<?php
 /**
  * AuthHelper: Authの変数にアクセスできる
  * @var \App\View\AppView $this

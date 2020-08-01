@@ -1,4 +1,7 @@
 <?php
+$this->layout = 'defaultshinki';
+?>
+<?php
 /**
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Deliver $product
@@ -14,7 +17,7 @@
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($Konpous, ['url' => ['action' => 'konpousyuuseipreadd']]);
+          echo $this->Form->create($Konpous, ['url' => ['action' => 'konpousyuuseido']]);
 
 ?>
 

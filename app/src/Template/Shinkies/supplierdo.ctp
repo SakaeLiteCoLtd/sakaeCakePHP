@@ -26,7 +26,7 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 
 <hr size="5" style="margin: 0.5rem">
 
-    <?= $this->Form->create($priceMaterials, ['url' => ['action' => 'menu']]) ?>
+    <?= $this->Form->create($suppliers, ['url' => ['action' => 'menu']]) ?>
 
     <br>
       <legend align="center"><font color="red"><?= __($mes) ?></font></legend>

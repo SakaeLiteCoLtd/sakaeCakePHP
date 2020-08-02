@@ -55,10 +55,10 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
     </tr>
   </table>
 
-  <?= $this->Form->control('grade', array('type'=>'hidden', 'value'=>$this->request->getData('name'), 'label'=>false)) ?>
-  <?= $this->Form->control('color', array('type'=>'hidden', 'value'=>$this->request->getData('charge_p'), 'label'=>false)) ?>
-  <?= $this->Form->control('lot_low', array('type'=>'hidden', 'value'=>$this->request->getData('address'), 'label'=>false)) ?>
-  <?= $this->Form->control('lot_upper', array('type'=>'hidden', 'value'=>$this->request->getData('tel'), 'label'=>false)) ?>
-  <?= $this->Form->control('lot_upper', array('type'=>'hidden', 'value'=>$this->request->getData('fax'), 'label'=>false)) ?>
+  <?= $this->Form->control('name', array('type'=>'hidden', 'value'=>$this->request->getData('name'), 'label'=>false)) ?>
+  <?= $this->Form->control('charge_p', array('type'=>'hidden', 'value'=>$this->request->getData('charge_p'), 'label'=>false)) ?>
+  <?= $this->Form->control('address', array('type'=>'hidden', 'value'=>$this->request->getData('address'), 'label'=>false)) ?>
+  <?= $this->Form->control('tel', array('type'=>'hidden', 'value'=>$this->request->getData('tel'), 'label'=>false)) ?>
+  <?= $this->Form->control('fax', array('type'=>'hidden', 'value'=>$this->request->getData('fax'), 'label'=>false)) ?>
 
 <br>

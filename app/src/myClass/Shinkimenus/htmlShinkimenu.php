@@ -20,6 +20,7 @@ class htmlShinkimenu extends AppController
 	public function Shinkimenus()
 	{
         $html =
+        "<tr style='border-style: none; background-color: #E6FFFF'>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/materialsform'>\n".
         "<img src='/img/ShinkiTourokuMenu/touroku_genryou.gif' width=105 height=36>\n".
         "</a>\n".
@@ -37,7 +38,19 @@ class htmlShinkimenu extends AppController
         "</a>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/products/priceyobidasiform'>\n".
         "<img src='/img/ShinkiTourokuMenu/shinki_tanka.gif' width=105 height=36>\n".
-        "</a>\n";
+        "</a>\n".
+        "</tr>\n".
+        "<tr style='border-style: none; background-color: #E6FFFF'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/gaityuform'>\n".
+        "<img src='/img/ShinkiTourokuMenu/touroku_supplier.gif' width=105 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/kumitateproductform'>\n".
+        "<img src='/img/ShinkiTourokuMenu/touroku_assemble.gif' width=105 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/form'>\n".
+        "<img src='/img/ShinkiTourokuMenu/TourokuNyuSyukko.gif' width=105 height=36>\n".
+        "</a>\n".
+        "</tr>\n";
 
 		return $html;
 		$this->html = $html;

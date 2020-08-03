@@ -23,6 +23,8 @@ class ShinkiesController extends AppController {
    $this->Suppliers = TableRegistry::get('suppliers');
    $this->AssembleProducts = TableRegistry::get('assembleProducts');
    $this->Products = TableRegistry::get('products');
+   $this->OutsourceHandys = TableRegistry::get('outsourceHandys');
+   $this->ProductSuppliers = TableRegistry::get('productSuppliers');
   }
 
   public function index()
@@ -558,6 +560,174 @@ class ShinkiesController extends AppController {
      ->where(['flag' => 0])->order(["product_code"=>"ASC"])->toArray();
      $this->set('AssembleProducts',$AssembleProducts);
 
+   }
+
+   public function nyusyukkoform()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $staff_id = $sessionData['login']['staff_id'];
+     $htmlRolecheck = new htmlRolecheck();//クラスを使用
+     $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+     $this->set('roleCheck',$roleCheck);
+
+     $outsourceHandys = $this->OutsourceHandys->newEntity();
+     $this->set('outsourceHandys',$outsourceHandys);
+
+     $arrDenpyou = [
+       '0' => '無',
+       '1' => '有'
+             ];
+      $this->set('arrDenpyou',$arrDenpyou);
+   }
+
+   public function nyusyukkoconfirm()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $outsourceHandys = $this->OutsourceHandys->newEntity();
+     $this->set('outsourceHandys',$outsourceHandys);
+
+     $data = $this->request->getData();
+/*
+     echo "<pre>";
+     print_r($data);
+     echo "</pre>";
+*/
+   }
+
+   public function nyusyukkodo()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     $outsourceHandys = $this->OutsourceHandys->newEntity();
+     $this->set('outsourceHandys',$outsourceHandys);
+     $productSuppliers = $this->ProductSuppliers->newEntity();
+     $this->set('productSuppliers',$productSuppliers);
+
+     $data = $this->request->getData();
+     $this->set('data',$data);
+/*
+     echo "<pre>";
+     print_r($data);
+     echo "</pre>";
+*/
+     $arrtourokuOutsourceHandys = array();
+     $arrtourokuOutsourceHandys[] = array(
+       'name' => $data["handy_name"],
+       'flag' => $data["flag"]
+     );
+/*
+      echo "<pre>";
+      print_r($arrtourokuOutsourceHandys);
+      echo "</pre>";
+*/
+     $OutsourceHandys = $this->OutsourceHandys->patchEntity($this->OutsourceHandys->newEntity(), $arrtourokuOutsourceHandys[0]);
+     $connection = ConnectionManager::get('default');//トランザクション1
+     // トランザクション開始2
+     $connection->begin();//トランザクション3
+     try {//トランザクション4
+       if ($this->OutsourceHandys->save($OutsourceHandys)) {
+
+         $OutsourceHandys = $this->OutsourceHandys->find()->where(['name' => $data["handy_name"]])->toArray();
+         $handy_id = $OutsourceHandys[0]->id;
+
+         $arrtourokuProductSuppliers = array();
+         $arrtourokuProductSuppliers[] = array(
+           'name' => $data["sup_name"],
+           'address' => $data["address"],
+           'handy_id' => $handy_id,
+           'flag_denpyou' => $data["flag"],
+           'delete_flag' => 0,
+           'created_at' => date('Y-m-d H:i:s'),
+           'created_staff' => $sessionData['login']['staff_id']
+         );
+
+         $ProductSuppliers = $this->ProductSuppliers->patchEntity($this->ProductSuppliers->newEntity(), $arrtourokuProductSuppliers[0]);
+         $this->ProductSuppliers->save($ProductSuppliers);
+
+         //旧DBに製品登録
+         $connection = ConnectionManager::get('DB_ikou_test');
+         $table = TableRegistry::get('outsource_handy');
+         $table->setConnection($connection);
+
+         $connection->insert('outsource_handy', [
+           'name' => $data["handy_name"],
+           'flag' => $data["flag"]
+         ]);
+
+         $sql = "SELECT id FROM outsource_handy".
+               " where name ='".$data["handy_name"]."'";
+         $connection = ConnectionManager::get('DB_ikou_test');
+         $outsource_handy_id = $connection->execute($sql)->fetchAll('assoc');
+         $handy_id_old = $outsource_handy_id[0]['id'];
+
+         $connection->insert('product_supplier', [
+           'name' => $data["sup_name"],
+           'address' => $data["address"],
+           'handy_id' => $handy_id_old,
+           'flag' => 0,
+           'flag_denpyou' => $data["flag"],
+           'created' => date('Y-m-d H:i:s')
+         ]);
+
+         $connection = ConnectionManager::get('default');//新DBに戻る
+         $table->setConnection($connection);
+
+         $mes = "※下記のように登録されました";
+         $this->set('mes',$mes);
+         $connection->commit();// コミット5
+       } else {
+         $mes = "※登録されませんでした";
+         $this->set('mes',$mes);
+         $this->Flash->error(__('The data could not be saved. Please, try again.'));
+         throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+       }
+     } catch (Exception $e) {//トランザクション7
+     //ロールバック8
+       $connection->rollback();//トランザクション9
+     }//トランザクション10
+
+   }
+
+   public function nyusyukkoyobidashi()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $outsourceHandys = $this->OutsourceHandys->newEntity();
+     $this->set('outsourceHandys',$outsourceHandys);
+     $productSuppliers = $this->ProductSuppliers->newEntity();
+     $this->set('productSuppliers',$productSuppliers);
+
+     $ProductSuppliers = $this->ProductSuppliers->find()
+     ->where(['delete_flag' => 0])->order(["id"=>"ASC"])->toArray();
+     $this->set('ProductSuppliers',$ProductSuppliers);
+
+   }
+
+   public function menugaityu()
+   {
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $data = $session->read();
    }
 
 }

@@ -41,16 +41,31 @@ class htmlShinkimenu extends AppController
         "</a>\n".
         "</tr>\n".
         "<tr style='border-style: none; background-color: #E6FFFF'>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/gaityuform'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/menugaityu'>\n".
         "<img src='/img/ShinkiTourokuMenu/touroku_supplier.gif' width=105 height=36>\n".
         "</a>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/kumitateproductform'>\n".
         "<img src='/img/ShinkiTourokuMenu/touroku_assemble.gif' width=105 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/form'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/nyusyukkoform'>\n".
         "<img src='/img/ShinkiTourokuMenu/TourokuNyuSyukko.gif' width=105 height=36>\n".
         "</a>\n".
         "</tr>\n";
+
+		return $html;
+		$this->html = $html;
+		$this->data = $shinkimenus;
+	}
+
+  public function gaityumenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/form'>\n".
+        "<img src='/img/Labelimg/sub_index_gaityuproduct.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/deliverform'>\n".
+        "<img src='/img/Labelimg/subUrikakeGaityu.gif' width=85 height=36>\n".
+        "</a>\n";
 
 		return $html;
 		$this->html = $html;

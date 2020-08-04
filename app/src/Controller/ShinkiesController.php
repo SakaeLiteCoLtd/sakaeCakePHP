@@ -29,6 +29,7 @@ class ShinkiesController extends AppController {
    $this->DeliverCompanies = TableRegistry::get('deliverCompanies');
    $this->ProductGaityus = TableRegistry::get('productGaityus');
    $this->UnitOrderToSuppliers = TableRegistry::get('unitOrderToSuppliers');
+   $this->SyoumouSuppliers = TableRegistry::get('syoumouSuppliers');
   }
 
   public function index()
@@ -1054,6 +1055,126 @@ class ShinkiesController extends AppController {
      //ロールバック8
        $connection->rollback();//トランザクション9
      }//トランザクション10
+
+   }
+
+   public function syoumouhinform()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $staff_id = $sessionData['login']['staff_id'];
+     $htmlRolecheck = new htmlRolecheck();//クラスを使用
+     $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+     $this->set('roleCheck',$roleCheck);
+
+     $syoumouSuppliers = $this->SyoumouSuppliers->newEntity();
+     $this->set('syoumouSuppliers',$syoumouSuppliers);
+
+     $arrTax = [
+       '0' => '税別',
+       '1' => '税込'
+             ];
+      $this->set('arrTax',$arrTax);
+   }
+
+   public function syoumouhinconfirm()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $syoumouSuppliers = $this->SyoumouSuppliers->newEntity();
+     $this->set('syoumouSuppliers',$syoumouSuppliers);
+   }
+
+   public function syoumouhindo()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     $syoumouSuppliers = $this->SyoumouSuppliers->newEntity();
+     $this->set('syoumouSuppliers',$syoumouSuppliers);
+
+     $data = $this->request->getData();
+     $this->set('data',$data);
+
+     $arrtouroku = array();
+     $arrtouroku[] = array(
+       'name' => $data["name"],
+       'furigana' => $data["furigana"],
+       'tax_include' => $data["tax_include"],
+       'delete_flag' => 0,
+       'created_staff' => $sessionData['login']['staff_id'],
+       'created_at' => date('Y-m-d H:i:s')
+     );
+/*
+      echo "<pre>";
+      print_r($arrtouroku);
+      echo "</pre>";
+*/
+     $SyoumouSuppliers = $this->SyoumouSuppliers->patchEntity($this->SyoumouSuppliers->newEntity(), $arrtouroku[0]);
+     $connection = ConnectionManager::get('default');//トランザクション1
+     // トランザクション開始2
+     $connection->begin();//トランザクション3
+     try {//トランザクション4
+       if ($this->SyoumouSuppliers->save($SyoumouSuppliers)) {
+
+         //旧DBに製品登録
+         $connection = ConnectionManager::get('DB_ikou_test');
+         $table = TableRegistry::get('syoumou_suppliers');
+         $table->setConnection($connection);
+
+         $connection->insert('syoumou_suppliers', [
+           'name' => $data["name"],
+           'furigana' => $data["furigana"],
+           'tax_include' => $data["tax_include"],
+           'delete_flag' => 0,
+           'created_emp_id' => $sessionData['login']['staff_id'],
+           'created_at' => date('Y-m-d H:i:s')
+         ]);
+
+         $connection = ConnectionManager::get('default');//新DBに戻る
+         $table->setConnection($connection);
+
+         $mes = "※下記のように登録されました";
+         $this->set('mes',$mes);
+         $connection->commit();// コミット5
+       } else {
+         $mes = "※登録されませんでした";
+         $this->set('mes',$mes);
+         $this->Flash->error(__('The data could not be saved. Please, try again.'));
+         throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+       }
+     } catch (Exception $e) {//トランザクション7
+     //ロールバック8
+       $connection->rollback();//トランザクション9
+     }//トランザクション10
+
+   }
+
+   public function syoumouhinyobidashi()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $syoumouSuppliers = $this->SyoumouSuppliers->newEntity();
+     $this->set('syoumouSuppliers',$syoumouSuppliers);
+
+     $SyoumouSuppliers = $this->SyoumouSuppliers->find()
+     ->where(['delete_flag' => 0])->order(["furigana"=>"ASC"])->toArray();
+     $this->set('SyoumouSuppliers',$SyoumouSuppliers);
 
    }
 

@@ -25,6 +25,10 @@ class ShinkiesController extends AppController {
    $this->Products = TableRegistry::get('products');
    $this->OutsourceHandys = TableRegistry::get('outsourceHandys');
    $this->ProductSuppliers = TableRegistry::get('productSuppliers');
+   $this->AccountUrikakePriceMaterials = TableRegistry::get('accountUrikakePriceMaterials');
+   $this->DeliverCompanies = TableRegistry::get('deliverCompanies');
+   $this->ProductGaityus = TableRegistry::get('productGaityus');
+   $this->UnitOrderToSuppliers = TableRegistry::get('unitOrderToSuppliers');
   }
 
   public function index()
@@ -728,6 +732,317 @@ class ShinkiesController extends AppController {
 
      $session = $this->request->getSession();
      $data = $session->read();
+   }
+
+   public function gaityuurikakeform()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $staff_id = $sessionData['login']['staff_id'];
+     $htmlRolecheck = new htmlRolecheck();//クラスを使用
+     $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+     $this->set('roleCheck',$roleCheck);
+
+     $accountUrikakePriceMaterials = $this->AccountUrikakePriceMaterials->newEntity();
+     $this->set('accountUrikakePriceMaterials',$accountUrikakePriceMaterials);
+
+     $arrCompanies = $this->DeliverCompanies->find('all', ['conditions' => ['customer_code >' => 0]])->order(['id' => 'ASC']);
+     $arrCompany = array();
+     foreach ($arrCompanies as $value) {
+       $arrCompany[] = array($value->customer_code=>$value->company);
+     }
+     $this->set('arrCompany',$arrCompany);
+   }
+
+   public function gaityuurikakeconfirm()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $accountUrikakePriceMaterials = $this->AccountUrikakePriceMaterials->newEntity();
+     $this->set('accountUrikakePriceMaterials',$accountUrikakePriceMaterials);
+
+     $data = $this->request->getData();
+/*
+     echo "<pre>";
+     print_r($data);
+     echo "</pre>";
+*/
+     $Companies = $this->DeliverCompanies->find('all', ['conditions' => ['customer_code' => $data['customer_code']]])->toArray();
+     $company = $Companies[0]->company;
+     $this->set('company',$company);
+
+   }
+
+   public function gaityuurikakedo()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     $accountUrikakePriceMaterials = $this->AccountUrikakePriceMaterials->newEntity();
+     $this->set('accountUrikakePriceMaterials',$accountUrikakePriceMaterials);
+
+     $data = $this->request->getData();
+     $this->set('data',$data);
+
+     $Companies = $this->DeliverCompanies->find('all', ['conditions' => ['customer_code' => $data['customer_code']]])->toArray();
+     $company = $Companies[0]->company;
+     $this->set('company',$company);
+
+     $arrtouroku = array();
+     $arrtouroku[] = array(
+       'grade' => $data['grade'],
+       'color' => $data['color'],
+       'price' => $data['price'],
+       'customer_code' => $data['customer_code'],
+       'delete_flag' => 0,
+       'created_staff' => $sessionData['login']['staff_id'],
+       'created_at' => date('Y-m-d H:i:s')
+     );
+/*
+     echo "<pre>";
+     print_r($arrtouroku);
+     echo "</pre>";
+*/
+     $AccountUrikakePriceMaterials = $this->AccountUrikakePriceMaterials->patchEntity($this->AccountUrikakePriceMaterials->newEntity(), $arrtouroku[0]);
+     $connection = ConnectionManager::get('default');//トランザクション1
+     // トランザクション開始2
+     $connection->begin();//トランザクション3
+     try {//トランザクション4
+       if ($this->AccountUrikakePriceMaterials->save($AccountUrikakePriceMaterials)) {
+
+         //旧DBに製品登録
+         $connection = ConnectionManager::get('DB_ikou_test');
+         $table = TableRegistry::get('account_urikake_price_material');
+         $table->setConnection($connection);
+
+         $connection->insert('account_urikake_price_material', [
+           'grade' => $data['grade'],
+           'color' => $data['color'],
+           'price' => $data['price'],
+           'cs_id' => $data['customer_code'],
+           'emp_id' => $sessionData['login']['staff_id'],
+           'delete_flag' => 0,
+           'created_at' => date('Y-m-d H:i:s')
+         ]);
+
+         $connection = ConnectionManager::get('default');//新DBに戻る
+         $table->setConnection($connection);
+
+         $mes = "※下記のように登録されました";
+         $this->set('mes',$mes);
+         $connection->commit();// コミット5
+       } else {
+         $mes = "※登録されませんでした";
+         $this->set('mes',$mes);
+         $this->Flash->error(__('The data could not be saved. Please, try again.'));
+         throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+       }
+     } catch (Exception $e) {//トランザクション7
+     //ロールバック8
+       $connection->rollback();//トランザクション9
+     }//トランザクション10
+
+   }
+
+   public function gaityuseihinproduct()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $staff_id = $sessionData['login']['staff_id'];
+     $htmlRolecheck = new htmlRolecheck();//クラスを使用
+     $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+     $this->set('roleCheck',$roleCheck);
+
+     $accountUrikakePriceMaterials = $this->AccountUrikakePriceMaterials->newEntity();
+     $this->set('accountUrikakePriceMaterials',$accountUrikakePriceMaterials);
+   }
+
+   public function gaityuseihinform()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $staff_id = $sessionData['login']['staff_id'];
+     $htmlRolecheck = new htmlRolecheck();//クラスを使用
+     $roleCheck = $htmlRolecheck->Rolecheck($staff_id);
+     $this->set('roleCheck',$roleCheck);
+
+     $accountUrikakePriceMaterials = $this->AccountUrikakePriceMaterials->newEntity();
+     $this->set('accountUrikakePriceMaterials',$accountUrikakePriceMaterials);
+
+     $data = $this->request->getData();
+     $product_code = $data['product_code'];
+     $this->set('product_code',$product_code);
+     $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+     $product_name = $Product[0]->product_name;
+     $this->set('product_name',$product_name);
+
+     $ProductSuppliers = $this->ProductSuppliers->find()
+     ->where(['delete_flag' => 0])->order(["id"=>"ASC"])->toArray();
+     $arrSuppliers = array();
+     foreach ($ProductSuppliers as $value) {
+       $arrSuppliers[] = array($value->id=>$value->name);
+     }
+     $this->set('arrSuppliers',$arrSuppliers);
+   }
+
+   public function gaityuseihinconfirm()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $accountUrikakePriceMaterials = $this->AccountUrikakePriceMaterials->newEntity();
+     $this->set('accountUrikakePriceMaterials',$accountUrikakePriceMaterials);
+
+     $data = $this->request->getData();
+     $product_code = $data['product_code'];
+     $this->set('product_code',$product_code);
+     $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+     $product_name = $Product[0]->product_name;
+     $this->set('product_name',$product_name);
+
+     $product_supplier_id = $data['product_supplier_id'];
+     $ProductSupplier = $this->ProductSuppliers->find()->where(['id' => $product_supplier_id])->toArray();
+     $product_supplier_name = $ProductSupplier[0]->name;
+     $this->set('product_supplier_name',$product_supplier_name);
+/*
+     echo "<pre>";
+     print_r($data);
+     echo "</pre>";
+*/
+   }
+
+   public function gaityuseihindo()
+   {
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     $productGaityus = $this->ProductGaityus->newEntity();
+     $this->set('productGaityus',$productGaityus);
+     $unitOrderToSuppliers = $this->UnitOrderToSuppliers->newEntity();
+     $this->set('unitOrderToSuppliers',$unitOrderToSuppliers);
+
+     $data = $this->request->getData();
+     $product_code = $data['product_code'];
+     $this->set('product_code',$product_code);
+     $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+     $product_name = $Product[0]->product_name;
+     $this->set('product_name',$product_name);
+
+     $product_supplier_id = $data['product_supplier_id'];
+     $ProductSupplier = $this->ProductSuppliers->find()->where(['id' => $product_supplier_id])->toArray();
+     $product_supplier_name = $ProductSupplier[0]->name;
+     $this->set('product_supplier_name',$product_supplier_name);
+
+     $arrtourokuproductgaityu = array();
+     $arrtourokuproductgaityu[] = array(
+       'product_code' => $data['product_code'],
+       'id_supplier' => $data['product_supplier_id'],
+       'price_shiire' => $data['price'],
+       'flag_denpyou' => 0,
+       'status' => 0,
+       'created_at' => date('Y-m-d H:i:s')
+     );
+
+     $arrtourokuunitordertosupplier = array();
+     $arrtourokuunitordertosupplier[] = array(
+       'id_supplier' => $data['product_supplier_id'],
+       'product_code' => $data['product_code'],
+       'unit_amount' => $data['unit'],
+       'kijyun_stock' => 0,
+       'delete_flag' => 0,
+       'created_staff' => $sessionData['login']['staff_id'],
+       'created_at' => date('Y-m-d H:i:s')
+     );
+/*
+     echo "<pre>";
+     print_r($arrtourokuproductgaityu);
+     echo "</pre>";
+
+     echo "<pre>";
+     print_r($arrtourokuunitordertosupplier);
+     echo "</pre>";
+*/
+     $ProductGaityus = $this->ProductGaityus->patchEntity($this->ProductGaityus->newEntity(), $arrtourokuproductgaityu[0]);
+     $connection = ConnectionManager::get('default');//トランザクション1
+     // トランザクション開始2
+     $connection->begin();//トランザクション3
+     try {//トランザクション4
+       if ($this->ProductGaityus->save($ProductGaityus)) {
+
+         $UnitOrderToSuppliers = $this->UnitOrderToSuppliers->patchEntity($this->UnitOrderToSuppliers->newEntity(), $arrtourokuunitordertosupplier[0]);
+         $this->UnitOrderToSuppliers->save($UnitOrderToSuppliers);
+
+         //旧DBに製品登録
+         $connection = ConnectionManager::get('DB_ikou_test');
+         $table = TableRegistry::get('product_gaityu');
+         $table->setConnection($connection);
+
+         $sql = "SELECT id FROM product_supplier".
+               " where name ='".$product_supplier_name."'";
+         $connection = ConnectionManager::get('DB_ikou_test');
+         $product_supplier_id = $connection->execute($sql)->fetchAll('assoc');
+         $id_supplier_old = $product_supplier_id[0]['id'];
+
+         $connection->insert('product_gaityu', [
+           'product_id' => $data['product_code'],
+           'id_supplier' => $id_supplier_old,
+           'price_shiire' => $data['price'],
+           'flag_denpyou' => 0,
+           'flag' => 0,
+           'created_at' => date('Y-m-d H:i:s')
+         ]);
+
+         $connection->insert('unit_order_to_supplier', [
+           'product_id' => $data['product_code'],
+           'id_supplier' => $id_supplier_old,
+           'unit_amount' => $data['unit'],
+           'kijyun_stock' => 0,
+           'delete_flag' => 0,
+           'created_emp_id' => $sessionData['login']['staff_id'],
+           'created_at' => date('Y-m-d H:i:s')
+         ]);
+
+         $connection = ConnectionManager::get('default');//新DBに戻る
+         $table->setConnection($connection);
+
+         $mes = "※下記のように登録されました";
+         $this->set('mes',$mes);
+         $connection->commit();// コミット5
+       } else {
+         $mes = "※登録されませんでした";
+         $this->set('mes',$mes);
+         $this->Flash->error(__('The data could not be saved. Please, try again.'));
+         throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+       }
+     } catch (Exception $e) {//トランザクション7
+     //ロールバック8
+       $connection->rollback();//トランザクション9
+     }//トランザクション10
+
    }
 
 }

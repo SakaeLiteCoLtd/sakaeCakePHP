@@ -60,10 +60,10 @@ class htmlShinkimenu extends AppController
   public function gaityumenus()
 	{
         $html =
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/form'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/gaityuseihinproduct'>\n".
         "<img src='/img/Labelimg/sub_index_gaityuproduct.gif' width=85 height=36>\n".
         "</a>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/customers/deliverform'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/gaityuurikakeform'>\n".
         "<img src='/img/Labelimg/subUrikakeGaityu.gif' width=85 height=36>\n".
         "</a>\n";
 

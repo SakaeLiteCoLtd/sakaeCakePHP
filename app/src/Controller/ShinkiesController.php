@@ -996,6 +996,13 @@ class ShinkiesController extends AppController {
          $UnitOrderToSuppliers = $this->UnitOrderToSuppliers->patchEntity($this->UnitOrderToSuppliers->newEntity(), $arrtourokuunitordertosupplier[0]);
          $this->UnitOrderToSuppliers->save($UnitOrderToSuppliers);
 
+         $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+         $product_id = $Product[0]->id;
+         $this->Products->updateAll(
+           ['gaityu' => 1, 'updated_staff' => $sessionData['login']['staff_id'], 'updated_at' => date('Y-m-d H:i:s')],
+           ['id'  => $product_id]
+         );
+
          //旧DBに製品登録
          $connection = ConnectionManager::get('DB_ikou_test');
          $table = TableRegistry::get('product_gaityu');
@@ -1025,6 +1032,11 @@ class ShinkiesController extends AppController {
            'created_emp_id' => $sessionData['login']['staff_id'],
            'created_at' => date('Y-m-d H:i:s')
          ]);
+
+         $gaityu = 1;
+         $updater = "UPDATE product set gaityu = '".$gaityu."', update_at = '".date('Y-m-d H:i:s')."'
+           where product_id ='".$data['product_code']."'";//もとのDBも更新
+         $connection->execute($updater);
 
          $connection = ConnectionManager::get('default');//新DBに戻る
          $table->setConnection($connection);

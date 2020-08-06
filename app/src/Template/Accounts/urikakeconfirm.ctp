@@ -57,7 +57,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
           <td width="300" bgcolor="#FFFFCC" colspan="2" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">数量（ヶ、kg）</strong></div></td>
       	</tr>
         <tr>
-          <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('productGrade', array('type'=>'text', 'label'=>false)) ?></td>
+          <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('productGrade', array('type'=>'text', 'label'=>false, 'autofocus'=>true)) ?></td>
           <td  width="220" bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><?= $this->Form->control('suryouKg', array('type'=>'text', 'label'=>false)) ?></td>
           <td width="82" bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">（ヶ、kg）</strong></td>
       	</tr>

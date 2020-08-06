@@ -40,7 +40,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
                 <td><div align="center"><strong style="font-size: 12pt; color:blue">顧客コード</strong></div></td>
                 <td style="border-left-style: none;"><div align="center"><strong style="font-size: 12pt; color:blue">顧客名</strong></div></td>
               <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-                <td><?= $this->Form->input("customer_code", array('type' => 'value', 'label'=>false)); ?></td>
+                <td><?= $this->Form->input("customer_code", array('type' => 'value', 'label'=>false, 'autofocus'=>true)); ?></td>
             		<td style="border-left-style: none;"><?= $this->Form->input("name", array('type' => 'value', 'label'=>false)); ?></td>
               <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
                 <td colspan="2"><div align="center"><strong style="font-size: 12pt; color:blue">住所</strong></div></td>

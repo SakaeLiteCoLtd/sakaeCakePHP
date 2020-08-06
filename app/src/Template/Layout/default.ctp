@@ -77,7 +77,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
                           <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('HeaderMenu/menu_material.gif',array('width'=>'105','height'=>'36'));?></a></td>
                         </tr>
                         <tr style="padding: 0; border-style: none;background-color: #E6FFFF">
-                          <td style="padding: 0.1rem 0.1rem;"><a href=<?php echo $this->Url->build(['controller'=>'Shinkies', 'action'=>'index', 'taskId' => 77]); ?>"><?php echo $this->Html->image('HeaderMenu/menu_shinki.gif',array('width'=>'105','height'=>'36'));?></a></td>
+                          <td style="padding: 0.1rem 0.1rem;"><?php echo $this->Html->image('HeaderMenu/menu_shinki.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Shinkies','action'=>'index')));?></td>
                           <td style="padding: 0.1rem 0.1rem;"><?php echo $this->Html->image('HeaderMenu/menu_edi.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'orderEdis','action'=>'indexmenu')));?></td>
                           <td style="padding: 0.1rem 0.1rem;"><?php echo $this->Html->image('HeaderMenu/menu_rejection.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'Zensukensas','action'=>'indexmenu')));?></td>
                           <td style="padding: 0.1rem 0.1rem;"><?php echo $this->Html->image('HeaderMenu/menu_denpyou.gif',array('width'=>'105','height'=>'36','url'=>array('controller'=>'orderEdis','action'=>'denpyouindex')));?></td>

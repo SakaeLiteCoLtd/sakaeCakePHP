@@ -179,6 +179,9 @@ class AccountsController extends AppController
       if($data['customer'] == 37 && $data['urikakeelement'] == 9){
         $zaiko_check = 1;
         $this->set('zaiko_check',$zaiko_check);
+      }elseif($data['customer'] == 43 && $data['urikakeelement'] == 9){
+        $zaiko_check = 1;
+        $this->set('zaiko_check',$zaiko_check);
       }else{
         $zaiko_check = 2;
         $this->set('zaiko_check',$zaiko_check);

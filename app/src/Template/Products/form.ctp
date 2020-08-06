@@ -41,7 +41,7 @@ $this->layout = 'defaultshinki';
     <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">品名</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false, 'autofocus'=>true)) ?></td>
     <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_name', array('type'=>'text', 'label'=>false)) ?></td>
 	</tr>
 </table>

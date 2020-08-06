@@ -30,7 +30,7 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
         <td width="500" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">業者名</strong></td>
       </tr>
       <tr>
-        <td  width="500" bgcolor="#FFFFCC"><?= $this->Form->control('name', array('type'=>'text', 'label'=>false)) ?></td>
+        <td  width="500" bgcolor="#FFFFCC"><?= $this->Form->control('name', array('type'=>'text', 'label'=>false, 'autofocus'=>true)) ?></td>
       </tr>
       </table>
       <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">

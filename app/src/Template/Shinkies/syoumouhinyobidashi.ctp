@@ -33,7 +33,7 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
           <thead>
               <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-                <td width="30" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue"></strong></div></td>
+                <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">業者ID</strong></div></td>
                 <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">業者名</strong></div></td>
                 <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">ふりがな</strong></div></td>
                 <td width="120" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">登録者</strong></div></td>
@@ -58,7 +58,7 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
               }
               ?>
 
-              <td colspan="20" nowrap="nowrap"><font><?= h($i+1) ?></font></td>
+              <td colspan="20" nowrap="nowrap"><font><?= h($SyoumouSuppliers[$i]->id) ?></font></td>
               <td colspan="20" nowrap="nowrap"><font><?= h($SyoumouSuppliers[$i]->name) ?></font></td>
               <td colspan="20" nowrap="nowrap"><font><?= h($SyoumouSuppliers[$i]->furigana) ?></font></td>
               <td colspan="20" nowrap="nowrap"><font><?= h($staff) ?></font></td>

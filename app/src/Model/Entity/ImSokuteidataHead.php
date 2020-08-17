@@ -33,7 +33,7 @@ class ImSokuteidataHead extends Entity
      * @var array
      */
     protected $_accessible = [
-        'product_id' => true,
+        'product_code' => true,
         'kind_kensa' => true,
         'inspec_date' => true,
         'lot_num' => true,

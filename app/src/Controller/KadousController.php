@@ -927,7 +927,7 @@ class KadousController extends AppController
     //      $this->set('KadouSeikeis',$KadouSeikeis);
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
-                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and pro_num = '".$product_code."' and seikeiki = '".$seikeiki."' order by order by seikeiki asc, starting_tm asc";
+                " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and pro_num = '".$product_code."' and seikeiki = '".$seikeiki."' order by seikeiki asc, starting_tm asc";
           $connection = ConnectionManager::get('DB_ikou_test');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 

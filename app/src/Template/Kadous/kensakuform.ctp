@@ -31,7 +31,7 @@
     <tr style="border-bottom: 0px;border-width: 0px">
       <td width="250" height="40" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">品番</strong></div></td>
       <td width="500" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">成形時間</strong></div></td>
-      <td width="250" height="40" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">成型機</strong></div></td>
+      <td width="250" height="40" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">成形機</strong></div></td>
     </tr>
 
 

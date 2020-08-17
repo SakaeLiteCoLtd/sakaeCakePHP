@@ -17,7 +17,7 @@ class htmlKensahyouSokuteidata extends AppController
          $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
     }
 
-	public function htmlHeaderKensahyouSokuteidata($product_id)
+	public function htmlHeaderKensahyouSokuteidata($product_code)
 	{
         $html =
                   "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
@@ -39,7 +39,7 @@ class htmlKensahyouSokuteidata extends AppController
                   "<td valign='middle' width='50' rowspan='3' nowrap='nowrap' colspan='2' style='valign: middle'><div align='center'><strong>規格</strong></div></td>\n".
                   "<td width='50' nowrap='nowrap' colspan='2'><div align='center'><strong>上限</strong></div></td>\n";
 
-            $KensahyouHeads = $this->KensahyouHeads->find('all', ['conditions' => ['product_id' => $product_id]])->order(['id' => 'ASC']);//
+            $KensahyouHeads = $this->KensahyouHeads->find('all', ['conditions' => ['product_code' => $product_code]])->order(['id' => 'ASC']);//
       			foreach ($KensahyouHeads as $value) {
       			}
 

@@ -35,7 +35,7 @@
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
         <thead>
             <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-              <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF66FF">成型機</strong></div></td>
+              <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF66FF">成形機</strong></div></td>
               <td width="180" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF66FF">品番</strong></div></td>
               <td width="180" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF66FF">品名</strong></div></td>
               <td width="300" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF66FF">ロットコード</strong></div></td>

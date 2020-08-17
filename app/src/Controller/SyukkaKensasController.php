@@ -487,17 +487,23 @@ class SyukkaKensasController extends AppController {
 
               ${"product_coded".$countnamed} = $KadouSeikeiDatac[$i-1]->product_code;//以下、index2に持っていくデータをセット
               ${"ProductDatad".$countnamed} = $this->Products->find()->where(['product_code' => ${"product_coded".$countnamed}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-              ${"product_named".$countnamed} = ${"ProductDatad".$countnamed}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+              if(isset(${"ProductDatad".$countnamed}[0])){
+                ${"product_named".$countnamed} = ${"ProductDatad".$countnamed}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                $this->set('product_named'.$countnamed,${"product_named".$countnamed});//セット
+              }else{
+                ${"product_named".$countnamed} = "";//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                $this->set('product_named'.$countnamed,${"product_named".$countnamed});//セット
+              }
               ${"KadouSeikeifinishing_tm".$countnamed} = $KadouSeikeiDatac[$i-1]->finishing_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
               ${"KadouSeikeifinishing_dated".$countnamed} = substr(${"KadouSeikeifinishing_tm".$countnamed},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},8,2);//finishing_tmの年月日を取得
 
               $this->set('product_coded'.$countnamed,${"product_coded".$countnamed});//セット
-              $this->set('product_named'.$countnamed,${"product_named".$countnamed});//セット
+      //        $this->set('product_named'.$countnamed,${"product_named".$countnamed});//セット
               $this->set('KadouSeikeifinishing_dated'.$countnamed,${"KadouSeikeifinishing_dated".$countnamed});//セット
 
               $session = $this->request->session();
               $session->write('product_coded', ${"product_coded".$countnamed});
-              $session->write('product_named', ${"product_named".$countnamed});
+      //        $session->write('product_named', ${"product_named".$countnamed});
 
               $countnamed += 1;//ファイル名の日付を識別するためカウント
               $this->set('countnamed',$countnamed);//セット
@@ -577,7 +583,7 @@ class SyukkaKensasController extends AppController {
                                       $arrIm_heads[] = 0;
                                       $arrIm_heads[] = 0;
 
-                                      $name_heads = array('product_id', 'kind_kensa', 'inspec_date', 'lot_num', 'torikomi', 'delete_flag');
+                                      $name_heads = array('product_code', 'kind_kensa', 'inspec_date', 'lot_num', 'torikomi', 'delete_flag');
                                       $arrIm_heads = array_combine($name_heads, $arrIm_heads);
                                       $arrIm_head[] = $arrIm_heads;
                                     }

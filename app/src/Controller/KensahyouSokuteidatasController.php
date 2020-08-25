@@ -276,8 +276,8 @@ class KensahyouSokuteidatasController  extends AppController
     	$this->set('entity',$this->KensahyouSokuteidatas->newEntity());//空のカラムにentityと名前を付け、ctpで使えるようにセット
 
     	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
-    	->select(['product_id','delete_flag' => '0'])
-    	->group('product_id');
+    	->select(['product_code','delete_flag' => '0'])
+    	->group('product_code');
 /*
       $KensahyouHeads = $KensahyouHeads->toArray();//データを配列に変更
       if(isset($KensahyouHeads[0])){
@@ -292,9 +292,9 @@ class KensahyouSokuteidatasController  extends AppController
 */
     	$arrProductcode = array();//配列の初期化
     		foreach ($KensahyouHeads as $value) {//$KensahyouHeadsのそれぞれに対して
-    			$product_id = $value->product_id;//$KensahyouHeadsのproduct_idに$product_idと名前を付ける
-    			$product = $this->Products->find()->where(['id' => $product_id])->toArray();//'id' => $product_code_idとなるデータをProductsテーブルから配列で取得
-    			$product_code = $product[0]->product_code;//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける
+    			$product_code = $value->product_code;//$KensahyouHeadsのproduct_idに$product_idと名前を付ける
+    	//		$product = $this->Products->find()->where(['id' => $product_id])->toArray();//'id' => $product_code_idとなるデータをProductsテーブルから配列で取得
+    	//		$product_code = $product[0]->product_code;//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける
     			$arrProductcode[] = $product_code;//$product_codeを配列に追加
     		}
     		sort($arrProductcode);//配列$arrProductcodeのデータを昇順に並び替え

@@ -43,12 +43,13 @@ class KensahyouHeadsController  extends AppController
     	$data = $this->request->getData();//postで送られた全データを取得
       $product_code = $data['product_code'];//product_idという名前のデータに$product_idと名前を付ける
       $this->set('Productcode',$product_code);//セット
+      $this->set('product_code',$product_code);//セット
 
-      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_idを満たすものを$Productとする
-    	$product_id = $Product[0]->id;//$Productのproduct_codeに$Productcodeと名前を付ける
+  //    $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_idを満たすものを$Productとする
+  //  	$product_id = $Product[0]->id;//$Productのproduct_codeに$Productcodeと名前を付ける
 
     //	$product_id = $data['product_id'];//product_idという名前のデータに$product_idと名前を付ける
-    	$this->set('product_id',$product_id);//セット
+    //	$this->set('product_id',$product_id);//セット
 
     	$staff_id = $this->Auth->user('staff_id');//ログインしているuserのstaff_idに$staff_idと名前を付ける
     	$this->set('staff_id',$staff_id);//セット
@@ -56,34 +57,34 @@ class KensahyouHeadsController  extends AppController
     	$kensahyouHead = $this->KensahyouHeads->newEntity();//newEntity・・・テーブルに空の行を作る
     	$this->set('kensahyouHead',$kensahyouHead);//セット
 
-    	$KensaProduct = $this->KensahyouHeads->find()->where(['product_id' => $product_id, 'delete_flag' => '0'])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
+    	$KensaProduct = $this->KensahyouHeads->find()->where(['product_code' => $product_code, 'delete_flag' => '0'])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
     	$this->set('KensaProduct',$KensaProduct);//セット
 
     //	$Product = $this->Products->find()->where(['id' => $product_id])->toArray();//'id' => $product_idを満たすものを$Productとする
     //	$Productcode = $Product[0]->product_code;//$Productのproduct_codeに$Productcodeと名前を付ける
     //	$this->set('Productcode',$Productcode);//セット
 
-    //	$Productn = $this->Products->find()->where(['id' => $product_id])->toArray();//
-    	$Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+    	$Productn = $this->Products->find()->where(['product_code' => $product_code])->toArray();//
+    	$Productname = $Productn[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
     	$this->set('Productname',$Productname);//セット
 
     	$this->set('kensahyouHeads',$this->KensahyouHeads->find()//KensahyouHeadsテーブルから
-    		->where(['delete_flag' => '0','product_id' => $product_id]));//'delete_flag' => '0'、'product_id' => $product_idを満たすデータをkensahyouHeadsにセット
+    		->where(['delete_flag' => '0','product_code' => $product_code]));//'delete_flag' => '0'、'product_id' => $product_idを満たすデータをkensahyouHeadsにセット
     }
 
      public function confirm()
     {
 	$data = $this->request->getData();//postで送られた全データを取得
 
-	$product_id = $data['product_id'];//product_idという名前のデータに$product_idと名前を付ける
-	$this->set('product_id',$product_id);//セット
+	$product_code = $data['product_code'];//product_idという名前のデータに$product_idと名前を付ける
+	$this->set('product_code',$product_code);//セット
 
 	$kensahyouHead = $this->KensahyouHeads->newEntity();//newEntity・テーブルに空の行を作る
 	$this->set('kensahyouHead',$kensahyouHead);//セット
 
 //	$KensaProduct = $this->KensahyouHeads->find()->where(['product_id' => $product_id])->toArray();//
 
-	$Product = $this->Products->find()->where(['id' => $product_id])->toArray();//'id' => $product_idを満たすものを$Product
+	$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_idを満たすものを$Product
 	$Productcode = $Product[0]->product_code;//$Productのproduct_codeに$Productcodeと名前を付ける
 	$this->set('Productcode',$Productcode);//セット
 
@@ -155,15 +156,15 @@ class KensahyouHeadsController  extends AppController
   $_SESSION['sokuteidata'] = array_merge($created_staff,$_SESSION['sokuteidata']);
 
   $data = $_SESSION['sokuteidata'];
-/*
+
   echo "<pre>";
   print_r($data);
   echo "</pre>";
-*/
-	$product_id = $data['product_id'];//product_idという名前のデータに$product_idと名前を付ける
-	$this->set('product_id',$product_id);//セット
 
-	$Product = $this->Products->find()->where(['id' => $product_id])->toArray();//'id' => $product_idを満たすものを$Product
+	$product_code = $data['product_code'];//product_idという名前のデータに$product_idと名前を付ける
+	$this->set('product_code',$product_code);//セット
+
+	$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_idを満たすものを$Product
 	$Productcode = $Product[0]->product_code;//$Productのproduct_codeに$Productcodeと名前を付ける
 	$this->set('Productcode',$Productcode);//セット
 

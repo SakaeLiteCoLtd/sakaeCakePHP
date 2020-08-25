@@ -1,5 +1,5 @@
 <?php
-$this->layout = 'defaultkadous';
+//$this->layout = 'defaultkadous';
 ?>
 
 <?php
@@ -18,6 +18,17 @@ $this->layout = 'defaultkadous';
   header('Pragma:');
   echo $this->Form->create($KadouSeikei, ['url' => ['action' => 'imgkensakuichiran']]);
 ?>
+<?php
+ use App\myClass\Kadous\htmlKadoumenu;//myClassフォルダに配置したクラスを使用
+ $htmlKadoumenu = new htmlKadoumenu();
+ $htmlKadoumenus = $htmlKadoumenu->Kadoumenus();
+ ?>
+ <hr size="5" style="margin: 0.5rem">
+ <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <?php
+    echo $htmlKadoumenus;
+ ?>
+ </table>
 
  <hr size="5" style="margin: 0.5rem">
 <br>
@@ -44,11 +55,13 @@ $this->layout = 'defaultkadous';
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
     <tr>
+      <td width="100" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">成形機</strong></div></td>
       <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">品番</strong></div></td>
       <td width="300" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">日報開始日時絞込</strong></div></td>
       <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">プライオリティ</strong></div></td>
       <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">グラフ種類</strong></div></td>
     </tr>
+    <td width="100" style="border-bottom: solid;border-width: 1px"><div align="center"><?= h($seikeiki." 号機") ?></div></td>
     <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><?= h($this->request->getData('product')) ?></div></td>
     <td width="300" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date", array('type' => 'date', 'value' => $date_sta, 'monthNames' => false, 'label'=>false)); ?></div></td>
     <td width="250" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input('priority', ["type"=>"select", "empty"=>"", "options"=>$arrImgpriority, 'label'=>false]); ?></td>

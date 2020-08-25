@@ -22,7 +22,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
     <fieldset>
           <?php
-          	$KensaProduct = $this->KensahyouHeads->find()->where(['product_id' => $product_id])->toArray();
+          	$KensaProduct = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();
           	$KensaProductV = $KensaProduct[0]->version;
            	$this->set('KensaProductV',$KensaProductV);
 
@@ -178,7 +178,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
         <?php
             echo $this->Form->hidden('version' ,['value'=>0]);
-            echo $this->Form->hidden('product_id' ,['value'=>$product_id]);
+            echo $this->Form->hidden('product_code' ,['value'=>$product_code]);
             echo $this->Form->hidden('status' ,['value'=>0]);
             echo $this->Form->hidden('delete_flag' ,['value'=>0]);
             echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);

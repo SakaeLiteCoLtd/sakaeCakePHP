@@ -52,7 +52,7 @@ class SyukkaKensasController extends AppController {
     	$product_id = $Product[0]->id;
       $this->set('product_id',$product_id);//セット
 
-      $ImKikakuex = $this->ImKikakuTaious->find()->where(['product_id' => $product_id])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
+      $ImKikakuex = $this->ImKikakuTaious->find()->where(['product_code' => $product_code])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
       $this->set('ImKikakuex',$ImKikakuex);//セット
 /*
       if(isset($ImKikakuex[0])){
@@ -69,7 +69,7 @@ class SyukkaKensasController extends AppController {
       $this->set('Productname',$Productname);//セット
 
       $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()//KensahyouSokuteidatasテーブルの中で
-    	->where(['product_id' => $product_id])->toArray();
+    	->where(['product_code' => $product_code])->toArray();
       $kind_kensa = $ImSokuteidataHeads[0]->kind_kensa;
 
       $arrKindKensa = array("","ノギス");//配列の初期化
@@ -94,17 +94,17 @@ class SyukkaKensasController extends AppController {
     	]);
 
     	 foreach ($Products as $value) {//$Productsそれぞれに対し
-    		$product_id= $value->id;//idに$product_idと名前を付ける
+    		$product_code= $value->product_code;//idに$product_idと名前を付ける
     	}
-    	$this->set('product_id',$product_id);//セット
+    	$this->set('product_code',$product_code);//セット
 
     	$htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
-    	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
+    	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
     	$this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
     	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();
     	$Productid = $Producti[0]->id;
-    	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_id' => $Productid])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
+    	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
     	$this->set('KensahyouHead',$KensahyouHead);//セット
 
     	$KensahyouHeadver = $KensahyouHead[0]->version+1;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
@@ -151,14 +151,14 @@ class SyukkaKensasController extends AppController {
      $Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
        'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
      ]);
-     foreach ($Products as $value) {//上で見つけた$Productsに対して
-       $product_id= $value->id;//$Productsのidに$product_idと名前を付ける
-     }
-     $this->set('product_id',$product_id);//セット
+     foreach ($Products as $value) {//$Productsそれぞれに対し
+      $product_code= $value->product_code;//idに$product_idと名前を付ける
+    }
+    $this->set('product_code',$product_code);//セット
 
-     $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//myClassフォルダに配置したクラスを使う
-     $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
-     $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+    $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+    $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+    $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
      $this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
     }
@@ -224,14 +224,14 @@ class SyukkaKensasController extends AppController {
    $Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
      'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
    ]);
-   foreach ($Products as $value) {//上で見つけた$Productsに対して
-     $product_id= $value->id;//$Productsのidに$product_idと名前を付ける
-   }
-   $this->set('product_id',$product_id);//セット
+   foreach ($Products as $value) {//$Productsそれぞれに対し
+    $product_code= $value->product_code;//idに$product_idと名前を付ける
+  }
+  $this->set('product_code',$product_code);//セット
 
-   $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//myClassフォルダに配置したクラスを使う
-   $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
-   $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+  $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+  $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+  $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
    $ImKikakuTaiou = $this->ImKikakuTaious->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
    $this->set('ImKikakuTaiou',$ImKikakuTaiou);//セット
@@ -616,8 +616,8 @@ class SyukkaKensasController extends AppController {
                                             $upper = $arrImKikakus[1][$k];
                                             $lower = $arrImKikakus[2][$k];
 
-                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1]])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                                            $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1]])->toArray();
+                                            $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;
 
                                             $arrIm_kikaku_data[] = $im_sokuteidata_head_id;//配列に追加する
                                             $arrIm_kikaku_data[] = $size_num;//配列に追加する
@@ -781,18 +781,18 @@ class SyukkaKensasController extends AppController {
     		'conditions' => ['product_code =' => $product_code]//Productsテーブルの'product_code' = $product_codeとなるものを$Productsとする
     	]);
 
-    	 foreach ($Products as $value) {//$Productsそれぞれに対し
-    		$product_id= $value->id;//idに$product_idと名前を付ける
-    	}
-    	$this->set('product_id',$product_id);//セット
+      foreach ($Products as $value) {//$Productsそれぞれに対し
+       $product_code= $value->product_code;//idに$product_idと名前を付ける
+     }
+     $this->set('product_code',$product_code);//セット
 
-    	$htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
-    	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
-    	$this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+     $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+     $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+     $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
     	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();
     	$Productid = $Producti[0]->id;
-    	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_id' => $Productid])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
+    	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
     	$this->set('KensahyouHead',$KensahyouHead);//セット
 
     	$KensahyouHeadver = $KensahyouHead[0]->version+1;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
@@ -850,18 +850,18 @@ class SyukkaKensasController extends AppController {
     		'conditions' => ['product_code =' => $product_code]//Productsテーブルの'product_code' = $product_codeとなるものを$Productsとする
     	]);
 
-    	 foreach ($Products as $value) {//$Productsそれぞれに対し
-    		$product_id= $value->id;//idに$product_idと名前を付ける
-    	}
-    	$this->set('product_id',$product_id);//セット
+      foreach ($Products as $value) {//$Productsそれぞれに対し
+       $product_code= $value->product_code;//idに$product_idと名前を付ける
+     }
+     $this->set('product_code',$product_code);//セット
 
-    	$htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
-    	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
-    	$this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+     $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+     $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+     $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
     	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();
     	$Productid = $Producti[0]->id;
-    	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_id' => $Productid])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
+    	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
     	$this->set('KensahyouHead',$KensahyouHead);//セット
 
     	$KensahyouHeadver = $KensahyouHead[0]->version+1;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
@@ -971,14 +971,14 @@ if(isset($ImSokuteidataHead[0])){
      $Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
        'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
      ]);
-     foreach ($Products as $value) {//上で見つけた$Productsに対して
-       $product_id= $value->id;//$Productsのidに$product_idと名前を付ける
-     }
-     $this->set('product_id',$product_id);//セット
+     foreach ($Products as $value) {//$Productsそれぞれに対し
+      $product_code= $value->product_code;//idに$product_idと名前を付ける
+    }
+    $this->set('product_code',$product_code);//セット
 
-     $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//myClassフォルダに配置したクラスを使う
-     $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
-     $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+    $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+    $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+    $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
      $kensahyouSokuteidata = $this->KensahyouSokuteidatas->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
      $this->set('kensahyouSokuteidata',$kensahyouSokuteidata);//セット
@@ -1149,17 +1149,17 @@ if(isset($ImSokuteidataHead[0])){
      'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
    ]);
 
-   foreach ($Products as $value) {//上で見つけた$Productsに対して
-     $product_id= $value->id;//$Productsのidに$product_idと名前を付ける
-   }
-   $this->set('product_id',$product_id);//セット
+   foreach ($Products as $value) {//$Productsそれぞれに対し
+    $product_code= $value->product_code;//idに$product_idと名前を付ける
+  }
+  $this->set('product_code',$product_code);//セット
+
+  $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+  $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+  $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
    $kensahyouSokuteidata = $this->KensahyouSokuteidatas->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
    $this->set('kensahyouSokuteidata',$kensahyouSokuteidata);//セット
-
-   $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//表示用
-   $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_id);//
-   $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
    $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();
    $Productid = $Producti[0]->id;

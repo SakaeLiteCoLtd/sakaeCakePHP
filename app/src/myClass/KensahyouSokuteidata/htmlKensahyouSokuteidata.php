@@ -39,12 +39,17 @@ class htmlKensahyouSokuteidata extends AppController
                   "<td valign='middle' width='50' rowspan='3' nowrap='nowrap' colspan='2' style='valign: middle'><div align='center'><strong>規格</strong></div></td>\n".
                   "<td width='50' nowrap='nowrap' colspan='2'><div align='center'><strong>上限</strong></div></td>\n";
 
-            $KensahyouHeads = $this->KensahyouHeads->find('all', ['conditions' => ['product_code' => $product_code]])->order(['id' => 'ASC']);//
+            $KensahyouHeads = $this->KensahyouHeads->find('all', ['conditions' => ['product_code' => $product_code, 'delete_flag' => 0]])->order(['id' => 'ASC']);//
       			foreach ($KensahyouHeads as $value) {
       			}
 
             for($l=1; $l<=8; $l++){
-        		$upper= $value->{"upper_{$l}"};//
+              if(isset($value)){
+                $upper= $value->{"upper_{$l}"};
+              }else{
+                $upper= "";
+              }
+      //  		$upper= $value->{"upper_{$l}"};
             $html = $html.
                     "<td colspan='2'><div align='center'>\n";
             $html = $html.$upper;
@@ -61,7 +66,12 @@ class htmlKensahyouSokuteidata extends AppController
           "<td nowrap='nowrap' colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'><strong>下限</strong></div></td>\n";
 
             for($l=1; $l<=8; $l++){
-        		$lower= $value->{"lower_{$l}"};//
+              if(isset($value)){
+                $lower= $value->{"lower_{$l}"};
+              }else{
+                $lower= "";
+              }
+    //    		$lower= $value->{"lower_{$l}"};
                 $html = $html.
                         "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'><font size='-1'>\n";
                 $html = $html.$lower;
@@ -77,7 +87,16 @@ class htmlKensahyouSokuteidata extends AppController
           "<td nowrap='nowrap' colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'><strong>寸法</strong></div></td>\n";
 
             for($l=1; $l<=9; $l++){
-        		$size= $value->{"size_{$l}"};//
+              if(isset($value)){
+                $size= $value->{"size_{$l}"};
+                $text_10 = $value->text_10;
+                $text_11 = $value->text_11;
+              }else{
+                $size= "";
+                $text_10= "";
+                $text_11= "";
+              }
+      //  		$size= $value->{"size_{$l}"};
                 $html = $html.
                         "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'>\n";
                 $html = $html.$size;
@@ -87,11 +106,11 @@ class htmlKensahyouSokuteidata extends AppController
   //          "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'></div></td>\n".
   //          "<td colspan='2'><div align='center'></div></td>\n";
             "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'>\n";
-            $html = $html.$value->text_10;
+            $html = $html.$text_10;
             $html = $html."</div></td>\n";
             $html = $html.
             "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'>\n";
-            $html = $html.$value->text_11;
+            $html = $html.$text_11;
             $html = $html."</div></td>\n";
 
 /*

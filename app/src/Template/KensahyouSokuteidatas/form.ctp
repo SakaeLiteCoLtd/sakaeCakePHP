@@ -50,7 +50,7 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
             echo $this->Form->hidden('inspec_date' ,['value'=>$inspec_date]);
           ?>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>検査年月日</strong></div></td>
-          <td colspan="9"><?= h($inspec_date) ?></td>
+          <td colspan="9"><?= $this->Form->input("inspec_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
      <?php else : ?>
        <td colspan="5" nowrap="nowrap"><div align="center"><strong>検査年月日</strong></div></td>
        <td colspan="9"><?= $this->Form->input("inspec_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>

@@ -21,7 +21,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
 
     <fieldset>
-<div align="center"><strong><font color="red">＊入力してください</font></strong></div>
+<div align="center"><strong><font color="red">＊ロット番号を入力して取り込みボタンを押してください</font></strong></div>
 <br>
     <table width="1200" border="1" align="center" bordercolor="#000000" style="background-color: #FFFFFF">
         <tr style="border-bottom: solid;border-width: 1px">

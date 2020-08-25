@@ -15,7 +15,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             header('Cache-Control:');
             header('Pragma:');
 
-            echo $this->Form->hidden('product_id' ,['value'=>$_POST['product_id'] ]) ;
+            echo $this->Form->hidden('product_code' ,['value'=>$_POST['product_code'] ]) ;
             echo $this->Form->hidden('version' ,['value'=>$_POST['version'] ]) ;
             echo $this->Form->hidden('type_im' ,['value'=>$_POST['type_im'] ]) ;
             echo $this->Form->hidden('maisu' ,['value'=>$_POST['maisu'] ]) ;
@@ -35,7 +35,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
 
             $_SESSION['sokuteidata'] = array(
-              'product_id' => $_POST['product_id'],
+              'product_code' => $_POST['product_code'],
               'version' => $_POST['version'],
               'type_im' => $_POST['type_im'],
               'maisu' => $_POST['maisu'],
@@ -69,6 +69,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               "bik" =>$_POST["bik"],
               "status" =>$_POST["status"],
               "delete_flag" =>$_POST["delete_flag"],
+              "created_at" =>date('Y-m-d H:i:s')
             );
 
         ?>

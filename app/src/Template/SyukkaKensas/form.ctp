@@ -40,8 +40,6 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
           <td colspan="9"><?= h($lot_num) ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
-          <td colspan="5" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
-          <td colspan="9"><?= $this->Form->input("manu_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
           <?php
             $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();
             if(isset($ImSokuteidataHead[0])){
@@ -49,12 +47,10 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
               $ImSokuteidataHead_id = $ImSokuteidataHead[0]->id;
             }
           ?>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
+          <td colspan="9"><?= $this->Form->input("manu_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>検査年月日</strong></div></td>
-          <?php if(isset($ImSokuteidataHead[0])): ?>
-            <td colspan="9"><?= h($inspec_date) ?></td>
-        <?php else : ?>
           <td colspan="9"><?= $this->Form->input("inspec_date", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
-        <?php endif; ?>
 
         </tr>
 

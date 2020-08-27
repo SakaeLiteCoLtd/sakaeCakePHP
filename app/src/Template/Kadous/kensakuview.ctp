@@ -61,7 +61,7 @@
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($kadouSeikei[$i]["last_lot_num"]) ?></font></td>
             <?php
             echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
-            echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $kadouSeikei[$i]["id"]]) ;
+            echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $i."_".$kadouSeikei[$i]["id"]]) ;
             echo "</div></td>";
             ?>
           </tr>

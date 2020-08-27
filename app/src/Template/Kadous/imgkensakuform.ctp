@@ -16,7 +16,7 @@
   header('Expires:-1');
   header('Cache-Control:');
   header('Pragma:');
-  echo $this->Form->create($KadouSeikei, ['url' => ['action' => 'imgkensakuichiran']]);
+  echo $this->Form->create($KadouSeikei, ['url' => ['action' => 'imgkensakuform']]);
 ?>
 <?php
  use App\myClass\Kadous\htmlKadoumenu;//myClassフォルダに配置したクラスを使用
@@ -70,9 +70,13 @@
 <br>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-<tr>
-  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('グラフ呼出', array('name' => 'yobidasi')); ?></div></td>
-</tr>
+  <tr>
+    <td style="border-style: none;"><div align="left"><?= $this->Form->submit('前へ', array('name' => 'neg')); ?></div></td>
+    <td  width="500" style="border-style: none;"><div align="left"></div></td>
+    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('グラフ呼出', array('name' => 'yobidasi')); ?></div></td>
+    <td  width="500" style="border-style: none;"><div align="left"></div></td>
+    <td style="border-style: none;"><div align="right"><?= $this->Form->submit('次へ', array('name' => 'poj')); ?></div></td>
+  </tr>
 </table>
 
 <?= $this->Form->control('seikeiki', array('type'=>'hidden', 'value'=>$seikeiki, 'label'=>false)) ?>

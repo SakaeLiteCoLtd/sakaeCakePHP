@@ -868,16 +868,13 @@ class KadousController extends AppController
 
       $product_code = $data['product_code'];
       $seikeiki = $data['seikeiki'];
-  //    $date_sta = $data['date_sta'];
-  //    $date_fin = $data['date_fin'];
+
       $date_fin = strtotime($date_fin);
       $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
 
       $connection = ConnectionManager::get('DB_ikou_test');//旧DBを参照
       $table = TableRegistry::get('kadou_seikei');
       $table->setConnection($connection);
-
-//      $num_0 = 0;
 
       if(empty($data['product_code'])){//product_codeの入力がないとき
         $product_code = "no";
@@ -932,6 +929,7 @@ class KadousController extends AppController
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
         }
+
       }
 
       $connection = ConnectionManager::get('default');
@@ -993,11 +991,28 @@ class KadousController extends AppController
       $this->set('kadouSeikei',$kadouSeikei);
       $this->set('countkadouSeikei',count($kadouSeikei));
 
+      session_start();
+      for($n=0; $n<count($kadouSeikei); $n++){
+        $_SESSION['imgdata'][$n] = array(
+          'id' => $kadouSeikei[$n]['id'],
+          'pro_num' => $kadouSeikei[$n]['pro_num'],
+          'starting_tm' => substr($kadouSeikei[$n]['starting_tm'], 0, 10),
+          'seikeiki' => $kadouSeikei[$n]['seikeiki']
+        );
+       }
+/*
+       echo "<pre>";
+       print_r($_SESSION);
+       echo "</pre>";
+*/
     }
 
     public function kensakusyousai()
     {
-      $this->request->session()->destroy(); // セッションの破棄
+  //    $this->request->session()->destroy(); // セッションの破棄
+      $session = $this->request->getSession();
+      $datasession = $session->read();
+
       $KadouSeikeis = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikeis',$KadouSeikeis);
 
@@ -1009,7 +1024,17 @@ class KadousController extends AppController
       print_r($data[0]);
       echo "</pre>";
 */
-      $KadouSeikeis = $this->KadouSeikeis->find()->where(['id' => $data[0]])->toArray();
+      $imgdatas = explode("_",$data[0]);//切り離し
+
+      $_SESSION['imgnum'] = array(
+        'num' => $imgdatas[0]
+      );
+/*
+      echo "<pre>";
+      print_r($_SESSION);
+      echo "</pre>";
+*/
+      $KadouSeikeis = $this->KadouSeikeis->find()->where(['id' => $imgdatas[1]])->toArray();
 
       $date_sta = $KadouSeikeis[0]["starting_tm"]->format('Y-m-d H:i:s');
 
@@ -1345,21 +1370,48 @@ class KadousController extends AppController
      $KadouSeikei = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikei',$KadouSeikei);
 
-     $data = $this->request->getData();
-/*
+     $session = $this->request->getSession();
+     $datasession = $session->read();
+
      echo "<pre>";
-     print_r($data);
+     print_r($datasession);
      echo "</pre>";
-*/
-     $date_sta = substr($data['start_tm'], 0, 10);
+
+     $imgdatanum = $datasession["imgnum"]["num"];
+
+//     $date_sta = substr($data['start_tm'], 0, 10);
+     $date_sta = $datasession["imgdata"][$imgdatanum]["starting_tm"];
      $this->set('date_sta',$date_sta);
+
+     $data = $this->request->getData();
+     if(isset($data["neg"])){
+       echo "<pre>";
+       print_r($data["neg"]);
+       echo "</pre>";
+     }elseif(isset($data["poj"])){
+       echo "<pre>";
+       print_r($data["poj"]);
+       echo "</pre>";
+     }elseif(isset($data["yobidasi"])){
+       echo "<pre>";
+       print_r($data["yobidasi"]);
+       echo "</pre>";
+     }else{
+       echo "<pre>";
+       print_r("no");
+       echo "</pre>";
+     }
+
      $product_code = $data['product'];
      $this->set('product_code',$product_code);
      $seikeiki = $data['seikeiki'];
      $this->set('seikeiki',$seikeiki);
-     $date_y = substr($data['start_tm'], 0, 4);
-     $date_m = substr($data['start_tm'], 5, 2);
-     $date_d = substr($data['start_tm'], 8, 2);
+//     $date_y = substr($data['start_tm'], 0, 4);
+//     $date_m = substr($data['start_tm'], 5, 2);
+//     $date_d = substr($data['start_tm'], 8, 2);
+     $date_y = substr($date_sta, 0, 4);
+     $date_m = substr($date_sta, 5, 2);
+     $date_d = substr($date_sta, 8, 2);
 
      $arrImgtype = ['1' => '選択なし','hist_place_cushion' => 'hist_place_cushion','hist_time_injection' => 'hist_time_injection',
      'hist_time_measure' => 'hist_time_measure','hist_pressure_injection' => 'hist_pressure_injection',
@@ -1429,7 +1481,6 @@ class KadousController extends AppController
      $this->set('gif7',$gif7);
      $gif8 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
      $this->set('gif8',$gif8);
-
 
      //192.168.4.246
 /*

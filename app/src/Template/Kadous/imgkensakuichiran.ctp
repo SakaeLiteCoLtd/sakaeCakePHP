@@ -104,7 +104,13 @@ $roop = floor(count($arrPngfiles) / 4);
 
  <br>
 
+ <?php
 
+ if($type == 1){
+   $type = "全て";
+ }
+
+ ?>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -112,20 +118,18 @@ $roop = floor(count($arrPngfiles) / 4);
       <td width="100" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">成形機</strong></div></td>
       <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">品番</strong></div></td>
       <td width="300" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">日時絞込</strong></div></td>
-      <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">プライオリティ</strong></div></td>
       <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">グラフ種類</strong></div></td>
     </tr>
     <td width="100" style="border-bottom: solid;border-width: 1px"><div align="center"><?= h($seikeiki." 号機") ?></div></td>
-    <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><?= h($this->request->getData('product_code')) ?></div></td>
-    <td width="300" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date", array('type' => 'date', 'value' => $this->request->getData('date'), 'monthNames' => false, 'label'=>false)); ?></div></td>
-    <td width="250" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input('priority', ["type"=>"select", "empty"=>"", "options"=>$arrImgpriority, 'label'=>false]); ?></td>
-    <td width="250" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input('type', ["type"=>"select", "empty"=>"", "options"=>$arrImgtype, 'label'=>false]); ?></td>
+    <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><?= h($product_code) ?></div></td>
+    <td width="300" style="border-bottom: solid;border-width: 1px"><div align="center"><?= h($date_sta) ?></div></td>
+    <td width="250" style="border-bottom: solid;border-width: 1px"><?= h($type) ?></td>
 </table>
 <br>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr>
-  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('グラフ呼出', array('name' => 'yobidasi')); ?></div></td>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
 </tr>
 </table>
 <?= $this->Form->control('seikeiki', array('type'=>'hidden', 'value'=>$seikeiki, 'label'=>false)) ?>

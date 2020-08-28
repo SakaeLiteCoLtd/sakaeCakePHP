@@ -62,7 +62,7 @@
       <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><strong style="font-size: 11pt; color:blue">グラフ種類</strong></div></td>
     </tr>
     <td width="100" style="border-bottom: solid;border-width: 1px"><div align="center"><?= h($seikeiki." 号機") ?></div></td>
-    <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><?= h($this->request->getData('product')) ?></div></td>
+    <td width="250" style="border-bottom: solid;border-width: 1px"><div align="center"><?= h($product_code) ?></div></td>
     <td width="300" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date", array('type' => 'date', 'value' => $date_sta, 'monthNames' => false, 'label'=>false)); ?></div></td>
     <td width="250" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input('priority', ["type"=>"select", "empty"=>"", "options"=>$arrImgpriority, 'label'=>false]); ?></td>
     <td width="250" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input('type', ["type"=>"select", "empty"=>"", "options"=>$arrImgtype, 'label'=>false]); ?></td>

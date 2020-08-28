@@ -428,11 +428,12 @@ class OrderEdisController extends AppController
            $keys[array_search('3',$keys)]='name_order';
            $keys[array_search('4',$keys)]='line_code';
            $keys[array_search('7',$keys)]='product_code';
+           $keys[array_search('9',$keys)]='date_order';
            $keys[array_search('15',$keys)]='place_deliver';
            $sample = array_combine( $keys, $sample );
 
            unset($sample['0'],$sample['1'],$sample['4'],$sample['5'],$sample['6'],$sample['8']);
-           unset($sample['9'],$sample['10'],$sample['11'],$sample['13'],$sample['14']);
+           unset($sample['10'],$sample['11'],$sample['13'],$sample['14']);
            unset($sample['12'],$sample['16'],$sample['17'],$sample['18']);//最後の改行も削除
 
            if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき（カンマのみの行が出てきたら配列への追加を終了）
@@ -699,7 +700,7 @@ echo "</pre>";
                   'place_deliver' => $place_deliver,
                   'code' => $arrEDImotodenpyoudnp[$k]["line_code"],
                   'conf_print' => 0,
-                  'tourokubi' => date("Y-m-d"),
+                  'tourokubi' => $arrEDImotodenpyoudnp[$k]["date_order"],
                   'created_at' => date("Y-m-d H:i:s")
               ]);
             }
@@ -3575,7 +3576,7 @@ echo "</pre>";
                     'place_deliver' => $place_deliver,
                     'code' => $data['order_edi']["line_code"],
                     'conf_print' => 0,
-                    'tourokubi' => date("Y-m-d"),
+                    'tourokubi' => $data['order_edi']["date_order"],
                     'created_at' => date("Y-m-d H:i:s")
                 ]);
 

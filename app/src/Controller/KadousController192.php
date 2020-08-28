@@ -72,7 +72,7 @@ class KadousController extends AppController
       	}
 
         //旧DB参照
-        $connection = ConnectionManager::get('DB_ikou_test');
+        $connection = ConnectionManager::get('sakaeMotoDB');
         $table = TableRegistry::get('scheduleKoutei');
         $table->setConnection($connection);
 
@@ -85,7 +85,7 @@ class KadousController extends AppController
 
            $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM schedule_koutei".
                  " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
 /*
            echo "<pre>";
@@ -356,7 +356,7 @@ class KadousController extends AppController
            $connection->commit();// コミット5
 
             //旧DBに登録
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('kari_kadou_seikei');
             $table->setConnection($connection);
 
@@ -555,7 +555,7 @@ class KadousController extends AppController
         if ($this->KadouSeikeis->saveMany($KadouSeikeis)) {
 
           //旧DBに登録
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('kadou_seikei');
           $table->setConnection($connection);
 
@@ -623,7 +623,7 @@ class KadousController extends AppController
               );
 
 //旧DBを更新
-              $connection = ConnectionManager::get('DB_ikou_test');
+              $connection = ConnectionManager::get('sakaeMotoDB');
               $table = TableRegistry::get('kari_kadou_seikei');
               $table->setConnection($connection);
 
@@ -868,13 +868,16 @@ class KadousController extends AppController
 
       $product_code = $data['product_code'];
       $seikeiki = $data['seikeiki'];
-
+  //    $date_sta = $data['date_sta'];
+  //    $date_fin = $data['date_fin'];
       $date_fin = strtotime($date_fin);
       $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
 
-      $connection = ConnectionManager::get('DB_ikou_test');//旧DBを参照
+      $connection = ConnectionManager::get('sakaeMotoDB');//旧DBを参照
       $table = TableRegistry::get('kadou_seikei');
       $table->setConnection($connection);
+
+//      $num_0 = 0;
 
       if(empty($data['product_code'])){//product_codeの入力がないとき
         $product_code = "no";
@@ -888,7 +891,7 @@ class KadousController extends AppController
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
     //      " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and present_kensahyou = ".$num_0." order by pro_num asc";
           " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' order by seikeiki asc, starting_tm asc";
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
         }else{//seikeikiの入力があるとき　product_code×　seikeiki〇　date〇//seikeikiと日にちで絞り込み
@@ -899,7 +902,7 @@ class KadousController extends AppController
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
                 " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and seikeiki = '".$seikeiki."' order by seikeiki asc, starting_tm asc";
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
         }
@@ -913,7 +916,7 @@ class KadousController extends AppController
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
                 " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and pro_num = '".$product_code."' order by seikeiki asc, starting_tm asc";
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
 
@@ -925,11 +928,10 @@ class KadousController extends AppController
 
           $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
                 " where starting_tm >= '".$date_sta."' and starting_tm <= '".$date_fin."' and pro_num = '".$product_code."' and seikeiki = '".$seikeiki."' order by seikeiki asc, starting_tm asc";
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $kadouSeikei = $connection->execute($sql)->fetchAll('assoc');
 
         }
-
       }
 
       $connection = ConnectionManager::get('default');
@@ -1000,11 +1002,7 @@ class KadousController extends AppController
           'seikeiki' => $kadouSeikei[$n]['seikeiki']
         );
        }
-/*
-       echo "<pre>";
-       print_r($_SESSION);
-       echo "</pre>";
-*/
+
     }
 
     public function kensakusyousai()
@@ -1322,7 +1320,7 @@ class KadousController extends AppController
            $connection->commit();// コミット5
 
            //旧DBも更新
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('kadou_seikei');
            $table->setConnection($connection);
 
@@ -1346,6 +1344,7 @@ class KadousController extends AppController
 
            $connection = ConnectionManager::get('default');
            $table->setConnection($connection);
+
 
            $mes = "※登録されました";
            $this->set('mes',$mes);
@@ -1448,6 +1447,7 @@ class KadousController extends AppController
      $this->set('arrImgpriority',$arrImgpriority);
 
      $dirName = "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/";
+  //   $dirName = "/img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/";
      if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
        $dirName = $dirName;
      }else{
@@ -1482,37 +1482,38 @@ class KadousController extends AppController
 
      //ローカル
      //存在するならファイルをコピー
-
+/*
      for($k=1; $k<9; $k++){
-       $file_name = ${"file_name".$k};
+       $file_name = "file_name".$k;
        if (file_exists("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
          copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
        }
      }
 
-     $gif1 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
+     $gif1 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
      $this->set('gif1',$gif1);
-     $gif2 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
+     $gif2 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
      $this->set('gif2',$gif2);
-     $gif3 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name3";
+     $gif3 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name3";
      $this->set('gif3',$gif3);
-     $gif4 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name4";
+     $gif4 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name4";
      $this->set('gif4',$gif4);
-     $gif5 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name5";
+     $gif5 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name5";
      $this->set('gif5',$gif5);
-     $gif6 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name6";
+     $gif6 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name6";
      $this->set('gif6',$gif6);
-     $gif7 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name7";
+     $gif7 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name7";
      $this->set('gif7',$gif7);
-     $gif8 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
+     $gif8 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
      $this->set('gif8',$gif8);
+*/
 
      //192.168.4.246
-/*
+
      for($k=1; $k<9; $k++){
        $file_name = ${"file_name".$k};
-       if (file_exists("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
-         copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
+       if (file_exists("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
+         copy("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
        }
      }
 
@@ -1532,10 +1533,9 @@ class KadousController extends AppController
      $this->set('gif7',$gif7);
      $gif8 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
      $this->set('gif8',$gif8);
-*/
 
-      $arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
-      //$arrAllfiles = glob("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
+      //$arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
+      $arrAllfiles = glob("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
       $countfile = count($arrAllfiles);
 
       if($countfile == 0){//フォルダが空の場合
@@ -1588,6 +1588,7 @@ class KadousController extends AppController
      $this->set('arrImgpriority',$arrImgpriority);
 
      $dirName = "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/";
+  //   $dirName = "/img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/";
      if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
        $dirName = $dirName;
      }else{
@@ -1599,8 +1600,8 @@ class KadousController extends AppController
        $typecheck = 1;
        $this->set('typecheck',$typecheck);
 
-       $arrAllfiles = glob("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
-    //   $arrAllfiles = glob("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
+    //   $arrAllfiles = glob("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
+       $arrAllfiles = glob("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
 
        $countfile = count($arrAllfiles);
        $arrPngfiles = array();
@@ -1612,26 +1613,22 @@ class KadousController extends AppController
        for($k=0; $k<$countfile; $k++){
 
          ${"file".$k} = explode("/",$arrAllfiles[$k]);
-         ${"pngcheck".$k} = substr(${"file".$k}[7], -3, 3);//ローカル
-         ${"seikeikicheck".$k} = substr(${"file".$k}[7], 0, 1);
-    //     ${"seikeikicheck".$k} = substr(${"file".$k}[9], 0, 1);
-    //     ${"pngcheck".$k} = substr(${"file".$k}[9], -3, 3);
-/*
-         echo "<pre>";
-         print_r(${"seikeikicheck".$k}.${"pngcheck".$k});
-         echo "</pre>";
-*/
+    //     ${"pngcheck".$k} = substr(${"file".$k}[7], -3, 3);//ローカル
+    //   ${"seikeikicheck".$k} = substr(${"file".$k}[7], 0, 1);
+         ${"seikeikicheck".$k} = substr(${"file".$k}[9], 0, 1);
+         ${"pngcheck".$k} = substr(${"file".$k}[9], -3, 3);
+
          if(${"pngcheck".$k} == "png" && ${"seikeikicheck".$k} == $seikeiki){
 
-           $arrPngfiles[] = ${"file".$k}[7];//ローカル
-    //       $arrPngfiles[] = ${"file".$k}[9];
+    //       $arrPngfiles[] = ${"file".$k}[7];//ローカル
+           $arrPngfiles[] = ${"file".$k}[9];
            $this->set('arrPngfiles',$arrPngfiles);
 
-           $file_name = ${"file".$k}[7];//ローカル
-    //       $file_name = ${"file".$k}[9];
+    //       $file_name = ${"file".$k}[7];//ローカル
+           $file_name = ${"file".$k}[9];
 
-           copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");//ローカル
-      //     copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
+      //     copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");//ローカル
+           copy("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
 
            ${"gif".$k} = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
            $this->set('gif'.$k,${"gif".$k});
@@ -1671,8 +1668,8 @@ class KadousController extends AppController
 
     //     if (file_exists("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
     //       copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
-         if (file_exists("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
-           copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
+         if (file_exists("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
+           copy("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
          }
 
        }
@@ -1700,6 +1697,7 @@ class KadousController extends AppController
        $this->set('typecheck',$typecheck);
 
         $dirName = "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/";
+        //   $dirName = "/img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/";
         if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
           $dirName = $dirName;
         }else{
@@ -1707,10 +1705,10 @@ class KadousController extends AppController
         }
 
         $file_name = $seikeiki."_".$type.".png";
-        if (file_exists("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
-          copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
     //    if (file_exists("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
     //      copy("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
+          if (file_exists("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
+            copy("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
         }
 
         $gif = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
@@ -1718,8 +1716,8 @@ class KadousController extends AppController
 
      }
 
-     $arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
-     //$arrAllfiles = glob("/home/centosuser/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
+     //$arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
+     $arrAllfiles = glob("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
      $countfile = count($arrAllfiles);
 
      if($countfile == 0){//フォルダが空の場合
@@ -1731,30 +1729,5 @@ class KadousController extends AppController
      }
 
    }
-
-
-//memo
-//$gif2 = "C:/Users/info/Desktop/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";//0702.RF51-B471HHの画像
-//    $gif2 = "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";
-//  $gif2 = '//192.168.4.246/centosuser/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif';
-//  $gif2 = "/img/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.gif";
-//  $gif2 = "/home/centosuser/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/5_hist_time_injection.png";
-//   $this->set('gif2',$gif2);
-
-//   $fp = fopen('C:/Users/info/Desktop/kadouimg/RF51-B471HH/2020/07/02/test.txt', 'r');//ファイル表示テスト
-//   $fp = fopen('/home/centosuser/kadouimg/RF51-B471HH/20/07/02/test.txt', 'r');//ファイル表示テスト
-//   $fp = fopen('\\192.168.1.220\社内共通\hirokawa\kadouimg\RF51-B471HH\20\07\02\test.txt', 'r');//ファイル表示テスト
-//   $fp = fopen('//192.168.1.220/社内共通/hirokawa/kadouimg/RF51-B471HH/20/07/02/test.txt', 'r');//ファイル表示テスト
-//   $fp = fopen('kadouimg/RF51-B471HH/2020/07/02/test.txt', 'r');//ファイル表示テスト
-//        $line = fgets($fp);
-//          echo "<pre>";
-//          print_r($line);
-//          echo "</pre>";
-//          fclose($fp);
-
-//ファイル名変更
-//      rename( "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/test_old.txt", "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/test_new.txt" );
- //    rename( "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test2.png", "/home/centosuser/kadouimg/RF51-B471HH/20/07/02/RF51-B471HH_200702_test22.png" );
-     //ファイルのパーミッション
 
 }

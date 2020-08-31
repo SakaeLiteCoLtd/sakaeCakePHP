@@ -861,6 +861,30 @@ class KadousController extends AppController
       //ファイルを移動させたいディレクトリの指定
        $move_directory = "img/shotgraphs/";   //この場合、現在いる（このプログラムファイルが存在する）ディレクトリの一つ上の階層にある「hoge」フォルダを指定している
 
+       $arrAll = glob("img/kadouimgcopy/*");//ローカル
+       echo "<pre>";
+       print_r($arrAll);
+       echo "</pre>";
+
+       $folder1 = $arrAll[0];
+       $arrAll2 = glob("$folder1/*");//ローカル
+       echo "<pre>";
+       print_r($arrAll2);
+       echo "</pre>";
+
+       $folder2 = $arrAll2[0];
+       $arrAll3 = glob("$folder2/*");//ローカル
+       echo "<pre>";
+       print_r($arrAll3);
+       echo "</pre>";
+
+       $folder3 = $arrAll3[0];
+       $arrAll4 = glob("$folder3/*");//ローカル
+       echo "<pre>";
+       print_r($arrAll4);
+       echo "</pre>";
+
+/*
        //現在いる（このプログラムファイルが存在する）ディレクトリのハンドルをオープンできれば処理を実行
        if ($handle = opendir("img/kadouimgcopy/")) {
       // if ($handle = opendir("img/kadouimgstock/")) {
@@ -870,14 +894,13 @@ class KadousController extends AppController
                if ($entry != "." && $entry != "..") {
                    //ファイルを指定したディレクトリに移動させる
                    rename("img/kadouimgcopy/".$entry, $move_directory.$entry);
-          //         rename("img/kadouimgstock/".$entry, $move_directory.$entry);
                    chmod($move_directory.$entry, 0777);
                }
            }
            //オープンしたディレクトリのハンドルをクローズする
            closedir($handle);
        }
-
+*/
     }
 
     public function kensakuview()//ロット検索

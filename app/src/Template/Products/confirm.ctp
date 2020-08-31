@@ -69,7 +69,13 @@ $this->layout = 'defaultshinki';
 
             $session->write('zensudata.product_code', $_POST['product_code']);
             $session->write('zensudata.shot_cycle', $_POST['shot_cycle']);
-            $session->write('zensudata.kijyun', $_POST['kijyun']);
+
+            if(!empty($_POST['kijyun'])){
+              $session->write('zensudata.kijyun', $_POST['kijyun']);
+            }else{
+              $session->write('zensudata.kijyun', NULL);
+            }
+
             $session->write('zensudata.kariunyou', 1);
             $session->write('zensudata.status', 0);
             $session->write('zensudata.staff_code', $_POST['created_staff']);

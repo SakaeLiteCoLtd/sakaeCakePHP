@@ -848,6 +848,16 @@ class KadousController extends AppController
       $this->request->session()->destroy(); // セッションの破棄
       $KadouSeikeis = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikeis',$KadouSeikeis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function kensakuview()//ロット検索
@@ -1371,6 +1381,12 @@ class KadousController extends AppController
 
      $session = $this->request->getSession();
      $datasession = $session->read();
+
+     if(!isset($datasession["imgnum"])){
+       return $this->redirect(['action' => 'kensakuform',
+       's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+     }
+
 /*
      echo "<pre>";
      print_r($datasession);
@@ -1535,7 +1551,7 @@ class KadousController extends AppController
      $this->set('gif8',$gif8);
 
       //$arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
-      $arrAllfiles = glob("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
+      $arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
       $countfile = count($arrAllfiles);
 
       if($countfile == 0){//フォルダが空の場合
@@ -1559,6 +1575,11 @@ class KadousController extends AppController
 */
       $session = $this->request->getSession();
       $datasession = $session->read();
+
+     if(!isset($datasession["imgnum"])){
+       return $this->redirect(['action' => 'kensakuform',
+       's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+     }
 
       $imgdatanum = $datasession["imgnum"]["num"];
       $product_code = $datasession["imgdata"][$imgdatanum]["pro_num"];

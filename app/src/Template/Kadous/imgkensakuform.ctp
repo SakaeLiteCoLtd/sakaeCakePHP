@@ -35,22 +35,6 @@
 
 <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
 
-<table style="margin-bottom:0px" width="1350" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-  <tr style="background-color: #E6FFFF">
-    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif1);?></td>
-    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif2);?></td>
-    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif3);?></td>
-    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif4);?></td>
-  </tr>
-  <tr style="background-color: #E6FFFF">
-    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif5);?></td>
-    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif6);?></td>
-    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif7);?></td>
-    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif8);?></td>
-  </tr>
- </table>
-
- <br>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -67,6 +51,7 @@
     <td width="250" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input('priority', ["type"=>"select", "empty"=>"", "options"=>$arrImgpriority, 'label'=>false]); ?></td>
     <td width="250" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input('type', ["type"=>"select", "empty"=>"", "options"=>$arrImgtype, 'label'=>false]); ?></td>
 </table>
+
 <br>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -79,7 +64,34 @@
   </tr>
 </table>
 
+<br><br>
+
+<table style="margin-bottom:0px" width="1000" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+   <tr style="background-color: #E6FFFF">
+     <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image('Labelimg/img_pink.png',array('width'=>'40','height'=>'30'));?><?= h(" : ".$lot_codes1) ?></td>
+     <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image('Labelimg/img_blue.png',array('width'=>'40','height'=>'30'));?><?= h(" : ".$lot_codes2) ?></td>
+     <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image('Labelimg/img_green.png',array('width'=>'40','height'=>'30'));?><?= h(" : ".$lot_codes3) ?></td>
+   </tr>
+ </table>
+
+<br><br>
+
+<table style="margin-bottom:0px" width="1350" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+  <tr style="background-color: #E6FFFF">
+    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif1);?></td>
+    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif2);?></td>
+    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif3);?></td>
+    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif4);?></td>
+  </tr>
+  <tr style="background-color: #E6FFFF">
+    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif5);?></td>
+    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif6);?></td>
+    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif7);?></td>
+    <td style="padding: 0.1rem 0.1rem; text-align: center"><?php echo $this->Html->image($gif8);?></td>
+  </tr>
+ </table>
+
 <?= $this->Form->control('seikeiki', array('type'=>'hidden', 'value'=>$seikeiki, 'label'=>false)) ?>
 <?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
 
-<br>
+<br><br><br>

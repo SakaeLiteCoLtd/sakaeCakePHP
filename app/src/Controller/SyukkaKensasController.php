@@ -68,10 +68,15 @@ class SyukkaKensasController extends AppController {
       $Productname = $Product[0]->product_name;
       $this->set('Productname',$Productname);//セット
 
-      $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()//KensahyouSokuteidatasテーブルの中で
+      $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()
     	->where(['product_code' => $product_code])->toArray();
-      $kind_kensa = $ImSokuteidataHeads[0]->kind_kensa;
-
+      /*
+      if(isset($ImSokuteidataHeads[0])){
+        $kind_kensa = $ImSokuteidataHeads[0]->kind_kensa;
+      }else{
+        $kind_kensa = "";
+      }
+*/
       $arrKindKensa = array("","ノギス");//配列の初期化
     	 	foreach ($ImSokuteidataHeads as $value) {//それぞれに対して
     			$arrKindKensa[] = $value->kind_kensa;//配列に追加

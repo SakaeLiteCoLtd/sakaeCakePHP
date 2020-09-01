@@ -182,9 +182,9 @@ class KensahyouSokuteidatasController  extends AppController
     	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);
     	$this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//$htmlKensahyouHeaderをセット
 
-    	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルの'product_code' = $product_codeとなるものを配列で取り出す
-    	$Productid = $Producti[0]->id;//配列の0番目のidに$Productidと名前を付ける
-    	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_id' => $Productid])->toArray();//KensahyouHeadsテーブルの'product_id' = $Productidとなるものを配列で取り出す
+    //	$Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルの'product_code' = $product_codeとなるものを配列で取り出す
+    //	$Productid = $Producti[0]->id;//配列の0番目のidに$Productidと名前を付ける
+    	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();//KensahyouHeadsテーブルの'product_id' = $Productidとなるものを配列で取り出す
     	$this->set('KensahyouHead',$KensahyouHead);//セット
 
     	$KensahyouHeadver = $KensahyouHead[0]->version+1;//新しいバージョンをセット
@@ -205,7 +205,7 @@ class KensahyouSokuteidatasController  extends AppController
     	$Productn = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルの'product_code' = $product_codeとなるものを配列で取り出す
       $Productname = $Productn[0]->product_name;//配列の0番目のproduct_nameに$Productnameと名前を付ける
     	$this->set('Productname',$Productname);//セット
-      $Productid = $Productn[0]->id;//配列の0番目のproduct_nameに$Productnameと名前を付ける
+  //    $Productid = $Productn[0]->id;//配列の0番目のproduct_nameに$Productnameと名前を付ける
 
     	for($i=1; $i<=9; $i++){//size_1～9までセット
     		${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
@@ -238,7 +238,7 @@ class KensahyouSokuteidatasController  extends AppController
       $ImKikakuid_9 = "ノギス";
       $this->set('ImKikakuid_9',$ImKikakuid_9);
 
-      $ImKikakus = $this->ImKikakuTaious->find()->where(['product_id' => $Productid])->toArray();//'id' => $product_code_idとなるデータをProductsテーブルから配列で取得（プルダウン）
+      $ImKikakus = $this->ImKikakuTaious->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_code_idとなるデータをProductsテーブルから配列で取得（プルダウン）
       foreach ((array)$ImKikakus as $key => $value) {
            $sort[$key] = $value['kensahyuo_num'];
        }
@@ -250,24 +250,23 @@ class KensahyouSokuteidatasController  extends AppController
         $j = $i + 1;
         if(isset($ImKikakus[$i])) {
           if($ImKikakus[$i]['kind_kensa'] != "") {
-            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];
             $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
           }else{
           }
         }else{
-          ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+          ${"ImKikakuid_".$j} = "ノギス";
           $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
         }
       }
 
-      $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+      $KensahyouHeadbik = $KensahyouHead[0]->bik;
       $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
 
     	$this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find('all', Array(//セット
-    	'conditions' => Array('product_code' => $product_code,'lot_num' => $lot_num,'delete_flag' => '0','manu_date' => $data[2]),//条件$data[1]['date']はgetで送られたmanu_date
+    	'conditions' => Array('product_code' => $product_code,'lot_num' => $lot_num,'delete_flag' => '0','manu_date' => $data[2]),
     	'order' => array('cavi_num ASC')//cavi_numの小さい順
     	)));
-
 
     }
 
@@ -382,12 +381,12 @@ class KensahyouSokuteidatasController  extends AppController
       $j = $i + 1;
       if(isset($ImKikakus[$i])) {
         if($ImKikakus[$i]['kind_kensa'] != "") {
-          ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+          ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];
           $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
         }else{
         }
       }else{
-        ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+        ${"ImKikakuid_".$j} = "ノギス";
         $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
       }
     }
@@ -474,12 +473,12 @@ class KensahyouSokuteidatasController  extends AppController
         $j = $i + 1;
         if(isset($ImKikakus[$i])) {
           if($ImKikakus[$i]['kind_kensa'] != "") {
-            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];
             $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
           }else{
           }
         }else{
-          ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+          ${"ImKikakuid_".$j} = "ノギス";
           $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
         }
       }
@@ -673,12 +672,12 @@ class KensahyouSokuteidatasController  extends AppController
         $j = $i + 1;
         if(isset($ImKikakus[$i])) {
           if($ImKikakus[$i]['kind_kensa'] != "") {
-            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];
             $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
           }else{
           }
         }else{
-          ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+          ${"ImKikakuid_".$j} = "ノギス";
           $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
         }
       }
@@ -820,12 +819,12 @@ class KensahyouSokuteidatasController  extends AppController
         $j = $i + 1;
         if(isset($ImKikakus[$i])) {
           if($ImKikakus[$i]['kind_kensa'] != "") {
-            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];
             $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
           }else{
           }
         }else{
-          ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+          ${"ImKikakuid_".$j} = "ノギス";
           $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
         }
       }

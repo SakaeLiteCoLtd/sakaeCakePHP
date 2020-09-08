@@ -1121,6 +1121,7 @@ class KadousController extends AppController
           'id' => $kadouSeikei[$n]['id'],
           'pro_num' => $kadouSeikei[$n]['pro_num'],
           'starting_tm' => substr($kadouSeikei[$n]['starting_tm'], 0, 10),
+          'starting_tm_nippou' => substr($kadouSeikei[$n]['starting_tm'], 0, 19),
           'seikeiki' => $kadouSeikei[$n]['seikeiki']
         );
        }
@@ -1499,11 +1500,6 @@ class KadousController extends AppController
        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
      }
 
-/*
-     echo "<pre>";
-     print_r($datasession);
-     echo "</pre>";
-*/
      $imgdatanum = $datasession["imgnum"]["num"];
      $imgdatanummax = count($datasession["imgdata"]) - 1;
 
@@ -1577,12 +1573,157 @@ class KadousController extends AppController
      $arrImgpriority = ['1' => '主要グラフ','2' => 'その他'];
      $this->set('arrImgpriority',$arrImgpriority);
 
-     $dirName = "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/";
-     if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
-       $dirName = $dirName;
-     }else{
-       mkdir($dirName, 0777, TRUE);//フォルダ作成　※２階層以上の深さを一度に作成するときには、第３引数にTRUEを付ける
-     }
+     $pro_num = $datasession["imgdata"][$imgdatanum]["pro_num"];
+     $seikeiki = $datasession["imgdata"][$imgdatanum]["seikeiki"];
+     $starting_tm_nippou = $datasession["imgdata"][$imgdatanum]["starting_tm_nippou"];
+
+     $connection = ConnectionManager::get('big_DB');//旧DBを参照
+     $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+     $table->setConnection($connection);
+
+     $sql = "SELECT status_making_graph, lot_code
+     FROM log_confirm_kadou_seikeikis".
+     " where starting_tm_nippou = '".$starting_tm_nippou."' and product_code = '".$pro_num."' and seikeiki = '".$seikeiki."'";
+     $connection = ConnectionManager::get('big_DB');
+     $status_making_graphs = $connection->execute($sql)->fetchAll('assoc');
+
+     $connection = ConnectionManager::get('default');
+     $table->setConnection($connection);
+/*
+     echo "<pre>";
+     print_r($status_making_graphs);
+     echo "</pre>";
+*/
+     $arrAll = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//webrootフォルダにファイルが存在するか確認
+     $countfile = count($arrAll);
+
+     $mes = "";
+     $this->set('mes',$mes);
+
+     if($countfile > 0){//webrootフォルダにファイルが存在しているときはそのまま表示する
+
+       $graphcheck = 1;
+       $this->set('graphcheck',$graphcheck);
+
+     }else{//webrootフォルダにファイルが存在していないとき
+
+       if(isset($status_making_graphs[0])){//①そもそもそのグラフが存在するか確認して、存在する場合
+
+         if($status_making_graphs[0]["status_making_graph"] == 1){//②グラフ作成が終わっている場合、グラフのコピーへ
+/*
+           echo "<pre>";
+           print_r($seikeiki." --- ".$pro_num." --- ".$starting_tm_nippou);
+           echo "</pre>";
+*/
+           $dirName = "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/";
+           if(is_dir($dirName)){//フォルダ自体はwebrootに存在する場合
+             $dirName = $dirName;
+           }else{//フォルダがwebrootに存在しない場合
+             mkdir($dirName, 0777, TRUE);//フォルダ作成　※２階層以上の深さを一度に作成するときには、第３引数にTRUEを付ける
+           }
+
+           $arrAllfiles = glob("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
+    //       $arrAllfiles = glob("img/kadouimgcopy/$product_code/$date_y/$date_m/$date_d/前回比較/*");
+
+           $countfile = count($arrAllfiles);
+
+           $arrAllfilesmoto = array();
+
+           for($k=0; $k<$countfile; $k++){
+
+             ${"file".$k} = explode("/",$arrAllfiles[$k]);
+
+      //       $arrPngfiles[] = ${"file".$k}[7];//ローカル
+             $arrPngfiles[] = ${"file".$k}[9];//192
+             $this->set('arrPngfiles',$arrPngfiles);
+
+      //       $file_name = ${"file".$k}[7];//ローカル
+             $file_name = ${"file".$k}[9];//192
+
+              copy("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");//192.168.4.246
+        //      copy("img/kadouimgcopy/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");//ローカル
+
+             $arrAllfilesmoto[] = $file_name;
+
+           }
+
+           $arrAllfilesWebroot = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");
+           $countfileWebroot = count($arrAllfilesWebroot);
+           $arrAllfilesafter = array();
+
+           for($k=0; $k<$countfileWebroot; $k++){
+      //       $file_name = ${"file".$k}[7];//ローカル
+             $file_name = ${"file".$k}[9];//192
+             $arrAllfilesafter[] = $file_name;
+           }
+
+           if($countfileWebroot == 0){//フォルダが空の場合
+
+             $mes = "品番：".$product_code."　日付：".$date_sta." のグラフデータはありません。";
+             $this->set('mes',$mes);
+
+           }
+
+           if(count(array_diff($arrAllfilesmoto, $arrAllfilesafter)) > 0){//一部のファイルがコピーできていない
+
+             echo "<pre>";
+             print_r("以下のファイルが正しくコピーできていません。");
+             echo "</pre>";
+             echo "<pre>";
+             print_r(array_diff($arrAllfilesmoto, $arrAllfilesafter));
+             echo "</pre>";
+
+             $mes = "グラフのコピー中に異常が発生しました。管理者に報告してください。";
+             $this->set('mes',$mes);
+
+             $graphcheck = 2;
+             $this->set('graphcheck',$graphcheck);
+
+             $connection = ConnectionManager::get('big_DB');
+             $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+             $table->setConnection($connection);
+
+             $statusnum = 9;
+
+             $updater = "UPDATE log_confirm_kadou_seikeikis set status_making_graph = '".$statusnum."'
+             where starting_tm_nippou ='".$starting_tm_nippou."' and product_code ='".$pro_num."' and seikeiki ='".$seikeiki."'";
+             $connection->execute($updater);
+
+             $connection = ConnectionManager::get('default');
+             $table->setConnection($connection);
+
+           }else{//ちゃんとコピーされている場合そのまま出力
+
+             $graphcheck = 1;
+             $this->set('graphcheck',$graphcheck);
+
+           }
+
+         }else{//②グラフ作成が終わっていない
+
+           $mes = "グラフ作成中です。しばらくたってからやり直してください。";
+           $this->set('mes',$mes);
+
+           $graphcheck = 3;
+           $this->set('graphcheck',$graphcheck);
+
+         }
+
+       }else{//①そもそもそのグラフが存在しない
+/*
+         echo "<pre>";
+         print_r("グラフが存在しません");
+         echo "</pre>";
+*/
+         $mes = "品番：".$product_code."　日付：".$date_sta." のグラフデータはありません。";
+         $this->set('mes',$mes);
+
+         $graphcheck = 4;
+         $this->set('graphcheck',$graphcheck);
+
+       }
+
+    }
 
      $primary_num = 0;
      $connection = ConnectionManager::get('big_DB');//旧DBを参照
@@ -1595,11 +1736,6 @@ class KadousController extends AppController
      $arrColumns = $connection->execute($sql)->fetchAll('assoc');
 
      $sql = "SELECT lot_code FROM log_confirm_kadou_seikeikis".
-     " where starting_tm_nippou <= '".$date_to."' and product_code = '".$product_code."' and seikeiki = '".$seikeiki."' order by starting_tm_nippou desc limit 3";
-     $connection = ConnectionManager::get('big_DB');
-     $lot_codes = $connection->execute($sql)->fetchAll('assoc');
-
-     $sql = "SELECT lot_code FROM log_confirm_kadou_seikeikis".
      " where starting_tm_nippou <= '".$date_to."' and product_code = '".$product_code."' and seikeiki = '".$seikeiki."' order by starting_tm_nippou desc limit 50";
      $connection = ConnectionManager::get('big_DB');
      $lot_codes = $connection->execute($sql)->fetchAll('assoc');
@@ -1607,11 +1743,6 @@ class KadousController extends AppController
      $lot_codes = array_unique($lot_codes, SORT_REGULAR);//重複削除
      $lot_codes = array_values($lot_codes);
 
-/*
-     echo "<pre>";
-     print_r($lot_codes);
-     echo "</pre>";
-*/
      if(isset($lot_codes[0])){
        $lot_codes1 = $lot_codes[0]["lot_code"];
      }else{
@@ -1645,43 +1776,6 @@ class KadousController extends AppController
      $file_name7 = $seikeiki."_plot_time_measure.png";
      $file_name8 = $seikeiki."_plot_place_cushion.png";
 
-     //ローカル
-     //存在するならファイルをコピー
-/*
-     for($k=1; $k<9; $k++){
-       $file_name = "file_name".$k;
-       if (file_exists("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
-         copy("img/kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
-       }
-     }
-
-     $gif1 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
-     $this->set('gif1',$gif1);
-     $gif2 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
-     $this->set('gif2',$gif2);
-     $gif3 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name3";
-     $this->set('gif3',$gif3);
-     $gif4 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name4";
-     $this->set('gif4',$gif4);
-     $gif5 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name5";
-     $this->set('gif5',$gif5);
-     $gif6 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name6";
-     $this->set('gif6',$gif6);
-     $gif7 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name7";
-     $this->set('gif7',$gif7);
-     $gif8 = "kadouimg/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
-     $this->set('gif8',$gif8);
-*/
-
-     //192.168.4.246
-
-     for($k=1; $k<9; $k++){
-       $file_name = ${"file_name".$k};
-       if (file_exists("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name")) {
-         copy("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
-       }
-     }
-
      $gif1 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
      $this->set('gif1',$gif1);
      $gif2 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name2";
@@ -1699,18 +1793,6 @@ class KadousController extends AppController
      $gif8 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name8";
      $this->set('gif8',$gif8);
 
-      //$arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
-      $arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
-      $countfile = count($arrAllfiles);
-
-      if($countfile == 0){//フォルダが空の場合
-        $mes = "品番：".$product_code."　日付：".$date_sta." のグラフデータはありません。";
-        $this->set('mes',$mes);
-      }else{
-        $mes = "";
-        $this->set('mes',$mes);
-      }
-
    }
 
    public function imgkensakuichiran()
@@ -1725,10 +1807,10 @@ class KadousController extends AppController
       $session = $this->request->getSession();
       $datasession = $session->read();
 
-     if(!isset($datasession["imgnum"])){
-       return $this->redirect(['action' => 'kensakuform',
-       's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
-     }
+      if(!isset($datasession["imgnum"])){
+        return $this->redirect(['action' => 'kensakuform',
+        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+      }
 
       $imgdatanum = $datasession["imgnum"]["num"];
       $product_code = $datasession["imgdata"][$imgdatanum]["pro_num"];
@@ -1762,11 +1844,10 @@ class KadousController extends AppController
        $typecheck = 1;
        $this->set('typecheck',$typecheck);
 
-       $arrAllfiles = glob("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");
-
+       $arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
        $countfile = count($arrAllfiles);
-       $arrPngfiles = array();
 
+       $arrPngfiles = array();
        if($countfile == 0){
          $this->set('arrPngfiles',$arrPngfiles);
        }
@@ -1775,30 +1856,15 @@ class KadousController extends AppController
 
          ${"file".$k} = explode("/",$arrAllfiles[$k]);
 
-         ${"seikeikicheck".$k} = substr(${"file".$k}[9], 0, 1);
-         ${"pngcheck".$k} = substr(${"file".$k}[9], -3, 3);
-/*
-         echo "<pre>";
-         print_r(${"file".$k});
-         echo "</pre>";
-*/
-         if(${"pngcheck".$k} == "png" && ${"seikeikicheck".$k} == $seikeiki){
+         $arrPngfiles[] = ${"file".$k}[7];//ローカル
+  //       $arrPngfiles[] = ${"file".$k}[9];
+         $this->set('arrPngfiles',$arrPngfiles);
 
-           $arrPngfiles[] = ${"file".$k}[9];
-           $this->set('arrPngfiles',$arrPngfiles);
+         $file_name = ${"file".$k}[7];//ローカル
+  //       $file_name = ${"file".$k}[9];
 
-           $file_name = ${"file".$k}[9];
-
-           copy("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
-
-           ${"gif".$k} = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
-           $this->set('gif'.$k,${"gif".$k});
-
-         }
-
-         if(count($arrPngfiles) == 0){
-           $this->set('arrPngfiles',$arrPngfiles);
-         }
+         ${"gif".$k} = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
+         $this->set('gif'.$k,${"gif".$k});
 
        }
 
@@ -1815,12 +1881,6 @@ class KadousController extends AppController
        $file_name6 = $seikeiki."_plot_time_injection.png";
        $file_name7 = $seikeiki."_plot_time_measure.png";
        $file_name8 = $seikeiki."_plot_place_cushion.png";
-
-       for($k=1; $k<9; $k++){
-
-         $file_name = ${"file_name".$k};
-
-       }
 
        $gif1 = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name1";
        $this->set('gif1',$gif1);
@@ -1851,7 +1911,7 @@ class KadousController extends AppController
 
      }
 
-     $arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//192
+     $arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//ローカル
      $countfile = count($arrAllfiles);
 
      if($countfile == 0){//フォルダが空の場合

@@ -867,7 +867,7 @@ class KadousController extends AppController
         $mess = "";
         $this->set('mess',$mess);
       }
-
+/*
       //ファイルを移動させたいディレクトリの指定
       $origin_directory = "/data/share/mkNewDir/";//元々のフォルダ
       $move_directory = "img/shotgraphs/";//webrootのフォルダ
@@ -887,8 +887,8 @@ class KadousController extends AppController
 
          }else{
 
-           rename($origin_directory.$pro_code, $move_directory.$pro_code);
-           chmod($move_directory.$pro_code, 0777);
+    //       rename($origin_directory.$pro_code, $move_directory.$pro_code);
+    //       chmod($move_directory.$pro_code, 0777);
 
          }
 
@@ -907,8 +907,8 @@ class KadousController extends AppController
 
            }else{
 
-             rename($origin_directory.$pro_code."/".$year, $move_directory.$pro_code."/".$year);
-             chmod($move_directory.$pro_code, 0777);
+    //         rmdir($origin_directory.$pro_code."/".$year, $move_directory.$pro_code."/".$year);
+    //         chmod($move_directory.$pro_code, 0777);
 
            }
 
@@ -928,8 +928,8 @@ class KadousController extends AppController
 
              }else{
 
-               rename($origin_directory.$pro_code."/".$year."/".$month, $move_directory.$pro_code."/".$year."/".$month);
-               chmod($move_directory.$pro_code, 0777);
+    //           rmdir($origin_directory.$pro_code."/".$year."/".$month, $move_directory.$pro_code."/".$year."/".$month);
+    //           chmod($move_directory.$pro_code, 0777);
 
              }
 
@@ -948,25 +948,17 @@ class KadousController extends AppController
                  $dirname = $move_directory.$pro_code."/".$year."/".$month."/".$day;
                  $dir = glob("$dirname/前回比較/*");
 
-                 foreach ($dir as $file){
-                   if (unlink($file)){
-                     $l = $l;
-                   }else{
-                     $l = $l;
-                   }
-                 }
-
                if(is_dir($move_directory.$pro_code."/".$year."/".$month."/".$day."/前回比較")){
-                 rmdir($move_directory.$pro_code."/".$year."/".$month."/".$day."/前回比較");
+      //           rmdir($move_directory.$pro_code."/".$year."/".$month."/".$day."/前回比較");
                }
-                 rmdir($move_directory.$pro_code."/".$year."/".$month."/".$day);
-                 rename($origin_directory.$pro_code."/".$year."/".$month."/".$day, $move_directory.$pro_code."/".$year."/".$month."/".$day);
+      //           rmdir($move_directory.$pro_code."/".$year."/".$month."/".$day);
+      //           rename($origin_directory.$pro_code."/".$year."/".$month."/".$day, $move_directory.$pro_code."/".$year."/".$month."/".$day);
             //     chmod($move_directory.$pro_code, 0777);
 
                }else{//なければrename
 
-                 rename($origin_directory.$pro_code."/".$year."/".$month."/".$day, $move_directory.$pro_code."/".$year."/".$month."/".$day);
-                 chmod($move_directory.$pro_code, 0777);
+      //           rename($origin_directory.$pro_code."/".$year."/".$month."/".$day, $move_directory.$pro_code."/".$year."/".$month."/".$day);
+      //           chmod($move_directory.$pro_code, 0777);
 
                }
 
@@ -977,7 +969,7 @@ class KadousController extends AppController
         }
 
       }
-
+*/
     }
 
     public function kensakuview()//ロット検索
@@ -1607,6 +1599,19 @@ class KadousController extends AppController
      $connection = ConnectionManager::get('big_DB');
      $lot_codes = $connection->execute($sql)->fetchAll('assoc');
 
+     $sql = "SELECT lot_code FROM log_confirm_kadou_seikeikis".
+     " where starting_tm_nippou <= '".$date_to."' and product_code = '".$product_code."' and seikeiki = '".$seikeiki."' order by starting_tm_nippou desc limit 50";
+     $connection = ConnectionManager::get('big_DB');
+     $lot_codes = $connection->execute($sql)->fetchAll('assoc');
+
+     $lot_codes = array_unique($lot_codes, SORT_REGULAR);//重複削除
+     $lot_codes = array_values($lot_codes);
+
+/*
+     echo "<pre>";
+     print_r($lot_codes);
+     echo "</pre>";
+*/
      if(isset($lot_codes[0])){
        $lot_codes1 = $lot_codes[0]["lot_code"];
      }else{
@@ -1757,10 +1762,7 @@ class KadousController extends AppController
        $typecheck = 1;
        $this->set('typecheck',$typecheck);
 
-       $arrAllfiles = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");
-       echo "<pre>";
-       print_r($arrAllfiles);
-       echo "</pre>";
+       $arrAllfiles = glob("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");
 
        $countfile = count($arrAllfiles);
        $arrPngfiles = array();
@@ -1773,15 +1775,21 @@ class KadousController extends AppController
 
          ${"file".$k} = explode("/",$arrAllfiles[$k]);
 
-         ${"seikeikicheck".$k} = substr(${"file".$k}[7], 0, 1);
-         ${"pngcheck".$k} = substr(${"file".$k}[7], -3, 3);
-
+         ${"seikeikicheck".$k} = substr(${"file".$k}[9], 0, 1);
+         ${"pngcheck".$k} = substr(${"file".$k}[9], -3, 3);
+/*
+         echo "<pre>";
+         print_r(${"file".$k});
+         echo "</pre>";
+*/
          if(${"pngcheck".$k} == "png" && ${"seikeikicheck".$k} == $seikeiki){
 
-           $arrPngfiles[] = ${"file".$k}[7];
+           $arrPngfiles[] = ${"file".$k}[9];
            $this->set('arrPngfiles',$arrPngfiles);
 
-           $file_name = ${"file".$k}[7];
+           $file_name = ${"file".$k}[9];
+
+           copy("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name", "img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name");
 
            ${"gif".$k} = "shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/$file_name";
            $this->set('gif'.$k,${"gif".$k});

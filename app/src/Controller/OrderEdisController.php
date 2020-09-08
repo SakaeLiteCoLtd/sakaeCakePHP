@@ -519,7 +519,12 @@ echo "</pre>";
             break;
           }
         }
-
+/*
+        echo "<pre>";
+        print_r("arrEDI");
+        print_r($arrEDI);
+        echo "</pre>";
+*/
         //同じcsvを入れようとした場合
         $EDInum = count($arrEDI);
         for($k=0; $k<$EDInum; $k++){//組み立て品登録
@@ -552,6 +557,9 @@ echo "</pre>";
       $connection->begin();//トランザクション3
       try {//トランザクション4
           if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
+            echo "<pre>";
+            print_r("1");
+            echo "</pre>";
 
             $arrFp = array();//空の配列を作る
             $arrFp = $arrEDI;
@@ -992,7 +1000,8 @@ echo "</pre>";
               file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
               $connection->commit();// コミット5
         } else {
-          $mes = "※登録されませんでした";
+
+          $mes = "※登録されませんでした。製品名にカンマが含まれていないか確認してください。";
           $this->set('mes',$mes);
           file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
           $this->Flash->error(__('This orderEdis could not be saved. Please, try again.'));

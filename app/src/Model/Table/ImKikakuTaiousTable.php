@@ -36,11 +36,12 @@ class ImKikakuTaiousTable extends Table
         $this->setTable('im_kikaku_taious');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
-
+/*
         $this->belongsTo('Products', [
             'foreignKey' => 'product_id',
             'joinType' => 'INNER'
         ]);
+*/
    }
 
     /**
@@ -75,10 +76,12 @@ class ImKikakuTaiousTable extends Table
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
+     /*
     public function buildRules(RulesChecker $rules)
     {
       $rules->add($rules->existsIn(['product_id'], 'Products'));
 
       return $rules;
     }
+    */
 }

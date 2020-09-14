@@ -17,7 +17,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
       for($n=1; $n<=9; $n++){
               $resultArray = Array();
                   $_SESSION['kikakudata'][$n] = array(
-                    'product_id' => $_POST['product_id'],
+                    'product_code' => $_POST['product_code'],
                     'kensahyuo_num' => $n,
                     "kind_kensa" => $_POST["kind_kensa_{$n}"],
                     "size_num" => $_POST["size_num_{$n}"],
@@ -85,7 +85,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <br>
 <br>
 <?php
-      echo $this->Form->hidden('product_id' ,['value'=>$product_id]);
+      echo $this->Form->hidden('product_code' ,['value'=>$product_code]);
 ?>
 </fieldset>
         <p align="center"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>

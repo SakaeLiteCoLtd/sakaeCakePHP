@@ -52,7 +52,7 @@ $this->layout = 'defaultshinki';
     <td width="282" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色調</strong></td>
 	</tr>
   <tr>
-    <td width="140" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('m_grade', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="140" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('m_grade', array('type'=>'text', 'label'=>false,  'required'=>true)) ?></td>
     <td width="140"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('col_num', array('type'=>'text', 'label'=>false)) ?></td>
     <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("color", ["type"=>"select","empty"=>"選択してください", "options"=>$arrColor, 'label'=>false]) ?></td>
 	</tr>
@@ -60,12 +60,12 @@ $this->layout = 'defaultshinki';
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">原料の種類</strong></td>
-    <td width="280" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">単価（円/kg）</strong></td>
+    <td width="280" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">単価（円/個）</strong></td>
 	</tr>
   <tr>
     <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("material_kind", ["type"=>"select","empty"=>"選択してください", "options"=>$arrMultipleCs, 'label'=>false]) ?></td>
     <td width="220" bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><?= $this->Form->control('price', array('type'=>'text', 'label'=>false)) ?></td>
-    <td width="62" bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">円/kg</strong></td>
+    <td width="62" bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">円/個</strong></td>
 	</tr>
 </table>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">

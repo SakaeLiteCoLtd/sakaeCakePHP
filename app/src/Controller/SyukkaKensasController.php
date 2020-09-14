@@ -49,8 +49,8 @@ class SyukkaKensasController extends AppController {
       $product_code = $data["product_code"];
       $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
-    	$product_id = $Product[0]->id;
-      $this->set('product_id',$product_id);//セット
+    //	$product_id = $Product[0]->id;
+    //  $this->set('product_id',$product_id);//セット
 
       $ImKikakuex = $this->ImKikakuTaious->find()->where(['product_code' => $product_code])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
       $this->set('ImKikakuex',$ImKikakuex);//セット
@@ -99,7 +99,7 @@ class SyukkaKensasController extends AppController {
     	]);
 
     	 foreach ($Products as $value) {//$Productsそれぞれに対し
-    		$product_code= $value->product_code;//idに$product_idと名前を付ける
+    		$product_code= $value->product_code;
     	}
     	$this->set('product_code',$product_code);//セット
 
@@ -145,11 +145,13 @@ class SyukkaKensasController extends AppController {
      $product_id = $sessiondata['kikakudata'][1]['product_id'];//$dataの'product_code'を$product_codeに
 */
      $data = $this->request->getData();
-     $product_id = $data['product_id'];
-     $this->set('product_id',$product_id);//セット
-     $Product = $this->Products->find()->where(['id' => $product_id])->toArray();
-     $product_code = $Product[0]->product_code;
+     $product_code = $data["product_code"];
+  //   $product_id = $data['product_id'];
+  //   $this->set('product_id',$product_id);//セット
+  //   $Product = $this->Products->find()->where(['id' => $product_id])->toArray();
+  //   $product_code = $Product[0]->product_code;
      $this->set('product_code',$product_code);//セット
+     $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
      $Productname = $Product[0]->product_name;
      $this->set('Productname',$Productname);//セット
 
@@ -157,7 +159,7 @@ class SyukkaKensasController extends AppController {
        'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
      ]);
      foreach ($Products as $value) {//$Productsそれぞれに対し
-      $product_code= $value->product_code;//idに$product_idと名前を付ける
+      $product_code= $value->product_code;
     }
     $this->set('product_code',$product_code);//セット
 
@@ -206,21 +208,16 @@ class SyukkaKensasController extends AppController {
        }
    }
 
-
     public function imtaioudo()//IMtaiou
     {
    //   $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
    $session = $this->request->getSession();
    $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
    $data = $sessiondata['kikakudata'];
-/*
-   echo "<pre>";
-   print_r($data);
-   echo "</pre>";
-*/
-   $product_id = $sessiondata['kikakudata'][1]['product_id'];//$dataの'product_code'を$product_codeに
-   $this->set('product_id',$product_id);//セット
-   $Product = $this->Products->find()->where(['id' => $product_id])->toArray();
+
+//   $product_id = $sessiondata['kikakudata'][1]['product_id'];//$dataの'product_code'を$product_codeに
+//   $this->set('product_id',$product_id);//セット
+   $Product = $this->Products->find()->where(['product_code' => $sessiondata['kikakudata'][1]['product_code']])->toArray();
    $product_code = $Product[0]->product_code;
    $this->set('product_code',$product_code);//セット
    $Productname = $Product[0]->product_name;
@@ -230,7 +227,7 @@ class SyukkaKensasController extends AppController {
      'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
    ]);
    foreach ($Products as $value) {//$Productsそれぞれに対し
-    $product_code= $value->product_code;//idに$product_idと名前を付ける
+    $product_code= $value->product_code;
   }
   $this->set('product_code',$product_code);//セット
 
@@ -240,7 +237,11 @@ class SyukkaKensasController extends AppController {
 
    $ImKikakuTaiou = $this->ImKikakuTaious->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
    $this->set('ImKikakuTaiou',$ImKikakuTaiou);//セット
-
+/*
+   echo "<pre>";
+   print_r($data);
+   echo "</pre>";
+*/
       if ($this->request->is('get')) {//getなら登録
         $ImKikakuTaiou = $this->ImKikakuTaious->patchEntities($ImKikakuTaiou, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
         $connection = ConnectionManager::get('default');//トランザクション1
@@ -578,10 +579,10 @@ class SyukkaKensasController extends AppController {
                                       $session = $this->request->session();
                                       $session->write('kind_kensa', $kind_kensa);
 
-                                    	$ProductData = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                                    	$product_id = $ProductData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+                                    //	$ProductData = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                    //	$product_id = $ProductData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
 
-                                      $arrIm_heads[] = $product_id;
+                                      $arrIm_heads[] = $product_code;
                                       $arrIm_heads[] = $kind_kensa;
                                       $arrIm_heads[] = $inspec_date;
                                       $arrIm_heads[] = ${"arruniLot_num".$countname}[$k-1];
@@ -787,7 +788,7 @@ class SyukkaKensasController extends AppController {
     	]);
 
       foreach ($Products as $value) {//$Productsそれぞれに対し
-       $product_code= $value->product_code;//idに$product_idと名前を付ける
+       $product_code= $value->product_code;
      }
      $this->set('product_code',$product_code);//セット
 
@@ -856,7 +857,7 @@ class SyukkaKensasController extends AppController {
     	]);
 
       foreach ($Products as $value) {//$Productsそれぞれに対し
-       $product_code= $value->product_code;//idに$product_idと名前を付ける
+       $product_code= $value->product_code;
      }
      $this->set('product_code',$product_code);//セット
 
@@ -977,7 +978,7 @@ if(isset($ImSokuteidataHead[0])){
        'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
      ]);
      foreach ($Products as $value) {//$Productsそれぞれに対し
-      $product_code= $value->product_code;//idに$product_idと名前を付ける
+      $product_code= $value->product_code;
     }
     $this->set('product_code',$product_code);//セット
 
@@ -1155,7 +1156,7 @@ if(isset($ImSokuteidataHead[0])){
    ]);
 
    foreach ($Products as $value) {//$Productsそれぞれに対し
-    $product_code= $value->product_code;//idに$product_idと名前を付ける
+    $product_code= $value->product_code;
   }
   $this->set('product_code',$product_code);//セット
 

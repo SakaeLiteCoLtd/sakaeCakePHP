@@ -895,4 +895,286 @@ class ProductsController extends AppController
 	}
 
 
+			public function shotcycleyobidasiform()
+		 {
+			 $ZensuProducts = $this->ZensuProducts->newEntity();
+			 $this->set('ZensuProducts',$ZensuProducts);
+		 }
+
+			 public function shotcycleyobidasiview()
+			{
+				$ZensuProducts = $this->ZensuProducts->newEntity();
+				$this->set('ZensuProducts',$ZensuProducts);
+
+			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+			 $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $data['product_code']])->toArray();
+			 if(isset($ZensuProduct[0])){
+					$shot_cycle = $ZensuProduct[0]->shot_cycle;
+					$this->set('shot_cycle',$shot_cycle);
+				}else{
+					echo "<pre>";
+					print_r("その製品はデータベースに存在しません。");
+					echo "</pre>";
+				}
+
+			}
+
+			public function shotcyclesyuuseikensaku()
+		 {
+			 $ZensuProducts = $this->ZensuProducts->newEntity();
+			 $this->set('ZensuProducts',$ZensuProducts);
+		 }
+
+			 public function shotcyclesyuuseiform()
+			{
+				$session = $this->request->getSession();
+	      $sessionData = $session->read();
+
+	      if(!isset($sessionData['login'])){
+	        return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
+	      }
+
+				$ZensuProducts = $this->ZensuProducts->newEntity();
+				$this->set('ZensuProducts',$ZensuProducts);
+
+				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+				 $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $data['product_code']])->toArray();
+				 if(isset($ZensuProduct[0])){
+	  				$ZensuProductId = $ZensuProduct[0]->id;
+	  				$this->set('ZensuProductId',$ZensuProductId);
+	  			}else{
+						echo "<pre>";
+						print_r("その製品はデータベースに存在しません。");
+						echo "</pre>";
+	  			}
+
+			}
+
+			public function shotcyclesyuuseiconfirm()
+		 {
+			 $ZensuProducts = $this->ZensuProducts->newEntity();
+			 $this->set('ZensuProducts',$ZensuProducts);
+
+			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+				$session = $this->request->getSession();
+				session_start();
+				$_SESSION['shotcycledatasyuusei'] = array(
+					'id' => $data['ZensuProductId'],
+					'product_code' => $data['product_code'],
+					'shot_cycle' => $data['shot_cycle'],
+					'updated_at' => date('Y-m-d H:i:s')
+				);
+/*
+				echo "<pre>";
+				print_r($_SESSION);
+				echo "</pre>";
+	*/
+		 }
+
+		 		public function shotcyclesyuuseido()
+		 	 {
+				 $ZensuProducts = $this->ZensuProducts->newEntity();
+				 $this->set('ZensuProducts',$ZensuProducts);
+
+				 $session = $this->request->getSession();
+	       $data = $session->read();
+	       $this->set('data',$data);
+
+				 $updated_staff = array('updated_staff'=>$data['login']['staff_id']);
+				 $_SESSION['shotcycledatasyuusei'] = array_merge($_SESSION['shotcycledatasyuusei'],$updated_staff);
+	/*
+	       echo "<pre>";
+	       print_r($data);
+	       echo "</pre>";
+	*/
+				 if ($this->request->is('post')) {
+					 $ZensuProduct = $this->ZensuProducts->patchEntity($ZensuProducts, $data['shotcycledatasyuusei']);
+					 $connection = ConnectionManager::get('default');//トランザクション1
+	  				// トランザクション開始2
+	  				$connection->begin();//トランザクション3
+	  				try {//トランザクション4
+							if ($this->ZensuProducts->updateAll(//検査終了時間の更新
+								['shot_cycle' => $data['shotcycledatasyuusei']['shot_cycle'], 'update_at' => date('Y-m-d H:i:s'), 'update_staff' => $_SESSION['shotcycledatasyuusei']['updated_staff']],
+								['id'  => $data['shotcycledatasyuusei']['id']]
+							)){
+
+	 							//旧DBに単価登録
+	 							$connection = ConnectionManager::get('DB_ikou_test');
+	 							$table = TableRegistry::get('zensu_product');
+	 							$table->setConnection($connection);
+
+								$updater = "UPDATE zensu_product set shot_cycle = '".$data['shotcycledatasyuusei']['shot_cycle']."'
+								, update_at = '".date('Y-m-d H:i:s')."' , update_staff = '".$_SESSION['shotcycledatasyuusei']['updated_staff']."'
+	              where product_id ='".$_SESSION['shotcycledatasyuusei']['product_code']."'";
+	              $connection->execute($updater);
+
+	 							$connection = ConnectionManager::get('default');//新DBに戻る
+	 							$table->setConnection($connection);
+
+	 						$mes = "※下記のように登録されました";
+	 						$this->set('mes',$mes);
+	 						$connection->commit();// コミット5
+
+	 					} else {
+
+	 						$mes = "※登録されませんでした";
+	 						$this->set('mes',$mes);
+	 						$this->Flash->error(__('The product could not be saved. Please, try again.'));
+	 						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+	 					}
+
+	 				} catch (Exception $e) {//トランザクション7
+	 				//ロールバック8
+	 					$connection->rollback();//トランザクション9
+	 				}//トランザクション10
+
+	 			}
+
+		 	 }
+
+			 public function kijyunyobidasiform()
+ 		 {
+ 			 $ZensuProducts = $this->ZensuProducts->newEntity();
+ 			 $this->set('ZensuProducts',$ZensuProducts);
+ 		 }
+
+ 			 public function kijyunyobidasiview()
+ 			{
+ 				$ZensuProducts = $this->ZensuProducts->newEntity();
+ 				$this->set('ZensuProducts',$ZensuProducts);
+
+ 			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+ 			 $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $data['product_code']])->toArray();
+ 			 if(isset($ZensuProduct[0])){
+ 					$kijyun = $ZensuProduct[0]->kijyun;
+ 					$this->set('kijyun',$kijyun);
+ 				}else{
+ 					echo "<pre>";
+ 					print_r("その製品はデータベースに存在しません。");
+ 					echo "</pre>";
+ 				}
+
+ 			}
+
+ 			public function kijyunsyuuseikensaku()
+ 		 {
+ 			 $ZensuProducts = $this->ZensuProducts->newEntity();
+ 			 $this->set('ZensuProducts',$ZensuProducts);
+ 		 }
+
+ 			 public function kijyunsyuuseiform()
+ 			{
+ 				$session = $this->request->getSession();
+ 	      $sessionData = $session->read();
+
+ 	      if(!isset($sessionData['login'])){
+ 	        return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
+ 	      }
+
+ 				$ZensuProducts = $this->ZensuProducts->newEntity();
+ 				$this->set('ZensuProducts',$ZensuProducts);
+
+ 				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+ 				 $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $data['product_code']])->toArray();
+ 				 if(isset($ZensuProduct[0])){
+ 	  				$ZensuProductId = $ZensuProduct[0]->id;
+ 	  				$this->set('ZensuProductId',$ZensuProductId);
+ 	  			}else{
+ 						echo "<pre>";
+ 						print_r("その製品はデータベースに存在しません。");
+ 						echo "</pre>";
+ 	  			}
+
+ 			}
+
+ 			public function kijyunsyuuseiconfirm()
+ 		 {
+ 			 $ZensuProducts = $this->ZensuProducts->newEntity();
+ 			 $this->set('ZensuProducts',$ZensuProducts);
+
+ 			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+ 				$session = $this->request->getSession();
+ 				session_start();
+ 				$_SESSION['kijyundatasyuusei'] = array(
+ 					'id' => $data['ZensuProductId'],
+ 					'product_code' => $data['product_code'],
+ 					'kijyun' => $data['kijyun'],
+ 					'updated_at' => date('Y-m-d H:i:s')
+ 				);
+ /*
+ 				echo "<pre>";
+ 				print_r($_SESSION);
+ 				echo "</pre>";
+ 	*/
+ 		 }
+
+ 		 		public function kijyunsyuuseido()
+ 		 	 {
+ 				 $ZensuProducts = $this->ZensuProducts->newEntity();
+ 				 $this->set('ZensuProducts',$ZensuProducts);
+
+ 				 $session = $this->request->getSession();
+ 	       $data = $session->read();
+ 	       $this->set('data',$data);
+
+ 				 $updated_staff = array('updated_staff'=>$data['login']['staff_id']);
+ 				 $_SESSION['kijyundatasyuusei'] = array_merge($_SESSION['kijyundatasyuusei'],$updated_staff);
+ 	/*
+ 	       echo "<pre>";
+ 	       print_r($data);
+ 	       echo "</pre>";
+ 	*/
+ 				 if ($this->request->is('post')) {
+ 					 $ZensuProduct = $this->ZensuProducts->patchEntity($ZensuProducts, $data['kijyundatasyuusei']);
+ 					 $connection = ConnectionManager::get('default');//トランザクション1
+ 	  				// トランザクション開始2
+ 	  				$connection->begin();//トランザクション3
+ 	  				try {//トランザクション4
+ 							if ($this->ZensuProducts->updateAll(//検査終了時間の更新
+ 								['kijyun' => $data['kijyundatasyuusei']['kijyun'], 'update_at' => date('Y-m-d H:i:s'), 'update_staff' => $_SESSION['kijyundatasyuusei']['updated_staff']],
+ 								['id'  => $data['kijyundatasyuusei']['id']]
+ 							)){
+
+ 	 							//旧DBに単価登録
+ 	 							$connection = ConnectionManager::get('DB_ikou_test');
+ 	 							$table = TableRegistry::get('zensu_product');
+ 	 							$table->setConnection($connection);
+
+ 								$updater = "UPDATE zensu_product set kijyun = '".$data['kijyundatasyuusei']['kijyun']."'
+ 								, update_at = '".date('Y-m-d H:i:s')."' , update_staff = '".$_SESSION['kijyundatasyuusei']['updated_staff']."'
+ 	              where product_id ='".$_SESSION['kijyundatasyuusei']['product_code']."'";
+ 	              $connection->execute($updater);
+
+ 	 							$connection = ConnectionManager::get('default');//新DBに戻る
+ 	 							$table->setConnection($connection);
+
+ 	 						$mes = "※下記のように登録されました";
+ 	 						$this->set('mes',$mes);
+ 	 						$connection->commit();// コミット5
+
+ 	 					} else {
+
+ 	 						$mes = "※登録されませんでした";
+ 	 						$this->set('mes',$mes);
+ 	 						$this->Flash->error(__('The product could not be saved. Please, try again.'));
+ 	 						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+ 	 					}
+
+ 	 				} catch (Exception $e) {//トランザクション7
+ 	 				//ロールバック8
+ 	 					$connection->rollback();//トランザクション9
+ 	 				}//トランザクション10
+
+ 	 			}
+
+ 		 	 }
+
 }

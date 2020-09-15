@@ -51,11 +51,11 @@ $this->layout = 'defaultshinki';
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
       <tr style="border-bottom: 0px;border-width: 0px">
-        <td width="300" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt"><strong style="font-size: 11pt; color:blue">単価（円/kg）</strong></td>
+        <td width="300" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt"><strong style="font-size: 11pt; color:blue">単価（円/個）</strong></td>
       </tr>
       <tr style="border-bottom: 0px;border-width: 0px">
         <td width="140" bgcolor="#FFFFCC" style="text-align: right;border-right-style: none"><?= h($price) ?></td>
-        <td width="140" bgcolor="#FFFFCC" style="text-align: left;border-left-style: none"><strong style="font-size: 11pt; color:blue">円/kg</strong></td>
+        <td width="140" bgcolor="#FFFFCC" style="text-align: left;border-left-style: none"><strong style="font-size: 11pt; color:blue">円/個</strong></td>
       </tr>
     </table>
   <br>

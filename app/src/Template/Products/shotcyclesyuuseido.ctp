@@ -17,7 +17,7 @@ $this->layout = 'defaultshinki';
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($AccountPriceProducts, ['url' => ['action' => 'pricesyuuseiconfirm']]);
+          echo $this->Form->create($ZensuProducts);
 
 ?>
 <hr size="5" style="margin: 0.5rem">
@@ -29,13 +29,16 @@ $this->layout = 'defaultshinki';
  <hr size="5" style="margin: 0.5rem">
  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
  <tr style="background-color: #E6FFFF">
-   <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_kensaku.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'products','action'=>'priceyobidasiform')));?></td>
-   <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_touroku.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'products','action'=>'pricesyuuseikensaku')));?></td>
+   <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_kensaku.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'products','action'=>'shotcycleyobidasiform')));?></td>
+   <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_touroku.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'products','action'=>'shotcyclesyuuseikensaku')));?></td>
  </tr>
  </table>
  <hr size="5" style="margin: 0.5rem">
  <br>
- <legend align="center"><strong style="font-size: 13pt; color:blue"><?= __("単価修正") ?></strong></legend>
+ <legend align="center"><strong style="font-size: 13pt; color:blue"><?= __("ショットサイクル修正") ?></strong></legend>
+<br>
+
+<legend align="center"><font color="red"><?= __($mes) ?></font></legend>
 <br>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -44,31 +47,19 @@ $this->layout = 'defaultshinki';
       <td width="300" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">品番</strong></div></td>
     </tr>
     <tr style="border-bottom: 0px;border-width: 0px">
-      <td bgcolor="#FFFFCC"><?= h($this->request->getData('product_code')) ?></td>
+      <td bgcolor="#FFFFCC"><?= h($data['shotcycledatasyuusei']['product_code']) ?></td>
     </tr>
   </table>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
       <tr style="border-bottom: 0px;border-width: 0px">
-        <td width="300" colspan="2" bgcolor="#FFFFCC" style="font-size: 12pt"><strong style="font-size: 11pt; color:blue">単価（円/個）</strong></td>
+        <td width="300" bgcolor="#FFFFCC" style="font-size: 12pt"><strong style="font-size: 11pt; color:blue">ショットサイクル</strong></td>
       </tr>
       <tr style="border-bottom: 0px;border-width: 0px">
-        <td width="220" bgcolor="#FFFFCC" style="border-right-style: none"><?= $this->Form->control('price', array('type'=>'text', 'label'=>false)) ?></td>
-        <td width="80" bgcolor="#FFFFCC" style="border-left-style: none"><strong style="font-size: 11pt; color:blue">円/個</strong></td>
+        <td width="300" bgcolor="#FFFFCC"><?= h($data['shotcycledatasyuusei']['shot_cycle']) ?></td>
       </tr>
     </table>
   <br>
-
-  <?php
-  echo $this->Form->hidden('product_code' ,['value'=>$this->request->getData('product_code')]);
-  echo $this->Form->hidden('AccountPriceProductId' ,['value'=>$AccountPriceProductId]);
-  ?>
-
-  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-    <tr bgcolor="#E6FFFF" >
-      <td align="center" rowspan="2" width="30" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'confirm', 'value'=>"1")); ?></div></td>
-    </tr>
-  </table>
 
 <br><br><br>

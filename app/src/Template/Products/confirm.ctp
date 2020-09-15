@@ -68,7 +68,12 @@ $this->layout = 'defaultshinki';
             $session->write('katakouzoudata.created_at', date('Y-m-d H:i:s'));
 
             $session->write('zensudata.product_code', $_POST['product_code']);
-            $session->write('zensudata.shot_cycle', $_POST['shot_cycle']);
+      //      $session->write('zensudata.shot_cycle', $_POST['shot_cycle']);
+            if(!empty($_POST['shot_cycle'])){
+              $session->write('zensudata.shot_cycle', $_POST['shot_cycle']);
+            }else{
+              $session->write('zensudata.shot_cycle', NULL);
+            }
 
             if(!empty($_POST['kijyun'])){
               $session->write('zensudata.kijyun', $_POST['kijyun']);

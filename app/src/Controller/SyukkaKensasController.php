@@ -32,7 +32,7 @@ class SyukkaKensasController extends AppController {
       //メニュー画面
     }
 
-    public function index1()//IMtaiou
+    public function improductform()//IMtaiou
     {
     	$this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
     }
@@ -41,42 +41,20 @@ class SyukkaKensasController extends AppController {
     {
     	$this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-/*
-      echo "<pre>";
- 		  print_r($data["product_code"]);
- 	  	echo "<br>";
-*/
+
       $product_code = $data["product_code"];
       $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
-    //	$product_id = $Product[0]->id;
-    //  $this->set('product_id',$product_id);//セット
 
       $ImKikakuex = $this->ImKikakuTaious->find()->where(['product_code' => $product_code])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
       $this->set('ImKikakuex',$ImKikakuex);//セット
-/*
-      if(isset($ImKikakuex[0])){
-        echo "<pre>";
-        print_r($ImKikakuex[0]['product_id']);
-        echo "<br>";
-      } else {
-        echo "<pre>";
-        print_r("else");
-        echo "<br>";
-     }
-*/
+
       $Productname = $Product[0]->product_name;
       $this->set('Productname',$Productname);//セット
 
       $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()
     	->where(['product_code' => $product_code])->toArray();
-      /*
-      if(isset($ImSokuteidataHeads[0])){
-        $kind_kensa = $ImSokuteidataHeads[0]->kind_kensa;
-      }else{
-        $kind_kensa = "";
-      }
-*/
+
       $arrKindKensa = array("","ノギス");//配列の初期化
     	 	foreach ($ImSokuteidataHeads as $value) {//それぞれに対して
     			$arrKindKensa[] = $value->kind_kensa;//配列に追加
@@ -85,11 +63,6 @@ class SyukkaKensasController extends AppController {
       $this->set('ImSokuteidataHeads',$ImSokuteidataHeads);//セット
       $this->set('arrKindKensa',$arrKindKensa);//セット
 
-/*
-      echo "<pre>";
- 		  print_r($arrKindKensa);
- 	  	echo "<br>";
-*/
       $this->loadModel("KensahyouSokuteidatas");
       $kensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();//newentityに$userという名前を付ける
     	$this->set('kensahyouSokuteidata',$kensahyouSokuteidatas);//空のカラムに$KensahyouSokuteidataと名前を付け、ctpで使えるようにセット
@@ -134,22 +107,10 @@ class SyukkaKensasController extends AppController {
 
     public function imtaiouconfirm()//IMtaiou
     {
-/*      $session = $this->request->getSession();
-      $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
-      $data = $sessiondata['kikakudata'];
 
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-
-     $product_id = $sessiondata['kikakudata'][1]['product_id'];//$dataの'product_code'を$product_codeに
-*/
      $data = $this->request->getData();
      $product_code = $data["product_code"];
-  //   $product_id = $data['product_id'];
-  //   $this->set('product_id',$product_id);//セット
-  //   $Product = $this->Products->find()->where(['id' => $product_id])->toArray();
-  //   $product_code = $Product[0]->product_code;
+
      $this->set('product_code',$product_code);//セット
      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
      $Productname = $Product[0]->product_name;
@@ -176,11 +137,8 @@ class SyukkaKensasController extends AppController {
 
      $session = $this->request->getSession();
      $data = $session->read();//postデータ取得し、$dataと名前を付ける
-/*
-     echo "<pre>";
-     print_r($data['kikakudata']);
-     echo "</pre>";
-*/    }
+
+    }
 
    public function imlogin()
    {
@@ -210,13 +168,11 @@ class SyukkaKensasController extends AppController {
 
     public function imtaioudo()//IMtaiou
     {
-   //   $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
    $session = $this->request->getSession();
    $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
    $data = $sessiondata['kikakudata'];
 
-//   $product_id = $sessiondata['kikakudata'][1]['product_id'];//$dataの'product_code'を$product_codeに
-//   $this->set('product_id',$product_id);//セット
    $Product = $this->Products->find()->where(['product_code' => $sessiondata['kikakudata'][1]['product_code']])->toArray();
    $product_code = $Product[0]->product_code;
    $this->set('product_code',$product_code);//セット
@@ -261,7 +217,7 @@ class SyukkaKensasController extends AppController {
       }
     }
 
-    public function index2()//取り込み画面
+    public function indexhome()//取り込み画面
     {
       $this->request->session()->destroy(); // セッションの破棄
 
@@ -269,188 +225,7 @@ class SyukkaKensasController extends AppController {
       $this->set('imKikakus', $imKikakus);
 
       $today = date("Y-m-d");
-/*
-      $dirName = 'data_IM測定/';//webroot内のフォルダ
-      $countname = 0;
-      $this->set('countname',$countname);//セット
 
-      if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
-    	  if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）
-    	    while(($folder = readdir($dir)) !== false){//親while（ディレクトリ内のファイル一覧を取得する）
-    	      if($folder != '.' && $folder != '..'){//フォルダーなら("."が無いならフォルダーという認識)
-    	        if(strpos($folder,'.',0)==''){//$folderが'.'を含まなかった時
-    	          if(is_dir($dirName.$folder)){//$dirName.$folderがディレクトリかどうかを調べる
-    	            if($child_dir = opendir($dirName.$folder)){//opendir で$dirName.$folderの子ディレクトリをオープン
-              			$folder_check = 0;//$folder_checkを定義
-                			if(strpos($folder,'_',0)==''){//$folderが'_'を含まなかった時
-                				$folder_check = 1;//$folder_check=1にする
-                			}else{//$folderが'_'を含む時
-                				$num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
-                				$product_code = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
-                          while(($file = readdir($child_dir)) !== false){//子while
-                               if($file != "." && $file != ".."){//ファイルなら
-                                if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
-                                   if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
-                                    $countname += 1;//ファイル名がかぶらないようにカウントしておく
-                                    $num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
-                            				${"product_code".$countname} = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
-                                    ${"ProductData".$countname} = $this->Products->find()->where(['product_code' => ${"product_code".$countname}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                                  	${"product_name".$countname} = ${"ProductData".$countname}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-                                    ${"inspec_date".$countname} = substr($file,0,4)."-".substr($file,4,2)."-".substr($file,6,2);
-
-                                      if(substr(${"inspec_date".$countname},0,10) === substr($today,0,10)){
-                                  //      echo ${"inspec_date".$countname};
-                                  //      echo substr($today);
-
-                                        $this->set('product_code'.$countname,${"product_code".$countname});//セット
-                                        $this->set('product_name'.$countname,${"product_name".$countname});//セット
-                                        $this->set('inspec_date'.$countname,${"inspec_date".$countname});//セット
-                                        $this->set('countname',$countname);//セット
-
-                                        $session = $this->request->session();
-                                        $session->write('product_code', ${"product_code".$countname});
-                                        $session->write('product_name', ${"product_name".$countname});
-                                      }
-                                  }
-                               }
-                             }else{
-//                              $this->set('countname',$countname);//セット
-                            }
-                          }
-                 			}
-       	            }
-     	          }//if(ファイルでなくフォルダーであるなら)の終わり
-     	        }//フォルダーであるなら
-     	      }
-    	    }//親whileの終わり
-
-    	  }
-     }
-*/
-/*     $dirName = 'backupData_IM測定/';//webroot内のフォルダ
-     $countname = 1;
-     $this->set('countname',$countname);//セット
-     $countnameb = 1;
-     $this->set('countnameb',$countnameb);//セット
-
-     if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
-      if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）
-        while(($folder = readdir($dir)) !== false){//親while（ディレクトリ内のファイル一覧を取得する）
-          if($folder != '.' && $folder != '..'){//フォルダーなら("."が無いならフォルダーという認識)
-            if(strpos($folder,'.',0)==''){//$folderが'.'を含まなかった時
-              if(is_dir($dirName.$folder)){//$dirName.$folderがディレクトリかどうかを調べる
-                if($child_dir = opendir($dirName.$folder)){//opendir で$dirName.$folderの子ディレクトリをオープン
-                  $folder_check = 0;//$folder_checkを定義
-                    if(strpos($folder,'_',0)==''){//$folderが'_'を含まなかった時
-                      $folder_check = 1;//$folder_check=1にする
-                    }else{//$folderが'_'を含む時
-                      $num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
-                      $product_code = mb_substr($folder,0,$num);//'_'までの文字列を$product_idと定義する
-                         while(($file = readdir($child_dir)) !== false){//子while
-                              if($file != "." && $file != ".."){//ファイルなら
-                               if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
-                                  if(substr($file, 0, 5) == "sumi_" ){//sumi_ファイルだけOPEN
-                                   $num = strpos($folder,'_',0);//$numを最初に'_'が現れた位置として定義
-
-                                   ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
-
-                                     if(substr(${"inspec_dateb".$countnameb},0,10) === substr($today,0,10)){//今日のデータの場合
-                                       ${"product_codeb".$countnameb} = mb_substr($folder,0,$num);//product_codeを取得
-                                       ${"KadouSeikeiDatab".$countnameb} = $this->KadouSeikeis->find()->where(['product_code' => ${"product_codeb".$countnameb} , 'present_kensahyou' => 0])->toArray();//'product_code' => ${"product_codeb".$countnameb} , 'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
-                                       for($i=0; $i<=9; $i++){//i=0~9まで
-                                        if(isset(${"KadouSeikeiDatab".$countnameb}[$i])){//${"KadouSeikeiDatab".$countnameb}[$i]が存在する時
-                                          ${"KadouSeikeifinishing_tm".$countnameb} = ${"KadouSeikeiDatab".$countnameb}[$i]->finishing_tm;//配列の$i番目のfinishing_tm
-                                          ${"KadouSeikeifinishing_date".$countnameb} = substr(${"KadouSeikeifinishing_tm".$countnameb},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnameb},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnameb},8,2);//finishing_tmの年月日を取得
-                                          ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);//ファイルの日付セット
-                                            if(substr(${"inspec_dateb".$countnameb},0,10) === substr(${"KadouSeikeifinishing_date".$countnameb},0,10)){//ファイルの日付と${"KadouSeikeiDatab".$countnameb}[$i]->finishing_tmの日付が同じ場合
-                                                  ${"KadouSeikeiid".$countnameb} = ${"KadouSeikeiDatab".$countnameb}[$i]->id;//以下、index2に持っていくデータをセット
-                                                  $this->set('KadouSeikeiid'.$countnameb,${"KadouSeikeiid".$countnameb});
-                                                  echo "<pre>";
-                                                  echo ${"KadouSeikeiDatab".$countnameb}[$i]->id."---kyou";
-                                                  echo "</pre>";
-
-                                                  ${"ProductDatab".$countnameb} = $this->Products->find()->where(['product_code' => ${"product_codeb".$countnameb}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                                                  ${"product_nameb".$countnameb} = ${"ProductDatab".$countnameb}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-                                                  ${"inspec_dateb".$countnameb} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
-
-                                                  $this->set('product_codeb'.$countnameb,${"product_codeb".$countnameb});//セット
-                                                  $this->set('product_nameb'.$countnameb,${"product_nameb".$countnameb});//セット
-                                                  $this->set('inspec_dateb'.$countnameb,${"inspec_dateb".$countnameb});//セット
-                                                  $this->set('countnameb',$countnameb);//セット
-
-                                                  $session = $this->request->session();
-                                                  $session->write('product_codeb', ${"product_codeb".$countnameb});
-                                                  $session->write('product_nameb', ${"product_nameb".$countnameb});
-
-                                                  $countnamec = $countnameb;
-                                                  $countnameb += 1;//ファイル名の日付を識別するためカウント
-                                                  echo "<pre>";
-                                                  echo $countnameb."b";
-                                                  echo "</pre>";
-
-                                                  }else{//ファイルの日付と${"KadouSeikeiDatab".$countnameb}[$i]->finishing_tmの日付が違う場合は何もしない
-                                                  }
-
-                                        }else{
-                                          break;
-                                        }
-                                      }
-
-                                     }else{//今日ではないデータの場合
-                                       ${"product_code".$countname} = mb_substr($folder,0,$num);//product_codeを取得
-                                       ${"KadouSeikeiData".$countname} = $this->KadouSeikeis->find()->where(['product_code' => ${"product_code".$countname} , 'present_kensahyou' => 0])->toArray();//'product_code' => ${"product_codeb".$countnameb} , 'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
-                                       for($i=0; $i<=9; $i++){//i=0~9
-                                        if(isset(${"KadouSeikeiData".$countname}[$i])){//${"KadouSeikeiData".$countnameb}[$i]が存在する時
-                                          ${"KadouSeikeifinishing_tm".$countname} = ${"KadouSeikeiData".$countname}[$i]->finishing_tm;//配列の$i番目のfinishing_tm
-                                          ${"KadouSeikeifinishing_date".$countname} = substr(${"KadouSeikeifinishing_tm".$countname},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countname},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countname},8,2);//finishing_tmの年月日を取得
-                                          ${"inspec_date".$countname} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);//ファイルの日付セット
-                                            if(substr(${"inspec_date".$countname},0,10) === substr(${"KadouSeikeifinishing_date".$countname},0,10)){//ファイルの日付と${"KadouSeikeiDatab".$countnameb}[$i]->finishing_tmの日付が同じ場合
-                                              ${"KadouSeikeiid".$countname} = ${"KadouSeikeiData".$countname}[$i]->id;//以下、index2に持っていくデータをセット
-                                              $this->set('KadouSeikeiid'.$countname,${"KadouSeikeiid".$countname});//セット
-                                              echo "<pre>";
-                                              echo ${"KadouSeikeiData".$countname}[$i]->id."---kyouじゃない";
-                                              echo "</pre>";
-
-                                              ${"ProductData".$countname} = $this->Products->find()->where(['product_code' => ${"product_code".$countname}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                                              ${"product_name".$countname} = ${"ProductData".$countname}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-                                              ${"inspec_date".$countname} = substr($file,7,4)."-".substr($file,11,2)."-".substr($file,13,2);
-
-                                              $this->set('product_code'.$countname,${"product_code".$countname});//セット
-                                              $this->set('product_name'.$countname,${"product_name".$countname});//セット
-                                              $this->set('inspec_date'.$countname,${"inspec_date".$countname});//セット
-                                              $this->set('countname',$countname);//セット
-
-                                              $session = $this->request->session();
-                                              $session->write('product_code', ${"product_code".$countname});
-                                              $session->write('product_name', ${"product_name".$countname});
-
-                                              $countname += 1;//ファイル名の日付を識別するためカウント
-                                              echo "<pre>";
-                                              echo $countname;
-                                              echo "</pre>";
-
-                                              }else{//ファイルの日付と${"KadouSeikeiDatab".$countnameb}[$i]->finishing_tmの日付が違う場合は何もしない
-                                              }
-                                        }else{
-                                          break;
-                                        }
-                                      }
-
-                                     }
-                                 }
-                              }
-                            }else{
-                           }
-                         }
-                      }
-                    }
-                }//if(ファイルでなくフォルダーであるなら)の終わり
-              }//フォルダーであるなら
-            }
-        }//親whileの終わり
-      }
-    }
-*/
       $countnamec = 1;
       $this->set('countnamec',$countnamec);//セット
       $countnamed = 1;
@@ -461,11 +236,7 @@ class SyukkaKensasController extends AppController {
         if(isset($KadouSeikeiDatac[$i-1])){
           ${"KadouSeikeifinishing_tm".$i} = $KadouSeikeiDatac[$i-1]->finishing_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
           ${"KadouSeikeifinishing_date".$i} = substr(${"KadouSeikeifinishing_tm".$i},0,4)."-".substr(${"KadouSeikeifinishing_tm".$i},5,2)."-".substr(${"KadouSeikeifinishing_tm".$i},8,2);//finishing_tmの年月日を取得
-/*
-          echo "<pre>";
-          print_r(substr(${"KadouSeikeifinishing_date".$i},0,10)."----".substr($today,0,10)."----".${"KadouSeikeifinishing_tm".$i});
-          echo "</pre>";
-*/
+
             if(substr(${"KadouSeikeifinishing_date".$i},0,10) === substr($today,0,10)){//今日のデータの場合
               ${"KadouSeikeiidc".$countnamec} = $KadouSeikeiDatac[$i-1]->id;//以下、index2に持っていくデータをセット
               $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});//セット
@@ -504,12 +275,11 @@ class SyukkaKensasController extends AppController {
               ${"KadouSeikeifinishing_dated".$countnamed} = substr(${"KadouSeikeifinishing_tm".$countnamed},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},8,2);//finishing_tmの年月日を取得
 
               $this->set('product_coded'.$countnamed,${"product_coded".$countnamed});//セット
-      //        $this->set('product_named'.$countnamed,${"product_named".$countnamed});//セット
+
               $this->set('KadouSeikeifinishing_dated'.$countnamed,${"KadouSeikeifinishing_dated".$countnamed});//セット
 
               $session = $this->request->session();
               $session->write('product_coded', ${"product_coded".$countnamed});
-      //        $session->write('product_named', ${"product_named".$countnamed});
 
               $countnamed += 1;//ファイル名の日付を識別するためカウント
               $this->set('countnamed',$countnamed);//セット
@@ -557,7 +327,6 @@ class SyukkaKensasController extends AppController {
                                 				$arrFp[] = $ImData;//配列に追加する
                                     }
 
-
                                     $arrLot_nums = array();//lot_numの重複チェック
                                     for ($k=4; $k<=$count-1; $k++) {
                                       ${"arrLot_nums".$countname}[] = $arrFp[$k][2];
@@ -565,7 +334,6 @@ class SyukkaKensasController extends AppController {
                                     $arruniLot_num = array_unique(${"arrLot_nums".$countname});//lot_numの重複削除
                                     ${"arruniLot_num".$countname} = array_values($arruniLot_num);//配列の添字を振り直し
                                     $cntLot = count(${"arruniLot_num".$countname});//配列の要素数確認
-
 
                                     //ImSokuteidataHeadsの登録用データをセット
                                     $arrIm_head = array();//空の配列を作る
@@ -579,9 +347,6 @@ class SyukkaKensasController extends AppController {
                                       $session = $this->request->session();
                                       $session->write('kind_kensa', $kind_kensa);
 
-                                    //	$ProductData = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-                                    //	$product_id = $ProductData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-
                                       $arrIm_heads[] = $product_code;
                                       $arrIm_heads[] = $kind_kensa;
                                       $arrIm_heads[] = $inspec_date;
@@ -593,13 +358,14 @@ class SyukkaKensasController extends AppController {
                                       $arrIm_heads = array_combine($name_heads, $arrIm_heads);
                                       $arrIm_head[] = $arrIm_heads;
                                     }
-                        //            echo "<pre>";
-                        //            print_r($arrIm_head);
-                        //            echo "<br>";
 
                                      //ImSokuteidataHeadsデータベースに登録
                                     $imSokuteidataHeads = $this->ImSokuteidataHeads->newEntity();//newentityに$userという名前を付ける
-
+/*
+                                    echo "<pre>";
+                                    print_r($arrIm_head);
+                                    echo "</pre>";
+*/
                                     $imSokuteidataHeads = $this->ImSokuteidataHeads->patchEntities($imSokuteidataHeads, $arrIm_head);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                     $connection = ConnectionManager::get('default');//トランザクション1
                                     // トランザクション開始2
@@ -622,7 +388,7 @@ class SyukkaKensasController extends AppController {
                                             $upper = $arrImKikakus[1][$k];
                                             $lower = $arrImKikakus[2][$k];
 
-                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1]])->toArray();
+                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1], 'kind_kensa' => $kind_kensa])->toArray();
                                             $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;
 
                                             $arrIm_kikaku_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -636,13 +402,14 @@ class SyukkaKensasController extends AppController {
 
                                           }
                                         }
-                                //        echo "<pre>";
-                                //        print_r($arrIm_kikaku);
-                              //          echo "<br>";
 
                                            //ImKikakusデータベースに登録
                                           $imKikakus = $this->ImKikakus->newEntity();//newentityに$userという名前を付ける
-
+/*
+                                          echo "<pre>";
+                                          print_r($arrIm_kikaku);
+                                          echo "</pre>";
+*/
                                           $imKikakus = $this->ImKikakus->patchEntities($imKikakus, $arrIm_kikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                              if ($this->ImKikakus->saveMany($imKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
@@ -660,11 +427,7 @@ class SyukkaKensasController extends AppController {
                                                       $result = $arrImResults[$j][$k];
                                                       $status = $arrImResults[$j][4];
 
-                                              //        echo "<pre>";
-                                              //        print_r($arrFp[$j+4][2]);
-                                              //        echo "<br>";
-
-                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2]])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2], 'kind_kensa' => $kind_kensa])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
                                                       $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
 
                                                       $arrIm_Result_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -679,13 +442,14 @@ class SyukkaKensasController extends AppController {
                                                       $arrIm_Result[] = $arrIm_Result_data;
                                                   }
                                                  }
-                                          //       echo "<pre>";
-                                          //       print_r($arrIm_Result);
-                                          //       echo "<br>";
 
                                                   //ImSokuteidataResultsデータベースに登録
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->newEntity();//newentityに$userという名前を付ける
-
+/*
+                                                  echo "<pre>";
+                                                  print_r($arrIm_Result);
+                                                  echo "</pre>";
+*/
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->patchEntities($imSokuteidataResults, $arrIm_Result);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                                   if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
                                                     } else {
@@ -734,6 +498,7 @@ class SyukkaKensasController extends AppController {
                                         }
                                     }
                                   }
+
                                }
                              }
                           }
@@ -745,26 +510,14 @@ class SyukkaKensasController extends AppController {
      	    }//親whileの終わり
     	  }
     	}
-      return $this->redirect(['action' => 'index2']);
+      return $this->redirect(['action' => 'indexhome']);
     }
 
     public function preform()//「出荷検査表登録」ページで検査結果を入力
     {
-/*      $session = $this->request->session();
 
-      $product_code = $session->read('product_code');
-      $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
-      $product_name = $session->read('product_name');
-      $this->set('Productname',$product_name);//セット
-      $kind_kensa = $session->read('kind_kensa');
-      $this->set('kind_kensa',$kind_kensa);//セット
-*/
       $data = array_values($this->request->query);//getで取り出した配列の値を取り出す
-/*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
+
       $product_code = $data[1];
       $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
       $product_name = $data[2];
@@ -827,11 +580,7 @@ class SyukkaKensasController extends AppController {
     public function form()//「出荷検査表登録」ページで検査結果を入力
     {
         $data = $this->request->getData();//postデータを$dataに
-/*
-      echo "<pre>";
-    	print_r($data);
-    	echo "</pre>";
-*/
+
         $product_code = $data['product_code1'];
         $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
         $product_name = $data['product_name1'];
@@ -877,13 +626,13 @@ class SyukkaKensasController extends AppController {
     	$this->set('KensahyouHeadid',$KensahyouHeadid);//セット
 
       $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();
-//
-for($i=1; $i<=9; $i++){//size_1～9までセット
-  ${"kind_kensa".$i} = "ノギス";
-  $this->set('kind_kensa'.$i,${"kind_kensa".$i});//セット
-}
-if(isset($ImSokuteidataHead[0])){
-//
+      //
+      for($i=1; $i<=9; $i++){//size_1～9までセット
+        ${"kind_kensa".$i} = "ノギス";
+        $this->set('kind_kensa'.$i,${"kind_kensa".$i});//セット
+      }
+      if(isset($ImSokuteidataHead[0])){
+      //
       $ImSokuteidataHead_id = $ImSokuteidataHead[0]->id;
       $ImKikaku = $this->ImKikakus->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHead_id])->toArray();
       for($i=1; $i<=5; $i++){//size_1～9までセット
@@ -942,7 +691,7 @@ if(isset($ImSokuteidataHead[0])){
         }
     	}
 //
-}
+    }
 //
     	for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
     		${"upper_".$j} = $KensahyouHead[0]->{"upper_{$j}"};//KensahyouHeadのupper_1～8まで
@@ -1027,14 +776,6 @@ if(isset($ImSokuteidataHead[0])){
    {
      $kensahyouSokuteidata = $this->KensahyouSokuteidatas->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
      $this->set('kensahyouSokuteidata',$kensahyouSokuteidata);//セット
-/*
-     $session = $this->request->getSession();
-     $data = $session->read();
-
-    echo "<pre>";
-    print_r($_SESSION['kadouseikeiId']);
-    echo "</pre>";
-*/
    }
 
   public function login()
@@ -1080,11 +821,6 @@ if(isset($ImSokuteidataHead[0])){
     $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
     $_SESSION['sokuteidata'][$n] = array_merge($created_staff,$_SESSION['sokuteidata'][$n]);
   }
-/*
-  echo "<pre>";
-  print_r($_SESSION['sokuteidata']);
-  echo "<br>";
-*/
   $data = $_SESSION['sokuteidata'];
 
   $product_code = $data[1]['product_code'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
@@ -1223,5 +959,43 @@ if(isset($ImSokuteidataHead[0])){
      }//トランザクション10
    }
  }
+
+ public function torikomitest()
+ {
+
+   $arrFp = array();//空の配列を作る
+
+   if ($this->request->is('post')) {
+     $source_file = $_FILES['file']['tmp_name'];
+
+     $fp = fopen($source_file, "r");
+     $fpcount = fopen($source_file, 'r' );
+      for($count = 0; fgets( $fpcount ); $count++ );
+      $arrFp = array();//空の配列を作る
+      for ($k=1; $k<=$count; $k++) {//最後の行まで
+        $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+        $line = mb_convert_encoding($line, 'UTF-8', 'SJIS-win');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+        $sample = explode(",",$line);//$lineを"（スペース）"毎に配列に入れる
+        $arrFp[] = $sample;//配列に追加する
+      }
+
+      $path = './test19080501/';
+      if(move_uploaded_file($_FILES['file']['tmp_name'], $path.'test200917.txt')){
+        echo "<pre>";
+        print_r("ok");
+        echo "</pre>";
+      }else{
+        echo "<pre>";
+        print_r("no");
+        echo "</pre>";
+      }
+
+    }
+
+    echo "<pre>";
+    print_r($arrFp);
+    echo "</pre>";
+
+  }
 
 }

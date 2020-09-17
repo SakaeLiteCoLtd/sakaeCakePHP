@@ -18,6 +18,18 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           echo $this->Form->hidden('product_code' ,['value'=>$product_code ]) ;
           echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'form']]);
         ?>
+        <?php
+         use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
+         $htmlSyukkakensamenu = new htmlSyukkakensamenu();
+         $htmlSyukkakensamenus = $htmlSyukkakensamenu->Syukkakensamenu();
+         ?>
+         <hr size="5" style="margin: 0.5rem">
+         <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+         <?php
+            echo $htmlSyukkakensamenus;
+         ?>
+         </table>
+         <hr size="5" style="margin: 0.5rem">
 
 
     <fieldset>
@@ -34,7 +46,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
           <td colspan="9"><?= h($KensahyouHeadver) ?></td>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
-          <td colspan="7"><?= $this->Form->input("lot_num", array('type' => 'text', 'label'=>false)); ?></td>
+          <td colspan="7"><?= $this->Form->input("lot_num", array('type' => 'text', 'label'=>false, 'autofocus'=>true)); ?></td>
           <td colspan="2" nowrap="nowrap"><div align="center"><?= $this->Form->submit(__('取り込み'), array('name' => 'top')); ?></div></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
@@ -73,7 +85,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                     $resultArray = Array();
                     for($i=1; $i<=9; $i++){
                         echo "<td colspan='2'><div align='center'>\n";
-                        echo "<input type='text' name=result_size_".$j."_".$i." value='' size='6'/>\n";
+        //                echo "<input type='text' name=result_size_".$j."_".$i." value='' size='6'/>\n";
                         echo "</div></td>\n";
                     }
                 echo "<td colspan='2'>\n";
@@ -81,7 +93,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 echo "<td colspan='2'>\n";
                 echo "</td>\n";
                 echo "<td colspan='2'>\n";
-                echo "<input type='text' name=result_weight_".$j." value='' size='6'/>\n";
+        //        echo "<input type='text' name=result_weight_".$j." value='' size='6'/>\n";
                 echo "</td>\n";
             }
         ?>

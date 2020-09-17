@@ -31,17 +31,52 @@ class KensahyouSokuteidatasController  extends AppController
       $this->Users = TableRegistry::get('users');//Usersテーブルを使う
      }
 
-     public function index()//「出荷検査用呼出」ページトップ
+     public function yobidashicustomer()//「出荷検査用呼出」ページトップ
      {
-     	$this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find()//KensahyouSokuteidatasテーブルの中で
+     	$this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find()
      	->select(['product_code','delete_flag' => '0'])
      	->group('product_code')
      	);
      }
 
+     public function yobidashipana()
+     {
+       $this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find()
+      	->select(['product_code','delete_flag' => '0'])
+      	->group('product_code')
+      	);
+     }
+
+     public function yobidashidnp()
+     {
+       $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();
+       $this->set('KensahyouSokuteidatas',$KensahyouSokuteidatas);
+
+        $Sokuteidataproduct_code = $this->KensahyouSokuteidatas->find()
+       	->select(['product_code','delete_flag' => '0'])
+       	->group('product_code')->toArray();
+
+        $count = count($Sokuteidataproduct_code);
+
+        for ($k=0; $k<$count; $k++) {
+          $product_code = $Sokuteidataproduct_code[$k]["product_code"];
+          $Products = $this->Products->find('all', ['conditions' => ['product_code' => $product_code,
+          'OR' => [['customer_id' => 11], ['customer_id' => 12], ['customer_id' => 13], ['customer_id' => 14]]]])->toArray();
+          if(isset($Products[0])){
+            $arrProduct[] = ["product_code" => $Products[0]["product_code"], "product_name" => $Products[0]["product_name"]];
+          }
+        }
+        $this->set('arrProduct',$arrProduct);
+/*
+        echo "<pre>";
+        print_r($arrProduct);
+        echo "</pre>";
+*/
+     }
+
      public function yobidasi1()//Pから始まるものだけにする
      {
-     	$this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find()//KensahyouSokuteidatasテーブルの中で
+     	$this->set('kensahyouSokuteidatas', $this->KensahyouSokuteidatas->find()
      	->select(['product_code','delete_flag' => '0'])
      	->group('product_code')
      	);
@@ -65,8 +100,13 @@ class KensahyouSokuteidatasController  extends AppController
 
     public function search()//「出荷検査用呼出」の日付で絞り込むページ
     {
-    	$data = array_values($this->request->getData());//配列の値を取り出す
-      $product_code = $data[0];//0番目の値
+      $data = $this->request->query();
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $product_code = $data["name"];//0番目の値
 
     	$this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
 
@@ -270,7 +310,7 @@ class KensahyouSokuteidatasController  extends AppController
 
     }
 
-    public function index1()//「出荷検査表登録」ページトップ
+    public function kensahyouproductform()//「出荷検査表登録」ページトップ
     {
     	$this->set('entity',$this->KensahyouSokuteidatas->newEntity());//空のカラムにentityと名前を付け、ctpで使えるようにセット
 
@@ -379,15 +419,16 @@ class KensahyouSokuteidatasController  extends AppController
 
     for($i=0; $i<=8; $i++){
       $j = $i + 1;
-      if(isset($ImKikakus[$i])) {
+    if(isset($ImKikakus[$i])) {
+      $kensahyuo_num = $ImKikakus[$i]["kensahyuo_num"];
+
         if($ImKikakus[$i]['kind_kensa'] != "") {
-          ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];
-          $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+          ${"ImKikakuid_".$kensahyuo_num} = $ImKikakus[$i]['kind_kensa'];
+          $this->set('ImKikakuid_'.$kensahyuo_num,${"ImKikakuid_".$kensahyuo_num});//セット
+
         }else{
         }
-      }else{
-        ${"ImKikakuid_".$j} = "ノギス";
-        $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+
       }
     }
 
@@ -471,15 +512,16 @@ class KensahyouSokuteidatasController  extends AppController
 
       for($i=0; $i<=8; $i++){
         $j = $i + 1;
-        if(isset($ImKikakus[$i])) {
+      if(isset($ImKikakus[$i])) {
+        $kensahyuo_num = $ImKikakus[$i]["kensahyuo_num"];
+
           if($ImKikakus[$i]['kind_kensa'] != "") {
-            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];
-            $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+            ${"ImKikakuid_".$kensahyuo_num} = $ImKikakus[$i]['kind_kensa'];
+            $this->set('ImKikakuid_'.$kensahyuo_num,${"ImKikakuid_".$kensahyuo_num});//セット
+
           }else{
           }
-        }else{
-          ${"ImKikakuid_".$j} = "ノギス";
-          $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+
         }
       }
 
@@ -670,15 +712,16 @@ class KensahyouSokuteidatasController  extends AppController
 
       for($i=0; $i<=8; $i++){
         $j = $i + 1;
-        if(isset($ImKikakus[$i])) {
+      if(isset($ImKikakus[$i])) {
+        $kensahyuo_num = $ImKikakus[$i]["kensahyuo_num"];
+
           if($ImKikakus[$i]['kind_kensa'] != "") {
-            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];
-            $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+            ${"ImKikakuid_".$kensahyuo_num} = $ImKikakus[$i]['kind_kensa'];
+            $this->set('ImKikakuid_'.$kensahyuo_num,${"ImKikakuid_".$kensahyuo_num});//セット
+
           }else{
           }
-        }else{
-          ${"ImKikakuid_".$j} = "ノギス";
-          $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+
         }
       }
 
@@ -817,15 +860,16 @@ class KensahyouSokuteidatasController  extends AppController
 
       for($i=0; $i<=8; $i++){
         $j = $i + 1;
-        if(isset($ImKikakus[$i])) {
+      if(isset($ImKikakus[$i])) {
+        $kensahyuo_num = $ImKikakus[$i]["kensahyuo_num"];
+
           if($ImKikakus[$i]['kind_kensa'] != "") {
-            ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];
-            $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+            ${"ImKikakuid_".$kensahyuo_num} = $ImKikakus[$i]['kind_kensa'];
+            $this->set('ImKikakuid_'.$kensahyuo_num,${"ImKikakuid_".$kensahyuo_num});//セット
+
           }else{
           }
-        }else{
-          ${"ImKikakuid_".$j} = "ノギス";
-          $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+
         }
       }
 

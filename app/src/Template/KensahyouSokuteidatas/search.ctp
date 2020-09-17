@@ -15,6 +15,10 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
           header('Pragma:');
 //          echo $this->Form->create($kensahyouSokuteidatas, ['url' => ['action' => 'index']]);
           $i = 0;
+
+          $dateYMD = date('Y-m-d');
+          $dateYMD1 = strtotime($dateYMD);
+          $dayye = date('Y-m-d', strtotime('-1 day', $dateYMD1));
 ?>
 
 <div align="center">
@@ -22,7 +26,7 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
      <fieldset>
 <div align="center"><strong><font color="blue"><?php echo "製造年月日";?></font></strong></div>
             <?=$this->Form->create('TimeSearch', ['url' => ['action' => 'search', 'type' => 'post']])?>
-            <?=$this->Form->input("start", array('type' => 'date', 'monthNames' => false)); ?>
+            <?=$this->Form->input("start", array('type' => 'date', 'monthNames' => false, 'value' => $dayye)); ?>
             <?=$this->Form->input("end", array('type' => 'date', 'monthNames' => false)); ?>
             <?=$this->Form->hidden("product_code", array('type' => 'value', 'value' => $product_code)); ?>
 <br>

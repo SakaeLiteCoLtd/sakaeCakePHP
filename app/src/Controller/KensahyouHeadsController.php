@@ -24,7 +24,7 @@ class KensahyouHeadsController  extends AppController
 	$this->Products = TableRegistry::get('products');//productsテーブルを使う
      }
 
-    public function index1()//検査表ヘッダー登録画面
+    public function kensahyouheadproductform()//検査表ヘッダー登録画面
     {
 	$this->set('entity',$this->KensahyouHeads->newEntity());//newEntity・テーブルに空の行を作る
   //      $this->request->session()->destroy(); // セッションの破棄

@@ -14,7 +14,9 @@ class htmlKensahyouSokuteidata extends AppController
         parent::initialize();
          $this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
          $this->Products = TableRegistry::get('products');//productsテーブルを使う
+         $this->Customers = TableRegistry::get('customers');
          $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
+         $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');
     }
 
 	public function htmlHeaderKensahyouSokuteidata($product_code)
@@ -135,9 +137,191 @@ class htmlKensahyouSokuteidata extends AppController
 		$this->data = $KensahyouHeads;
 	}
 
-	public function get_data(){
-		return $this->data;
-		}
+  public function Pana0()
+ {
+   $Sokuteidataproduct_code = $this->KensahyouSokuteidatas->find()
+   ->select(['product_code','delete_flag' => '0'])
+   ->group('product_code')->toArray();
+
+   $count = count($Sokuteidataproduct_code);
+
+   $arrProduct = array();
+
+   for ($k=0; $k<$count; $k++) {
+     $product_code = $Sokuteidataproduct_code[$k]["product_code"];
+     if(0 === strpos($product_code, "P0")){
+       $Products = $this->Products->find('all', ['conditions' => ['product_code' => $product_code, 'customer_id' => 1]])->toArray();
+       if(isset($Products[0])){
+         $arrProduct[] = ["product_code" => $Products[0]["product_code"], "product_name" => $Products[0]["product_name"]];
+       }
+     }
+   }
+
+   return $arrProduct;
+ }
+
+ public function Pana1()
+{
+  $Sokuteidataproduct_code = $this->KensahyouSokuteidatas->find()
+  ->select(['product_code','delete_flag' => '0'])
+  ->group('product_code')->toArray();
+
+  $count = count($Sokuteidataproduct_code);
+
+  $arrProduct = array();
+
+  for ($k=0; $k<$count; $k++) {
+    $product_code = $Sokuteidataproduct_code[$k]["product_code"];
+    if(0 === strpos($product_code, "P1")){
+      $Products = $this->Products->find('all', ['conditions' => ['product_code' => $product_code, 'customer_id' => 1]])->toArray();
+      if(isset($Products[0])){
+        $arrProduct[] = ["product_code" => $Products[0]["product_code"], "product_name" => $Products[0]["product_name"]];
+      }
+    }
+  }
+
+  return $arrProduct;
+}
+
+public function Pana2()
+{
+  $Sokuteidataproduct_code = $this->KensahyouSokuteidatas->find()
+  ->select(['product_code','delete_flag' => '0'])
+  ->group('product_code')->toArray();
+
+  $count = count($Sokuteidataproduct_code);
+
+  $arrProduct = array();
+
+  for ($k=0; $k<$count; $k++) {
+    $product_code = $Sokuteidataproduct_code[$k]["product_code"];
+    if(0 !== strpos($product_code, "P0") && 0 !== strpos($product_code, "P1") && 0 !== strpos($product_code, "W") && 0 !== strpos($product_code, "H") && 0 !== strpos($product_code, "RE")){
+      $Products = $this->Products->find('all', ['conditions' => ['product_code' => $product_code, 'customer_id' => 1]])->toArray();
+      if(isset($Products[0])){
+        $arrProduct[] = ["product_code" => $Products[0]["product_code"], "product_name" => $Products[0]["product_name"]];
+      }
+    }
+  }
+
+ return $arrProduct;
+}
+
+public function PanaW()
+{
+  $Sokuteidataproduct_code = $this->KensahyouSokuteidatas->find()
+  ->select(['product_code','delete_flag' => '0'])
+  ->group('product_code')->toArray();
+
+  $count = count($Sokuteidataproduct_code);
+
+  $arrProduct = array();
+
+  for ($k=0; $k<$count; $k++) {
+    $product_code = $Sokuteidataproduct_code[$k]["product_code"];
+    if(false !== strpos($product_code, "W")){
+      $Products = $this->Products->find('all', ['conditions' => ['product_code' => $product_code, 'customer_id' => 2]])->toArray();
+      if(isset($Products[0])){
+        $arrProduct[] = ["product_code" => $Products[0]["product_code"], "product_name" => $Products[0]["product_name"]];
+      }
+    }
+  }
+
+ return $arrProduct;
+}
+
+public function PanaH()
+{
+  $Sokuteidataproduct_code = $this->KensahyouSokuteidatas->find()
+  ->select(['product_code','delete_flag' => '0'])
+  ->group('product_code')->toArray();
+
+  $count = count($Sokuteidataproduct_code);
+
+  $arrProduct = array();
+
+  for ($k=0; $k<$count; $k++) {
+    $product_code = $Sokuteidataproduct_code[$k]["product_code"];
+    if(0 === strpos($product_code, "H")){
+      $Products = $this->Products->find('all', ['conditions' => ['product_code' => $product_code, 'customer_id' => 2]])->toArray();
+      if(isset($Products[0])){
+        $arrProduct[] = ["product_code" => $Products[0]["product_code"], "product_name" => $Products[0]["product_name"]];
+      }
+    }
+  }
+
+ return $arrProduct;
+}
+
+public function PanaRE()
+{
+  $Sokuteidataproduct_code = $this->KensahyouSokuteidatas->find()
+  ->select(['product_code','delete_flag' => '0'])
+  ->group('product_code')->toArray();
+
+  $count = count($Sokuteidataproduct_code);
+
+  $arrProduct = array();
+
+  for ($k=0; $k<$count; $k++) {
+    $product_code = $Sokuteidataproduct_code[$k]["product_code"];
+    if(0 === strpos($product_code, "R")){
+      $Products = $this->Products->find('all', ['conditions' => ['product_code' => $product_code, 'customer_id' => 3]])->toArray();
+      if(isset($Products[0])){
+        $arrProduct[] = ["product_code" => $Products[0]["product_code"], "product_name" => $Products[0]["product_name"]];
+      }
+    }
+  }
+
+ return $arrProduct;
+}
+
+public function Dnp()
+{
+  $Sokuteidataproduct_code = $this->KensahyouSokuteidatas->find()
+  ->select(['product_code','delete_flag' => '0'])
+  ->group('product_code')->toArray();
+
+  $count = count($Sokuteidataproduct_code);
+
+  $arrProduct = array();
+
+  for ($k=0; $k<$count; $k++) {
+    $product_code = $Sokuteidataproduct_code[$k]["product_code"];
+    $Products = $this->Products->find('all', ['conditions' => ['product_code' => $product_code,
+    'OR' => [['customer_id' => 11], ['customer_id' => 12], ['customer_id' => 13], ['customer_id' => 14]]]])->toArray();
+    if(isset($Products[0])){
+      $arrProduct[] = ["product_code" => $Products[0]["product_code"], "product_name" => $Products[0]["product_name"]];
+    }
+  }
+
+ return $arrProduct;
+}
+
+public function Others()
+{
+  $Sokuteidataproduct_code = $this->KensahyouSokuteidatas->find()
+  ->select(['product_code','delete_flag' => '0'])
+  ->group('product_code')->toArray();
+
+  $count = count($Sokuteidataproduct_code);
+
+  $arrProduct = array();
+
+  for ($k=0; $k<$count; $k++) {
+    $product_code = $Sokuteidataproduct_code[$k]["product_code"];
+    $Products = $this->Products->find('all', ['conditions' => ['product_code' => $product_code]])->toArray();
+    if(isset($Products[0])){
+      $customer_id = $Products[0]->customer_id;
+      $Customers = $this->Customers->find('all', ['conditions' => ['id' => $customer_id]])->toArray();
+      $customer_code = $Customers[0]->customer_code;
+      if(0 !== strpos($customer_code, "1") && 0 !== strpos($customer_code, "2")){
+        $arrProduct[] = ["product_code" => $Products[0]["product_code"], "product_name" => $Products[0]["product_name"]];
+      }
+    }
+  }
+
+ return $arrProduct;
+}
 
 	public function get_rows(){
 		return $this->rows;

@@ -13,7 +13,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($kensahyouSokuteidatas, ['url' => ['action' => 'search']]);
+          echo $this->Form->create($KensahyouSokuteidatas, ['url' => ['action' => 'search']]);
 ?>
 <?php
  use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
@@ -51,3 +51,15 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 </table>
 
 <br><br>
+
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-style: none;">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#E6FFFF">
+      <?php for($i=0; $i<count($arrProduct); $i++): ?>
+      <tr>
+          <td class="actions" style="border-style: none; color:#ff0000; text-decoration: underline;">
+              <?= $this->Html->link(__($arrProduct[$i]["product_code"]), ['action' => 'search',  'name' => $arrProduct[$i]["product_code"]]) ?>
+          </td>
+          <td style="border-style: none;"><?= h($arrProduct[$i]["product_name"]) ?></td>
+      </tr>
+    <?php endfor;?>
+</table>

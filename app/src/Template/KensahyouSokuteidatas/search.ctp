@@ -20,6 +20,27 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
           $dateYMD1 = strtotime($dateYMD);
           $dayye = date('Y-m-d', strtotime('-1 day', $dateYMD1));
 ?>
+<hr size="5" style="margin: 0.5rem">
+<table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+  <?php
+   use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
+   $htmlSyukkakensamenu = new htmlSyukkakensamenu();
+   $htmlSyukkakensamenus = $htmlSyukkakensamenu->Syukkakensamenu();
+   ?>
+<?php
+   echo $htmlSyukkakensamenus;
+?>
+</table>
+<hr size="5" style="margin: 0.5rem">
+
+<br>
+<table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+            <tr style="background-color: #E6FFFF">
+              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_pana.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'KensahyouSokuteidatas','action'=>'yobidashipana')));?></td>
+              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_dnp.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'KensahyouSokuteidatas','action'=>'yobidashidnp')));?></td>
+              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_others.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'KensahyouSokuteidatas','action'=>'yobidashiothers')));?></td>
+            </tr>
+</table>
 
 <div align="center">
      <?=$this->Form->create() ?>
@@ -27,7 +48,7 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
 <div align="center"><strong><font color="blue"><?php echo "製造年月日";?></font></strong></div>
             <?=$this->Form->create('TimeSearch', ['url' => ['action' => 'search', 'type' => 'post']])?>
             <?=$this->Form->input("start", array('type' => 'date', 'monthNames' => false, 'value' => $dayye)); ?>
-            <?=$this->Form->input("end", array('type' => 'date', 'monthNames' => false)); ?>
+            <?=$this->Form->input("end", array('type' => 'date', 'monthNames' => false, 'value' => $dateYMD)); ?>
             <?=$this->Form->hidden("product_code", array('type' => 'value', 'value' => $product_code)); ?>
 <br>
      <?= $this->Form->button(__('絞り込み')) ?>
@@ -38,10 +59,10 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <thead>
             <tr  border="2" bordercolor="#E6FFFF" bgcolor="#FFFFFF">
-              <th scope="col"><?= $this->Paginator->sort('ロット番号') ?></th>
-              <th scope="col"><?= $this->Paginator->sort('manu_date') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('product_code') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('product_name') ?></th>
+              <td><?php echo "ロット番号";?></td>
+              <td><?php echo "製造年月日";?></td>
+              <td><?php echo "品番";?></td>
+              <td><?php echo "品名";?></td>
             </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFFF">

@@ -21,7 +21,8 @@ class KensahyouSokuteidatasController  extends AppController
      {
     	parent::initialize();
     	$this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
-    	$this->Products = TableRegistry::get('products');//productsテーブルを使う
+      $this->Products = TableRegistry::get('products');//productsテーブルを使う
+      $this->Customers = TableRegistry::get('customers');
       $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
       $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouHeadsテーブルを使う
       $this->ImKikakus = TableRegistry::get('imKikakus');//ImKikakuTaiousテーブルを使う
@@ -47,31 +48,103 @@ class KensahyouSokuteidatasController  extends AppController
       	);
      }
 
+     public function yobidashipanap0()
+     {
+       $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();
+       $this->set('KensahyouSokuteidatas',$KensahyouSokuteidatas);
+/*
+        $Sokuteidataproduct_code = $this->KensahyouSokuteidatas->find()
+        ->select(['product_code','delete_flag' => '0'])
+        ->group('product_code')->toArray();
+
+        $count = count($Sokuteidataproduct_code);
+
+        $arrProduct = array();
+
+        for ($k=0; $k<$count; $k++) {
+          $product_code = $Sokuteidataproduct_code[$k]["product_code"];
+          if(0 === strpos($product_code, "P0")){
+            $Products = $this->Products->find('all', ['conditions' => ['product_code' => $product_code, 'customer_id' => 1]])->toArray();
+            if(isset($Products[0])){
+              $arrProduct[] = ["product_code" => $Products[0]["product_code"], "product_name" => $Products[0]["product_name"]];
+            }
+          }
+        }
+*/
+
+        $Panayobidashi = new htmlKensahyouSokuteidata();//クラスを使用
+        $arrProduct = $Panayobidashi->Pana0();
+        $this->set('arrProduct',$arrProduct);
+     }
+
+     public function yobidashipanap1()
+     {
+       $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();
+       $this->set('KensahyouSokuteidatas',$KensahyouSokuteidatas);
+
+       $Panayobidashi = new htmlKensahyouSokuteidata();//クラスを使用
+       $arrProduct = $Panayobidashi->Pana1();
+       $this->set('arrProduct',$arrProduct);
+     }
+
+     public function yobidashipanap2()
+     {
+       $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();
+       $this->set('KensahyouSokuteidatas',$KensahyouSokuteidatas);
+
+       $Panayobidashi = new htmlKensahyouSokuteidata();//クラスを使用
+       $arrProduct = $Panayobidashi->Pana2();
+       $this->set('arrProduct',$arrProduct);
+     }
+
+     public function yobidashipanaw()
+     {
+       $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();
+       $this->set('KensahyouSokuteidatas',$KensahyouSokuteidatas);
+
+       $Panayobidashi = new htmlKensahyouSokuteidata();//クラスを使用
+       $arrProduct = $Panayobidashi->PanaW();
+       $this->set('arrProduct',$arrProduct);
+     }
+
+     public function yobidashipanah()
+     {
+       $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();
+       $this->set('KensahyouSokuteidatas',$KensahyouSokuteidatas);
+
+       $Panayobidashi = new htmlKensahyouSokuteidata();//クラスを使用
+       $arrProduct = $Panayobidashi->PanaH();
+       $this->set('arrProduct',$arrProduct);
+     }
+
+     public function yobidashipanare()
+     {
+       $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();
+       $this->set('KensahyouSokuteidatas',$KensahyouSokuteidatas);
+
+       $Panayobidashi = new htmlKensahyouSokuteidata();//クラスを使用
+       $arrProduct = $Panayobidashi->PanaRE();
+       $this->set('arrProduct',$arrProduct);
+     }
+
      public function yobidashidnp()
      {
        $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();
        $this->set('KensahyouSokuteidatas',$KensahyouSokuteidatas);
 
-        $Sokuteidataproduct_code = $this->KensahyouSokuteidatas->find()
-       	->select(['product_code','delete_flag' => '0'])
-       	->group('product_code')->toArray();
+       $Panayobidashi = new htmlKensahyouSokuteidata();//クラスを使用
+       $arrProduct = $Panayobidashi->Dnp();
+       $this->set('arrProduct',$arrProduct);
+     }
 
-        $count = count($Sokuteidataproduct_code);
+     public function yobidashiothers()
+     {
+       $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();
+       $this->set('KensahyouSokuteidatas',$KensahyouSokuteidatas);
 
-        for ($k=0; $k<$count; $k++) {
-          $product_code = $Sokuteidataproduct_code[$k]["product_code"];
-          $Products = $this->Products->find('all', ['conditions' => ['product_code' => $product_code,
-          'OR' => [['customer_id' => 11], ['customer_id' => 12], ['customer_id' => 13], ['customer_id' => 14]]]])->toArray();
-          if(isset($Products[0])){
-            $arrProduct[] = ["product_code" => $Products[0]["product_code"], "product_name" => $Products[0]["product_name"]];
-          }
-        }
-        $this->set('arrProduct',$arrProduct);
-/*
-        echo "<pre>";
-        print_r($arrProduct);
-        echo "</pre>";
-*/
+       $Panayobidashi = new htmlKensahyouSokuteidata();//クラスを使用
+       $arrProduct = $Panayobidashi->Others();
+       $this->set('arrProduct',$arrProduct);
      }
 
      public function yobidasi1()//Pから始まるものだけにする
@@ -101,13 +174,13 @@ class KensahyouSokuteidatasController  extends AppController
     public function search()//「出荷検査用呼出」の日付で絞り込むページ
     {
       $data = $this->request->query();
-/*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
-      $product_code = $data["name"];//0番目の値
 
+      if(isset($data["name"])){
+        $product_code = $data["name"];
+      }else{
+        $data = $this->request->getData();
+        $product_code = $data["product_code"];
+      }
     	$this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
 
     	if ($this->request->is('post')) {//データがpostで送られたとき（日付を選んだ場合）
@@ -192,8 +265,10 @@ class KensahyouSokuteidatasController  extends AppController
           $sort[$key] = $value['manu_date'];
       }
 
-      array_multisort($sort, SORT_DESC, $uniquearrP);
-      $uniquearrP = array_slice($uniquearrP , 0, 3);
+      if(count($uniquearrP) > 0){
+        array_multisort($sort, SORT_DESC, $uniquearrP);
+        $uniquearrP = array_slice($uniquearrP , 0, 3);
+      }
 
       $this->set('uniquearrP',$uniquearrP);//セット
     	}

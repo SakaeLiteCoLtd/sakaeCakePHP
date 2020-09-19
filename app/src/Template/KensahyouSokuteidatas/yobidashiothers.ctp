@@ -13,7 +13,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($kensahyouSokuteidatas, ['url' => ['action' => 'search']]);
+          echo $this->Form->create($KensahyouSokuteidatas, ['url' => ['action' => 'search']]);
 ?>
 <?php
  use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
@@ -30,19 +30,21 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
  <br>
 
- <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-   <tr>
-     <td bgcolor="#FFFFCC" style="width: 50px;border-bottom: solid;border-width: 1px">品番</td>
-     <td bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false, 'autofocus'=>true)) ?></td>
-     <td style="border-style: none"><div align="center"><?= $this->Form->submit(__('検索'), array('name' => 'kakunin')); ?></div></td>
- 	</tr>
- </table>
-<br><br>
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
             <tr style="background-color: #E6FFFF">
-              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_pana.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'KensahyouSokuteidatas','action'=>'yobidashipana')));?></td>
-              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_dnp.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'KensahyouSokuteidatas','action'=>'yobidashidnp')));?></td>
               <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_others.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'KensahyouSokuteidatas','action'=>'yobidashiothers')));?></td>
             </tr>
 </table>
 <br><br><br>
+
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-style: none;">
+      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#E6FFFF">
+      <?php for($i=0; $i<count($arrProduct); $i++): ?>
+      <tr>
+          <td class="actions" style="border-style: none; color:#ff0000; text-decoration: underline;">
+              <?= $this->Html->link(__($arrProduct[$i]["product_code"]), ['action' => 'search',  'name' => $arrProduct[$i]["product_code"]]) ?>
+          </td>
+          <td style="border-style: none;"><?= h($arrProduct[$i]["product_name"]) ?></td>
+      </tr>
+    <?php endfor;?>
+</table>

@@ -15,6 +15,18 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Cache-Control:');
           header('Pragma:');
         ?>
+        <?php
+         use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
+         $htmlSyukkakensamenu = new htmlSyukkakensamenu();
+         $htmlSyukkakensamenus = $htmlSyukkakensamenu->Syukkakensamenu();
+         ?>
+         <hr size="5" style="margin: 0.5rem">
+         <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+         <?php
+            echo $htmlSyukkakensamenus;
+         ?>
+         </table>
+         <hr size="5" style="margin: 0.5rem">
 
 <?php if($KensaProduct == empty($arr)): ?>
 
@@ -59,7 +71,6 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 </td>
         </tr>
     </table>
-
 
     <?php endforeach; ?>
 <?=$this->Form->end() ?>
@@ -181,12 +192,13 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo $this->Form->hidden('product_code' ,['value'=>$product_code]);
             echo $this->Form->hidden('status' ,['value'=>0]);
             echo $this->Form->hidden('delete_flag' ,['value'=>0]);
-            echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);
             echo $this->Form->hidden('updated_staff');
         ?>
 
     </fieldset>
     <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>
+    <br>
+    <br>
 
 <?php endif; ?>

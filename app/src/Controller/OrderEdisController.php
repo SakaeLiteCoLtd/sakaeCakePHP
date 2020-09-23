@@ -519,12 +519,7 @@ echo "</pre>";
             break;
           }
         }
-/*
-        echo "<pre>";
-        print_r("arrEDI");
-        print_r($arrEDI);
-        echo "</pre>";
-*/
+
         //同じcsvを入れようとした場合
         $EDInum = count($arrEDI);
         for($k=0; $k<$EDInum; $k++){//組み立て品登録
@@ -557,9 +552,6 @@ echo "</pre>";
       $connection->begin();//トランザクション3
       try {//トランザクション4
           if ($this->OrderEdis->saveMany($orderEdis)) {//saveManyで一括登録
-            echo "<pre>";
-            print_r("1");
-            echo "</pre>";
 
             $arrFp = array();//空の配列を作る
             $arrFp = $arrEDI;
@@ -629,6 +621,19 @@ echo "</pre>";
                   $table->setConnection($connection);
 
                   for($m=0; $m<count($arrFp); $m++){
+
+                    $sql = "SELECT bunnou FROM order_edi".//
+                          " where date_order ='".$arrEDI[$k]["date_order"]."' and num_order = '".$arrEDI[$k]["num_order"]."'
+                           and product_id = '".$arrEDI[$k]["product_code"]."' order by bunnou desc limit 1";//
+                    $connection = ConnectionManager::get('DB_ikou_test');//
+                    $bunnoumoto = $connection->execute($sql)->fetchAll('assoc');//
+      //
+                    if(isset($bunnoumoto[0]["bunnou"])){//
+                      $bunnou = $bunnoumoto[0]["bunnou"] + 1;//
+                    }else{//
+                      $bunnou = $arrEDI[$k]["bunnou"];//
+                    }//
+
                     $connection->insert('order_edi', [
                         'date_order' => $arrFp[$m]["date_order"],
                         'num_order' => $arrFp[$m]["num_order"],
@@ -641,7 +646,7 @@ echo "</pre>";
                         'place_line' => $arrFp[$m]["place_line"],
                         'line_code' => $arrFp[$m]["line_code"],
                         'check_denpyou' => $arrFp[$m]["check_denpyou"],
-                        'bunnou' => $arrFp[$m]["bunnou"],
+                        'bunnou' => $bunnou,
                         'kannou' => $arrFp[$m]["kannou"],
                         'delete_flg' => $arrFp[$m]["delete_flag"],
                         'created_at' => date("Y-m-d H:i:s")
@@ -671,6 +676,19 @@ echo "</pre>";
             $table->setConnection($connection);
 
             for($k=0; $k<count($arrEDI); $k++){
+
+              $sql = "SELECT bunnou FROM order_edi".//
+                    " where date_order ='".$arrEDI[$k]["date_order"]."' and num_order = '".$arrEDI[$k]["num_order"]."'
+                     and product_id = '".$arrEDI[$k]["product_code"]."' order by bunnou desc limit 1";//
+              $connection = ConnectionManager::get('DB_ikou_test');//
+              $bunnoumoto = $connection->execute($sql)->fetchAll('assoc');//
+//
+              if(isset($bunnoumoto[0]["bunnou"])){//
+                $bunnou = $bunnoumoto[0]["bunnou"] + 1;//
+              }else{//
+                $bunnou = $arrEDI[$k]["bunnou"];//
+              }//
+
               $connection->insert('order_edi', [
                   'date_order' => $arrEDI[$k]["date_order"],
                   'num_order' => $arrEDI[$k]["num_order"],
@@ -683,7 +701,7 @@ echo "</pre>";
                   'place_line' => $arrEDI[$k]["place_line"],
                   'line_code' => $arrEDI[$k]["line_code"],
                   'check_denpyou' => $arrEDI[$k]["check_denpyou"],
-                  'bunnou' => $arrEDI[$k]["bunnou"],
+                  'bunnou' => $bunnou,
                   'kannou' => $arrEDI[$k]["kannou"],
                   'delete_flg' => $arrEDI[$k]["delete_flag"],
                   'created_at' => date("Y-m-d H:i:s")
@@ -699,18 +717,29 @@ echo "</pre>";
                 $place_deliver = str_replace("弊社","",$arrEDImotodenpyoudnp[$k]["place_deliver"]);
               }else{
                 $place_deliver = $arrEDImotodenpyoudnp[$k]["place_deliver"];
-            }
+              }
 
-              $connection->insert('denpyou_dnp', [
-                  'num_order' => $arrEDImotodenpyoudnp[$k]["num_order"],
-                  'product_id' => $arrEDImotodenpyoudnp[$k]["product_code"],
-                  'name_order' => $arrEDImotodenpyoudnp[$k]["name_order"],
-                  'place_deliver' => $place_deliver,
-                  'code' => $arrEDImotodenpyoudnp[$k]["line_code"],
-                  'conf_print' => 0,
-                  'tourokubi' => $arrEDImotodenpyoudnp[$k]["date_order"],
-                  'created_at' => date("Y-m-d H:i:s")
-              ]);
+
+              $sql = "SELECT num_order FROM denpyou_dnp".//
+                    " where num_order ='".$arrEDImotodenpyoudnp[$k]["num_order"]."' and product_id = '".$arrEDImotodenpyoudnp[$k]["product_code"]."'
+                     and tourokubi = '".$arrEDImotodenpyoudnp[$k]["date_order"]."'";//
+              $connection = ConnectionManager::get('DB_ikou_test');//
+              $denpyou_dnpcheck = $connection->execute($sql)->fetchAll('assoc');//
+
+              if(isset($denpyou_dnpcheck[0]["num_order"])){//
+
+              }else{//
+                $connection->insert('denpyou_dnp', [
+                    'num_order' => $arrEDImotodenpyoudnp[$k]["num_order"],
+                    'product_id' => $arrEDImotodenpyoudnp[$k]["product_code"],
+                    'name_order' => $arrEDImotodenpyoudnp[$k]["name_order"],
+                    'place_deliver' => $place_deliver,
+                    'code' => $arrEDImotodenpyoudnp[$k]["line_code"],
+                    'conf_print' => 0,
+                    'tourokubi' => $arrEDImotodenpyoudnp[$k]["date_order"],
+                    'created_at' => date("Y-m-d H:i:s")
+                ]);
+              }//
             }
 
             $connection = ConnectionManager::get('default');
@@ -780,6 +809,7 @@ echo "</pre>";
               $mikanline_code = $OrderEdi[0]['line_code'];
               $mikandate_deliver = $OrderEdi[0]['date_deliver'];
               $mikanamount = $OrderEdi[0]['amount'];
+              $mikanbunnou = $OrderEdi[0]['bunnou'];//
               $mikanminoukannou = 0;
 
               $connection = ConnectionManager::get('DB_ikou_test');
@@ -793,6 +823,7 @@ echo "</pre>";
                     'code' => $mikanline_code,
                     'date_deliver' => $mikandate_deliver,
                     'amount' => $mikanamount,
+                    'bunnou' => $mikanbunnou,//
                     'minoukannou' => 1,
                     'delete_flg' => 0,
                     'created_at' => date("Y-m-d H:i:s")
@@ -1000,7 +1031,6 @@ echo "</pre>";
               file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
               $connection->commit();// コミット5
         } else {
-
           $mes = "※登録されませんでした。製品名にカンマが含まれていないか確認してください。";
           $this->set('mes',$mes);
           file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す

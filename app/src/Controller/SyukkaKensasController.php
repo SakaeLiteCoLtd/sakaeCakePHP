@@ -21,6 +21,7 @@ class SyukkaKensasController extends AppController {
      $this->ImKikakus = TableRegistry::get('imKikakus');//imKikakusテーブルを使う
      $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//imSokuteidataResultsテーブルを使う
      $this->Products = TableRegistry::get('products');//productsテーブルを使う
+     $this->Customers = TableRegistry::get('customers');
      $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
      $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouSokuteidatasテーブルを使う
      $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');//KadouSeikeisテーブルを使う
@@ -32,18 +33,228 @@ class SyukkaKensasController extends AppController {
       //メニュー画面
     }
 
-    public function improductform()//IMtaiou
+    public function yobidashimenu()//「出荷検査用呼出」ページトップ
     {
-    	$this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
     }
 
-    public function imtaiouform()//IMtaiou
+    public function yobidashicustomer()//「出荷検査用呼出」ページトップ
     {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+    }
+
+    public function yobidashipana()
+    {
+      $this->set('products', $this->Products->find()
+       ->select(['product_code','delete_flag' => '0'])
+       );
+    }
+
+    public function yobidashipanap0()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+       $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "P0")) && ($customer_id == 1)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+/*
+       echo "<pre>";
+       print_r($arrProduct);
+       echo "</pre>";
+*/
+    }
+
+    public function yobidashipanap1()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "P1")) && ($customer_id == 1)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function yobidashipanap2()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if(0 !== strpos($product_code, "P0") && 0 !== strpos($product_code, "P1") && 0 !== strpos($product_code, "W") && 0 !== strpos($product_code, "H") && 0 !== strpos($product_code, "RE") && ($customer_id == 1)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function yobidashipanaw()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "W")) && ($customer_id == 2)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function yobidashipanah()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "H")) && ($customer_id == 2)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function yobidashipanare()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "R")) && ($customer_id == 3)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function yobidashidnp()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if(($customer_id == 11) || ($customer_id == 12) || ($customer_id == 13) || ($customer_id == 14)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function yobidashiothers()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         $Customers = $this->Customers->find('all', ['conditions' => ['id' => $customer_id]])->toArray();
+         if(isset($Customers[0])){
+           $customer_code = $Customers[0]->customer_code;
+           if(0 !== strpos($customer_code, "1") && 0 !== strpos($customer_code, "2")){
+             $arrProduct[] = ["product_code" => $Products[$k]["product_code"], "product_name" => $Products[$k]["product_name"]];
+           }
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function version()//IMtaiou
+    {
+      $data = $this->request->query();
+
+      if(isset($data["name"])){
+        $product_code = $data["name"];
+      }else{
+        $data = $this->request->getData();
+        $product_code = $data["product_code"];
+      }
+      $this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
+/*
     	$this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
       $product_code = $data["product_code"];
       $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
+      */
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
 
       $ImKikakuex = $this->ImKikakuTaious->find()->where(['product_code' => $product_code])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
@@ -102,6 +313,85 @@ class SyukkaKensasController extends AppController {
     		${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
     		$this->set('lower_'.$j,${"lower_".$j});//セット
     	}
+
+    }
+
+    public function imtaiouform()//IMtaiou
+    {
+      $data = $this->request->query();
+
+      if(isset($data["name"])){
+        $product_code = $data["name"];
+      }else{
+        $data = $this->request->getData();
+        $product_code = $data["product_code"];
+      }
+      $this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
+
+    	$this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
+  //    $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+  //    $product_code = $data["product_code"];
+  //    $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
+
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+
+      $ImKikakuex = $this->ImKikakuTaious->find()->where(['product_code' => $product_code])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
+      $this->set('ImKikakuex',$ImKikakuex);//セット
+
+      $Productname = $Product[0]->product_name;
+      $this->set('Productname',$Productname);//セット
+
+      $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()
+    	->where(['product_code' => $product_code])->toArray();
+
+      $arrKindKensa = array("","ノギス");//配列の初期化
+    	 	foreach ($ImSokuteidataHeads as $value) {//それぞれに対して
+    			$arrKindKensa[] = $value->kind_kensa;//配列に追加
+    		}
+        $arrKindKensa = array_unique($arrKindKensa);
+      $this->set('ImSokuteidataHeads',$ImSokuteidataHeads);//セット
+      $this->set('arrKindKensa',$arrKindKensa);//セット
+
+      $this->loadModel("KensahyouSokuteidatas");
+      $kensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();//newentityに$userという名前を付ける
+    	$this->set('kensahyouSokuteidata',$kensahyouSokuteidatas);//空のカラムに$KensahyouSokuteidataと名前を付け、ctpで使えるようにセット
+
+    	$Products = $this->Products->find('all',[
+    		'conditions' => ['product_code =' => $product_code]//Productsテーブルの'product_code' = $product_codeとなるものを$Productsとする
+    	]);
+
+    	 foreach ($Products as $value) {//$Productsそれぞれに対し
+    		$product_code= $value->product_code;
+    	}
+    	$this->set('product_code',$product_code);//セット
+
+    	$htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+    	$htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+    	$this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+
+    	$KensahyouHead = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
+    	$this->set('KensahyouHead',$KensahyouHead);//セット
+
+      if(isset($KensahyouHead[0])){
+        $KensahyouHeadver = $KensahyouHead[0]->version+1;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+      	$this->set('KensahyouHeadver',$KensahyouHeadver);//セット
+
+      	$KensahyouHeadid = $KensahyouHead[0]->id;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のidに$KensahyouHeadidと名前を付ける
+      	$this->set('KensahyouHeadid',$KensahyouHeadid);//セット
+
+      	for($i=1; $i<=9; $i++){//size_1～9までセット
+      		${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
+      		$this->set('size_'.$i,${"size_".$i});//セット
+      	}
+
+      	for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
+      		${"upper_".$j} = $KensahyouHead[0]->{"upper_{$j}"};//KensahyouHeadのupper_1～8まで
+      		$this->set('upper_'.$j,${"upper_".$j});//セット
+      		${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
+      		$this->set('lower_'.$j,${"lower_".$j});//セット
+      	}
+      }
 
     }
 

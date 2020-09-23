@@ -27,6 +27,20 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           }
 */
         ?>
+
+        <?php
+         use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
+         $htmlSyukkakensamenu = new htmlSyukkakensamenu();
+         $htmlSyukkakensamenus = $htmlSyukkakensamenu->Syukkakensamenu();
+         ?>
+         <hr size="5" style="margin: 0.5rem">
+         <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+         <?php
+            echo $htmlSyukkakensamenus;
+         ?>
+         </table>
+         <hr size="5" style="margin: 0.5rem">
+
 <?php if(isset($ImKikakuex[0])): ?>
   <fieldset>
     <div align="center"><strong><font color="red">＊運用中</font></strong></div>

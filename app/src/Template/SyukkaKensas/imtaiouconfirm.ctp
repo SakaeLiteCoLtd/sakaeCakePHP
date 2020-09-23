@@ -15,21 +15,28 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
       $session = $this->request->getSession();
 
       for($n=1; $n<=9; $n++){
-              $resultArray = Array();
-                  $_SESSION['kikakudata'][$n] = array(
-                    'product_code' => $_POST['product_code'],
-                    'kensahyuo_num' => $n,
-                    "kind_kensa" => $_POST["kind_kensa_{$n}"],
-                    "size_num" => $_POST["size_num_{$n}"],
-                  );
+        $resultArray = Array();
+        $_SESSION['kikakudata'][$n] = array(
+          'product_code' => $_POST['product_code'],
+          'kensahyuo_num' => $n,
+          "kind_kensa" => $_POST["kind_kensa_{$n}"],
+          "size_num" => $_POST["size_num_{$n}"],
+        );
       }
 ?>
+<?php
+ use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
+ $htmlSyukkakensamenu = new htmlSyukkakensamenu();
+ $htmlSyukkakensamenus = $htmlSyukkakensamenu->Syukkakensamenu();
+ ?>
+ <hr size="5" style="margin: 0.5rem">
+ <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <?php
+    echo $htmlSyukkakensamenus;
+ ?>
+ </table>
+ <hr size="5" style="margin: 0.5rem">
 <br>
-
-<br>
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
-
-<hr size="5">
 <div align="center"><strong><font color="red">＊下記のように登録します</font></strong></div>
 <br>
 

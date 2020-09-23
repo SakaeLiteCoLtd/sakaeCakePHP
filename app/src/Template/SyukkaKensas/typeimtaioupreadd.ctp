@@ -7,7 +7,7 @@
 
 <br>
     <?= $this->Flash->render() ?>
-    <?= $this->Form->create($entity, ['url' => ['action' => 'imlogin']]) ?>
+    <?= $this->Form->create($KouteiKensahyouHeads, ['url' => ['action' => 'typeimlogin']]) ?>
     <br><br>
     <legend align="center"><strong style="font-size: 11pt; color:blue"><?= __("社員ID登録") ?></strong></legend>
     <fieldset>

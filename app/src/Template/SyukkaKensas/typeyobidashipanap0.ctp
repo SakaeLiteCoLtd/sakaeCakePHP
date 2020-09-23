@@ -13,7 +13,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($KensahyouHeads, ['url' => ['action' => 'imtaiouform']]);
+          echo $this->Form->create($KensahyouHeads, ['url' => ['action' => 'typeimtaiouform']]);
 ?>
 <?php
  use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
@@ -31,21 +31,21 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
             <tr style="background-color: #E6FFFF">
-              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_pana.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'yobidashipana')));?></td>
+              <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/button_pana.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'typeyobidashipana')));?></td>
             </tr>
 </table>
 
 <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
   <tr style="background-color: #E6FFFF">
-    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_p0001.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'yobidashipanap0')));?></td>
-      <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_p1000.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'yobidashipanap1')));?></td>
-        <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_p2000.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'yobidashipanap2')));?></td>
+    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_p0001.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'typeyobidashipanap0')));?></td>
+      <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_p1000.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'typeyobidashipanap1')));?></td>
+        <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_p2000.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'typeyobidashipanap2')));?></td>
   </tr>
   <br><br>
   <tr style="background-color: #E6FFFF">
-    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_w.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'yobidashipanaw')));?></td>
-      <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_h.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'yobidashipanah')));?></td>
-        <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_re.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'yobidashipanare')));?></td>
+    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_w.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'typeyobidashipanaw')));?></td>
+      <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_h.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'typeyobidashipanah')));?></td>
+        <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_re.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'typeyobidashipanare')));?></td>
   </tr>
 </table>
 
@@ -56,7 +56,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
       <?php for($i=0; $i<count($arrProduct); $i++): ?>
       <tr>
           <td class="actions" style="border-style: none; color:#ff0000; text-decoration: underline;">
-              <?= $this->Html->link(__($arrProduct[$i]["product_code"]), ['action' => 'imtaiouform',  'name' => $arrProduct[$i]["product_code"]]) ?>
+              <?= $this->Html->link(__($arrProduct[$i]["product_code"]), ['action' => 'typeimtaiouform',  'name' => $arrProduct[$i]["product_code"]]) ?>
           </td>
           <td style="border-style: none;"><?= h($arrProduct[$i]["product_name"]) ?></td>
       </tr>

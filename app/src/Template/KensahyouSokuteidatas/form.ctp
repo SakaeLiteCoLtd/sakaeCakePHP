@@ -22,6 +22,18 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
           $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();
 
         ?>
+        <?php
+         use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
+         $htmlSyukkakensamenu = new htmlSyukkakensamenu();
+         $htmlSyukkakensamenus = $htmlSyukkakensamenu->Syukkakensamenu();
+         ?>
+         <hr size="5" style="margin: 0.5rem">
+         <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+         <?php
+            echo $htmlSyukkakensamenus;
+         ?>
+         </table>
+         <hr size="5" style="margin: 0.5rem">
 
     <fieldset>
 <div align="center"><strong><font color="red">＊入力してください</font></strong></div>
@@ -37,7 +49,7 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
           <td colspan="9"><?= h($KensahyouHeadver) ?></td>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
-          <td colspan="9"><?= $this->Form->input("lot_num", array('type' => 'text', 'label'=>false)); ?></td>
+          <td colspan="9"><?= h($this->request->getData('lot_num')) ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
@@ -124,11 +136,12 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
 </td>
 </table>
         <?php
-            echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
-            echo $this->Form->hidden('product_code' ,['value'=>$product_code]) ;
-            echo $this->Form->hidden('delete_flag' ,['value'=>0]);
-            echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);
-            echo $this->Form->hidden('updated_staff');
+        echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
+        echo $this->Form->hidden('lot_num' ,['value'=>$this->request->getData('lot_num')]);
+        echo $this->Form->hidden('product_code' ,['value'=>$product_code]) ;
+        echo $this->Form->hidden('delete_flag' ,['value'=>0]);
+        echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);
+        echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

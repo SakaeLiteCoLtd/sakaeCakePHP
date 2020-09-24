@@ -44,13 +44,22 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= h($Productname) ?></td>
         </tr>
     </table>
+    <br>
+    <table width="600" border="1" align="center" bordercolor="#000000" bgcolor="#FFDEAD">
+        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+        <tr>
+          <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><strong><font color="blue">工程検査運用中バージョン</font></strong></div></td>
+          <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= h($versionnow) ?></td>
+        </tr>
+    </table>
+    <br>
     <table width="600" border="1" align="center" bordercolor="#000000" bgcolor="#FFDEAD">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
         <tr>
           <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><strong><font color="blue">使用中IMタイプ</font></strong></div></td>
           <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= h($typenow) ?></td>
           <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><strong><font color="blue">新規IMタイプ</font></strong></div></td>
-          <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("color", ["type"=>"select","empty"=>"選択してください", "options"=>$arrType, 'label'=>false, 'required'=>true]) ?></td>
+          <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= $this->Form->input("type_im", ["type"=>"select","empty"=>"選択してください", "options"=>$arrType, 'label'=>false, 'required'=>true]) ?></td>
         </tr>
     </table>
 <br>
@@ -59,6 +68,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
   <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('更新'), array('name' => 'kakunin')); ?></div></td>
 </tr>
 </table>
+
+<?php
+echo $this->Form->hidden('id' ,['value'=>$id]);
+echo $this->Form->hidden('version' ,['value'=>$newversion]);
+?>
 
 </fieldset>
 <?php else: ?>

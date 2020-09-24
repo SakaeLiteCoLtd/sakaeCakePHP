@@ -32,6 +32,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
          </table>
          <hr size="5" style="margin: 0.5rem">
 
+         <?php if($check == 1): ?>
+
     <fieldset>
 <div align="center"><strong><font color="red">＊ロット番号を入力して取り込みボタンを押してください</font></strong></div>
 <br>
@@ -121,8 +123,6 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
             echo $this->Form->hidden('product_code' ,['value'=>$product_code]) ;
             echo $this->Form->hidden('delete_flag' ,['value'=>0]);
-            echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);
-            echo $this->Form->hidden('updated_staff');
         ?>
     </fieldset>
 
@@ -132,3 +132,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
     </fieldset>
 
     <?= $this->Form->end() ?>
+
+    <?php else: ?>
+    <br><br>
+    <div align="center"><strong><font color="red">＊その品番は検査表ヘッダーが登録されていません。</font></strong></div>
+    <br><br>
+      <?php endif; ?>

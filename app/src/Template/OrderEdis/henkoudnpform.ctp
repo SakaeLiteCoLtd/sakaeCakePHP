@@ -170,20 +170,20 @@ header('Pragma:');
                   ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
                 <?php
-                  $product_code = ${"orderEdis".$i}->product_code;
-                  $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
-                  $Dnpdate_deliver = $DnpTotalAmount[0]->date_deliver;
+            //      $product_code = ${"orderEdis".$i}->product_code;
+            //      $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
+            //      $Dnpdate_deliver = $DnpTotalAmount[0]->date_deliver;
                 ?>
-                <td width="200" colspan="20" nowrap="nowrap"><?= h($Dnpdate_deliver) ?></td>
+                <td width="200" colspan="20" nowrap="nowrap"><?= h(${"date_deliver".$i}) ?></td>
               <?php
               echo $this->Form->hidden("orderEdis_".$i ,['value'=>${"orderEdis".$i}->id]);
               ?>
               <?php
-                $product_code = ${"orderEdis".$i}->product_code;
-                $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
-                $TotalAmount = $DnpTotalAmount[0]->amount;
+            //    $product_code = ${"orderEdis".$i}->product_code;
+            //    $DnpTotalAmount = $this->DnpTotalAmounts->find()->where(['num_order' => ${"orderEdis".$i}->num_order, 'date_order' => ${"orderEdis".$i}->date_order, 'product_code' => $product_code])->toArray();
+            //    $TotalAmount = $DnpTotalAmount[0]->amount;
               ?>
-                <td width="150" colspan="20" nowrap="nowrap"><?= h($TotalAmount) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h(${"amount".$i}) ?></td>
               </tr>
               <?php endforeach; ?>
             <?php endfor;?>

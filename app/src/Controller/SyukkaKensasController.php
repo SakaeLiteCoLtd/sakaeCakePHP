@@ -596,6 +596,8 @@ class SyukkaKensasController extends AppController {
 
     public function typeimtaiouform()//IMtaiou
     {
+      $this->request->session()->destroy();// セッションの破棄
+
       $data = $this->request->query();
 
       if(isset($data["name"])){
@@ -614,7 +616,13 @@ class SyukkaKensasController extends AppController {
 
       $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['product_code' => $product_code])->toArray();
       if(isset($KouteiKensahyouHeads[0])){
+        $id = $KouteiKensahyouHeads[0]->id;
+        $this->set('id',$id);
+        $versionnow = $KouteiKensahyouHeads[0]->version;
+        $this->set('versionnow',$versionnow);
         $typenow = $KouteiKensahyouHeads[0]->type_im;
+        $newversion = $versionnow + 1;
+        $this->set('newversion',$newversion);
         if($typenow == 0){
           $typenow = "IM6120(1号機)";
         }else{
@@ -635,7 +643,6 @@ class SyukkaKensasController extends AppController {
 
     public function imtaiouconfirm()//IMtaiou
     {
-
      $data = $this->request->getData();
      $product_code = $data["product_code"];
 
@@ -665,7 +672,6 @@ class SyukkaKensasController extends AppController {
 
      $session = $this->request->getSession();
      $data = $session->read();//postデータ取得し、$dataと名前を付ける
-
     }
 
     public function typeimtaioupreadd()
@@ -675,6 +681,11 @@ class SyukkaKensasController extends AppController {
      $session = $this->request->getSession();
      $data = $session->read();//postデータ取得し、$dataと名前を付ける
 
+     $_SESSION['imdatanew'][0] = array(
+       'id' => $_POST['id'],
+       'version' => $_POST['version'],
+       'type_im' => $_POST['type_im']
+     );
     }
 
    public function imlogin()
@@ -782,29 +793,30 @@ class SyukkaKensasController extends AppController {
     public function typeimtaioudo()
     {
       $session = $this->request->getSession();
-      $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
-      $data = $sessiondata['kikakudata'];
+      $data = $session->read();//postデータ取得し、$dataと名前を付ける
 
-      $Product = $this->Products->find()->where(['product_code' => $sessiondata['kikakudata'][1]['product_code']])->toArray();
-      $product_code = $Product[0]->product_code;
-      $this->set('product_code',$product_code);//セット
-      $Productname = $Product[0]->product_name;
-      $this->set('Productname',$Productname);//セット
+      $updated_staff = array('updated_staff'=>$data['Auth']['User']['staff_id']);
+      $data["imdatanew"][0] = array_merge($data["imdatanew"][0],$updated_staff);
 
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
+      $this->set('KouteiKensahyouHeads',$this->KouteiKensahyouHeads->newEntity());
 
-/*
       if ($this->request->is('get')) {//getなら登録
-        $ImKikakuTaiou = $this->ImKikakuTaious->patchEntities($ImKikakuTaiou, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+        $KouteiKensahyouHead = $this->KouteiKensahyouHeads->patchEntities($this->KouteiKensahyouHeads->newEntity(), $data["imdatanew"][0]);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
         $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2
         $connection->begin();//トランザクション3
         try {//トランザクション4
-            if ($this->ImKikakuTaious->saveMany($ImKikakuTaiou)) {//saveManyで一括登録
+          if ($this->KouteiKensahyouHeads->updateAll(
+            ['version' => $data["imdatanew"][0]['version'], 'type_im' => $data["imdatanew"][0]['type_im'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data["imdatanew"][0]['updated_staff']],
+            ['id'  => $data["imdatanew"][0]['id']]
+            )){
+
+              $mes = "※更新されました。";
+   						$this->set('mes',$mes);
               $connection->commit();// コミット5
             } else {
+              $mes = "※更新されませんでした。";
+   						$this->set('mes',$mes);
               $this->Flash->error(__('The KensahyouSokuteidatasimdo could not be saved. Please, try again.'));
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
@@ -813,7 +825,7 @@ class SyukkaKensasController extends AppController {
           $connection->rollback();//トランザクション9
         }//トランザクション10
       }
-  */
+
     }
 
     public function indexhome()//取り込み画面

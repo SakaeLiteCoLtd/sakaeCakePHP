@@ -1858,8 +1858,9 @@ echo "</pre>";
         $Totalamount = 0;
         $this->set('bunnou_num',$bunnou_num);
         $num_order0 = $orderEdis0[0]->num_order;
+        $line_code0 = $orderEdis0[0]->line_code;
         $product_code0 = $orderEdis0[0]->product_code;
-        $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'product_code' => $product_code0])->toArray();
+        $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'line_code' => $line_code0,'product_code' => $product_code0])->toArray();
         for($n=0; $n<=100; $n++){
           if(isset($orderEdis[$n])){
             ${"orderEdis".$n} = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $orderEdis[$n]->id])->toArray();

@@ -994,6 +994,10 @@ class KensahyouSokuteidatasController  extends AppController
     		$this->set('upper_'.$j,${"upper_".$j});//セット
     		${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
     		$this->set('lower_'.$j,${"lower_".$j});//セット
+
+        ${"hikaku_".$j} = "0_-1_0_1_0_1";
+    		$this->set('hikaku_'.$j,${"hikaku_".$j});//セット
+
     	}
 
       $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
@@ -1142,6 +1146,10 @@ class KensahyouSokuteidatasController  extends AppController
     		$this->set('upper_'.$j,${"upper_".$j});//セット
     		${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
     		$this->set('lower_'.$j,${"lower_".$j});//セット
+
+        ${"hikaku_".$j} = "0_-1_0_1_0_1";
+        $this->set('hikaku_'.$j,${"hikaku_".$j});//セット
+
     	}
 
       $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける

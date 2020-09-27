@@ -331,11 +331,36 @@ class KensahyouHeadsController  extends AppController
       $_SESSION['sokuteidata'] = array_merge($created_staff,$_SESSION['sokuteidata']);
 
       $data = $_SESSION['sokuteidata'];
-/*
+
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-*/
+
+      for($i=1; $i<=9; $i++){
+        if(empty($data["size_".$i])){
+          $data["size_".$i] = null;
+        }
+    	}
+
+    	for($j=1; $j<=8; $j++){
+        if(empty($data["upper_".$j])){
+          $data["upper_".$j] = null;
+        }
+        if(empty($data["lower_".$j])){
+          $data["lower_".$j] = null;
+        }
+    	}
+
+      for($i=10; $i<=11; $i++){
+        if(empty($data["text_".$i])){
+          $data["text_".$i] = null;
+        }
+    	}
+
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+
     	$product_code = $data['product_code'];//product_idという名前のデータに$product_idと名前を付ける
     	$this->set('product_code',$product_code);//セット
       $this->set('Productcode',$product_code);//セット
@@ -350,6 +375,46 @@ class KensahyouHeadsController  extends AppController
     		$connection->begin();//トランザクション3
     		try {//トランザクション4
     			if ($this->KensahyouHeads->save($kensahyouHead)) {//saveできた時
+
+            //旧DB更新
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('kensahyou_head');
+            $table->setConnection($connection);
+
+            $connection->insert('kensahyou_head', [
+                'product_id' => $data['product_code'],
+                'maisu' => $data['maisu'],
+                'size_1' => null,
+                'upper_1' => $data['upper_1'],
+                'lower_1' => $data['lower_1'],
+                'size_2' => $data['size_2'],
+                'upper_2' => $data['upper_2'],
+                'lower_2' => $data['lower_2'],
+                'size_3' => $data['size_3'],
+                'upper_3' => $data['upper_3'],
+                'lower_3' => $data['lower_3'],
+                'size_4' => $data['size_4'],
+                'upper_4' => $data['upper_4'],
+                'lower_4' => $data['lower_4'],
+                'size_5' => $data['size_5'],
+                'upper_5' => $data['upper_5'],
+                'lower_5' => $data['lower_5'],
+                'size_6' => $data['size_6'],
+                'upper_6' => $data['upper_6'],
+                'lower_6' => $data['lower_6'],
+                'size_7' => $data['size_7'],
+                'upper_7' => $data['upper_7'],
+                'lower_7' => $data['lower_7'],
+                'size_8' => $data['size_8'],
+                'upper_8' => $data['upper_8'],
+                'lower_8' => $data['lower_8'],
+                'size_9' => $data['size_9'],
+                'text_10' => $data['text_10'],
+                'text_11' => $data['text_11'],
+                'bik' => $data['bik']
+            ]);
+            $connection = ConnectionManager::get('default');
+
             $mes = "※下記のように登録されました";
 						$this->set('mes',$mes);
 						$connection->commit();// コミット5
@@ -364,6 +429,7 @@ class KensahyouHeadsController  extends AppController
     			$connection->rollback();//トランザクション9
     		}//トランザクション10
     	}
+
     }
 
     public function edit($id = null)

@@ -90,7 +90,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <div align="center"><strong><font color="red">＊下記のように登録します</font></strong></div>
 <br>
 
-    <table width="1200" border="1" align="center" bordercolor="#000000" bgcolor="#FFFFFF" style="background-color: #FFFFFF">
+    <table width="1400" border="1" align="center" bordercolor="#000000" bgcolor="#FFFFFF" style="background-color: #FFFFFF">
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>部品番号</strong></div></td>
           <td colspan="9" nowrap="nowrap"><?= h($this->request->getData('product_code')) ?></td>
@@ -165,6 +165,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 echo "</td>\n";
                 echo "<td colspan='2'><div align='center'>\n";
                 echo $this->request->getData("result_weight_{$q}");
+                echo "</td>\n";
+                echo "<td colspan='2'><div align='center'>\n";
+                echo ${"hikaku_".$q};
                 echo "</td>\n";
             }
         ?>

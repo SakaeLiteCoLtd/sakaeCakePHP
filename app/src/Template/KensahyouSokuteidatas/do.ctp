@@ -29,7 +29,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
  <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
 <br>
 
-    <table width="1200" border="1" align="center" bordercolor="#000000" bgcolor="#FFFFFF" style="background-color: #FFFFFF">
+    <table width="1400" border="1" align="center" bordercolor="#000000" bgcolor="#FFFFFF" style="background-color: #FFFFFF">
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>部品番号</strong></div></td>
           <td colspan="9" nowrap="nowrap"><?= h($product_code) ?></td>
@@ -95,9 +95,12 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               echo "<td colspan='2'>\n";
               echo $_SESSION['sokuteidata']["{$q}"]["situation_dist2"];
               echo "</td>\n";
-                echo "<td colspan='2'>\n";
-                echo $_SESSION['sokuteidata']["{$q}"]["result_weight"];
-                echo "</td>\n";
+              echo "<td colspan='2'>\n";
+              echo $_SESSION['sokuteidata']["{$q}"]["result_weight"];
+              echo "</td>\n";
+              echo "<td colspan='2'><div align='center'>\n";
+              echo ${"hikaku_".$q};
+              echo "</td>\n";
             }
         ?>
         </tr>

@@ -36,4 +36,7 @@
   </tr>
   </table>
 <br>
+<legend align="center"><font color="red"><?= __($mess) ?></font></legend>
+<br>
+
     <?= $this->Form->end() ?>

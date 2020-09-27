@@ -260,6 +260,15 @@ class ZensukensasController extends AppController
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
        $this->request->session()->destroy();// セッションの破棄
+
+       $mess = "";
+       $this->set('mess',$mess);
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }
+
      }
 
      public function zensuendstafflogin()
@@ -532,7 +541,7 @@ class ZensukensasController extends AppController
        $this->set('data',$data);
 /*
        echo "<pre>";
-       print_r($_SESSION['zensufooder']);
+       print_r($_SESSION);
        echo "</pre>";
 */
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
@@ -541,6 +550,11 @@ class ZensukensasController extends AppController
        $this->set('ResultZensuFooders',$ResultZensuFooders);
        $CheckLots = $this->CheckLots->newEntity();
        $this->set('CheckLots',$CheckLots);
+
+       if(!isset($_SESSION["zensuhead"])){
+         return $this->redirect(['action' => 'zensuendstaff',
+         's' => ['mess' => "ログアウトされました。この画面からやり直してください。"]]);
+       }
 
        $staffData = $this->Staffs->find()->where(['id' =>  $_SESSION['zensuhead']['updated_staff']])->toArray();
        $staff_code = $staffData[0]->staff_code;
@@ -618,7 +632,7 @@ class ZensukensasController extends AppController
                    $lot_in = substr($_SESSION['result_zensu_head_id']['lot_num'], 0, 3);
                    if($lot_in == "IN."){
                      $lot_oomoto = substr($_SESSION['result_zensu_head_id']['lot_num'], 4, 6);
-                     $lot_kodomo = substr($_SESSION['result_zensu_head_id']['lot_num'], 0, 6);
+                     $lot_kodomo = substr($_SESSION['result_zensu_head_id']['lot_num'], 0, 9);
                      $lot_num_touroku = substr($_SESSION['result_zensu_head_id']['lot_num'], -3);
 /*
                      echo "<pre>";
@@ -640,11 +654,7 @@ class ZensukensasController extends AppController
                      array_multisort($sort , SORT_ASC, $arrCheckLotkodomo);
                      $lot_kodomo_first = substr($arrCheckLotkodomo[0]['lot_num'], -3);
                      $bangou_lot = $lot_num_touroku - ($lot_kodomo_first - 1);//$lot_num_tourokuが同じ$lot_oomotoの中で何番目なのか調べる
-  /*
-                     echo "<pre>";
-                     print_r($arrCheckLotkodomo);
-                     echo "</pre>";
-  */
+
                      $LabelInsideout = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code']])->toArray();
                      $LabelInside_num = $LabelInsideout[0]->num_inside;
 
@@ -663,7 +673,60 @@ class ZensukensasController extends AppController
                        $arrCheckLotkodomotati[] = $CheckLotkodomo[$m]->flag_used;
                        $flag_used_total = $flag_used_total + $CheckLotkodomo[$m]->flag_used;
                      }
-
+/*
+                     echo "<pre>";
+                     print_r("lot_oomoto--  ");
+                     print_r($lot_oomoto);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("lot_kodomo--  ");
+                     print_r($lot_kodomo);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("lot_num_touroku--  ");
+                     print_r($lot_num_touroku);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("CheckLotId--  ");
+                     print_r($CheckLotId);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("cntkodomo--  ");
+                     print_r($cntkodomo);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("cntoya--  ");
+                     print_r($cntoya);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("lot_kodomo_first--  ");
+                     print_r($lot_kodomo_first);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("bangou_lot--  ");
+                     print_r($bangou_lot);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("bangou_oya_lot--  ");
+                     print_r($bangou_oya_lot);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("LabelInside_num--  ");
+                     print_r($LabelInside_num);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("ini--  ");
+                     print_r($bangou_oya_lot*$LabelInside_num - $LabelInside_num);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("last--  ");
+                     print_r($bangou_oya_lot*$LabelInside_num - 1);
+                     echo "</pre>";
+                     echo "<pre>";
+                     print_r("flag_used_total--  ");
+                     print_r($flag_used_total);
+                     echo "</pre>";
+*/
                     if($flag_used_total == 0){//子ロットが全部検査済みの場合は親ロットのflag_usedを０に変更
                       $arrCheckLotoya = array();//空の配列を作る　$lot_oyaの仲間を全部集める
                       foreach ((array)$CheckLotoya as $key => $value) {//lot_numで並び替え

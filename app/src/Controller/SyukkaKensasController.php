@@ -766,11 +766,20 @@ class SyukkaKensasController extends AppController {
 
      $ImKikakuTaiou = $this->ImKikakuTaious->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
      $this->set('ImKikakuTaiou',$ImKikakuTaiou);//セット
-      /*
-         echo "<pre>";
-         print_r($data);
-         echo "</pre>";
-      */
+
+     $count = count($data);
+     for($k=1; $k<=$count; $k++){
+
+       if(!empty($data[$k]["kind_kensa"]) && !empty($data[$k]["size_num"])){
+         $k = $k;
+       }else{
+         unset($data[$k]);
+       }
+
+     }
+
+     $data = array_values($data);
+
       if ($this->request->is('get')) {//getなら登録
         $ImKikakuTaiou = $this->ImKikakuTaious->patchEntities($ImKikakuTaiou, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
         $connection = ConnectionManager::get('default');//トランザクション1
@@ -778,8 +787,30 @@ class SyukkaKensasController extends AppController {
         $connection->begin();//トランザクション3
         try {//トランザクション4
             if ($this->ImKikakuTaious->saveMany($ImKikakuTaiou)) {//saveManyで一括登録
+
+            //旧DB更新
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('im_kikaku_taiou');
+            $table->setConnection($connection);
+
+            for($k=0; $k<count($data); $k++){
+              $connection->insert('im_kikaku_taiou', [
+                'product_id' => $data[$k]["product_code"],
+                'kensahyou_size' => $data[$k]["kensahyuo_num"],
+                'kind_kensa' => $data[$k]["kind_kensa"],
+                'im_size_num' => $data[$k]["size_num"]
+              ]);
+            }
+            $connection = ConnectionManager::get('default');
+
+            $mes = "※登録されました。";
+            $this->set('mes',$mes);
               $connection->commit();// コミット5
             } else {
+            $mes = "※登録できませんでした。";
+            $this->set('mes',$mes);
+
+
               $this->Flash->error(__('The KensahyouSokuteidatasimdo could not be saved. Please, try again.'));
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
@@ -787,7 +818,9 @@ class SyukkaKensasController extends AppController {
         //ロールバック8
           $connection->rollback();//トランザクション9
         }//トランザクション10
+
       }
+
     }
 
     public function typeimtaioudo()

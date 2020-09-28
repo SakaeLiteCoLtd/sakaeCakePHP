@@ -10,7 +10,7 @@
 
 <br>
     <?= $this->Flash->render() ?>
-    <?= $this->Form->create($orderEdis, ['url' => ['action' => 'henkoupanalogin']]) ?>
+    <?= $this->Form->create($orderEdis, ['url' => ['action' => 'henkoudnplogin']]) ?>
     <br><br>
     <legend align="center"><strong style="font-size: 11pt; color:blue"><?= __("社員ID登録") ?></strong></legend>
 

@@ -1995,7 +1995,16 @@ echo "</pre>";
 
             $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' , updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";
             $connection->execute($updater);
+
+            $table = TableRegistry::get('order_dnp_kannous');
+            $table->setConnection($connection);
+
+            $updater = "UPDATE order_dnp_kannous set updated_at = '".date('Y-m-d H:i:s')."', date_deliver = '".$newdate_deliver."'
+            where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."'";//もとのDBも更新
+            $connection->execute($updater);
+
             $connection = ConnectionManager::get('default');
+
             //ここまで
           }else{
             $mes = "※更新されませんでした";

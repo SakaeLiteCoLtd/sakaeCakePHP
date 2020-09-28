@@ -14,7 +14,7 @@
    $this->Products = TableRegistry::get('products');//productsテーブルを使う
    $this->PlaceDelivers = TableRegistry::get('placeDelivers');
    $this->OrderEdis = TableRegistry::get('orderEdis');
-   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkoupanapreadd']]);
+   echo $this->Form->create($orderEdis, ['url' => ['action' => 'henkoudnppreadd']]);
 ?>
 <?php
 header('Expires:-1');//この３行がなければ「戻る」をしたら「フォーム再送信の確認」が表示される。

@@ -27,23 +27,24 @@
          ?>
          </table>
          <hr size="5" style="margin: 0.5rem">
-<?=$this->Form->create($KadouSeikeis, ['url' => ['action' => 'kensakusyousai']]) ?>
+<?=$this->Form->create($kadouSeikeis, ['url' => ['action' => 'kensakusyousai']]) ?>
 <br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
         <thead>
-            <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">品番</strong></div></td>
-              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">成型機</strong></div></td>
-              <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">開始時刻</strong></div></td>
-              <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">終了時刻</strong></div></td>
-              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">ショットサイクル	</strong></div></td>
-              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">ショット数	</strong></div></td>
-              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">達成率	</strong></div></td>
-              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">開始ロット</strong></div></td>
-              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">最終ロット</strong></div></td>
-              <td width="60" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF"></strong></div></td>
-            </tr>
+          <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+            <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">品番</strong></div></td>
+            <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF">成形機</strong></div></td>
+            <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">開始時刻</strong></div></td>
+            <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">終了時刻</strong></div></td>
+            <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF">ショットサイクル</strong></div></td>
+            <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 8pt; color:#FF66FF">日報ショット数</strong></div></td>
+            <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 8pt; color:#FF66FF">PRGショット数</strong></div></td>
+            <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF">達成率</strong></div></td>
+            <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">開始ロット</strong></div></td>
+            <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">最終ロット</strong></div></td>
+            <td width="60" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF"></strong></div></td>
+          </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
           <?php for($i=0; $i<$countkadouSeikei; $i++): ?>
@@ -54,6 +55,7 @@
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis[$i]["finishing_tm"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis[$i]["cycle_shot"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis[$i]["amount_shot"]) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis[$i]["amount_programming"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="red"><?= h($KadouSeikeis[$i]["accomp_rate"] * 100) ?></font><font color="blue"><?= h(" ％") ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis[$i]["first_lot_num"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis[$i]["last_lot_num"]) ?></font></td>

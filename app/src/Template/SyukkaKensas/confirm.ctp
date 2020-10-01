@@ -7,6 +7,18 @@
 $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
 $this->Products = TableRegistry::get('products');//productsテーブルを使う
 ?>
+<?php
+ use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
+ $htmlSyukkakensamenu = new htmlSyukkakensamenu();
+ $htmlSyukkakensamenus = $htmlSyukkakensamenu->Syukkakensamenu();
+ ?>
+ <hr size="5" style="margin: 0.5rem">
+ <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <?php
+    echo $htmlSyukkakensamenus;
+ ?>
+ </table>
+ <hr size="5" style="margin: 0.5rem">
 
 <?= $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'preadd']]) ?>
 
@@ -85,10 +97,6 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 */
 ?>
 
-<br>
-              <p align="center"><?php echo $this->Html->image('ShinkiTourokuMenu/touroku.gif',array('width'=>'157','height'=>'50'));?></p>
-
-<hr size="5">
 <div align="center"><strong><font color="red">＊下記のように登録します</font></strong></div>
 <br>
 

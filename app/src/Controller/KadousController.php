@@ -892,7 +892,7 @@ class KadousController extends AppController
           $seikeiki = "no";//日にちだけで絞り込み
 
           $KadouSeikeis = $this->KadouSeikeis->find()
-          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'present_kensahyou' => 0])->order(["seikeiki"=>"ASC"])->toArray();
+          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin])->order(["seikeiki"=>"ASC"])->toArray();
           $this->set('KadouSeikeis',$KadouSeikeis);
 
     //      $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
@@ -903,7 +903,7 @@ class KadousController extends AppController
         }else{//seikeikiの入力があるとき　product_code×　seikeiki〇　date〇//seikeikiと日にちで絞り込み
 
           $KadouSeikeis = $this->KadouSeikeis->find()
-          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'present_kensahyou' => 0])->order(["seikeiki"=>"ASC"])->toArray();
+          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki])->order(["seikeiki"=>"ASC"])->toArray();
           $this->set('KadouSeikeis',$KadouSeikeis);
 
     //      $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
@@ -917,7 +917,7 @@ class KadousController extends AppController
           $seikeiki = "no";//プロダクトコードと日にちで絞り込み
 
           $KadouSeikeis = $this->KadouSeikeis->find()
-          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["seikeiki"=>"ASC"])->toArray();
+          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'product_code' => $product_code])->order(["seikeiki"=>"ASC"])->toArray();
           $this->set('KadouSeikeis',$KadouSeikeis);
 
     //      $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
@@ -929,7 +929,7 @@ class KadousController extends AppController
         }else{//seikeikiの入力があるとき　product_code〇　seikeiki〇　date〇//プロダクトコードとseikeikiと日にちで絞り込み
 
           $KadouSeikeis = $this->KadouSeikeis->find()
-          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'product_code' => $product_code, 'present_kensahyou' => 0])->order(["seikeiki"=>"ASC"])->toArray();
+          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'product_code' => $product_code])->order(["seikeiki"=>"ASC"])->toArray();
           $this->set('KadouSeikeis',$KadouSeikeis);
 
     //      $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
@@ -992,11 +992,11 @@ class KadousController extends AppController
 
       }
 
-/*
+
       echo "<pre>";
-      print_r($kadouSeikei);
+      print_r($KadouSeikeis);
       echo "</pre>";
-*/
+
       $this->set('KadouSeikeis',$KadouSeikeis);
       $this->set('countkadouSeikei',count($KadouSeikeis));
 
@@ -1010,11 +1010,11 @@ class KadousController extends AppController
           'seikeiki' => $KadouSeikeis[$n]['seikeiki']
         );
       }
-/*
+
        echo "<pre>";
        print_r($_SESSION);
        echo "</pre>";
-*/
+
     }
 
     public function kensakusyousai()

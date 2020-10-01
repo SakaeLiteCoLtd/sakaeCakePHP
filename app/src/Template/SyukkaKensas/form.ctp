@@ -22,6 +22,18 @@ $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//produ
 //          echo $this->Form->hidden('lot_num', ['value'=>$lot_num]);
           echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'confirm']]);
         ?>
+        <?php
+         use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
+         $htmlSyukkakensamenu = new htmlSyukkakensamenu();
+         $htmlSyukkakensamenus = $htmlSyukkakensamenu->Syukkakensamenu();
+         ?>
+         <hr size="5" style="margin: 0.5rem">
+         <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+         <?php
+            echo $htmlSyukkakensamenus;
+         ?>
+         </table>
+         <hr size="5" style="margin: 0.5rem">
 
     <fieldset>
 <div align="center"><strong><font color="red">＊入力してください</font></strong></div>

@@ -1007,7 +1007,7 @@ class SyukkaKensasController extends AppController {
               ['id'  => $scheduleId]
             )){
 
-                //旧DBに単価登録
+                //旧DB
                 $connection = ConnectionManager::get('DB_ikou_test');
                 $table = TableRegistry::get('schedule_koutei');
                 $table->setConnection($connection);
@@ -1060,10 +1060,9 @@ class SyukkaKensasController extends AppController {
 
       }
 
-//検査済みの場合は'present_kensahyou' => 0に変更する
 
       $KadouSeikeiDatac = $this->KadouSeikeis->find()->where(['present_kensahyou' => 0])->toArray();//'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
-      for($i=1; $i<=count($KadouSeikeiDatac); $i++){
+      for($i=1; $i<=count($KadouSeikeiDatac); $i++){//KadouSeikeisテーブルの'present_kensahyou' => 0のデータに対して
         $KadouSeikeisId = $KadouSeikeiDatac[$i-1]->id;
         $KadouSeikeispro = $KadouSeikeiDatac[$i-1]->product_code;
         $KadouSeikeisdaymoto = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d_H_:i:s');
@@ -1082,7 +1081,7 @@ class SyukkaKensasController extends AppController {
 
         $KensahyouSokuteidatasData = $this->KensahyouSokuteidatas->find()->where(['product_code' => $KadouSeikeispro, 'manu_date' => $KadouSeikeisday])->order(["product_code"=>"desc"])->toArray();
 
-        if(isset($KensahyouSokuteidatasData[0])){
+        if(isset($KensahyouSokuteidatasData[0])){//検査済みの場合は'present_kensahyou' => 1
 
           $KadouSeikeis = $this->KadouSeikeis->patchEntity($this->KadouSeikeis->newEntity(), $this->request->getData());
           $connection = ConnectionManager::get('default');//トランザクション1

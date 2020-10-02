@@ -616,7 +616,12 @@ class SyukkaKensasController extends AppController {
       $Productname = $Product[0]->product_name;
       $this->set('Productname',$Productname);
 
-      $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['product_code' => $product_code])->toArray();
+      $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['product_code' => $product_code, 'delete_flag' => 0])->order(["version"=>"desc"])->toArray();//versionが大きいものから順に呼出
+/*
+      echo "<pre>";
+      print_r(count($KouteiKensahyouHeads));
+      echo "</pre>";
+*/
       if(isset($KouteiKensahyouHeads[0])){
         $id = $KouteiKensahyouHeads[0]->id;
         $this->set('id',$id);
@@ -835,6 +840,49 @@ class SyukkaKensasController extends AppController {
 
       $this->set('KouteiKensahyouHeads',$this->KouteiKensahyouHeads->newEntity());
 
+      $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['id' => $data["imdatanew"][0]['id']])->toArray();
+      $product_code = $KouteiKensahyouHeads[0]->product_code;
+      $tourokuData = [
+        'product_code' => $product_code,
+        'version' => $data["imdatanew"][0]['version'],
+        'type_im' => $data["imdatanew"][0]['type_im'],
+        'size_1' => $KouteiKensahyouHeads[0]->size_1,
+        'upper_1' => $KouteiKensahyouHeads[0]->upper_1,
+        'lower_1' => $KouteiKensahyouHeads[0]->lower_1,
+        'size_2' => $KouteiKensahyouHeads[0]->size_2,
+        'upper_2' => $KouteiKensahyouHeads[0]->upper_2,
+        'lower_2' => $KouteiKensahyouHeads[0]->lower_2,
+        'size_3' => $KouteiKensahyouHeads[0]->size_3,
+        'upper_3' => $KouteiKensahyouHeads[0]->upper_3,
+        'lower_3' => $KouteiKensahyouHeads[0]->lower_3,
+        'size_4' => $KouteiKensahyouHeads[0]->size_4,
+        'upper_4' => $KouteiKensahyouHeads[0]->upper_4,
+        'lower_4' => $KouteiKensahyouHeads[0]->lower_4,
+        'size_5' => $KouteiKensahyouHeads[0]->size_5,
+        'upper_5' => $KouteiKensahyouHeads[0]->upper_5,
+        'lower_5' => $KouteiKensahyouHeads[0]->lower_5,
+        'size_6' => $KouteiKensahyouHeads[0]->size_6,
+        'upper_6' => $KouteiKensahyouHeads[0]->upper_6,
+        'lower_6' => $KouteiKensahyouHeads[0]->lower_6,
+        'size_7' => $KouteiKensahyouHeads[0]->size_7,
+        'upper_7' => $KouteiKensahyouHeads[0]->upper_7,
+        'lower_7' => $KouteiKensahyouHeads[0]->lower_7,
+        'size_8' => $KouteiKensahyouHeads[0]->size_8,
+        'upper_8' => $KouteiKensahyouHeads[0]->upper_8,
+        'lower_8' => $KouteiKensahyouHeads[0]->lower_8,
+        'size_9' => $KouteiKensahyouHeads[0]->size_9,
+        'text_10' => $KouteiKensahyouHeads[0]->text_10,
+        'text_11' => $KouteiKensahyouHeads[0]->text_11,
+        'bik' => $KouteiKensahyouHeads[0]->bik,
+        'status' => $KouteiKensahyouHeads[0]->status,
+        'created_at' => date('Y-m-d H:i:s'),
+        'created_staff' => $data["imdatanew"][0]['updated_staff']
+      ];
+/*
+      echo "<pre>";
+      print_r($tourokuData);
+      echo "</pre>";
+*/
       if ($this->request->is('get')) {//getなら登録
         $KouteiKensahyouHead = $this->KouteiKensahyouHeads->patchEntities($this->KouteiKensahyouHeads->newEntity(), $data["imdatanew"][0]);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
         $connection = ConnectionManager::get('default');//トランザクション1
@@ -842,9 +890,67 @@ class SyukkaKensasController extends AppController {
         $connection->begin();//トランザクション3
         try {//トランザクション4
           if ($this->KouteiKensahyouHeads->updateAll(
-            ['version' => $data["imdatanew"][0]['version'], 'type_im' => $data["imdatanew"][0]['type_im'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data["imdatanew"][0]['updated_staff']],
+        //    ['version' => $data["imdatanew"][0]['version'], 'type_im' => $data["imdatanew"][0]['type_im'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data["imdatanew"][0]['updated_staff']],
+            ['delete_flag' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data["imdatanew"][0]['updated_staff']],
             ['id'  => $data["imdatanew"][0]['id']]
             )){
+
+              $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->patchEntity($this->KouteiKensahyouHeads->newEntity(), $tourokuData);
+  						$this->KouteiKensahyouHeads->save($KouteiKensahyouHeads);
+
+              $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['id' => $data["imdatanew"][0]['id']])->toArray();
+
+              //旧DBに登録
+  						$connection = ConnectionManager::get('DB_ikou_test');
+  						$table = TableRegistry::get('koutei_kensahyou_head');
+  						$table->setConnection($connection);
+
+              $delete_flag = 1;
+              $versionmoto = $data["imdatanew"][0]['version'] - 1;
+              $updater = "UPDATE koutei_kensahyou_head set status ='".$delete_flag."' ,
+               updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$data["imdatanew"][0]['updated_staff']."'
+              where product_id ='".$product_code."' and version ='".$versionmoto."'";
+              $connection->execute($updater);
+
+  							$connection->insert('koutei_kensahyou_head', [
+                  'product_id' => $product_code,
+                  'version' => $data["imdatanew"][0]['version'],
+                  'type_im' => $data["imdatanew"][0]['type_im'],
+                  'size_1' => $KouteiKensahyouHeads[0]->size_1,
+                  'upper_1' => $KouteiKensahyouHeads[0]->upper_1,
+                  'lower_1' => $KouteiKensahyouHeads[0]->lower_1,
+                  'size_2' => $KouteiKensahyouHeads[0]->size_2,
+                  'upper_2' => $KouteiKensahyouHeads[0]->upper_2,
+                  'lower_2' => $KouteiKensahyouHeads[0]->lower_2,
+                  'size_3' => $KouteiKensahyouHeads[0]->size_3,
+                  'upper_3' => $KouteiKensahyouHeads[0]->upper_3,
+                  'lower_3' => $KouteiKensahyouHeads[0]->lower_3,
+                  'size_4' => $KouteiKensahyouHeads[0]->size_4,
+                  'upper_4' => $KouteiKensahyouHeads[0]->upper_4,
+                  'lower_4' => $KouteiKensahyouHeads[0]->lower_4,
+                  'size_5' => $KouteiKensahyouHeads[0]->size_5,
+                  'upper_5' => $KouteiKensahyouHeads[0]->upper_5,
+                  'lower_5' => $KouteiKensahyouHeads[0]->lower_5,
+                  'size_6' => $KouteiKensahyouHeads[0]->size_6,
+                  'upper_6' => $KouteiKensahyouHeads[0]->upper_6,
+                  'lower_6' => $KouteiKensahyouHeads[0]->lower_6,
+                  'size_7' => $KouteiKensahyouHeads[0]->size_7,
+                  'upper_7' => $KouteiKensahyouHeads[0]->upper_7,
+                  'lower_7' => $KouteiKensahyouHeads[0]->lower_7,
+                  'size_8' => $KouteiKensahyouHeads[0]->size_8,
+                  'upper_8' => $KouteiKensahyouHeads[0]->upper_8,
+                  'lower_8' => $KouteiKensahyouHeads[0]->lower_8,
+                  'size_9' => $KouteiKensahyouHeads[0]->size_9,
+                  'text_10' => $KouteiKensahyouHeads[0]->text_10,
+                  'text_11' => $KouteiKensahyouHeads[0]->text_11,
+                  'bik' => $KouteiKensahyouHeads[0]->bik,
+                  'status' => $KouteiKensahyouHeads[0]->status,
+                  'created_at' => date('Y-m-d H:i:s'),
+                  'created_emp_id' => $data["imdatanew"][0]['updated_staff']
+  							]);
+
+                $connection = ConnectionManager::get('default');//新DBに戻る
+                $table->setConnection($connection);
 
               $mes = "※更新されました。";
    						$this->set('mes',$mes);

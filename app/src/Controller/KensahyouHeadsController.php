@@ -332,10 +332,6 @@ class KensahyouHeadsController  extends AppController
 
       $data = $_SESSION['sokuteidata'];
 
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-
       for($i=1; $i<=9; $i++){
         if(empty($data["size_".$i])){
           $data["size_".$i] = null;
@@ -384,7 +380,7 @@ class KensahyouHeadsController  extends AppController
             $connection->insert('kensahyou_head', [
                 'product_id' => $data['product_code'],
                 'maisu' => $data['maisu'],
-                'size_1' => null,
+                'size_1' => $data['size_1'],
                 'upper_1' => $data['upper_1'],
                 'lower_1' => $data['lower_1'],
                 'size_2' => $data['size_2'],
@@ -446,6 +442,12 @@ class KensahyouHeadsController  extends AppController
     	$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_idを満たすものを$Product
     	$Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
     	$this->set('Productname',$Productname);//セット
+
+      $KensaProduct = $this->KensahyouHeads->find()->where(['product_code' => $product_code ,'delete_flag' => '0'])->order(["version"=>"desc"])->toArray();
+      $KensaProductV = $KensaProduct[0]->version;
+      $newversion = $KensaProductV + 1;
+      $this->set('newversion',$newversion);
+
     }
 
     public function editconfirm()
@@ -525,11 +527,28 @@ class KensahyouHeadsController  extends AppController
        $_SESSION['sokuteidata'] = array_merge($created_staff,$_SESSION['sokuteidata']);
 
        $data = $_SESSION['sokuteidata'];
-/*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
+
+       for($i=1; $i<=9; $i++){
+         if(empty($data["size_".$i])){
+           $data["size_".$i] = null;
+         }
+     	}
+
+     	for($j=1; $j<=8; $j++){
+         if(empty($data["upper_".$j])){
+           $data["upper_".$j] = null;
+         }
+         if(empty($data["lower_".$j])){
+           $data["lower_".$j] = null;
+         }
+     	}
+
+       for($i=10; $i<=11; $i++){
+         if(empty($data["text_".$i])){
+           $data["text_".$i] = null;
+         }
+     	}
+
      	$Productcode = $data["product_code"];
      	$this->set('Productcode',$Productcode);//セット
       $Product = $this->Products->find()->where(['product_code' => $Productcode])->toArray();
@@ -560,23 +579,109 @@ class KensahyouHeadsController  extends AppController
              $connection->rollback();//トランザクション9
            }//トランザクション10
          }else{
+
+           $tourokuData = [
+             'product_code' => $Productcode,
+             'version' => $data['version'],
+             'maisu' => $data['maisu'],
+             'type_im' => $data['type_im'],
+             'size_1' => $data['size_1'],
+             'upper_1' => $data['upper_1'],
+             'lower_1' => $data['lower_1'],
+             'size_2' => $data['size_2'],
+             'upper_2' => $data['upper_2'],
+             'lower_2' => $data['lower_2'],
+             'size_3' => $data['size_3'],
+             'upper_3' => $data['upper_3'],
+             'lower_3' => $data['lower_3'],
+             'size_4' => $data['size_4'],
+             'upper_4' => $data['upper_4'],
+             'lower_4' => $data['lower_4'],
+             'size_5' => $data['size_5'],
+             'upper_5' => $data['upper_5'],
+             'lower_5' => $data['lower_5'],
+             'size_6' => $data['size_6'],
+             'upper_6' => $data['upper_6'],
+             'lower_6' => $data['lower_6'],
+             'size_7' => $data['size_7'],
+             'upper_7' => $data['upper_7'],
+             'lower_7' => $data['lower_7'],
+             'size_8' => $data['size_8'],
+             'upper_8' => $data['upper_8'],
+             'lower_8' => $data['lower_8'],
+             'size_9' => $data['size_9'],
+             'text_10' => $data['text_10'],
+             'text_11' => $data['text_11'],
+             'bik' => $data['bik'],
+             'status' => $data['status'],
+             'created_at' => date('Y-m-d H:i:s'),
+             'created_staff' => $data['updated_staff']
+           ];
+
            $kensahyouHead = $this->KensahyouHeads->patchEntity($kensahyouHead, $this->request->getData());
            $connection = ConnectionManager::get('default');//トランザクション1
              // トランザクション開始2
            $connection->begin();//トランザクション3
            try {//トランザクション4
              if ($this->KensahyouHeads->updateAll(//検査終了時間の更新
- 							['version' => $data['version'], 'maisu' => $data['maisu'], 'type_im' => $data['type_im'], 'size_1' => $data['size_1'],
-              'size_2' => $data['size_2'], 'size_3' => $data['size_3'], 'size_4' => $data['size_4'], 'size_5' => $data['size_5'],
-              'size_6' => $data['size_6'], 'size_7' => $data['size_7'], 'size_8' => $data['size_8'], 'size_9' => $data['size_9'],
-              'upper_1' => $data['upper_1'], 'upper_2' => $data['upper_2'], 'upper_3' => $data['upper_3'], 'upper_4' => $data['upper_4'],
-              'upper_5' => $data['upper_5'], 'upper_6' => $data['upper_6'], 'upper_7' => $data['upper_7'], 'upper_8' => $data['upper_8'],
-              'lower_1' => $data['lower_1'], 'lower_2' => $data['lower_2'], 'lower_3' => $data['lower_3'], 'lower_4' => $data['lower_4'],
-              'lower_5' => $data['lower_5'], 'lower_6' => $data['lower_6'], 'lower_7' => $data['lower_7'], 'lower_8' => $data['lower_8'],
-              'text_10' => $data['text_10'], 'text_11' => $data['text_11'], 'bik' => $data['bik'], 'delete_flag' => $data['delete_flag'],
-              'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data['updated_staff']],
+ 							[
+              'delete_flag' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data['updated_staff']],
  							['id'  => $data['id']]
  						)){
+
+              $KensahyouHeads = $this->KensahyouHeads->patchEntity($this->KensahyouHeads->newEntity(), $tourokuData);
+  						$this->KensahyouHeads->save($KensahyouHeads);
+
+              $KensahyouHeads = $this->KensahyouHeads->find()->where(['id' => $data['id']])->toArray();
+
+              //旧DBに登録
+  						$connection = ConnectionManager::get('DB_ikou_test');
+  						$table = TableRegistry::get('kensahyou_head');
+  						$table->setConnection($connection);
+
+              $delete_flag = 1;
+              $versionmoto = $data['version'] - 1;
+              $updater = "UPDATE kensahyou_head set status ='".$delete_flag."'
+              where product_id ='".$Productcode."' and version ='".$versionmoto."'";
+              $connection->execute($updater);
+
+  							$connection->insert('kensahyou_head', [
+                  'product_id' => $Productcode,
+                  'version' => $data['version'],
+                  'size_1' => $data['size_1'],
+                  'upper_1' => $data['upper_1'],
+                  'lower_1' => $data['lower_1'],
+                  'size_2' => $data['size_2'],
+                  'upper_2' => $data['upper_2'],
+                  'lower_2' => $data['lower_2'],
+                  'size_3' => $data['size_3'],
+                  'upper_3' => $data['upper_3'],
+                  'lower_3' => $data['lower_3'],
+                  'size_4' => $data['size_4'],
+                  'upper_4' => $data['upper_4'],
+                  'lower_4' => $data['lower_4'],
+                  'size_5' => $data['size_5'],
+                  'upper_5' => $data['upper_5'],
+                  'lower_5' => $data['lower_5'],
+                  'size_6' => $data['size_6'],
+                  'upper_6' => $data['upper_6'],
+                  'lower_6' => $data['lower_6'],
+                  'size_7' => $data['size_7'],
+                  'upper_7' => $data['upper_7'],
+                  'lower_7' => $data['lower_7'],
+                  'size_8' => $data['size_8'],
+                  'upper_8' => $data['upper_8'],
+                  'lower_8' => $data['lower_8'],
+                  'size_9' => $data['size_9'],
+                  'text_10' => $data['text_10'],
+                  'text_11' => $data['text_11'],
+                  'bik' => $data['bik'],
+                  'status' => 0
+  							]);
+
+                $connection = ConnectionManager::get('default');//新DBに戻る
+                $table->setConnection($connection);
+
                $mes = "※下記のように更新されました";
     						$this->set('mes',$mes);
     						$connection->commit();// コミット5

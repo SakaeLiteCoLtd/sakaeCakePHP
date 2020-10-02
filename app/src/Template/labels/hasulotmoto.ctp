@@ -53,7 +53,11 @@
 
   <?php for($i=0; $i<=$tuika; $i++): ?>
   <tr style="border-bottom: solid;border-width: 1px">
-    <td bgcolor="#FFFFCC"><?= $this->Form->control('text'.$i, array('type'=>'text', 'label'=>false, 'maxlength' => 100)) ?></td>
+    <?php if ($i == $tuika): ?>
+      <td bgcolor="#FFFFCC"><?= $this->Form->control('text'.$i, array('type'=>'text', 'label'=>false, 'maxlength' => 100 ,'autofocus'=>true)) ?></td>
+    <?php else : ?>
+      <td bgcolor="#FFFFCC"><?= $this->Form->control('text'.$i, array('type'=>'text', 'label'=>false, 'maxlength' => 100)) ?></td>
+    <?php endif; ?>
   </tr>
   <?= $this->Form->control('num', array('type'=>'hidden', 'value'=>$i, 'label'=>false)) ?>
   <?php endfor;?>

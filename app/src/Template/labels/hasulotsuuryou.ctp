@@ -57,7 +57,7 @@
   <?php for($i=0; $i<=$tuika; $i++): ?>
   <tr style="border-bottom: solid;border-width: 1px">
     <td width="250"  bgcolor="#FFFFCC" style="font-size: 12pt;"><?= h(${"lot_moto".$i}) ?></td>
-    <td width="250" bgcolor="#FFFFCC"><?= $this->Form->control('amount_moto'.$i, array('type'=>'text', 'label'=>false, 'maxlength' => 100)) ?></td>
+    <td width="250" bgcolor="#FFFFCC"><?= $this->Form->control('amount_moto'.$i, array('type'=>'text', 'label'=>false, 'maxlength' => 100 ,'autofocus'=>true)) ?></td>
   </tr>
   <?= $this->Form->control('lot_moto'.$i, array('type'=>'hidden', 'value'=>${"lot_moto".$i}, 'label'=>false)) ?>
   <?= $this->Form->control('num', array('type'=>'hidden', 'value'=>$i, 'label'=>false)) ?>
@@ -85,6 +85,6 @@
     <?= $this->Form->end() ?>
   <?php else: //合計数量が違う時 ?>
     <br><br>
-    <legend align="center"><font color="red"><?= __('＊そのロットは、製品が違います。') ?></font></legend>
+    <legend align="center"><font color="red"><?= __('＊そのロットは、製品が違うまたは未検査のロットです。') ?></font></legend>
     <br><br><br><br><br>
   <?php endif; ?>

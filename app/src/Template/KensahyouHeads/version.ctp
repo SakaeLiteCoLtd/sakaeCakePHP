@@ -34,7 +34,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
     <fieldset>
           <?php
-          	$KensaProduct = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();
+          	$KensaProduct = $this->KensahyouHeads->find()->where(['product_code' => $product_code ,'delete_flag' => '0'])->order(["version"=>"desc"])->toArray();
           	$KensaProductV = $KensaProduct[0]->version;
            	$this->set('KensaProductV',$KensaProductV);
 

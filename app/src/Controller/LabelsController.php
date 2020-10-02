@@ -3482,6 +3482,17 @@ class LabelsController extends AppController
              $amount_sum = $amount_sum + ${"amount_moto".$i};
              $this->set('amount_sum',$amount_sum);
 
+             ${"CheckLot".$i} = $this->CheckLots->find()->where(['lot_num' => ${"lot_moto".$i},  'product_code' => ${"product_moto".$i}])->toArray();
+             ${"CheckLotflag_used".$i} = ${"CheckLot".$i}[0]->flag_used;
+
+             if(${"CheckLotflag_used".$i} == 0){
+               $check_product = $check_product;
+               $this->set('check_product',$check_product);
+             }else{
+               $check_product = 1;
+               $this->set('check_product',$check_product);
+             }
+
              if(${"product_moto".$i} == $product_code1){
                $check_product = $check_product;
                $this->set('check_product',$check_product);

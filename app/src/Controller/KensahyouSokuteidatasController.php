@@ -24,7 +24,6 @@ class KensahyouSokuteidatasController  extends AppController
       $this->Products = TableRegistry::get('products');//productsテーブルを使う
       $this->Customers = TableRegistry::get('customers');
       $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
-      $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouHeadsテーブルを使う
       $this->ImKikakus = TableRegistry::get('imKikakus');//ImKikakuTaiousテーブルを使う
       $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuTaiousテーブルを使う
       $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//ImKikakuTaiousテーブルを使う

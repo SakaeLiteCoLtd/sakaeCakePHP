@@ -99,8 +99,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
           <td colspan="9"><?= h($this->request->getData('version')) ?></td>
-          <td colspan="5" nowrap="nowrap"><div align="center"><strong>type_im</strong></div></td>
-          <td colspan="9"><?= h($this->request->getData('type_im')) ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>IMタイプ</strong></div></td>
+          <td colspan="9"><?= h($type_im) ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>枚数</strong></div></td>

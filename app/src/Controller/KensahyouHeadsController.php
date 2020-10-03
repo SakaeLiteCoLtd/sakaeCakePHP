@@ -251,6 +251,10 @@ class KensahyouHeadsController  extends AppController
 
     	$this->set('kensahyouHeads',$this->KensahyouHeads->find()//KensahyouHeadsテーブルから
     		->where(['delete_flag' => '0','product_code' => $product_code]));//'delete_flag' => '0'、'product_id' => $product_idを満たすデータをkensahyouHeadsにセット
+
+        $arrType = ['0' => 'IM6120(1号機)', '1' => 'IM7000(2号機)'];
+  			$this->set('arrType',$arrType);
+
     }
 
      public function confirm()
@@ -269,6 +273,14 @@ class KensahyouHeadsController  extends AppController
 
     	$Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
     	$this->set('Productname',$Productname);//セット
+
+      if($data['type_im'] == 0){
+        $type_im = "IM6120(1号機)";
+      }else{
+        $type_im = "IM7000(2号機)";
+      }
+      $this->set('type_im',$type_im);
+
     }
 
     public function preadd()
@@ -332,6 +344,13 @@ class KensahyouHeadsController  extends AppController
 
       $data = $_SESSION['sokuteidata'];
 
+      if($data['type_im'] == 0){
+        $type_im = "IM6120(1号機)";
+      }else{
+        $type_im = "IM7000(2号機)";
+      }
+      $this->set('type_im',$type_im);
+
       for($i=1; $i<=9; $i++){
         if(empty($data["size_".$i])){
           $data["size_".$i] = null;
@@ -352,11 +371,11 @@ class KensahyouHeadsController  extends AppController
           $data["text_".$i] = null;
         }
     	}
-
+/*
       echo "<pre>";
       print_r($data);
       echo "</pre>";
-
+*/
     	$product_code = $data['product_code'];//product_idという名前のデータに$product_idと名前を付ける
     	$this->set('product_code',$product_code);//セット
       $this->set('Productcode',$product_code);//セット
@@ -448,6 +467,8 @@ class KensahyouHeadsController  extends AppController
       $newversion = $KensaProductV + 1;
       $this->set('newversion',$newversion);
 
+      $arrType = ['0' => 'IM6120(1号機)', '1' => 'IM7000(2号機)'];
+      $this->set('arrType',$arrType);
     }
 
     public function editconfirm()
@@ -477,6 +498,13 @@ class KensahyouHeadsController  extends AppController
        $mes = "※以下のように更新します。";
        $this->set('mes',$mes);
      }
+
+     if($data['type_im'] == 0){
+       $type_im = "IM6120(1号機)";
+     }else{
+       $type_im = "IM7000(2号機)";
+     }
+     $this->set('type_im',$type_im);
 
    }
 
@@ -527,6 +555,17 @@ class KensahyouHeadsController  extends AppController
        $_SESSION['sokuteidata'] = array_merge($created_staff,$_SESSION['sokuteidata']);
 
        $data = $_SESSION['sokuteidata'];
+/*
+       echo "<pre>";
+       print_r($data['maisu']);
+       echo "</pre>";
+*/
+       if($data['type_im'] == 0){
+         $type_im = "IM6120(1号機)";
+       }else{
+         $type_im = "IM7000(2号機)";
+       }
+       $this->set('type_im',$type_im);
 
        for($i=1; $i<=9; $i++){
          if(empty($data["size_".$i])){
@@ -648,6 +687,7 @@ class KensahyouHeadsController  extends AppController
   							$connection->insert('kensahyou_head', [
                   'product_id' => $Productcode,
                   'version' => $data['version'],
+                  'maisu' => $data['maisu'],
                   'size_1' => $data['size_1'],
                   'upper_1' => $data['upper_1'],
                   'lower_1' => $data['lower_1'],

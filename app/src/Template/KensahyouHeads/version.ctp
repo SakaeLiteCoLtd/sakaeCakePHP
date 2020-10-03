@@ -89,9 +89,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
-          <td colspan="9"><?= h("1") ?></td>
-          <td colspan="5" nowrap="nowrap"><div align="center"><strong>type_im</strong></div></td>
-          <td colspan="9"><?= $this->Form->input("type_im", array('type' => 'value', 'label'=>false)); ?></td>
+          <td colspan="9"><?= h("0") ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>IMタイプ</strong></div></td>
+          <td colspan="9"><?= $this->Form->input("type_im", ["type"=>"select","empty"=>"選択してください", "options"=>$arrType, 'label'=>false, 'required'=>true]) ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>枚数</strong></div></td>

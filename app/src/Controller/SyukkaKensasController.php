@@ -1527,7 +1527,9 @@ class SyukkaKensasController extends AppController {
                                             ['id'  => $id]
                                           );
 
-                                          $toCopyFile = "sumi_".$countname."_".$file;
+                                          $countfile =  1;//フォルダーに入る最初のファイル
+
+                                          $toCopyFile = "sumi_".$countfile."_".$file;
                                           if (rename($output_dir.'/'.$file, $output_dir.'/'.$toCopyFile)) {//ファイル名変更
                                             unlink($dirName.$folder.'/'.$file);
                                             unlink($dirName.$folder.'/'.$Filebi2."005.bi2");
@@ -1606,7 +1608,14 @@ class SyukkaKensasController extends AppController {
                                           ['id'  => $id]
                                         );
 
-                                        $toCopyFile = "sumi_".$countname."_".$file;
+                                        $arrAllfiles = glob("$output_dir/*");
+                                        $countfile = count($arrAllfiles) - 1;//フォルダーのファイルが二つずつ増えるから
+/*
+                                        echo "<pre>";
+                                        print_r($countfile);
+                                        echo "</pre>";
+*/
+                                        $toCopyFile = "sumi_".$countfile."_".$file;
                                         if (rename($output_dir.'/'.$file, $output_dir.'/'.$toCopyFile)) {//ファイル名変更（元ファイルを削除）
                                           unlink($dirName.$folder.'/'.$file);
                                           unlink($dirName.$folder.'/'.$Filebi2."005.bi2");

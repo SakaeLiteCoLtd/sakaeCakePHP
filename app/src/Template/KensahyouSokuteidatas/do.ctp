@@ -11,7 +11,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
 <?php
           $username = $this->request->Session()->read('Auth.User.username');
-          echo $this->Form->create($kensahyouSokuteidata, ['url' => ['controller'=>'SyukkaKensas','action' => 'index2']]);
+          echo $this->Form->create($kensahyouSokuteidata, ['url' => ['controller'=>'SyukkaKensas','action' => 'indexhome']]);
 ?>
 <?php
  use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用

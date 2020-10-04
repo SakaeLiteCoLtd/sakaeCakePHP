@@ -1154,6 +1154,10 @@ class KensahyouSokuteidatasController  extends AppController
       $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
       $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
 
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+
     	if ($this->request->is('get')) {
     		$kensahyouSokuteidata = $this->KensahyouSokuteidatas->patchEntities($kensahyouSokuteidata, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
     		$connection = ConnectionManager::get('default');//トランザクション1
@@ -1161,6 +1165,62 @@ class KensahyouSokuteidatasController  extends AppController
     		$connection->begin();//トランザクション3
     		try {//トランザクション4
     				if ($this->KensahyouSokuteidatas->saveMany($kensahyouSokuteidata)) {//saveManyで一括登録
+
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('kensahyou_sokuteidata_result');
+              $table->setConnection($connection);
+
+              $kensahyou_sokuteidata_head_id = $data[1]["product_code"]."-".$data[1]["lot_num"];
+
+              $connection->insert('kensahyou_sokuteidata_head', [
+                'kensahyou_sokuteidata_head_id' => $kensahyou_sokuteidata_head_id,
+                'product_id' => $data[1]["product_code"],
+                'manu_date' => $data[1]["manu_date"],
+                'inspec_date' => $data[1]["inspec_date"],
+                'lot_num' => $data[1]["lot_num"],
+                'emp_id' => $data[1]["created_staff"],
+                'timestamp' => date('Y-m-d H:i:s')
+              ]);
+
+
+              for($k=1; $k<=count($data); $k++){
+
+                for($i=1; $i<=9; $i++){
+                  if(empty($data[$k]["result_size_".$i])){
+                    $data[$k]["result_size_".$i] = null;
+                  }
+              	}
+
+                if(empty($data[$k]["result_weight"])){
+                  $data[$k]["result_weight"] = null;
+                }
+
+                $kensahyou_sokuteidata_head_id = $data[$k]["product_code"]."-".$data[$k]["lot_num"];
+
+                $connection->insert('kensahyou_sokuteidata_result', [
+                  'kensahyou_sokuteidata_result_id' => $kensahyou_sokuteidata_head_id,
+                  'cavi_num' => $data[$k]["cavi_num"],
+                  'product_id' => $data[$k]["product_code"],
+                  'result_size_a' => $data[$k]["result_size_1"],
+                  'result_size_b' => $data[$k]["result_size_2"],
+                  'result_size_c' => $data[$k]["result_size_3"],
+                  'result_size_d' => $data[$k]["result_size_4"],
+                  'result_size_e' => $data[$k]["result_size_5"],
+                  'result_size_f' => $data[$k]["result_size_6"],
+                  'result_size_g' => $data[$k]["result_size_7"],
+                  'result_size_h' => $data[$k]["result_size_8"],
+                  'result_size_i' => $data[$k]["result_size_9"],
+                  'result_text_j' => $data[$k]["situation_dist1"],
+                  'result_text_k' => $data[$k]["situation_dist2"],
+                  'result_weight' => $data[$k]["result_weight"]
+              //    'situation_dist' => ""
+                ]);
+
+              }
+
+              $connection = ConnectionManager::get('default');
+
+
               $mes = "※登録されました。";
    						$this->set('mes',$mes);
     					$connection->commit();// コミット5

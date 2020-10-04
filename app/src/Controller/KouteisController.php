@@ -11,24 +11,19 @@ use Cake\Filesystem\Folder;
 use Cake\Filesystem\File;
 use App\myClass\KensahyouSokuteidata\htmlKensahyouSokuteidata;//myClassフォルダに配置したクラスを使用
 
-class SyukkaKensasController extends AppController {
+class KouteisController extends AppController {
 
       public function initialize()
     {
      parent::initialize();
-     $this->ImKikakuTaious = TableRegistry::get('imKikakuTaious');//ImKikakuTaiousテーブルを使う
-     $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//imSokuteidataHeadsテーブルを使う
-     $this->ImKikakus = TableRegistry::get('imKikakus');//imKikakusテーブルを使う
-     $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//imSokuteidataResultsテーブルを使う
      $this->Products = TableRegistry::get('products');//productsテーブルを使う
      $this->Customers = TableRegistry::get('customers');
-     $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
-     $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouSokuteidatasテーブルを使う
-     $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');//KadouSeikeisテーブルを使う
      $this->Users = TableRegistry::get('users');
      $this->KouteiKensahyouHeads = TableRegistry::get('kouteiKensahyouHeads');
      $this->FileCopyChecks = TableRegistry::get('fileCopyChecks');
-     $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');
+     $this->KouteiKensahyouHeads = TableRegistry::get('kouteiKensahyouHeads');
+     $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
+     $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouSokuteidatasテーブルを使う
     }
 
     public function index()
@@ -54,6 +49,18 @@ class SyukkaKensasController extends AppController {
       $this->set('KensahyouHeads',$KensahyouHeads);
     }
 
+    public function headyobidashicustomer()//「出荷検査用呼出」ページトップ
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+    }
+
+    public function tourokuyobidashicustomer()//「出荷検査用呼出」ページトップ
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+    }
+
     public function yobidashipana()
     {
       $this->set('products', $this->Products->find()
@@ -62,6 +69,20 @@ class SyukkaKensasController extends AppController {
     }
 
     public function typeyobidashipana()
+    {
+      $this->set('products', $this->Products->find()
+       ->select(['product_code','delete_flag' => '0'])
+       );
+    }
+
+    public function headyobidashipana()
+    {
+      $this->set('products', $this->Products->find()
+       ->select(['product_code','delete_flag' => '0'])
+       );
+    }
+
+    public function tourokuyobidashipana()
     {
       $this->set('products', $this->Products->find()
        ->select(['product_code','delete_flag' => '0'])
@@ -96,6 +117,60 @@ class SyukkaKensasController extends AppController {
     }
 
     public function typeyobidashipanap0()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+       $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "P0")) && ($customer_id == 1)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+/*
+       echo "<pre>";
+       print_r($arrProduct);
+       echo "</pre>";
+*/
+    }
+
+    public function headyobidashipanap0()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+       $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "P0")) && ($customer_id == 1)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+/*
+       echo "<pre>";
+       print_r($arrProduct);
+       echo "</pre>";
+*/
+    }
+
+    public function tourokuyobidashipanap0()
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
       $this->set('KensahyouHeads',$KensahyouHeads);
@@ -166,6 +241,50 @@ class SyukkaKensasController extends AppController {
        $this->set('arrProduct',$arrProduct);
     }
 
+    public function headyobidashipanap1()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "P1")) && ($customer_id == 1)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function tourokuyobidashipanap1()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "P1")) && ($customer_id == 1)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
     public function yobidashipanap2()
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
@@ -189,6 +308,50 @@ class SyukkaKensasController extends AppController {
     }
 
     public function typeyobidashipanap2()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if(0 !== strpos($product_code, "P0") && 0 !== strpos($product_code, "P1") && 0 !== strpos($product_code, "W") && 0 !== strpos($product_code, "H") && 0 !== strpos($product_code, "RE") && ($customer_id == 1)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function headyobidashipanap2()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if(0 !== strpos($product_code, "P0") && 0 !== strpos($product_code, "P1") && 0 !== strpos($product_code, "W") && 0 !== strpos($product_code, "H") && 0 !== strpos($product_code, "RE") && ($customer_id == 1)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function tourokuyobidashipanap2()
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
       $this->set('KensahyouHeads',$KensahyouHeads);
@@ -254,6 +417,50 @@ class SyukkaKensasController extends AppController {
        $this->set('arrProduct',$arrProduct);
     }
 
+    public function headyobidashipanaw()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "W")) && ($customer_id == 2)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function tourokuyobidashipanaw()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "W")) && ($customer_id == 2)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
     public function yobidashipanah()
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
@@ -277,6 +484,50 @@ class SyukkaKensasController extends AppController {
     }
 
     public function typeyobidashipanah()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "H")) && ($customer_id == 2)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function headyobidashipanah()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "H")) && ($customer_id == 2)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function tourokuyobidashipanah()
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
       $this->set('KensahyouHeads',$KensahyouHeads);
@@ -342,6 +593,50 @@ class SyukkaKensasController extends AppController {
        $this->set('arrProduct',$arrProduct);
     }
 
+    public function headyobidashipanare()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "R")) && ($customer_id == 3)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function tourokuyobidashipanare()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if((0 === strpos($product_code, "R")) && ($customer_id == 3)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
     public function yobidashidnp()
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
@@ -365,6 +660,50 @@ class SyukkaKensasController extends AppController {
     }
 
     public function typeyobidashidnp()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if(($customer_id == 11) || ($customer_id == 12) || ($customer_id == 13) || ($customer_id == 14)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function headyobidashidnp()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         if(($customer_id == 11) || ($customer_id == 12) || ($customer_id == 13) || ($customer_id == 14)){
+             $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function tourokuyobidashidnp()
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
       $this->set('KensahyouHeads',$KensahyouHeads);
@@ -413,6 +752,58 @@ class SyukkaKensasController extends AppController {
     }
 
     public function typeyobidashiothers()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         $Customers = $this->Customers->find('all', ['conditions' => ['id' => $customer_id]])->toArray();
+         if(isset($Customers[0])){
+           $customer_code = $Customers[0]->customer_code;
+           if(0 !== strpos($customer_code, "1") && 0 !== strpos($customer_code, "2")){
+             $arrProduct[] = ["product_code" => $Products[$k]["product_code"], "product_name" => $Products[$k]["product_name"]];
+           }
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function headyobidashiothers()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Products = $this->Products->find()->where(['delete_flag' => 0])->order(['product_code' => 'ASC'])->toArray();
+
+       $count = count($Products);
+
+       $arrProduct = array();
+
+       for ($k=0; $k<$count; $k++) {
+         $product_code = $Products[$k]["product_code"];
+         $customer_id = $Products[$k]["customer_id"];
+         $Customers = $this->Customers->find('all', ['conditions' => ['id' => $customer_id]])->toArray();
+         if(isset($Customers[0])){
+           $customer_code = $Customers[0]->customer_code;
+           if(0 !== strpos($customer_code, "1") && 0 !== strpos($customer_code, "2")){
+             $arrProduct[] = ["product_code" => $Products[$k]["product_code"], "product_name" => $Products[$k]["product_name"]];
+           }
+         }
+       }
+
+       $this->set('arrProduct',$arrProduct);
+    }
+
+    public function tourokuyobidashiothers()
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
       $this->set('KensahyouHeads',$KensahyouHeads);
@@ -973,300 +1364,8 @@ class SyukkaKensasController extends AppController {
     {
       $this->request->session()->destroy(); // セッションの破棄
 
-      $imKikakus = $this->ImKikakus->newEntity();
-      $this->set('imKikakus', $imKikakus);
-
-      $today = date("Y-m-d");
-
-      $connection = ConnectionManager::get('DB_ikou_test');//旧DBを参照
-      $table = TableRegistry::get('schedule_koutei');
-      $table->setConnection($connection);
-//今日以降のスケジュールのデータを旧DBから引っ張り出す
-      $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name,tantou FROM schedule_koutei".
-       " where datetime >= '".$today."' order by datetime asc";
-      $arrSchedule_koutei = $connection->execute($sql)->fetchAll('assoc');
-
-      $connection = ConnectionManager::get('default');
-      $table->setConnection($connection);
-
-      $arrTouroku = array();
-      for($i=0; $i<count($arrSchedule_koutei); $i++){//新DBにデータが存在しなければ新DBに保存するための配列に追加する
-
-        $ScheduleKouteiData = $this->ScheduleKouteis->find()->where(['datetime' => $arrSchedule_koutei[$i]["datetime"], 'seikeiki' => $arrSchedule_koutei[$i]["seikeiki"]])->toArray();
-
-        if(!isset($ScheduleKouteiData[0])){
-
-          $arrTouroku[] = [
-            'datetime' => $arrSchedule_koutei[$i]["datetime"],
-            'seikeiki' => $arrSchedule_koutei[$i]["seikeiki"],
-            'product_code' => $arrSchedule_koutei[$i]["product_id"],
-            'present_kensahyou' => $arrSchedule_koutei[$i]["present_kensahyou"],
-            'product_name' => $arrSchedule_koutei[$i]["product_name"],
-            'tantou' => $arrSchedule_koutei[$i]["tantou"]
-          ];
-
-        }
-
-      }
-
-      if(isset($arrTouroku[0])){//登録するデータがある場合は一括登録
-
-        $ScheduleKouteis = $this->ScheduleKouteis->patchEntities($this->ScheduleKouteis->newEntity(), $arrTouroku);
-        $connection = ConnectionManager::get('default');//トランザクション1
-        // トランザクション開始2
-        $connection->begin();//トランザクション3
-        try {//トランザクション4
-          if ($this->ScheduleKouteis->saveMany($ScheduleKouteis)){
-            $connection->commit();// コミット5
-          } else {
-            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-          }
-        } catch (Exception $e) {//トランザクション7
-        //ロールバック8
-          $connection->rollback();//トランザクション9
-        }//トランザクション10
-      }
-
-
-      $KadouSeikeiDatab = $this->KadouSeikeis->find()->where(['present_kensahyou' => 0])->order(["product_code"=>"ASC"])->toArray();//'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
-
-      $arrProduct = array();
-      for($i=0; $i<count($KadouSeikeiDatab); $i++){//'present_kensahyou' => 0の製品を重複なしで集める
-        $arrProduct[] = $KadouSeikeiDatab[$i]["product_code"];
-      }
-      $arrProduct = array_unique($arrProduct, SORT_REGULAR);//重複削除
-      $arrProduct = array_values($arrProduct);
-
-      for($i=0; $i<count($arrProduct); $i++){//それぞれの品番に対して、最新のロットの日報とその日報の一つ前の日報の差を取得し、２４時間成形+２時間以内は同一ロットとみなす➝前回ロットの'present_kensahyou' => 1にする
-        ${"product_code".$i} = $arrProduct[$i];
-        $KadouSeikeiPro = $this->KadouSeikeis->find()->where(['present_kensahyou' => 0, 'product_code' => ${"product_code".$i}])->order(["starting_tm"=>"desc"])->toArray();
-
-        for($j=1; $j<count($KadouSeikeiPro); $j++){
-
-          $zenkaihikaku = strtotime($KadouSeikeiPro[$j-1]["starting_tm"]) - strtotime($KadouSeikeiPro[$j]["starting_tm"]);
-
-          if($zenkaihikaku < 93600){//この場合'present_kensahyou' => 1にする
-
-            $KadouSeikeis = $this->KadouSeikeis->patchEntity($this->KadouSeikeis->newEntity(), $this->request->getData());
-            $connection = ConnectionManager::get('default');//トランザクション1
-     				// トランザクション開始2
-     				$connection->begin();//トランザクション3
-     				try {//トランザクション4
-   						if ($this->KadouSeikeis->updateAll(//検査終了時間の更新
-   							['present_kensahyou' => 1, 'updated_at' => date('Y-m-d H:i:s')],
-   							['id'  => $KadouSeikeiPro[$j]["id"]]
-   						)){
-
-    							//旧DBに単価登録
-    							$connection = ConnectionManager::get('DB_ikou_test');
-    							$table = TableRegistry::get('kadou_seikei');
-    							$table->setConnection($connection);
-
-                  $num = 1;
-                  $updater = "UPDATE kadou_seikei set present_kensahyou ='".$num."'
-                   where pro_num ='".$KadouSeikeiPro[$j]['product_code']."' and seikeiki_id ='".$KadouSeikeiPro[$j]['seikeiki_code']."' and starting_tm ='".$KadouSeikeiPro[$j]['starting_tm']."'";
-                   $connection->execute($updater);
-
-    							$connection = ConnectionManager::get('default');//新DBに戻る
-    							$table->setConnection($connection);
-
-                  $connection->commit();// コミット5
-
-                } else {
-                  throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-                }
-
-              } catch (Exception $e) {//トランザクション7
-              //ロールバック8
-                $connection->rollback();//トランザクション9
-              }//トランザクション10
-
-          }
-
-        }
-
-      }
-
-      $countnamec = 1;//今日のデータをカウントする変数
-      $this->set('countnamec',$countnamec);//セット
-      $countnamed = 1;//昨日までのデータをカウントする変数
-      $this->set('countnamed',$countnamed);//セット
-
-      $ScheduleKouteisDatac = $this->ScheduleKouteis->find()->where(['datetime >=' => $today." 8:00", 'datetime <=' => $today."23:59", 'present_kensahyou' => 0])->order(["datetime"=>"desc"])->toArray();
-
-      for($i=0; $i<count($ScheduleKouteisDatac); $i++){//既に検査済みの場合は'present_kensahyou' => 1に更新する
-
-        $scheduleId = $ScheduleKouteisDatac[$i]->id;
-        $schedulepro = $ScheduleKouteisDatac[$i]->product_code;
-        $scheduleday = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d');
-
-        $KensahyouSokuteidatasData = $this->KensahyouSokuteidatas->find()->where(['product_code' => $schedulepro, 'manu_date' => $scheduleday])->order(["product_code"=>"desc"])->toArray();
-        if(isset($KensahyouSokuteidatasData[0])){
-
-          $ScheduleKouteis = $this->ScheduleKouteis->patchEntity($this->ScheduleKouteis->newEntity(), $this->request->getData());
-          $connection = ConnectionManager::get('default');//トランザクション1
-          // トランザクション開始2
-          $connection->begin();//トランザクション3
-          try {//トランザクション4
-            if ($this->ScheduleKouteis->updateAll(//検査終了時間の更新
-              ['present_kensahyou' => 1],
-              ['id'  => $scheduleId]
-            )){
-
-                //旧DB
-                $connection = ConnectionManager::get('DB_ikou_test');
-                $table = TableRegistry::get('schedule_koutei');
-                $table->setConnection($connection);
-
-                $num = 1;
-                $datetime = $ScheduleKouteisDatac[$i]->datetime;
-                $seikeiki = $ScheduleKouteisDatac[$i]->seikeiki;
-                $updater = "UPDATE schedule_koutei set present_kensahyou ='".$num."'
-                 where product_id ='".$schedulepro."' and datetime ='".$datetime."' and seikeiki ='".$seikeiki."'";
-                 $connection->execute($updater);
-
-                $connection = ConnectionManager::get('default');//新DBに戻る
-                $table->setConnection($connection);
-
-                $connection->commit();// コミット5
-
-              } else {
-                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-              }
-
-            } catch (Exception $e) {//トランザクション7
-            //ロールバック8
-              $connection->rollback();//トランザクション9
-            }//トランザクション10
-
-          }else{//検査していない場合
-
-            ${"KadouSeikeiidc".$countnamec} = "sch_".$scheduleId;
-
-            $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});
-
-            ${"product_codec".$countnamec} = $ScheduleKouteisDatac[$i]->product_code;
-            ${"ProductDatac".$countnamec} = $this->Products->find()->where(['product_code' => ${"product_codec".$countnamec}])->toArray();
-            ${"product_namec".$countnamec} = ${"ProductDatac".$countnamec}[0]->product_name;
-            ${"KadouSeikeifinishing_tm".$countnamec} = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d H:i:s');
-            ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
-
-            $this->set('product_codec'.$countnamec,${"product_codec".$countnamec});
-            $this->set('product_namec'.$countnamec,${"product_namec".$countnamec});
-            $this->set('KadouSeikeifinishing_datec'.$countnamec,${"KadouSeikeifinishing_datec".$countnamec});
-
-            $session = $this->request->session();
-            $session->write('product_codec', ${"product_codec".$countnamec});
-            $session->write('product_namec', ${"product_namec".$countnamec});
-
-            $countnamec += 1;//ファイル名の日付を識別するためカウント
-            $this->set('countnamec',$countnamec);//セット
-
-          }
-
-      }
-
-
-      $KadouSeikeiDatac = $this->KadouSeikeis->find()->where(['present_kensahyou' => 0])->toArray();//'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
-      for($i=1; $i<=count($KadouSeikeiDatac); $i++){//KadouSeikeisテーブルの'present_kensahyou' => 0のデータに対して
-        $KadouSeikeisId = $KadouSeikeiDatac[$i-1]->id;
-        $KadouSeikeispro = $KadouSeikeiDatac[$i-1]->product_code;
-        $KadouSeikeisdaymoto = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d_H_:i:s');
-
-        list($a, $h, $c) = explode('_', $KadouSeikeisdaymoto);
-        if(8 <= intval($h) && intval($h) <= 23){//開始時間が８時～２３時の場合はその日がmanu_date
-
-          $KadouSeikeisday = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d');
-
-        }else{//開始時間が８時～２３時でない場合はその前日がmanu_date
-
-          $KadouSeikeisdayymd = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d');
-          $KadouSeikeisday = date("Y-m-d", strtotime("-1 day", strtotime($KadouSeikeisdayymd)));
-
-        }
-
-        $KensahyouSokuteidatasData = $this->KensahyouSokuteidatas->find()->where(['product_code' => $KadouSeikeispro, 'manu_date' => $KadouSeikeisday])->order(["product_code"=>"desc"])->toArray();
-
-        if(isset($KensahyouSokuteidatasData[0])){//検査済みの場合は'present_kensahyou' => 1
-
-          $KadouSeikeis = $this->KadouSeikeis->patchEntity($this->KadouSeikeis->newEntity(), $this->request->getData());
-          $connection = ConnectionManager::get('default');//トランザクション1
-          // トランザクション開始2
-          $connection->begin();//トランザクション3
-          try {//トランザクション4
-            if ($this->KadouSeikeis->updateAll(//検査終了時間の更新
-              ['present_kensahyou' => 1],
-              ['id'  => $KadouSeikeisId]
-            )){
-
-                //旧DBに単価登録
-                $connection = ConnectionManager::get('DB_ikou_test');
-                $table = TableRegistry::get('kadou_seikei');
-                $table->setConnection($connection);
-
-                $num = 1;
-                $KadouSeikeispro = $KadouSeikeiDatac[$i-1]->product_code;
-                $KadouSeikeisseikeiki = $KadouSeikeiDatac[$i-1]->seikeiki_code;
-                $KadouSeikeisstartingtm = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d H:i:s');
-/*
-                echo "<pre>";
-                print_r($KadouSeikeisstartingtm);
-                echo "</pre>";
-*/
-                $updater = "UPDATE kadou_seikei set present_kensahyou ='".$num."'
-                 where pro_num ='".$KadouSeikeispro."' and seikeiki_id ='".$KadouSeikeisseikeiki."' and starting_tm ='".$KadouSeikeisstartingtm."'";
-                 $connection->execute($updater);
-
-                $connection = ConnectionManager::get('default');//新DBに戻る
-                $table->setConnection($connection);
-
-                $connection->commit();// コミット5
-
-              } else {
-                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-              }
-
-            } catch (Exception $e) {//トランザクション7
-            //ロールバック8
-              $connection->rollback();//トランザクション9
-            }//トランザクション10
-
-          }else{//検査していない場合
-
-          ${"KadouSeikeifinishing_tm".$i} = $KadouSeikeiDatac[$i-1]->finishing_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
-          ${"KadouSeikeifinishing_date".$i} = substr(${"KadouSeikeifinishing_tm".$i},0,4)."-".substr(${"KadouSeikeifinishing_tm".$i},5,2)."-".substr(${"KadouSeikeifinishing_tm".$i},8,2);//finishing_tmの年月日を取得
-
-            if(substr(${"KadouSeikeifinishing_date".$i},0,10) === substr($today,0,10)){//今日のデータの場合は表示しない
-              $countnamed = $countnamed;
-            }else{//今日ではないデータの場合
-              ${"KadouSeikeiidd".$countnamed} = $KadouSeikeiDatac[$i-1]->id;//以下、index2に持っていくデータをセット
-              $this->set('KadouSeikeiidd'.$countnamed,${"KadouSeikeiidd".$countnamed});//セット
-
-              ${"product_coded".$countnamed} = $KadouSeikeiDatac[$i-1]->product_code;//以下、index2に持っていくデータをセット
-              ${"ProductDatad".$countnamed} = $this->Products->find()->where(['product_code' => ${"product_coded".$countnamed}])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
-              if(isset(${"ProductDatad".$countnamed}[0])){
-                ${"product_named".$countnamed} = ${"ProductDatad".$countnamed}[0]->product_name;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-                $this->set('product_named'.$countnamed,${"product_named".$countnamed});//セット
-              }else{
-                ${"product_named".$countnamed} = "";//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
-                $this->set('product_named'.$countnamed,${"product_named".$countnamed});//セット
-              }
-              ${"KadouSeikeifinishing_tm".$countnamed} = $KadouSeikeiDatac[$i-1]->finishing_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
-              ${"KadouSeikeifinishing_dated".$countnamed} = substr(${"KadouSeikeifinishing_tm".$countnamed},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},8,2);//finishing_tmの年月日を取得
-
-              $this->set('product_coded'.$countnamed,${"product_coded".$countnamed});//セット
-
-              $this->set('KadouSeikeifinishing_dated'.$countnamed,${"KadouSeikeifinishing_dated".$countnamed});//セット
-
-              $session = $this->request->session();
-              $session->write('product_coded', ${"product_coded".$countnamed});
-
-              $countnamed += 1;//ファイル名の日付を識別するためカウント
-              $this->set('countnamed',$countnamed);//セット
-            }
-          }
-      }
-
+      $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->newEntity();
+      $this->set('KouteiKensahyouHeads', $KouteiKensahyouHeads);
     }
 
      public function torikomi()//取り込み（画面なし自動で次のページへ）

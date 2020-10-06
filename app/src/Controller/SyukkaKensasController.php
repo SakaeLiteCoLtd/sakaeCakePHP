@@ -610,24 +610,24 @@ class SyukkaKensasController extends AppController {
       }
       $this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
 
-    	$this->set('KouteiKensahyouHeads',$this->KouteiKensahyouHeads->newEntity());
+    	$this->set('KensahyouHeads',$this->KensahyouHeads->newEntity());
 
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
       $Productname = $Product[0]->product_name;
       $this->set('Productname',$Productname);
 
-      $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['product_code' => $product_code, 'delete_flag' => 0])->order(["version"=>"desc"])->toArray();//versionが大きいものから順に呼出
+      $KensahyouHeads = $this->KensahyouHeads->find()->where(['product_code' => $product_code, 'delete_flag' => 0])->order(["version"=>"desc"])->toArray();//versionが大きいものから順に呼出
 /*
       echo "<pre>";
       print_r(count($KouteiKensahyouHeads));
       echo "</pre>";
 */
-      if(isset($KouteiKensahyouHeads[0])){
-        $id = $KouteiKensahyouHeads[0]->id;
+      if(isset($KensahyouHeads[0])){
+        $id = $KensahyouHeads[0]->id;
         $this->set('id',$id);
-        $versionnow = $KouteiKensahyouHeads[0]->version;
+        $versionnow = $KensahyouHeads[0]->version;
         $this->set('versionnow',$versionnow);
-        $typenow = $KouteiKensahyouHeads[0]->type_im;
+        $typenow = $KensahyouHeads[0]->type_im;
         $newversion = $versionnow + 1;
         $this->set('newversion',$newversion);
         if($typenow == 0){
@@ -838,43 +838,43 @@ class SyukkaKensasController extends AppController {
       $updated_staff = array('updated_staff'=>$data['Auth']['User']['staff_id']);
       $data["imdatanew"][0] = array_merge($data["imdatanew"][0],$updated_staff);
 
-      $this->set('KouteiKensahyouHeads',$this->KouteiKensahyouHeads->newEntity());
+      $this->set('KensahyouHeads',$this->KensahyouHeads->newEntity());
 
-      $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['id' => $data["imdatanew"][0]['id']])->toArray();
-      $product_code = $KouteiKensahyouHeads[0]->product_code;
+      $KensahyouHeads = $this->KensahyouHeads->find()->where(['id' => $data["imdatanew"][0]['id']])->toArray();
+      $product_code = $KensahyouHeads[0]->product_code;
       $tourokuData = [
         'product_code' => $product_code,
         'version' => $data["imdatanew"][0]['version'],
         'type_im' => $data["imdatanew"][0]['type_im'],
-        'size_1' => $KouteiKensahyouHeads[0]->size_1,
-        'upper_1' => $KouteiKensahyouHeads[0]->upper_1,
-        'lower_1' => $KouteiKensahyouHeads[0]->lower_1,
-        'size_2' => $KouteiKensahyouHeads[0]->size_2,
-        'upper_2' => $KouteiKensahyouHeads[0]->upper_2,
-        'lower_2' => $KouteiKensahyouHeads[0]->lower_2,
-        'size_3' => $KouteiKensahyouHeads[0]->size_3,
-        'upper_3' => $KouteiKensahyouHeads[0]->upper_3,
-        'lower_3' => $KouteiKensahyouHeads[0]->lower_3,
-        'size_4' => $KouteiKensahyouHeads[0]->size_4,
-        'upper_4' => $KouteiKensahyouHeads[0]->upper_4,
-        'lower_4' => $KouteiKensahyouHeads[0]->lower_4,
-        'size_5' => $KouteiKensahyouHeads[0]->size_5,
-        'upper_5' => $KouteiKensahyouHeads[0]->upper_5,
-        'lower_5' => $KouteiKensahyouHeads[0]->lower_5,
-        'size_6' => $KouteiKensahyouHeads[0]->size_6,
-        'upper_6' => $KouteiKensahyouHeads[0]->upper_6,
-        'lower_6' => $KouteiKensahyouHeads[0]->lower_6,
-        'size_7' => $KouteiKensahyouHeads[0]->size_7,
-        'upper_7' => $KouteiKensahyouHeads[0]->upper_7,
-        'lower_7' => $KouteiKensahyouHeads[0]->lower_7,
-        'size_8' => $KouteiKensahyouHeads[0]->size_8,
-        'upper_8' => $KouteiKensahyouHeads[0]->upper_8,
-        'lower_8' => $KouteiKensahyouHeads[0]->lower_8,
-        'size_9' => $KouteiKensahyouHeads[0]->size_9,
-        'text_10' => $KouteiKensahyouHeads[0]->text_10,
-        'text_11' => $KouteiKensahyouHeads[0]->text_11,
-        'bik' => $KouteiKensahyouHeads[0]->bik,
-        'status' => $KouteiKensahyouHeads[0]->status,
+        'size_1' => $KensahyouHeads[0]->size_1,
+        'upper_1' => $KensahyouHeads[0]->upper_1,
+        'lower_1' => $KensahyouHeads[0]->lower_1,
+        'size_2' => $KensahyouHeads[0]->size_2,
+        'upper_2' => $KensahyouHeads[0]->upper_2,
+        'lower_2' => $KensahyouHeads[0]->lower_2,
+        'size_3' => $KensahyouHeads[0]->size_3,
+        'upper_3' => $KensahyouHeads[0]->upper_3,
+        'lower_3' => $KensahyouHeads[0]->lower_3,
+        'size_4' => $KensahyouHeads[0]->size_4,
+        'upper_4' => $KensahyouHeads[0]->upper_4,
+        'lower_4' => $KensahyouHeads[0]->lower_4,
+        'size_5' => $KensahyouHeads[0]->size_5,
+        'upper_5' => $KensahyouHeads[0]->upper_5,
+        'lower_5' => $KensahyouHeads[0]->lower_5,
+        'size_6' => $KensahyouHeads[0]->size_6,
+        'upper_6' => $KensahyouHeads[0]->upper_6,
+        'lower_6' => $KensahyouHeads[0]->lower_6,
+        'size_7' => $KensahyouHeads[0]->size_7,
+        'upper_7' => $KensahyouHeads[0]->upper_7,
+        'lower_7' => $KensahyouHeads[0]->lower_7,
+        'size_8' => $KensahyouHeads[0]->size_8,
+        'upper_8' => $KensahyouHeads[0]->upper_8,
+        'lower_8' => $KensahyouHeads[0]->lower_8,
+        'size_9' => $KensahyouHeads[0]->size_9,
+        'text_10' => $KensahyouHeads[0]->text_10,
+        'text_11' => $KensahyouHeads[0]->text_11,
+        'bik' => $KensahyouHeads[0]->bik,
+        'status' => $KensahyouHeads[0]->status,
         'created_at' => date('Y-m-d H:i:s'),
         'created_staff' => $data["imdatanew"][0]['updated_staff']
       ];
@@ -884,69 +884,66 @@ class SyukkaKensasController extends AppController {
       echo "</pre>";
 */
       if ($this->request->is('get')) {//getなら登録
-        $KouteiKensahyouHead = $this->KouteiKensahyouHeads->patchEntities($this->KouteiKensahyouHeads->newEntity(), $data["imdatanew"][0]);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+        $KouteiKensahyouHead = $this->KensahyouHeads->patchEntities($this->KensahyouHeads->newEntity(), $data["imdatanew"][0]);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
         $connection = ConnectionManager::get('default');//トランザクション1
         // トランザクション開始2
         $connection->begin();//トランザクション3
         try {//トランザクション4
-          if ($this->KouteiKensahyouHeads->updateAll(
+          if ($this->KensahyouHeads->updateAll(
         //    ['version' => $data["imdatanew"][0]['version'], 'type_im' => $data["imdatanew"][0]['type_im'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data["imdatanew"][0]['updated_staff']],
             ['delete_flag' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data["imdatanew"][0]['updated_staff']],
             ['id'  => $data["imdatanew"][0]['id']]
             )){
 
-              $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->patchEntity($this->KouteiKensahyouHeads->newEntity(), $tourokuData);
-  						$this->KouteiKensahyouHeads->save($KouteiKensahyouHeads);
+              $KensahyouHeads = $this->KensahyouHeads->patchEntity($this->KensahyouHeads->newEntity(), $tourokuData);
+  						$this->KensahyouHeads->save($KensahyouHeads);
 
-              $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['id' => $data["imdatanew"][0]['id']])->toArray();
+              $KensahyouHeads = $this->KensahyouHeads->find()->where(['id' => $data["imdatanew"][0]['id']])->toArray();
 
               //旧DBに登録
   						$connection = ConnectionManager::get('DB_ikou_test');
-  						$table = TableRegistry::get('koutei_kensahyou_head');
+  						$table = TableRegistry::get('kensahyou_head');
   						$table->setConnection($connection);
 
               $delete_flag = 1;
               $versionmoto = $data["imdatanew"][0]['version'] - 1;
-              $updater = "UPDATE koutei_kensahyou_head set status ='".$delete_flag."' ,
-               updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$data["imdatanew"][0]['updated_staff']."'
+              $updater = "UPDATE kensahyou_head set status ='".$delete_flag."'
               where product_id ='".$product_code."' and version ='".$versionmoto."'";
               $connection->execute($updater);
 
-  							$connection->insert('koutei_kensahyou_head', [
+  							$connection->insert('kensahyou_head', [
                   'product_id' => $product_code,
                   'version' => $data["imdatanew"][0]['version'],
-                  'type_im' => $data["imdatanew"][0]['type_im'],
-                  'size_1' => $KouteiKensahyouHeads[0]->size_1,
-                  'upper_1' => $KouteiKensahyouHeads[0]->upper_1,
-                  'lower_1' => $KouteiKensahyouHeads[0]->lower_1,
-                  'size_2' => $KouteiKensahyouHeads[0]->size_2,
-                  'upper_2' => $KouteiKensahyouHeads[0]->upper_2,
-                  'lower_2' => $KouteiKensahyouHeads[0]->lower_2,
-                  'size_3' => $KouteiKensahyouHeads[0]->size_3,
-                  'upper_3' => $KouteiKensahyouHeads[0]->upper_3,
-                  'lower_3' => $KouteiKensahyouHeads[0]->lower_3,
-                  'size_4' => $KouteiKensahyouHeads[0]->size_4,
-                  'upper_4' => $KouteiKensahyouHeads[0]->upper_4,
-                  'lower_4' => $KouteiKensahyouHeads[0]->lower_4,
-                  'size_5' => $KouteiKensahyouHeads[0]->size_5,
-                  'upper_5' => $KouteiKensahyouHeads[0]->upper_5,
-                  'lower_5' => $KouteiKensahyouHeads[0]->lower_5,
-                  'size_6' => $KouteiKensahyouHeads[0]->size_6,
-                  'upper_6' => $KouteiKensahyouHeads[0]->upper_6,
-                  'lower_6' => $KouteiKensahyouHeads[0]->lower_6,
-                  'size_7' => $KouteiKensahyouHeads[0]->size_7,
-                  'upper_7' => $KouteiKensahyouHeads[0]->upper_7,
-                  'lower_7' => $KouteiKensahyouHeads[0]->lower_7,
-                  'size_8' => $KouteiKensahyouHeads[0]->size_8,
-                  'upper_8' => $KouteiKensahyouHeads[0]->upper_8,
-                  'lower_8' => $KouteiKensahyouHeads[0]->lower_8,
-                  'size_9' => $KouteiKensahyouHeads[0]->size_9,
-                  'text_10' => $KouteiKensahyouHeads[0]->text_10,
-                  'text_11' => $KouteiKensahyouHeads[0]->text_11,
-                  'bik' => $KouteiKensahyouHeads[0]->bik,
-                  'status' => $KouteiKensahyouHeads[0]->status,
-                  'created_at' => date('Y-m-d H:i:s'),
-                  'created_emp_id' => $data["imdatanew"][0]['updated_staff']
+            //      'type_im' => $data["imdatanew"][0]['type_im'],
+                  'size_1' => $KensahyouHeads[0]->size_1,
+                  'upper_1' => $KensahyouHeads[0]->upper_1,
+                  'lower_1' => $KensahyouHeads[0]->lower_1,
+                  'size_2' => $KensahyouHeads[0]->size_2,
+                  'upper_2' => $KensahyouHeads[0]->upper_2,
+                  'lower_2' => $KensahyouHeads[0]->lower_2,
+                  'size_3' => $KensahyouHeads[0]->size_3,
+                  'upper_3' => $KensahyouHeads[0]->upper_3,
+                  'lower_3' => $KensahyouHeads[0]->lower_3,
+                  'size_4' => $KensahyouHeads[0]->size_4,
+                  'upper_4' => $KensahyouHeads[0]->upper_4,
+                  'lower_4' => $KensahyouHeads[0]->lower_4,
+                  'size_5' => $KensahyouHeads[0]->size_5,
+                  'upper_5' => $KensahyouHeads[0]->upper_5,
+                  'lower_5' => $KensahyouHeads[0]->lower_5,
+                  'size_6' => $KensahyouHeads[0]->size_6,
+                  'upper_6' => $KensahyouHeads[0]->upper_6,
+                  'lower_6' => $KensahyouHeads[0]->lower_6,
+                  'size_7' => $KensahyouHeads[0]->size_7,
+                  'upper_7' => $KensahyouHeads[0]->upper_7,
+                  'lower_7' => $KensahyouHeads[0]->lower_7,
+                  'size_8' => $KensahyouHeads[0]->size_8,
+                  'upper_8' => $KensahyouHeads[0]->upper_8,
+                  'lower_8' => $KensahyouHeads[0]->lower_8,
+                  'size_9' => $KensahyouHeads[0]->size_9,
+                  'text_10' => $KensahyouHeads[0]->text_10,
+                  'text_11' => $KensahyouHeads[0]->text_11,
+                  'bik' => $KensahyouHeads[0]->bik,
+                  'status' => 0
   							]);
 
                 $connection = ConnectionManager::get('default');//新DBに戻る
@@ -2002,294 +1999,478 @@ class SyukkaKensasController extends AppController {
     $this->request->session()->destroy(); // セッションの破棄
   }
 
-  public function do()//「出荷検査表登録」登録画面
- {
-  $session = $this->request->getSession();
-  $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
+      public function do()//「出荷検査表登録」登録画面
+     {
+      $session = $this->request->getSession();
+      $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
 
-  for($n=1; $n<=8; $n++){
-    $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
-    $_SESSION['sokuteidata'][$n] = array_merge($created_staff,$_SESSION['sokuteidata'][$n]);
-  }
-  $data = $_SESSION['sokuteidata'];
+      for($n=1; $n<=8; $n++){
+        $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+        $_SESSION['sokuteidata'][$n] = array_merge($created_staff,$_SESSION['sokuteidata'][$n]);
+      }
+      $data = $_SESSION['sokuteidata'];
 
-  $product_code = $data[1]['product_code'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
-  $this->set('product_code',$product_code);//セット
+      $product_code = $data[1]['product_code'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
+      $this->set('product_code',$product_code);//セット
 
-  $lot_num = $data[1]['lot_num'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
-  $this->set('lot_num',$lot_num);//セット
+      $lot_num = $data[1]['lot_num'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
+      $this->set('lot_num',$lot_num);//セット
 
-    $manu_date = $data[1]['manu_date'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
-    $this->set('manu_date',$manu_date);//セット
+        $manu_date = $data[1]['manu_date'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
+        $this->set('manu_date',$manu_date);//セット
 
-    $inspec_date = $data[1]['inspec_date'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
-    $this->set('inspec_date',$inspec_date);//セット
+        $inspec_date = $data[1]['inspec_date'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
+        $this->set('inspec_date',$inspec_date);//セット
 
-    $ImKikakuid_1 = "ノギス";
-    $this->set('ImKikakuid_1',$ImKikakuid_1);
-    $ImKikakuid_2 = "ノギス";
-    $this->set('ImKikakuid_2',$ImKikakuid_2);
-    $ImKikakuid_3 = "ノギス";
-    $this->set('ImKikakuid_3',$ImKikakuid_3);
-    $ImKikakuid_4 = "ノギス";
-    $this->set('ImKikakuid_4',$ImKikakuid_4);
-    $ImKikakuid_5 = "ノギス";
-    $this->set('ImKikakuid_5',$ImKikakuid_5);
-    $ImKikakuid_6 = "ノギス";
-    $this->set('ImKikakuid_6',$ImKikakuid_6);
-    $ImKikakuid_7 = "ノギス";
-    $this->set('ImKikakuid_7',$ImKikakuid_7);
-    $ImKikakuid_8 = "ノギス";
-    $this->set('ImKikakuid_8',$ImKikakuid_8);
-    $ImKikakuid_9 = "ノギス";
-    $this->set('ImKikakuid_9',$ImKikakuid_9);
+        $ImKikakuid_1 = "ノギス";
+        $this->set('ImKikakuid_1',$ImKikakuid_1);
+        $ImKikakuid_2 = "ノギス";
+        $this->set('ImKikakuid_2',$ImKikakuid_2);
+        $ImKikakuid_3 = "ノギス";
+        $this->set('ImKikakuid_3',$ImKikakuid_3);
+        $ImKikakuid_4 = "ノギス";
+        $this->set('ImKikakuid_4',$ImKikakuid_4);
+        $ImKikakuid_5 = "ノギス";
+        $this->set('ImKikakuid_5',$ImKikakuid_5);
+        $ImKikakuid_6 = "ノギス";
+        $this->set('ImKikakuid_6',$ImKikakuid_6);
+        $ImKikakuid_7 = "ノギス";
+        $this->set('ImKikakuid_7',$ImKikakuid_7);
+        $ImKikakuid_8 = "ノギス";
+        $this->set('ImKikakuid_8',$ImKikakuid_8);
+        $ImKikakuid_9 = "ノギス";
+        $this->set('ImKikakuid_9',$ImKikakuid_9);
 
-    $ImKikakus = $this->ImKikakuTaious->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_code_idとなるデータをProductsテーブルから配列で取得（プルダウン）
-    foreach ((array)$ImKikakus as $key => $value) {
-         $sort[$key] = $value['kensahyuo_num'];
-     }
-     if(isset($ImKikakus[0])){
-      array_multisort($sort, SORT_ASC, $ImKikakus);
-    }
-
-    for($i=0; $i<=8; $i++){
-      $j = $i + 1;
-      if(isset($ImKikakus[$i])) {
-        if($ImKikakus[$i]['kind_kensa'] != "") {
-          ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
-          $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
-        }else{
+        $ImKikakus = $this->ImKikakuTaious->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_code_idとなるデータをProductsテーブルから配列で取得（プルダウン）
+        foreach ((array)$ImKikakus as $key => $value) {
+             $sort[$key] = $value['kensahyuo_num'];
+         }
+         if(isset($ImKikakus[0])){
+          array_multisort($sort, SORT_ASC, $ImKikakus);
         }
-      }else{
-        ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
-        $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+
+        for($i=0; $i<=8; $i++){
+          $j = $i + 1;
+          if(isset($ImKikakus[$i])) {
+            if($ImKikakus[$i]['kind_kensa'] != "") {
+              ${"ImKikakuid_".$j} = $ImKikakus[$i]['kind_kensa'];//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+              $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+            }else{
+            }
+          }else{
+            ${"ImKikakuid_".$j} = "ノギス";//配列の0番目（0番目しかない）のproduct_codeに$product_codeと名前を付ける（プルダウン）
+            $this->set('ImKikakuid_'.$j,${"ImKikakuid_".$j});//セット
+          }
+        }
+
+        for($q=1; $q<=8; $q++){
+          ${"result_weight_".$q} = $data["{$q}"]["result_weight"];
+          $this->set('result_weight_'.$q,${"result_weight_".$q});//セット
+          for($r=1; $r<=8; $r++){
+            ${"result_size_".$q."_".$r} = $data["{$q}"]["result_size_{$r}"];
+            $this->set('result_size_'.$q.'_'.$r,${"result_size_".$q."_".$r});//セット
+          }
+        }
+
+       $Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
+         'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
+       ]);
+
+       foreach ($Products as $value) {//$Productsそれぞれに対し
+        $product_code= $value->product_code;
       }
-    }
+      $this->set('product_code',$product_code);//セット
 
-    for($q=1; $q<=8; $q++){
-      ${"result_weight_".$q} = $data["{$q}"]["result_weight"];
-      $this->set('result_weight_'.$q,${"result_weight_".$q});//セット
-      for($r=1; $r<=8; $r++){
-        ${"result_size_".$q."_".$r} = $data["{$q}"]["result_size_{$r}"];
-        $this->set('result_size_'.$q.'_'.$r,${"result_size_".$q."_".$r});//セット
-      }
-    }
+      $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+      $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+      $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
-   $Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
-     'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
-   ]);
+       $kensahyouSokuteidata = $this->KensahyouSokuteidatas->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
+       $this->set('kensahyouSokuteidata',$kensahyouSokuteidata);//セット
 
-   foreach ($Products as $value) {//$Productsそれぞれに対し
-    $product_code= $value->product_code;
-  }
-  $this->set('product_code',$product_code);//セット
+       $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
+       $Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+       $KensahyouHead = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
+       $this->set('KensahyouHead',$KensahyouHead);//セット
+       $Productname = $Producti[0]->product_name;//$Productiの0番目のデータ（0番目のデータしかない）のproduct_nameに$Productnameと名前を付ける
+       $this->set('Productname',$Productname);//セット
 
-  $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
-  $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
-  $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+       $KensahyouHeadver = $KensahyouHead[0]->version+1;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+       $this->set('KensahyouHeadver',$KensahyouHeadver);//セット
 
-   $kensahyouSokuteidata = $this->KensahyouSokuteidatas->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
-   $this->set('kensahyouSokuteidata',$kensahyouSokuteidata);//セット
+       $KensahyouHeadid = $KensahyouHead[0]->id;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のidに$KensahyouHeadidと名前を付ける
+       $this->set('KensahyouHeadid',$KensahyouHeadid);//セット
 
-   $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
-   $Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
-   $KensahyouHead = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
-   $this->set('KensahyouHead',$KensahyouHead);//セット
-   $Productname = $Producti[0]->product_name;//$Productiの0番目のデータ（0番目のデータしかない）のproduct_nameに$Productnameと名前を付ける
-   $this->set('Productname',$Productname);//セット
+       for($i=1; $i<=9; $i++){//size_1～9までセット
+         ${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
+         $this->set('size_'.$i,${"size_".$i});//セット
+       }
 
-   $KensahyouHeadver = $KensahyouHead[0]->version+1;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
-   $this->set('KensahyouHeadver',$KensahyouHeadver);//セット
+       for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
+         ${"upper_".$j} = $KensahyouHead[0]->{"upper_{$j}"};//KensahyouHeadのupper_1～8まで
+         $this->set('upper_'.$j,${"upper_".$j});//セット
+         ${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
+         $this->set('lower_'.$j,${"lower_".$j});//セット
+       }
 
-   $KensahyouHeadid = $KensahyouHead[0]->id;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のidに$KensahyouHeadidと名前を付ける
-   $this->set('KensahyouHeadid',$KensahyouHeadid);//セット
+       $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+       $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
+    /*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+    */
+       if ($this->request->is('get')) {//postなら登録
+         $kensahyouSokuteidata = $this->KensahyouSokuteidatas->patchEntities($kensahyouSokuteidata, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+         $connection = ConnectionManager::get('default');//トランザクション1
+         // トランザクション開始2
+         $connection->begin();//トランザクション3
+         try {//トランザクション4
+             if ($this->KensahyouSokuteidatas->saveMany($kensahyouSokuteidata)) {//saveManyで一括登録
 
-   for($i=1; $i<=9; $i++){//size_1～9までセット
-     ${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
-     $this->set('size_'.$i,${"size_".$i});//セット
-   }
+               $connection = ConnectionManager::get('DB_ikou_test');
+               $table = TableRegistry::get('kensahyou_sokuteidata_result');
+               $table->setConnection($connection);
 
-   for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
-     ${"upper_".$j} = $KensahyouHead[0]->{"upper_{$j}"};//KensahyouHeadのupper_1～8まで
-     $this->set('upper_'.$j,${"upper_".$j});//セット
-     ${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
-     $this->set('lower_'.$j,${"lower_".$j});//セット
-   }
+               $kensahyou_sokuteidata_head_id = $data[1]["product_code"]."-".$data[1]["lot_num"];
 
-   $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
-   $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
-/*
-   echo "<pre>";
-   print_r($data);
-   echo "</pre>";
-*/
-   if ($this->request->is('get')) {//postなら登録
-     $kensahyouSokuteidata = $this->KensahyouSokuteidatas->patchEntities($kensahyouSokuteidata, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
-     $connection = ConnectionManager::get('default');//トランザクション1
-     // トランザクション開始2
-     $connection->begin();//トランザクション3
-     try {//トランザクション4
-         if ($this->KensahyouSokuteidatas->saveMany($kensahyouSokuteidata)) {//saveManyで一括登録
-
-           $connection = ConnectionManager::get('DB_ikou_test');
-           $table = TableRegistry::get('kensahyou_sokuteidata_result');
-           $table->setConnection($connection);
-
-           $kensahyou_sokuteidata_head_id = $data[1]["product_code"]."-".$data[1]["lot_num"];
-
-           $connection->insert('kensahyou_sokuteidata_head', [
-             'kensahyou_sokuteidata_head_id' => $kensahyou_sokuteidata_head_id,
-             'product_id' => $data[1]["product_code"],
-             'manu_date' => $data[1]["manu_date"],
-             'inspec_date' => $data[1]["inspec_date"],
-             'lot_num' => $data[1]["lot_num"],
-             'emp_id' => $data[1]["created_staff"],
-             'timestamp' => date('Y-m-d H:i:s')
-           ]);
+               $connection->insert('kensahyou_sokuteidata_head', [
+                 'kensahyou_sokuteidata_head_id' => $kensahyou_sokuteidata_head_id,
+                 'product_id' => $data[1]["product_code"],
+                 'manu_date' => $data[1]["manu_date"],
+                 'inspec_date' => $data[1]["inspec_date"],
+                 'lot_num' => $data[1]["lot_num"],
+                 'emp_id' => $data[1]["created_staff"],
+                 'timestamp' => date('Y-m-d H:i:s')
+               ]);
 
 
-           for($k=1; $k<=count($data); $k++){
+               for($k=1; $k<=count($data); $k++){
 
-             for($i=1; $i<=9; $i++){
-               if(empty($data[$k]["result_size_".$i])){
-                 $data[$k]["result_size_".$i] = null;
+                 for($i=1; $i<=9; $i++){
+                   if(empty($data[$k]["result_size_".$i])){
+                     $data[$k]["result_size_".$i] = null;
+                   }
+                 }
+
+                 if(empty($data[$k]["result_weight"])){
+                   $data[$k]["result_weight"] = null;
+                 }
+
+                 $kensahyou_sokuteidata_head_id = $data[$k]["product_code"]."-".$data[$k]["lot_num"];
+
+                 $connection->insert('kensahyou_sokuteidata_result', [
+                   'kensahyou_sokuteidata_result_id' => $kensahyou_sokuteidata_head_id,
+                   'cavi_num' => $data[$k]["cavi_num"],
+                   'product_id' => $data[$k]["product_code"],
+                   'result_size_a' => $data[$k]["result_size_1"],
+                   'result_size_b' => $data[$k]["result_size_2"],
+                   'result_size_c' => $data[$k]["result_size_3"],
+                   'result_size_d' => $data[$k]["result_size_4"],
+                   'result_size_e' => $data[$k]["result_size_5"],
+                   'result_size_f' => $data[$k]["result_size_6"],
+                   'result_size_g' => $data[$k]["result_size_7"],
+                   'result_size_h' => $data[$k]["result_size_8"],
+                   'result_size_i' => $data[$k]["result_size_9"],
+                   'result_text_j' => $data[$k]["situation_dist1"],
+                   'result_text_k' => $data[$k]["situation_dist2"],
+                   'result_weight' => $data[$k]["result_weight"]
+               //    'situation_dist' => ""
+                 ]);
+
                }
+
+               $connection = ConnectionManager::get('default');
+
+             if(strpos($_SESSION['kadouseikeiId'],'_') !== false){
+               $sch_id = explode("_",$_SESSION['kadouseikeiId']);
+
+               $this->ScheduleKouteis->updateAll(
+               ['present_kensahyou' => 1],
+               ['id'   => $sch_id[1]]
+               );
+
+               $ScheduleKouteiData = $this->ScheduleKouteis->find()->where(['id' => $sch_id[1]])->toArray();
+
+               $ScheduleKouteidatetime = $ScheduleKouteiData[0]->datetime->format('Y-m-d H:i:s');
+               $ScheduleKouteiseikeiki = $ScheduleKouteiData[0]->seikeiki;
+
+               $connection = ConnectionManager::get('DB_ikou_test');
+               $table = TableRegistry::get('schedule_koutei');
+               $table->setConnection($connection);
+
+               $num = 1;
+               $updater = "UPDATE schedule_koutei set present_kensahyou ='".$num."'
+                where datetime ='".$ScheduleKouteidatetime."' and seikeiki ='".$ScheduleKouteiseikeiki."'";
+                $connection->execute($updater);
+
+               $connection = ConnectionManager::get('default');//新DBに戻る
+               $table->setConnection($connection);
+
+             }else{
+
+               $KadouSeikeiData = $this->KadouSeikeis->find()->where(['id' => $_SESSION['kadouseikeiId']])->toArray();
+               $KadouSeikeistarting_tm = $KadouSeikeiData[0]->starting_tm->format('Y-m-d H:i:s');
+               $KadouSeikeifinishing_tm = $KadouSeikeiData[0]->finishing_tm->format('Y-m-d H:i:s');
+               $KadouSeikeicreated_at = $KadouSeikeiData[0]->created_at->format('Y-m-d H:i:s');
+               $KadouSeikeiseikeiki_code = $KadouSeikeiData[0]->seikeiki_code;
+               $KadouSeikeiproduct_code = $KadouSeikeiData[0]->product_code;
+
+               $this->KadouSeikeis->updateAll(
+               ['present_kensahyou' => 1 ,'starting_tm' => $KadouSeikeistarting_tm ,'finishing_tm' => $KadouSeikeifinishing_tm ,'created_at' => $KadouSeikeicreated_at ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
+               ['id'   => $_SESSION['kadouseikeiId'] ]
+               );
+
+               $connection = ConnectionManager::get('DB_ikou_test');
+               $table = TableRegistry::get('kadou_seikei');
+               $table->setConnection($connection);
+
+               $num = 1;
+               $updater = "UPDATE kadou_seikei set present_kensahyou ='".$num."'
+                where pro_num ='".$KadouSeikeiproduct_code."' and seikeiki_id ='".$KadouSeikeiseikeiki_code."' and starting_tm ='".$KadouSeikeistarting_tm."'";
+                $connection->execute($updater);
+
+               $connection = ConnectionManager::get('default');//新DBに戻る
+               $table->setConnection($connection);
+
              }
 
-             if(empty($data[$k]["result_weight"])){
-               $data[$k]["result_weight"] = null;
+             $mes = "＊下記のように登録されました";
+             $this->set('mes',$mes);
+                 $connection->commit();// コミット5
+             } else {
+               $this->Flash->error(__('The KensahyouSokuteidatasdo could not be saved. Please, try again.'));
+               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
              }
+         } catch (Exception $e) {//トランザクション7
+         //ロールバック8
+           $connection->rollback();//トランザクション9
+         }//トランザクション10
+       }
 
-             $kensahyou_sokuteidata_head_id = $data[$k]["product_code"]."-".$data[$k]["lot_num"];
+     }
 
-             $connection->insert('kensahyou_sokuteidata_result', [
-               'kensahyou_sokuteidata_result_id' => $kensahyou_sokuteidata_head_id,
-               'cavi_num' => $data[$k]["cavi_num"],
-               'product_id' => $data[$k]["product_code"],
-               'result_size_a' => $data[$k]["result_size_1"],
-               'result_size_b' => $data[$k]["result_size_2"],
-               'result_size_c' => $data[$k]["result_size_3"],
-               'result_size_d' => $data[$k]["result_size_4"],
-               'result_size_e' => $data[$k]["result_size_5"],
-               'result_size_f' => $data[$k]["result_size_6"],
-               'result_size_g' => $data[$k]["result_size_7"],
-               'result_size_h' => $data[$k]["result_size_8"],
-               'result_size_i' => $data[$k]["result_size_9"],
-               'result_text_j' => $data[$k]["situation_dist1"],
-               'result_text_k' => $data[$k]["situation_dist2"],
-               'result_weight' => $data[$k]["result_weight"]
-           //    'situation_dist' => ""
-             ]);
+     public function imtaiouedit($id = null)
+     {
+       $this->request->session()->destroy(); // セッションの破棄
 
+       $ImKikakuTaious = $this->ImKikakuTaious->get($id);
+       $this->set('ImKikakuTaious', $ImKikakuTaious);//$kensahyouHeadをctpで使えるようにセット
+
+       $KouteiKensahyouHeadid = $ImKikakuTaious['id'];//product_idという名前のデータに$product_idと名前を付ける
+       $this->set('KouteiKensahyouHeadid',$KouteiKensahyouHeadid);//セット
+/*
+       echo "<pre>";
+       print_r($KouteiKensahyouHeadid);
+       echo "</pre>";
+*/
+       $product_code = $ImKikakuTaious['product_code'];//product_idという名前のデータに$product_idと名前を付ける
+       $this->set('product_code',$product_code);//セット
+       $this->set('Productcode',$product_code);//セット
+
+       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_idを満たすものを$Product
+       $Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+       $this->set('Productname',$Productname);//セット
+
+       $newversion = $ImKikakuTaious['version'] + 1;
+       $this->set('newversion',$newversion);
+
+       $arrType = ['0' => 'IM6120(1号機)', '1' => 'IM7000(2号機)'];
+       $this->set('arrType',$arrType);
+
+       $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+       $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderkouteidata($product_code);//
+       $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+
+       $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()
+      ->where(['product_code' => $product_code])->toArray();
+
+       $arrKindKensa = array("","ノギス");//配列の初期化
+        foreach ($ImSokuteidataHeads as $value) {//それぞれに対して
+           $arrKindKensa[] = $value->kind_kensa;//配列に追加
+        }
+         $arrKindKensa = array_unique($arrKindKensa);
+
+        $this->set('arrKindKensa',$arrKindKensa);
+
+     }
+
+     public function imtaioueditconfirm()
+     {
+      $data = $this->request->getData();
+      $product_code = $data["product_code"];
+
+      $this->set('product_code',$product_code);//セット
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $Productname = $Product[0]->product_name;
+      $this->set('Productname',$Productname);//セット
+
+      $Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
+        'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
+      ]);
+      foreach ($Products as $value) {//$Productsそれぞれに対し
+       $product_code= $value->product_code;
+     }
+     $this->set('product_code',$product_code);//セット
+
+     $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+     $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+     $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+
+      $this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
+     }
+
+     public function imtaioueditpreadd()
+     {
+       $this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
+
+       $session = $this->request->getSession();
+       $data = $session->read();//postデータ取得し、$dataと名前を付ける
+     }
+
+     public function imtaioueditlogin()
+     {
+       if ($this->request->is('post')) {
+         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+         $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+         $ary = explode(',', $str);//$strを配列に変換
+
+         $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+         //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+         $this->set('username', $username);
+         $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+           if(empty($Userdata)){
+             $delete_flag = "";
+           }else{
+             $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+             $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
            }
-
-           $connection = ConnectionManager::get('default');
-
-         if(strpos($_SESSION['kadouseikeiId'],'_') !== false){
-           $sch_id = explode("_",$_SESSION['kadouseikeiId']);
-
-           $this->ScheduleKouteis->updateAll(
-           ['present_kensahyou' => 1],
-           ['id'   => $sch_id[1]]
-           );
-
-           $ScheduleKouteiData = $this->ScheduleKouteis->find()->where(['id' => $sch_id[1]])->toArray();
-
-           $ScheduleKouteidatetime = $ScheduleKouteiData[0]->datetime->format('Y-m-d H:i:s');
-           $ScheduleKouteiseikeiki = $ScheduleKouteiData[0]->seikeiki;
-
-           $connection = ConnectionManager::get('DB_ikou_test');
-           $table = TableRegistry::get('schedule_koutei');
-           $table->setConnection($connection);
-
-           $num = 1;
-           $updater = "UPDATE schedule_koutei set present_kensahyou ='".$num."'
-            where datetime ='".$ScheduleKouteidatetime."' and seikeiki ='".$ScheduleKouteiseikeiki."'";
-            $connection->execute($updater);
-
-           $connection = ConnectionManager::get('default');//新DBに戻る
-           $table->setConnection($connection);
-
-         }else{
-
-           $KadouSeikeiData = $this->KadouSeikeis->find()->where(['id' => $_SESSION['kadouseikeiId']])->toArray();
-           $KadouSeikeistarting_tm = $KadouSeikeiData[0]->starting_tm->format('Y-m-d H:i:s');
-           $KadouSeikeifinishing_tm = $KadouSeikeiData[0]->finishing_tm->format('Y-m-d H:i:s');
-           $KadouSeikeicreated_at = $KadouSeikeiData[0]->created_at->format('Y-m-d H:i:s');
-           $KadouSeikeiseikeiki_code = $KadouSeikeiData[0]->seikeiki_code;
-           $KadouSeikeiproduct_code = $KadouSeikeiData[0]->product_code;
-
-           $this->KadouSeikeis->updateAll(
-           ['present_kensahyou' => 1 ,'starting_tm' => $KadouSeikeistarting_tm ,'finishing_tm' => $KadouSeikeifinishing_tm ,'created_at' => $KadouSeikeicreated_at ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
-           ['id'   => $_SESSION['kadouseikeiId'] ]
-           );
-
-           $connection = ConnectionManager::get('DB_ikou_test');
-           $table = TableRegistry::get('kadou_seikei');
-           $table->setConnection($connection);
-
-           $num = 1;
-           $updater = "UPDATE kadou_seikei set present_kensahyou ='".$num."'
-            where pro_num ='".$KadouSeikeiproduct_code."' and seikeiki_id ='".$KadouSeikeiseikeiki_code."' and starting_tm ='".$KadouSeikeistarting_tm."'";
-            $connection->execute($updater);
-
-           $connection = ConnectionManager::get('default');//新DBに戻る
-           $table->setConnection($connection);
-
+             $user = $this->Auth->identify();
+           if ($user) {
+             $this->Auth->setUser($user);
+             return $this->redirect(['action' => 'imtaioueditdo']);
+           }
          }
+     }
 
-         $mes = "＊下記のように登録されました";
-         $this->set('mes',$mes);
-             $connection->commit();// コミット5
-         } else {
-           $this->Flash->error(__('The KensahyouSokuteidatasdo could not be saved. Please, try again.'));
-           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-         }
-     } catch (Exception $e) {//トランザクション7
-     //ロールバック8
-       $connection->rollback();//トランザクション9
-     }//トランザクション10
-   }
+     public function imtaioueditdo()
+    {
+      $session = $this->request->getSession();
+      $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
 
+      $data = $sessiondata['kikakudata'];
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
 
- }
+      $Product = $this->Products->find()->where(['product_code' => $sessiondata['kikakudata'][1]['product_code']])->toArray();
+      $product_code = $Product[0]->product_code;
+      $this->set('product_code',$product_code);//セット
+      $Productname = $Product[0]->product_name;
+      $this->set('Productname',$Productname);//セット
 
- public function torikomitest()
- {
+      $Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
+        'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
+      ]);
+      foreach ($Products as $value) {//$Productsそれぞれに対し
+       $product_code= $value->product_code;
+     }
+     $this->set('product_code',$product_code);//セット
 
-   $arrFp = array();//空の配列を作る
+     $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+     $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+     $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
 
-   if ($this->request->is('post')) {
-     $source_file = $_FILES['file']['tmp_name'];
+     $ImKikakuTaious = $this->ImKikakuTaious->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
+     $this->set('ImKikakuTaious',$ImKikakuTaious);//セット
 
-     $fp = fopen($source_file, "r");
-     $fpcount = fopen($source_file, 'r' );
-      for($count = 0; fgets( $fpcount ); $count++ );
-      $arrFp = array();//空の配列を作る
-      for ($k=1; $k<=$count; $k++) {//最後の行まで
-        $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
-        $line = mb_convert_encoding($line, 'UTF-8', 'SJIS-win');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
-        $sample = explode(",",$line);//$lineを"（スペース）"毎に配列に入れる
-        $arrFp[] = $sample;//配列に追加する
-      }
+     $count = count($data);
+     for($k=1; $k<=$count; $k++){
 
-      $path = './test19080501/';
-      if(move_uploaded_file($_FILES['file']['tmp_name'], $path.'test200917.txt')){
-        echo "<pre>";
-        print_r("ok");
-        echo "</pre>";
-      }else{
-        echo "<pre>";
-        print_r("no");
-        echo "</pre>";
-      }
+       if(!empty($data[$k]["kind_kensa"]) && !empty($data[$k]["size_num"])){
+
+         $staff_id = $sessiondata['Auth']['User']['staff_id'];//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+         $data[$k]['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+
+       }else{
+         unset($data[$k]);
+
+       }
+
+     }
+
+     $data = array_values($data);
+/*
+     echo "<pre>";
+     print_r($data);
+     echo "</pre>";
+*/
+         if ($data[0]['product_code'] == 1) {
+
+        }else{
+
+          $KensahyouHeads = $this->ImKikakuTaious->patchEntity($ImKikakuTaious, $this->request->getData());
+          $connection = ConnectionManager::get('default');//トランザクション1
+            // トランザクション開始2
+          $connection->begin();//トランザクション3
+          try {//トランザクション4
+
+            $ImKikakuTaiou = $this->ImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => '0'])->toArray();
+
+            for($k=0; $k<count($ImKikakuTaiou); $k++){
+
+              ${"id".$k} = $ImKikakuTaiou[$k]->id;
+
+              $this->ImKikakuTaious->updateAll(
+                ['status' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data[0]['created_staff']],
+                ['id'  => ${"id".$k}]
+              );
+
+            }
+
+             $ImKikakuTaious = $this->ImKikakuTaious->patchEntities($this->ImKikakuTaious->newEntity(), $data);
+             $this->ImKikakuTaious->saveMany($ImKikakuTaious);
+
+             //旧DB更新
+             $connection = ConnectionManager::get('DB_ikou_test');
+             $table = TableRegistry::get('koutei_im_kikaku_taiou');
+             $table->setConnection($connection);
+
+             $statusmoto = 0;
+             $status = 1;
+             $updater = "UPDATE im_kikaku_taiou set status = '".$status."'
+             , updated_at = '".date('Y-m-d H:i:s')."' , updated_staff = '".$data[0]['created_staff']."'
+             where product_id ='".$product_code."' and status ='".$statusmoto."'";
+             $connection->execute($updater);
+
+             //旧DB更新
+             $connection = ConnectionManager::get('DB_ikou_test');
+             $table = TableRegistry::get('im_kikaku_taiou');
+             $table->setConnection($connection);
+
+             for($k=0; $k<count($data); $k++){
+               $connection->insert('im_kikaku_taiou', [
+                 'product_id' => $data[$k]["product_code"],
+                 'kensahyou_size' => $data[$k]["kensahyuo_num"],
+                 'kind_kensa' => $data[$k]["kind_kensa"],
+                 'im_size_num' => $data[$k]["size_num"]
+               ]);
+             }
+             $connection = ConnectionManager::get('default');
+
+              $mes = "※下記のように更新されました";
+               $this->set('mes',$mes);
+               $connection->commit();// コミット5
+
+          } catch (Exception $e) {//トランザクション7
+          //ロールバック8
+            $connection->rollback();//トランザクション9
+          }//トランザクション10
+
+        }
 
     }
 
-    echo "<pre>";
-    print_r($arrFp);
-    echo "</pre>";
-
-  }
 
 }

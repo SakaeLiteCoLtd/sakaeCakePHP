@@ -13,7 +13,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($products, ['url' => ['action' => 'imtaiouform']]);
+          echo $this->Form->create($products, ['url' => ['action' => 'kouteiheadview']]);
 ?>
 <?php
  use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用

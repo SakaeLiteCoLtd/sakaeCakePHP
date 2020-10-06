@@ -7,6 +7,7 @@
  use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
 $this->Products = TableRegistry::get('products');//productsテーブルを使う
+$this->ImKikakuTaious = TableRegistry::get('imKikakuTaious');//productsテーブルを使う
 ?>
         <?php
           $username = $this->request->Session()->read('Auth.User.username');
@@ -42,6 +43,14 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
          <hr size="5" style="margin: 0.5rem">
 
 <?php if(isset($ImKikakuex[0])): ?>
+
+  <?php
+    $KensaProduct = $this->ImKikakuTaious->find()->where(['product_code' => $product_code ,'status' => '0'])->order(["version"=>"desc"])->toArray();
+    $KensaProductV = $KensaProduct[0]->version;
+
+    $newversion = $KensaProductV + 1;
+  ?>
+
   <fieldset>
     <div align="center"><strong><font color="red">＊運用中</font></strong></div>
     <br>
@@ -54,7 +63,32 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td colspan="6" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= h($Productname) ?></td>
         </tr>
     </table>
-<br>
+
+    <table width="600" border="1" align="center" bordercolor="#000000" bgcolor="#FFDEAD">
+        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+        <tr>
+          <td colspan="9" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><strong><font color="blue">出荷検査運用中バージョン</font></strong></div></td>
+          <td colspan="3" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= h($KensaProductV) ?></td>
+        </tr>
+    </table>
+    <table width="600" border="1" align="center" bordercolor="#000000" bgcolor="#FFDEAD">
+        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+        <tr>
+          <td colspan="9" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><strong><font color="blue">新規登録バージョン</font></strong></div></td>
+          <td colspan="3" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= h($newversion) ?></td>
+        </tr>
+    </table>
+
+    <br>
+
+    <table align="center">
+        <tr>
+                <td class="actions">
+                    <a><?= $this->Html->link(__('編集'), ['action' => 'imtaiouedit', $KensaProduct[0]->id]) ?></a>
+                </td>
+        </tr>
+    </table>
+
 </fieldset>
 <?php else: ?>
 

@@ -15,7 +15,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Cache-Control:');
           header('Pragma:');
 
-          echo $this->Form->create($KouteiKensahyouHeads, ['url' => ['action' => 'typeimtaioupreadd']]);
+          echo $this->Form->create($KensahyouHeads, ['url' => ['action' => 'typeimtaioupreadd']]);
         ?>
 
         <?php

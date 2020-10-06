@@ -13,7 +13,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($KensahyouHeads, ['url' => ['action' => 'imtaiouform']]);
+          echo $this->Form->create($KensahyouHeads, ['url' => ['action' => 'kouteiheadview']]);
 ?>
 <?php
  use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
@@ -42,7 +42,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
       <?php for($i=0; $i<count($arrProduct); $i++): ?>
       <tr>
           <td class="actions" style="border-style: none; color:#ff0000; text-decoration: underline;">
-              <?= $this->Html->link(__($arrProduct[$i]["product_code"]), ['action' => 'imtaiouform',  'name' => $arrProduct[$i]["product_code"]]) ?>
+              <?= $this->Html->link(__($arrProduct[$i]["product_code"]), ['action' => 'kouteiheadview',  'name' => $arrProduct[$i]["product_code"]]) ?>
           </td>
           <td style="border-style: none;"><?= h($arrProduct[$i]["product_name"]) ?></td>
       </tr>

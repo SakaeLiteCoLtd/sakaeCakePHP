@@ -6,6 +6,7 @@
  use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
 $this->Products = TableRegistry::get('products');//productsテーブルを使う
+$this->ImKikakuTaious = TableRegistry::get('imKikakuTaious');
 ?>
 
 <?= $this->Form->create($entity, ['url' => ['action' => 'imtaioueditpreadd']]) ?>
@@ -14,21 +15,25 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
       $username = $this->request->Session()->read('Auth.User.username');
       $session = $this->request->getSession();
 
+      $ImKikakuTaious = $this->ImKikakuTaious->find()->where(['product_code' => $_POST['product_code'], 'status' => '0'])->toArray();
+      $version = $ImKikakuTaious[0]->version + 1;
+
       for($n=1; $n<=9; $n++){
         $resultArray = Array();
         $_SESSION['kikakudata'][$n] = array(
           'product_code' => $_POST['product_code'],
           'kensahyuo_num' => $n,
+          'version' => $version,
           "kind_kensa" => $_POST["kind_kensa_{$n}"],
           "size_num" => $_POST["size_num_{$n}"],
+          "created_staff" => "",
+          "created_at" => ""
         );
       }
 
-
-      echo "<pre>";
-      print_r($_SESSION['kikakudata']);
-      echo "</pre>";
-
+      $_SESSION['kousinn_flag'] = array(
+        'kousinn_flag' => 9999
+      );
 
 ?>
 <?php
@@ -44,7 +49,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
  </table>
  <hr size="5" style="margin: 0.5rem">
 <br>
-<div align="center"><strong><font color="red">＊下記のように登録します</font></strong></div>
+<div align="center"><strong><font color="red">＊下記のように更新します</font></strong></div>
 <br>
 
     <table width="1200" border="1" align="center" bordercolor="#000000" style="background-color: #FFFFFF">

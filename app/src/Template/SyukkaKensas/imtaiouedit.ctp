@@ -23,18 +23,14 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 	<?php
   echo $this->Form->create($ImKikakuTaious, ['url' => ['action' => 'imtaioueditconfirm']]);
   $options2 = [
-    '0' => 'データを編集',
-    '1' => 'データを削除'
+    '0' => '新バージョン登録',
+    '1' => '登録内容修正　　'
   ];
+  $attributes = array('value' => 0)
 	?>
-
-      <?php
-    /*  <a align="center"><?= $this->Form->radio("delete_flag", $options2); ?></a> */
-      ?>
-
-      <fieldset>
-  <div align="center"><strong><font color="red">＊入力してください</font></strong></div>
-  <br>
+  <fieldset>
+<div align="center"><strong><font color="red">＊入力してください</font></strong></div>
+<br>
       <table width="1200" border="1" align="center" bordercolor="#000000" style="background-color: #FFFFFF">
           <tr style="border-bottom: solid;border-width: 1px">
             <td colspan="28" nowrap="nowrap"><div align="center"><strong>検査表</strong></div></td>

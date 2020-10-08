@@ -84,6 +84,10 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               "updated_at" =>date('Y-m-d H:i:s')
             );
 
+            $_SESSION['kousinn_flag'] = array(
+              'kousinn_flag' => $_POST['kousinn_flag']
+            );
+
         ?>
         <br>
         <legend align="center"><font color="red"><?= __($mes) ?></font></legend>

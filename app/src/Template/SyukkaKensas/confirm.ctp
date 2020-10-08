@@ -97,6 +97,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 */
 ?>
 
+<br>
 <div align="center"><strong><font color="red">＊下記のように登録します</font></strong></div>
 <br>
 

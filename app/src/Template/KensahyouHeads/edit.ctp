@@ -23,14 +23,15 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 	<?php
   echo $this->Form->create($kensahyouHead, ['url' => ['action' => 'editconfirm']]);
   $options2 = [
-    '0' => 'データを編集',
-    '1' => 'データを削除'
+    '0' => '新バージョン登録',
+    '1' => '登録内容修正　　'
   ];
+  $attributes = array('value' => 0)
 	?>
 
     <fieldset>
 
- 		<a align="center"><?= $this->Form->radio("delete_flag", $options2); ?></a>
+      <a align="center"><?= $this->Form->radio("kousinn_flag", $options2, $attributes); ?></a>
 <br>
 <table width="1200" border="1" align="center" bordercolor="#000000" bgcolor="#FFFFFF" style="background-color: #FFFFFF">
     <tr style="border-bottom: solid;border-width: 1px">
@@ -144,6 +145,7 @@ echo $this->Form->hidden('id' ,['value'=>$kensahyouHead->id]);
 echo $this->Form->hidden('version' ,['value'=>$kensahyouHead->version+1]);
 echo $this->Form->hidden('product_code' ,['value'=>$product_code]);
 echo $this->Form->hidden('status' ,['value'=>0]);
+echo $this->Form->hidden('delete_flag' ,['value'=>0]);
 echo $this->Form->hidden('updated_staff');
 ?>
     </fieldset>

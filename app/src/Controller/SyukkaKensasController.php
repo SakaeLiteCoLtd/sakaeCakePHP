@@ -1961,6 +1961,16 @@ class SyukkaKensasController extends AppController {
        $this->set('upper_'.$j,${"upper_".$j});//セット
        ${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
        $this->set('lower_'.$j,${"lower_".$j});//セット
+
+       ${"result_weight_".$j} = $data['result_weight_'.$j];
+       if(!empty(${"result_weight_".$j})){
+         ${"hikaku_".$j} = "0_0_0_0_0_0";
+         $this->set('hikaku_'.$j,${"hikaku_".$j});//セット
+       }else{
+         ${"hikaku_".$j} = NULL;
+         $this->set('hikaku_'.$j,${"hikaku_".$j});//セット
+       }
+
      }
 
      $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
@@ -2121,6 +2131,17 @@ class SyukkaKensasController extends AppController {
          $this->set('upper_'.$j,${"upper_".$j});//セット
          ${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
          $this->set('lower_'.$j,${"lower_".$j});//セット
+       }
+
+       for($j=1; $j<=8; $j++){
+         ${"result_weight_".$j} = $data[$j]['result_weight'];
+         if(!empty(${"result_weight_".$j})){
+           ${"hikaku_".$j} = "0_0_0_0_0_0";
+           $this->set('hikaku_'.$j,${"hikaku_".$j});//セット
+         }else{
+           ${"hikaku_".$j} = NULL;
+           $this->set('hikaku_'.$j,${"hikaku_".$j});//セット
+         }
        }
 
        $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける

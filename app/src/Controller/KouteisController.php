@@ -1440,6 +1440,7 @@ class KouteisController extends AppController {
 
      public function torikomi()//取り込み（画面なし自動で次のページへ）
     {
+
       $dirName = 'data_工程_IMデータ/';//webroot内のフォルダ
       $countname = 0;//ファイル名のかぶりを防ぐため
 
@@ -1876,7 +1877,444 @@ class KouteisController extends AppController {
      	    }//親whileの終わり
     	  }
     	}
+
+
+      $dirName = 'data_工程_2_IMデータ/';//webroot内のフォルダ
+
+      if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
+    	  if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）
+    	    while(($folder = readdir($dir)) !== false){//親while（ディレクトリ内のファイル一覧を取得する）
+    	      if($folder != '.' && $folder != '..'){//フォルダーなら("."が無いならフォルダーという認識)
+    	        if(strpos($folder,'.',0)==''){//$folderが'.'を含まなかった時
+    	          if(is_dir($dirName.$folder)){//$dirName.$folderがディレクトリかどうかを調べる
+    	            if($child_dir = opendir($dirName.$folder)){//opendir で$dirName.$folderの子ディレクトリをオープン
+              			$folder_check = 0;//$folder_checkを定義
+                			if(strpos($folder,'_',0)==''){//$folderが'_'を含まなかった時
+                				$folder_check = 1;//$folder_check=1にする
+                			}else{//$folderが'_'を含む時
+
+                        $foldername = explode("_",$folder);
+
+                        $product_code = $foldername[2];
+                        $kind_kensa = $foldername[3];
+
+                          while(($file = readdir($child_dir)) !== false){//子while
+                               if($file != "." && $file != ".."){//ファイルなら
+                                if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
+
+                                  $fp = fopen('data_工程_2_IMデータ/'.$folder.'/'.$file, "r");//kesuyatu
+
+                                   if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
+                                    $countname += 1;//ファイル名がかぶらないようにカウントしておく
+
+                                    $fp = fopen('data_工程_2_IMデータ/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
+                              			$this->set('fp',$fp);
+
+                              			$fpcount = fopen('data_工程_2_IMデータ/'.$folder.'/'.$file, 'r' );
+                              			for( $count = 0; fgets( $fpcount ); $count++ );
+
+                              			$arrFp = array();//空の配列を作る
+                                    for ($k=1; $k<=$count; $k++) {
+                                        $line = fgets($fp);//ファイル$fpの上の１行を取る
+                                        $ImData = explode(',',$line);//$lineを","毎に配列に入れる
+                                        $keys=array_keys($ImData);
+                                        $ImData = array_combine( $keys, $ImData );
+                                				$arrFp[] = $ImData;//配列に追加する
+                                    }
+
+                                    $arrLot_nums = array();//lot_numの重複チェック
+                                    for ($k=4; $k<=$count-1; $k++) {
+                                      ${"arrLot_nums".$countname}[] = $arrFp[$k][2];
+                                    }
+                                    $arruniLot_num = array_unique(${"arrLot_nums".$countname});//lot_numの重複削除
+                                    ${"arruniLot_num".$countname} = array_values($arruniLot_num);//配列の添字を振り直し
+                                    $cntLot = count(${"arruniLot_num".$countname});//配列の要素数確認
+
+                                    //ImSokuteidataHeadsの登録用データをセット
+                                    $arrIm_head = array();//空の配列を作る
+                                    for ($k=1; $k<=$cntLot; $k++) {
+                                      $arrIm_heads = array();//空の配列を作る
+                                      $len = mb_strlen($folder);
+                                      $inspec_date = substr($file,0,4)."-".substr($file,4,2)."-".substr($file,6,2);
+
+                                      $session = $this->request->session();
+                                      $session->write('kind_kensa', $kind_kensa);
+
+                                      $arrIm_heads[] = $product_code;
+                                      $arrIm_heads[] = $kind_kensa;
+                                      $arrIm_heads[] = $inspec_date;
+                                      $arrIm_heads[] = ${"arruniLot_num".$countname}[$k-1];
+                                      $arrIm_heads[] = 0;
+                                      $arrIm_heads[] = 0;
+                                      $arrIm_heads[] = date('Y-m-d H:i:s');
+
+                                      $name_heads = array('product_code', 'kind_kensa', 'inspec_date', 'lot_num', 'torikomi', 'delete_flag', 'created_at');
+                                      $arrIm_heads = array_combine($name_heads, $arrIm_heads);
+                                      $arrIm_head[] = $arrIm_heads;
+                                    }
+
+                                    $KouteiImSokuteidataHead = $this->KouteiImSokuteidataHeads->patchEntities($this->KouteiImSokuteidataHeads->newEntity(), $arrIm_head);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+                                    $connection = ConnectionManager::get('default');//トランザクション1
+                                    // トランザクション開始2
+                                    $connection->begin();//トランザクション3
+                                    try {//トランザクション4
+                                      if ($this->KouteiImSokuteidataHeads->saveMany($KouteiImSokuteidataHead)) {
+
+                                        $connection = ConnectionManager::get('DB_ikou_test');
+                                        $table = TableRegistry::get('koutei_im_sokuteidata_head');
+                                        $table->setConnection($connection);
+
+                                        $connection->insert('koutei_im_sokuteidata_head', [
+                                            'product_id' => $arrIm_head[0]['product_code'],
+                                            'kind_kensa' => $arrIm_head[0]['kind_kensa'],
+                                            'version' => 0,
+                                            'inspec_date' => $arrIm_head[0]['inspec_date'],
+                                            'lot_num' => $arrIm_head[0]['lot_num'],
+                                            'torikomi' => $arrIm_head[0]['torikomi']
+                                        ]);
+                                        $connection = ConnectionManager::get('default');
+
+
+                                          //ImKikakusの登録用データをセット
+                                          $cnt = count($arrFp[1]);
+                                          $arrImKikakus = array_slice($arrFp , 1, 3);
+                                          $arrIm_kikaku = array();
+
+                                        for ($m=1; $m<=$cntLot; $m++) {
+                                          for ($k=7; $k<=$cnt-1; $k++) {//IM2の方はカンマが１つ少ない
+
+                                            $arrIm_kikaku_data = array();
+
+                                            $size_num = $k-6;
+                                            $size = trim($arrImKikakus[0][$k]);
+                                            $upper = trim($arrImKikakus[1][$k]);
+                                            $lower = trim($arrImKikakus[2][$k]);
+
+                                            $KouteiImSokuteidataHeadsData = $this->KouteiImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1], 'kind_kensa' => $kind_kensa])->toArray();
+                                            $im_sokuteidata_head_id = $KouteiImSokuteidataHeadsData[0]->id;
+
+                                            $arrIm_kikaku_data[] = $im_sokuteidata_head_id;//配列に追加する
+                                            $arrIm_kikaku_data[] = $size_num;//配列に追加する
+                                            $arrIm_kikaku_data[] = $size;//配列に追加する
+                                            $arrIm_kikaku_data[] = $upper;//配列に追加する
+                                            $arrIm_kikaku_data[] = $lower;//配列に追加する
+                                            $name_kikaku = array('im_sokuteidata_head_id', 'size_num', 'size', 'upper', 'lower');
+                                            $arrIm_kikaku_data = array_combine($name_kikaku, $arrIm_kikaku_data);
+                                            $arrIm_kikaku[] = $arrIm_kikaku_data;
+
+                                          }
+                                        }
+
+                                           //ImKikakusデータベースに登録
+                                          $KouteiImKikakus = $this->KouteiImKikakus->newEntity();//newentityに$userという名前を付ける
+
+                                          $KouteiImKikakus = $this->KouteiImKikakus->patchEntities($KouteiImKikakus, $arrIm_kikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+                                             if ($this->KouteiImKikakus->saveMany($KouteiImKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
+
+                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $table = TableRegistry::get('koutei_im_kikaku');
+                                               $table->setConnection($connection);
+
+                                               $sql = "SELECT id FROM koutei_im_sokuteidata_head".
+                                               " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
+                                                and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
+                                                 order by id desc limit 1";
+                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
+
+                                               for($k=0; $k<count($arrIm_kikaku); $k++){
+                                                 $connection->insert('koutei_im_kikaku', [
+                                                     'id' => $im_sokuteidata_head_id[0]["id"],
+                                                     'size_num' => $arrIm_kikaku[$k]["size_num"],
+                                                     'size' => $arrIm_kikaku[$k]["size"],
+                                                     'upper' => $arrIm_kikaku[$k]["upper"],
+                                                     'lower' => $arrIm_kikaku[$k]["lower"]
+                                                 ]);
+                                               }
+
+                                               $connection = ConnectionManager::get('default');
+
+                                                //KouteiImSokuteidataResultsの登録用データをセット
+                                                $inspec_datetime = substr($arrFp[4][1],0,4)."-".substr($arrFp[4][1],5,2)."-".substr($arrFp[4][1],8,mb_strlen($arrFp[4][1])-8);
+                                                $arrIm_Result = array();
+
+                                                 $arrImResults = array_slice($arrFp , 4, $count);
+                                                 for ($j=0; $j<=$count-5; $j++) {
+                                                    for ($k=7; $k<=$cnt-1; $k++) {//IM2の方はカンマが１つ少ない
+                                                      $arrIm_Result_data = array();
+
+                                                      $serial = $arrImResults[$j][3];
+                                                      $size_num = $k-6;
+                                                      $result = trim($arrImResults[$j][$k]);
+                                                      $status = $arrImResults[$j][4];
+
+                                                      $KouteiImSokuteidataHeadsData = $this->KouteiImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2], 'kind_kensa' => $kind_kensa])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                                      $im_sokuteidata_head_id = $KouteiImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
+
+                                                      $arrIm_Result_data[] = $im_sokuteidata_head_id;//配列に追加する
+                                                      $arrIm_Result_data[] = $inspec_datetime;//配列に追加する
+                                                      $arrIm_Result_data[] = $serial;//配列に追加する
+                                                      $arrIm_Result_data[] = $size_num;//配列に追加する
+                                                      $arrIm_Result_data[] = $result;//配列に追加する
+                                                      $arrIm_Result_data[] = $status;//配列に追加する
+                                                      $name_Result = array('im_sokuteidata_head_id', 'inspec_datetime', 'serial', 'size_num', 'result', 'status');
+                                                      $arrIm_Result_data = array_combine($name_Result, $arrIm_Result_data);
+
+                                                      $arrIm_Result[] = $arrIm_Result_data;
+                                                  }
+                                                 }
+
+
+                                                  //ImSokuteidataResultsデータベースに登録
+                                                  $KouteiImSokuteidataResults = $this->KouteiImSokuteidataResults->newEntity();//newentityに$userという名前を付ける
+
+                                                  $KouteiImSokuteidataResults = $this->KouteiImSokuteidataResults->patchEntities($KouteiImSokuteidataResults, $arrIm_Result);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+                                                  if ($this->KouteiImSokuteidataResults->saveMany($KouteiImSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
+
+                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $table = TableRegistry::get('koutei_im_sokuteidata_result');
+                                                    $table->setConnection($connection);
+
+                                                    $sql = "SELECT id FROM koutei_im_sokuteidata_head".
+                                                    " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
+                                                     and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
+                                                      order by id desc limit 1";
+                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
+
+                                                    for($k=0; $k<count($arrIm_Result); $k++){
+
+                                                      $sql = "SELECT id FROM koutei_im_sokuteidata_result".
+                                                      " where id = '".$im_sokuteidata_head_id[0]["id"]."' and inspec_datetime = '".$arrIm_Result[$k]["inspec_datetime"]."'
+                                                       and serial = '".$arrIm_Result[$k]["serial"]."' and size_num = '".$arrIm_Result[$k]["size_num"]."'
+                                                        order by id desc limit 1";
+                                                      $connection = ConnectionManager::get('DB_ikou_test');
+                                                      $koutei_im_sokuteidata_result = $connection->execute($sql)->fetchAll('assoc');
+
+                                                      if(!isset($koutei_im_sokuteidata_result[0])){
+
+                                                        $connection->insert('koutei_im_sokuteidata_result', [
+                                                            'id' => $im_sokuteidata_head_id[0]["id"],
+                                                            'inspec_datetime' => $arrIm_Result[$k]["inspec_datetime"],
+                                                            'serial' => $arrIm_Result[$k]["serial"],
+                                                            'size_num' => $arrIm_Result[$k]["size_num"],
+                                                            'result' => $arrIm_Result[$k]["result"],
+                                                            'status' => $arrIm_Result[$k]["status"]
+                                                        ]);
+
+                                                      }
+
+                                                    }
+
+                                                    $connection = ConnectionManager::get('default');
+
+                                                    } else {
+                                                      $this->Flash->error(__('This data1 could not be saved. Please, try again.'));
+                                                      throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                                                  }
+
+                                            } else {
+                                              $this->Flash->error(__('This data2 could not be saved. Please, try again.'));
+                                              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                                            }
+
+                                         $connection->commit();// コミット5
+
+                                      } else {
+                                        $this->Flash->error(__('This data3 could not be saved. Please, try again.'));
+                                        throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                                      }
+                                    } catch (Exception $e) {//トランザクション7
+                                    //ロールバック8
+                                      $connection->rollback();//トランザクション9
+                                  }//トランザクション10
+
+                                  }else{
+                                   print_r('else ');
+                                  }
+
+
+                                $output_dir = 'backupData_工程_2_IMデータ/'.$folder;
+
+                                  if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
+                                   if (mkdir($output_dir)) {
+                                      $Filebi2 = mb_substr($file,0,-4);
+                                      if (copy($dirName.$folder.'/'.$file, $output_dir.'/'.$file) && copy($dirName.$folder.'/'.$Filebi2."110.bi3", $output_dir.'/'.$Filebi2."110.bi3")) {
+                                        //DBに登録KouteiFileCopyChecks
+
+                                        $arrfiledate = [
+                                  				'name_folder' => $folder,
+                                  				'name_file' => $file,
+                                  				'created_at' => date('Y-m-d H:i:s')
+                                        ];
+
+                                        $KouteiFileCopyChecks = $this->KouteiFileCopyChecks->newEntity();
+                                        $fileCopyCheck = $this->KouteiFileCopyChecks->patchEntity($KouteiFileCopyChecks, $arrfiledate);
+                                        $this->KouteiFileCopyChecks->save($fileCopyCheck);
+
+                                        fclose($fp);
+                                        $fp = fopen('data_工程_2_IMデータ/'.$folder.'/'.$file, "r");
+                                        $fpcount = fopen('data_工程_2_IMデータ/'.$folder.'/'.$file, 'r' );
+                                  			for( $count = 0; fgets( $fpcount ); $count++ );
+
+                                  			$arrFpmoto = array();//空の配列を作る
+                                        for ($k=1; $k<=$count; $k++) {
+                                            $line = fgets($fp);//ファイル$fpの上の１行を取る
+                                            $ImData = explode(',',$line);//$lineを","毎に配列に入れる
+                                            $keys=array_keys($ImData);
+                                            $ImData = array_combine( $keys, $ImData );
+                                    				$arrFpmoto[] = $ImData;//配列に追加する
+                                        }
+
+                                        $fpnew = fopen($output_dir.'/'.$file, "r");
+                                        $fpcountnew = fopen($output_dir.'/'.$file, 'r' );
+                                  			for( $count = 0; fgets( $fpcountnew ); $count++ );
+
+                                  			$arrFnew = array();//空の配列を作る
+                                        for ($k=1; $k<=$count; $k++) {
+                                            $line = fgets($fpnew);//ファイル$fpの上の１行を取る
+                                            $ImData = explode(',',$line);//$lineを","毎に配列に入れる
+                                            $keys=array_keys($ImData);
+                                            $ImData = array_combine( $keys, $ImData );
+                                    				$arrFnew[] = $ImData;//配列に追加する
+                                        }
+
+                                        $arrayDiff = array();
+                                        $copy_check = 0;
+                                        for ($k=0; $k<count($arrFpmoto); $k++) {
+                                          array_diff($arrFpmoto[$k], $arrFnew[$k]);
+                                          if(isset(array_diff($arrFpmoto[$k], $arrFnew[$k])[0])){
+                                            $copy_check = $copy_check + 1;
+                                          }
+                                        }
+
+                                        if($copy_check == 0){//元ファイルとコピーしたファイルが一致している場合
+                                          $KouteiFileCopyChecks = $this->KouteiFileCopyChecks->find()->where(['name_folder' => $folder, 'name_file' => $file, 'copy_status' => 0])->toArray();
+                                          $id = $KouteiFileCopyChecks[0]->id;
+
+                                          $this->KouteiFileCopyChecks->updateAll(
+                                            ['copy_status' => 1, 'updated_at' => date('Y-m-d H:i:s')],
+                                            ['id'  => $id]
+                                          );
+
+                                          $countfile =  1;//フォルダーに入る最初のファイル
+
+                                          $toCopyFile = "sumi_".$countfile."_".$file;
+                                          if (rename($output_dir.'/'.$file, $output_dir.'/'.$toCopyFile)) {//ファイル名変更
+                                            unlink($dirName.$folder.'/'.$file);
+                                            unlink($dirName.$folder.'/'.$Filebi2."110.bi3");
+                                          }
+
+                                        }else{//元ファイルとコピーしたファイルが一致していない場合
+                                          $KouteiFileCopyChecks = $this->KouteiFileCopyChecks->find()->where(['name_folder' => $folder, 'name_file' => $file, 'copy_status' => 0])->toArray();
+                                          $id = $KouteiFileCopyChecks[0]->id;
+
+                                          $this->KouteiFileCopyChecks->updateAll(
+                                            ['copy_status' => 9, 'updated_at' => date('Y-m-d H:i:s')],
+                                            ['id'  => $id]
+                                          );
+                                        }
+
+                                      }
+                                    }
+
+                                  } else {//backupData_IM測定の中に$folderがあるとき
+                                    $Filebi2 = mb_substr($file,0,-4);
+                                    if (copy($dirName.$folder.'/'.$file, $output_dir.'/'.$file) && copy($dirName.$folder.'/'.$Filebi2."110.bi3", $output_dir.'/'.$Filebi2."110.bi3")) {
+                                      //DBに登録
+
+                                      $arrfiledate = [
+                                        'name_folder' => $folder,
+                                        'name_file' => $file,
+                                        'created_at' => date('Y-m-d H:i:s')
+                                      ];
+
+                                      $KouteiFileCopyChecks = $this->KouteiFileCopyChecks->newEntity();
+                                      $fileCopyCheck = $this->KouteiFileCopyChecks->patchEntity($KouteiFileCopyChecks, $arrfiledate);
+                                      $this->KouteiFileCopyChecks->save($fileCopyCheck);//KouteiFileCopyChecksテーブルに登録
+
+                                      fclose($fp);
+                                      $fp = fopen('data_工程_2_IMデータ/'.$folder.'/'.$file, "r");
+                                      $fpcount = fopen('data_工程_2_IMデータ/'.$folder.'/'.$file, 'r' );
+                                      for( $count = 0; fgets( $fpcount ); $count++ );
+
+                                      $arrFpmoto = array();//空の配列を作る
+                                      for ($k=1; $k<=$count; $k++) {
+                                          $line = fgets($fp);//ファイル$fpの上の１行を取る
+                                          $ImData = explode(',',$line);//$lineを","毎に配列に入れる
+                                          $keys=array_keys($ImData);
+                                          $ImData = array_combine( $keys, $ImData );
+                                          $arrFpmoto[] = $ImData;//配列に追加する
+                                      }
+
+                                      $fpnew = fopen($output_dir.'/'.$file, "r");
+                                      $fpcountnew = fopen($output_dir.'/'.$file, 'r' );
+                                      for( $count = 0; fgets( $fpcountnew ); $count++ );
+
+                                      $arrFnew = array();//空の配列を作る
+                                      for ($k=1; $k<=$count; $k++) {
+                                          $line = fgets($fpnew);//ファイル$fpの上の１行を取る
+                                          $ImData = explode(',',$line);//$lineを","毎に配列に入れる
+                                          $keys=array_keys($ImData);
+                                          $ImData = array_combine( $keys, $ImData );
+                                          $arrFnew[] = $ImData;//配列に追加する
+                                      }
+
+                                      $arrayDiff = array();
+                                      $copy_check = 0;
+                                      for ($k=0; $k<count($arrFpmoto); $k++) {
+                                        array_diff($arrFpmoto[$k], $arrFnew[$k]);
+                                        if(isset(array_diff($arrFpmoto[$k], $arrFnew[$k])[0])){
+                                          $copy_check = $copy_check + 1;
+                                        }
+                                      }
+
+                                      if($copy_check == 0){//元ファイルとコピーしたファイルが一致している場合
+                                        $KouteiFileCopyChecks = $this->KouteiFileCopyChecks->find()->where(['name_folder' => $folder, 'name_file' => $file, 'copy_status' => 0])->toArray();
+                                        $id = $KouteiFileCopyChecks[0]->id;
+
+                                        $this->KouteiFileCopyChecks->updateAll(//KouteiFileCopyChecksテーブルのcopy_statusを１に更新
+                                          ['copy_status' => 1, 'updated_at' => date('Y-m-d H:i:s')],
+                                          ['id'  => $id]
+                                        );
+
+                                        $arrAllfiles = glob("$output_dir/*");
+                                        $countfile = count($arrAllfiles) - 1;//フォルダーのファイルが二つずつ増えるから
+
+                                        $toCopyFile = "sumi_".$countfile."_".$file;
+                                        if (rename($output_dir.'/'.$file, $output_dir.'/'.$toCopyFile)) {//ファイル名変更（元ファイルを削除）
+                                          unlink($dirName.$folder.'/'.$file);
+                                          unlink($dirName.$folder.'/'.$Filebi2."110.bi3");
+                                        }
+
+                                      }else{//元ファイルとコピーしたファイルが一致していない場合
+                                        $KouteiFileCopyChecks = $this->KouteiFileCopyChecks->find()->where(['name_folder' => $folder, 'name_file' => $file, 'copy_status' => 0])->toArray();
+                                        $id = $KouteiFileCopyChecks[0]->id;
+
+                                        $this->KouteiFileCopyChecks->updateAll(//KouteiFileCopyChecksテーブルのcopy_statusを９に更新
+                                          ['copy_status' => 9, 'updated_at' => date('Y-m-d H:i:s')],
+                                          ['id'  => $id]
+                                        );
+                                      }
+
+                                    }
+                                  }
+
+
+                               }
+                             }
+                          }
+                	 		}
+       	            }
+    	           }//if(ファイルでなくフォルダーであるなら)の終わり
+    	        }//フォルダーであるなら
+     	      }
+     	    }//親whileの終わり
+    	  }
+    	}
+
       return $this->redirect(['action' => 'indexhome']);
+
     }
 
     public function preform()//「出荷検査表登録」ページで検査結果を入力

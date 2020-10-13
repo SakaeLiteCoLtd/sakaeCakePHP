@@ -996,7 +996,7 @@ class KensahyouSokuteidatasController  extends AppController
 
         ${"result_weight_".$j} = $data['result_weight_'.$j];
         if(!empty(${"result_weight_".$j})){
-          ${"hikaku_".$j} = "0_0_0_0_0_0";
+          ${"hikaku_".$j} = " _ _ _ _ _ ";
           $this->set('hikaku_'.$j,${"hikaku_".$j});//セット
         }else{
           ${"hikaku_".$j} = NULL;
@@ -1157,7 +1157,7 @@ class KensahyouSokuteidatasController  extends AppController
       for($j=1; $j<=8; $j++){
         ${"result_weight_".$j} = $data[$j]['result_weight'];
         if(!empty(${"result_weight_".$j})){
-          ${"hikaku_".$j} = "0_0_0_0_0_0";
+          ${"hikaku_".$j} = " _ _ _ _ _ ";
           $this->set('hikaku_'.$j,${"hikaku_".$j});//セット
         }else{
           ${"hikaku_".$j} = NULL;
@@ -1180,7 +1180,7 @@ class KensahyouSokuteidatasController  extends AppController
     		try {//トランザクション4
     				if ($this->KensahyouSokuteidatas->saveMany($kensahyouSokuteidata)) {//saveManyで一括登録
 
-              $connection = ConnectionManager::get('DB_ikou_test');
+              $connection = ConnectionManager::get('sakaeMotoDB');
               $table = TableRegistry::get('kensahyou_sokuteidata_result');
               $table->setConnection($connection);
 

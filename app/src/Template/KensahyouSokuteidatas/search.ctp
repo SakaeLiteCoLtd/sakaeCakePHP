@@ -51,7 +51,7 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
             <?=$this->Form->input("end", array('type' => 'date', 'monthNames' => false, 'value' => $dateYMD)); ?>
             <?=$this->Form->hidden("product_code", array('type' => 'value', 'value' => $product_code)); ?>
 <br>
-     <?= $this->Form->button(__('絞り込み')) ?>
+     <?= $this->Form->submit(__('絞り込み')) ?>
      </fieldset>
 
 <div align="center"><strong><font color="blue"><?php echo $mes;?></font></strong></div>

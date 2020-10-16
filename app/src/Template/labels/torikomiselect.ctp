@@ -48,20 +48,47 @@
 
 <?php elseif(isset($counttourokuzumi)): ?>
 
+
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+
   <br><br>
-  <legend align="center"><strong style="font-size: 12pt; color:red"><?= __($mes) ?></strong></legend>
+  <?php
+  if ($mes == "登録されました。") {
+    echo "<legend align='center'><strong style='font-size: 12pt'>\n";
+    echo $mes;
+    echo "</strong></div></td>\n";
+  }else{
+    echo "<legend align='center'><strong style='font-size: 12pt; color:red'>\n";
+    echo $mes;
+    echo "</strong></div></td>\n";
+  }
+  ?>
+  <br>
   <br>
 
   <?php for ($k=0;$k<$counttourokuzumi;$k++): ?>
     <legend align="center"><strong style="font-size: 11pt; color:red"><?= __(${"CheckLottourokuzumiproduct_code".$k}." --- ".${"CheckLottourokuzumilot_num".$k}) ?></strong></legend>
   <?php endfor;?>
 
+</table>
+
   <br><br>
+
 
 <?php else: ?>
 
   <br><br>
-  <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
+  <?php
+  if ($mes == "登録されました。") {
+    echo "<legend align='center'><strong style='font-size: 12pt; color:black''>\n";
+    echo $mes;
+    echo "</strong></div></td>\n";
+  }else{
+    echo "<legend align='center'><strong style='font-size: 12pt; color:red'>\n";
+    echo $mes;
+    echo "</strong></div></td>\n";
+  }
+  ?>
   <br>
 
 <?php endif; ?>

@@ -805,7 +805,7 @@ class SyukkaKensasController extends AppController {
             if ($this->ImKikakuTaious->saveMany($ImKikakuTaiou)) {//saveManyで一括登録
 
             //旧DB更新
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('im_kikaku_taiou');
             $table->setConnection($connection);
 
@@ -911,7 +911,7 @@ class SyukkaKensasController extends AppController {
               $KensahyouHeads = $this->KensahyouHeads->find()->where(['id' => $data["imdatanew"][0]['id']])->toArray();
 
               //旧DBに登録
-  						$connection = ConnectionManager::get('DB_ikou_test');
+  						$connection = ConnectionManager::get('sakaeMotoDB');
   						$table = TableRegistry::get('kensahyou_head');
   						$table->setConnection($connection);
 
@@ -985,7 +985,7 @@ class SyukkaKensasController extends AppController {
 
       $today = date("Y-m-d");
 
-      $connection = ConnectionManager::get('DB_ikou_test');//旧DBを参照
+      $connection = ConnectionManager::get('sakaeMotoDB');//旧DBを参照
       $table = TableRegistry::get('schedule_koutei');
       $table->setConnection($connection);
 //今日以降のスケジュールのデータを旧DBから引っ張り出す
@@ -1044,7 +1044,7 @@ class SyukkaKensasController extends AppController {
       $arrProduct = array_unique($arrProduct, SORT_REGULAR);//重複削除
       $arrProduct = array_values($arrProduct);
 
-      for($i=0; $i<count($arrProduct); $i++){//それぞれの品番に対して、最新のロットの日報とその日報の一つ前の日報の差を取得し、２４時間成形+２時間以内は同一ロットとみなす➝前回ロットの'present_kensahyou' => 1にする
+      for($i=0; $i<count($arrProduct); $i++){//それぞれの品番に対して、最新のロットの日報とその日報の一つ前の日報の差を取得し、２４時間成形+２時間以内は同一ロットとみなす?前回ロットの'present_kensahyou' => 1にする
         ${"product_code".$i} = $arrProduct[$i];
         $KadouSeikeiPro = $this->KadouSeikeis->find()->where(['present_kensahyou' => 0, 'product_code' => ${"product_code".$i}])->order(["starting_tm"=>"desc"])->toArray();
 
@@ -1065,7 +1065,7 @@ class SyukkaKensasController extends AppController {
    						)){
 
     							//旧DBに単価登録
-    							$connection = ConnectionManager::get('DB_ikou_test');
+    							$connection = ConnectionManager::get('sakaeMotoDB');
     							$table = TableRegistry::get('kadou_seikei');
     							$table->setConnection($connection);
 
@@ -1121,7 +1121,7 @@ class SyukkaKensasController extends AppController {
             )){
 
                 //旧DB
-                $connection = ConnectionManager::get('DB_ikou_test');
+                $connection = ConnectionManager::get('sakaeMotoDB');
                 $table = TableRegistry::get('schedule_koutei');
                 $table->setConnection($connection);
 
@@ -1207,7 +1207,7 @@ class SyukkaKensasController extends AppController {
             )){
 
                 //旧DBに単価登録
-                $connection = ConnectionManager::get('DB_ikou_test');
+                $connection = ConnectionManager::get('sakaeMotoDB');
                 $table = TableRegistry::get('kadou_seikei');
                 $table->setConnection($connection);
 
@@ -1280,7 +1280,7 @@ class SyukkaKensasController extends AppController {
     {
 
   //    $dirName = 'data_IM測定/';//ローカル//IM測定器ナンバー１のフォルダ
-      $dirName = '/data/share/syukkaIM/data_IM測定/';//192//IM測定器ナンバー１のフォルダ
+      $dirName = '/data/share/syukkaIM/data_IMsokutei/';//192//IM測定器ナンバー１のフォルダ
       $countname = 0;//ファイル名のかぶりを防ぐため
 
       if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
@@ -1303,17 +1303,17 @@ class SyukkaKensasController extends AppController {
                                 if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
 
                           //        $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
-                                  $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
+                                  $fp = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, "r");//kesuyatu
 
                                    if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
                                     $countname += 1;//ファイル名がかぶらないようにカウントしておく
 
                           //          $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//ローカル
-                                    $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");//192
+                                    $fp = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, "r");//192
                               			$this->set('fp',$fp);
 
                           //          $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
-                                    $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
+                                    $fpcount = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, 'r' );
                               			for( $count = 0; fgets( $fpcount ); $count++ );
 
                               			$arrFp = array();//空の配列を作る
@@ -1367,7 +1367,7 @@ class SyukkaKensasController extends AppController {
                                     try {//トランザクション4
                                       if ($this->ImSokuteidataHeads->saveMany($imSokuteidataHeads)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                        $connection = ConnectionManager::get('DB_ikou_test');
+                                        $connection = ConnectionManager::get('sakaeMotoDB');
                                         $table = TableRegistry::get('im_sokuteidata_head');
                                         $table->setConnection($connection);
 
@@ -1416,7 +1416,7 @@ class SyukkaKensasController extends AppController {
                                           $imKikakus = $this->ImKikakus->patchEntities($imKikakus, $arrIm_kikaku);
                                              if ($this->ImKikakus->saveMany($imKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $table = TableRegistry::get('im_kikaku');
                                                $table->setConnection($connection);
 
@@ -1424,7 +1424,7 @@ class SyukkaKensasController extends AppController {
                                                " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                 and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                  order by id desc limit 1";
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                for($k=0; $k<count($arrIm_kikaku); $k++){
@@ -1483,7 +1483,7 @@ class SyukkaKensasController extends AppController {
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->patchEntities($imSokuteidataResults, $arrIm_Result);
                                                   if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
 
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $table = TableRegistry::get('im_sokuteidata_result');
                                                     $table->setConnection($connection);
 
@@ -1491,7 +1491,7 @@ class SyukkaKensasController extends AppController {
                                                     " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                      and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                       order by id desc limit 1";
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                     for($k=0; $k<count($arrIm_Result); $k++){
@@ -1532,7 +1532,7 @@ class SyukkaKensasController extends AppController {
 
 
                           //        $output_dir = 'backupData_IM測定/'.$folder;
-                                  $output_dir = '/data/share/syukkaIM/backupData_IM測定/'.$folder;
+                                  $output_dir = '/data/share/syukkaIM/backupData_IMsokutei/'.$folder;
 
                                   if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
                                    if (mkdir($output_dir)) {
@@ -1552,9 +1552,9 @@ class SyukkaKensasController extends AppController {
 
                                         fclose($fp);
                             //            $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");
-                                        $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");
+                                        $fp = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, "r");
                             //            $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
-                                        $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
+                                        $fpcount = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, 'r' );
                                   			for( $count = 0; fgets( $fpcount ); $count++ );
 
                                   			$arrFpmoto = array();//空の配列を作る
@@ -1635,9 +1635,9 @@ class SyukkaKensasController extends AppController {
 
                                       fclose($fp);
                             //          $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");
-                                      $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");
+                                      $fp = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, "r");
                             //          $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
-                                      $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
+                                      $fpcount = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, 'r' );
                                       for( $count = 0; fgets( $fpcount ); $count++ );
 
                                       $arrFpmoto = array();//空の配列を作る
@@ -1817,7 +1817,7 @@ class SyukkaKensasController extends AppController {
                                     try {//トランザクション4
                                       if ($this->ImSokuteidataHeads->saveMany($imSokuteidataHeads)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                        $connection = ConnectionManager::get('DB_ikou_test');
+                                        $connection = ConnectionManager::get('sakaeMotoDB');
                                         $table = TableRegistry::get('im_sokuteidata_head');
                                         $table->setConnection($connection);
 
@@ -1873,7 +1873,7 @@ class SyukkaKensasController extends AppController {
                                           $imKikakus = $this->ImKikakus->patchEntities($imKikakus, $arrIm_kikaku);
                                              if ($this->ImKikakus->saveMany($imKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $table = TableRegistry::get('im_kikaku');
                                                $table->setConnection($connection);
 
@@ -1881,7 +1881,7 @@ class SyukkaKensasController extends AppController {
                                                " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                 and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                 order by id desc limit 1";
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                for($k=0; $k<count($arrIm_kikaku); $k++){
@@ -1933,7 +1933,7 @@ class SyukkaKensasController extends AppController {
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->patchEntities($imSokuteidataResults, $arrIm_Result);
                                                   if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
 
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $table = TableRegistry::get('im_sokuteidata_result');
                                                     $table->setConnection($connection);
 
@@ -1941,7 +1941,7 @@ class SyukkaKensasController extends AppController {
                                                     " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                      and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                       order by id desc limit 1";
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                     for($k=0; $k<count($arrIm_Result); $k++){
@@ -2626,7 +2626,7 @@ class SyukkaKensasController extends AppController {
          try {//トランザクション4
              if ($this->KensahyouSokuteidatas->saveMany($kensahyouSokuteidata)) {//saveManyで一括登録
 
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('kensahyou_sokuteidata_result');
                $table->setConnection($connection);
 
@@ -2693,7 +2693,7 @@ class SyukkaKensasController extends AppController {
                $ScheduleKouteidatetime = $ScheduleKouteiData[0]->datetime->format('Y-m-d H:i:s');
                $ScheduleKouteiseikeiki = $ScheduleKouteiData[0]->seikeiki;
 
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('schedule_koutei');
                $table->setConnection($connection);
 
@@ -2719,7 +2719,7 @@ class SyukkaKensasController extends AppController {
                ['id'   => $_SESSION['kadouseikeiId'] ]
                );
 
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('kadou_seikei');
                $table->setConnection($connection);
 
@@ -2921,7 +2921,7 @@ class SyukkaKensasController extends AppController {
            }
 
            //旧DB更新
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('im_kikaku_taiou');
            $table->setConnection($connection);
 
@@ -2964,7 +2964,7 @@ class SyukkaKensasController extends AppController {
              $this->ImKikakuTaious->saveMany($ImKikakuTaious);
 
              //旧DB更新
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('im_kikaku_taiou');
              $table->setConnection($connection);
 
@@ -2976,7 +2976,7 @@ class SyukkaKensasController extends AppController {
              $connection->execute($updater);
 
              //旧DB更新
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('im_kikaku_taiou');
              $table->setConnection($connection);
 

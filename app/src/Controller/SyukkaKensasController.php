@@ -1148,26 +1148,30 @@ class SyukkaKensasController extends AppController {
 
           }else{//検査していない場合
 
-            ${"KadouSeikeiidc".$countnamec} = "sch_".$scheduleId;
-
-            $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});
-
             ${"product_codec".$countnamec} = $ScheduleKouteisDatac[$i]->product_code;
             ${"ProductDatac".$countnamec} = $this->Products->find()->where(['product_code' => ${"product_codec".$countnamec}])->toArray();
-            ${"product_namec".$countnamec} = ${"ProductDatac".$countnamec}[0]->product_name;
-            ${"KadouSeikeifinishing_tm".$countnamec} = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d H:i:s');
-            ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
+            if(isset(${"ProductDatac".$countnamec}[0])){
+              ${"product_namec".$countnamec} = ${"ProductDatac".$countnamec}[0]->product_name;
 
-            $this->set('product_codec'.$countnamec,${"product_codec".$countnamec});
-            $this->set('product_namec'.$countnamec,${"product_namec".$countnamec});
-            $this->set('KadouSeikeifinishing_datec'.$countnamec,${"KadouSeikeifinishing_datec".$countnamec});
+              ${"KadouSeikeiidc".$countnamec} = "sch_".$scheduleId;
 
-            $session = $this->request->session();
-            $session->write('product_codec', ${"product_codec".$countnamec});
-            $session->write('product_namec', ${"product_namec".$countnamec});
+              $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});
 
-            $countnamec += 1;//ファイル名の日付を識別するためカウント
-            $this->set('countnamec',$countnamec);//セット
+              ${"KadouSeikeifinishing_tm".$countnamec} = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d H:i:s');
+              ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
+
+              $this->set('product_codec'.$countnamec,${"product_codec".$countnamec});
+              $this->set('product_namec'.$countnamec,${"product_namec".$countnamec});
+              $this->set('KadouSeikeifinishing_datec'.$countnamec,${"KadouSeikeifinishing_datec".$countnamec});
+
+              $session = $this->request->session();
+              $session->write('product_codec', ${"product_codec".$countnamec});
+              $session->write('product_namec', ${"product_namec".$countnamec});
+
+              $countnamec += 1;//ファイル名の日付を識別するためカウント
+              $this->set('countnamec',$countnamec);//セット
+
+            }
 
           }
 
@@ -1279,8 +1283,8 @@ class SyukkaKensasController extends AppController {
      public function torikomi()//取り込み（画面なし自動で次のページへ）
     {
 
-  //    $dirName = 'data_IM測定/';//ローカル//IM測定器ナンバー１のフォルダ
-      $dirName = '/data/share/syukkaIM/data_IM測定/';//192//IM測定器ナンバー１のフォルダ
+      $dirName = 'data_IM測定/';//ローカル//IM測定器ナンバー１のフォルダ
+  //    $dirName = '/data/share/syukkaIM/data_IM測定/';//192//IM測定器ナンバー１のフォルダ
       $countname = 0;//ファイル名のかぶりを防ぐため
 
       if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
@@ -1302,18 +1306,18 @@ class SyukkaKensasController extends AppController {
                                if($file != "." && $file != ".."){//ファイルなら
                                 if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
 
-                          //        $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
-                                  $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
+                                  $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
+                          //        $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
 
                                    if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
                                     $countname += 1;//ファイル名がかぶらないようにカウントしておく
 
-                          //          $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//ローカル
-                                    $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");//192
+                                    $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//ローカル
+                          //          $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");//192
                               			$this->set('fp',$fp);
 
-                          //          $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
-                                    $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
+                                    $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
+                          //          $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
                               			for( $count = 0; fgets( $fpcount ); $count++ );
 
                               			$arrFp = array();//空の配列を作る
@@ -1395,7 +1399,7 @@ class SyukkaKensasController extends AppController {
                                             $upper = $arrImKikakus[1][$k];
                                             $lower = $arrImKikakus[2][$k];
 
-                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1], 'kind_kensa' => $kind_kensa])->toArray();
+                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1], 'kind_kensa' => $kind_kensa])->order(["id"=>"desc"])->toArray();
                                             $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;
 
                                             $arrIm_kikaku_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -1454,7 +1458,7 @@ class SyukkaKensasController extends AppController {
                                                       $result = $arrImResults[$j][$k];
                                                       $status = $arrImResults[$j][4];
 
-                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2], 'kind_kensa' => $kind_kensa])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2], 'kind_kensa' => $kind_kensa])->order(["id"=>"desc"])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
                                                       $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
 
                                                       $arrIm_Result_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -1531,8 +1535,8 @@ class SyukkaKensasController extends AppController {
                                   }
 
 
-                          //        $output_dir = 'backupData_IM測定/'.$folder;
-                                  $output_dir = '/data/share/syukkaIM/backupData_IM測定/'.$folder;
+                                  $output_dir = 'backupData_IM測定/'.$folder;
+                          //        $output_dir = '/data/share/syukkaIM/backupData_IM測定/'.$folder;
 
                                   if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
                                    if (mkdir($output_dir)) {
@@ -1551,10 +1555,10 @@ class SyukkaKensasController extends AppController {
                                         $this->FileCopyChecks->save($fileCopyCheck);
 
                                         fclose($fp);
-                            //            $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");
-                                        $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");
-                            //            $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
-                                        $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
+                                        $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");
+                            //            $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");
+                                        $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
+                            //            $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
                                   			for( $count = 0; fgets( $fpcount ); $count++ );
 
                                   			$arrFpmoto = array();//空の配列を作る
@@ -1634,10 +1638,10 @@ class SyukkaKensasController extends AppController {
                                       $this->FileCopyChecks->save($fileCopyCheck);//FileCopyChecksテーブルに登録
 
                                       fclose($fp);
-                            //          $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");
-                                      $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");
-                            //          $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
-                                      $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
+                                      $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");
+                            //          $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");
+                                      $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
+                            //          $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
                                       for( $count = 0; fgets( $fpcount ); $count++ );
 
                                       $arrFpmoto = array();//空の配列を作る
@@ -1715,8 +1719,8 @@ class SyukkaKensasController extends AppController {
     	}
 
 
-  //    $dirName = 'data_2_IM測定/';//ローカル//IM測定器ナンバー２のフォルダ
-      $dirName = '/data/share/syukkaIM/data_2_IMsokutei/';//192//IM測定器ナンバー２のフォルダ
+      $dirName = 'data_2_IM測定/';//ローカル//IM測定器ナンバー２のフォルダ
+  //    $dirName = '/data/share/syukkaIM/data_2_IMsokutei/';//192//IM測定器ナンバー２のフォルダ
 
       if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
     	  if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）
@@ -1741,18 +1745,18 @@ class SyukkaKensasController extends AppController {
                                if($file != "." && $file != ".."){//ファイルなら
                                 if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
 
-                      //            $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
-                                  $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");//kesuyatu
+                                  $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
+                      //            $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");//kesuyatu
 
                                    if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
                                     $countname += 1;//ファイル名がかぶらないようにカウントしておく
 
-                      //              $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
-                                    $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
+                                    $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
+                      //              $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
                               			$this->set('fp',$fp);
 
-                      //              $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
-                                    $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
+                                    $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
+                      //              $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
                               			for( $count = 0; fgets( $fpcount ); $count++ );
 
                               			$arrFp = array();//空の配列を作る
@@ -1845,7 +1849,7 @@ class SyukkaKensasController extends AppController {
                                             $upper = trim($arrImKikakus[1][$k]);
                                             $lower = trim($arrImKikakus[2][$k]);
 
-                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1], 'kind_kensa' => $kind_kensa])->toArray();
+                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1], 'kind_kensa' => $kind_kensa])->order(["id"=>"desc"])->toArray();
                                             $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;
 
                                             $arrIm_kikaku_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -1911,7 +1915,7 @@ class SyukkaKensasController extends AppController {
                                                       $result = trim($arrImResults[$j][$k]);
                                                       $status = $arrImResults[$j][4];
 
-                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2], 'kind_kensa' => $kind_kensa])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2], 'kind_kensa' => $kind_kensa])->order(["id"=>"desc"])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
                                                       $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
 
                                                       $arrIm_Result_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -1990,8 +1994,8 @@ class SyukkaKensasController extends AppController {
                               }
 
 
-                      //        $output_dir = 'backupData_2_IM測定/'.$folder;
-                              $output_dir = '/data/share/syukkaIM/backupData_2_IMsokutei/'.$folder;
+                              $output_dir = 'backupData_2_IM測定/'.$folder;
+                      //        $output_dir = '/data/share/syukkaIM/backupData_2_IMsokutei/'.$folder;
 
                                   if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
                                    if (mkdir($output_dir)) {
@@ -2010,10 +2014,10 @@ class SyukkaKensasController extends AppController {
                                         $this->FileCopyChecks->save($fileCopyCheck);
 
                                         fclose($fp);
-                                  //      $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");
-                                        $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");
-                                  //      $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
-                                        $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
+                                        $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");
+                                  //      $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");
+                                        $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
+                                  //      $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
                                   			for( $count = 0; fgets( $fpcount ); $count++ );
 
                                   			$arrFpmoto = array();//空の配列を作る
@@ -2093,10 +2097,10 @@ class SyukkaKensasController extends AppController {
                                       $this->FileCopyChecks->save($fileCopyCheck);//FileCopyChecksテーブルに登録
 
                                       fclose($fp);
-                          //            $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");
-                                      $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");
-                          //            $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
-                                      $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
+                                      $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");
+                          //            $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");
+                                      $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
+                          //            $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
                                       for( $count = 0; fgets( $fpcount ); $count++ );
 
                                       $arrFpmoto = array();//空の配列を作る

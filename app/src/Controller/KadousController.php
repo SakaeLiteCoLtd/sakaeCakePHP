@@ -858,6 +858,27 @@ class KadousController extends AppController
         $this->set('mess',$mess);
       }
 
+      $dateYMD = date('Y-m-d');
+      $dateYMD1 = strtotime($dateYMD);
+      $dayyey = date('Y', strtotime('-1 day', $dateYMD1));
+      $arrYears = array();
+      for ($k=2010; $k<=$dayyey; $k++){
+        $arrYears[$k]=$k;
+      }
+      $this->set('arrYears',$arrYears);
+
+      $arrMonths = array();
+        for ($k=1; $k<=12; $k++){
+          $arrMonths[$k] =$k;
+        }
+      $this->set('arrMonths',$arrMonths);
+
+      $arrDays = array();
+        for ($k=1; $k<=31; $k++){
+          $arrDays[$k] =$k;
+        }
+      $this->set('arrDays',$arrDays);
+
     }
 
     public function kensakuview()//ロット検索
@@ -870,11 +891,13 @@ class KadousController extends AppController
       print_r($data);
       echo "</pre>";
 */
-      $date_sta = $data['date_sta'];
-      $date_fin = $data['date_fin'];
+  //    $date_sta = $data['date_sta'];
+  //    $date_fin = $data['date_fin'];
 
-      $date_sta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
-      $date_fin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
+//  $date_sta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
+//  $date_fin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
+  $date_sta = $data['date_sta_year']."-".$data['date_sta_month']."-".$data['date_sta_date'];
+  $date_fin = $data['date_fin_year']."-".$data['date_fin_month']."-".$data['date_fin_date'];
 
       $product_code = $data['product_code'];
       $seikeiki = $data['seikeiki'];
@@ -917,7 +940,7 @@ class KadousController extends AppController
           $seikeiki = "no";//プロダクトコードと日にちで絞り込み
 
           $KadouSeikeis = $this->KadouSeikeis->find()
-          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'product_code' => $product_code])->order(["seikeiki"=>"ASC"])->toArray();
+          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'product_code like' => '%'.$product_code.'%'])->order(["seikeiki"=>"ASC"])->toArray();
           $this->set('KadouSeikeis',$KadouSeikeis);
 
     //      $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
@@ -929,7 +952,7 @@ class KadousController extends AppController
         }else{//seikeikiの入力があるとき　product_code〇　seikeiki〇　date〇//プロダクトコードとseikeikiと日にちで絞り込み
 
           $KadouSeikeis = $this->KadouSeikeis->find()
-          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'product_code' => $product_code])->order(["seikeiki"=>"ASC"])->toArray();
+          ->where(['starting_tm >=' => $date_sta, 'starting_tm <=' => $date_fin, 'seikeiki' => $seikeiki, 'product_code like' => '%'.$product_code.'%'])->order(["seikeiki"=>"ASC"])->toArray();
           $this->set('KadouSeikeis',$KadouSeikeis);
 
     //      $sql = "SELECT pro_num,seikeiki,starting_tm,finishing_tm,cycle_shot,amount_shot,accomp_rate,first_lot_num,last_lot_num FROM kadou_seikei".
@@ -992,11 +1015,11 @@ class KadousController extends AppController
 
       }
 
-
+/*
       echo "<pre>";
       print_r($KadouSeikeis);
       echo "</pre>";
-
+*/
       $this->set('KadouSeikeis',$KadouSeikeis);
       $this->set('countkadouSeikei',count($KadouSeikeis));
 
@@ -1011,10 +1034,12 @@ class KadousController extends AppController
         );
       }
 
+
+/*
        echo "<pre>";
        print_r($_SESSION);
        echo "</pre>";
-
+*/
     }
 
     public function kensakusyousai()

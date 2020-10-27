@@ -77,7 +77,7 @@
 <tr bgcolor="#E6FFFF" >
   <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('行追加'), array('name' => 'tuika')); ?></div></td>
   <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('行削除'), array('name' => 'sakujo')); ?></div></td>
-  <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('不良内容登録確認'), array('name' => 'kakunin')); ?></div></td>
+  <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('登録確認'), array('name' => 'kakunin')); ?></div></td>
 </tr>
 </table>
 <br><br>
@@ -91,7 +91,7 @@
   <?php for($i=0; $i<1; $i++): ?>
   <tr style="border-bottom: solid;border-width: 1px">
     <td bgcolor="#FFFFCC"><?= h($i+1) ?></td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input('amount'.$i, ["type"=>"text", 'label'=>false]); ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input('amount'.$i, ["type"=>"text", 'label'=>false, 'autofocus'=>true]); ?></td>
     <td bgcolor="#FFFFCC"><?= $this->Form->input('date_deliver'.$i, array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></td>
   </tr>
   <?= $this->Form->control('num', array('type'=>'hidden', 'value'=>$i, 'label'=>false)) ?>

@@ -41,6 +41,12 @@
       $dateYMD = date('Y-m-d');
       $dateYMD1 = strtotime($dateYMD);
       $dayye = date('Y-m-d', strtotime('-1 day', $dateYMD1));
+      $dayyey = date('Y', strtotime('-1 day', $dateYMD1));
+      $dayyem = date('m', strtotime('-1 day', $dateYMD1));
+      $dayyed = date('d', strtotime('-1 day', $dateYMD1));
+      $dayyetoy = date('Y');
+      $dayyetom = date('m');
+      $dayyetod = date('d');
 
       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
       echo "<td rowspan='2'  height='6' colspan='20'>\n";
@@ -54,8 +60,14 @@
   //    echo "</div></td>\n";
 
   ?>
-  <td width="350" colspan="37" style="border-bottom: 0px;border-width: 1px"><div align="center"><?= $this->Form->input("date_sta", array('type' => 'date', 'value' => $dayye, 'monthNames' => false, 'label'=>false)); ?></div></td>
+  <td width="80" colspan="12" style="border-right-style: none;border-bottom: 0px;border-width: 1px"><div align="center"><?= $this->Form->input("date_sta_year", array('type' => 'select', "options"=>$arrYears, 'value' => $dayyey, 'label'=>false)); ?></div></td>
+  <td width="80" colspan="12" style="border-right-style: none;border-left-style: none;border-bottom: 0px;border-width: 1px"><div align="center"><?= $this->Form->input("date_sta_month", array('type' => 'select', "options"=>$arrMonths, 'value' => $dayyem, 'monthNames' => false, 'label'=>false)); ?></div></td>
+  <td width="80" colspan="13" style="border-left-style: none;border-bottom: 0px;border-width: 1px"><div align="center"><?= $this->Form->input("date_sta_date", array('type' => 'select', "options"=>$arrDays, 'value' => $dayyed, 'label'=>false)); ?></div></td>
   <?php
+
+//  echo "<td width='350' colspan='37' style='border-bottom: 0px;border-width: 1px'>\n";
+//  echo "<input type='date' value=$dayye min='2010-01-01' name=date_sta monthNames=false size='6'/>\n";
+//  echo "</td>\n";
 
       echo "<td rowspan='2' height='6' colspan='20'>\n";
       echo "<input type='text' name=seikeiki size='6'/>\n";
@@ -70,7 +82,9 @@
 //      echo "</div></td>\n";
 
 ?>
-<td colspan="37" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date_fin", array('type' => 'date', 'value' => $dateYMD, 'monthNames' => false, 'label'=>false)); ?></div></td>
+<td width="80" colspan="12" style="border-right-style: none;border-width: 1px"><div align="center"><?= $this->Form->input("date_fin_year", array('type' => 'select', "options"=>$arrYears, 'value' => $dayyetoy, 'label'=>false)); ?></div></td>
+<td width="80" colspan="12" style="border-right-style: none;border-left-style: none;border-width: 1px"><div align="center"><?= $this->Form->input("date_fin_month", array('type' => 'select', "options"=>$arrMonths, 'value' => $dayyetom, 'monthNames' => false, 'label'=>false)); ?></div></td>
+<td width="80" colspan="13" style="border-left-style: none;border-width: 1px"><div align="center"><?= $this->Form->input("date_fin_date", array('type' => 'select', "options"=>$arrDays, 'value' => $dayyetod, 'label'=>false)); ?></div></td>
 <?php
 
       echo "</tr>\n";

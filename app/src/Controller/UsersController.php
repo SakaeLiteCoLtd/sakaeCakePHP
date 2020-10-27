@@ -28,6 +28,7 @@ class UsersController extends AppController
 			parent::initialize();
 			$this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
 			$this->Roles = TableRegistry::get('roles');//rolesテーブルを使う
+			$this->Products = TableRegistry::get('products');//rolesテーブルを使う
      }
 
 		 public function preadd()
@@ -206,7 +207,7 @@ class UsersController extends AppController
 			$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
     }
 
-     public function docsv()
+     public function docsvmoto()
     {
 		//	$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 		//	echo "<pre>";
@@ -369,4 +370,65 @@ class UsersController extends AppController
 	 }
  }
 
+ public function ryousan()
+ {
+	 $source_file = $_FILES['file']['tmp_name'];
+
+	 $fp = fopen($source_file, "r");
+	 $fpcount = fopen($source_file, 'r' );
+		for($count = 0; fgets( $fpcount ); $count++ );
+		$arrFp = array();//空の配列を作る
+		$arrLot = array();//空の配列を作る
+		$created_staff = $this->Auth->user('staff_id');
+		for ($k=1; $k<=$count; $k++) {//最後の行まで
+			$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+			$sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
+			$arrFp[] = $sample;//配列に追加する
+	}
+	echo "<pre>";
+	print_r($arrFp);
+	echo "<br>";
+
+ }
+
+ public function docsv()
+{
+$fp = fopen("ryousan.txt", "r");//csvファイルはwebrootに入れる
+$this->set('fp',$fp);
+
+$fpcount = fopen("ryousan.txt", 'r' );
+for( $count = 0; fgets( $fpcount ); $count++ );
+$this->set('count',$count);
+
+$arrFp = array();//空の配列を作る
+//$line = fgets($fp);//ファイル$fpの上の１行を取る（１行目）
+for ($k=1; $k<=$count; $k++) {//行数分
+$line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+$sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
+
+$keys=array_keys($sample);
+$keys[array_search('0',$keys)]='pro_code';//名前の変更
+$keys[array_search('1',$keys)]='ryousan';
+$sample = array_combine( $keys, $sample );
+
+$arrFp[] = $sample;//配列に追加する
+}
+
+$this->set('arrFp',$arrFp);//$arrFpをctpで使用できるようセット
+echo "<pre>";
+print_r($arrFp);
+echo "<br>";
+
+for ($k=0; $k<$count; $k++) {
+
+	$ProductsData = $this->Products->find()->where(['product_code' => $arrFp[$k]['pro_code']])->toArray();
+	$ProductsDataid =  $ProductsData[0]->id;
+	$this->Products->updateAll(//検査終了時間の更新
+		['ryousan_flag' => $arrFp[$k]['ryousan']],
+		['id'  => $ProductsDataid]
+	);
+
+}
+
+}
 }

@@ -1,6 +1,3 @@
-<?php
-$this->layout = 'defaultaccount';
-?>
 
 <?php
 use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置したクラスを使用

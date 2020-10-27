@@ -4146,8 +4146,8 @@ echo "</pre>";
         $ProductSuppliers = $this->ProductSuppliers->find()->where(['id' => $id_supplier])->toArray();
         $Supplier = $ProductSuppliers[0]->name;
 
-        $AccountPriceProducts = $this->AccountPriceProducts->find()->where(['product_code' => $product_code])->toArray();
-        $price = $AccountPriceProducts[0]->price;
+        $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $product_code])->toArray();
+        $price = $ProductGaityu[0]->price_shiire;
 
         $k1 = $k+1;
         $arrOrderToSupplier[] = ["num_order" => $k1, "product_code" => $product_code, "price" => $price,

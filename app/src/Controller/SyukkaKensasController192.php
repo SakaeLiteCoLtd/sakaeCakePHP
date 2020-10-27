@@ -1148,26 +1148,30 @@ class SyukkaKensasController extends AppController {
 
           }else{//検査していない場合
 
-            ${"KadouSeikeiidc".$countnamec} = "sch_".$scheduleId;
-
-            $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});
-
             ${"product_codec".$countnamec} = $ScheduleKouteisDatac[$i]->product_code;
             ${"ProductDatac".$countnamec} = $this->Products->find()->where(['product_code' => ${"product_codec".$countnamec}])->toArray();
-            ${"product_namec".$countnamec} = ${"ProductDatac".$countnamec}[0]->product_name;
-            ${"KadouSeikeifinishing_tm".$countnamec} = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d H:i:s');
-            ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
+            if(isset(${"ProductDatac".$countnamec}[0])){
+              ${"product_namec".$countnamec} = ${"ProductDatac".$countnamec}[0]->product_name;
 
-            $this->set('product_codec'.$countnamec,${"product_codec".$countnamec});
-            $this->set('product_namec'.$countnamec,${"product_namec".$countnamec});
-            $this->set('KadouSeikeifinishing_datec'.$countnamec,${"KadouSeikeifinishing_datec".$countnamec});
+              ${"KadouSeikeiidc".$countnamec} = "sch_".$scheduleId;
 
-            $session = $this->request->session();
-            $session->write('product_codec', ${"product_codec".$countnamec});
-            $session->write('product_namec', ${"product_namec".$countnamec});
+              $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});
 
-            $countnamec += 1;//ファイル名の日付を識別するためカウント
-            $this->set('countnamec',$countnamec);//セット
+              ${"KadouSeikeifinishing_tm".$countnamec} = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d H:i:s');
+              ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
+
+              $this->set('product_codec'.$countnamec,${"product_codec".$countnamec});
+              $this->set('product_namec'.$countnamec,${"product_namec".$countnamec});
+              $this->set('KadouSeikeifinishing_datec'.$countnamec,${"KadouSeikeifinishing_datec".$countnamec});
+
+              $session = $this->request->session();
+              $session->write('product_codec', ${"product_codec".$countnamec});
+              $session->write('product_namec', ${"product_namec".$countnamec});
+
+              $countnamec += 1;//ファイル名の日付を識別するためカウント
+              $this->set('countnamec',$countnamec);//セット
+
+            }
 
           }
 
@@ -1395,7 +1399,7 @@ class SyukkaKensasController extends AppController {
                                             $upper = $arrImKikakus[1][$k];
                                             $lower = $arrImKikakus[2][$k];
 
-                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1], 'kind_kensa' => $kind_kensa])->toArray();
+                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1], 'kind_kensa' => $kind_kensa])->order(["id"=>"desc"])->toArray();
                                             $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;
 
                                             $arrIm_kikaku_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -1454,7 +1458,7 @@ class SyukkaKensasController extends AppController {
                                                       $result = $arrImResults[$j][$k];
                                                       $status = $arrImResults[$j][4];
 
-                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2], 'kind_kensa' => $kind_kensa])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2], 'kind_kensa' => $kind_kensa])->order(["id"=>"desc"])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
                                                       $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
 
                                                       $arrIm_Result_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -1816,7 +1820,7 @@ class SyukkaKensasController extends AppController {
                                     $connection->begin();//トランザクション3
                                     try {//トランザクション4
                                       if ($this->ImSokuteidataHeads->saveMany($imSokuteidataHeads)) {//ImKikakusをsaveできた時（saveManyで一括登録）
-
+/*
                                         $connection = ConnectionManager::get('sakaeMotoDB');
                                         $table = TableRegistry::get('im_sokuteidata_head');
                                         $table->setConnection($connection);
@@ -1829,7 +1833,7 @@ class SyukkaKensasController extends AppController {
                                             'torikomi' => $arrIm_head[0]['torikomi']
                                         ]);
                                         $connection = ConnectionManager::get('default');
-
+*/
                                           //ImKikakusの登録用データをセット
                                           $cnt = count($arrFp[1]);
                                           $arrImKikakus = array_slice($arrFp , 1, 3);
@@ -1845,7 +1849,7 @@ class SyukkaKensasController extends AppController {
                                             $upper = trim($arrImKikakus[1][$k]);
                                             $lower = trim($arrImKikakus[2][$k]);
 
-                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1], 'kind_kensa' => $kind_kensa])->toArray();
+                                            $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => ${"arruniLot_num".$countname}[$m-1], 'kind_kensa' => $kind_kensa])->order(["id"=>"desc"])->toArray();
                                             $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;
 
                                             $arrIm_kikaku_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -1872,7 +1876,7 @@ class SyukkaKensasController extends AppController {
 
                                           $imKikakus = $this->ImKikakus->patchEntities($imKikakus, $arrIm_kikaku);
                                              if ($this->ImKikakus->saveMany($imKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
-
+/*
                                                $connection = ConnectionManager::get('sakaeMotoDB');
                                                $table = TableRegistry::get('im_kikaku');
                                                $table->setConnection($connection);
@@ -1895,7 +1899,7 @@ class SyukkaKensasController extends AppController {
                                                }
 
                                                $connection = ConnectionManager::get('default');
-
+*/
 
                                                 //ImSokuteidataResultsの登録用データをセット
                                                 $inspec_datetime = substr($arrFp[4][1],0,4)."-".substr($arrFp[4][1],5,2)."-".substr($arrFp[4][1],8,mb_strlen($arrFp[4][1])-8);
@@ -1911,7 +1915,7 @@ class SyukkaKensasController extends AppController {
                                                       $result = trim($arrImResults[$j][$k]);
                                                       $status = $arrImResults[$j][4];
 
-                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2], 'kind_kensa' => $kind_kensa])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
+                                                      $ImSokuteidataHeadsData = $this->ImSokuteidataHeads->find()->where(['lot_num' => $arrFp[$j+4][2], 'kind_kensa' => $kind_kensa])->order(["id"=>"desc"])->toArray();//'product_code' => $product_codeとなるデータをProductsテーブルから配列で取得
                                                       $im_sokuteidata_head_id = $ImSokuteidataHeadsData[0]->id;//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
 
                                                       $arrIm_Result_data[] = $im_sokuteidata_head_id;//配列に追加する
@@ -1932,7 +1936,7 @@ class SyukkaKensasController extends AppController {
 
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->patchEntities($imSokuteidataResults, $arrIm_Result);
                                                   if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
-
+/*
                                                     $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $table = TableRegistry::get('im_sokuteidata_result');
                                                     $table->setConnection($connection);
@@ -1965,7 +1969,7 @@ class SyukkaKensasController extends AppController {
                                                     }
 
                                                     $connection = ConnectionManager::get('default');
-
+*/
                                                     } else {
                                                       $this->Flash->error(__('This data1 could not be saved. Please, try again.'));
                                                       throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6

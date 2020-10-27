@@ -11,9 +11,7 @@
 ?>
                 <?php
             	    echo "<pre>";
-                    print_r('以下のデータが登録されました。');
-                    echo "<br>";
-                    print_r($this->request->getData('userdata'));
+                    print_r('test');
                     echo "<br>";
                 ?>
 <?= $this->Form->end() ?>

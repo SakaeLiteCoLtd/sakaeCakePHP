@@ -24,7 +24,7 @@
     <div align="left"><font color="blue" size="3"><?= __("　　　期限超過一覧") ?></font></div>
  <br>
 
-<?=$this->Form->create($OrderMaterials, ['url' => ['action' => 'nyuukotyoukakousin']]) ?>
+<?=$this->Form->create($OrderMaterials, ['url' => ['action' => 'nyuukominyuukakousin']]) ?>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
         <thead>

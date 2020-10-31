@@ -23,8 +23,17 @@
  <hr size="5" style="margin: 0.5rem">
     <div align="left"><font color="blue" size="3"><?= __("　　　期限超過一覧") ?></font></div>
  <br>
+    <div align="center"><font color="red" size="3"><?= __($mes) ?></font></div>
+ <br>
 
-<?=$this->Form->create($OrderMaterials, ['url' => ['action' => 'nyuukotyoukakousin']]) ?>
+<?=$this->Form->create($OrderMaterials, ['url' => ['action' => 'nyuukotyouka']]) ?>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+<td style="border-style: none;"><div align="center"><?= $this->Form->submit('一覧へ', array('name' => 'itiran')); ?></div></td>
+</tr>
+</table>
+<br>
+
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
         <thead>
@@ -39,7 +48,6 @@
             <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">実際入荷日</strong></div></td>
             <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">ロットNO.</strong></div></td>
             <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">入荷確認</strong></div></td>
-            <td width="60" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF"></strong></div></td>
           </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -54,26 +62,20 @@
             }else{
               $company = "";
             }
+            $num_lot = $arrOrderMaterials[$i]['num_lot'];
             $check_flag = $arrOrderMaterials[$i]['check_flag'];
             ?>
 
-            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrOrderMaterials[$i]["id_order"]) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrOrderMaterials[$i]["date_order"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrOrderMaterials[$i]["grade"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrOrderMaterials[$i]["color"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrOrderMaterials[$i]["amount"]) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($company) ?></font></td>
             <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrOrderMaterials[$i]["date_stored"]) ?></font></td>
-            <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->control("check_flag".$i, array('type' => 'select', "options"=>$arrGyousya, 'value'=>$check_flag, 'label'=>false)); ?></div></td>
-            <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->control("date_stored".$i, array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></div></td>
-            <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->control("num_lot".$i, array('type' => 'text', 'label'=>false)); ?></div></td>
-            <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->control("flg".$i, array('type' => 'select', "options"=>$arrFlag, 'label'=>false)); ?></div></td>
-            <?php
-            echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
-            echo $this->Form->submit("更新" , ['action'=>'nyuukotyoukakousin', 'name' => $i]) ;
-            echo "</div></td>";
-            ?>
-            <?= $this->Form->control('id', array('type'=>'hidden', 'value'=>$arrOrderMaterials[$i]["id"], 'label'=>false)) ?>
-
+            <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->input("check_flag", array('type' => 'select', "options"=>$arrGyousya, 'value'=>$check_flag, 'label'=>false)); ?></div></td>
+            <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->input("date_nyuuka", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></div></td>
+            <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->control("num_lot", array('type' => 'text', 'label'=>false)); ?></div></td>
+            <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->control("flg", array('type' => 'select', "options"=>$arrFlag, 'label'=>false)); ?></div></td>
           </tr>
         <?php endfor;?>
         </tbody>

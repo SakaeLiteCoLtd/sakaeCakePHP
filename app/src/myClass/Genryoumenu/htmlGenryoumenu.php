@@ -33,9 +33,15 @@ class htmlGenryoumenu extends AppController
                   "<img src='/img/Labelimg/report_stock_mate.gif' width=115 height=40>\n".
                   "</a>\n".
 */
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/nyuukomenu'>\n".
-                  "<img src='/img/Labelimg/gen_nyuuko.gif' width=115 height=40>\n".
-                  "</a>\n";
+"<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/nyuukopreadd'>\n".
+"<img src='/img/Labelimg/gen_nyuuko.gif' width=115 height=40>\n".
+"</a>\n".
+"<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/csvtest'>\n".
+"<img src='/img/Labelimg/testcsv.gif' width=115 height=40>\n".
+"</a>\n".
+"<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/nyuukomenu'>\n".
+"<img src='/img/Labelimg/testgazou.gif' width=115 height=40>\n".
+"</a>\n";
 
     		return $html;
     		$this->html = $html;
@@ -57,6 +63,20 @@ class htmlGenryoumenu extends AppController
        return $html;
        $this->html = $html;
    }
+
+   public function csvmenus()
+  {
+      $html =
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/csvtest1d'>\n".
+                "<img src='/img/Labelimg/test1d.gif' width=100 height=40>\n".
+                "</a>\n".
+                "<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/csvtest1w'>\n".
+                "<img src='/img/Labelimg/test1w.gif' width=100 height=40>\n".
+                "</a>\n";
+
+      return $html;
+      $this->html = $html;
+  }
 
 }
 

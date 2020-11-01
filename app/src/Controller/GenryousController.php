@@ -15,11 +15,19 @@ class GenryousController extends AppController
 		{
 		 parent::initialize();
 		 $this->OrderMaterials = TableRegistry::get('orderMaterials');
+		 $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');
 		}
 
 		public function menu()
     {
-
+			$Data=$this->request->query('s');//セッションが切れて戻ってきた場合
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
     }
 
 		public function tourokuzumisearch()
@@ -193,13 +201,27 @@ class GenryousController extends AppController
 
 		public function nyuukomenu()
     {
+			$session = $this->request->getSession();
+			$datasession = $session->read();
 
+			if(!isset($datasession['Auth'])){
+        return $this->redirect(['action' => 'menu',
+        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+      }
     }
 
 		public function nyuukotyouka()
 		{
 			$OrderMaterials = $this->OrderMaterials->newEntity();
 	    $this->set('OrderMaterials',$OrderMaterials);
+
+			$session = $this->request->getSession();
+			$datasession = $session->read();
+
+			if(!isset($datasession['Auth'])){
+        return $this->redirect(['action' => 'menu',
+        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+      }
 
 			$dateYMD = date('Y-m-d');
 
@@ -229,6 +251,11 @@ class GenryousController extends AppController
 
 			$session = $this->request->getSession();
 			$datasession = $session->read();
+
+			if(!isset($datasession['Auth'])){
+        return $this->redirect(['action' => 'menu',
+        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+      }
 
 			$data = $this->request->getData();
 
@@ -318,6 +345,14 @@ class GenryousController extends AppController
 			$OrderMaterials = $this->OrderMaterials->newEntity();
 	    $this->set('OrderMaterials',$OrderMaterials);
 
+			$session = $this->request->getSession();
+			$datasession = $session->read();
+
+			if(!isset($datasession['Auth'])){
+        return $this->redirect(['action' => 'menu',
+        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+      }
+
 			$arrOrderMaterials = $this->OrderMaterials->find()
 			->where(['flg !=' => 1])->order(["date_stored"=>"ASC"])->toArray();
 			$this->set('arrOrderMaterials',$arrOrderMaterials);
@@ -344,6 +379,11 @@ class GenryousController extends AppController
 
 			$session = $this->request->getSession();
 			$datasession = $session->read();
+
+			if(!isset($datasession['Auth'])){
+        return $this->redirect(['action' => 'menu',
+        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+      }
 
 			$data = $this->request->getData();
 
@@ -429,6 +469,15 @@ class GenryousController extends AppController
 		{
 			$OrderMaterials = $this->OrderMaterials->newEntity();
 			$this->set('OrderMaterials',$OrderMaterials);
+
+			$session = $this->request->getSession();
+			$datasession = $session->read();
+
+			if(!isset($datasession['Auth'])){
+				return $this->redirect(['action' => 'menu',
+				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+			}
+
 		}
 
 		public function nyuukonoukiitiran()
@@ -438,6 +487,14 @@ class GenryousController extends AppController
 
 			$OrderMaterials = $this->OrderMaterials->newEntity();
 			$this->set('OrderMaterials',$OrderMaterials);
+
+			$session = $this->request->getSession();
+			$datasession = $session->read();
+
+			if(!isset($datasession['Auth'])){
+				return $this->redirect(['action' => 'menu',
+				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+			}
 
 			$data = $this->request->getData();
 
@@ -486,6 +543,11 @@ class GenryousController extends AppController
 
 			$session = $this->request->getSession();
 			$datasession = $session->read();
+
+			if(!isset($datasession['Auth'])){
+				return $this->redirect(['action' => 'menu',
+				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+			}
 
 			$data = $this->request->getData();
 
@@ -579,10 +641,139 @@ class GenryousController extends AppController
 			$this->set('OrderMaterials',$OrderMaterials);
 		}
 
+		public function csvtest1dsyuturyoku()
+		{
+			$OrderMaterials = $this->OrderMaterials->newEntity();
+			$this->set('OrderMaterials',$OrderMaterials);
+
+			$data = $this->request->getData();
+			$date1 = $data['date1d']['year']."-".$data['date1d']['month']."-".$data['date1d']['day'];
+			$date1d = $data['date1d']['year']."-".$data['date1d']['month']."-".$data['date1d']['day']." 08:00:00";
+			$date1d0 = strtotime($date1d);
+			$date1d0 = date('Y-m-d', strtotime('+1 day', $date1d0));
+			$date1d0 = $date1d0." 07:59:59";
+
+			$ScheduleKouteis = $this->ScheduleKouteis->find()
+			->where(['datetime >=' => $date1d, 'datetime <=' => $date1d0])->toArray();
+
+			if(isset($ScheduleKouteis[0])){
+
+        foreach($ScheduleKouteis as $key => $row ) {
+          $tmp_seikeiki[$key] = $row["seikeiki"];
+          $tmp_datetime[$key] = $row["datetime"];
+        }
+
+        array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
+
+			}
+
+			$time = $ScheduleKouteis[1]->datetime->format('H:i');
+
+			$arrScheduleKoutei_csv = array();
+			for($k=0; $k<count($ScheduleKouteis); $k++){
+
+				$arrScheduleKoutei_csv[] = [
+					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"],
+					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
+					'product_code' => $ScheduleKouteis[$k]["product_code"],
+					'product_name' => $ScheduleKouteis[$k]["product_name"],
+					'tantou' => $ScheduleKouteis[$k]["tantou"]
+			 ];
+
+			}
+
+			$day = date('Y-n-j',strtotime($date1));
+			$file_name = "ScheduleKoutei_1day_".$day.".csv";
+
+		   // $fp = fopen('/home/centosuser/kadouseikei_csv/'.$file_name, 'w');//192
+		    $fp = fopen($file_name, 'w');//ローカル
+
+				foreach ($arrScheduleKoutei_csv as $line) {
+	//				$line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+					fputcsv($fp, $line);
+				}
+
+				if(fclose($fp)){
+					$mes = "//に「".$file_name."」ファイルが出力されました。";
+					$this->set('mes',$mes);
+				}else{
+					$mes = "エラーが発生しました。もう一度出力し直してください。";
+					$this->set('mes',$mes);
+				}
+
+		}
+
 		public function csvtest1w()
 		{
 			$OrderMaterials = $this->OrderMaterials->newEntity();
 			$this->set('OrderMaterials',$OrderMaterials);
+		}
+
+		public function csvtest1wsyuturyoku()
+		{
+			$OrderMaterials = $this->OrderMaterials->newEntity();
+			$this->set('OrderMaterials',$OrderMaterials);
+
+			$data = $this->request->getData();
+			$date1 = $data['date1w']['year']."-".$data['date1w']['month']."-".$data['date1w']['day'];
+			$date1w = $data['date1w']['year']."-".$data['date1w']['month']."-".$data['date1w']['day']." 08:00:00";
+			$date1w0 = strtotime($date1w);
+			$date1w0 = date('Y-m-d', strtotime('+7 day', $date1w0));
+			$date1w0 = $date1w0." 07:59:59";
+
+			$ScheduleKouteis = $this->ScheduleKouteis->find()
+			->where(['datetime >=' => $date1w, 'datetime <=' => $date1w0])->toArray();
+
+			if(isset($ScheduleKouteis[0])){
+
+        foreach($ScheduleKouteis as $key => $row ) {
+          $tmp_seikeiki[$key] = $row["seikeiki"];
+          $tmp_datetime[$key] = $row["datetime"];
+        }
+
+        array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
+
+			}
+
+			$time = $ScheduleKouteis[1]->datetime->format('H:i');
+
+			$arrScheduleKoutei_csv = array();
+			for($k=0; $k<count($ScheduleKouteis); $k++){
+
+				$arrScheduleKoutei_csv[] = [
+					'day' => $ScheduleKouteis[$k]->datetime->format('j'),//0なしの日付
+					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"],
+					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
+					'product_code' => $ScheduleKouteis[$k]["product_code"],
+					'product_name' => $ScheduleKouteis[$k]["product_name"],
+					'tantou' => $ScheduleKouteis[$k]["tantou"]
+			 ];
+
+			}
+
+			$day = date('Y-n-j',strtotime($date1));
+			$file_name = "ScheduleKoutei_1week_".$day.".csv";
+
+		   // $fp = fopen('/home/centosuser/kadouseikei_csv/'.$file_name, 'w');//192
+		    $fp = fopen($file_name, 'w');//ローカル
+
+				foreach ($arrScheduleKoutei_csv as $line) {
+	//				$line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+					fputcsv($fp, $line);
+				}
+
+				if(fclose($fp)){
+					$mes = "//に「".$file_name."」ファイルが出力されました。";
+					$this->set('mes',$mes);
+				}else{
+					$mes = "エラーが発生しました。もう一度出力し直してください。";
+					$this->set('mes',$mes);
+				}
+/*
+			echo "<pre>";
+			print_r($arrScheduleKoutei_csv);
+			echo "</pre>";
+*/
 		}
 
 	}

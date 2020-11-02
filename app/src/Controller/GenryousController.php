@@ -665,15 +665,15 @@ class GenryousController extends AppController
 
         array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
 
-			}
+				$time = $ScheduleKouteis[0]->datetime->format('H:i');
 
-			$time = $ScheduleKouteis[1]->datetime->format('H:i');
+			}
 
 			$arrScheduleKoutei_csv = array();
 			for($k=0; $k<count($ScheduleKouteis); $k++){
 
 				$arrScheduleKoutei_csv[] = [
-					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"],
+					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $ScheduleKouteis[$k]["product_name"],
@@ -733,16 +733,16 @@ class GenryousController extends AppController
 
         array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
 
-			}
+				$time = $ScheduleKouteis[0]->datetime->format('H:i');
 
-			$time = $ScheduleKouteis[1]->datetime->format('H:i');
+			}
 
 			$arrScheduleKoutei_csv = array();
 			for($k=0; $k<count($ScheduleKouteis); $k++){
 
 				$arrScheduleKoutei_csv[] = [
 					'day' => $ScheduleKouteis[$k]->datetime->format('j'),//0なしの日付
-					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"],
+					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $ScheduleKouteis[$k]["product_name"],
@@ -775,5 +775,42 @@ class GenryousController extends AppController
 			echo "</pre>";
 */
 		}
+
+		public function gazoutest()
+		{
+			$OrderMaterials = $this->OrderMaterials->newEntity();
+			$this->set('OrderMaterials',$OrderMaterials);
+		}
+
+		public function gazouhyoujitest()
+		{
+			$OrderMaterials = $this->OrderMaterials->newEntity();
+			$this->set('OrderMaterials',$OrderMaterials);
+
+			if ($this->request->is('post')) {
+
+				$fileName =$_FILES['upfile']['tmp_name'];
+
+				if($_FILES['upfile']['size']>0)
+				{
+					if($_FILES['upfile']['size']>1000000){
+							echo '画像サイズが大き過ぎます';
+						}else{
+							move_uploaded_file($_FILES['upfile']["tmp_name"],"img/gazoutest/".$_FILES['upfile']["name"]);//ローカル
+	//						move_uploaded_file($fileName['tmp_name'],"/home/centosuser/".$_FILES['upfile']["name"]);//192
+						}
+					}
+
+			}
+/*
+			echo "<pre>";
+			print_r($_FILES['upfile']["name"]);
+			echo "</pre>";
+*/
+			$gif1 = "gazoutest/".$_FILES['upfile']["name"];//ローカル
+			$this->set('gif1',$gif1);
+
+		}
+
 
 	}

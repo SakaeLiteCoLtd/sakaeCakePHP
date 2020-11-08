@@ -288,7 +288,7 @@ class GenryousController extends AppController
 				 )){
 
 					 //旧DBに単価登録
-					 $connection = ConnectionManager::get('DB_ikou_test');
+					 $connection = ConnectionManager::get('sakaeMotoDB');
 					 $table = TableRegistry::get('order_material');
 					 $table->setConnection($connection);
 
@@ -416,7 +416,7 @@ class GenryousController extends AppController
 				 )){
 
 					 //旧DBに単価登録
-					 $connection = ConnectionManager::get('DB_ikou_test');
+					 $connection = ConnectionManager::get('sakaeMotoDB');
 					 $table = TableRegistry::get('order_material');
 					 $table->setConnection($connection);
 
@@ -580,7 +580,7 @@ class GenryousController extends AppController
 				 )){
 
 					 //旧DBに単価登録
-					 $connection = ConnectionManager::get('DB_ikou_test');
+					 $connection = ConnectionManager::get('sakaeMotoDB');
 					 $table = TableRegistry::get('order_material');
 					 $table->setConnection($connection);
 
@@ -674,7 +674,7 @@ class GenryousController extends AppController
 			for($k=0; $k<count($ScheduleKouteis); $k++){
 
 				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
-	      $product_name = $Product[0]->product_name;
+				$product_name = $Product[0]->product_name;
 
 				$arrScheduleKoutei_csv[] = [
 					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
@@ -689,8 +689,9 @@ class GenryousController extends AppController
 			$day = date('Y-n-j',strtotime($date1));
 			$file_name = "ScheduleKoutei_1day_".$day.".csv";
 
-		   // $fp = fopen('/home/centosuser/kadouseikei_csv/'.$file_name, 'w');//192
-		    $fp = fopen($file_name, 'w');//ローカル
+		//	$fp = fopen('/data/share/csvFiles/'.$file_name, 'w');//192
+			$fp = fopen('/home/centosuser/csvFiles/'.$file_name, 'w');//192
+		  //  $fp = fopen($file_name, 'w');//ローカル
 
 				foreach ($arrScheduleKoutei_csv as $line) {
 					$line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -698,7 +699,8 @@ class GenryousController extends AppController
 				}
 
 				if(fclose($fp)){
-					$mes = "//に「".$file_name."」ファイルが出力されました。";
+		//			$mes = "/data/share/csvFiles/に「".$file_name."」ファイルが出力されました。";
+					$mes = "/home/centosuser/csvFiles/に「".$file_name."」ファイルが出力されました。";
 					$this->set('mes',$mes);
 				}else{
 					$mes = "エラーが発生しました。もう一度出力し直してください。";
@@ -761,8 +763,9 @@ class GenryousController extends AppController
 			$day = date('Y-n-j',strtotime($date1));
 			$file_name = "ScheduleKoutei_1week_".$day.".csv";
 
-		   // $fp = fopen('/home/centosuser/kadouseikei_csv/'.$file_name, 'w');//192
-		    $fp = fopen($file_name, 'w');//ローカル
+	//		$fp = fopen('/data/share/csvFiles/'.$file_name, 'w');//192
+			$fp = fopen('/home/centosuser/csvFiles/'.$file_name, 'w');//192
+		//  $fp = fopen($file_name, 'w');//ローカル
 
 				foreach ($arrScheduleKoutei_csv as $line) {
 					$line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -770,7 +773,8 @@ class GenryousController extends AppController
 				}
 
 				if(fclose($fp)){
-					$mes = "//に「".$file_name."」ファイルが出力されました。";
+		//			$mes = "/data/share/csvFiles/に「".$file_name."」ファイルが出力されました。";
+					$mes = "/home/centosuser/csvFiles/に「".$file_name."」ファイルが出力されました。";
 					$this->set('mes',$mes);
 				}else{
 					$mes = "エラーが発生しました。もう一度出力し直してください。";

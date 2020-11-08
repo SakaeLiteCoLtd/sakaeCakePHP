@@ -42,11 +42,11 @@
       $dateYMD1 = strtotime($dateYMD);
       $dayye = date('Y-m-d', strtotime('-1 day', $dateYMD1));
       $dayyey = date('Y', strtotime('-1 day', $dateYMD1));
-      $dayyem = date('m', strtotime('-1 day', $dateYMD1));
-      $dayyed = date('d', strtotime('-1 day', $dateYMD1));
+      $dayyem = date('n', strtotime('-1 day', $dateYMD1));
+      $dayyed = date('j', strtotime('-1 day', $dateYMD1));
       $dayyetoy = date('Y');
-      $dayyetom = date('m');
-      $dayyetod = date('d');
+      $dayyetom = date('n');
+      $dayyetod = date('j');
 
       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
       echo "<td rowspan='2'  height='6' colspan='20'>\n";

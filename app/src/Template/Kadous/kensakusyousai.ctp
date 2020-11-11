@@ -96,7 +96,7 @@
                 <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($starting_tm_program) ?></font></td>
                 <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($finishing_tm_program) ?></font></td>
                 <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($amount_programming) ?></font></td>
-                <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($shot_cycle_mode) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font color=#111111><?= h($shot_cycle_heikin) ?></font></td>
               </tr>
             </tbody>
     </table>

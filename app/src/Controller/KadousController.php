@@ -30,6 +30,7 @@ class KadousController extends AppController
        $this->Products = TableRegistry::get('products');//productsテーブルを使う
        $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
        $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
+       $this->KadouritsuSeikeikis = TableRegistry::get('kadouritsuSeikeikis');
 
        $this->Auth->allow();
      }
@@ -977,13 +978,385 @@ class KadousController extends AppController
 
       }
 
+      $this->set('countkadouSeikei',count($KadouSeikeis));
 /*
       echo "<pre>";
       print_r($KadouSeikeis);
       echo "</pre>";
 */
-      $this->set('KadouSeikeis',$KadouSeikeis);
-      $this->set('countkadouSeikei',count($KadouSeikeis));
+
+//以下稼働率を各成形機ごとに計算
+
+      $day1 = strtotime($date_sta);
+      $day2 = strtotime($date_fin);
+      $diff = ($day2 - $day1) / (60 * 60 * 24);
+
+      //開始時時間と終了時間を持ってくる
+      $arrStartTime = array();
+      $arrFinishTime = array();
+      for($n=0; $n<count($KadouSeikeis); $n++){
+
+        $starting_tm = substr($KadouSeikeis[$n]['starting_tm'], 0, 10);
+        $starting_tm = $starting_tm." 08:00:00";
+        $finishing_tm = strtotime($starting_tm);
+        $finishing_tm = date('Y/m/d H:i:s', strtotime('+1 day', $finishing_tm));
+
+        $flag_start = 1;
+        $flag_finish = 2;
+        $connection = ConnectionManager::get('big_DB');//旧DBを参照
+        $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+        $table->setConnection($connection);
+
+        $sql = "SELECT datetime,seikeiki,product_code,shot_cycle,flag_start_finish
+        FROM shotdata_sensors".
+        " where datetime >= '".$starting_tm."' and datetime < '".$finishing_tm."'
+         and seikeiki = '".$KadouSeikeis[$n]["seikeiki"]."' and flag_start_finish = '".$flag_start."' order by datetime asc";
+        $connection = ConnectionManager::get('big_DB');
+        $arrFlag_start = $connection->execute($sql)->fetchAll('assoc');
+
+        $sql = "SELECT datetime,seikeiki,product_code,shot_cycle,flag_start_finish
+        FROM shotdata_sensors".
+        " where datetime >= '".$starting_tm."' and datetime < '".$finishing_tm."'
+         and seikeiki = '".$KadouSeikeis[$n]["seikeiki"]."' and flag_start_finish = '".$flag_finish."' order by datetime asc";
+        $connection = ConnectionManager::get('big_DB');
+        $arrFlag_finish = $connection->execute($sql)->fetchAll('assoc');
+
+        $connection = ConnectionManager::get('default');
+        $table->setConnection($connection);
+
+        if(!isset($arrFlag_start[0])){
+          $arrFlag_start[] = [
+            'datetime' => $starting_tm,
+            'seikeiki' => $KadouSeikeis[$n]["seikeiki"]
+          ];
+        }
+        if(!isset($arrFlag_finish[0])){
+          $arrFlag_finish[] = [
+            'datetime' => $finishing_tm,
+            'seikeiki' => $KadouSeikeis[$n]["seikeiki"]
+          ];
+        }
+/*
+        echo "<pre>";
+        print_r($n);
+        echo "</pre>";
+        echo "<pre>";
+        print_r($arrFlag_start);
+        echo "</pre>";
+        echo "<pre>";
+        print_r($arrFlag_finish);
+        echo "</pre>";
+*/
+        for($m=0; $m<count($arrFlag_start); $m++){
+          $arrStartTime[] = $arrFlag_start[$m];
+        }
+        for($m=0; $m<count($arrFlag_finish); $m++){
+          $arrFinishTime[] = $arrFlag_finish[$m];
+        }
+
+      }
+
+      $arrStartTime = array_unique($arrStartTime, SORT_REGULAR);
+      $arrStartTime = array_values($arrStartTime);
+      $arrFinishTime = array_unique($arrFinishTime, SORT_REGULAR);
+      $arrFinishTime = array_values($arrFinishTime);
+
+      $count = count($arrStartTime);
+      for($l=0; $l<$count; $l++){
+
+        $arrStartTimestuika = array('program_starting_tm'=>$arrStartTime[$l]['datetime']);
+        $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $arrStartTimestuika);
+
+        $arrFinishTimestuika = array('program_finishing_tm'=>$arrFinishTime[$l]['datetime']);
+        $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $arrFinishTimestuika);
+
+      }
+
+      $numkadouritu = 0;
+      for($n=0; $n<=count($KadouSeikeis); $n++){//絞り込んだデータそれぞれに対して
+  //      for($n=0; $n<=4; $n++){//絞り込んだデータそれぞれに対して
+
+        for($m=1; $m<10; $m++){//成形機1～9に対して
+
+          for($l=0; $l<$diff; $l++){//それぞれの日付に対して
+
+            $groupday = strtotime("+$l day " . $date_sta);
+            $groupday = date("Y-m-d", $groupday);
+            $p = $l + 1;
+            $groupdayto = strtotime("+$p day " . $date_sta);
+            $groupdayto = date("Y-m-d", $groupdayto);
+
+            if((($n < count($KadouSeikeis)) && ($KadouSeikeis[$n]["seikeiki"] == $m) && (strtotime($KadouSeikeis[$n]["starting_tm"]) > strtotime($groupday)) && (strtotime($KadouSeikeis[$n]["starting_tm"]) < strtotime($groupdayto)))){//同じ日の同じ成形機の仲間
+
+              $n1 = $n - 1;
+
+              if(isset($KadouSeikeis[$n1])){
+
+                $connection = ConnectionManager::get('big_DB');//旧DBを参照
+                $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+                $table->setConnection($connection);
+
+                $sql = "SELECT lot_code,starting_tm_nippou,starting_tm_program,finishing_tm_nippou,
+                finishing_tm_program,shot_cycle_nippou,shot_cycle_mode,amount_nippou,amount_programming
+                FROM log_confirm_kadou_seikeikis".
+                " where starting_tm_nippou = '".$KadouSeikeis[$n1]["starting_tm"]."' and product_code = '".$KadouSeikeis[$n1]["product_code"]."' and seikeiki = '".$KadouSeikeis[$n1]["seikeiki"]."'";
+                $connection = ConnectionManager::get('big_DB');
+                $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
+
+                $sql = "SELECT datetime,seikeiki,product_code,shot_cycle
+                FROM shotdata_sensors".
+                " where datetime >= '".$groupday."' and datetime <= '".$groupdayto."' and product_code = '".$KadouSeikeis[$n1]["product_code"]."' and seikeiki = '".$KadouSeikeis[$n1]["seikeiki"]."'";
+                $connection = ConnectionManager::get('big_DB');
+                $shotdata_sensors = $connection->execute($sql)->fetchAll('assoc');
+
+                $connection = ConnectionManager::get('default');
+                $table->setConnection($connection);
+
+                $countshot_cycle_mode = 0;
+                $totalshot_cycle_mode = 0;
+                for($k=0; $k<count($shotdata_sensors); $k++){
+                  if(($shotdata_sensors[$k]["shot_cycle"] <= $log_confirm_kadou_seikeikis[0]["shot_cycle_mode"] + 1) && ($shotdata_sensors[$k]["shot_cycle"] >= $log_confirm_kadou_seikeikis[0]["shot_cycle_mode"] - 1)){
+                    $countshot_cycle_mode = $countshot_cycle_mode + 1;
+                    $totalshot_cycle_mode = $totalshot_cycle_mode + $shotdata_sensors[$k]["shot_cycle"];
+                    $shot_cycle = round($totalshot_cycle_mode/$countshot_cycle_mode, 1);//小数点以下1桁
+                  }
+                }
+
+        //        $starting_tm_program = $log_confirm_kadou_seikeikis[0]["starting_tm_program"];
+        //        $finishing_tm_program = $log_confirm_kadou_seikeikis[0]["finishing_tm_program"];
+
+                $starting_tm_program = $KadouSeikeis[$n1]["program_starting_tm"];
+                $finishing_tm_program = $KadouSeikeis[$n1]["program_finishing_tm"];
+
+                $start_program = strtotime($starting_tm_program);
+                $finish_program = strtotime($finishing_tm_program);
+                $diff_program = ($finish_program - $start_program);//生産時間
+                $riron_shot_amount = round($diff_program/$shot_cycle);//理論ショット数
+
+                $riron_loss_shot = $riron_shot_amount - $log_confirm_kadou_seikeikis[0]["amount_programming"];
+                if($riron_loss_shot > 0){//ロスがある場合
+                  $riron_loss_time = $riron_loss_shot * $shot_cycle;
+                }else{
+                  $riron_loss_time = 0;
+                }
+
+                $arrriron_loss_time = array('riron_loss_time'=>$riron_loss_time);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrriron_loss_time);
+
+                $arrriron_shot_amount = array('riron_shot_amount'=>$riron_shot_amount);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrriron_shot_amount);
+
+                $arrshot_cycle = array('shot_cycle'=>$shot_cycle);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrshot_cycle);
+
+                $arrshot_cycle_mode = array('shot_cycle_mode'=>$log_confirm_kadou_seikeikis[0]["shot_cycle_mode"]);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrshot_cycle_mode);
+
+                $arrnumkadouritu = array('numkadouritu'=>$numkadouritu);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrnumkadouritu);
+
+              }
+
+              if(($n > 0) && ($KadouSeikeis[$n-1]['seikeiki'] == $KadouSeikeis[$n]['seikeiki']) && ($KadouSeikeis[$n-1]['starting_tm']->format('Y-m-d') == $KadouSeikeis[$n]['starting_tm']->format('Y-m-d'))){
+
+                $numkadouritu = $numkadouritu;
+
+              }else{
+
+                $numkadouritu = $numkadouritu + 1;
+
+              }
+
+            }elseif($n == count($KadouSeikeis)){//最後の行の時,前の行と同じ仲間かチェック
+
+              $n1 = $n - 1;
+
+              if(isset($KadouSeikeis[$n1-1]['seikeiki']) && ($KadouSeikeis[$n1-1]['seikeiki'] == $KadouSeikeis[$n1]['seikeiki']) && ($KadouSeikeis[$n1-1]['starting_tm']->format('Y-m-d') == $KadouSeikeis[$n1]['starting_tm']->format('Y-m-d'))){
+
+                $connection = ConnectionManager::get('big_DB');//旧DBを参照
+                $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+                $table->setConnection($connection);
+
+                $sql = "SELECT lot_code,starting_tm_nippou,starting_tm_program,finishing_tm_nippou,
+                finishing_tm_program,shot_cycle_nippou,shot_cycle_mode,amount_nippou,amount_programming
+                FROM log_confirm_kadou_seikeikis".
+                " where starting_tm_nippou = '".$KadouSeikeis[$n1]["starting_tm"]."' and product_code = '".$KadouSeikeis[$n1]["product_code"]."' and seikeiki = '".$KadouSeikeis[$n1]["seikeiki"]."'";
+                $connection = ConnectionManager::get('big_DB');
+                $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
+
+                $sql = "SELECT datetime,seikeiki,product_code,shot_cycle
+                FROM shotdata_sensors".
+                " where datetime >= '".$groupday."' and datetime <= '".$groupdayto."' and product_code = '".$KadouSeikeis[$n1]["product_code"]."' and seikeiki = '".$KadouSeikeis[$n1]["seikeiki"]."'";
+                $connection = ConnectionManager::get('big_DB');
+                $shotdata_sensors = $connection->execute($sql)->fetchAll('assoc');
+
+                $connection = ConnectionManager::get('default');
+                $table->setConnection($connection);
+
+                $countshot_cycle_mode = 0;
+                $totalshot_cycle_mode = 0;
+                for($k=0; $k<count($shotdata_sensors); $k++){
+                  if(($shotdata_sensors[$k]["shot_cycle"] <= $log_confirm_kadou_seikeikis[0]["shot_cycle_mode"] + 1) && ($shotdata_sensors[$k]["shot_cycle"] >= $log_confirm_kadou_seikeikis[0]["shot_cycle_mode"] - 1)){
+                    $countshot_cycle_mode = $countshot_cycle_mode + 1;
+                    $totalshot_cycle_mode = $totalshot_cycle_mode + $shotdata_sensors[$k]["shot_cycle"];
+                    $shot_cycle = round($totalshot_cycle_mode/$countshot_cycle_mode, 1);//小数点以下1桁
+                  }
+                }
+
+                //        $starting_tm_program = $log_confirm_kadou_seikeikis[0]["starting_tm_program"];
+                //        $finishing_tm_program = $log_confirm_kadou_seikeikis[0]["finishing_tm_program"];
+
+                $starting_tm_program = $KadouSeikeis[$n1]["program_starting_tm"];
+                $finishing_tm_program = $KadouSeikeis[$n1]["program_finishing_tm"];
+
+                $start_program = strtotime($starting_tm_program);
+                $finish_program = strtotime($finishing_tm_program);
+                $diff_program = ($finish_program - $start_program);//生産時間
+                $riron_shot_amount = round($diff_program/$shot_cycle);//理論ショット数
+
+                $riron_loss_shot = $riron_shot_amount - $log_confirm_kadou_seikeikis[0]["amount_programming"];
+                if($riron_loss_shot > 0){//ロスがある場合
+                  $riron_loss_time = $riron_loss_shot * $shot_cycle;
+                }else{
+                  $riron_loss_time = 0;
+                }
+
+                $arrriron_loss_time = array('riron_loss_time'=>$riron_loss_time);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrriron_loss_time);
+
+                $arrriron_shot_amount = array('riron_shot_amount'=>$riron_shot_amount);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrriron_shot_amount);
+
+                $arrshot_cycle = array('shot_cycle'=>$shot_cycle);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrshot_cycle);
+
+                $arrshot_cycle_mode = array('shot_cycle_mode'=>$log_confirm_kadou_seikeikis[0]["shot_cycle_mode"]);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrshot_cycle_mode);
+
+                $arrnumkadouritu = array('numkadouritu'=>$numkadouritu);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrnumkadouritu);
+
+              }else{
+
+                $connection = ConnectionManager::get('big_DB');//旧DBを参照
+                $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+                $table->setConnection($connection);
+
+                $sql = "SELECT lot_code,starting_tm_nippou,starting_tm_program,finishing_tm_nippou,
+                finishing_tm_program,shot_cycle_nippou,shot_cycle_mode,amount_nippou,amount_programming
+                FROM log_confirm_kadou_seikeikis".
+                " where starting_tm_nippou = '".$KadouSeikeis[$n1]["starting_tm"]."' and product_code = '".$KadouSeikeis[$n1]["product_code"]."' and seikeiki = '".$KadouSeikeis[$n1]["seikeiki"]."'";
+                $connection = ConnectionManager::get('big_DB');
+                $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
+
+                $sql = "SELECT datetime,seikeiki,product_code,shot_cycle
+                FROM shotdata_sensors".
+                " where datetime >= '".$groupday."' and datetime <= '".$groupdayto."' and product_code = '".$KadouSeikeis[$n1]["product_code"]."' and seikeiki = '".$KadouSeikeis[$n1]["seikeiki"]."'";
+                $connection = ConnectionManager::get('big_DB');
+                $shotdata_sensors = $connection->execute($sql)->fetchAll('assoc');
+
+                $connection = ConnectionManager::get('default');
+                $table->setConnection($connection);
+
+                $countshot_cycle_mode = 0;
+                $totalshot_cycle_mode = 0;
+                for($k=0; $k<count($shotdata_sensors); $k++){
+                  if(($shotdata_sensors[$k]["shot_cycle"] <= $log_confirm_kadou_seikeikis[0]["shot_cycle_mode"] + 1) && ($shotdata_sensors[$k]["shot_cycle"] >= $log_confirm_kadou_seikeikis[0]["shot_cycle_mode"] - 1)){
+                    $countshot_cycle_mode = $countshot_cycle_mode + 1;
+                    $totalshot_cycle_mode = $totalshot_cycle_mode + $shotdata_sensors[$k]["shot_cycle"];
+                    $shot_cycle = round($totalshot_cycle_mode/$countshot_cycle_mode, 1);//小数点以下1桁
+                  }
+                }
+
+                //        $starting_tm_program = $log_confirm_kadou_seikeikis[0]["starting_tm_program"];
+                //        $finishing_tm_program = $log_confirm_kadou_seikeikis[0]["finishing_tm_program"];
+
+                $starting_tm_program = $KadouSeikeis[$n1]["program_starting_tm"];
+                $finishing_tm_program = $KadouSeikeis[$n1]["program_finishing_tm"];
+
+                $start_program = strtotime($starting_tm_program);
+                $finish_program = strtotime($finishing_tm_program);
+                $diff_program = ($finish_program - $start_program);//生産時間
+                $riron_shot_amount = round($diff_program/$shot_cycle);//理論ショット数
+
+                $riron_loss_shot = $riron_shot_amount - $log_confirm_kadou_seikeikis[0]["amount_programming"];
+                if($riron_loss_shot > 0){//ロスがある場合
+                  $riron_loss_time = $riron_loss_shot * $shot_cycle;
+                }else{
+                  $riron_loss_time = 0;
+                }
+
+                $arrriron_loss_time = array('riron_loss_time'=>$riron_loss_time);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrriron_loss_time);
+
+                $arrriron_shot_amount = array('riron_shot_amount'=>$riron_shot_amount);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrriron_shot_amount);
+
+                $arrshot_cycle = array('shot_cycle'=>$shot_cycle);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrshot_cycle);
+
+                $arrshot_cycle_mode = array('shot_cycle_mode'=>$log_confirm_kadou_seikeikis[0]["shot_cycle_mode"]);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrshot_cycle_mode);
+
+                $arrnumkadouritu = array('numkadouritu'=>$numkadouritu);
+                $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrnumkadouritu);
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+//型替え時間を計算
+
+      $katagae_time = 0;
+      for($n=0; $n<count($KadouSeikeis); $n++){
+
+          if(($n > 0) && ($KadouSeikeis[$n]["numkadouritu"] == $KadouSeikeis[$n-1]["numkadouritu"])){
+
+      //      $starting_tm_kadou = strtotime($KadouSeikeis[$n]["starting_tm"]);
+      //      $finishing_tm_kadou = strtotime($KadouSeikeis[$n-1]["finishing_tm"]);
+
+            $starting_tm_kadou = strtotime($KadouSeikeis[$n]["program_starting_tm"]);
+            $finishing_tm_kadou = strtotime($KadouSeikeis[$n-1]["program_finishing_tm"]);
+
+            $katagae_time = round($katagae_time + ($starting_tm_kadou - $finishing_tm_kadou) / 60);//生産時間（分）
+
+            $arrkatagae_time = array('katagae_time'=>$katagae_time);
+            $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkatagae_time);
+
+            $total_loss_time = round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60));
+
+            $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
+            $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrtotal_loss_time);
+
+            $kadouritsu = round(1 - (($total_loss_time * 60) / 86400), 3);
+            $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
+            $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkadouritsu);
+            $katagae_time = 0;
+
+          }else{
+
+            $arrkatagae_time = array('katagae_time'=>0);
+            $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkatagae_time);
+
+            $total_loss_time = round($KadouSeikeis[$n]["riron_loss_time"] / 60);
+            $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
+            $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrtotal_loss_time);
+
+            $kadouritsu = round(1 - (($total_loss_time * 60) / 86400), 3);
+            $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
+            $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkadouritsu);
+
+            $katagae_time = 0;
+
+          }
+
+      }
 
       session_start();
       for($n=0; $n<count($KadouSeikeis); $n++){
@@ -992,8 +1365,96 @@ class KadousController extends AppController
           'pro_num' => $KadouSeikeis[$n]['product_code'],
           'starting_tm_nippou' => substr($KadouSeikeis[$n]['starting_tm'], 0, 19),
           'starting_tm' => substr($KadouSeikeis[$n]['starting_tm'], 0, 10),
+          'shot_cycle' => $KadouSeikeis[$n]['shot_cycle'],
           'seikeiki' => $KadouSeikeis[$n]['seikeiki']
         );
+      }
+
+      for($n=0; $n<count($KadouSeikeis); $n++){
+
+        $arrGroup[] = $KadouSeikeis[$n]["numkadouritu"];
+
+      }
+
+      $arrGroupcount = array_count_values($arrGroup);
+      $this->set('arrGroupcount',$arrGroupcount);
+
+      //終了時間から翌8:00までの時間をロスタイムに追加
+      //データベースに登録用の配列を作成
+      $countfin = 0;
+      $arrTouroku = array();
+      for($n=1; $n<=count($arrGroupcount); $n++){
+
+        $countfin = $countfin + $arrGroupcount[$n];
+
+        $start = substr($KadouSeikeis[$countfin-1]['starting_tm'], 0, 10);
+        $start = $start." 08:00:00";
+        $finish = strtotime($start);
+        $finish = date('Y/m/d H:i:s', strtotime('+1 day', $finish));
+
+        $program_finishing_tm = strtotime($KadouSeikeis[$countfin-1]['program_finishing_tm']);
+        $finish = strtotime($finish);
+
+        $loss_time = round(($finish - $program_finishing_tm) / 60);//生産時間（分）
+        /*
+        echo "<pre>";
+        print_r($loss_time." + ".$KadouSeikeis[$countfin-1]['total_loss_time']);
+        echo "</pre>";
+*/
+        $total_loss_time = $KadouSeikeis[$countfin-1]['total_loss_time'] + $loss_time;
+
+        $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
+        $KadouSeikeis[$countfin-1] = array_merge($KadouSeikeis[$countfin-1], $arrtotal_loss_time);
+
+        $kadouritsu = round(1 - (($KadouSeikeis[$countfin-1]['total_loss_time'] * 60) / 86400), 3);
+        $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
+        $KadouSeikeis[$countfin-1] = array_merge($KadouSeikeis[$countfin-1], $arrkadouritsu);
+
+        $arrTouroku[] = [
+          'seikeiki' => $KadouSeikeis[$countfin-1]["seikeiki"],
+          'date' => substr($KadouSeikeis[$countfin-1]['starting_tm'], 0, 10),
+          'kadouritus' => $KadouSeikeis[$countfin-1]["kadouritsu"],
+          'delete_flag' => 0,
+          'created_at' => date('Y-m-d H:i:s'),
+          'created_staff' => $KadouSeikeis[$countfin-1]["created_staff"]
+        ];
+
+      }
+
+      $this->set('KadouSeikeis',$KadouSeikeis);
+/*
+      echo "<pre>";
+      print_r($arrTouroku);
+      echo "</pre>";
+*/
+      for($n=0; $n<count($arrTouroku); $n++){
+
+        $KadouritsuSeikeiki = $this->KadouritsuSeikeikis->find()->where(['seikeiki' => $arrTouroku[$n]['seikeiki'], 'date' => $arrTouroku[$n]['date']])->toArray();
+
+        if(!isset($KadouritsuSeikeiki[0])){
+          $KadouritsuSeikeikis = $this->KadouritsuSeikeikis->patchEntity($this->KadouritsuSeikeikis->newEntity(), $arrTouroku[$n]);
+  				$connection = ConnectionManager::get('default');//トランザクション1
+  				// トランザクション開始2
+  				$connection->begin();//トランザクション3
+  				try {//トランザクション4
+  					if ($this->KadouritsuSeikeikis->save($KadouritsuSeikeikis)) {
+
+  						$connection->commit();// コミット5
+
+  					} else {
+
+  						$this->Flash->error(__('The product could not be saved. Please, try again.'));
+  						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+  					}
+
+  				} catch (Exception $e) {//トランザクション7
+  				//ロールバック8
+  					$connection->rollback();//トランザクション9
+  				}//トランザクション10
+
+        }
+
       }
 
     }
@@ -1003,6 +1464,13 @@ class KadousController extends AppController
   //    $this->request->session()->destroy(); // セッションの破棄
       $session = $this->request->getSession();
       $datasession = $session->read();
+
+      if(!isset($datasession["imgdata"])){
+        return $this->redirect(['action' => 'kensakuform',
+        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+      }
+
+      $arrdatasession = $datasession["imgdata"];
 
       $KadouSeikeis = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikeis',$KadouSeikeis);
@@ -1017,14 +1485,13 @@ class KadousController extends AppController
 */
       $imgdatas = explode("_",$data[0]);//切り離し
 
+      $shot_cycle_heikin = $arrdatasession[$imgdatas[0]]["shot_cycle"];
+      $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+
       $_SESSION['imgnum'] = array(
         'num' => $imgdatas[0]
       );
-/*
-      echo "<pre>";
-      print_r($_SESSION);
-      echo "</pre>";
-*/
+
       $KadouSeikeis = $this->KadouSeikeis->find()->where(['id' => $imgdatas[1]])->toArray();
 
       $date_sta = $KadouSeikeis[0]["starting_tm"]->format('Y-m-d H:i:s');

@@ -30,11 +30,11 @@
             </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-            <?php for($i=0; $i<$countlot; $i++): ?>
+          <?php for($i=0; $i<count($checkLot); $i++): ?>
             <tr style="border-bottom: solid;border-width: 1px">
-                <td width="150" colspan="20" nowrap="nowrap"><?= h($checkLot[$i]["product_id"]) ?></td>
+                <td width="150" colspan="20" nowrap="nowrap"><?= h($checkLot[$i]["product_code"]) ?></td>
                 <?php
-                  $product_code = $checkLot[$i]["product_id"];
+                  $product_code = $checkLot[$i]["product_code"];
               		$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
               		$product_name = $Product[0]->product_name;
                 ?>
@@ -47,7 +47,7 @@
               $f_used = $checkLot[$i]["flag_used"];
               $flag_deliver = $checkLot[$i]["flag_deliver"];
               if($flag_deliver != null){
-                $flag_used = $flag_deliver." 納品済み";
+                $flag_used = $flag_deliver->format('Y-m-d')." 納品済み";
               }elseif($f_used == 0){
                 $flag_used = "検査済み";
               }else{

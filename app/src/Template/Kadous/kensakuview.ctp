@@ -103,7 +103,8 @@
 
             <?php
             echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
-            echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $i."_".$KadouSeikeis[$i]["id"]]) ;
+            echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $i."_".$KadouSeikeis[$i]["id"]."_".strval($KadouSeikeis[$i]["accomp_rate_program"] * 1000).
+            "_".strval($KadouSeikeis[$i]["kobetu_loss_time"] * 1000)."_".strval($KadouSeikeis[$i]["katagae_time"] * 1000)]) ;
             echo "</div></td>";
             ?>
           </tr>
@@ -145,7 +146,7 @@
               <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis[$i]["last_lot_num"]) ?></font></td>
               <?php
               echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
-              echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $i."_".$KadouSeikeis[$i]["id"]]) ;
+              echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $i."_".$KadouSeikeis[$i]["id"]."_-_-_-"]) ;
               echo "</div></td>";
               ?>
             </tr>

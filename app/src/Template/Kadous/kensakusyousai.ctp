@@ -58,12 +58,18 @@
                 <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
                   <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF0000">開始ロット</strong></div></td>
                   <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF0000">終了ロット</strong></div></td>
+                  <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF0000">個別達成率</strong></div></td>
+                  <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF0000">個別非生産時間</strong></div></td>
+                  <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:#FF0000">型替え時間</strong></div></td>
                 </tr>
             </thead>
             <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
               <tr style="border-bottom: solid;border-width: 1px">
                 <td colspan="20" nowrap="nowrap"><font><?= h($first_lot_num) ?></font></td>
                 <td colspan="20" nowrap="nowrap"><font><?= h($last_lot_num) ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($accomp_rate_program) ?></font><font><?= h(" ％") ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($kobetu_loss_time) ?></font><font><?= h(" 分") ?></font></td>
+                <td colspan="20" nowrap="nowrap"><font><?= h($katagae_time) ?></font><font><?= h(" 分") ?></font></td>
               </tr>
             </tbody>
         </table>

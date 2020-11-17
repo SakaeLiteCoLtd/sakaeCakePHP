@@ -1811,7 +1811,6 @@ class KadousController extends AppController
 
     public function kensakusyousai()
     {
-  //    $this->request->session()->destroy(); // セッションの破棄
       $session = $this->request->getSession();
       $datasession = $session->read();
 
@@ -1837,9 +1836,35 @@ class KadousController extends AppController
         $imgdatas = explode("_",$data[0]);//切り離し
 
       }
+/*
+      echo "<pre>";
+      print_r($imgdatas);
+      echo "</pre>";
+*/
 
-      $shot_cycle_heikin = $arrdatasession[$imgdatas[0]]["shot_cycle"];
-      $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+      if($imgdatas[2] == "-"){
+
+        $accomp_rate_program = "-";
+        $this->set('accomp_rate_program',$accomp_rate_program);
+        $kobetu_loss_time = "-";
+        $this->set('kobetu_loss_time',$kobetu_loss_time);
+        $katagae_time = "-";
+        $this->set('katagae_time',$katagae_time);
+        $shot_cycle_heikin = "-";
+        $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+
+      }else{
+
+        $accomp_rate_program = $imgdatas[2] / 10;
+        $this->set('accomp_rate_program',$accomp_rate_program);
+        $kobetu_loss_time = $imgdatas[3] / 1000;
+        $this->set('kobetu_loss_time',$kobetu_loss_time);
+        $katagae_time = $imgdatas[4] / 1000;
+        $this->set('katagae_time',$katagae_time);
+        $shot_cycle_heikin = $arrdatasession[$imgdatas[0]]["shot_cycle"];
+        $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+
+      }
 
       $_SESSION['imgnum'] = array(
         'num' => $imgdatas[0]

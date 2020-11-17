@@ -37,6 +37,15 @@ class KadousController extends AppController
 
     public function kariindex()
     {
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
       $this->request->session()->destroy(); // セッションの破棄
 
 			$KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
@@ -1809,40 +1818,62 @@ class KadousController extends AppController
 
   }
 
-    public function kensakusyousai()
-    {
-  //    $this->request->session()->destroy(); // セッションの破棄
-      $session = $this->request->getSession();
-      $datasession = $session->read();
+  public function kensakusyousai()
+  {
+    $session = $this->request->getSession();
+    $datasession = $session->read();
 
-      if(!isset($datasession["imgdata"])){
-        return $this->redirect(['action' => 'kensakuform',
-        's' => ['mess' => "セッションが切れました。日報呼出ボタンからやり直してください。"]]);
-      }
+    if(!isset($datasession["imgdata"])){
+      return $this->redirect(['action' => 'kariindex',
+      's' => ['mess' => "セッションが切れました。日報呼出ボタンからやり直してください。"]]);
+    }
 
-      $arrdatasession = $datasession["imgdata"];
+    $arrdatasession = $datasession["imgdata"];
 
-      $KadouSeikeis = $this->KadouSeikeis->newEntity();
-      $this->set('KadouSeikeis',$KadouSeikeis);
+    $KadouSeikeis = $this->KadouSeikeis->newEntity();
+    $this->set('KadouSeikeis',$KadouSeikeis);
 
-      $KadouSeikeis = $this->KadouSeikeis->newEntity();
-      $this->set('KadouSeikeis',$KadouSeikeis);
+    $Data=$this->request->query('s');
+    if(isset($Data["returndata"])){
 
-      $Data=$this->request->query('s');
-      if(isset($Data["returndata"])){
+      $imgdatas = explode("_",$Data["returndata"]);//切り離し
 
-        $imgdatas = explode("_",$Data["returndata"]);//切り離し
+    }else{
 
-      }else{
+      $data = $this->request->getData();
+      $data = array_keys($data, '詳細');
+      $imgdatas = explode("_",$data[0]);//切り離し
 
-        $data = $this->request->getData();
-        $data = array_keys($data, '詳細');
-        $imgdatas = explode("_",$data[0]);//切り離し
+    }
+/*
+    echo "<pre>";
+    print_r($imgdatas);
+    echo "</pre>";
+*/
 
-      }
+    if($imgdatas[2] == "-"){
 
+      $accomp_rate_program = "-";
+      $this->set('accomp_rate_program',$accomp_rate_program);
+      $kobetu_loss_time = "-";
+      $this->set('kobetu_loss_time',$kobetu_loss_time);
+      $katagae_time = "-";
+      $this->set('katagae_time',$katagae_time);
+      $shot_cycle_heikin = "-";
+      $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+
+    }else{
+
+      $accomp_rate_program = $imgdatas[2] / 10;
+      $this->set('accomp_rate_program',$accomp_rate_program);
+      $kobetu_loss_time = $imgdatas[3] / 1000;
+      $this->set('kobetu_loss_time',$kobetu_loss_time);
+      $katagae_time = $imgdatas[4] / 1000;
+      $this->set('katagae_time',$katagae_time);
       $shot_cycle_heikin = $arrdatasession[$imgdatas[0]]["shot_cycle"];
       $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+
+    }
 
       $_SESSION['imgnum'] = array(
         'num' => $imgdatas[0]
@@ -2193,7 +2224,7 @@ class KadousController extends AppController
      $datasession = $session->read();
 
      if(!isset($datasession["imgnum"])){
-       return $this->redirect(['action' => 'kensakuform',
+       return $this->redirect(['action' => 'kariindex',
        's' => ['mess' => "セッションが切れました。日報呼出ボタンからやり直してください。"]]);
      }
 
@@ -2544,7 +2575,7 @@ class KadousController extends AppController
       $datasession = $session->read();
 
       if(!isset($datasession["imgnum"])){
-        return $this->redirect(['action' => 'kensakuform',
+        return $this->redirect(['action' => 'kariindex',
         's' => ['mess' => "セッションが切れました。日報呼出ボタンからやり直してください。"]]);
       }
 

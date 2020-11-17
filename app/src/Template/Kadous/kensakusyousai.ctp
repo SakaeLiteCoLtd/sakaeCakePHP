@@ -100,13 +100,30 @@
               </tr>
             </tbody>
     </table>
-<br><br><br>
+
+    <br>
+
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('グラフ呼出', array('name' => 'imgyobidasi')); ?></div></td>
+    </tr>
+    </table>
+
+<br>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
+  <strong style="text-align: left">備考：</strong><br>
+  <strong style="text-align: left"><?= h($bik) ?></strong><br>
+      <textarea name="bik"  cols="120" rows="8"></textarea>
+    </td>
+</table>
+<table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr>
-  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('グラフ呼出', array('name' => 'imgyobidasi')); ?></div></td>
+  <td style="border-style: none;"><div align="right"><?= $this->Form->submit('備考追加', array('name' => 'bikou')); ?></div></td>
 </tr>
 </table>
+
 
 <?= $this->Form->control('seikeiki', array('type'=>'hidden', 'value'=>$seikeiki, 'label'=>false)) ?>
 <?= $this->Form->control('product', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>

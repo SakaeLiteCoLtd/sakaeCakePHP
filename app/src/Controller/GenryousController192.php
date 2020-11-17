@@ -664,7 +664,7 @@ class GenryousController extends AppController
           $tmp_datetime[$key] = $row["datetime"];
         }
 
-        array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
+				array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
 
 				$time = $ScheduleKouteis[0]->datetime->format('H:i');
 
@@ -681,7 +681,7 @@ class GenryousController extends AppController
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $product_name,
-					'tantou' => $ScheduleKouteis[$k]["tantou"]
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
 			 ];
 
 			}
@@ -690,7 +690,7 @@ class GenryousController extends AppController
 			$file_name = "ScheduleKoutei_1day_".$day.".csv";
 
 		//	$fp = fopen('/data/share/csvFiles/'.$file_name, 'w');//192
-			$fp = fopen('/home/centosuser/csvFiles/'.$file_name, 'w');//192
+			$fp = fopen('/home/centosuser/csvFiles/kouteis/downloads/'.$file_name, 'w');//192
 		  //  $fp = fopen($file_name, 'w');//ローカル
 
 				foreach ($arrScheduleKoutei_csv as $line) {
@@ -700,7 +700,7 @@ class GenryousController extends AppController
 
 				if(fclose($fp)){
 		//			$mes = "/data/share/csvFiles/に「".$file_name."」ファイルが出力されました。";
-					$mes = "/home/centosuser/csvFiles/に「".$file_name."」ファイルが出力されました。";
+					$mes = "/home/centosuser/csvFiles/kouteis/downloads/に「".$file_name."」ファイルが出力されました。";
 					$this->set('mes',$mes);
 				}else{
 					$mes = "エラーが発生しました。もう一度出力し直してください。";
@@ -730,14 +730,23 @@ class GenryousController extends AppController
 			$ScheduleKouteis = $this->ScheduleKouteis->find()
 			->where(['datetime >=' => $date1w, 'datetime <=' => $date1w0])->toArray();
 
+			for($k=0; $k<count($ScheduleKouteis); $k++){
+
+				$day = $ScheduleKouteis[$k]->datetime->format('j');
+				$ScheduleKouteis[$k]['present_kensahyou'] = $day;
+
+			}
+
 			if(isset($ScheduleKouteis[0])){
 
-        foreach($ScheduleKouteis as $key => $row ) {
-          $tmp_seikeiki[$key] = $row["seikeiki"];
-          $tmp_datetime[$key] = $row["datetime"];
+				foreach($ScheduleKouteis as $key => $row ) {
+					$tmp_day[$key] = $row["present_kensahyou"];
+					$tmp_seikeiki[$key] = $row["seikeiki"];
+  //        $tmp_datetime[$key] = $row["datetime"];
         }
 
-        array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
+				array_multisort($tmp_day, SORT_ASC, $tmp_seikeiki, SORT_ASC, $ScheduleKouteis);
+	//			array_multisort($tmp_day, SORT_ASC, $tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
 
 				$time = $ScheduleKouteis[0]->datetime->format('H:i');
 
@@ -755,7 +764,7 @@ class GenryousController extends AppController
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $product_name,
-					'tantou' => $ScheduleKouteis[$k]["tantou"]
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
 			 ];
 
 			}
@@ -764,7 +773,7 @@ class GenryousController extends AppController
 			$file_name = "ScheduleKoutei_1week_".$day.".csv";
 
 	//		$fp = fopen('/data/share/csvFiles/'.$file_name, 'w');//192
-			$fp = fopen('/home/centosuser/csvFiles/'.$file_name, 'w');//192
+			$fp = fopen('/home/centosuser/csvFiles/kouteis/downloads/'.$file_name, 'w');//192
 		//  $fp = fopen($file_name, 'w');//ローカル
 
 				foreach ($arrScheduleKoutei_csv as $line) {
@@ -774,7 +783,7 @@ class GenryousController extends AppController
 
 				if(fclose($fp)){
 		//			$mes = "/data/share/csvFiles/に「".$file_name."」ファイルが出力されました。";
-					$mes = "/home/centosuser/csvFiles/に「".$file_name."」ファイルが出力されました。";
+					$mes = "/home/centosuser/csvFiles/kouteis/downloads/に「".$file_name."」ファイルが出力されました。";
 					$this->set('mes',$mes);
 				}else{
 					$mes = "エラーが発生しました。もう一度出力し直してください。";

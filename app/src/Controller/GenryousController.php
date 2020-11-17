@@ -664,7 +664,7 @@ class GenryousController extends AppController
           $tmp_datetime[$key] = $row["datetime"];
         }
 
-        array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
+				array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
 
 				$time = $ScheduleKouteis[0]->datetime->format('H:i');
 
@@ -681,7 +681,7 @@ class GenryousController extends AppController
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $product_name,
-					'tantou' => $ScheduleKouteis[$k]["tantou"]
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
 			 ];
 
 			}
@@ -728,14 +728,23 @@ class GenryousController extends AppController
 			$ScheduleKouteis = $this->ScheduleKouteis->find()
 			->where(['datetime >=' => $date1w, 'datetime <=' => $date1w0])->toArray();
 
+			for($k=0; $k<count($ScheduleKouteis); $k++){
+
+				$day = $ScheduleKouteis[$k]->datetime->format('j');
+				$ScheduleKouteis[$k]['present_kensahyou'] = $day;
+
+			}
+
 			if(isset($ScheduleKouteis[0])){
 
         foreach($ScheduleKouteis as $key => $row ) {
-          $tmp_seikeiki[$key] = $row["seikeiki"];
-          $tmp_datetime[$key] = $row["datetime"];
+					$tmp_day[$key] = $row["present_kensahyou"];
+					$tmp_seikeiki[$key] = $row["seikeiki"];
+  //        $tmp_datetime[$key] = $row["datetime"];
         }
 
-        array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
+				array_multisort($tmp_day, SORT_ASC, $tmp_seikeiki, SORT_ASC, $ScheduleKouteis);
+	//			array_multisort($tmp_day, SORT_ASC, $tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
 
 				$time = $ScheduleKouteis[0]->datetime->format('H:i');
 
@@ -753,7 +762,7 @@ class GenryousController extends AppController
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $product_name,
-					'tantou' => $ScheduleKouteis[$k]["tantou"]
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
 			 ];
 
 			}
@@ -776,11 +785,8 @@ class GenryousController extends AppController
 					$mes = "エラーが発生しました。もう一度出力し直してください。";
 					$this->set('mes',$mes);
 				}
-/*
-			echo "<pre>";
-			print_r($arrScheduleKoutei_csv);
-			echo "</pre>";
-*/
+
+
 		}
 
 		public function gazoutest()

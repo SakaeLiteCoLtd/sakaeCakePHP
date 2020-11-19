@@ -73,6 +73,8 @@
               if($i >= $num && isset($arrGroupcount[$count])){
                 $numcell = $arrGroupcount[$count];
                 $num = $num + $arrGroupcount[$count];
+
+                $total_loss_time = round((1 - $KadouSeikeis[$num-1]["kadouritsu"]) * 86400 / 60 , 1);
 /*
                 $total_loss = 0;
                 for($n=$i; $n<=$num-1; $n++){
@@ -86,8 +88,8 @@
                 echo "</font>";
                 echo "</font></div></td>";
                 echo "<td colspan='20' nowrap='nowrap' rowspan=$numcell><div align='center'><font color='red'>";
-        //        echo $total_loss;
-                echo $KadouSeikeis[$num-1]["total_loss_time"];
+                echo $total_loss_time;
+        //        echo $KadouSeikeis[$num-1]["total_loss_time"];
                 echo "<font color='blue'>";
                 echo " 分";
                 echo "</font>";

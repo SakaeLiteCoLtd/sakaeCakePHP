@@ -59,6 +59,11 @@ class htmlShinkimenu extends AppController
         "<td style='padding: 0.1rem 0.1rem;'><a href='/products/kijyunyobidasiform'>\n".
         "<img src='/img/ShinkiTourokuMenu/kijyun.png' width=105 height=36>\n".
         "</a>\n".
+        "</tr>\n".
+        "<tr style='border-style: none; background-color: #E6FFFF'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/menugaityu'>\n".
+        "<img src='/img/ShinkiTourokuMenu/chokusoukankei.gif' width=105 height=36>\n".
+        "</a>\n".
         "</tr>\n";
 
 		return $html;

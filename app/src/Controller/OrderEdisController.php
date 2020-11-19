@@ -70,7 +70,7 @@ class OrderEdisController extends AppController
           $sample = explode(',',$line);//$lineを','毎に配列に入れる
 
            $keys=array_keys($sample);
-           $keys[array_search('3',$keys)]='place_deliver_code';//名前の変更（3?place_deliver_code）
+           $keys[array_search('3',$keys)]='place_deliver_code';//名前の変更（3?place_deliver_code）$place_deliver_codehennkou
            $keys[array_search('10',$keys)]='date_order';
            $keys[array_search('12',$keys)]='price';
            $keys[array_search('14',$keys)]='amount';
@@ -3024,7 +3024,7 @@ echo "</pre>";
       $PlaceDeliver = $this->PlaceDelivers->find()->where(['id' => $place_deliver])->toArray();
       $place_deliver_name = $PlaceDeliver[0]->name;
       $this->set('place_deliver_name',$place_deliver_name);
-      $place_deliver_code = $PlaceDeliver[0]->id_from_order;
+      $place_deliver_code = $PlaceDeliver[0]->id_from_order;//$place_deliver_codehennkou
       $this->set('place_deliver_code',$place_deliver_code);
   //    $line_code = $data["line_code"];
       $this->set('line_code',$line_code);

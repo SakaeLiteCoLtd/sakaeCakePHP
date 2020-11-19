@@ -1612,83 +1612,122 @@ class KadousController extends AppController
 
   //型替え時間を計算
 
-        $katagae_time = 0;
-        $seisan_time = 0;
-        for($n=0; $n<count($KadouSeikeis); $n++){
+  $katagae_time = 0;
+  $seisan_time = 0;
+  for($n=0; $n<count($KadouSeikeis); $n++){
 
-            if(($n > 0) && ($KadouSeikeis[$n]["numkadouritu"] == $KadouSeikeis[$n-1]["numkadouritu"])){
+      if(($n > 0) && ($KadouSeikeis[$n]["numkadouritu"] == $KadouSeikeis[$n-1]["numkadouritu"])){
 
-        //      $starting_tm_kadou = strtotime($KadouSeikeis[$n]["starting_tm"]);
-        //      $finishing_tm_kadou = strtotime($KadouSeikeis[$n-1]["finishing_tm"]);
+  //      $starting_tm_kadou = strtotime($KadouSeikeis[$n]["starting_tm"]);
+  //      $finishing_tm_kadou = strtotime($KadouSeikeis[$n-1]["finishing_tm"]);
 
-              $starting_tm_kadou = strtotime($KadouSeikeis[$n]["program_starting_tm"]);
-              $finishing_tm_kadou = strtotime($KadouSeikeis[$n-1]["program_finishing_tm"]);
+        $starting_tm_kadou = strtotime($KadouSeikeis[$n]["program_starting_tm"]);
+        $finishing_tm_kadou = strtotime($KadouSeikeis[$n-1]["program_finishing_tm"]);
 
-              $katagae_time = round($katagae_time + ($starting_tm_kadou - $finishing_tm_kadou) / 60 , 1);//生産時間（分）
+        $connection = ConnectionManager::get('big_DB');//旧DBを参照
+        $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+        $table->setConnection($connection);
 
-              $arrkatagae_time = array('katagae_time'=>$katagae_time);
-              $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkatagae_time);
+        $sql = "SELECT time_mold_change,before_product_code
+        FROM log_confirm_kadou_seikeikis".
+        " where starting_tm_program ='".$KadouSeikeis[$n]["program_starting_tm"]."' and product_code ='".$KadouSeikeis[$n]["product_code"]."'";
+        $connection = ConnectionManager::get('big_DB');
+        $log_confirm_time_mold_change = $connection->execute($sql)->fetchAll('assoc');
 
-              $total_loss_time = round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
+        $connection = ConnectionManager::get('default');
+        $table->setConnection($connection);
+/*
+        echo "<pre>";
+        print_r($log_confirm_time_mold_change[0]["time_mold_change"]);
+        echo "</pre>";
+*/
+        if(!empty($log_confirm_time_mold_change[0]["time_mold_change"])){//登録されている場合
 
-              $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
-              $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrtotal_loss_time);
+          $katagae_time = round(($log_confirm_time_mold_change[0]["time_mold_change"]) / 60 , 1);//生産時間（分）
 
-              $kadouritsu = round(1 - (($total_loss_time * 60) / 86400), 3);
-              $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
-              $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkadouritsu);
+          $arrkatagae_time = array('katagae_time'=>$katagae_time);
+          $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkatagae_time);
 
-              $katagae_time = 0;
-              $seisan_time = 0;
-  /*
-              echo "<pre>";
-              print_r("before  ".$KadouSeikeis[$n-1]["product_code"]." ".$KadouSeikeis[$n]["product_code"]." ".$KadouSeikeis[$n]["program_starting_tm"]);
-              echo "</pre>";
-  */
-              //big_DB
-              $connection = ConnectionManager::get('big_DB');//big_DBを参照
-              $table = TableRegistry::get('log_confirm_kadou_seikeikis');
-              $table->setConnection($connection);
+        }else{
 
-              $updater = "UPDATE log_confirm_kadou_seikeikis set before_product_code = '".$KadouSeikeis[$n-1]["product_code"]."' , updated_at ='".date('Y-m-d H:i:s')."'
-              where starting_tm_program ='".$KadouSeikeis[$n]["program_starting_tm"]."' and product_code ='".$KadouSeikeis[$n]["product_code"]."'";
-              $connection->execute($updater);
+          $katagae_time = round($katagae_time + ($starting_tm_kadou - $finishing_tm_kadou) / 60 , 1);//生産時間（分）
 
-              $connection = ConnectionManager::get('default');//新DBに戻る
-              $table->setConnection($connection);
-
-            }else{
-
-              $arrkatagae_time = array('katagae_time'=>0);
-              $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkatagae_time);
-
-              $total_loss_time = round($KadouSeikeis[$n]["riron_loss_time"] / 60 , 1);
-              $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
-              $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrtotal_loss_time);
-
-              $kadouritsu = round(1 - (($total_loss_time * 60) / 86400), 3);
-              $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
-              $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkadouritsu);
-
-              $katagae_time = 0;
-              $seisan_time = 0;
-
-              //big_DBに単価登録
-              $connection = ConnectionManager::get('big_DB');//旧DBを参照
-              $table = TableRegistry::get('log_confirm_kadou_seikeikis');
-              $table->setConnection($connection);
-
-              $none = "none";
-              $updater = "UPDATE log_confirm_kadou_seikeikis set before_product_code = '".$none."' , updated_at ='".date('Y-m-d H:i:s')."'
-              where starting_tm_program ='".$KadouSeikeis[$n]["program_starting_tm"]."' and product_code ='".$KadouSeikeis[$n]["product_code"]."'";
-              $connection->execute($updater);
-
-              $connection = ConnectionManager::get('default');//新DBに戻る
-              $table->setConnection($connection);
-
-            }
+          $arrkatagae_time = array('katagae_time'=>$katagae_time);
+          $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkatagae_time);
 
         }
+
+        $total_loss_time = round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
+
+        $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
+        $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrtotal_loss_time);
+
+        $kadouritsu = round(1 - (($total_loss_time * 60) / 86400), 3);
+        $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
+        $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkadouritsu);
+
+        $katagae_time_touroku = $katagae_time * 60 ;
+/*
+        echo "<pre>";
+        print_r("before  ".$katagae_time_touroku." ".$KadouSeikeis[$n-1]["product_code"]." ".$KadouSeikeis[$n]["product_code"]." ".$KadouSeikeis[$n]["program_starting_tm"]);
+        echo "</pre>";
+*/
+        if(!empty($log_confirm_time_mold_change[0]["time_mold_change"])){//既に登録されている場合
+
+          $katagae_time = 0;
+          $seisan_time = 0;
+
+        }else{
+
+          //big_DB
+          $connection = ConnectionManager::get('big_DB');//big_DBを参照
+          $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+          $table->setConnection($connection);
+
+          $updater = "UPDATE log_confirm_kadou_seikeikis set time_mold_change = '".$katagae_time_touroku."' ,before_product_code = '".$KadouSeikeis[$n-1]["product_code"]."' , updated_at ='".date('Y-m-d H:i:s')."'
+          where starting_tm_program ='".$KadouSeikeis[$n]["program_starting_tm"]."' and product_code ='".$KadouSeikeis[$n]["product_code"]."'";
+          $connection->execute($updater);
+
+          $connection = ConnectionManager::get('default');//新DBに戻る
+          $table->setConnection($connection);
+
+          $katagae_time = 0;
+          $seisan_time = 0;
+
+        }
+
+      }else{
+
+        $arrkatagae_time = array('katagae_time'=>0);
+        $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkatagae_time);
+
+        $total_loss_time = round($KadouSeikeis[$n]["riron_loss_time"] / 60 , 1);
+        $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
+        $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrtotal_loss_time);
+
+        $kadouritsu = round(1 - (($total_loss_time * 60) / 86400), 3);
+        $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
+        $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkadouritsu);
+
+        $katagae_time = 0;
+        $seisan_time = 0;
+
+        //big_DBに単価登録
+        $connection = ConnectionManager::get('big_DB');//旧DBを参照
+        $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+        $table->setConnection($connection);
+
+        $none = "none";
+        $updater = "UPDATE log_confirm_kadou_seikeikis set before_product_code = '".$none."' , updated_at ='".date('Y-m-d H:i:s')."'
+        where starting_tm_program ='".$KadouSeikeis[$n]["program_starting_tm"]."' and product_code ='".$KadouSeikeis[$n]["product_code"]."'";
+        $connection->execute($updater);
+
+        $connection = ConnectionManager::get('default');//新DBに戻る
+        $table->setConnection($connection);
+
+      }
+
+  }
 
         session_start();
         for($n=0; $n<count($KadouSeikeis); $n++){
@@ -1738,7 +1777,19 @@ class KadousController extends AppController
           $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
           $KadouSeikeis[$countfin-1] = array_merge($KadouSeikeis[$countfin-1], $arrtotal_loss_time);
 
-          $kadouritsu = round(1 - (($KadouSeikeis[$countfin-1]['total_loss_time'] * 60) / 86400), 3);
+          $KadouritsuSeikeikidata = $this->KadouritsuSeikeikis->find()
+          ->where(['seikeiki' => $KadouSeikeis[$countfin-1]['seikeiki'], 'date' => substr($KadouSeikeis[$countfin-1]['starting_tm'], 0, 10)])->toArray();
+
+          if(isset($KadouritsuSeikeikidata[0])){//既にデータが存在する場合
+
+            $kadouritsu = $KadouritsuSeikeikidata[0]["kadouritus"];
+
+          }else{
+            
+            $kadouritsu = round(1 - (($KadouSeikeis[$countfin-1]['total_loss_time'] * 60) / 86400), 3);
+
+          }
+
           $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
           $KadouSeikeis[$countfin-1] = array_merge($KadouSeikeis[$countfin-1], $arrkadouritsu);
 

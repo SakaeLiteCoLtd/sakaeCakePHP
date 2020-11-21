@@ -983,7 +983,12 @@ class KadousController extends AppController
 
         array_multisort( $tmp_seikeiki, SORT_ASC, $tmp_starting_tm, SORT_ASC, $KadouSeikeis);
 
-        for ($k=0; $k<count($KadouSeikeis); $k++){
+        $countfirst = count($KadouSeikeis);
+
+        $arrNon_data_KadouSeikeis = array();
+        $check_sonzai_log_confirm = 0;
+
+        for ($k=0; $k<$countfirst; $k++){
 
           $connection = ConnectionManager::get('big_DB');//旧DBを参照
           $table = TableRegistry::get('log_confirm_kadou_seikeikis');
@@ -996,19 +1001,29 @@ class KadousController extends AppController
 
           if(isset($log_confirm_kadou_seikeikis[0])){
             $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
+
+            $connection = ConnectionManager::get('default');
+            $table->setConnection($connection);
+
+            $arramount_programming = array('amount_programming'=>$amount_programming);
+            $KadouSeikeis[$k] = array_merge($KadouSeikeis[$k]->toArray(), $arramount_programming);
+
+            if($KadouSeikeis[$k]["product_code"] === "W002"){
+
+              $KadouSeikeis[$k]['amount_shot'] = $KadouSeikeis[$k]['amount_shot'] * 2;
+
+            }
+
+            $check_sonzai_log_confirm = $check_sonzai_log_confirm;
+
           }else{
             $amount_programming = "データベースに存在しません";
-          }
 
-          $connection = ConnectionManager::get('default');
-          $table->setConnection($connection);
+            $arrNon_data_KadouSeikeis[] = $KadouSeikeis[$k];
 
-          $arramount_programming = array('amount_programming'=>$amount_programming);
-          $KadouSeikeis[$k] = array_merge($KadouSeikeis[$k]->toArray(), $arramount_programming);
+            unset($KadouSeikeis[$k]);
 
-          if($KadouSeikeis[$k]["product_code"] === "W002"){
-
-            $KadouSeikeis[$k]['amount_shot'] = $KadouSeikeis[$k]['amount_shot'] * 2;
+            $check_sonzai_log_confirm = $check_sonzai_log_confirm + 1;
 
           }
 
@@ -1016,10 +1031,11 @@ class KadousController extends AppController
 
       }
 
-      $this->set('countkadouSeikei',count($KadouSeikeis));
+      $KadouSeikeis = array_values($KadouSeikeis);
+//      $this->set('countkadouSeikei',count($KadouSeikeis));
 /*
       echo "<pre>";
-      print_r($KadouSeikeis);
+      print_r($arrNon_data_KadouSeikeis);
       echo "</pre>";
 */
 
@@ -1067,7 +1083,14 @@ class KadousController extends AppController
         }else{
           $countbig = count($arrFlag_start);
         }
-
+/*
+        echo "<pre>";
+        print_r($arrFlag_start);
+        echo "</pre>";
+        echo "<pre>";
+        print_r($arrFlag_finish);
+        echo "</pre>";
+*/
         for($m=0; $m<$countbig; $m++){
 
           if(!isset($arrFlag_start[$m])){
@@ -1086,7 +1109,7 @@ class KadousController extends AppController
         }
 /*
         echo "<pre>";
-        print_r($n);
+        print_r($n." ".$KadouSeikeis[$n]["product_code"]);
         echo "</pre>";
         echo "<pre>";
         print_r($arrFlag_start);
@@ -1111,7 +1134,11 @@ class KadousController extends AppController
 
       $count = count($arrStartTime);
       $countFinishTime = count($arrFinishTime);
-
+/*
+      echo "<pre>";
+      print_r($count." ".$countFinishTime);
+      echo "</pre>";
+*/
       for($l=0; $l<$count; $l++){
 
         if(!isset($arrFinishTime[$l]['datetime'])){
@@ -1509,7 +1536,11 @@ class KadousController extends AppController
                         $shot_cycle = round($totalshot_cycle_mode/$countshot_cycle_mode, 1);//小数点以下1桁
                       }
                     }
-
+/*
+                    echo "<pre>";
+                    print_r($KadouSeikeis[$n1]["id"]."  ".$KadouSeikeis[$n1]["program_starting_tm"]."  ".$KadouSeikeis[$n1]["product_code"]);
+                    echo "</pre>";
+*/
                     $status = 1;
                     //big_DB
                     $connection = ConnectionManager::get('big_DB');//big_DBを参照
@@ -1666,11 +1697,6 @@ for($n=0; $n<count($KadouSeikeis); $n++){
 
       }
 
-  //    $katagae_time = round($katagae_time + ($starting_tm_kadou - $finishing_tm_kadou) / 60 , 1);//生産時間（分）
-
-  //    $arrkatagae_time = array('katagae_time'=>$katagae_time);
-  //    $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkatagae_time);
-
       $total_loss_time = round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
 
       $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
@@ -1817,8 +1843,6 @@ for($n=0; $n<count($KadouSeikeis); $n++){
         ];
 
       }
-
-      $this->set('KadouSeikeis',$KadouSeikeis);
 /*
       echo "<pre>";
       print_r($KadouSeikeis);
@@ -1854,9 +1878,30 @@ for($n=0; $n<count($KadouSeikeis); $n++){
 
       }
 
+
+      $checkn_on_data_KadouSeikeis = 0;
+      if($check_sonzai_log_confirm > 0){//kadouSeikeis にはデータがあるが　log_confirm_kadou_seikeikisテーブルに存在しない場合
+
+        $checkn_on_data_KadouSeikeis = 1;
+        $countarrNon_data_KadouSeikeis = count($arrNon_data_KadouSeikeis);
+
+      }else{
+
+        $countarrNon_data_KadouSeikeis = 0;
+
+      }
+
+      $this->set('countarrNon_data_KadouSeikeis',$countarrNon_data_KadouSeikeis);
+      $this->set('arrNon_data_KadouSeikeis',$arrNon_data_KadouSeikeis);
+
+      $this->set('KadouSeikeis',$KadouSeikeis);
+      $this->set('countkadouSeikei',count($KadouSeikeis));
+
     }else{//品番で絞り込んでいる場合またはデータが1つもない場合
 
       $this->set('countkadouSeikei',count($KadouSeikeis));
+      $countarrNon_data_KadouSeikeis = 0;
+      $this->set('countarrNon_data_KadouSeikeis',$countarrNon_data_KadouSeikeis);
 
       session_start();
       for($n=0; $n<count($KadouSeikeis); $n++){

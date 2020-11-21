@@ -111,6 +111,44 @@
             ?>
           </tr>
         <?php endfor;?>
+
+        <?php if($countarrNon_data_KadouSeikeis > 0): ?>
+
+          <?php for($i=0; $i<$countarrNon_data_KadouSeikeis; $i++): ?>
+          <tr style="border-bottom: solid;border-width: 1px">
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrNon_data_KadouSeikeis[$i]["product_code"]) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrNon_data_KadouSeikeis[$i]["seikeiki"]." 号機") ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrNon_data_KadouSeikeis[$i]["starting_tm"]) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrNon_data_KadouSeikeis[$i]["finishing_tm"]) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrNon_data_KadouSeikeis[$i]["cycle_shot"]) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h("-") ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($arrNon_data_KadouSeikeis[$i]["amount_shot"]) ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="blue"><?= h("-") ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="red"><?= h($arrNon_data_KadouSeikeis[$i]["accomp_rate"]*100) ?></font><font color="blue"><?= h(" ％") ?></font></td>
+            <td colspan="20" nowrap="nowrap"><font color="red"><font color="blue"><?= h("-") ?></font></td>
+
+            <?php
+                echo "<td colspan='20' nowrap='nowrap' rowspan=$numcell><div align='center'><font color='red'>";
+                echo "データがありません";
+                echo "</font></div></td>";
+                echo "<td colspan='20' nowrap='nowrap' rowspan=$numcell><div align='center'><font color='red'>";
+                echo "データがありません";
+                echo "</font></div></td>";
+            ?>
+
+            <td colspan="20" nowrap="nowrap"><font color="red"><?= h("データがありません") ?></font></td>
+
+            <?php
+            echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
+            echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $i."_".$arrNon_data_KadouSeikeis[$i]["id"]."_-_-_-"]) ;
+            echo "</div></td>";
+            ?>
+          </tr>
+        <?php endfor;?>
+
+    <?php else: ?>
+    <?php endif; ?>
+
         </tbody>
     </table>
 <br><br>

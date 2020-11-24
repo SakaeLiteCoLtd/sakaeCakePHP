@@ -61,7 +61,7 @@ class htmlShinkimenu extends AppController
         "</a>\n".
         "</tr>\n".
         "<tr style='border-style: none; background-color: #E6FFFF'>\n".
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/menugaityu'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/menuchokusou'>\n".
         "<img src='/img/ShinkiTourokuMenu/chokusoukankei.gif' width=105 height=36>\n".
         "</a>\n".
         "</tr>\n";
@@ -251,6 +251,22 @@ class htmlShinkimenu extends AppController
 		$this->html = $html;
 		$this->data = $shinkimenus;
 	}
+
+  public function chokusoumenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/chokusoubuhinmenu'>\n".
+        "<img src='/img/Labelimg/chokusoubuhin.gif' width=105 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/chokusouikisakimenu'>\n".
+        "<img src='/img/Labelimg/chokusouikisaki.gif' width=105 height=36>\n".
+        "</a>\n";
+
+        return $html;
+    		$this->html = $html;
+    		$this->data = $shinkimenus;
+	}
+
 
 	public function get_data(){
 		return $this->data;

@@ -929,7 +929,13 @@ class KadousController extends AppController
     print_r($starting_tm_search." ~ ".$finishing_tm_search);
     echo "</pre>";
 */
-    $check_product = 0;
+    
+          if(strtotime($date_sta) - strtotime('2020-6-30') > 0){//6/30以前のデータはkadouseikeisテーブルのデータをそのまま使用
+            $check_product = 0;
+          }else{
+            $check_product = 1;
+          }
+
     if(empty($data['product_code'])){//product_codeの入力がないとき
       $product_code = "no";
       if(empty($data['seikeiki'])){//seikeikiの入力がないとき　product_code×　seikeiki×　date〇

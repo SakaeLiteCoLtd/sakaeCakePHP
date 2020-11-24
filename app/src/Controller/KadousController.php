@@ -920,7 +920,13 @@ class KadousController extends AppController
       print_r($starting_tm_search." ~ ".$finishing_tm_search);
       echo "</pre>";
 */
-      $check_product = 0;
+
+      if(strtotime($date_sta) - strtotime('2020-6-30') > 0){//6/30以前のデータはkadouseikeisテーブルのデータをそのまま使用
+        $check_product = 0;
+      }else{
+        $check_product = 1;
+      }
+
       if(empty($data['product_code'])){//product_codeの入力がないとき
         $product_code = "no";
         if(empty($data['seikeiki'])){//seikeikiの入力がないとき　product_code×　seikeiki×　date〇
@@ -1098,7 +1104,7 @@ class KadousController extends AppController
             }
 
           }
-/*
+
           echo "<pre>";
           print_r($n." ".$KadouSeikeis[$n]["product_code"]);
           echo "</pre>";
@@ -1108,7 +1114,7 @@ class KadousController extends AppController
           echo "<pre>";
           print_r($arrFlag_finish);
           echo "</pre>";
-*/
+
           for($m=0; $m<count($arrFlag_start); $m++){
             $arrStartTime[] = $arrFlag_start[$m];
           }
@@ -1888,7 +1894,7 @@ class KadousController extends AppController
         $this->set('KadouSeikeis',$KadouSeikeis);
         $this->set('countkadouSeikei',count($KadouSeikeis));
 
-      }else{//品番で絞り込んでいる場合またはデータが1つもない場合
+      }else{//品番で絞り込んでいる場合またはデータが1つもない場合または2020/6/30以前のデータの場合
 
         $this->set('countkadouSeikei',count($KadouSeikeis));
         $countarrNon_data_KadouSeikeis = 0;

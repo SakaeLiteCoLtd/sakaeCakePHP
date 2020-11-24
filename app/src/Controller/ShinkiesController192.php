@@ -186,7 +186,7 @@ class ShinkiesController extends AppController {
        if ($this->PriceMaterials->save($PriceMaterials)) {
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('price_material');
          $table->setConnection($connection);
 
@@ -330,7 +330,7 @@ class ShinkiesController extends AppController {
        if ($this->Suppliers->save($Suppliers)) {
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('supplier');
          $table->setConnection($connection);
 
@@ -519,7 +519,7 @@ class ShinkiesController extends AppController {
           if ($this->AssembleProducts->saveMany($assembleProducts)) {//saveManyで一括登録
 
             //insert 旧DB
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('assemble_products');
             $table->setConnection($connection);
 
@@ -666,7 +666,7 @@ class ShinkiesController extends AppController {
          $this->ProductSuppliers->save($ProductSuppliers);
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('outsource_handy');
          $table->setConnection($connection);
 
@@ -677,7 +677,7 @@ class ShinkiesController extends AppController {
 
          $sql = "SELECT id FROM outsource_handy".
                " where name ='".$data["handy_name"]."'";
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $outsource_handy_id = $connection->execute($sql)->fetchAll('assoc');
          $handy_id_old = $outsource_handy_id[0]['id'];
 
@@ -825,7 +825,7 @@ class ShinkiesController extends AppController {
        if ($this->AccountUrikakePriceMaterials->save($AccountUrikakePriceMaterials)) {
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('account_urikake_price_material');
          $table->setConnection($connection);
 
@@ -1008,13 +1008,13 @@ class ShinkiesController extends AppController {
          );
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('product_gaityu');
          $table->setConnection($connection);
 
          $sql = "SELECT id FROM product_supplier".
                " where name ='".$product_supplier_name."'";
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $product_supplier_id = $connection->execute($sql)->fetchAll('assoc');
          $id_supplier_old = $product_supplier_id[0]['id'];
 
@@ -1131,7 +1131,7 @@ class ShinkiesController extends AppController {
        if ($this->SyoumouSuppliers->save($SyoumouSuppliers)) {
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('syoumou_suppliers');
          $table->setConnection($connection);
 
@@ -1534,7 +1534,7 @@ class ShinkiesController extends AppController {
        if ($this->PlaceDelivers->save($PlaceDelivers)) {
 
          //旧DBに登録
-        $connection = ConnectionManager::get('DB_ikou_test');
+        $connection = ConnectionManager::get('sakaeMotoDB');
         $table = TableRegistry::get('placedeliver');
         $table->setConnection($connection);
 
@@ -1704,7 +1704,7 @@ class ShinkiesController extends AppController {
         )){
 
           //旧DBに単価登録
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('placedeliver');
           $table->setConnection($connection);
 

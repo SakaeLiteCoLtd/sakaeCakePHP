@@ -46,7 +46,7 @@ $this->layout = 'defaultshinki';
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
           <td colspan="2"><div align="center"><strong style="font-size: 12pt; color:blue">顧客コード</strong></div></td>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <td colspan="2" bgcolor="#FFFFCC"><?= $this->Form->input("cs_code", ["type"=>"select","empty"=>"選択してください", "options"=>$arrCustomer, 'value'=>"20003", 'label'=>false]) ?></td>
+          <td colspan="2" bgcolor="#FFFFCC"><?= $this->Form->input("cs_code", ["type"=>"select","empty"=>"選択してください", "options"=>$arrCustomer, 'value'=>"20003", 'label'=>false, 'required'=>true]) ?></td>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
           <td><div align="center"><strong style="font-size: 12pt; color:blue">納入先ID</strong></div></td>
           <td style="border-left-style: none;"><div align="center"><strong style="font-size: 12pt; color:blue">ハンディ表示名</strong></div></td>
@@ -70,5 +70,6 @@ $this->layout = 'defaultshinki';
 </table>
 
 <?= $this->Form->control('PlaceDeliversid', array('type'=>'hidden', 'value'=>$PlaceDeliversid, 'label'=>false)) ?>
+<?= $this->Form->control('CustomersHandysid', array('type'=>'hidden', 'value'=>$CustomersHandysid, 'label'=>false)) ?>
 
 <br><br><br>

@@ -33,6 +33,7 @@ class ShinkiesController extends AppController {
    $this->ProductChokusous = TableRegistry::get('productChokusous');
    $this->PlaceDelivers = TableRegistry::get('placeDelivers');
    $this->Customers = TableRegistry::get('customers');
+   $this->CustomersHandys = TableRegistry::get('customersHandys');
   }
 
   public function index()
@@ -1286,7 +1287,7 @@ class ShinkiesController extends AppController {
      $arrtouroku = array();
      $arrtouroku[] = array(
        'product_code' => $product_code,
-  //     'status' => 0,
+       'status' => 0,
   //     'delete_flag' => 0,
        'created_staff' => $sessionData['login']['staff_id'],
        'created_at' => date('Y-m-d H:i:s')
@@ -1521,6 +1522,14 @@ class ShinkiesController extends AppController {
        'created_staff' => $sessionData['login']['staff_id'],
        'created_at' => date('Y-m-d H:i:s')
      );
+
+     $arrtourokuhandy = array();
+     $arrtourokuhandy[] = array(
+       'place_deliver_code' => $data["id_from_order"],
+       'name' => $data["name"],
+       'flag' => 0
+     );
+
 /*
      echo "<pre>";
      print_r($arrtouroku);
@@ -1533,6 +1542,10 @@ class ShinkiesController extends AppController {
      try {//トランザクション4
        if ($this->PlaceDelivers->save($PlaceDelivers)) {
 
+         //customers_handys登録
+         $CustomersHandys = $this->CustomersHandys->patchEntity($this->CustomersHandys->newEntity(), $arrtourokuhandy[0]);
+         $this->CustomersHandys->save($CustomersHandys);
+
          //旧DBに登録
         $connection = ConnectionManager::get('DB_ikou_test');
         $table = TableRegistry::get('placedeliver');
@@ -1542,6 +1555,12 @@ class ShinkiesController extends AppController {
              'id_from_order' => $arrtouroku[0]["id_from_order"],
              'name' => $arrtouroku[0]["name"],
              'cs_id' => $arrtouroku[0]["cs_code"]
+         ]);
+
+         $connection->insert('customers_handy', [
+             'place_deliver_id' => $arrtourokuhandy[0]["place_deliver_code"],
+             'name' => $arrtourokuhandy[0]["name"],
+             'flag' => $arrtourokuhandy[0]["flag"]
          ]);
 
          $connection = ConnectionManager::get('default');//新DBに戻る
@@ -1612,6 +1631,14 @@ class ShinkiesController extends AppController {
      $this->set('id_from_order',$id_from_order);
      $customer = $PlaceDeliversData[0]->cs_code;
      $this->set('customer',$customer);
+
+     $CustomersHandysData = $this->CustomersHandys->find()->where(['place_deliver_code' => $PlaceDeliversData[0]->id_from_order])->toArray();
+     if(isset($CustomersHandysData[0])){
+       $CustomersHandysid = $CustomersHandysData[0]->id;
+     }else{
+       $CustomersHandysid = 0;
+     }
+     $this->set('CustomersHandysid',$CustomersHandysid);
 
      $arrCustomers = $this->Customers->find('all', ['conditions' => ['delete_flag' => '0']])->order(['customer_code' => 'ASC'])->toArray();//Customersテーブルの'delete_flag' => '0'となるものを見つけ、customer_code順に並べる
      $arrCustomer = array();
@@ -1692,6 +1719,13 @@ class ShinkiesController extends AppController {
      $PlaceDeliversData = $this->PlaceDelivers->find()->where(['id' => $data["PlaceDeliversid"]])->toArray();
      $motoPlaceDeliver = $PlaceDeliversData[0]->id_from_order;
 
+     $CustomersHandysData = $this->CustomersHandys->find()->where(['id' => $data["CustomersHandysid"]])->toArray();
+     if(isset($CustomersHandysData[0])){
+       $motoCustomersHandy = $CustomersHandysData[0]->place_deliver_code;
+     }else{
+       $motoCustomersHandy = 0;
+     }
+
      $PlaceDelivers = $this->PlaceDelivers->patchEntity($this->PlaceDelivers->newEntity(), $data);
      $connection = ConnectionManager::get('default');//トランザクション1
       // トランザクション開始2
@@ -1703,6 +1737,11 @@ class ShinkiesController extends AppController {
           ['id'  => $data["PlaceDeliversid"]]
         )){
 
+          $this->CustomersHandys->updateAll(
+          ['place_deliver_code' => $data["id_from_order"], 'name' => $data["name"], 'flag' => $data["status"]],
+          ['id'  => $data["CustomersHandysid"]]
+          );
+
           //旧DBに単価登録
           $connection = ConnectionManager::get('DB_ikou_test');
           $table = TableRegistry::get('placedeliver');
@@ -1711,6 +1750,11 @@ class ShinkiesController extends AppController {
           $updater = "UPDATE placedeliver set id_from_order = '".$data["id_from_order"]."' , name ='".$data["name"]."'
           , cs_id = '".$data["cs_code"]."'
           where id_from_order ='".$motoPlaceDeliver."'";
+          $connection->execute($updater);
+
+          $updater = "UPDATE customers_handy set place_deliver_id = '".$data["id_from_order"]."' , name ='".$data["name"]."'
+          , flag = '".$data["status"]."'
+          where place_deliver_id ='".$motoCustomersHandy."'";
           $connection->execute($updater);
 
           $connection = ConnectionManager::get('default');//新DBに戻る

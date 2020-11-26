@@ -929,7 +929,7 @@ class KadousController extends AppController
     print_r($starting_tm_search." ~ ".$finishing_tm_search);
     echo "</pre>";
 */
-    
+
           if(strtotime($date_sta) - strtotime('2020-6-30') > 0){//6/30以前のデータはkadouseikeisテーブルのデータをそのまま使用
             $check_product = 0;
           }else{
@@ -1849,11 +1849,36 @@ for($n=0; $n<count($KadouSeikeis); $n++){
         ];
 
       }
-/*
-      echo "<pre>";
-      print_r($KadouSeikeis);
-      echo "</pre>";
-*/
+
+      for($m=1; $m<=9; $m++){
+
+        ${"check".$m} = 0;
+
+        for($n=0; $n<count($arrTouroku); $n++){
+
+          if($arrTouroku[$n]["seikeiki"] == $m){
+
+            ${"check".$m} = 1;
+
+          }
+
+        }
+
+        if(${"check".$m} == 0){
+
+          $arrTouroku[] = [
+            'seikeiki' => $m,
+            'date' => substr($KadouSeikeis[0]['starting_tm'], 0, 10),
+            'kadouritus' => 0,
+            'delete_flag' => 0,
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_staff' => $KadouSeikeis[0]["created_staff"]
+          ];
+
+        }
+
+      }
+
       for($n=0; $n<count($arrTouroku); $n++){
 
         $KadouritsuSeikeiki = $this->KadouritsuSeikeikis->find()->where(['seikeiki' => $arrTouroku[$n]['seikeiki'], 'date' => $arrTouroku[$n]['date']])->toArray();

@@ -1104,7 +1104,7 @@ class KadousController extends AppController
             }
 
           }
-
+/*
           echo "<pre>";
           print_r($n." ".$KadouSeikeis[$n]["product_code"]);
           echo "</pre>";
@@ -1114,7 +1114,7 @@ class KadousController extends AppController
           echo "<pre>";
           print_r($arrFlag_finish);
           echo "</pre>";
-
+*/
           for($m=0; $m<count($arrFlag_start); $m++){
             $arrStartTime[] = $arrFlag_start[$m];
           }
@@ -1840,16 +1840,51 @@ class KadousController extends AppController
           ];
 
         }
-  /*
+
+
+        for($m=1; $m<=9; $m++){
+
+          ${"check".$m} = 0;
+
+          for($n=0; $n<count($arrTouroku); $n++){
+
+            if($arrTouroku[$n]["seikeiki"] == $m){
+
+              ${"check".$m} = 1;
+
+            }
+
+          }
+
+          if(${"check".$m} == 0){
+
+            $arrTouroku[] = [
+              'seikeiki' => $m,
+              'date' => substr($KadouSeikeis[0]['starting_tm'], 0, 10),
+              'kadouritus' => 0,
+              'delete_flag' => 0,
+              'created_at' => date('Y-m-d H:i:s'),
+              'created_staff' => $KadouSeikeis[0]["created_staff"]
+            ];
+
+          }
+
+        }
+
         echo "<pre>";
-        print_r($KadouSeikeis);
+        print_r($arrTouroku);
         echo "</pre>";
-  */
+
         for($n=0; $n<count($arrTouroku); $n++){
 
           $KadouritsuSeikeiki = $this->KadouritsuSeikeikis->find()->where(['seikeiki' => $arrTouroku[$n]['seikeiki'], 'date' => $arrTouroku[$n]['date']])->toArray();
 
           if(!isset($KadouritsuSeikeiki[0])){
+
+            echo "<pre>";
+            print_r("Touroku");
+            echo "</pre>";
+
             $KadouritsuSeikeikis = $this->KadouritsuSeikeikis->patchEntity($this->KadouritsuSeikeikis->newEntity(), $arrTouroku[$n]);
     				$connection = ConnectionManager::get('default');//トランザクション1
     				// トランザクション開始2

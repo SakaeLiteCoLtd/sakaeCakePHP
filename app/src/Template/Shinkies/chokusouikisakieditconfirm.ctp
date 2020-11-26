@@ -70,6 +70,7 @@ $this->layout = 'defaultshinki';
 </table>
 
 <?= $this->Form->control('PlaceDeliversid', array('type'=>'hidden', 'value'=>$this->request->getData('PlaceDeliversid'), 'label'=>false)) ?>
+<?= $this->Form->control('CustomersHandysid', array('type'=>'hidden', 'value'=>$this->request->getData('CustomersHandysid'), 'label'=>false)) ?>
 <?= $this->Form->control('id_from_order', array('type'=>'hidden', 'value'=>$this->request->getData('id_from_order'), 'label'=>false)) ?>
 <?= $this->Form->control('name', array('type'=>'hidden', 'value'=>$this->request->getData('name'), 'label'=>false)) ?>
 <?= $this->Form->control('cs_code', array('type'=>'hidden', 'value'=>$cs_code, 'label'=>false)) ?>

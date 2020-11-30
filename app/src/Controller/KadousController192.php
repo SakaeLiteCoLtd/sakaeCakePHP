@@ -905,24 +905,24 @@ class KadousController extends AppController
     $kadouSeikeis = $this->KadouSeikeis->newEntity();
     $this->set('kadouSeikeis',$kadouSeikeis);
     $data = $this->request->getData();
-/*
-    echo "<pre>";
-    print_r($data);
-    echo "</pre>";
-*/
 
     $date_sta = $data['date_sta_year']."-".$data['date_sta_month']."-".$data['date_sta_date'];
     $date_fin = $data['date_fin_year']."-".$data['date_fin_month']."-".$data['date_fin_date'];
-
+/*
+    echo "<pre>";
+    print_r($date_sta." - ".$date_fin);
+    echo "</pre>";
+*/
     $product_code = $data['product_code'];
     $seikeiki = $data['seikeiki'];
 
-    $date_fin = strtotime($date_fin);
-    $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
+//    $date_fin = strtotime($date_fin);
+//    $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
 
 //    $starting_tm_search = substr($KadouSeikeis[$n]['starting_tm'], 0, 10);
     $starting_tm_search = $date_sta." 08:00:00";
-    $finishing_tm_search = strtotime($starting_tm_search);
+    $finishing_tm_search = $date_fin." 08:00:00";
+    $finishing_tm_search = strtotime($finishing_tm_search);
     $finishing_tm_search = date('Y/m/d H:i:s', strtotime('+1 day', $finishing_tm_search));
 /*
     echo "<pre>";
@@ -930,11 +930,11 @@ class KadousController extends AppController
     echo "</pre>";
 */
 
-          if(strtotime($date_sta) - strtotime('2020-6-30') > 0){//6/30以前のデータはkadouseikeisテーブルのデータをそのまま使用
-            $check_product = 0;
-          }else{
-            $check_product = 1;
-          }
+    if(strtotime($date_sta) - strtotime('2020-6-30') > 0){//6/30以前のデータはkadouseikeisテーブルのデータをそのまま使用
+      $check_product = 0;
+    }else{
+      $check_product = 1;
+    }
 
     if(empty($data['product_code'])){//product_codeの入力がないとき
       $product_code = "no";
@@ -975,7 +975,7 @@ class KadousController extends AppController
     $this->set('check_product',$check_product);
 /*
     echo "<pre>";
-    print_r($KadouSeikeis);
+    print_r(count($KadouSeikeis));
     echo "</pre>";
 */
     if($check_product == 0 && count($KadouSeikeis) > 0){//品番で絞り込んでいない場合
@@ -1047,10 +1047,16 @@ class KadousController extends AppController
 
 //以下稼働率を各成形機ごとに計算
 
-      $day1 = strtotime($date_sta);
-      $day2 = strtotime($date_fin);
+//  $day1 = strtotime($date_sta);
+//  $day2 = strtotime($date_fin);
+      $day1 = strtotime($starting_tm_search);
+      $day2 = strtotime($finishing_tm_search);
       $diff = ($day2 - $day1) / (60 * 60 * 24);
-
+/*
+      echo "<pre>";
+      print_r($diff);
+      echo "</pre>";
+*/
       //開始時時間と終了時間を持ってくる
       $arrStartTime = array();
       $arrFinishTime = array();

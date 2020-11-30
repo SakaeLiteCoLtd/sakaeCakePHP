@@ -8,6 +8,12 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 
+
+use CakeCoreConfigure;//apiのため追加
+use CakeNetworkExceptionNotFoundException;//apiのため追加
+use CakeViewExceptionMissingTemplateException;//apiのため追加
+
+
 class GenryousController extends AppController
 	{
 
@@ -640,6 +646,16 @@ class GenryousController extends AppController
 		{
 			$OrderMaterials = $this->OrderMaterials->newEntity();
 			$this->set('OrderMaterials',$OrderMaterials);
+
+			$Data=$this->request->query('s');
+			if(isset($Data["mess"])){
+				$mess = $Data["mess"];
+				$this->set('mess',$mess);
+			}else{
+				$mess = "";
+				$this->set('mess',$mess);
+			}
+
 		}
 
 		public function csvtest1dsyuturyoku()
@@ -653,6 +669,10 @@ class GenryousController extends AppController
 			$date1d0 = strtotime($date1d);
 			$date1d0 = date('Y-m-d', strtotime('+1 day', $date1d0));
 			$date1d0 = $date1d0." 07:59:59";
+
+	//		$date1d = "2020-10-08 08:00:00";
+	//		$date1d0 = "2020-10-09 07:59:59";
+			//http://localhost:5000/genryous/csvtest1dsyuturyoku/api/test.xml
 
 			$ScheduleKouteis = $this->ScheduleKouteis->find()
 			->where(['datetime >=' => $date1d, 'datetime <=' => $date1d0])->toArray();
@@ -686,6 +706,33 @@ class GenryousController extends AppController
 
 			}
 
+			$this->request->session()->destroy();// セッションの破棄
+			session_start();
+
+			for($k=0; $k<count($ScheduleKouteis); $k++){
+
+				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
+				$product_name = $Product[0]->product_name;
+
+				$_SESSION['ScheduleKoutei_csv'][$k] = array(
+					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
+					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
+					'product_code' => $ScheduleKouteis[$k]["product_code"],
+					'product_name' => $product_name,
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
+				);
+
+			 }
+/*
+			echo "<pre>";
+			print_r($_SESSION['ScheduleKoutei_csv']);
+			echo "</pre>";
+*/
+
+			$mes = "「http://localhost:5000/genryous/csvtest1dApi/api/test.xml」にアクセスしてください。（ここをクリック）";
+			$this->set('mes',$mes);
+
+/*
 			$day = date('Y-n-j',strtotime($date1));
 			$file_name = "ScheduleKoutei_1day_".$day.".csv";
 
@@ -705,12 +752,42 @@ class GenryousController extends AppController
 					$this->set('mes',$mes);
 				}
 
+*/
+		}
+
+		public function csvtest1dApi()
+		{
+			//http://localhost:5000/genryous/csvtest1dApi/api/test.xml
+
+			$session = $this->request->getSession();
+			$data = $session->read();
+
+			if(!isset($data["ScheduleKoutei_csv"])){
+        return $this->redirect(['action' => 'csvtest1d',
+        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+      }
+
+			$this->set([
+					'sample_list' => $data['ScheduleKoutei_csv'],
+					'_serialize' => ['sample_list']
+			]);
+
 		}
 
 		public function csvtest1w()
 		{
 			$OrderMaterials = $this->OrderMaterials->newEntity();
 			$this->set('OrderMaterials',$OrderMaterials);
+
+			$Data=$this->request->query('s');
+			if(isset($Data["mess"])){
+				$mess = $Data["mess"];
+				$this->set('mess',$mess);
+			}else{
+				$mess = "";
+				$this->set('mess',$mess);
+			}
+
 		}
 
 		public function csvtest1wsyuturyoku()
@@ -767,6 +844,29 @@ class GenryousController extends AppController
 
 			}
 
+			$this->request->session()->destroy();// セッションの破棄
+			session_start();
+
+			for($k=0; $k<count($ScheduleKouteis); $k++){
+
+				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
+				$product_name = $Product[0]->product_name;
+
+				$_SESSION['ScheduleKoutei_csv'][$k] = array(
+					'day' => $ScheduleKouteis[$k]->datetime->format('j'),//0なしの日付
+					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
+					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
+					'product_code' => $ScheduleKouteis[$k]["product_code"],
+					'product_name' => $product_name,
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
+				);
+
+			 }
+
+			 $mes = "「http://localhost:5000/genryous/csvtest1wApi/api/test.xml」にアクセスしてください。（ここをクリック）";
+			 $this->set('mes',$mes);
+
+/*
 			$day = date('Y-n-j',strtotime($date1));
 			$file_name = "ScheduleKoutei_1week_".$day.".csv";
 
@@ -785,8 +885,26 @@ class GenryousController extends AppController
 					$mes = "エラーが発生しました。もう一度出力し直してください。";
 					$this->set('mes',$mes);
 				}
+*/
 
+		}
 
+		public function csvtest1wApi()
+		{
+			//http://localhost:5000/genryous/csvtest1dApi/api/test.xml
+
+			$session = $this->request->getSession();
+			$data = $session->read();
+
+			if(!isset($data["ScheduleKoutei_csv"])){
+				return $this->redirect(['action' => 'csvtest1w',
+				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+			}
+
+			$this->set([
+					'sample_list' => $data['ScheduleKoutei_csv'],
+					'_serialize' => ['sample_list']
+			]);
 		}
 
 		public function gazoutest()

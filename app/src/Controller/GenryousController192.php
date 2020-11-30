@@ -640,6 +640,16 @@ class GenryousController extends AppController
 		{
 			$OrderMaterials = $this->OrderMaterials->newEntity();
 			$this->set('OrderMaterials',$OrderMaterials);
+
+			$Data=$this->request->query('s');
+			if(isset($Data["mess"])){
+				$mess = $Data["mess"];
+				$this->set('mess',$mess);
+			}else{
+				$mess = "";
+				$this->set('mess',$mess);
+			}
+
 		}
 
 		public function csvtest1dsyuturyoku()
@@ -686,33 +696,65 @@ class GenryousController extends AppController
 
 			}
 
-			$day = date('Y-n-j',strtotime($date1));
-			$file_name = "ScheduleKoutei_1day_".$day.".csv";
+			$this->request->session()->destroy();// セッションの破棄
+			session_start();
 
-		//	$fp = fopen('/data/share/csvFiles/'.$file_name, 'w');//192
-			$fp = fopen('/home/centosuser/csvFiles/kouteis/downloads/'.$file_name, 'w');//192
-		  //  $fp = fopen($file_name, 'w');//ローカル
+			for($k=0; $k<count($ScheduleKouteis); $k++){
 
-				foreach ($arrScheduleKoutei_csv as $line) {
-					$line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
-					fputcsv($fp, $line);
-				}
+				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
+				$product_name = $Product[0]->product_name;
 
-				if(fclose($fp)){
-		//			$mes = "/data/share/csvFiles/に「".$file_name."」ファイルが出力されました。";
-					$mes = "/home/centosuser/csvFiles/kouteis/downloads/に「".$file_name."」ファイルが出力されました。";
-					$this->set('mes',$mes);
-				}else{
-					$mes = "エラーが発生しました。もう一度出力し直してください。";
-					$this->set('mes',$mes);
-				}
+				$_SESSION['ScheduleKoutei_csv'][$k] = array(
+					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
+					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
+					'product_code' => $ScheduleKouteis[$k]["product_code"],
+					'product_name' => $product_name,
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
+				);
 
+			 }
+/*
+			echo "<pre>";
+			print_r($_SESSION['ScheduleKoutei_csv']);
+			echo "</pre>";
+*/
+
+			$mes = "「http://192.168.4.246/genryous/csvtest1dApi/api/test.xml」にアクセスしてください。（ここをクリック）";
+			$this->set('mes',$mes);
+		}
+
+		public function csvtest1dApi()
+		{
+			//http://localhost:5000/genryous/csvtest1dApi/api/test.xml
+
+			$session = $this->request->getSession();
+			$data = $session->read();
+
+			if(!isset($data["ScheduleKoutei_csv"])){
+				return $this->redirect(['action' => 'csvtest1d',
+				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+			}
+
+			$this->set([
+					'sample_list' => $data['ScheduleKoutei_csv'],
+					'_serialize' => ['sample_list']
+			]);
 		}
 
 		public function csvtest1w()
 		{
 			$OrderMaterials = $this->OrderMaterials->newEntity();
 			$this->set('OrderMaterials',$OrderMaterials);
+
+			$Data=$this->request->query('s');
+			if(isset($Data["mess"])){
+				$mess = $Data["mess"];
+				$this->set('mess',$mess);
+			}else{
+				$mess = "";
+				$this->set('mess',$mess);
+			}
+
 		}
 
 		public function csvtest1wsyuturyoku()
@@ -769,31 +811,46 @@ class GenryousController extends AppController
 
 			}
 
-			$day = date('Y-n-j',strtotime($date1));
-			$file_name = "ScheduleKoutei_1week_".$day.".csv";
+			$this->request->session()->destroy();// セッションの破棄
+			session_start();
 
-	//		$fp = fopen('/data/share/csvFiles/'.$file_name, 'w');//192
-			$fp = fopen('/home/centosuser/csvFiles/kouteis/downloads/'.$file_name, 'w');//192
-		//  $fp = fopen($file_name, 'w');//ローカル
+			for($k=0; $k<count($ScheduleKouteis); $k++){
 
-				foreach ($arrScheduleKoutei_csv as $line) {
-					$line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
-					fputcsv($fp, $line);
-				}
+				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
+				$product_name = $Product[0]->product_name;
 
-				if(fclose($fp)){
-		//			$mes = "/data/share/csvFiles/に「".$file_name."」ファイルが出力されました。";
-					$mes = "/home/centosuser/csvFiles/kouteis/downloads/に「".$file_name."」ファイルが出力されました。";
-					$this->set('mes',$mes);
-				}else{
-					$mes = "エラーが発生しました。もう一度出力し直してください。";
-					$this->set('mes',$mes);
-				}
-/*
-			echo "<pre>";
-			print_r($arrScheduleKoutei_csv);
-			echo "</pre>";
-*/
+				$_SESSION['ScheduleKoutei_csv'][$k] = array(
+					'day' => $ScheduleKouteis[$k]->datetime->format('j'),//0なしの日付
+					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
+					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
+					'product_code' => $ScheduleKouteis[$k]["product_code"],
+					'product_name' => $product_name,
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
+				);
+
+			 }
+
+			 $mes = "「http://192.168.4.246/genryous/csvtest1wApi/api/test.xml」にアクセスしてください。（ここをクリック）";
+			 $this->set('mes',$mes);
+
+		}
+
+		public function csvtest1wApi()
+		{
+			//http://localhost:5000/genryous/csvtest1dApi/api/test.xml
+
+			$session = $this->request->getSession();
+			$data = $session->read();
+
+			if(!isset($data["ScheduleKoutei_csv"])){
+				return $this->redirect(['action' => 'csvtest1w',
+				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+			}
+
+			$this->set([
+					'sample_list' => $data['ScheduleKoutei_csv'],
+					'_serialize' => ['sample_list']
+			]);
 		}
 
 		public function gazoutest()

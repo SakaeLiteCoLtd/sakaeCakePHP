@@ -21,5 +21,5 @@
  <br>
     <div align="left"><font color="blue" size="3"><?= __("　　　１日分データ出力") ?></font></div>
     <br>
-       <div align="center"><font color="red" size="3"><?= __($mes) ?></font></div>
+       <div align="center"><font color="red" size="3"><a href="http://localhost:5000/genryous/csvtest1dApi/api/test.xml"><?= __($mes) ?></a></font></div>
     <br>

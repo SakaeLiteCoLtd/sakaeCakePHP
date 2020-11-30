@@ -19,7 +19,8 @@
  <hr size="5" style="margin: 0.5rem">
  <?=$this->Form->create($OrderMaterials, ['url' => ['action' => 'csvtest1dsyuturyoku']]) ?>
  <br>
-    <div align="left"><font color="blue" size="3"><?= __("　　　１日分データ出力") ?></font></div>
+ <div align="center"><font color="red" size="3"><?= __($mess) ?></font></div>
+ <div align="left"><font color="blue" size="3"><?= __("　　　１日分データ出力") ?></font></div>
  <br>
  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
    <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">

@@ -130,9 +130,12 @@
 </tr>
 </table>
 
-
 <?= $this->Form->control('seikeiki', array('type'=>'hidden', 'value'=>$seikeiki, 'label'=>false)) ?>
 <?= $this->Form->control('product', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
 <?= $this->Form->control('start_tm', array('type'=>'hidden', 'value'=>$starting_tm_nippou, 'label'=>false)) ?>
+<?= $this->Form->control('accomp_rate_program', array('type'=>'hidden', 'value'=>$accomp_rate_program, 'label'=>false)) ?>
+<?= $this->Form->control('kobetu_loss_time', array('type'=>'hidden', 'value'=>$kobetu_loss_time, 'label'=>false)) ?>
+<?= $this->Form->control('katagae_time', array('type'=>'hidden', 'value'=>$katagae_time, 'label'=>false)) ?>
+<?= $this->Form->control('shot_cycle_heikin', array('type'=>'hidden', 'value'=>$shot_cycle_heikin, 'label'=>false)) ?>
 
 <br><br><br>

@@ -1973,33 +1973,43 @@ class KadousController extends AppController
       $this->set('KadouSeikeis',$KadouSeikeis);
 
       $Data=$this->request->query('s');
-      if(isset($Data["returndata"])){
+      if(isset($Data["returndata"])){//備考を追加した場合
 
         $imgdatas = explode("_",$Data["returndata"]);//切り離し
 
-      }else{
+      }else{//最初にこのページに来た時
 
         $data = $this->request->getData();
         $data = array_keys($data, '詳細');
         $imgdatas = explode("_",$data[0]);//切り離し
 
       }
-/*
-      echo "<pre>";
-      print_r($imgdatas);
-      echo "</pre>";
-*/
 
-      if($imgdatas[2] == "-"){
+      if(isset($imgdatas[2])){
 
-        $accomp_rate_program = "-";
-        $this->set('accomp_rate_program',$accomp_rate_program);
-        $kobetu_loss_time = "-";
-        $this->set('kobetu_loss_time',$kobetu_loss_time);
-        $katagae_time = "-";
-        $this->set('katagae_time',$katagae_time);
-        $shot_cycle_heikin = "-";
-        $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+        if($imgdatas[2] == "-"){
+
+          $accomp_rate_program = "-";
+          $this->set('accomp_rate_program',$accomp_rate_program);
+          $kobetu_loss_time = "-";
+          $this->set('kobetu_loss_time',$kobetu_loss_time);
+          $katagae_time = "-";
+          $this->set('katagae_time',$katagae_time);
+          $shot_cycle_heikin = "-";
+          $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+
+        }else{
+
+          $accomp_rate_program = $imgdatas[2] / 10;
+          $this->set('accomp_rate_program',$accomp_rate_program);
+          $kobetu_loss_time = $imgdatas[3] / 1000;
+          $this->set('kobetu_loss_time',$kobetu_loss_time);
+          $katagae_time = $imgdatas[4] / 1000;
+          $this->set('katagae_time',$katagae_time);
+          $shot_cycle_heikin = $arrdatasession[$imgdatas[0]]["shot_cycle"];
+          $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+
+        }
 
       }else{
 
@@ -2404,11 +2414,20 @@ class KadousController extends AppController
 
        $connection = ConnectionManager::get('default');
        $table->setConnection($connection);
+/*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+*/
+        $accomp_rate_program = $data["accomp_rate_program"]*10;
+        $kobetu_loss_time = $data["kobetu_loss_time"]*1000;
+        $katagae_time = $data["katagae_time"]*1000;
 
-       $returndata = $imgdatanum."_".$datasession["imgdata"][$imgdatanum]["id"];
+        $returndata = $imgdatanum."_".$datasession["imgdata"][$imgdatanum]["id"]."_".
+        $accomp_rate_program."_".$kobetu_loss_time."_".$katagae_time."_".$data["shot_cycle_heikin"];
 
-       return $this->redirect(['action' => 'kensakusyousai',
-       's' => ['returndata' => $returndata]]);
+        return $this->redirect(['action' => 'kensakusyousai',
+        's' => ['returndata' => $returndata]]);
 
      }
 

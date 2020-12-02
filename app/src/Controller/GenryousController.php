@@ -8,11 +8,7 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 
-
-use CakeCoreConfigure;//apiのため追加
-use CakeNetworkExceptionNotFoundException;//apiのため追加
-use CakeViewExceptionMissingTemplateException;//apiのため追加
-
+use Cake\Routing\Router;//urlの取得
 
 class GenryousController extends AppController
 	{
@@ -732,6 +728,11 @@ class GenryousController extends AppController
 			$mes = "「http://localhost:5000/genryous/csvtest1dApi/api/test.xml」にアクセスしてください。（ここをクリック）";
 			$this->set('mes',$mes);
 
+			Router::reverse($this->request, false);
+			echo "<pre>";
+			print_r(Router::reverse($this->request, false));
+			echo "</pre>";
+
 /*
 			$day = date('Y-n-j',strtotime($date1));
 			$file_name = "ScheduleKoutei_1day_".$day.".csv";
@@ -759,16 +760,51 @@ class GenryousController extends AppController
 		{
 			//http://localhost:5000/genryous/csvtest1dApi/api/test.xml
 
-			$session = $this->request->getSession();
-			$data = $session->read();
+			$day = substr(Router::reverse($this->request, false), -14, 10);//urlの取得（use Cake\Routing\Routerが必要）
+/*
+			echo "<pre>";
+			print_r($day);
+			echo "</pre>";
+*/
+			$date1d = $day." 08:00:00";
+			$date1d0 = strtotime($date1d);
+			$date1d0 = date('Y-m-d', strtotime('+1 day', $date1d0));
+			$date1d0 = $date1d0." 07:59:59";
 
-			if(!isset($data["ScheduleKoutei_csv"])){
-        return $this->redirect(['action' => 'csvtest1d',
-        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
-      }
+			$ScheduleKouteis = $this->ScheduleKouteis->find()
+			->where(['datetime >=' => $date1d, 'datetime <=' => $date1d0])->toArray();
+
+			if(isset($ScheduleKouteis[0])){
+
+        foreach($ScheduleKouteis as $key => $row ) {
+          $tmp_seikeiki[$key] = $row["seikeiki"];
+          $tmp_datetime[$key] = $row["datetime"];
+        }
+
+				array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
+
+				$time = $ScheduleKouteis[0]->datetime->format('H:i');
+
+			}
+
+			$arrScheduleKoutei_csv = array();
+			for($k=0; $k<count($ScheduleKouteis); $k++){
+
+				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
+	      $product_name = $Product[0]->product_name;
+
+				$arrScheduleKoutei_csv[] = [
+					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
+					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
+					'product_code' => $ScheduleKouteis[$k]["product_code"],
+					'product_name' => $product_name,
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
+			 ];
+
+			}
 
 			$this->set([
-					'sample_list' => $data['ScheduleKoutei_csv'],
+					'sample_list' => $arrScheduleKoutei_csv,
 					'_serialize' => ['sample_list']
 			]);
 
@@ -892,7 +928,7 @@ class GenryousController extends AppController
 		public function csvtest1wApi()
 		{
 			//http://localhost:5000/genryous/csvtest1dApi/api/test.xml
-
+/*
 			$session = $this->request->getSession();
 			$data = $session->read();
 
@@ -905,6 +941,60 @@ class GenryousController extends AppController
 					'sample_list' => $data['ScheduleKoutei_csv'],
 					'_serialize' => ['sample_list']
 			]);
+*/
+			$day = substr(Router::reverse($this->request, false), -14, 10);//urlの取得（use Cake\Routing\Routerが必要）
+
+			$date1w = $day." 08:00:00";
+			$date1w0 = strtotime($date1w);
+			$date1w0 = date('Y-m-d', strtotime('+7 day', $date1w0));
+			$date1w0 = $date1w0." 07:59:59";
+
+			$ScheduleKouteis = $this->ScheduleKouteis->find()
+			->where(['datetime >=' => $date1w, 'datetime <=' => $date1w0])->order(["datetime"=>"ASC"])->toArray();
+
+			for($k=0; $k<count($ScheduleKouteis); $k++){
+
+				$day = $ScheduleKouteis[$k]->datetime->format('Y-m-j');
+				$ScheduleKouteis[$k]['present_kensahyou'] = $day;
+
+			}
+
+			if(isset($ScheduleKouteis[0])){
+
+        foreach($ScheduleKouteis as $key => $row ) {
+					$tmp_day[$key] = $row["present_kensahyou"];
+					$tmp_seikeiki[$key] = $row["seikeiki"];
+        }
+
+				array_multisort(array_map( "strtotime", $tmp_day ), SORT_ASC, $tmp_seikeiki, SORT_ASC, $ScheduleKouteis);
+		//		array_multisort($tmp_seikeiki, SORT_ASC, $ScheduleKouteis);
+
+				$time = $ScheduleKouteis[0]->datetime->format('H:i');
+
+			}
+
+			$arrScheduleKoutei_csv = array();
+			for($k=0; $k<count($ScheduleKouteis); $k++){
+
+				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
+				$product_name = $Product[0]->product_name;
+
+				$arrScheduleKoutei_csv[] = [
+					'day' => $ScheduleKouteis[$k]->datetime->format('j'),//0なしの日付
+					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
+					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
+					'product_code' => $ScheduleKouteis[$k]["product_code"],
+					'product_name' => $product_name,
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
+			 ];
+
+			}
+
+			$this->set([
+					'sample_list' => $arrScheduleKoutei_csv,
+					'_serialize' => ['sample_list']
+			]);
+
 		}
 
 		public function gazoutest()

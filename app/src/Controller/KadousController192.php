@@ -1989,29 +1989,44 @@ for($n=0; $n<count($KadouSeikeis); $n++){
     echo "</pre>";
 */
 
-    if($imgdatas[2] == "-"){
+      if(isset($imgdatas[2])){
 
-      $accomp_rate_program = "-";
-      $this->set('accomp_rate_program',$accomp_rate_program);
-      $kobetu_loss_time = "-";
-      $this->set('kobetu_loss_time',$kobetu_loss_time);
-      $katagae_time = "-";
-      $this->set('katagae_time',$katagae_time);
-      $shot_cycle_heikin = "-";
-      $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+        if($imgdatas[2] == "-"){
 
-    }else{
+          $accomp_rate_program = "-";
+          $this->set('accomp_rate_program',$accomp_rate_program);
+          $kobetu_loss_time = "-";
+          $this->set('kobetu_loss_time',$kobetu_loss_time);
+          $katagae_time = "-";
+          $this->set('katagae_time',$katagae_time);
+          $shot_cycle_heikin = "-";
+          $this->set('shot_cycle_heikin',$shot_cycle_heikin);
 
-      $accomp_rate_program = $imgdatas[2] / 10;
-      $this->set('accomp_rate_program',$accomp_rate_program);
-      $kobetu_loss_time = $imgdatas[3] / 1000;
-      $this->set('kobetu_loss_time',$kobetu_loss_time);
-      $katagae_time = $imgdatas[4] / 1000;
-      $this->set('katagae_time',$katagae_time);
-      $shot_cycle_heikin = $arrdatasession[$imgdatas[0]]["shot_cycle"];
-      $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+        }else{
 
-    }
+          $accomp_rate_program = $imgdatas[2] / 10;
+          $this->set('accomp_rate_program',$accomp_rate_program);
+          $kobetu_loss_time = $imgdatas[3] / 1000;
+          $this->set('kobetu_loss_time',$kobetu_loss_time);
+          $katagae_time = $imgdatas[4] / 1000;
+          $this->set('katagae_time',$katagae_time);
+          $shot_cycle_heikin = $arrdatasession[$imgdatas[0]]["shot_cycle"];
+          $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+
+        }
+
+      }else{
+
+        $accomp_rate_program = $imgdatas[2] / 10;
+        $this->set('accomp_rate_program',$accomp_rate_program);
+        $kobetu_loss_time = $imgdatas[3] / 1000;
+        $this->set('kobetu_loss_time',$kobetu_loss_time);
+        $katagae_time = $imgdatas[4] / 1000;
+        $this->set('katagae_time',$katagae_time);
+        $shot_cycle_heikin = $arrdatasession[$imgdatas[0]]["shot_cycle"];
+        $this->set('shot_cycle_heikin',$shot_cycle_heikin);
+
+      }
 
       $_SESSION['imgnum'] = array(
         'num' => $imgdatas[0]
@@ -2405,7 +2420,12 @@ for($n=0; $n<count($KadouSeikeis); $n++){
        $connection = ConnectionManager::get('default');
        $table->setConnection($connection);
 
-       $returndata = $imgdatanum."_".$datasession["imgdata"][$imgdatanum]["id"];
+       $accomp_rate_program = $data["accomp_rate_program"]*10;
+       $kobetu_loss_time = $data["kobetu_loss_time"]*1000;
+       $katagae_time = $data["katagae_time"]*1000;
+
+       $returndata = $imgdatanum."_".$datasession["imgdata"][$imgdatanum]["id"]."_".
+       $accomp_rate_program."_".$kobetu_loss_time."_".$katagae_time."_".$data["shot_cycle_heikin"];
 
        return $this->redirect(['action' => 'kensakusyousai',
        's' => ['returndata' => $returndata]]);

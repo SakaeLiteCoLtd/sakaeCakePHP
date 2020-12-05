@@ -16,6 +16,7 @@
 
   $num = 0;
   $count = 1;
+  $kadouritutotal = 0;
 ?>
 
 <?php
@@ -98,6 +99,8 @@
                 $count = $count + 1;
                 $total_loss = 0;
 
+                $kadouritutotal = $kadouritutotal + $KadouSeikeis[$num-1]["kadouritsu"] * 100;
+
               }
             ?>
 
@@ -152,6 +155,23 @@
         </tbody>
     </table>
 <br><br>
+
+<?php if($itiniticheck > 0): ?>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+  <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+    <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+      <td width="250" height="30" style="border-bottom: solid;border-width: 1px" colspan="20" nowrap="nowrap"><font color=#FF66FF><strong style="font-size: 12pt"><?= h($date_hyouji." 全体稼働率") ?></strong></font></td>
+      <td width="150" style="border-bottom: solid;border-width: 1px" colspan="20" nowrap="nowrap"><font color="red"><strong style="font-size: 12pt"><?= h(round($kadouritutotal / 9 , 1)) ?></strong></font><font color="blue"><?= h(" ％") ?></font></td>
+    </tr>
+  </tbody>
+  </table>
+
+  <br><br>
+
+<?php else: ?>
+<?php endif; ?>
+
 
 <?php else: ?>
 

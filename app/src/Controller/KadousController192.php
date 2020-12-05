@@ -936,6 +936,11 @@ class KadousController extends AppController
       $check_product = 1;
     }
 
+    $itiniticheck = 0;
+    $this->set('itiniticheck',$itiniticheck);
+    $date_hyouji = $data['date_sta_year']."年".$data['date_sta_month']."月".$data['date_sta_date']."日";
+    $this->set('date_hyouji',$date_hyouji);
+
     if(empty($data['product_code'])){//product_codeの入力がないとき
       $product_code = "no";
       if(empty($data['seikeiki'])){//seikeikiの入力がないとき　product_code×　seikeiki×　date〇
@@ -944,6 +949,29 @@ class KadousController extends AppController
         $KadouSeikeis = $this->KadouSeikeis->find()
         ->where(['starting_tm >=' => $starting_tm_search, 'starting_tm <' => $finishing_tm_search])->order(["seikeiki"=>"ASC"])->toArray();
         $this->set('KadouSeikeis',$KadouSeikeis);
+
+        $day1 = strtotime($starting_tm_search);
+        $day2 = strtotime($finishing_tm_search);
+        $diff = ($day2 - $day1) / (60 * 60 * 24);
+
+          $daytoday = date('Y-m-d');
+          $daytoday = strtotime($daytoday);
+          $dayye = date('Y-m-d', strtotime('-1 day', $daytoday));
+          $dayye = strtotime($dayye);
+/*
+          echo "<pre>";
+          print_r($daytoday);
+          echo "</pre>";
+          echo "<pre>";
+          print_r(strtotime($date_fin));
+          echo "</pre>";
+*/
+          if($diff == 1 ||( $dayye === strtotime($date_sta) && $daytoday === strtotime($date_fin))){//絞込みが1日だけの場合
+
+          $itiniticheck = 1;
+          $this->set('itiniticheck',$itiniticheck);
+
+        }
 
       }else{//seikeikiの入力があるとき　product_code×　seikeiki〇　date〇//seikeikiと日にちで絞り込み
 

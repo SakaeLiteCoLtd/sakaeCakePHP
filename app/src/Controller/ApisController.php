@@ -127,7 +127,11 @@ class ApisController extends AppController
 			for($k=0; $k<count($ScheduleKouteis); $k++){
 
 				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
-				$product_name = $Product[0]->product_name;
+				if(isset($Product[0])){
+					$product_name = $Product[0]->product_name;
+				}else{
+					$product_name = "";
+				}
 
 				$arrScheduleKoutei_csv[] = [
 					'day' => $ScheduleKouteis[$k]->datetime->format('j'),//0なしの日付
@@ -184,7 +188,11 @@ class ApisController extends AppController
 			for($k=0; $k<count($ScheduleKouteis); $k++){
 
 				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
-	      $product_name = $Product[0]->product_name;
+				if(isset($Product[0])){
+					$product_name = $Product[0]->product_name;
+				}else{
+					$product_name = "　";
+				}
 
 				$arrScheduleKoutei_csv[] = [
 					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
@@ -249,7 +257,11 @@ class ApisController extends AppController
 			for($k=0; $k<count($ScheduleKouteis); $k++){
 
 				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
-				$product_name = $Product[0]->product_name;
+				if(isset($Product[0])){
+					$product_name = $Product[0]->product_name;
+				}else{
+					$product_name = "　";
+				}
 
 				$arrScheduleKoutei_csv[] = [
 					'day' => $ScheduleKouteis[$k]->datetime->format('j'),//0なしの日付
@@ -293,10 +305,10 @@ class ApisController extends AppController
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'm%'], ['product_code like' => 'AR%']]])
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
-				$arrOrderEdis = array();
+				$arrOrderEdis = array();//注文呼び出し
 				$arrAssembleProducts = array();
 				for($k=0; $k<count($OrderEdis); $k++){
 
@@ -330,7 +342,9 @@ class ApisController extends AppController
 				}
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast])->order(["date_stock"=>"ASC"])->toArray();
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
+				->order(["date_stock"=>"ASC"])->toArray();
 
 				$arrStockProducts = array();
 				for($k=0; $k<count($StockProducts); $k++){
@@ -344,7 +358,9 @@ class ApisController extends AppController
 				}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])->order(["date_deliver"=>"ASC"])->toArray();
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
+				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
@@ -365,7 +381,9 @@ class ApisController extends AppController
 				echo "</pre>";
 */
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])->order(["starting_tm"=>"ASC"])->toArray();
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
+				->order(["starting_tm"=>"ASC"])->toArray();
 
 				$arrSeisans = array();
 				for($k=0; $k<count($KadouSeikeis); $k++){
@@ -462,6 +480,7 @@ class ApisController extends AppController
 				'SyoyouKeikakus' => $arrSyoyouKeikakus,
 				'Seisans' => $arrSeisans,
 				'_serialize' => ['OrderEdis', 'StockProducts', 'AssembleProducts', 'SyoyouKeikakus', 'Seisans']
+	//			'_serialize' => ['OrderEdis','AssembleProducts']
 			]);
 
 		}

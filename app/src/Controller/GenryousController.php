@@ -19,6 +19,7 @@ class GenryousController extends AppController
 		 $this->OrderMaterials = TableRegistry::get('orderMaterials');
 		 $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');
 		 $this->Products = TableRegistry::get('products');
+		 $this->Customers = TableRegistry::get('customers');
 		}
 
 		public function menu()
@@ -718,6 +719,7 @@ class GenryousController extends AppController
 					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
 				);
 
+
 			 }
 /*
 			echo "<pre>";
@@ -727,10 +729,22 @@ class GenryousController extends AppController
 
 			$mes = "「http://localhost:5000/genryous/csvtest1dApi/api/test.xml」にアクセスしてください。（ここをクリック）";
 			$this->set('mes',$mes);
-
+/*
 			Router::reverse($this->request, false);
 			echo "<pre>";
 			print_r(Router::reverse($this->request, false));
+			echo "</pre>";
+*/
+
+			echo "<pre>";
+			print_r($ScheduleKouteis[0]["product_code"]);
+			echo "</pre>";
+
+			$Product = $this->Products->find()->contain(["Customers"])
+			->where(['product_code' => $ScheduleKouteis[0]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code like' => '2%'])->toArray();//productsの絞込みprimary_dnp
+
+			echo "<pre>";
+			print_r($Product[0]["customer"]["customer_code"]);
 			echo "</pre>";
 
 /*

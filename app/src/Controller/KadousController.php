@@ -1835,6 +1835,7 @@ class KadousController extends AppController
 
           $start = substr($KadouSeikeis[$countfin-1]['starting_tm'], 0, 10);
           $start = $start." 08:00:00";
+
           $finish = strtotime($start);
           $finish = date('Y/m/d H:i:s', strtotime('+1 day', $finish));
 
@@ -1842,12 +1843,18 @@ class KadousController extends AppController
           $finish = strtotime($finish);
 
           $loss_time = round(($finish - $program_finishing_tm) / 60 , 1);//生産時間（分）
-  /*
+
+          $program_starting_tm = strtotime($KadouSeikeis[$countfin-$arrGroupcount[$n]]['program_starting_tm']);
+          $starttm = $start;
+          $starttm = strtotime($starttm);
+
+          $loss_time_sta = round(($program_starting_tm - $starttm) / 60 , 1);//生産時間（分）
+/*
           echo "<pre>";
-          print_r($loss_time." + ".$KadouSeikeis[$countfin-1]['total_loss_time']);
+          print_r($loss_time_sta." = ".$program_starting_tm." - ".$starttm);
           echo "</pre>";
-  */
-          $total_loss_time = $KadouSeikeis[$countfin-1]['total_loss_time'] + $loss_time;
+*/
+          $total_loss_time = $KadouSeikeis[$countfin-1]['total_loss_time'] + $loss_time + $loss_time_sta;
 
           $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
           $KadouSeikeis[$countfin-1] = array_merge($KadouSeikeis[$countfin-1], $arrtotal_loss_time);

@@ -14,12 +14,8 @@
   header('Cache-Control:');
   header('Pragma:');
 
-  $num1 = 0;
   $num = 0;
-  $count1 = 1;
-  $count2 = 0;
   $count = 1;
-  $kadouritutotal1 = 0;
   $kadouritutotal = 0;
 ?>
 
@@ -37,81 +33,7 @@
  <hr size="5" style="margin: 0.5rem">
 <?=$this->Form->create($kadouSeikeis, ['url' => ['action' => 'kensakusyousai']]) ?>
 
-
-
 <?php if($check_product != 1): ?>
-
-  <?php if($itiniticheck > 0): ?>
-
-    <?php
-
-    for($i=0; $i<$countkadouSeikei; $i++){
-
-      if($i >= $num1 && isset($arrGroupcount[$count1])){
-
-        $numcell1 = $arrGroupcount[$count1];
-        $num1 = $num1 + $arrGroupcount[$count1];
-
-        $total_loss_time = round((1 - $KadouSeikeis[$num1-1]["kadouritsu"]) * 86400 / 60 , 1);
-
-        $count1 = $count1 + 1;
-        $total_loss1 = 0;
-
-        $kadouritutotal1 = $kadouritutotal1 + $KadouSeikeis[$num1-1]["kadouritsu"] * 100;
-
-      }
-
-    }
-
-    ?>
-
-  <br>
-  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-    <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-      <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-        <td width="250" height="30" style="border-bottom: solid;border-width: 1px" colspan="20" nowrap="nowrap"><font color=#FF66FF><strong style="font-size: 12pt"><?= h($date_hyouji." 全体稼働率") ?></strong></font></td>
-        <td width="150" style="border-bottom: solid;border-width: 1px" colspan="20" nowrap="nowrap"><font color="red"><strong style="font-size: 12pt"><?= h(round($kadouritutotal1 / 9 , 1)) ?></strong></font><font color="blue"><?= h(" ％") ?></font></td>
-      </tr>
-    </tbody>
-    </table>
-
-  <?php else: ?>
-
-    <?php
-
-    for($i=0; $i<$countkadouSeikei; $i++){
-
-      if($i >= $num1 && isset($arrGroupcount[$count1])){
-
-        $numcell1 = $arrGroupcount[$count1];
-        $num1 = $num1 + $arrGroupcount[$count1];
-
-        $total_loss_time = round((1 - $KadouSeikeis[$num1-1]["kadouritsu"]) * 86400 / 60 , 1);
-
-        $count1 = $count1 + 1;
-        $count2 = $count2 + 1;
-        $total_loss1 = 0;
-
-        $kadouritutotal1 = $kadouritutotal1 + $KadouSeikeis[$num1-1]["kadouritsu"] * 100;
-
-      }
-
-    }
-
-    ?>
-
-    <br>
-    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-      <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-        <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <td width="200" height="30" style="border-bottom: solid;border-width: 1px" colspan="20" nowrap="nowrap"><font color=#FF66FF><strong style="font-size: 12pt"><?= h("絞込データ全体稼働率") ?></strong></font></td>
-          <td width="150" style="border-bottom: solid;border-width: 1px" colspan="20" nowrap="nowrap"><font color="red"><strong style="font-size: 12pt"><?= h(round($kadouritutotal1 / $count2 , 1)) ?></strong></font><font color="blue"><?= h(" ％") ?></font></td>
-        </tr>
-      </tbody>
-      </table>
-
-  <?php endif; ?>
-
 
 <br><br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -233,6 +155,23 @@
         </tbody>
     </table>
 <br><br>
+
+<?php if($itiniticheck > 0): ?>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+  <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+    <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+      <td width="250" height="30" style="border-bottom: solid;border-width: 1px" colspan="20" nowrap="nowrap"><font color=#FF66FF><strong style="font-size: 12pt"><?= h($date_hyouji." 全体稼働率") ?></strong></font></td>
+      <td width="150" style="border-bottom: solid;border-width: 1px" colspan="20" nowrap="nowrap"><font color="red"><strong style="font-size: 12pt"><?= h(round($kadouritutotal / 9 , 1)) ?></strong></font><font color="blue"><?= h(" ％") ?></font></td>
+    </tr>
+  </tbody>
+  </table>
+
+  <br><br>
+
+<?php else: ?>
+<?php endif; ?>
+
 
 <?php else: ?>
 

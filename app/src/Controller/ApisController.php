@@ -23,6 +23,8 @@ class ApisController extends AppController
 		 $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');
 		 $this->Katakouzous = TableRegistry::get('katakouzous');
 		 $this->AssembleProducts = TableRegistry::get('assembleProducts');
+		 $this->Customers = TableRegistry::get('customers');
+//		 $this->belongsTo('Customers');
 		}
 
 		public function xmlday()
@@ -287,15 +289,20 @@ class ApisController extends AppController
 			$data = Router::reverse($this->request, false);//urlを取得
 			$urlarr = explode("/",$data);//切り離し
 			$dayarr = explode("_",$urlarr[4]);//切り離し
-			$sheetarr = explode(".",$dayarr[1]);//切り離し
+			if(isset($dayarr[2])){
+				$sheetarr = explode(".",$dayarr[2]);//切り離し
+				$sheet = $dayarr[1]."_".$sheetarr[0];//シート名の取得
+			}else{
+				$sheetarr = explode(".",$dayarr[1]);//切り離し
+				$sheet = $sheetarr[0];//シート名の取得
+			}
 
 			$day = $dayarr[0];//日付の取得
-			$sheet = $sheetarr[0];//シート名の取得
+
+			//http://192.168.4.246/Apis/zaikocyou/api/2020-10_primary.xml
+			//http://localhost:5000/Apis/zaikocyou/api/2020-10_primary.xml
 
 			if($sheet === "primary"){
-		//		echo "<pre>";
-		//		print_r("primary - ".$day);
-		//		echo "</pre>";
 
 				$date1 = $day."-1";//選択した月の初日
 				$date1st = strtotime($date1);
@@ -305,37 +312,37 @@ class ApisController extends AppController
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
 				$arrAssembleProducts = array();
 				for($k=0; $k<count($OrderEdis); $k++){
 
-					$Product = $this->Products->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();
+					$Product = $this->Products->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
 
 					if(isset($Product[0])){
 
-						$arrOrderEdis[] = [
-							'date_order' => $OrderEdis[$k]["date_order"],
-							'num_order' => $OrderEdis[$k]["num_order"],
-							'product_code' => $OrderEdis[$k]["product_code"],
-							'price' => $OrderEdis[$k]["price"],
-							'date_deliver' => $OrderEdis[$k]["date_deliver"],
-							'amount' => $OrderEdis[$k]["amount"]
-					 ];
-
-					}
-
-					//組立品呼び出し
-					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
-
-					if(isset($AssembleProducts[0])){
-
-							$arrAssembleProducts[] = [
-								'product_code' => $AssembleProducts[0]["product_code"],
-								'inzu' => $AssembleProducts[0]["inzu"]
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
 						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
 
 					}
 
@@ -343,66 +350,81 @@ class ApisController extends AppController
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_stock"=>"ASC"])->toArray();
 
-				$arrStockProducts = array();
-				for($k=0; $k<count($StockProducts); $k++){
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
 
-					$arrStockProducts[] = [
-						'product_code' => $StockProducts[$k]["product_code"],
-						'date_stock' => $StockProducts[$k]["date_stock"],
-						'amount' => $StockProducts[$k]["amount"]
-				 ];
+						$Product = $this->Products->find()->where(['product_code' => $StockProducts[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
 
-				}
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 
-					$arrSyoyouKeikakus[] = [
-						'product_code' => $SyoyouKeikakus[$k]["product_code"],
-						'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
-						'amount' => $SyoyouKeikakus[$k]["amount"]
-				 ];
+					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
 
 				}
 
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
-/*
-				echo "<pre>";
-				print_r($daystart." ".$dayfin);
-				echo "</pre>";
-*/
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["starting_tm"=>"ASC"])->toArray();
 
-				$arrSeisans = array();
-				for($k=0; $k<count($KadouSeikeis); $k++){
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
 
-					$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+						$Product = $this->Products->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
 
-					if(isset($Katakouzous[0])){
-						$torisu = $Katakouzous[0]["torisu"];
-					}else{
-						$torisu = "Katakouzousテーブルに登録なし";
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
 					}
-
-					$arrSeisans[] = [
-						'product_code' => $KadouSeikeis[$k]["product_code"],
-						'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
-						'torisu' => $torisu
-				 ];
-
-				}
 
 /*
 				echo "<pre>";
@@ -411,65 +433,1403 @@ class ApisController extends AppController
 */
 
 			}elseif($sheet === "primary_dnp"){
-				echo "<pre>";
-				print_r("primary_dnp - ".$day);
-				echo "</pre>";
+
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+
+				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				'OR' => [['customer_code like' => '2%']]])//productsの絞込みprimary_dnp
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrOrderEdis = array();//注文呼び出し
+				$arrAssembleProducts = array();
+				for($k=0; $k<count($OrderEdis); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code like' => '2%'])->toArray();//productsの絞込みprimary_dnp
+
+					if(isset($Product[0])){
+
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
+						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
+
+					}
+
+				}
+
+				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast])
+				->order(["date_stock"=>"ASC"])->toArray();
+
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code like' => '2%'])->toArray();//productsの絞込みprimary_dnp
+
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
+				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrSyoyouKeikakus = array();
+				for($k=0; $k<count($SyoyouKeikakus); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code like' => '2%'])->toArray();//productsの絞込みprimary_dnp
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
+
+				}
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
+				->order(["starting_tm"=>"ASC"])->toArray();
+
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code like' => '2%'])->toArray();//productsの絞込みprimary_dnp
+
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
+					}
 
 			}elseif($sheet === "primary_w"){
-				echo "<pre>";
-				print_r("primary_w - ".$day);
-				echo "</pre>";
+
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+
+				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				'OR' => [['product_code like' => 'W%', 'product_code like' => 'AW%', 'customer_code' => '10002']]])//productsの絞込みprimary_w
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrOrderEdis = array();//注文呼び出し
+				$arrAssembleProducts = array();
+				for($k=0; $k<count($OrderEdis); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_w
+
+					if(isset($Product[0])){
+
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
+						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
+
+					}
+
+				}
+
+				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
+				->order(["date_stock"=>"ASC"])->toArray();
+
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_w
+
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
+				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrSyoyouKeikakus = array();
+				for($k=0; $k<count($SyoyouKeikakus); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_w
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
+
+				}
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
+				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
+				->order(["starting_tm"=>"ASC"])->toArray();
+
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_w
+
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
+					}
 
 			}elseif($sheet === "primary_h"){
-				echo "<pre>";
-				print_r("primary_h - ".$day);
-				echo "</pre>";
+
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+
+				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
+				'OR' => [['product_code like' => 'H%']]])//productsの絞込みprimary_h
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrOrderEdis = array();//注文呼び出し
+				$arrAssembleProducts = array();
+				for($k=0; $k<count($OrderEdis); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_h
+
+					if(isset($Product[0])){
+
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
+						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
+
+					}
+
+				}
+
+				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
+				->order(["date_stock"=>"ASC"])->toArray();
+
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_h
+
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
+				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrSyoyouKeikakus = array();
+				for($k=0; $k<count($SyoyouKeikakus); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_h
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
+
+				}
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
+				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
+				->order(["starting_tm"=>"ASC"])->toArray();
+
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_h
+
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
+					}
 
 			}elseif($sheet === "reizouko"){
-				echo "<pre>";
-				print_r("reizouko - ".$day);
-				echo "</pre>";
+
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+
+				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				'OR' => [['customer_code' => '10005']]])//productsの絞込みreizouko
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrOrderEdis = array();//注文呼び出し
+				$arrAssembleProducts = array();
+				for($k=0; $k<count($OrderEdis); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10005'])->toArray();//productsの絞込みreizouko
+
+					if(isset($Product[0])){
+
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
+						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
+
+					}
+
+				}
+
+				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast])
+				->order(["date_stock"=>"ASC"])->toArray();
+
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10005'])->toArray();//productsの絞込みreizouko
+
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
+				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrSyoyouKeikakus = array();
+				for($k=0; $k<count($SyoyouKeikakus); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10005'])->toArray();//productsの絞込みreizouko
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
+
+				}
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
+				->order(["starting_tm"=>"ASC"])->toArray();
+
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10005'])->toArray();//productsの絞込みreizouko
+
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
+					}
 
 			}elseif($sheet === "uwawaku"){
-				echo "<pre>";
-				print_r("uwawaku - ".$day);
-				echo "</pre>";
+
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+
+				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				'OR' => [['customer_code' => '10003']]])//productsの絞込みuwawaku
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrOrderEdis = array();//注文呼び出し
+				$arrAssembleProducts = array();
+				for($k=0; $k<count($OrderEdis); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10005'])->toArray();//productsの絞込みuwawaku
+
+					if(isset($Product[0])){
+
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
+						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
+
+					}
+
+				}
+
+				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast])
+				->order(["date_stock"=>"ASC"])->toArray();
+
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10003'])->toArray();//productsの絞込みuwawaku
+
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
+				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrSyoyouKeikakus = array();
+				for($k=0; $k<count($SyoyouKeikakus); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10003'])->toArray();//productsの絞込みuwawaku
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
+
+				}
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
+				->order(["starting_tm"=>"ASC"])->toArray();
+
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10003'])->toArray();//productsの絞込みuwawaku
+
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
+					}
 
 			}elseif($sheet === "other"){
-				echo "<pre>";
-				print_r("other - ".$day);
-				echo "</pre>";
+
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+
+				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				'NOT' => [['customer_code like' => '1%', 'customer_code like' => '2%']]])//productsの絞込みother
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrOrderEdis = array();//注文呼び出し
+				$arrAssembleProducts = array();
+				for($k=0; $k<count($OrderEdis); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0,
+					'NOT' => [['customer_code like' => '1%', 'customer_code like' => '2%']]])//productsの絞込みother
+					->toArray();//productsの絞込みother
+
+					if(isset($Product[0])){
+
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
+						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
+
+					}
+
+				}
+
+				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast])
+				->order(["date_stock"=>"ASC"])->toArray();
+
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'customer_code not like' => '1%',
+						'NOT' => [['customer_code like' => '2%']]])//productsの絞込みother
+						->toArray();//productsの絞込みother
+
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
+				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrSyoyouKeikakus = array();
+				for($k=0; $k<count($SyoyouKeikakus); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'customer_code not like' => '1%',
+					'NOT' => [['customer_code like' => '2%']]])//productsの絞込みother
+					->toArray();//productsの絞込みother
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
+
+				}
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
+				->order(["starting_tm"=>"ASC"])->toArray();
+
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'customer_code not like' => '1%',
+						'NOT' => [['customer_code like' => '2%']]])//productsの絞込みother
+						->toArray();//productsの絞込みother
+
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
+					}
 
 			}elseif($sheet === "p0"){
-				echo "<pre>";
-				print_r("p0 - ".$day);
-				echo "</pre>";
+
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+
+				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10001',
+				'OR' => [['product_code like' => 'P0%']]])//productsの絞込みp0
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrOrderEdis = array();//注文呼び出し
+				$arrAssembleProducts = array();
+				for($k=0; $k<count($OrderEdis); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
+
+					if(isset($Product[0])){
+
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
+						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
+
+					}
+
+				}
+
+				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
+				->order(["date_stock"=>"ASC"])->toArray();
+
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
+
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
+				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrSyoyouKeikakus = array();
+				for($k=0; $k<count($SyoyouKeikakus); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
+
+				}
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
+				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
+				->order(["starting_tm"=>"ASC"])->toArray();
+
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
+
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
+					}
 
 			}elseif($sheet === "p1"){
-				echo "<pre>";
-				print_r("p1 - ".$day);
-				echo "</pre>";
+
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+
+				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10001',
+				'OR' => [['product_code like' => 'P1%' ,'product_code like' => 'P2%']]])//productsの絞込みp1
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrOrderEdis = array();//注文呼び出し
+				$arrAssembleProducts = array();
+				for($k=0; $k<count($OrderEdis); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp1
+
+					if(isset($Product[0])){
+
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
+						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
+
+					}
+
+				}
+
+				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				'OR' => [['product_code like' => 'P1%' ,'product_code like' => 'P2%']]])//productsの絞込みp1
+				->order(["date_stock"=>"ASC"])->toArray();
+
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp1
+
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
+				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				'OR' => [['product_code like' => 'P1%' ,'product_code like' => 'P2%']]])//productsの絞込みp1
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrSyoyouKeikakus = array();
+				for($k=0; $k<count($SyoyouKeikakus); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp1
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
+
+				}
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
+				'OR' => [['product_code like' => 'P1%' ,'product_code like' => 'P2%']]])//productsの絞込みp1
+				->order(["starting_tm"=>"ASC"])->toArray();
+
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp1
+
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
+					}
 
 			}elseif($sheet === "w"){
-				echo "<pre>";
-				print_r("w - ".$day);
-				echo "</pre>";
+
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+
+				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				'OR' => [['product_code like' => 'W%', 'product_code like' => 'AW%', 'customer_code' => '10002']]])//productsの絞込みw
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrOrderEdis = array();//注文呼び出し
+				$arrAssembleProducts = array();
+				for($k=0; $k<count($OrderEdis); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
+
+					if(isset($Product[0])){
+
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
+						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
+
+					}
+
+				}
+
+				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
+				->order(["date_stock"=>"ASC"])->toArray();
+
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
+
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
+				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrSyoyouKeikakus = array();
+				for($k=0; $k<count($SyoyouKeikakus); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
+
+				}
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
+				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
+				->order(["starting_tm"=>"ASC"])->toArray();
+
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
+
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
+					}
 
 			}elseif($sheet === "dnp"){
-				echo "<pre>";
-				print_r("dnp - ".$day);
-				echo "</pre>";
+
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+
+				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				'OR' => [['customer_code like' => '2%']]])//productsの絞込みdnp
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrOrderEdis = array();//注文呼び出し
+				$arrAssembleProducts = array();
+				for($k=0; $k<count($OrderEdis); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
+
+					if(isset($Product[0])){
+
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
+						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
+
+					}
+
+				}
+
+				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast])
+				->order(["date_stock"=>"ASC"])->toArray();
+
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
+
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
+				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrSyoyouKeikakus = array();
+				for($k=0; $k<count($SyoyouKeikakus); $k++){
+
+					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
+
+				}
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
+				->order(["starting_tm"=>"ASC"])->toArray();
+
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
+
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
+					}
 
 			}elseif($sheet === "sinsei"){
-				echo "<pre>";
-				print_r("sinsei - ".$day);
-				echo "</pre>";
+
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+
+				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrOrderEdis = array();//注文呼び出し
+				$arrAssembleProducts = array();
+				for($k=0; $k<count($OrderEdis); $k++){
+
+					$Product = $this->Products->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'status' => 0, 'primary_p' => 0])->toArray();//productsの絞込みsinsei
+
+					if(isset($Product[0])){
+
+							$arrOrderEdis[] = [
+								'date_order' => $OrderEdis[$k]["date_order"],
+								'num_order' => $OrderEdis[$k]["num_order"],
+								'product_code' => $OrderEdis[$k]["product_code"],
+								'price' => $OrderEdis[$k]["price"],
+								'date_deliver' => $OrderEdis[$k]["date_deliver"],
+								'amount' => $OrderEdis[$k]["amount"]
+						 ];
+
+						 //組立品呼び出し
+	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+
+	 					if(isset($AssembleProducts[0])){
+
+	 							$arrAssembleProducts[] = [
+	 								'product_code' => $AssembleProducts[0]["product_code"],
+	 								'inzu' => $AssembleProducts[0]["inzu"]
+	 						 ];
+
+	 					}
+
+					}
+
+				}
+
+				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
+				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
+				->order(["date_stock"=>"ASC"])->toArray();
+
+					$arrStockProducts = array();
+					for($k=0; $k<count($StockProducts); $k++){
+
+						$Product = $this->Products->find()->where(['product_code' => $StockProducts[$k]["product_code"], 'status' => 0, 'primary_p' => 0])->toArray();//productsの絞込みsinsei
+
+						if(isset($Product[0])){
+
+							$arrStockProducts[] = [
+								'product_code' => $StockProducts[$k]["product_code"],
+								'date_stock' => $StockProducts[$k]["date_stock"],
+								'amount' => $StockProducts[$k]["amount"]
+						 ];
+
+						}
+
+					}
+
+
+				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
+				->order(["date_deliver"=>"ASC"])->toArray();
+
+				$arrSyoyouKeikakus = array();
+				for($k=0; $k<count($SyoyouKeikakus); $k++){
+
+					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0, 'primary_p' => 0])->toArray();//productsの絞込みsinsei
+
+					if(isset($Product[0])){
+
+						$arrSyoyouKeikakus[] = [
+							'product_code' => $SyoyouKeikakus[$k]["product_code"],
+							'date_deliver' => $SyoyouKeikakus[$k]["date_deliver"],
+							'amount' => $SyoyouKeikakus[$k]["amount"]
+					 ];
+
+					}
+
+				}
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
+				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
+				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
+				->order(["starting_tm"=>"ASC"])->toArray();
+
+					$arrSeisans = array();
+					for($k=0; $k<count($KadouSeikeis); $k++){
+
+						$Product = $this->Products->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'status' => 0, 'primary_p' => 0])->toArray();//productsの絞込みsinsei
+
+						if(isset($Product[0])){
+
+							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+
+							if(isset($Katakouzous[0])){
+								$torisu = $Katakouzous[0]["torisu"];
+							}else{
+								$torisu = "Katakouzousテーブルに登録なし";
+							}
+
+							$arrSeisans[] = [
+								'product_code' => $KadouSeikeis[$k]["product_code"],
+								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+								'torisu' => $torisu
+						 ];
+
+						}
+
+					}
 
 			}else{
 
 				echo "<pre>";
 				print_r("エラーです。URLを確認してください。");
 				echo "</pre>";
+
+				$arrOrderEdis = array();
+				$arrStockProducts = array();
+				$arrAssembleProducts = array();
+				$arrSyoyouKeikakus = array();
+				$arrSeisans = array();
 
 			}
 
@@ -480,7 +1840,6 @@ class ApisController extends AppController
 				'SyoyouKeikakus' => $arrSyoyouKeikakus,
 				'Seisans' => $arrSeisans,
 				'_serialize' => ['OrderEdis', 'StockProducts', 'AssembleProducts', 'SyoyouKeikakus', 'Seisans']
-	//			'_serialize' => ['OrderEdis','AssembleProducts']
 			]);
 
 		}

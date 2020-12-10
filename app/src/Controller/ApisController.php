@@ -338,6 +338,8 @@ class ApisController extends AppController
 	 					if(isset($AssembleProducts[0])){
 
 	 							$arrAssembleProducts[] = [
+				//					'date_order' => $OrderEdis[$k]["date_order"],
+				//					'date_deliver' => $OrderEdis[$k]["date_deliver"],
 	 								'product_code' => $AssembleProducts[0]["product_code"],
 	 								'inzu' => $AssembleProducts[0]["inzu"]
 	 						 ];
@@ -409,7 +411,20 @@ class ApisController extends AppController
 						if(isset($Product[0])){
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
+/*
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));//選択した月の最後の日
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+/*
+							echo "<pre>";
+							print_r($nippouday);
+							echo "</pre>";
+*/
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -417,6 +432,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+				//				'nippouday' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -565,8 +581,8 @@ class ApisController extends AppController
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'W%', 'product_code like' => 'AW%', 'customer_code' => '10002']]])//productsの絞込みprimary_w
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
+				'OR' => [['product_code like' => 'W%', 'product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
@@ -952,7 +968,7 @@ class ApisController extends AppController
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10005'])->toArray();//productsの絞込みuwawaku
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10003'])->toArray();//productsの絞込みuwawaku
 
 					if(isset($Product[0])){
 
@@ -1067,8 +1083,8 @@ class ApisController extends AppController
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'NOT' => [['customer_code like' => '1%', 'customer_code like' => '2%']]])//productsの絞込みother
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code not like' => '1%',
+				'NOT' => [['customer_code like' => '2%']]])//productsの絞込みother
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
@@ -1076,8 +1092,8 @@ class ApisController extends AppController
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0,
-					'NOT' => [['customer_code like' => '1%', 'customer_code like' => '2%']]])//productsの絞込みother
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code not like' => '1%',
+					'NOT' => [['customer_code like' => '2%']]])//productsの絞込みother
 					->toArray();//productsの絞込みother
 
 					if(isset($Product[0])){
@@ -1208,7 +1224,7 @@ class ApisController extends AppController
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
 
 					if(isset($Product[0])){
 
@@ -1246,7 +1262,7 @@ class ApisController extends AppController
 					for($k=0; $k<count($StockProducts); $k++){
 
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
 
 						if(isset($Product[0])){
 
@@ -1269,7 +1285,7 @@ class ApisController extends AppController
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
 
 					if(isset($Product[0])){
 
@@ -1295,7 +1311,7 @@ class ApisController extends AppController
 					for($k=0; $k<count($KadouSeikeis); $k++){
 
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
 
 						if(isset($Product[0])){
 
@@ -1453,8 +1469,8 @@ class ApisController extends AppController
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'W%', 'product_code like' => 'AW%', 'customer_code' => '10002']]])//productsの絞込みw
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
+				'OR' => [['product_code like' => 'W%', 'product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
@@ -1819,6 +1835,33 @@ class ApisController extends AppController
 
 					}
 
+			}elseif($sheet === "testtouroku"){
+
+				$arrOrderEdis = array();
+				$arrStockProducts = array();
+				$arrAssembleProducts = array();
+				$arrSyoyouKeikakus = array();
+				$arrSeisans = array();
+
+				$tourokutestproduct = [
+					'product_code' => date('Y-m-d H:i:s').'acbd',
+					'product_name' => 'APIテスト',
+					'weight' => '9999',
+					'primary_p' => '0',
+					'status' => '0',
+					'delete_flag' => '0',
+					'created_at' => date('Y-m-d H:i:s'),
+					'created_staff' => '9999',
+				];
+/*
+			  $Products = $this->Products->patchEntity($this->Products->newEntity(), $tourokutestproduct);
+				$this->Products->save($Products);
+
+				$this->Products->updateAll(
+				['product_code' => "dcba" , 'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => "9999"],
+				['id'   => 1434]
+				);
+*/
 			}else{
 
 				echo "<pre>";
@@ -1841,8 +1884,12 @@ class ApisController extends AppController
 				'Seisans' => $arrSeisans,
 				'_serialize' => ['OrderEdis', 'StockProducts', 'AssembleProducts', 'SyoyouKeikakus', 'Seisans']
 			]);
-
+/*
+			$this->set([
+				'tourokutestproduct' => $tourokutestproduct,
+				'_serialize' => ['tourokutestproduct']
+			]);
+*/
 		}
-
 
 	}

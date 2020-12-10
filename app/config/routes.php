@@ -46,6 +46,8 @@ use Cake\Routing\Route\DashedRoute;
  */
 Router::defaultRouteClass(DashedRoute::class);
 
+Router::mapResources('Apidatas');
+
 Router::extensions(['json', 'xml']);//apiのため追加
 
 Router::scope('/', function (RouteBuilder $routes) {

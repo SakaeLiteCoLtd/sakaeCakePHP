@@ -98,6 +98,12 @@
 
     }
 
+    if($count2 > 0){
+      $zentaikadouritu = round($kadouritutotal1 / $count2 , 1);
+    }else{
+      $zentaikadouritu = "";
+    }
+
     ?>
 
     <br>
@@ -105,7 +111,7 @@
       <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
         <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
           <td width="200" height="30" style="border-bottom: solid;border-width: 1px" colspan="20" nowrap="nowrap"><font color=#FF66FF><strong style="font-size: 12pt"><?= h("絞込データ全体稼働率") ?></strong></font></td>
-          <td width="150" style="border-bottom: solid;border-width: 1px" colspan="20" nowrap="nowrap"><font color="red"><strong style="font-size: 12pt"><?= h(round($kadouritutotal1 / $count2 , 1)) ?></strong></font><font color="blue"><?= h(" ％") ?></font></td>
+          <td width="150" style="border-bottom: solid;border-width: 1px" colspan="20" nowrap="nowrap"><font color="red"><strong style="font-size: 12pt"><?= h($zentaikadouritu) ?></strong></font><font color="blue"><?= h(" ％") ?></font></td>
         </tr>
       </tbody>
       </table>

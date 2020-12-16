@@ -44,7 +44,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 
       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
       echo "<td rowspan='2'  height='6' colspan='20'>\n";
-      echo "<input type='text' name=product_code size='6'/>\n";
+      echo "<input type='text' name=product_code autofocus=true size='6'/>\n";
       echo "</td>\n";
       echo "<td width='50' colspan='3' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
       echo "開始";

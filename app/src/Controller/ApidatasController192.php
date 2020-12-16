@@ -10,8 +10,6 @@ use Cake\Core\Configure;//トランザクション
 use Cake\Utility\Xml;//xmlのファイルを読み込みために必要
 
 use Cake\Routing\Router;//urlの取得
-use Cake\Http\Client;//httpの読取に必要
-//use Cake\Http\ServerRequest;
 
 class ApidatasController extends AppController
 	{
@@ -31,7 +29,7 @@ class ApidatasController extends AppController
 		 $this->Users = TableRegistry::get('users');//staffsテーブルを使う
 		}
 
-		public function preadd()//http://localhost:5000 http://192.168.4.246  http://localhost:5000/Apidatas/preadd
+		public function preadd()//http://localhost:5000 http://192.168.4.246
 		{
 			$staff = $this->Products->newEntity();//newentityに$staffという名前を付ける
 			$this->set('staff',$staff);//1行上の$staffをctpで使えるようにセット
@@ -73,24 +71,11 @@ class ApidatasController extends AppController
 
 */
 
-		//		$xmlArray = Xml::toArray(Xml::build('http://localhost:5000/Apidatas/test/api/test.xml'));
-				$http = new Client();
-
-				//			$response = $http->get('http://192.168.4.246/Apidatas/test/api/test.xml');//参考https://book.cakephp.org/3/ja/core-libraries/httpclient.html
-				//			$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.xml');//参考https://book.cakephp.org/3/ja/core-libraries/httpclient.html
-				//			$response = $http->put('http://192.168.4.246/Apidatas/test/api/test.xml');//参考https://book.cakephp.org/3/ja/core-libraries/httpclient.html
-
-		//		$response = $http->post('https://qiita.com/api/v2/users/TakahiRoyte');//参考https://book.cakephp.org/3/ja/core-libraries/httpclient.html
-
-				$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.json');//参考https://codelab.website/cakephp3-api/
-				$array = json_decode($response->body(), true);//trueがあれば配列として受け取れる　参考https://qiita.com/muramount/items/6be585bf9c031a997d9a
-
+				$xmlArray = Xml::toArray(Xml::build('http://localhost:5000/Apidatas/test/api/test.xml'));
 				echo "<pre>";
-				print_r($array);
+				print_r($xmlArray);
 				echo "</pre>";
-				echo "<pre>";
-				print_r($array["tourokutestproduct"]["product_name"]);
-				echo "</pre>";
+
 
 		}
 
@@ -115,45 +100,91 @@ class ApidatasController extends AppController
 					 $user = $this->Auth->identify();
 				 if ($user) {
 
-			//		 $url = 'http://localhost:5000/Apidatas/zaikocyoudata/api/2020-10_primary.xml';
-
-			//		 $this->Auth->setUser($user);
-			//		 return $this->redirect($url);
+					 $url = 'http://localhost:5000/Apidatas/zaikocyoudata/api/2020-10_primary.xml';
 
 					 $this->Auth->setUser($user);
-					 return $this->redirect(['action' => 'preadd']);
-
+					 return $this->redirect($url);
 				 }
 			 }
 	 }
 
-		public function updatedatas()//http://localhost:5000/Apidatas/updatedatas/api/20-10_test1_test2_test3.xml
+		public function zaikocyoudata()
 		{
-
 			$data = Router::reverse($this->request, false);//urlを取得
 			$urlarr = explode("/",$data);//切り離し
-			$dataarr = explode("_",$urlarr[4]);//切り離し
+			$dayarr = explode("_",$urlarr[4]);//切り離し
+			if(isset($dayarr[2])){
+				$sheetarr = explode(".",$dayarr[2]);//切り離し
+				$sheet = $dayarr[1]."_".$sheetarr[0];//シート名の取得
+			}else{
+				$sheetarr = explode(".",$dayarr[1]);//切り離し
+				$sheet = $sheetarr[0];//シート名の取得
+			}
 
-			$day = $dataarr[0];//日付の取得
-			$tourokutestproduct[] = array("day" => date('Y-m-d H:i:s'));
+			$day = $dayarr[0];//日付の取得
 
-			for ($k=1; $k<count($dataarr); $k++) {
+			//http://192.168.4.246/Apidatas/zaikocyoudata/api/2020-10_primary.xml
+			//http://localhost:5000/Apidatas/zaikocyoudata/api/2020-10_primary.xml
 
-				if($k == count($dataarr)-1){
-					$datas = explode(".",$dataarr[$k]);//切り離し
-					${"product".$k} = $datas[0];
-				}else{
-					${"product".$k} = $dataarr[$k];
-				}
+			if($sheet === "primary"){
 
-				$tourokutestproduct[] = array("product" => ${"product".$k});
+		//		$xmlString = 'http://localhost:5000/Apidatas/zaikocyoudata/api/2020-10_testtouroku.xml';
+		//		$xmlArray = Xml::toArray(Xml::build($xmlString));
+/*
+				$xmlArray = [
+				    'root' => [
+				        'xmlns:' => 'http://localhost:5000/Apidatas/zaikocyoudata/api/2020-10_testtouroku.xml',
+				        'child' => 'value'
+				    ]
+				];
+				$xml1 = Xml::fromArray($xmlArray);
+*/
+				$url = 'http://localhost:5000/Apidatas/test/api/test.xml';
+				$curl = curl_init($url);
+				$xml = curl_exec($curl);
+
+				// 受け取ったXMLレスポンスをPHPの連想配列へ変換
+				$xmlObj = simplexml_load_string($xml);
+				$json = json_encode($xmlObj);
+				$response = json_decode($json, true);
+
+				echo "<pre>";
+				print_r($xmlObj);
+				echo "</pre>";
+
+				$arrOrderEdis = array();
+				$arrStockProducts = array();
+				$arrAssembleProducts = array();
+				$arrSyoyouKeikakus = array();
+				$arrSeisans = array();
+
+/*
+			  $Products = $this->Products->patchEntity($this->Products->newEntity(), $tourokutestproduct);
+				$this->Products->save($Products);
+
+				$this->Products->updateAll(
+				['product_code' => "dcba" , 'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => "9999"],
+				['id'   => 1434]
+				);
+*/
+			}else{
+
+				echo "<pre>";
+				print_r("エラーです。URLを確認してください。");
+				echo "</pre>";
+
+				$arrOrderEdis = array();
+				$arrStockProducts = array();
+				$arrAssembleProducts = array();
+				$arrSyoyouKeikakus = array();
+				$arrSeisans = array();
 
 			}
 
- 		 $this->set([
- 			 'tourokutestproduct' => $tourokutestproduct,
- 			 '_serialize' => ['tourokutestproduct']
- 		 ]);
+			$this->set([
+				'tourokutestproduct' => $arrOrderEdis,
+				'_serialize' => ['tourokutestproduct']
+			]);
 
 		}
 
@@ -162,7 +193,7 @@ class ApidatasController extends AppController
 
 		 $tourokutestproduct = [
 			 'product_code' => date('Y-m-d H:i:s').'acbd',
-			 'product_name' => 'APIテスト192',
+			 'product_name' => 'APIテスト',
 			 'weight' => '9999',
 			 'primary_p' => '0',
 			 'status' => '0',
@@ -170,8 +201,6 @@ class ApidatasController extends AppController
 			 'created_at' => date('Y-m-d H:i:s'),
 			 'created_staff' => '9999',
 		 ];
-
-	//	 mb_convert_variables('UTF-8','SJIS-win',$tourokutestproduct);//文字コードを変換
 
 		 $this->set([
 			 'tourokutestproduct' => $tourokutestproduct,

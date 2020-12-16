@@ -34,13 +34,15 @@ class ProcessesController extends AppController
 			$checkMobile = 0;
 			if ($this->request->is('mobile')) {
 			    if ($this->request->is('tablet')) {
-						echo "<pre>";
-						print_r("タブレットです");
-						echo "</pre>";
+						$this->viewBuilder()->theme('Sp');
+			//			echo "<pre>";
+			//			print_r("タブレットです");
+			//			echo "</pre>";
 			    } else {
-						echo "<pre>";
-						print_r("タブレットじゃないモバイルです");
-						echo "</pre>";
+						$this->viewBuilder()->theme('Sp');
+			//			echo "<pre>";
+			//			print_r("タブレットじゃないモバイルです");
+			//			echo "</pre>";
 			    }
 			} else {
 	//			echo "<pre>";

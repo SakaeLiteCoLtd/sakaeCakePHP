@@ -28,18 +28,3 @@ $this->layout = "";//defaultのレイアウトを使わない
 
 
  <br><br><br>
-
- <table style="margin-bottom:0px" width=75% border="0" align="center" cellpadding="0" cellspacing="0">
-   <tr>
-     <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/processkatagae.gif',array('width'=>'180','height'=>'90','url'=>array('action'=>'menukatagae')));?></td>
-       <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/processkatagae.gif',array('width'=>'180','height'=>'90','url'=>array('action'=>'menukatagae')));?></td>
-   </tr>
- </table>
-
- <br><br><br>
-
-<br>
-<br>
-<br>
-<br>
-<br>

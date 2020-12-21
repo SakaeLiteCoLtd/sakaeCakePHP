@@ -3065,13 +3065,7 @@ class ApisController extends AppController
 
 			}
 
-	//		mb_convert_variables('UTF-8','SJIS-win',$arrOrderEdis);//文字コードを変換
-	//		mb_convert_variables('UTF-8','SJIS-win',$arrStockProducts);//文字コードを変換
-	//		mb_convert_variables('UTF-8','SJIS-win',$arrAssembleProducts);//文字コードを変換
-	//		mb_convert_variables('UTF-8','SJIS-win',$arrSyoyouKeikakus);//文字コードを変換
-	//		mb_convert_variables('UTF-8','SJIS-win',$arrSeisans);//文字コードを変換
-
-
+/*
 				$arrOrderEdis2 = array();
 				$arrStockProducts2 = array();
 				$arrAssembleProducts2 = array();
@@ -3079,45 +3073,29 @@ class ApisController extends AppController
 				$arrSeisans2 = array();
 
 				for($k=0; $k<10; $k++){
-
 					if(isset($arrOrderEdis[$k])){
-
 						$arrOrderEdis2[] = $arrOrderEdis[$k];
-
 					}
-
 					if(isset($arrStockProducts[$k])){
-
 						$arrStockProducts2[] = $arrStockProducts[$k];
-
 					}
-
 					if(isset($arrAssembleProducts[$k])){
-
 						$arrAssembleProducts2[] = $arrAssembleProducts[$k];
-
 					}
-
 					if(isset($arrSyoyouKeikakus[$k])){
-
 						$arrSyoyouKeikakus2[] = $arrSyoyouKeikakus[$k];
-
 					}
-
 					if(isset($arrSeisans[$k])){
-
 						$arrSeisans2[] = $arrSeisans[$k];
-
 					}
-
 				}
-
+*/
 			$this->set([
-				'OrderEdis' => $arrOrderEdis2,
-				'StockProducts' => $arrStockProducts2,
-				'AssembleProducts' => $arrAssembleProducts2,
-				'SyoyouKeikakus' => $arrSyoyouKeikakus2,
-				'Seisans' => $arrSeisans2,
+				'OrderEdis' => $arrOrderEdis,
+				'StockProducts' => $arrStockProducts,
+				'AssembleProducts' => $arrAssembleProducts,
+				'SyoyouKeikakus' => $arrSyoyouKeikakus,
+				'Seisans' => $arrSeisans,
 				'_serialize' => ['OrderEdis', 'StockProducts', 'AssembleProducts', 'SyoyouKeikakus', 'Seisans']
 			]);
 /*

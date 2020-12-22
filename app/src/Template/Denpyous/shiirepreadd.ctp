@@ -27,9 +27,9 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
           </tr>
         </table>
     <?= $this->Flash->render() ?>
-    <?= $this->Form->create($Users, ['url' => ['action' => 'syoumoulogin']]) ?>
+    <?= $this->Form->create($Users, ['url' => ['action' => 'shiirelogin']]) ?>
     <br><br>
-    <legend align="center"><strong style="font-size: 11pt; color:blue"><?= __("消耗・修繕発注　社員ID登録") ?></strong></legend>
+    <legend align="center"><strong style="font-size: 11pt; color:blue"><?= __("外注仕入発注　社員ID登録") ?></strong></legend>
     <fieldset>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>

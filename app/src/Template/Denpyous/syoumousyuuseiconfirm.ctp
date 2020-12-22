@@ -27,7 +27,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
           </tr>
         </table>
         <?= $this->Flash->render() ?>
-    <?= $this->Form->create($Users, ['url' => ['action' => 'syoumoudo']]) ?>
+    <?= $this->Form->create($Users, ['url' => ['action' => 'syoumousyuuseido']]) ?>
     <br><br><br>
     <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
       <tr>
@@ -96,7 +96,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
     <td bgcolor="#FFFFCC"><?= h(${"price".$i}) ?></td>
     <td bgcolor="#FFFFCC"><?= h(${"amount".$i}) ?></td>
     <td bgcolor="#FFFFCC"><?= h(${"date_deliver".$i}) ?></td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input('kannou'.$i, ["type"=>"select", "empty"=>"", "options"=>$arrKannou, 'label'=>false, 'required'=>true]); ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input('kannou'.$i, ["type"=>"select", "empty"=>"", "options"=>$arrKannou, 'label'=>false, 'value'=>${"kannou".$i},'required'=>true]); ?></td>
   </tr>
   <?= $this->Form->control('elementsiwakeid'.$i, array('type'=>'hidden', 'value'=>${"elementsiwakeid".$i}, 'label'=>false)) ?>
   <?= $this->Form->control('order_product_code'.$i, array('type'=>'hidden', 'value'=>${"order_product_code".$i}, 'label'=>false)) ?>

@@ -27,8 +27,11 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
           </tr>
         </table>
         <?= $this->Flash->render() ?>
-    <?= $this->Form->create($Users, ['url' => ['action' => 'syoumoudo']]) ?>
-    <br><br><br>
+    <?= $this->Form->create($Users, ['url' => ['action' => 'syoumoumenu']]) ?>
+    <br><br>
+    <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
+<br>
+
     <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
       <tr>
         <td  width="150" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">登録社員名</strong></td>
@@ -72,9 +75,6 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 
 <br><br><br><br><br><br>
 
-<legend align="left"><strong style="font-size: 11pt; color:red"><?= __("価格が不明な場合は、￥０で入力（ただし、前回注文履歴が有る場合は、前回価格で入力）、") ?></strong></legend>
-<legend align="left"><strong style="font-size: 11pt; color:red"><?= __("納入日が不明な場合は、おおよその日付で入力してください。") ?></strong></legend>
-<br>
 <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr style="border-bottom: solid;border-width: 1px">
     <td width='10'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue"></strong></td>
@@ -96,33 +96,19 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
     <td bgcolor="#FFFFCC"><?= h(${"price".$i}) ?></td>
     <td bgcolor="#FFFFCC"><?= h(${"amount".$i}) ?></td>
     <td bgcolor="#FFFFCC"><?= h(${"date_deliver".$i}) ?></td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input('kannou'.$i, ["type"=>"select", "empty"=>"", "options"=>$arrKannou, 'label'=>false, 'required'=>true]); ?></td>
+    <td bgcolor="#FFFFCC"><?= h(${"kannouhyouji".$i}) ?></td>
   </tr>
-  <?= $this->Form->control('elementsiwakeid'.$i, array('type'=>'hidden', 'value'=>${"elementsiwakeid".$i}, 'label'=>false)) ?>
-  <?= $this->Form->control('order_product_code'.$i, array('type'=>'hidden', 'value'=>${"order_product_code".$i}, 'label'=>false)) ?>
-  <?= $this->Form->control('order_product_name'.$i, array('type'=>'hidden', 'value'=>${"order_product_name".$i}, 'label'=>false)) ?>
-  <?= $this->Form->control('price'.$i, array('type'=>'hidden', 'value'=>${"price".$i}, 'label'=>false)) ?>
-  <?= $this->Form->control('amount'.$i, array('type'=>'hidden', 'value'=>${"amount".$i}, 'label'=>false)) ?>
-  <?= $this->Form->control('date_deliver'.$i, array('type'=>'hidden', 'value'=>${"date_deliver".$i}, 'label'=>false)) ?>
   <?= $this->Form->control('num', array('type'=>'hidden', 'value'=>$i, 'label'=>false)) ?>
   <?php endfor;?>
 
 </table>
-<br>
-<table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr bgcolor="#E6FFFF" >
-  <td width="30" colspan="50" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
-  <td align="right" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('登録'), array('name' => 'kakunin')); ?></div></td>
+  <td align="center" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="center"><?= $this->Form->submit(__('TOP'), array('name' => 'kakunin')); ?></div></td>
 </tr>
 </table>
 
-<br><br><br><br><br><br><br><br><br><br>
-<?= $this->Form->control('Staff', array('type'=>'hidden', 'value'=>$Staff, 'label'=>false)) ?>
-<?= $this->Form->control('Staffid', array('type'=>'hidden', 'value'=>$Staffid, 'label'=>false)) ?>
-<?= $this->Form->control('num_order', array('type'=>'hidden', 'value'=>$num_order, 'label'=>false)) ?>
-<?= $this->Form->control('syoumousupplierhyouji', array('type'=>'hidden', 'value'=>$syoumousupplierhyouji, 'label'=>false)) ?>
-<?= $this->Form->control('fromorderid', array('type'=>'hidden', 'value'=>$fromorderid, 'label'=>false)) ?>
-<?= $this->Form->control('date_order', array('type'=>'hidden', 'value'=>$date_order, 'label'=>false)) ?>
-<?= $this->Form->control('syoumousupplierid', array('type'=>'hidden', 'value'=>$syoumousupplierid, 'label'=>false)) ?>
+<br>
 
     <?= $this->Form->end() ?>

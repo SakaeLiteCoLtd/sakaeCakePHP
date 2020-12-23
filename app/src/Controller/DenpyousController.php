@@ -25,6 +25,7 @@ class DenpyousController extends AppController
 		 $this->OrderSyoumouShiireHeaders = TableRegistry::get('orderSyoumouShiireHeaders');
 		 $this->OrderSyoumouShiireFooders = TableRegistry::get('orderSyoumouShiireFooders');
 		 $this->ProductSuppliers = TableRegistry::get('productSuppliers');
+		 $this->OrderSpecialShiires = TableRegistry::get('orderSpecialShiires');
 		}
 
 			public function syoumoumenu()
@@ -491,7 +492,6 @@ class DenpyousController extends AppController
   	 		 $arrSyoumouSupplier[] = array($value->id=>$value->name);
   	 	 }
 			 $this->set('arrSyoumouSupplier',$arrSyoumouSupplier);
-
 	 	}
 
 		public function syoumouitiran()
@@ -1226,7 +1226,7 @@ class DenpyousController extends AppController
 	  	 $this->set('arrProductSupplier',$arrProductSupplier);
 
 			$arrElement = [
-				"kanagatashinsaku"=>"金型新作","kanagatakaizou"=>"金型改造","kanagatasyuri"=>"金型修理","shisaku"=>"試作","zumen"=>"図面","sonota"=>"その他"
+				" "=>" ","kanagatashinsaku"=>"金型新作","kanagatakaizou"=>"金型改造","kanagatasyuri"=>"金型修理","shisaku"=>"試作","zumen"=>"図面","sonota"=>"その他"
 			];
 	 	 $this->set('arrElement',$arrElement);
 
@@ -1236,49 +1236,455 @@ class DenpyousController extends AppController
 		{
 			$data = $this->request->getData();
 
-			echo "<pre>";
-			print_r($data);
-			echo "</pre>";
+			$Users = $this->Users->newEntity();
+			$this->set('Users',$Users);
 
+			$date_order = $data['date_order']['year']."-".$data['date_order']['month']."-".$data['date_order']['day'];
+			$this->set('date_order',$date_order);
+
+			$num_order = $data['num_order'];
+			$this->set('num_order',$num_order);
+			$Staff = $data['Staff'];
+			$this->set('Staff',$Staff);
+			$Staffid = $data['Staffid'];
+			$this->set('Staffid',$Staffid);
+
+			$ProductSupplierId = $data['ProductSupplierId'];
+			$this->set('ProductSupplierId',$ProductSupplierId);
+			$ProductSuppliers = $this->ProductSuppliers->find('all')->where(['id' => $ProductSupplierId])->toArray();
+			$ProductSupplierhyouji = $ProductSuppliers[0]->name;
+			$this->set('ProductSupplierhyouji',$ProductSupplierhyouji);
+			$order_name = $data['order_name']."(".$data['order_name_element'].")";
+			$this->set('order_name',$order_name);
+			$price = $data['price'];
+			$this->set('price',$price);
+			$amount = $data['amount'];
+			$this->set('amount',$amount);
+			$date_deliver = $data['date_deliver']['year']."-".$data['date_deliver']['month']."-".$data['date_deliver']['day'];
+			$this->set('date_deliver',$date_deliver);
 	 	}
 
 		public function shiiredo()
 		{
+			$data = $this->request->getData();
+
+			$Users = $this->Users->newEntity();
+			$this->set('Users',$Users);
+
+			$date_order = $data['date_order'];
+			$this->set('date_order',$date_order);
+
+			$num_order = $data['num_order'];
+			$this->set('num_order',$num_order);
+			$Staff = $data['Staff'];
+			$this->set('Staff',$Staff);
+			$Staffid = $data['Staffid'];
+			$this->set('Staffid',$Staffid);
+
+			$ProductSupplierId = $data['ProductSupplierId'];
+			$this->set('ProductSupplierId',$ProductSupplierId);
+			$ProductSuppliers = $this->ProductSuppliers->find('all')->where(['id' => $ProductSupplierId])->toArray();
+			$ProductSupplierhyouji = $ProductSuppliers[0]->name;
+			$this->set('ProductSupplierhyouji',$ProductSupplierhyouji);
+			$order_name = $data['order_name'];
+			$this->set('order_name',$order_name);
+			$price = $data['price'];
+			$this->set('price',$price);
+			$amount = $data['amount'];
+			$this->set('amount',$amount);
+			$date_deliver = $data['date_deliver'];
+			$this->set('date_deliver',$date_deliver);
+
+			$check = $data['check'];
+			if($check == 1){
+				$kannou = "完納済";
+			}else{
+				$kannou = "未納";
+			}
+			$this->set('kannou',$kannou);
+
+			$arrTourokushiire = [
+				"date_order"=>$data['date_order'],
+				"num_order"=>$data['num_order'],
+				"order_name"=>$data['order_name'],
+				"price"=>$data['price'],
+				"date_deliver"=>$data['date_deliver'],
+				"amount"=>$data['amount'],
+				"product_supplier_id"=>$data['ProductSupplierId'],
+				"kannou"=>$data['check'],
+				"delete_flag"=>0,
+				"created_staff"=>$data['Staffid'],
+				"created_at"=>date('Y-m-d H:i:s')
+			];
+/*
+			echo "<pre>";
+			print_r($arrTourokushiire);
+			echo "</pre>";
+*/
+			if ($this->request->is('post')) {
+				$OrderSpecialShiires = $this->OrderSpecialShiires->patchEntity($this->OrderSpecialShiires->newEntity(), $arrTourokushiire);//$customerデータ（空の行）を$this->request->getData()に更新する
+				$connection = ConnectionManager::get('default');//トランザクション1
+				// トランザクション開始2
+				$connection->begin();//トランザクション3
+				try {//トランザクション4
+					if ($this->OrderSpecialShiires->save($OrderSpecialShiires)) {
+
+            //旧DBに製品登録
+						$connection = ConnectionManager::get('DB_ikou_test');
+						$table = TableRegistry::get('order_special_shiire');
+						$table->setConnection($connection);
+
+            $connection->insert('order_special_shiire', [
+                'date_order' => $arrTourokushiire["date_order"],
+								'num_order' => $arrTourokushiire["num_order"],
+								'order_name' => $arrTourokushiire["order_name"],
+								'price' => $arrTourokushiire["price"],
+								'date_deliver' => $arrTourokushiire["date_deliver"],
+								'amount' => $arrTourokushiire["amount"],
+								'ps_id' => $arrTourokushiire["product_supplier_id"],
+								'kannou' => $arrTourokushiire["kannou"],
+								'delete_flag' => $arrTourokushiire["delete_flag"],
+								'emp_id' => $arrTourokushiire["created_staff"],
+								'created_at' => $arrTourokushiire["created_at"]
+            ]);
+
+            $connection = ConnectionManager::get('default');//新DBに戻る
+            $table->setConnection($connection);
+
+						$mes = "※下記のように登録されました";
+						$this->set('mes',$mes);
+						$connection->commit();// コミット5
+					} else {
+						$mes = "※登録されませんでした";
+						$this->set('mes',$mes);
+						$this->Flash->error(__('The data could not be saved. Please, try again.'));
+						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+					}
+				} catch (Exception $e) {//トランザクション7
+				//ロールバック8
+					$connection->rollback();//トランザクション9
+				}//トランザクション10
+			}
 
 	 	}
 
 		public function shiireitiranform()
 		{
+			$Users = $this->Users->newEntity();
+			$this->set('Users',$Users);
 
+			$arrProductSuppliers = $this->ProductSuppliers->find('all')->where(['delete_flag' => 0])->order(['id' => 'ASC']);
+			$arrProductSupplier = array();
+	  	 foreach ($arrProductSuppliers as $value) {
+	  		 $arrProductSupplier[] = array($value->id=>$value->name);
+	  	 }
+	  	 $this->set('arrProductSupplier',$arrProductSupplier);
 	 	}
 
 		public function shiireitiran()
 		{
+			$Users = $this->Users->newEntity();
+			$this->set('Users',$Users);
+
+			$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+			$date_sta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
+			$date_fin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
+
+			if(empty($data['product_supplier_id'])){
+
+				$arrOrderSpecialShiires = $this->OrderSpecialShiires->find('all')->where(['date_order >=' => $date_sta, 'date_order <' => $date_fin, 'delete_flag' => 0])->order(['date_order' => 'ASC'])->toArray();
+
+			}else{
+
+				$arrOrderSpecialShiires = $this->OrderSpecialShiires->find()->contain(["ProductSuppliers"])
+				->where(['date_order >=' => $date_sta, 'date_order <' => $date_fin, 'product_supplier_id' => $data['product_supplier_id']])->toArray();
+
+			}
+
+			$arrOrderSpecialShiire = array();
+			for($n=0; $n<count($arrOrderSpecialShiires); $n++){
+				$product_supplier_id = $arrOrderSpecialShiires[$n]->product_supplier_id;
+
+				$ProductSuppliers = $this->ProductSuppliers->find('all')->where(['id' => $product_supplier_id])->toArray();
+				$ProductSuppliername = $ProductSuppliers[0]->name;
+
+				if($arrOrderSpecialShiires[$n]->kannou == 1){
+					$kannouhyouji = "完納";
+				}else{
+					$kannouhyouji = "未納";
+				}
+				$arrOrderSpecialShiire[] = [
+					'ProductSuppliername' => $ProductSuppliername,
+					'id' => $arrOrderSpecialShiires[$n]->id,
+					'date_order' => $arrOrderSpecialShiires[$n]->date_order,
+					'num_order' => $arrOrderSpecialShiires[$n]->num_order,
+					'order_name' => $arrOrderSpecialShiires[$n]->order_name,
+					'price' => $arrOrderSpecialShiires[$n]->price,
+					'amount' => $arrOrderSpecialShiires[$n]->amount,
+					'kannouhyouji' => $kannouhyouji,
+					'kannou' => $arrOrderSpecialShiires[$n]->kannou
+			 ];
+		 }
+		 $this->set('arrOrderSpecialShiire',$arrOrderSpecialShiire);
 
 	 	}
 
 		public function shiiresyuuseipreadd()
 		{
+			$this->request->session()->destroy();// セッションの破棄
 
+			$data = $this->request->getData();
+			$data = array_keys($data, '編集');
+			$OrderSpecialShiireid = $data[0];
+
+			session_start();
+
+			$_SESSION['OrderSpecialShiireid'] = array(
+				'id' => $OrderSpecialShiireid
+			);
+
+			$Users = $this->Users->newEntity();
+	    $this->set('Users',$Users);
 	 	}
 
 		public function shiiresyuuseilogin()
 		{
+			if ($this->request->is('post')) {
+ 			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+ 			 $this->set('data',$data);//セット
+ 			 $userdata = $data['username'];
+ 			 $this->set('userdata',$userdata);//セット
 
+ 			 $htmllogin = new htmlLogin();//クラスを使用
+ 			 $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
+
+ 			 $username = $arraylogindate[0];
+ 			 $delete_flag = $arraylogindate[1];
+ 			 $this->set('username',$username);
+ 			 $this->set('delete_flag',$delete_flag);
+
+ 			 $user = $this->Auth->identify();
+
+ 				if ($user) {
+ 					$this->Auth->setUser($user);
+ 					return $this->redirect(['action' => 'shiiresyuuseiform',//以下のデータを持ってshiireformに移動
+ 					's' => ['username' => $username]]);
+ 				}
+ 			}
 	 	}
 
 		public function shiiresyuuseiform()
 		{
+			$Users = $this->Users->newEntity();
+			$this->set('Users',$Users);
 
+			$session = $this->request->getSession();
+			$sessiondata = $session->read();
+
+			$Staffid = $sessiondata['Auth']['User']['staff_id'];
+			$this->set('Staffid',$Staffid);
+
+			$arrProductSuppliers = $this->ProductSuppliers->find('all')->where(['delete_flag' => 0])->order(['id' => 'ASC']);
+			$arrProductSupplier = array();
+			 foreach ($arrProductSuppliers as $value) {
+				 $arrProductSupplier[] = array($value->id=>$value->name);
+			 }
+			 $this->set('arrProductSupplier',$arrProductSupplier);
+
+			$arrElement = [
+				" "=>" ","kanagatashinsaku"=>"金型新作","kanagatakaizou"=>"金型改造","kanagatasyuri"=>"金型修理","shisaku"=>"試作","zumen"=>"図面","sonota"=>"その他"
+			];
+		 $this->set('arrElement',$arrElement);
+
+		 $OrderSpecialShiireid = $sessiondata['OrderSpecialShiireid']['id'];
+		 $OrderSpecialShiires = $this->OrderSpecialShiires->find('all')->where(['id' => $OrderSpecialShiireid])->toArray();
+		 $date_order = $OrderSpecialShiires[0]->date_order;
+		 $this->set('date_order',$date_order);
+		 $num_order = $OrderSpecialShiires[0]->num_order;
+		 $this->set('num_order',$num_order);
+		 $product_supplier_id = $OrderSpecialShiires[0]->product_supplier_id;
+		 $this->set('product_supplier_id',$product_supplier_id);
+		 $order_name = $OrderSpecialShiires[0]->order_name;
+		 $order_namearr = explode("(",$order_name);//切り離し
+		 $order_name = $order_namearr[0];
+		 if(isset($order_namearr[1])){
+			 $order_elementarr = explode(")",$order_namearr[1]);//切り離し
+			 $order_element = $order_elementarr[0];
+		 }else{
+			 $order_element = "";
+		 }
+		 $this->set('order_name',$order_name);
+		 $this->set('order_element',$order_element);
+		 $price = $OrderSpecialShiires[0]->price;
+		 $this->set('price',$price);
+		 $amount = $OrderSpecialShiires[0]->amount;
+		 $this->set('amount',$amount);
+		 $date_deliver = $OrderSpecialShiires[0]->date_deliver;
+		 $this->set('date_deliver',$date_deliver);
+		 $delete_flag = $OrderSpecialShiires[0]->delete_flag;
+		 $this->set('delete_flag',$delete_flag);
 	 	}
 
 		public function shiiresyuuseiconfirm()
 		{
+			$Users = $this->Users->newEntity();
+			$this->set('Users',$Users);
+
+			$data = $this->request->getData();
+
+			$date_order = $data['date_order']['year']."-".$data['date_order']['month']."-".$data['date_order']['day'];
+			$this->set('date_order',$date_order);
+
+			$num_order = $data['num_order'];
+			$this->set('num_order',$num_order);
+			$Staffid = $data['Staffid'];
+			$this->set('Staffid',$Staffid);
+
+			$ProductSupplierId = $data['ProductSupplierId'];
+			$this->set('ProductSupplierId',$ProductSupplierId);
+			$ProductSuppliers = $this->ProductSuppliers->find('all')->where(['id' => $ProductSupplierId])->toArray();
+			$ProductSupplierhyouji = $ProductSuppliers[0]->name;
+			$this->set('ProductSupplierhyouji',$ProductSupplierhyouji);
+			$order_name = $data['order_name']."(".$data['order_name_element'].")";
+			$this->set('order_name',$order_name);
+			$price = $data['price'];
+			$this->set('price',$price);
+			$amount = $data['amount'];
+			$this->set('amount',$amount);
+			$date_deliver = $data['date_deliver']['year']."-".$data['date_deliver']['month']."-".$data['date_deliver']['day'];
+			$this->set('date_deliver',$date_deliver);
+			$delete_flag = $data['check'];
+			$this->set('delete_flag',$delete_flag);
+
+			session_start();
+
+			$_SESSION['tourokushiiresyuusei'] = array(
+  			 'date_order' => $date_order,
+  			 'num_order' => $num_order,
+  			 'order_name' => $order_name,
+  			 'price' => $price,
+				 'amount' => $amount,
+				 'date_deliver' => $date_deliver,
+				 'product_supplier_id' => $ProductSupplierId,
+  			 "delete_flag" => $delete_flag,
+  			 'created_at' => date('Y-m-d H:i:s'),
+  			 'created_staff' => $Staffid
+  		 );
 
 	 	}
 
 		public function shiiresyuuseido()
 		{
+			$Users = $this->Users->newEntity();
+			$this->set('Users',$Users);
+
+			$session = $this->request->getSession();
+			$sessiondata = $session->read();
+
+			$OrderSpecialShiires = $this->OrderSpecialShiires->find('all')->where(['id' => $sessiondata["OrderSpecialShiireid"]["id"]])->toArray();
+			$moto_date_order = $OrderSpecialShiires[0]->date_order;
+			$moto_num_order = $OrderSpecialShiires[0]->num_order;
+			$moto_product_supplier_id = $OrderSpecialShiires[0]->product_supplier_id;
+			$moto_kannou = $OrderSpecialShiires[0]->kannou;
+
+			if(isset($data["check"])){
+				$sessiondata["tourokushiiresyuusei"] = array_merge($sessiondata["tourokushiiresyuusei"],array('kannou'=>$data["check"]));
+
+			}else{
+				$sessiondata["tourokushiiresyuusei"] = array_merge($sessiondata["tourokushiiresyuusei"],array('kannou'=>$moto_kannou));
+
+			}
+
+			$data = $this->request->getData();
+
+			$date_order = $sessiondata["tourokushiiresyuusei"]['date_order'];
+			$this->set('date_order',$date_order);
+
+			$num_order = $sessiondata["tourokushiiresyuusei"]['num_order'];
+			$this->set('num_order',$num_order);
+			$ProductSupplierId = $sessiondata["tourokushiiresyuusei"]['product_supplier_id'];
+			$this->set('ProductSupplierId',$ProductSupplierId);
+			$ProductSuppliers = $this->ProductSuppliers->find('all')->where(['id' => $ProductSupplierId])->toArray();
+			$ProductSupplierhyouji = $ProductSuppliers[0]->name;
+			$this->set('ProductSupplierhyouji',$ProductSupplierhyouji);
+			$order_name = $sessiondata["tourokushiiresyuusei"]['order_name'];
+			$this->set('order_name',$order_name);
+			$price = $sessiondata["tourokushiiresyuusei"]['price'];
+			$this->set('price',$price);
+			$amount = $sessiondata["tourokushiiresyuusei"]['amount'];
+			$this->set('amount',$amount);
+			$date_deliver = $sessiondata["tourokushiiresyuusei"]['date_deliver'];
+			$this->set('date_deliver',$date_deliver);
+			$delete_flag = $sessiondata["tourokushiiresyuusei"]['delete_flag'];
+			$this->set('delete_flag',$delete_flag);
+			$kannou = $sessiondata["tourokushiiresyuusei"]['kannou'];
+			if($kannou == 1){
+				$kannou = "完納";
+			}else{
+				$kannou = "未納";
+			}
+			$this->set('kannou',$kannou);
+/*
+			echo "<pre>";
+			print_r($sessiondata["tourokushiiresyuusei"]);
+			echo "</pre>";
+*/
+			if ($this->request->is('post')) {
+				$OrderSpecialShiires = $this->OrderSpecialShiires->patchEntity($this->OrderSpecialShiires->newEntity(), $sessiondata['tourokushiiresyuusei']);
+				$connection = ConnectionManager::get('default');//トランザクション1
+				 // トランザクション開始2
+				 $connection->begin();//トランザクション3
+				 try {//トランザクション4
+					 if ($this->OrderSpecialShiires->updateAll(
+						 ['date_order' => $sessiondata['tourokushiiresyuusei']['date_order'], 'num_order' => $sessiondata['tourokushiiresyuusei']['num_order'],
+							'order_name' => $sessiondata['tourokushiiresyuusei']['order_name'], 'price' => $sessiondata['tourokushiiresyuusei']['price'],
+							'amount' => $sessiondata['tourokushiiresyuusei']['amount'], 'date_deliver' => $sessiondata['tourokushiiresyuusei']['date_deliver'],
+							'product_supplier_id' => $sessiondata['tourokushiiresyuusei']['product_supplier_id'], 'kannou' => $sessiondata['tourokushiiresyuusei']['kannou'],
+							'delete_flag' => $sessiondata['tourokushiiresyuusei']['delete_flag'],
+							'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessiondata['tourokushiiresyuusei']['created_staff']],
+						 ['id'  => $sessiondata['OrderSpecialShiireid']['id']]
+					 )){
+
+						 //旧DBに単価登録
+						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $table = TableRegistry::get('order_special_shiire');
+						 $table->setConnection($connection);
+
+						 $updater = "UPDATE order_special_shiire set date_order ='".$sessiondata['tourokushiiresyuusei']['date_order']."' , num_order ='".$sessiondata['tourokushiiresyuusei']['num_order']."' ,
+						 order_name ='".$sessiondata['tourokushiiresyuusei']['order_name']."', price ='".$sessiondata['tourokushiiresyuusei']['price']."',
+						 amount ='".$sessiondata['tourokushiiresyuusei']['amount']."', date_deliver ='".$sessiondata['tourokushiiresyuusei']['date_deliver']."',
+						 ps_id ='".$sessiondata['tourokushiiresyuusei']['product_supplier_id']."', kannou ='".$sessiondata['tourokushiiresyuusei']['kannou']."',
+						 delete_flag ='".$sessiondata['tourokushiiresyuusei']['delete_flag']."', update_emp_id ='".$sessiondata['tourokushiiresyuusei']['created_staff']."' ,updated_at ='".date('Y-m-d H:i:s')."'
+						 where date_order ='".$moto_date_order."' and num_order ='".$moto_num_order."' and ps_id ='".$moto_product_supplier_id."' and kannou ='".$moto_kannou."'";
+						 $connection->execute($updater);
+
+						 $connection = ConnectionManager::get('default');//新DBに戻る
+						 $table->setConnection($connection);
+
+						 $mes = "※下記のように更新されました";
+						 $this->set('mes',$mes);
+						 $connection->commit();// コミット5
+
+					 } else {
+
+						 $mes = "※更新されませんでした";
+						 $this->set('mes',$mes);
+						 $this->Flash->error(__('The product could not be saved. Please, try again.'));
+						 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+					 }
+
+			 } catch (Exception $e) {//トランザクション7
+			 //ロールバック8
+				 $connection->rollback();//トランザクション9
+			 }//トランザクション10
+			}
+
+			if($delete_flag == 1){
+				$mes = "※以下のデータが削除されました。";
+				$this->set('mes',$mes);
+			}
 
 	 	}
 

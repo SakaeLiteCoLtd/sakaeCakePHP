@@ -64,7 +64,8 @@ class ApisController extends AppController
 			for($k=0; $k<count($ScheduleKouteis); $k++){
 
 				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
-	      $product_name = $Product[0]->product_name;
+				$product_name = $Product[0]->product_name;
+	 //			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
 
 				$arrScheduleKoutei_csv[] = [
 					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
@@ -131,6 +132,7 @@ class ApisController extends AppController
 				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
 				if(isset($Product[0])){
 					$product_name = $Product[0]->product_name;
+		 //			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
 				}else{
 					$product_name = "";
 				}
@@ -192,6 +194,7 @@ class ApisController extends AppController
 				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
 				if(isset($Product[0])){
 					$product_name = $Product[0]->product_name;
+		 //			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
 				}else{
 					$product_name = "　";
 				}
@@ -261,6 +264,7 @@ class ApisController extends AppController
 				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
 				if(isset($Product[0])){
 					$product_name = $Product[0]->product_name;
+		 //			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
 				}else{
 					$product_name = "　";
 				}
@@ -309,6 +313,29 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0, 'primary_p' => 1,
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
@@ -317,20 +344,37 @@ class ApisController extends AppController
 
 				$arrOrderEdis = array();//注文呼び出し
 				$arrAssembleProducts = array();
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+								 unset($arrProductsmoto[$l]);
+								 $arrProductsmoto = array_values($arrProductsmoto);
+
+							 }
+
+						}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -338,8 +382,6 @@ class ApisController extends AppController
 	 					if(isset($AssembleProducts[0])){
 
 	 							$arrAssembleProducts[] = [
-				//					'date_order' => $OrderEdis[$k]["date_order"],
-				//					'date_deliver' => $OrderEdis[$k]["date_deliver"],
 	 								'product_code' => $AssembleProducts[0]["product_code"],
 	 								'inzu' => $AssembleProducts[0]["inzu"]
 	 						 ];
@@ -350,8 +392,48 @@ class ApisController extends AppController
 
 				}
 
+				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+				for($l=0; $l<count($arrOrderEdis); $l++){
+
+					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+/*
+							echo "<pre>";
+							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
+							echo "</pre>";
+*/
+							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+
+							$arrOrderEdis[$l]["amount"] = $amount;
+							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+							unset($arrOrderEdis[$m]);
+							$arrOrderEdis = array_values($arrOrderEdis);
+
+						}
+
+					}
+
+				}
+
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_stock"=>"ASC"])->toArray();
 
@@ -371,7 +453,6 @@ class ApisController extends AppController
 						}
 
 					}
-
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
@@ -411,20 +492,24 @@ class ApisController extends AppController
 						if(isset($Product[0])){
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
-/*
-							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
+/*
+							echo "<pre>";
+							print_r(substr($KadouSeikeis[$k]['starting_tm'], 10));
+							echo "</pre>";
+							echo "<pre>";
+							print_r($dateseikei." - ".strtotime(" 08:00:00"));
+							echo "</pre>";
+*/
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));//選択した月の最後の日
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
-/*
-							echo "<pre>";
-							print_r($nippouday);
-							echo "</pre>";
-*/
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -432,7 +517,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
-				//				'nippouday' => $nippouday,
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -441,13 +526,30 @@ class ApisController extends AppController
 						}
 
 					}
-
 /*
-				echo "<pre>";
-				print_r($arrStockProducts);
-				echo "</pre>";
+					echo "<pre>";
+					var_dump($arrSeisans[0]);
+					echo "</pre>";
 */
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
 
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
+					}
+/*
+					echo "<pre>";
+					var_dump($tmp_product_array);
+					echo "</pre>";
+					echo "<pre>";
+					var_dump($tmp_dateseikei_array);
+					echo "</pre>";
+*/
 			}elseif($sheet === "primary_dnp"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -455,6 +557,29 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0, 'primary_p' => 1,
+				'OR' => [['customer_code like' => '2%']]])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
@@ -470,14 +595,30 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+								 unset($arrProductsmoto[$l]);
+								 $arrProductsmoto = array_values($arrProductsmoto);
+
+							 }
+
+						}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -494,9 +635,79 @@ class ApisController extends AppController
 					}
 
 				}
+				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+				for($l=0; $l<count($arrOrderEdis); $l++){
 
+					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+/*
+							echo "<pre>";
+							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
+							echo "</pre>";
+*/
+							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+
+							$arrOrderEdis[$l]["amount"] = $amount;
+							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+							unset($arrOrderEdis[$m]);
+							$arrOrderEdis = array_values($arrOrderEdis);
+
+						}
+
+					}
+
+				}
+
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+/*
+				for($j=0; $j<count($arrProducts); $j++){
+
+					for($k=0; $k<count($OrderEdis); $k++){
+
+						if($arrProducts[$j]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+							$product_name = $Product[0]->product_name;
+				//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+							$arrOrderEdis[] = [
+								'date_order' => "",
+								'num_order' => "",
+								'product_code' => $arrProducts[$j]["product_code"],
+								'product_name' => $product_name,
+								'price' => "",
+								'date_deliver' => "",
+								'amount' => ""
+						 ];
+
+						}
+
+					}
+
+				}
+*/
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+/*
+				echo "<pre>";
+				print_r($arrOrderEdis);
+				echo "</pre>";
+*/
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast])
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
 				->order(["date_stock"=>"ASC"])->toArray();
 
 					$arrStockProducts = array();
@@ -556,6 +767,15 @@ class ApisController extends AppController
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -563,6 +783,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -572,6 +793,18 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
+
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
+					}
+
 			}elseif($sheet === "primary_w"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -579,6 +812,29 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0, 'primary_p' => 1, 'customer_code' => '10002',
+				'OR' => [['product_code like' => 'W%', 'product_code like' => 'AW%']]])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
@@ -594,14 +850,30 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+						 							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+						 								 unset($arrProductsmoto[$l]);
+						 								 $arrProductsmoto = array_values($arrProductsmoto);
+
+						 							 }
+
+						 		 				}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -619,8 +891,48 @@ class ApisController extends AppController
 
 				}
 
+				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+				for($l=0; $l<count($arrOrderEdis); $l++){
+
+					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+/*
+							echo "<pre>";
+							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
+							echo "</pre>";
+*/
+							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+
+							$arrOrderEdis[$l]["amount"] = $amount;
+							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+							unset($arrOrderEdis[$m]);
+							$arrOrderEdis = array_values($arrOrderEdis);
+
+						}
+
+					}
+
+				}
+
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_stock"=>"ASC"])->toArray();
 
@@ -683,6 +995,15 @@ class ApisController extends AppController
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -690,6 +1011,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -699,6 +1021,18 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
+
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
+					}
+
 			}elseif($sheet === "primary_h"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -706,6 +1040,29 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0, 'customer_code' => '10002',
+				'OR' => [['product_code like' => 'H%']]])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
@@ -721,14 +1078,30 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+								 unset($arrProductsmoto[$l]);
+								 $arrProductsmoto = array_values($arrProductsmoto);
+
+							 }
+
+						}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -746,8 +1119,48 @@ class ApisController extends AppController
 
 				}
 
+				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+				for($l=0; $l<count($arrOrderEdis); $l++){
+
+					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+/*
+							echo "<pre>";
+							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
+							echo "</pre>";
+*/
+							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+
+							$arrOrderEdis[$l]["amount"] = $amount;
+							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+							unset($arrOrderEdis[$m]);
+							$arrOrderEdis = array_values($arrOrderEdis);
+
+						}
+
+					}
+
+				}
+
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 				->order(["date_stock"=>"ASC"])->toArray();
 
@@ -810,6 +1223,15 @@ class ApisController extends AppController
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -817,6 +1239,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -826,6 +1249,18 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
+
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
+					}
+
 			}elseif($sheet === "reizouko"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -833,6 +1268,28 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0, 'customer_code' => '10005'])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
@@ -848,14 +1305,30 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+								 unset($arrProductsmoto[$l]);
+								 $arrProductsmoto = array_values($arrProductsmoto);
+
+							 }
+
+						}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -873,8 +1346,48 @@ class ApisController extends AppController
 
 				}
 
+				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+				for($l=0; $l<count($arrOrderEdis); $l++){
+
+					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+/*
+							echo "<pre>";
+							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
+							echo "</pre>";
+*/
+							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+
+							$arrOrderEdis[$l]["amount"] = $amount;
+							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+							unset($arrOrderEdis[$m]);
+							$arrOrderEdis = array_values($arrOrderEdis);
+
+						}
+
+					}
+
+				}
+
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast])
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
 				->order(["date_stock"=>"ASC"])->toArray();
 
 					$arrStockProducts = array();
@@ -934,6 +1447,15 @@ class ApisController extends AppController
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -941,6 +1463,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -950,6 +1473,18 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
+
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
+					}
+
 			}elseif($sheet === "uwawaku"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -957,6 +1492,28 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0, 'customer_code' => '10003'])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
@@ -972,14 +1529,30 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+								 unset($arrProductsmoto[$l]);
+								 $arrProductsmoto = array_values($arrProductsmoto);
+
+							 }
+
+						}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -997,8 +1570,48 @@ class ApisController extends AppController
 
 				}
 
+				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+				for($l=0; $l<count($arrOrderEdis); $l++){
+
+					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+/*
+							echo "<pre>";
+							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
+							echo "</pre>";
+*/
+							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+
+							$arrOrderEdis[$l]["amount"] = $amount;
+							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+							unset($arrOrderEdis[$m]);
+							$arrOrderEdis = array_values($arrOrderEdis);
+
+						}
+
+					}
+
+				}
+
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast])
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
 				->order(["date_stock"=>"ASC"])->toArray();
 
 					$arrStockProducts = array();
@@ -1058,6 +1671,15 @@ class ApisController extends AppController
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -1065,6 +1687,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -1074,6 +1697,18 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
+
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
+					}
+
 			}elseif($sheet === "other"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -1081,6 +1716,29 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0, 'customer_code not like' => '1%',
+				'OR' => [['customer_code like' => '2%']]])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code not like' => '1%',
@@ -1098,14 +1756,30 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+						 							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+						 								 unset($arrProductsmoto[$l]);
+						 								 $arrProductsmoto = array_values($arrProductsmoto);
+
+						 							 }
+
+						 		 				}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -1123,8 +1797,48 @@ class ApisController extends AppController
 
 				}
 
+				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+				for($l=0; $l<count($arrOrderEdis); $l++){
+
+					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+/*
+							echo "<pre>";
+							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
+							echo "</pre>";
+*/
+							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+
+							$arrOrderEdis[$l]["amount"] = $amount;
+							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+							unset($arrOrderEdis[$m]);
+							$arrOrderEdis = array_values($arrOrderEdis);
+
+						}
+
+					}
+
+				}
+
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast])
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
 				->order(["date_stock"=>"ASC"])->toArray();
 
 					$arrStockProducts = array();
@@ -1190,6 +1904,15 @@ class ApisController extends AppController
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -1197,6 +1920,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -1206,6 +1930,18 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
+
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
+					}
+
 			}elseif($sheet === "p0"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -1213,6 +1949,29 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0, 'primary_p' => 0, 'customer_code' => '10001',
+				'OR' => [['product_code like' => 'P0%']]])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10001',
@@ -1228,14 +1987,30 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+								 unset($arrProductsmoto[$l]);
+								 $arrProductsmoto = array_values($arrProductsmoto);
+
+							 }
+
+						}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -1253,8 +2028,48 @@ class ApisController extends AppController
 
 				}
 
+				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+				for($l=0; $l<count($arrOrderEdis); $l++){
+
+					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+/*
+							echo "<pre>";
+							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
+							echo "</pre>";
+*/
+							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+
+							$arrOrderEdis[$l]["amount"] = $amount;
+							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+							unset($arrOrderEdis[$m]);
+							$arrOrderEdis = array_values($arrOrderEdis);
+
+						}
+
+					}
+
+				}
+
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 				->order(["date_stock"=>"ASC"])->toArray();
 
@@ -1317,6 +2132,15 @@ class ApisController extends AppController
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -1324,6 +2148,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -1333,6 +2158,18 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
+
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
+					}
+
 			}elseif($sheet === "p1"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -1340,10 +2177,33 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0, 'primary_p' => 0, 'customer_code' => '10001',
+				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10001',
-				'OR' => [['product_code like' => 'P1%' ,'product_code like' => 'P2%']]])//productsの絞込みp1
+				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
@@ -1355,14 +2215,30 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+						 							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+						 								 unset($arrProductsmoto[$l]);
+						 								 $arrProductsmoto = array_values($arrProductsmoto);
+
+						 							 }
+
+						 		 				}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -1380,9 +2256,49 @@ class ApisController extends AppController
 
 				}
 
+				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+				for($l=0; $l<count($arrOrderEdis); $l++){
+
+					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+/*
+							echo "<pre>";
+							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
+							echo "</pre>";
+*/
+							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+
+							$arrOrderEdis[$l]["amount"] = $amount;
+							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+							unset($arrOrderEdis[$m]);
+							$arrOrderEdis = array_values($arrOrderEdis);
+
+						}
+
+					}
+
+				}
+
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
-				'OR' => [['product_code like' => 'P1%' ,'product_code like' => 'P2%']]])//productsの絞込みp1
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_stock"=>"ASC"])->toArray();
 
 					$arrStockProducts = array();
@@ -1405,7 +2321,7 @@ class ApisController extends AppController
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
-				'OR' => [['product_code like' => 'P1%' ,'product_code like' => 'P2%']]])//productsの絞込みp1
+				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -1431,7 +2347,7 @@ class ApisController extends AppController
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
-				'OR' => [['product_code like' => 'P1%' ,'product_code like' => 'P2%']]])//productsの絞込みp1
+				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["starting_tm"=>"ASC"])->toArray();
 
 					$arrSeisans = array();
@@ -1444,6 +2360,15 @@ class ApisController extends AppController
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -1451,6 +2376,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -1460,6 +2386,18 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
+
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
+					}
+
 			}elseif($sheet === "w"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -1467,10 +2405,33 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0, 'customer_code' => '10002',
+				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
-				'OR' => [['product_code like' => 'W%', 'product_code like' => 'AW%']]])//productsの絞込みw
+				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
@@ -1482,14 +2443,30 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+						 							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+						 								 unset($arrProductsmoto[$l]);
+						 								 $arrProductsmoto = array_values($arrProductsmoto);
+
+						 							 }
+
+						 		 				}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -1507,8 +2484,48 @@ class ApisController extends AppController
 
 				}
 
+				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+				for($l=0; $l<count($arrOrderEdis); $l++){
+
+					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+/*
+							echo "<pre>";
+							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
+							echo "</pre>";
+*/
+							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+
+							$arrOrderEdis[$l]["amount"] = $amount;
+							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+							unset($arrOrderEdis[$m]);
+							$arrOrderEdis = array_values($arrOrderEdis);
+
+						}
+
+					}
+
+				}
+
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_stock"=>"ASC"])->toArray();
 
@@ -1571,6 +2588,15 @@ class ApisController extends AppController
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -1578,6 +2604,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -1587,6 +2614,18 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
+
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
+					}
+
 			}elseif($sheet === "dnp"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -1594,6 +2633,29 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0, 'customer_code like' => '2%',
+				'OR' => [['product_code like' => '2%']]])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
@@ -1609,14 +2671,30 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+						 							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+						 								 unset($arrProductsmoto[$l]);
+						 								 $arrProductsmoto = array_values($arrProductsmoto);
+
+						 							 }
+
+						 		 				}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -1634,8 +2712,22 @@ class ApisController extends AppController
 
 				}
 
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast])
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
 				->order(["date_stock"=>"ASC"])->toArray();
 
 					$arrStockProducts = array();
@@ -1695,6 +2787,15 @@ class ApisController extends AppController
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -1702,6 +2803,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -1711,6 +2813,18 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
+
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
+					}
+
 			}elseif($sheet === "sinsei"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -1718,6 +2832,29 @@ class ApisController extends AppController
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 				$datelast = strtotime($datenext1);
 				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
+				$dateback = strtotime($dateback1);
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+
+				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+				->where(['products.status' => 0,  'primary_p' => 0,
+				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])->toArray();
+
+				$arrProductsmoto = array();
+				for($k=0; $k<count($arrProducts); $k++){
+
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => ""
+				 ];
+
+				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
@@ -1732,14 +2869,30 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						$product_name = $Product[0]->product_name;
+			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
 								'product_code' => $OrderEdis[$k]["product_code"],
+								'product_name' => $product_name,
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
-								'amount' => $OrderEdis[$k]["amount"]
+								'amount' => $OrderEdis[$k]["amount"],
+								'denpyoumaisu' => 1
 						 ];
+
+						 for($l=0; $l<count($arrProductsmoto); $l++){
+
+							 if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
+
+								 unset($arrProductsmoto[$l]);
+								 $arrProductsmoto = array_values($arrProductsmoto);
+
+							 }
+
+						}
 
 						 //組立品呼び出し
 	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
@@ -1757,8 +2910,22 @@ class ApisController extends AppController
 
 				}
 
+				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrOrderEdis as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($OrderEdis) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+				}
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $date1, 'date_stock <=' => $datelast,
+				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_stock"=>"ASC"])->toArray();
 
@@ -1819,6 +2986,15 @@ class ApisController extends AppController
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
+							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+
+							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+								$starting_tm = strtotime($starting_tm);
+								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+							}else{
+								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							}
+
 							if(isset($Katakouzous[0])){
 								$torisu = $Katakouzous[0]["torisu"];
 							}else{
@@ -1826,6 +3002,7 @@ class ApisController extends AppController
 							}
 
 							$arrSeisans[] = [
+								'dateseikei' => $nippouday,
 								'product_code' => $KadouSeikeis[$k]["product_code"],
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
@@ -1833,6 +3010,18 @@ class ApisController extends AppController
 
 						}
 
+					}
+
+					//並べかえ
+					$tmp_product_array2 = array();
+					$tmp_dateseikei_array = array();
+					foreach($arrSeisans as $key => $row ) {
+						$tmp_product_array2[$key] = $row["product_code"];
+						$tmp_dateseikei_array[$key] = $row["dateseikei"];
+					}
+
+					if(count($arrSeisans) > 0){
+						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
 					}
 
 			}elseif($sheet === "testtouroku"){
@@ -1853,7 +3042,7 @@ class ApisController extends AppController
 					'created_at' => date('Y-m-d H:i:s'),
 					'created_staff' => '9999',
 				];
-
+/*
 			  $Products = $this->Products->patchEntity($this->Products->newEntity(), $tourokutestproduct);
 				$this->Products->save($Products);
 
@@ -1861,7 +3050,7 @@ class ApisController extends AppController
 				['product_code' => "dcba" , 'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => "9999"],
 				['id'   => 1434]
 				);
-
+*/
 			}else{
 
 				echo "<pre>";
@@ -1876,6 +3065,37 @@ class ApisController extends AppController
 
 			}
 
+	//		mb_convert_variables('UTF-8','SJIS-win',$arrOrderEdis);//文字コードを変換
+	//		mb_convert_variables('UTF-8','SJIS-win',$arrStockProducts);//文字コードを変換
+	//		mb_convert_variables('UTF-8','SJIS-win',$arrAssembleProducts);//文字コードを変換
+	//		mb_convert_variables('UTF-8','SJIS-win',$arrSyoyouKeikakus);//文字コードを変換
+	//		mb_convert_variables('UTF-8','SJIS-win',$arrSeisans);//文字コードを変換
+
+/*
+				$arrOrderEdis2 = array();
+				$arrStockProducts2 = array();
+				$arrAssembleProducts2 = array();
+				$arrSyoyouKeikakus2 = array();
+				$arrSeisans2 = array();
+
+				for($k=0; $k<10; $k++){
+					if(isset($arrOrderEdis[$k])){
+						$arrOrderEdis2[] = $arrOrderEdis[$k];
+					}
+					if(isset($arrStockProducts[$k])){
+						$arrStockProducts2[] = $arrStockProducts[$k];
+					}
+					if(isset($arrAssembleProducts[$k])){
+						$arrAssembleProducts2[] = $arrAssembleProducts[$k];
+					}
+					if(isset($arrSyoyouKeikakus[$k])){
+						$arrSyoyouKeikakus2[] = $arrSyoyouKeikakus[$k];
+					}
+					if(isset($arrSeisans[$k])){
+						$arrSeisans2[] = $arrSeisans[$k];
+					}
+				}
+*/
 			$this->set([
 				'OrderEdis' => $arrOrderEdis,
 				'StockProducts' => $arrStockProducts,
@@ -1884,7 +3104,12 @@ class ApisController extends AppController
 				'Seisans' => $arrSeisans,
 				'_serialize' => ['OrderEdis', 'StockProducts', 'AssembleProducts', 'SyoyouKeikakus', 'Seisans']
 			]);
-
+/*
+			$this->set([
+				'tourokutestproduct' => $tourokutestproduct,
+				'_serialize' => ['tourokutestproduct']
+			]);
+*/
 		}
 
 	}

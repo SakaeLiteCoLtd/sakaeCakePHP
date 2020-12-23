@@ -454,6 +454,18 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
+					}
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
@@ -727,6 +739,17 @@ class ApisController extends AppController
 						}
 
 					}
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
+					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
@@ -952,6 +975,17 @@ class ApisController extends AppController
 
 						}
 
+					}
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
@@ -1181,6 +1215,17 @@ class ApisController extends AppController
 						}
 
 					}
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
+					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
@@ -1407,6 +1452,17 @@ class ApisController extends AppController
 						}
 
 					}
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
+					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
@@ -1630,6 +1686,17 @@ class ApisController extends AppController
 
 						}
 
+					}
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
@@ -1859,6 +1926,17 @@ class ApisController extends AppController
 
 						}
 
+					}
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
@@ -2090,6 +2168,17 @@ class ApisController extends AppController
 						}
 
 					}
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
+					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
@@ -2317,6 +2406,17 @@ class ApisController extends AppController
 
 						}
 
+					}
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
@@ -2546,6 +2646,17 @@ class ApisController extends AppController
 						}
 
 					}
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
+					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
@@ -2747,6 +2858,17 @@ class ApisController extends AppController
 						}
 
 					}
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
+					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
@@ -2946,6 +3068,17 @@ class ApisController extends AppController
 
 					}
 
+					//並べかえ
+					$tmp_product_array = array();
+					$tmp_date_stock_array = array();
+					foreach($arrStockProducts as $key => $row ) {
+						$tmp_product_array[$key] = $row["product_code"];
+						$tmp_date_stock_array[$key] = $row["date_stock"];
+					}
+
+					if(count($arrStockProducts) > 0){
+						array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
+					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,

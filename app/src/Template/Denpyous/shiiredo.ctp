@@ -27,8 +27,10 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
           </tr>
         </table>
         <?= $this->Flash->render() ?>
-        <?= $this->Form->create($Users, ['url' => ['action' => 'shiiredo']]) ?>
- <br><br><br>
+        <?= $this->Form->create($Users, ['url' => ['action' => 'shiiremenu']]) ?>
+        <br><br>
+        <legend align="center"><font color="red"><?= __($mes) ?></font></legend>
+    <br>
       <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
         <tr style="border-bottom: solid;border-width: 1px">
           <td width='250'  bgcolor="#FFFFCC"><div align="center"><strong style="font-size: 11pt; color:blue">発注日付</strong></div></td>
@@ -62,30 +64,23 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 
       <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
         <tr style="border-bottom: solid;border-width: 1px">
-          <td width='300'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">完納済は、チェック</strong></td>
-          <td hight='60' bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('check', array('type'=>'checkbox', 'label'=>false)) ?></td>
+          <td width='300'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">未納・完納</strong></td>
+        </tr>
+        <tr style="border-bottom: solid;border-width: 1px">
+          <td hight='60' bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($kannou) ?></td>
         </tr>
       </table>
       <br><br><br>
 
-      <legend align="left"><strong style="font-size: 11pt; color:black"><?= __("※検収後登録なら完納済にチェックです。") ?></strong></legend>
 <br><br>
       <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
       <tr bgcolor="#E6FFFF" >
         <td width="30" colspan="50" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
-        <td align="right" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('登録'), array('name' => 'kakunin')); ?></div></td>
+        <td align="right" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('TOP'), array('name' => 'kakunin')); ?></div></td>
       </tr>
       </table>
       <?= $this->Form->control('Staff', array('type'=>'hidden', 'value'=>$Staff, 'label'=>false)) ?>
       <?= $this->Form->control('Staffid', array('type'=>'hidden', 'value'=>$Staffid, 'label'=>false)) ?>
-      <?= $this->Form->control('date_order', array('type'=>'hidden', 'value'=>$date_order, 'label'=>false)) ?>
-      <?= $this->Form->control('num_order', array('type'=>'hidden', 'value'=>$num_order, 'label'=>false)) ?>
-      <?= $this->Form->control('ProductSupplierId', array('type'=>'hidden', 'value'=>$ProductSupplierId, 'label'=>false)) ?>
-      <?= $this->Form->control('order_name', array('type'=>'hidden', 'value'=>$order_name, 'label'=>false)) ?>
-      <?= $this->Form->control('price', array('type'=>'hidden', 'value'=>$price, 'label'=>false)) ?>
-      <?= $this->Form->control('amount', array('type'=>'hidden', 'value'=>$amount, 'label'=>false)) ?>
-      <?= $this->Form->control('date_deliver', array('type'=>'hidden', 'value'=>$date_deliver, 'label'=>false)) ?>
-
 
 <br><br><br><br><br><br>
     <?= $this->Form->end() ?>

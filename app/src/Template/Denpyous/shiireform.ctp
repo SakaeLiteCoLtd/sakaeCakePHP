@@ -22,8 +22,8 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         <hr size="5" style="margin: 0.5rem">
         <table style="margin-bottom:0px" width=85% border="0" align="center" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/subTouroku.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'syoumoupreadd')));?></td>
-              <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_ichiran.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'syoumouitiranform')));?></td>
+            <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/subTouroku.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'shiirepreadd')));?></td>
+            <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/label_ichiran.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'shiireitiranform')));?></td>
           </tr>
         </table>
         <?= $this->Flash->render() ?>
@@ -38,11 +38,11 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         <tr style="border-bottom: solid;border-width: 1px">
           <td bgcolor="#FFFFCC"><div align="center"><?= $this->Form->input("date_order", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></div></td>
           <td bgcolor="#FFFFCC"><?= $this->Form->input('num_order', ["type"=>"text", 'label'=>false, 'required'=>true]); ?></td>
-          <td bgcolor="#FFFFCC"><?= $this->Form->input('syoumousupplierid', ["type"=>"select", "empty"=>"選択してください", "options"=>$arrProductSupplier, 'label'=>false, 'required'=>true]); ?></td>
+          <td bgcolor="#FFFFCC"><?= $this->Form->input('ProductSupplierId', ["type"=>"select", "empty"=>"選択してください", "options"=>$arrProductSupplier, 'label'=>false, 'required'=>true]); ?></td>
         </tr>
       </table>
       <br><br><br><br>
-      <br><br><br><br>
+      <br><br>
 
       <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
         <tr style="border-bottom: solid;border-width: 1px">
@@ -51,18 +51,14 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
           <td width='60'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">価格（円）</strong></td>
           <td width='60'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">数量</strong></td>
           <td width='200'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">納入日</strong></td>
-          <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">削除</strong></td>
         </tr>
-
         <tr style="border-bottom: solid;border-width: 1px">
-          <td bgcolor="#FFFFCC"><?= $this->Form->input('order_product_code', ["type"=>"text", 'label'=>false, 'required'=>true]); ?></td>
-          <td bgcolor="#FFFFCC"><?= $this->Form->input('elementsiwakeid', ["type"=>"select", "empty"=>"選択してください", "options"=>$arrElement, 'label'=>false, 'required'=>true]); ?></td>
-          <td bgcolor="#FFFFCC"><?= $this->Form->input('order_product_code', ["type"=>"text", 'label'=>false, 'required'=>true]); ?></td>
-          <td bgcolor="#FFFFCC"><?= $this->Form->input('order_product_code', ["type"=>"text", 'label'=>false, 'required'=>true]); ?></td>
+          <td bgcolor="#FFFFCC"><?= $this->Form->input('order_name', ["type"=>"text", 'label'=>false, 'required'=>true]); ?></td>
+          <td bgcolor="#FFFFCC"><?= $this->Form->input('order_name_element', ["type"=>"select", "empty"=>"選択してください", "options"=>$arrElement, 'label'=>false, 'required'=>true]); ?></td>
+          <td bgcolor="#FFFFCC"><?= $this->Form->input('price', ["type"=>"text", 'label'=>false, 'required'=>true]); ?></td>
+          <td bgcolor="#FFFFCC"><?= $this->Form->input('amount', ["type"=>"text", 'label'=>false, 'required'=>true]); ?></td>
           <td bgcolor="#FFFFCC"><div align="center"><?= $this->Form->input("date_deliver", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></div></td>
-          <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('check', array('type'=>'checkbox', 'label'=>false)) ?></td>
         </tr>
-
       </table>
       <br><br><br>
       <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -74,7 +70,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
       <?= $this->Form->control('Staff', array('type'=>'hidden', 'value'=>$Staff, 'label'=>false)) ?>
       <?= $this->Form->control('Staffid', array('type'=>'hidden', 'value'=>$Staffid, 'label'=>false)) ?>
 
-      <br><br><br><br><br><br><br><br><br><br>
+      <br><br><br>
 
 <br><br><br><br><br><br>
     <?= $this->Form->end() ?>

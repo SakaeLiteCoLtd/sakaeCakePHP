@@ -30,6 +30,15 @@ class DenpyousController extends AppController
 
 			public function syoumoumenu()
 	 	 {
+			 $Data=$this->request->query('s');
+			 if(isset($Data["mess"])){
+				 $mess = $Data["mess"];
+				 $this->set('mess',$mess);
+			 }else{
+				 $mess = "";
+				 $this->set('mess',$mess);
+			 }
+
 			 $this->request->session()->destroy();// セッションの破棄
 		 }
 
@@ -287,6 +296,11 @@ class DenpyousController extends AppController
 			$session = $this->request->getSession();
 			$sessiondata = $session->read();
 
+			if(!isset($sessiondata['tourokusyoumouheader'])){
+				return $this->redirect(['action' => 'syoumoumenu',
+        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+      }
+
 			$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
 			$kannoucheck = 0;
@@ -534,7 +548,7 @@ class DenpyousController extends AppController
 
 				if(empty($data['syoumousupplierid'])){
 
-					$arrOrderSyoumouShiireFooders = $this->OrderSyoumouShiireFooders->find('all')->where(['date_deliver >=' => $date_sta, 'date_deliver <' => $date_fin, 'delete_flag' => 0])->order(['date_deliver' => 'ASC'])->toArray();
+					$arrOrderSyoumouShiireFooders = $this->OrderSyoumouShiireFooders->find('all')->where(['date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'delete_flag' => 0])->order(['date_deliver' => 'ASC'])->toArray();
 
 				}else{
 
@@ -938,6 +952,11 @@ class DenpyousController extends AppController
 			$session = $this->request->getSession();
 			$sessiondata = $session->read();
 
+			if(!isset($sessiondata['tourokusyoumouheadersyuusei'])){
+				return $this->redirect(['action' => 'syoumoumenu',
+				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+			}
+
 			$data = $this->request->getData();
 
 			$kannoucheck = 0;
@@ -1155,7 +1174,14 @@ class DenpyousController extends AppController
 
 		public function shiiremenu()
 		{
-
+			$Data=$this->request->query('s');
+			if(isset($Data["mess"])){
+				$mess = $Data["mess"];
+				$this->set('mess',$mess);
+			}else{
+				$mess = "";
+				$this->set('mess',$mess);
+			}
 	 	}
 
 		public function shiirepreadd()
@@ -1270,6 +1296,14 @@ class DenpyousController extends AppController
 
 			$Users = $this->Users->newEntity();
 			$this->set('Users',$Users);
+
+			$session = $this->request->getSession();
+			$sessiondata = $session->read();
+
+			if(!isset($sessiondata['Auth'])){
+				return $this->redirect(['action' => 'shiiremenu',
+				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+			}
 
 			$date_order = $data['date_order'];
 			$this->set('date_order',$date_order);
@@ -1393,7 +1427,7 @@ class DenpyousController extends AppController
 
 			if(empty($data['product_supplier_id'])){
 
-				$arrOrderSpecialShiires = $this->OrderSpecialShiires->find('all')->where(['date_order >=' => $date_sta, 'date_order <' => $date_fin, 'delete_flag' => 0])->order(['date_order' => 'ASC'])->toArray();
+				$arrOrderSpecialShiires = $this->OrderSpecialShiires->find('all')->where(['date_order >=' => $date_sta, 'date_order <=' => $date_fin, 'delete_flag' => 0])->order(['date_order' => 'ASC'])->toArray();
 
 			}else{
 
@@ -1576,6 +1610,15 @@ class DenpyousController extends AppController
 
 		public function shiiresyuuseido()
 		{
+
+			$session = $this->request->getSession();
+			$sessiondata = $session->read();
+
+			if(!isset($sessiondata['Auth'])){
+				return $this->redirect(['action' => 'shiiremenu',
+				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+			}
+
 			$Users = $this->Users->newEntity();
 			$this->set('Users',$Users);
 

@@ -488,6 +488,18 @@ class ApisController extends AppController
 
 				}
 
+				//並べかえ
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrSyoyouKeikakus as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
+
+				if(count($arrSyoyouKeikakus) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+				}
+
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
 
@@ -773,6 +785,18 @@ class ApisController extends AppController
 
 				}
 
+								//並べかえ
+								$tmp_product_array = array();
+								$tmp_date_deliver_array = array();
+								foreach($arrSyoyouKeikakus as $key => $row ) {
+									$tmp_product_array[$key] = $row["product_code"];
+									$tmp_date_deliver_array[$key] = $row["date_deliver"];
+								}
+
+								if(count($arrSyoyouKeikakus) > 0){
+									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+								}
+
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
 
@@ -1010,6 +1034,18 @@ class ApisController extends AppController
 					}
 
 				}
+
+								//並べかえ
+								$tmp_product_array = array();
+								$tmp_date_deliver_array = array();
+								foreach($arrSyoyouKeikakus as $key => $row ) {
+									$tmp_product_array[$key] = $row["product_code"];
+									$tmp_date_deliver_array[$key] = $row["date_deliver"];
+								}
+
+								if(count($arrSyoyouKeikakus) > 0){
+									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+								}
 
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
@@ -1250,6 +1286,18 @@ class ApisController extends AppController
 
 				}
 
+								//並べかえ
+								$tmp_product_array = array();
+								$tmp_date_deliver_array = array();
+								foreach($arrSyoyouKeikakus as $key => $row ) {
+									$tmp_product_array[$key] = $row["product_code"];
+									$tmp_date_deliver_array[$key] = $row["date_deliver"];
+								}
+
+								if(count($arrSyoyouKeikakus) > 0){
+									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+								}
+
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
 
@@ -1486,6 +1534,18 @@ class ApisController extends AppController
 
 				}
 
+								//並べかえ
+								$tmp_product_array = array();
+								$tmp_date_deliver_array = array();
+								foreach($arrSyoyouKeikakus as $key => $row ) {
+									$tmp_product_array[$key] = $row["product_code"];
+									$tmp_date_deliver_array[$key] = $row["date_deliver"];
+								}
+
+								if(count($arrSyoyouKeikakus) > 0){
+									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+								}
+
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
 
@@ -1721,6 +1781,18 @@ class ApisController extends AppController
 
 				}
 
+								//並べかえ
+								$tmp_product_array = array();
+								$tmp_date_deliver_array = array();
+								foreach($arrSyoyouKeikakus as $key => $row ) {
+									$tmp_product_array[$key] = $row["product_code"];
+									$tmp_date_deliver_array[$key] = $row["date_deliver"];
+								}
+
+								if(count($arrSyoyouKeikakus) > 0){
+									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+								}
+
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
 
@@ -1788,9 +1860,14 @@ class ApisController extends AppController
 				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
 
 				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'customer_code not like' => '1%',
-				'OR' => [['customer_code like' => '2%']]])->toArray();
-
+		//		->where(['products.status' => 0, 'customer_code not like' => '1%', 'customer_code not like' => '2%'])->toArray();
+				->where(['products.status' => 0,
+				'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])->toArray();
+/*
+				echo "<pre>";
+				print_r($arrProducts);
+				echo "</pre>";
+*/
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
@@ -1808,8 +1885,8 @@ class ApisController extends AppController
 				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code not like' => '1%',
-				'NOT' => [['customer_code like' => '2%']]])//productsの絞込みother
+		//		->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code not like' => '1%', 'customer_code not like' => '2%'])//productsの絞込みother
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
@@ -1817,8 +1894,8 @@ class ApisController extends AppController
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code not like' => '1%',
-					'NOT' => [['customer_code like' => '2%']]])//productsの絞込みother
+		//			->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code not like' => '1%', 'customer_code not like' => '2%'])//productsの絞込みother
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
 					->toArray();//productsの絞込みother
 
 					if(isset($Product[0])){
@@ -1912,8 +1989,7 @@ class ApisController extends AppController
 					for($k=0; $k<count($StockProducts); $k++){
 
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'customer_code not like' => '1%',
-						'NOT' => [['customer_code like' => '2%']]])//productsの絞込みother
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
 						->toArray();//productsの絞込みother
 
 						if(isset($Product[0])){
@@ -1947,8 +2023,7 @@ class ApisController extends AppController
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'customer_code not like' => '1%',
-					'NOT' => [['customer_code like' => '2%']]])//productsの絞込みother
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
 					->toArray();//productsの絞込みother
 
 					if(isset($Product[0])){
@@ -1963,6 +2038,18 @@ class ApisController extends AppController
 
 				}
 
+								//並べかえ
+								$tmp_product_array = array();
+								$tmp_date_deliver_array = array();
+								foreach($arrSyoyouKeikakus as $key => $row ) {
+									$tmp_product_array[$key] = $row["product_code"];
+									$tmp_date_deliver_array[$key] = $row["date_deliver"];
+								}
+
+								if(count($arrSyoyouKeikakus) > 0){
+									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+								}
+
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
 
@@ -1974,8 +2061,7 @@ class ApisController extends AppController
 					for($k=0; $k<count($KadouSeikeis); $k++){
 
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'customer_code not like' => '1%',
-						'NOT' => [['customer_code like' => '2%']]])//productsの絞込みother
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
 						->toArray();//productsの絞込みother
 
 						if(isset($Product[0])){
@@ -2202,6 +2288,18 @@ class ApisController extends AppController
 					}
 
 				}
+
+								//並べかえ
+								$tmp_product_array = array();
+								$tmp_date_deliver_array = array();
+								foreach($arrSyoyouKeikakus as $key => $row ) {
+									$tmp_product_array[$key] = $row["product_code"];
+									$tmp_date_deliver_array[$key] = $row["date_deliver"];
+								}
+
+								if(count($arrSyoyouKeikakus) > 0){
+									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+								}
 
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
@@ -2442,6 +2540,18 @@ class ApisController extends AppController
 
 				}
 
+								//並べかえ
+								$tmp_product_array = array();
+								$tmp_date_deliver_array = array();
+								foreach($arrSyoyouKeikakus as $key => $row ) {
+									$tmp_product_array[$key] = $row["product_code"];
+									$tmp_date_deliver_array[$key] = $row["date_deliver"];
+								}
+
+								if(count($arrSyoyouKeikakus) > 0){
+									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+								}
+
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
 
@@ -2510,7 +2620,7 @@ class ApisController extends AppController
 				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
 
 				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'customer_code' => '10002',
+				->where(['products.status' => 0, 'customer_code' => '10002', 'primary_p' => 0,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])->toArray();
 
 				$arrProductsmoto = array();
@@ -2539,7 +2649,7 @@ class ApisController extends AppController
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
 
 					if(isset($Product[0])){
 
@@ -2633,7 +2743,7 @@ class ApisController extends AppController
 					for($k=0; $k<count($StockProducts); $k++){
 
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
 
 						if(isset($Product[0])){
 
@@ -2667,7 +2777,7 @@ class ApisController extends AppController
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
 
 					if(isset($Product[0])){
 
@@ -2681,6 +2791,18 @@ class ApisController extends AppController
 
 				}
 
+								//並べかえ
+								$tmp_product_array = array();
+								$tmp_date_deliver_array = array();
+								foreach($arrSyoyouKeikakus as $key => $row ) {
+									$tmp_product_array[$key] = $row["product_code"];
+									$tmp_date_deliver_array[$key] = $row["date_deliver"];
+								}
+
+								if(count($arrSyoyouKeikakus) > 0){
+									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+								}
+
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
 
@@ -2693,7 +2815,7 @@ class ApisController extends AppController
 					for($k=0; $k<count($KadouSeikeis); $k++){
 
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
 
 						if(isset($Product[0])){
 
@@ -2749,7 +2871,7 @@ class ApisController extends AppController
 				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
 
 				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'customer_code like' => '2%',
+				->where(['products.status' => 0, 'customer_code like' => '2%', 'primary_p' => 0,
 				'OR' => [['product_code like' => '2%']]])->toArray();
 
 				$arrProductsmoto = array();
@@ -2778,7 +2900,7 @@ class ApisController extends AppController
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
+					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
 
 					if(isset($Product[0])){
 
@@ -2845,7 +2967,7 @@ class ApisController extends AppController
 					for($k=0; $k<count($StockProducts); $k++){
 
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
+						->where(['product_code' => $StockProducts[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
 
 						if(isset($Product[0])){
 
@@ -2878,7 +3000,7 @@ class ApisController extends AppController
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
+					->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
 
 					if(isset($Product[0])){
 
@@ -2892,6 +3014,18 @@ class ApisController extends AppController
 
 				}
 
+								//並べかえ
+								$tmp_product_array = array();
+								$tmp_date_deliver_array = array();
+								foreach($arrSyoyouKeikakus as $key => $row ) {
+									$tmp_product_array[$key] = $row["product_code"];
+									$tmp_date_deliver_array[$key] = $row["date_deliver"];
+								}
+
+								if(count($arrSyoyouKeikakus) > 0){
+									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+								}
+
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
 
@@ -2903,7 +3037,7 @@ class ApisController extends AppController
 					for($k=0; $k<count($KadouSeikeis); $k++){
 
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
+						->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
 
 						if(isset($Product[0])){
 
@@ -3101,6 +3235,18 @@ class ApisController extends AppController
 					}
 
 				}
+
+								//並べかえ
+								$tmp_product_array = array();
+								$tmp_date_deliver_array = array();
+								foreach($arrSyoyouKeikakus as $key => $row ) {
+									$tmp_product_array[$key] = $row["product_code"];
+									$tmp_date_deliver_array[$key] = $row["date_deliver"];
+								}
+
+								if(count($arrSyoyouKeikakus) > 0){
+									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+								}
 
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";

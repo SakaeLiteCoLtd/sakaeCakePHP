@@ -86,8 +86,7 @@ class ApidatasController extends AppController
 
 		//		$response = $http->post('https://qiita.com/api/v2/users/TakahiRoyte');//参考https://book.cakephp.org/3/ja/core-libraries/httpclient.html
 
-		$response = $http->post('http://192.168.4.246/Apidatas/vbatest/api/test.json');//参考https://codelab.website/cakephp3-api/
-	//	$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.json');//参考https://codelab.website/cakephp3-api/
+				$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.json');//参考https://codelab.website/cakephp3-api/
 				$array = json_decode($response->body(), true);//trueがあれば配列として受け取れる　参考https://qiita.com/muramount/items/6be585bf9c031a997d9a
 
 				echo "<pre>";

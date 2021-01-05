@@ -4078,11 +4078,18 @@ echo "</pre>";
       $this->set('product_name',$product_name);
 
       $ProductGaityus = $this->ProductGaityus->find()->where(['product_code' => $product_code])->toArray();
-      $id_supplier = $ProductGaityus[0]->id_supplier;
-
-      $ProductSuppliers = $this->ProductSuppliers->find()->where(['id' => $id_supplier])->toArray();
-      $Supplier = $ProductSuppliers[0]->name;
-      $this->set('Supplier',$Supplier);
+      if(isset($ProductGaityus[0])){
+        $id_supplier = $ProductGaityus[0]->id_supplier;
+        $ProductSuppliers = $this->ProductSuppliers->find()->where(['id' => $id_supplier])->toArray();
+        $Supplier = $ProductSuppliers[0]->name;
+        $this->set('Supplier',$Supplier);
+      }else{
+        $Supplier = "ProductGaityusテーブルに登録されていません";
+        $this->set('Supplier',$Supplier);
+        echo "<pre>";
+        print_r("ProductGaityusテーブルに登録してから再度登録してください。");
+        echo "</pre>";
+      }
 
     }
 

@@ -24,6 +24,8 @@ class ApisController extends AppController
 		 $this->Katakouzous = TableRegistry::get('katakouzous');
 		 $this->AssembleProducts = TableRegistry::get('assembleProducts');
 		 $this->Customers = TableRegistry::get('customers');
+		 $this->Konpous = TableRegistry::get('konpous');
+		 $this->ResultZensuHeads = TableRegistry::get('resultZensuHeads');
 //		 $this->belongsTo('Customers');
 		}
 
@@ -376,21 +378,48 @@ class ApisController extends AppController
 
 						}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+						//組立品呼び出し
+						$ResultZensuHeads = $this->ResultZensuHeads->find()
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->order(["datetime_finish"=>"DESC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+						if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+							$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+							if(isset($AssembleProducts[0])){
+
+								$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+								$irisu = $Konpou[0]->irisu;
+								$amount = $irisu * count($ResultZensuHeads);
+
+								 $arrAssembleProducts[] = [
+									 'product_code' => $OrderEdis[$k]["product_code"],
+									 'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+									 'amount' => $amount
+								];
+
+								$arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+				        $arrAssembleProducts = array_values($arrAssembleProducts);
+
+								$product_code = array();
+ 							 $kensabi = array();
+ 							 foreach ($arrAssembleProducts as $key => $value) {
+ 								 $product_code[$key] = $value['product_code'];
+ 								 $kensabi[$key] = $value["kensabi"];
+ 							 }
+
+ 				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+ 							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+							}
+
+						}
 
 					}
 
 				}
+
 
 				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
 				for($l=0; $l<count($arrOrderEdis); $l++){
@@ -644,17 +673,43 @@ class ApisController extends AppController
 
 						}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+						//組立品呼び出し
+						$ResultZensuHeads = $this->ResultZensuHeads->find()
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->order(["product_code"=>"ASC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+						if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+							$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+							if(isset($AssembleProducts[0])){
+
+								$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+								$irisu = $Konpou[0]->irisu;
+								$amount = $irisu * count($ResultZensuHeads);
+
+								$arrAssembleProducts[] = [
+									'product_code' => $OrderEdis[$k]["product_code"],
+									'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+									'amount' => $amount
+							 ];
+
+							 $arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+							 $arrAssembleProducts = array_values($arrAssembleProducts);
+
+							 $product_code = array();
+							 $kensabi = array();
+							 foreach ($arrAssembleProducts as $key => $value) {
+								 $product_code[$key] = $value['product_code'];
+								 $kensabi[$key] = $value["kensabi"];
+							 }
+
+				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+							}
+
+						}
 
 					}
 
@@ -815,10 +870,11 @@ class ApisController extends AppController
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
 							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
@@ -922,17 +978,43 @@ class ApisController extends AppController
 
 						 		 				}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+												//組立品呼び出し
+												$ResultZensuHeads = $this->ResultZensuHeads->find()
+												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+												->order(["product_code"=>"ASC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+												if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+													$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+													if(isset($AssembleProducts[0])){
+
+														$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+														$irisu = $Konpou[0]->irisu;
+														$amount = $irisu * count($ResultZensuHeads);
+
+														$arrAssembleProducts[] = [
+					 									 'product_code' => $OrderEdis[$k]["product_code"],
+					 									 'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+					 									 'amount' => $amount
+					 								];
+
+					 								$arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+					 				        $arrAssembleProducts = array_values($arrAssembleProducts);
+
+													$product_code = array();
+					 							 $kensabi = array();
+					 							 foreach ($arrAssembleProducts as $key => $value) {
+					 								 $product_code[$key] = $value['product_code'];
+					 								 $kensabi[$key] = $value["kensabi"];
+					 							 }
+
+					 				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+					 							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+													}
+
+												}
 
 					}
 
@@ -1066,10 +1148,11 @@ class ApisController extends AppController
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
 							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
@@ -1173,17 +1256,43 @@ class ApisController extends AppController
 
 						}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+						//組立品呼び出し
+						$ResultZensuHeads = $this->ResultZensuHeads->find()
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->order(["product_code"=>"ASC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+						if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+							$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+							if(isset($AssembleProducts[0])){
+
+								$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+								$irisu = $Konpou[0]->irisu;
+								$amount = $irisu * count($ResultZensuHeads);
+
+								$arrAssembleProducts[] = [
+									'product_code' => $OrderEdis[$k]["product_code"],
+									'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+									'amount' => $amount
+							 ];
+
+							 $arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+							 $arrAssembleProducts = array_values($arrAssembleProducts);
+
+							 $product_code = array();
+							 $kensabi = array();
+							 foreach ($arrAssembleProducts as $key => $value) {
+								 $product_code[$key] = $value['product_code'];
+								 $kensabi[$key] = $value["kensabi"];
+							 }
+
+				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+							}
+
+						}
 
 					}
 
@@ -1317,10 +1426,11 @@ class ApisController extends AppController
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
 							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
@@ -1423,17 +1533,43 @@ class ApisController extends AppController
 
 						}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+						//組立品呼び出し
+						$ResultZensuHeads = $this->ResultZensuHeads->find()
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->order(["product_code"=>"ASC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+						if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+							$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+							if(isset($AssembleProducts[0])){
+
+								$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+								$irisu = $Konpou[0]->irisu;
+								$amount = $irisu * count($ResultZensuHeads);
+
+								$arrAssembleProducts[] = [
+									'product_code' => $OrderEdis[$k]["product_code"],
+									'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+									'amount' => $amount
+							 ];
+
+							 $arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+							 $arrAssembleProducts = array_values($arrAssembleProducts);
+
+							 $product_code = array();
+							 $kensabi = array();
+							 foreach ($arrAssembleProducts as $key => $value) {
+								 $product_code[$key] = $value['product_code'];
+								 $kensabi[$key] = $value["kensabi"];
+							 }
+
+				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+							}
+
+						}
 
 					}
 
@@ -1564,10 +1700,11 @@ class ApisController extends AppController
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
 							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
@@ -1670,17 +1807,43 @@ class ApisController extends AppController
 
 						}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+						//組立品呼び出し
+						$ResultZensuHeads = $this->ResultZensuHeads->find()
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->order(["product_code"=>"ASC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+						if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+							$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+							if(isset($AssembleProducts[0])){
+
+								$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+								$irisu = $Konpou[0]->irisu;
+								$amount = $irisu * count($ResultZensuHeads);
+
+								$arrAssembleProducts[] = [
+									'product_code' => $OrderEdis[$k]["product_code"],
+									'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+									'amount' => $amount
+							 ];
+
+							 $arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+							 $arrAssembleProducts = array_values($arrAssembleProducts);
+
+							 $product_code = array();
+							 $kensabi = array();
+							 foreach ($arrAssembleProducts as $key => $value) {
+								 $product_code[$key] = $value['product_code'];
+								 $kensabi[$key] = $value["kensabi"];
+							 }
+
+				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+							}
+
+						}
 
 					}
 
@@ -1811,10 +1974,11 @@ class ApisController extends AppController
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
 							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
@@ -1925,17 +2089,43 @@ class ApisController extends AppController
 
 						 		 				}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+												//組立品呼び出し
+												$ResultZensuHeads = $this->ResultZensuHeads->find()
+												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+												->order(["product_code"=>"ASC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+												if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+													$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+													if(isset($AssembleProducts[0])){
+
+														$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+														$irisu = $Konpou[0]->irisu;
+														$amount = $irisu * count($ResultZensuHeads);
+
+														$arrAssembleProducts[] = [
+					 									 'product_code' => $OrderEdis[$k]["product_code"],
+					 									 'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+					 									 'amount' => $amount
+					 								];
+
+					 								$arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+					 				        $arrAssembleProducts = array_values($arrAssembleProducts);
+
+													$product_code = array();
+					 							 $kensabi = array();
+					 							 foreach ($arrAssembleProducts as $key => $value) {
+					 								 $product_code[$key] = $value['product_code'];
+					 								 $kensabi[$key] = $value["kensabi"];
+					 							 }
+
+					 				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+					 							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+													}
+
+												}
 
 					}
 
@@ -2069,10 +2259,11 @@ class ApisController extends AppController
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
 							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
@@ -2176,17 +2367,43 @@ class ApisController extends AppController
 
 						}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+						//組立品呼び出し
+						$ResultZensuHeads = $this->ResultZensuHeads->find()
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->order(["product_code"=>"ASC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+						if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+							$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+							if(isset($AssembleProducts[0])){
+
+								$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+								$irisu = $Konpou[0]->irisu;
+								$amount = $irisu * count($ResultZensuHeads);
+
+								$arrAssembleProducts[] = [
+									'product_code' => $OrderEdis[$k]["product_code"],
+									'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+									'amount' => $amount
+							 ];
+
+							 $arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+							 $arrAssembleProducts = array_values($arrAssembleProducts);
+
+							 $product_code = array();
+							 $kensabi = array();
+							 foreach ($arrAssembleProducts as $key => $value) {
+								 $product_code[$key] = $value['product_code'];
+								 $kensabi[$key] = $value["kensabi"];
+							 }
+
+				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+							}
+
+						}
 
 					}
 
@@ -2320,10 +2537,11 @@ class ApisController extends AppController
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
 							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
@@ -2427,17 +2645,43 @@ class ApisController extends AppController
 
 						 		 				}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+												//組立品呼び出し
+												$ResultZensuHeads = $this->ResultZensuHeads->find()
+												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+												->order(["product_code"=>"ASC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+												if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+													$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+													if(isset($AssembleProducts[0])){
+
+														$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+														$irisu = $Konpou[0]->irisu;
+														$amount = $irisu * count($ResultZensuHeads);
+
+														$arrAssembleProducts[] = [
+					 									 'product_code' => $OrderEdis[$k]["product_code"],
+					 									 'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+					 									 'amount' => $amount
+					 								];
+
+					 								$arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+					 				        $arrAssembleProducts = array_values($arrAssembleProducts);
+
+													$product_code = array();
+					 							 $kensabi = array();
+					 							 foreach ($arrAssembleProducts as $key => $value) {
+					 								 $product_code[$key] = $value['product_code'];
+					 								 $kensabi[$key] = $value["kensabi"];
+					 							 }
+
+					 				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+					 							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+													}
+
+												}
 
 					}
 
@@ -2571,10 +2815,11 @@ class ApisController extends AppController
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
 							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
@@ -2678,17 +2923,43 @@ class ApisController extends AppController
 
 						 		 				}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+												//組立品呼び出し
+												$ResultZensuHeads = $this->ResultZensuHeads->find()
+												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+												->order(["product_code"=>"ASC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+												if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+													$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+													if(isset($AssembleProducts[0])){
+
+														$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+														$irisu = $Konpou[0]->irisu;
+														$amount = $irisu * count($ResultZensuHeads);
+
+														$arrAssembleProducts[] = [
+					 									 'product_code' => $OrderEdis[$k]["product_code"],
+					 									 'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+					 									 'amount' => $amount
+					 								];
+
+					 								$arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+					 				        $arrAssembleProducts = array_values($arrAssembleProducts);
+
+													$product_code = array();
+					 							 $kensabi = array();
+					 							 foreach ($arrAssembleProducts as $key => $value) {
+					 								 $product_code[$key] = $value['product_code'];
+					 								 $kensabi[$key] = $value["kensabi"];
+					 							 }
+
+					 				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+					 							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+													}
+
+												}
 
 					}
 
@@ -2822,10 +3093,11 @@ class ApisController extends AppController
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
 							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
@@ -2929,17 +3201,43 @@ class ApisController extends AppController
 
 						 		 				}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+												//組立品呼び出し
+												$ResultZensuHeads = $this->ResultZensuHeads->find()
+												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+												->order(["product_code"=>"ASC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+												if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+													$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+													if(isset($AssembleProducts[0])){
+
+														$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+														$irisu = $Konpou[0]->irisu;
+														$amount = $irisu * count($ResultZensuHeads);
+
+														$arrAssembleProducts[] = [
+					 									 'product_code' => $OrderEdis[$k]["product_code"],
+					 									 'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+					 									 'amount' => $amount
+					 								];
+
+					 								$arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+					 				        $arrAssembleProducts = array_values($arrAssembleProducts);
+
+													$product_code = array();
+					 							 $kensabi = array();
+					 							 foreach ($arrAssembleProducts as $key => $value) {
+					 								 $product_code[$key] = $value['product_code'];
+					 								 $kensabi[$key] = $value["kensabi"];
+					 							 }
+
+					 				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+					 							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+													}
+
+												}
 
 					}
 
@@ -3044,10 +3342,11 @@ class ApisController extends AppController
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
 							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
@@ -3150,17 +3449,43 @@ class ApisController extends AppController
 
 						}
 
-						 //組立品呼び出し
-	 					$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'flag' => 0])->toArray();
+						//組立品呼び出し
+						$ResultZensuHeads = $this->ResultZensuHeads->find()
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->order(["product_code"=>"ASC"])->toArray();
 
-	 					if(isset($AssembleProducts[0])){
+						if(isset($ResultZensuHeads[0])){
 
-	 							$arrAssembleProducts[] = [
-	 								'product_code' => $AssembleProducts[0]["product_code"],
-	 								'inzu' => $AssembleProducts[0]["inzu"]
-	 						 ];
+							$AssembleProducts = $this->AssembleProducts->find()->where(['child_pid' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-	 					}
+							if(isset($AssembleProducts[0])){
+
+								$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
+								$irisu = $Konpou[0]->irisu;
+								$amount = $irisu * count($ResultZensuHeads);
+
+								$arrAssembleProducts[] = [
+									'product_code' => $OrderEdis[$k]["product_code"],
+									'kensabi' => substr($ResultZensuHeads[0]["datetime_finish"], 0, 10),
+									'amount' => $amount
+							 ];
+
+							 $arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
+							 $arrAssembleProducts = array_values($arrAssembleProducts);
+
+							 $product_code = array();
+							 $kensabi = array();
+							 foreach ($arrAssembleProducts as $key => $value) {
+								 $product_code[$key] = $value['product_code'];
+								 $kensabi[$key] = $value["kensabi"];
+							 }
+
+				//			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
+							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+
+							}
+
+						}
 
 					}
 
@@ -3266,10 +3591,11 @@ class ApisController extends AppController
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
 							$starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
+							$dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-							if(substr($KadouSeikeis[$k]['starting_tm'], 10, 2) < 8){
+							if($dateseikei < strtotime(" 08:00:00")){
 								$starting_tm = strtotime($starting_tm);
-								$nippouday = date('Y-m-d', strtotime('-1 day', $starting_tm));
+								$nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
 							}else{
 								$nippouday = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
 							}
@@ -3369,6 +3695,7 @@ class ApisController extends AppController
 					}
 				}
 */
+
 			$this->set([
 				'OrderEdis' => $arrOrderEdis,
 				'StockProducts' => $arrStockProducts,
@@ -3379,8 +3706,8 @@ class ApisController extends AppController
 			]);
 /*
 			$this->set([
-				'tourokutestproduct' => $tourokutestproduct,
-				'_serialize' => ['tourokutestproduct']
+			'AssembleProducts' => $arrAssembleProducts,
+				'_serialize' => ['AssembleProducts']
 			]);
 */
 		}

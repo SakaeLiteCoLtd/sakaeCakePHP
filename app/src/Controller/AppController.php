@@ -27,7 +27,30 @@ use Cake\Event\Event;
  */
 class AppController extends Controller
 {
+/*//apiのため追加//不要
+	use \Crud\Controller\ControllerTrait;
 
+	public $components = [
+			'RequestHandler',
+			'Crud.Crud' => [
+					// API化対象アクション
+					'actions' => [
+							'Crud.Index',
+							'Crud.View',
+							'Crud.Add',
+							'Crud.Edit',
+							'Crud.Delete'
+					],
+					// リスナー指定
+					'listeners' => [
+							'Crud.Api',
+							'Crud.ApiPagination',
+							'Crud.ApiQueryLog'
+					]
+			]
+	];
+
+	*/
     /**
      * Initialization hook method.
      *
@@ -112,7 +135,7 @@ class AppController extends Controller
 					// plugins/Sp/Template内のviewが読み込まれる
 					$this->viewBuilder()->theme('Sp');
 				}
-			
+
     }
 
 }

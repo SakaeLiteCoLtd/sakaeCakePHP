@@ -1626,6 +1626,7 @@ class DenpyousController extends AppController
 			$sessiondata = $session->read();
 
 			$OrderSpecialShiires = $this->OrderSpecialShiires->find('all')->where(['id' => $sessiondata["OrderSpecialShiireid"]["id"]])->toArray();
+			$moto_order_name = $OrderSpecialShiires[0]->order_name;
 			$moto_date_order = $OrderSpecialShiires[0]->date_order;
 			$moto_num_order = $OrderSpecialShiires[0]->num_order;
 			$moto_product_supplier_id = $OrderSpecialShiires[0]->product_supplier_id;
@@ -1694,12 +1695,19 @@ class DenpyousController extends AppController
 						 $table = TableRegistry::get('order_special_shiire');
 						 $table->setConnection($connection);
 
+						 $sql = "SELECT id,order_name,date_order,num_order,ps_id
+						 FROM order_special_shiire".
+						 " where order_name = '".$moto_order_name."' and date_order = '".$moto_date_order."' and num_order = '".$moto_num_order."' and ps_id = '".$moto_product_supplier_id."'";
+						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $order_special_shiire_id = $connection->execute($sql)->fetchAll('assoc');
+						 $moto_id = $order_special_shiire_id[0]["id"];
+
 						 $updater = "UPDATE order_special_shiire set date_order ='".$sessiondata['tourokushiiresyuusei']['date_order']."' , num_order ='".$sessiondata['tourokushiiresyuusei']['num_order']."' ,
 						 order_name ='".$sessiondata['tourokushiiresyuusei']['order_name']."', price ='".$sessiondata['tourokushiiresyuusei']['price']."',
 						 amount ='".$sessiondata['tourokushiiresyuusei']['amount']."', date_deliver ='".$sessiondata['tourokushiiresyuusei']['date_deliver']."',
 						 ps_id ='".$sessiondata['tourokushiiresyuusei']['product_supplier_id']."', kannou ='".$sessiondata['tourokushiiresyuusei']['kannou']."',
 						 delete_flag ='".$sessiondata['tourokushiiresyuusei']['delete_flag']."', update_emp_id ='".$sessiondata['tourokushiiresyuusei']['created_staff']."' ,updated_at ='".date('Y-m-d H:i:s')."'
-						 where date_order ='".$moto_date_order."' and num_order ='".$moto_num_order."' and ps_id ='".$moto_product_supplier_id."' and kannou ='".$moto_kannou."'";
+						 where id ='".$moto_id."'";
 						 $connection->execute($updater);
 
 						 $connection = ConnectionManager::get('default');//新DBに戻る

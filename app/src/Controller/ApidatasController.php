@@ -33,9 +33,11 @@ class ApidatasController extends AppController
 		 $this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
 		 $this->OrderSyoumouShiireHeaders = TableRegistry::get('orderSyoumouShiireHeaders');
 
+		 $this->ScheduleKouteisTests = TableRegistry::get('scheduleKouteisTests');
+
 		}
 
-		public function preadd()//http://localhost:5000 http://192.168.4.246  http://localhost:5000/Apidatas/preadd
+		public function preadd()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apidatas/preadd
 		{
 			$staff = $this->Products->newEntity();//newentityに$staffという名前を付ける
 			$this->set('staff',$staff);//1行上の$staffをctpで使えるようにセット
@@ -86,7 +88,7 @@ class ApidatasController extends AppController
 
 		//		$response = $http->post('https://qiita.com/api/v2/users/TakahiRoyte');//参考https://book.cakephp.org/3/ja/core-libraries/httpclient.html
 
-		$response = $http->post('http://192.168.4.246/Apidatas/vbatest/api/test.json');//参考https://codelab.website/cakephp3-api/
+		$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.json');//参考https://codelab.website/cakephp3-api/
 	//	$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.json');//参考https://codelab.website/cakephp3-api/
 				$array = json_decode($response->body(), true);//trueがあれば配列として受け取れる　参考https://qiita.com/muramount/items/6be585bf9c031a997d9a
 
@@ -163,27 +165,75 @@ class ApidatasController extends AppController
  		 ]);
 
 		}
-
-		public function test()//http://localhost:5000/Apidatas/test/api/test.xml
+													//http://192.168.4.246/Apidatas/test/api/2020-10-28_2020-11-4_2020-10-28 08:00:00_2_CAS-NDS-20002_0_粉砕量注意！.xml
+		public function test()//http://localhost:5000/Apidatas/test/api/2020-10-28_2020-11-4_2020-10-28 08:00:00_2_CAS-NDS-20002_0_粉砕量注意！.xml
  	 {
+		 			$access_url = $_SERVER['REQUEST_URI'];
 
-		 $tourokutestproduct = [
-			 'product_code' => date('Y-m-d H:i:s').'acbd',
-			 'product_name' => 'APIテスト192',
-			 'weight' => '9999',
-			 'primary_p' => '0',
-			 'status' => '0',
-			 'delete_flag' => '0',
-			 'created_at' => date('Y-m-d H:i:s'),
-			 'created_staff' => '9999',
-		 ];
+		 			//URLをデコードして表示
+		 			$data = urldecode($_SERVER['REQUEST_URI']);
+		 			//	 echo Router::reverse($this->request, false);//文字化けする
 
-	//	 mb_convert_variables('UTF-8','SJIS-win',$tourokutestproduct);//文字コードを変換
+		 			$urlarr = explode("/",$data);//切り離し
+		 			$dataarr = explode("_",$urlarr[4]);//切り離し
 
-		 $this->set([
-			 'tourokutestproduct' => $tourokutestproduct,
-			 '_serialize' => ['tourokutestproduct']
-		 ]);
+		 			$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
+		 			$dayfinish = $dataarr[1]." 07:59:59";//1週間の終わりの日付の取得
+		 			$datetime = str_replace("%20", " ", $dataarr[2]);//datetimeの取得
+		 			$datetime = str_replace("%3A", ":", $datetime);//datetimeの取得
+		 			$seikeiki = $dataarr[3];//seikeikiの取得
+		 			$product_code = $dataarr[4];//product_codeの取得
+		 			$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+		 			if(isset($Product[0])){
+		 			$product_name = $Product[0]->product_name;
+		 			}else{
+		 			$product_name = "";
+		 			}
+
+		 			$present_kensahyou = $dataarr[5];//present_kensahyouの取得
+
+		 			$tantouarr = explode(".",$dataarr[6]);//切り離し
+
+		 			$tantou = $tantouarr[0];//tantouの取得
+
+		 			$kouteivba['datetime'] = $datetime;
+		 			$kouteivba['seikeiki'] = $seikeiki;
+		 			$kouteivba['product_code'] = $product_code;
+		 			$kouteivba['present_kensahyou'] = $present_kensahyou;
+		 			$kouteivba['product_name'] = $product_name;
+		 			$kouteivba['tantou'] = $tantou;
+
+		 			echo "<pre>";
+		 			print_r($daystart." ~ ".$dayfinish);
+		 			echo "</pre>";
+		 			echo "<pre>";
+		 			print_r($kouteivba);
+		 			echo "</pre>";
+
+		 			$this->set([
+		 			'tourokutest' => $kouteivba,
+		 			'_serialize' => ['tourokutest']
+		 			]);
+
+		 			//1週間分のデータを削除
+		 			$ScheduleKouteisTestsdelete = $this->ScheduleKouteisTests->find()->where(['datetime >=' => $daystart, 'datetime <=' => $dayfinish, 'delete_flag' => 0])->toArray();
+		 			if(isset($ScheduleKouteisTestsdelete[0])){
+
+		 				for($k=0; $k<count($ScheduleKouteisTestsdelete); $k++){
+		 					$id = $ScheduleKouteisTestsdelete[$k]->id;
+
+		 					$this->ScheduleKouteisTests->updateAll(
+		 					['delete_flag' => 1],
+		 					['id'   => $id]
+		 					);
+
+		 				}
+
+		 			}
+
+		 			//新しいデータを登録
+		 			$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $kouteivba);
+		 			$this->ScheduleKouteisTests->save($ScheduleKouteisTests);
 
 	 }
 
@@ -296,5 +346,233 @@ class ApidatasController extends AppController
 */
 
 	 }
+
+	 public function vbatest()//http://localhost:5000/Apidatas/vbatest/api/test.xml
+	{
+/*
+		$http = new Client();
+
+		$response = $http->put('http://192.168.4.246/Apidatas/vbatest/api/test.xml');//参考https://codelab.website/cakephp3-api/
+		$array = json_decode($response->body(), true);//trueがあれば配列として受け取れる　参考https://qiita.com/muramount/items/6be585bf9c031a997d9a
+
+		echo "<pre>";
+		print_r($array);
+		echo "</pre>";
+
+	//	$Products = $this->Products->patchEntity($this->Products->newEntity(), $array["tourokutestproduct"]);
+	//	$this->Products->save($Products);
+
+		$this->set([
+				'message' => $array["tourokutestproduct"],
+				'_serialize' => ['message']
+		]);
+
+		$Products = $this->Products->newEntity($this->request->getData());
+		if ($this->Products->save($Products)) {
+				$message = '登録されました。';
+		} else {
+				$message = '登録されませんでした。';
+		}
+		$this->set([
+				'message' => $message,
+				'Products' => $Products,
+				'_serialize' => ['message', 'Products']
+		]);
+*/
+
+		if ($this->request->is(['post'])) {//post,put,get
+
+			echo "<pre>";
+			print_r('post');
+			echo "</pre>";
+
+			$name = $response->getHeaderLine('content-type');
+			$count = $response->headers;
+			$count = count($count);
+
+			$tourokutestproduct = [
+				'product_code' => 'post'.date('Y-m-d H:i:s'),
+				'product_name' => $response->body(),
+				'weight' => '9999',
+				'primary_p' => '0',
+				'status' => '0',
+				'delete_flag' => '0',
+				'created_at' => date('Y-m-d H:i:s'),
+				'created_staff' => '9999',
+			];
+
+			$Products = $this->Products->patchEntity($this->Products->newEntity(), $tourokutestproduct);
+			$this->Products->save($Products);
+
+		}elseif($this->request->is(['put'])){
+
+			echo "<pre>";
+			print_r('put');
+			echo "</pre>";
+
+//			$data = Router::reverse($this->request, false);//urlを取得
+
+			$data = urldecode($_SERVER['REQUEST_URI']);//文字化けしない
+
+			$urlarr = explode("/",$data);//切り離し
+			$dataarr = explode("_",$urlarr[4]);//切り離し
+
+			$daystart = $dataarr[0];//1週間の初めの日付の取得
+			$dayfinish = $dataarr[1];//1週間の終わりの日付の取得
+			$datetime = str_replace("%20", " ", $dataarr[2]);//datetimeの取得
+			$datetime = str_replace("%3A", ":", $datetime);//datetimeの取得
+			$seikeiki = $dataarr[3];//seikeikiの取得
+			$product_code = $dataarr[4];//product_codeの取得
+			$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+			if(isset($Product[0])){
+				$product_name = $Product[0]->product_name;
+			}else{
+				$product_name = "";
+			}
+
+			$present_kensahyou = $dataarr[5];//present_kensahyouの取得
+
+			$tantouarr = explode(".",$dataarr[6]);//切り離し
+
+			$tantou = $tantouarr[0];//tantouの取得
+
+			$tourokutestproduct = [
+				'product_code' => 'put_test_'.date('Y-m-d H:i:s'),
+				'product_name' => $product_name,
+				'weight' => '0',
+				'primary_p' => '0',
+				'status' => '0',
+				'delete_flag' => '0',
+				'created_at' => date('Y-m-d H:i:s'),
+				'created_staff' => '9999',
+			];
+
+			$Products = $this->Products->patchEntity($this->Products->newEntity(), $tourokutestproduct);
+			$this->Products->save($Products);
+
+		}elseif($this->request->is(['get'])){
+
+			echo "<pre>";
+			print_r('get');
+			echo "</pre>";
+/*
+			$http = new Client();
+			$response = $http->get('http://localhost:5000/Apidatas/vbatest/api/test.json');
+			$name = $response->json;
+*/
+			$tourokutestproduct = [
+				'product_code' => 'get'.date('Y-m-d H:i:s'),
+				'product_name' => 'get',
+				'weight' => '0',
+				'primary_p' => '0',
+				'status' => '0',
+				'delete_flag' => '0',
+				'created_at' => date('Y-m-d H:i:s'),
+				'created_staff' => '9999',
+			];
+
+			$Products = $this->Products->patchEntity($this->Products->newEntity(), $tourokutestproduct);
+			$this->Products->save($Products);
+
+		}
+
+	}
+
+																	//http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28 08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
+			public function vbakoutei()//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28 08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
+			{
+				$access_url = $_SERVER['REQUEST_URI'];
+
+				//URLをデコードして表示
+				$data = urldecode($_SERVER['REQUEST_URI']);
+				//	 echo Router::reverse($this->request, false);//文字化けする
+
+				$urlarr = explode("/",$data);//切り離し
+				$dataarr = explode("_",$urlarr[4]);//切り離し
+
+					if(isset($dataarr[2])){
+/*
+						echo "<pre>";
+						print_r(" if ");
+						echo "</pre>";
+*/
+						$datetime = str_replace("%20", " ", $dataarr[0]);//datetimeの取得
+						$datetime = str_replace("%3A", ":", $datetime);//datetimeの取得
+						$seikeiki = $dataarr[1];//seikeikiの取得
+						$product_code = $dataarr[2];//product_codeの取得
+						$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+						if(isset($Product[0])){
+						$product_name = $Product[0]->product_name;
+						}else{
+						$product_name = "";
+						}
+
+						$tantouarr = explode(".",$dataarr[3]);//切り離し
+
+						$tantou = $tantouarr[0];//tantouの取得
+
+						$present_kensahyou = 0;
+
+						$kouteivba['datetime'] = $datetime;
+						$kouteivba['seikeiki'] = $seikeiki;
+						$kouteivba['product_code'] = $product_code;
+						$kouteivba['present_kensahyou'] = $present_kensahyou;
+						$kouteivba['product_name'] = $product_name;
+						$kouteivba['tantou'] = $tantou;
+
+						$this->set([
+						'tourokutest' => $kouteivba,
+						'_serialize' => ['tourokutest']
+						]);
+
+						//新しいデータを登録
+						$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $kouteivba);
+						$connection = ConnectionManager::get('default');//トランザクション1
+						// トランザクション開始2
+						$connection->begin();//トランザクション3
+						try {//トランザクション4
+							if ($this->ScheduleKouteisTests->save($ScheduleKouteisTests)) {
+
+								$connection->commit();// コミット5
+
+							} else {
+
+								$this->Flash->error(__('The data could not be saved. Please, try again.'));
+								throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+							}
+						} catch (Exception $e) {//トランザクション7
+						//ロールバック8
+							$connection->rollback();//トランザクション9
+						}//トランザクション10
+
+					}else{
+/*
+						echo "<pre>";
+						print_r(" else ");
+						echo "</pre>";
+*/
+						$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
+						$dayfinish = $dataarr[1]." 07:59:59";//1週間の終わりの日付の取得
+
+						//1週間分のデータを削除
+						$ScheduleKouteisTestsdelete = $this->ScheduleKouteisTests->find()->where(['datetime >=' => $daystart, 'datetime <=' => $dayfinish, 'delete_flag' => 0])->toArray();
+						if(isset($ScheduleKouteisTestsdelete[0])){
+
+							for($k=0; $k<count($ScheduleKouteisTestsdelete); $k++){
+								$id = $ScheduleKouteisTestsdelete[$k]->id;
+
+								$this->ScheduleKouteisTests->updateAll(
+								['delete_flag' => 1],
+								['id'   => $id]
+								);
+
+							}
+
+						}
+
+					}
+
+			}
 
 	}

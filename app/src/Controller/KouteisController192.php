@@ -957,6 +957,7 @@ class KouteisController extends AppController {
        }
      }
 
+
      if(isset($KouteiKensahyouHead[0])){
        $KensahyouHeadbik = $KouteiKensahyouHead[0]->bik;
        $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
@@ -964,6 +965,8 @@ class KouteisController extends AppController {
        $KensahyouHeadbik = "";
        $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
      }
+
+
 
    }
 
@@ -1258,7 +1261,7 @@ class KouteisController extends AppController {
             if ($this->KouteiImKikakuTaious->saveMany($KouteiImKikakuTaiou)) {//saveManyで一括登録
 
             //旧DB更新
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('koutei_im_kikaku_taiou');
             $table->setConnection($connection);
 
@@ -1366,7 +1369,7 @@ class KouteisController extends AppController {
               $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['id' => $data["imdatanew"][0]['id']])->toArray();
 
               //旧DBに登録
-  						$connection = ConnectionManager::get('DB_ikou_test');
+  						$connection = ConnectionManager::get('sakaeMotoDB');
   						$table = TableRegistry::get('koutei_kensahyou_head');
   						$table->setConnection($connection);
 
@@ -1528,7 +1531,7 @@ class KouteisController extends AppController {
                                     try {//トランザクション4
                                       if ($this->KouteiImSokuteidataHeads->saveMany($KouteiImSokuteidataHead)) {
 
-                                        $connection = ConnectionManager::get('DB_ikou_test');
+                                        $connection = ConnectionManager::get('sakaeMotoDB');
                                         $table = TableRegistry::get('koutei_im_sokuteidata_head');
                                         $table->setConnection($connection);
 
@@ -1579,7 +1582,7 @@ class KouteisController extends AppController {
                                           $KouteiImKikakus = $this->KouteiImKikakus->patchEntities($KouteiImKikakus, $arrIm_kikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                              if ($this->KouteiImKikakus->saveMany($KouteiImKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $table = TableRegistry::get('koutei_im_kikaku');
                                                $table->setConnection($connection);
 
@@ -1587,7 +1590,7 @@ class KouteisController extends AppController {
                                                " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                 and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                  order by id desc limit 1";
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                for($k=0; $k<count($arrIm_kikaku); $k++){
@@ -1638,7 +1641,7 @@ class KouteisController extends AppController {
                                                   $KouteiImSokuteidataResults = $this->KouteiImSokuteidataResults->patchEntities($KouteiImSokuteidataResults, $arrIm_Result);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                                   if ($this->KouteiImSokuteidataResults->saveMany($KouteiImSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
 
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $table = TableRegistry::get('koutei_im_sokuteidata_result');
                                                     $table->setConnection($connection);
 
@@ -1646,7 +1649,7 @@ class KouteisController extends AppController {
                                                     " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                      and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                       order by id desc limit 1";
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                     for($k=0; $k<count($arrIm_Result); $k++){
@@ -1655,7 +1658,7 @@ class KouteisController extends AppController {
                                                       " where id = '".$im_sokuteidata_head_id[0]["id"]."' and inspec_datetime = '".$arrIm_Result[$k]["inspec_datetime"]."'
                                                        and serial = '".$arrIm_Result[$k]["serial"]."' and size_num = '".$arrIm_Result[$k]["size_num"]."'
                                                         order by id desc limit 1";
-                                                      $connection = ConnectionManager::get('DB_ikou_test');
+                                                      $connection = ConnectionManager::get('sakaeMotoDB');
                                                       $koutei_im_sokuteidata_result = $connection->execute($sql)->fetchAll('assoc');
 
                                                       if(!isset($koutei_im_sokuteidata_result[0])){
@@ -1964,7 +1967,7 @@ class KouteisController extends AppController {
                                     try {//トランザクション4
                                       if ($this->KouteiImSokuteidataHeads->saveMany($KouteiImSokuteidataHead)) {
 
-                                        $connection = ConnectionManager::get('DB_ikou_test');
+                                        $connection = ConnectionManager::get('sakaeMotoDB');
                                         $table = TableRegistry::get('koutei_im_sokuteidata_head');
                                         $table->setConnection($connection);
 
@@ -2015,7 +2018,7 @@ class KouteisController extends AppController {
                                           $KouteiImKikakus = $this->KouteiImKikakus->patchEntities($KouteiImKikakus, $arrIm_kikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                              if ($this->KouteiImKikakus->saveMany($KouteiImKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $table = TableRegistry::get('koutei_im_kikaku');
                                                $table->setConnection($connection);
 
@@ -2023,7 +2026,7 @@ class KouteisController extends AppController {
                                                " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                 and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                  order by id desc limit 1";
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                for($k=0; $k<count($arrIm_kikaku); $k++){
@@ -2075,7 +2078,7 @@ class KouteisController extends AppController {
                                                   $KouteiImSokuteidataResults = $this->KouteiImSokuteidataResults->patchEntities($KouteiImSokuteidataResults, $arrIm_Result);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                                   if ($this->KouteiImSokuteidataResults->saveMany($KouteiImSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
 
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $table = TableRegistry::get('koutei_im_sokuteidata_result');
                                                     $table->setConnection($connection);
 
@@ -2083,7 +2086,7 @@ class KouteisController extends AppController {
                                                     " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                      and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                       order by id desc limit 1";
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                     for($k=0; $k<count($arrIm_Result); $k++){
@@ -2092,7 +2095,7 @@ class KouteisController extends AppController {
                                                       " where id = '".$im_sokuteidata_head_id[0]["id"]."' and inspec_datetime = '".$arrIm_Result[$k]["inspec_datetime"]."'
                                                        and serial = '".$arrIm_Result[$k]["serial"]."' and size_num = '".$arrIm_Result[$k]["size_num"]."'
                                                         order by id desc limit 1";
-                                                      $connection = ConnectionManager::get('DB_ikou_test');
+                                                      $connection = ConnectionManager::get('sakaeMotoDB');
                                                       $koutei_im_sokuteidata_result = $connection->execute($sql)->fetchAll('assoc');
 
                                                       if(!isset($koutei_im_sokuteidata_result[0])){
@@ -2483,7 +2486,7 @@ class KouteisController extends AppController {
            if ($this->KouteiKensahyouHeads->save($KouteiKensahyouHeads)) {//saveできた時
 
              //旧DBに登録
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('koutei_kensahyou_head');
              $table->setConnection($connection);
 
@@ -2848,7 +2851,7 @@ class KouteisController extends AppController {
          )){
 
            //旧DBに登録
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('koutei_kensahyou_head');
            $table->setConnection($connection);
 
@@ -2963,7 +2966,7 @@ class KouteisController extends AppController {
            $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['id' => $data['id']])->toArray();
 
            //旧DBに登録
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('koutei_kensahyou_head');
            $table->setConnection($connection);
 
@@ -3140,7 +3143,7 @@ class KouteisController extends AppController {
               $this->KouteiImKikakuTaious->saveMany($KouteiImKikakuTaious);
 
               //旧DB更新
-              $connection = ConnectionManager::get('DB_ikou_test');
+              $connection = ConnectionManager::get('sakaeMotoDB');
               $table = TableRegistry::get('koutei_im_kikaku_taiou');
               $table->setConnection($connection);
 

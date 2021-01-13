@@ -7,6 +7,8 @@ use Cake\Datasource\ConnectionManager;//トランザクション
 use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 
+use App\myClass\Apifind\htmlApifind;//myClassフォルダに配置したクラスを使用
+
 use Cake\Routing\Router;//urlの取得
 
 class ApisController extends AppController
@@ -339,13 +341,91 @@ class ApisController extends AppController
 
 				}
 
+				$arrAssembleProducts = array();//ここから組立品
+				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
+				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+				->order(["datetime_finish"=>"DESC"])->toArray();
+
+				$arrResultZensuHeadsmoto = array();
+				for($k=0; $k<count($ResultZensuHeads); $k++){
+
+					$arrResultZensuHeadsmoto[] = [
+						'product_code' => $ResultZensuHeads[$k]["product_code"],
+						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
+						'count' => 1
+				 ];
+
+				}
+
+				$product_code_moto = array();//ここから配列の並び変え
+				$datetime_finish_moto = array();
+				foreach ($arrResultZensuHeadsmoto as $key => $value) {
+					 $product_code[$key] = $value['product_code'];
+					 $datetime_finish[$key] = $value["datetime_finish"];
+				 }
+
+				array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
+
+				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
+				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
+
+					for($m=$l+1; $m<count($arrResultZensuHeadsmoto); $m++){
+
+						if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
+
+							$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
+
+							$arrResultZensuHeadsmoto[$l]["count"] = $count;
+
+							unset($arrResultZensuHeadsmoto[$m]);
+
+						}
+
+					}
+					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
+
+				}
+
+				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
+
+					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
+
+					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立
+
+						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
+						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'delete_flag' => 0,
+						'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+						->toArray();
+
+						if(isset($OrderEdisAssemble[0])){
+
+							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
+							$irisu = $Konpou[0]->irisu;//製品の入数を取得
+
+							$amount = $irisu * $arrResultZensuHeadsmoto[$l]["count"];//入数をかけてamountを取得
+
+							 $arrAssembleProducts[] = [//配列$arrAssembleProductsに追加
+								 'product_code' => $arrResultZensuHeadsmoto[$l]["product_code"],
+								 'kensabi' => $arrResultZensuHeadsmoto[$l]["datetime_finish"],
+								 'amount' => $amount
+							];
+
+						}
+
+					}
+
+				}
+/*
+				echo "<pre>";
+				print_r($arrAssembleProducts);
+				echo "</pre>";
+*/
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
 
 				for($k=0; $k<count($OrderEdis); $k++){
 
@@ -378,81 +458,21 @@ class ApisController extends AppController
 
 						}
 
-						//組立品呼び出し
-						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
-						->order(["datetime_finish"=>"DESC"])->toArray();
 /*
-						echo "<pre>";
-						print_r($OrderEdis[$k]["product_code"]." ".$date1." 00:00:00 ~ ".$datenext1." 00:00:00");
-						echo "</pre>";
+						//組立品呼び出し//クラス使用
+						$arrAssembleProducts[10000] = [
+							'product_code' => $OrderEdis[$k]["product_code"],
+							'kensabi' => $date1,
+							'amount' => 0
+					 ];
+
+						$htmlApifind = new htmlApifind();//クラスを使用
+						$arrAssembleProducts = $htmlApifind->Assemble($arrAssembleProducts);//クラスを使用
 */
-/*
-						echo "<pre>";
-						print_r($OrderEdis[$k]["product_code"]." ".count($ResultZensuHeads));
-						echo "</pre>";
-*/
-						if(isset($ResultZensuHeads[0])){//210107データ確認ok
-																																							//child_pid変更
-								$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
-
-								if(isset($AssembleProducts[0])){
-
-									$diff = floor((strtotime($datenext1) - $date1st) / (60 * 60 * 24));
-
-									for($l=0; $l<$diff; $l++){//それぞれの日付に対して
-
-										$datetime_finish = strtotime("+$l day " . $date1);
-			              $datetime_finish = date("Y-m-d", $datetime_finish);
-
-										$Konpou = $this->Konpous->find()->where(['product_code' => $OrderEdis[$k]["product_code"]])->toArray();
-										$irisu = $Konpou[0]->irisu;
-
-						//				$datetime_finish = substr($ResultZensuHeads[$m]["datetime_finish"], 0, 10);
-
-										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
-										->order(["datetime_finish"=>"DESC"])->toArray();
-
-										if(isset($ResultZensuHeadsday[0])){
-/*
-											echo "<pre>";
-											print_r($OrderEdis[$k]["product_code"]." ".$datetime_finish." 00:00:00 ~ ".$datetime_finish." 23:59:59 ".count($ResultZensuHeadsday));
-											echo "</pre>";
-*/
-											$amount = $irisu * count($ResultZensuHeadsday);
-
-											 $arrAssembleProducts[] = [
-												 'product_code' => $OrderEdis[$k]["product_code"],
-												 'kensabi' => $datetime_finish,
-												 'amount' => $amount
-											];
-
-										}
-
-									}
-
-								}
-
-							$arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
-							$arrAssembleProducts = array_values($arrAssembleProducts);
-
-							$product_code = array();
-							$kensabi = array();
-							foreach ($arrAssembleProducts as $key => $value) {
-  							 $product_code[$key] = $value['product_code'];
-  							 $kensabi[$key] = $value["kensabi"];
-  						 }
-
-							 //			 array_multisort($product_code, SORT_ASC, $arrAssembleProducts);
-							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
-
-						}
 
 					}
 
 				}
-
 
 				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
 				for($l=0; $l<count($arrOrderEdis); $l++){
@@ -460,23 +480,19 @@ class ApisController extends AppController
 					for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
 						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-/*
-							echo "<pre>";
-							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-							echo "</pre>";
-*/
+
 							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
 							$arrOrderEdis[$l]["amount"] = $amount;
 							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
 							unset($arrOrderEdis[$m]);
-							$arrOrderEdis = array_values($arrOrderEdis);
 
 						}
 
 					}
+					$arrOrderEdis = array_values($arrOrderEdis);
 
 				}
 
@@ -646,14 +662,6 @@ class ApisController extends AppController
 						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
 					}
 
-/*
-					echo "<pre>";
-					var_dump($tmp_product_array);
-					echo "</pre>";
-					echo "<pre>";
-					var_dump($tmp_dateseikei_array);
-					echo "</pre>";
-*/
 			}elseif($sheet === "primary_dnp"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -790,23 +798,19 @@ class ApisController extends AppController
 					for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
 						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-/*
-							echo "<pre>";
-							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-							echo "</pre>";
-*/
+
 							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
 							$arrOrderEdis[$l]["amount"] = $amount;
 							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
 							unset($arrOrderEdis[$m]);
-							$arrOrderEdis = array_values($arrOrderEdis);
 
 						}
 
 					}
+					$arrOrderEdis = array_values($arrOrderEdis);
 
 				}
 
@@ -1125,32 +1129,28 @@ class ApisController extends AppController
 
 
 										//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
+										for($l=0; $l<count($arrOrderEdis); $l++){
 
-					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+											for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
-						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-/*
-							echo "<pre>";
-							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-							echo "</pre>";
-*/
-							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+												if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
 
-							$arrOrderEdis[$l]["amount"] = $amount;
-							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+													$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+													$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
-							unset($arrOrderEdis[$m]);
-							$arrOrderEdis = array_values($arrOrderEdis);
+													$arrOrderEdis[$l]["amount"] = $amount;
+													$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
-						}
+													unset($arrOrderEdis[$m]);
 
-					}
+												}
 
-				}
+											}
+											$arrOrderEdis = array_values($arrOrderEdis);
 
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+										}
+
+										$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
 
 				//並べかえ
 				$tmp_product_array = array();
@@ -1442,23 +1442,19 @@ class ApisController extends AppController
 					for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
 						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-/*
-							echo "<pre>";
-							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-							echo "</pre>";
-*/
+
 							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
 							$arrOrderEdis[$l]["amount"] = $amount;
 							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
 							unset($arrOrderEdis[$m]);
-							$arrOrderEdis = array_values($arrOrderEdis);
 
 						}
 
 					}
+					$arrOrderEdis = array_values($arrOrderEdis);
 
 				}
 
@@ -1753,23 +1749,19 @@ class ApisController extends AppController
 					for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
 						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-/*
-							echo "<pre>";
-							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-							echo "</pre>";
-*/
+
 							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
 							$arrOrderEdis[$l]["amount"] = $amount;
 							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
 							unset($arrOrderEdis[$m]);
-							$arrOrderEdis = array_values($arrOrderEdis);
 
 						}
 
 					}
+					$arrOrderEdis = array_values($arrOrderEdis);
 
 				}
 
@@ -2061,23 +2053,19 @@ class ApisController extends AppController
 					for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
 						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-/*
-							echo "<pre>";
-							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-							echo "</pre>";
-*/
+
 							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
 							$arrOrderEdis[$l]["amount"] = $amount;
 							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
 							unset($arrOrderEdis[$m]);
-							$arrOrderEdis = array_values($arrOrderEdis);
 
 						}
 
 					}
+					$arrOrderEdis = array_values($arrOrderEdis);
 
 				}
 
@@ -2372,32 +2360,28 @@ class ApisController extends AppController
 
 
 										//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
+										for($l=0; $l<count($arrOrderEdis); $l++){
 
-					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+											for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
-						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-/*
-							echo "<pre>";
-							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-							echo "</pre>";
-*/
-							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+												if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
 
-							$arrOrderEdis[$l]["amount"] = $amount;
-							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+													$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+													$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
-							unset($arrOrderEdis[$m]);
-							$arrOrderEdis = array_values($arrOrderEdis);
+													$arrOrderEdis[$l]["amount"] = $amount;
+													$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
-						}
+													unset($arrOrderEdis[$m]);
 
-					}
+												}
 
-				}
+											}
+											$arrOrderEdis = array_values($arrOrderEdis);
 
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+										}
+
+										$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
 
 				//並べかえ
 				$tmp_product_array = array();
@@ -2688,23 +2672,19 @@ class ApisController extends AppController
 					for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
 						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-/*
-							echo "<pre>";
-							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-							echo "</pre>";
-*/
+
 							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
 							$arrOrderEdis[$l]["amount"] = $amount;
 							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
 							unset($arrOrderEdis[$m]);
-							$arrOrderEdis = array_values($arrOrderEdis);
 
 						}
 
 					}
+					$arrOrderEdis = array_values($arrOrderEdis);
 
 				}
 
@@ -2995,32 +2975,28 @@ class ApisController extends AppController
 
 
 										//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
+										for($l=0; $l<count($arrOrderEdis); $l++){
 
-					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+											for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
-						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-/*
-							echo "<pre>";
-							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-							echo "</pre>";
-*/
-							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+												if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
 
-							$arrOrderEdis[$l]["amount"] = $amount;
-							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+													$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+													$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
-							unset($arrOrderEdis[$m]);
-							$arrOrderEdis = array_values($arrOrderEdis);
+													$arrOrderEdis[$l]["amount"] = $amount;
+													$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
-						}
+													unset($arrOrderEdis[$m]);
 
-					}
+												}
 
-				}
+											}
+											$arrOrderEdis = array_values($arrOrderEdis);
 
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+										}
+
+										$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
 
 				//並べかえ
 				$tmp_product_array = array();
@@ -3307,32 +3283,28 @@ class ApisController extends AppController
 
 
 										//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
+										for($l=0; $l<count($arrOrderEdis); $l++){
 
-					for($m=$l+1; $m<count($arrOrderEdis); $m++){
+											for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
-						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-/*
-							echo "<pre>";
-							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-							echo "</pre>";
-*/
-							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+												if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
 
-							$arrOrderEdis[$l]["amount"] = $amount;
-							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+													$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+													$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
-							unset($arrOrderEdis[$m]);
-							$arrOrderEdis = array_values($arrOrderEdis);
+													$arrOrderEdis[$l]["amount"] = $amount;
+													$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
-						}
+													unset($arrOrderEdis[$m]);
 
-					}
+												}
 
-				}
+											}
+											$arrOrderEdis = array_values($arrOrderEdis);
 
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+										}
+
+										$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
 
 				//並べかえ
 				$tmp_product_array = array();
@@ -3625,23 +3597,19 @@ class ApisController extends AppController
 											for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
 												if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-						/*
-													echo "<pre>";
-													print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-													echo "</pre>";
-						*/
+
 													$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-													$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+													$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
 													$arrOrderEdis[$l]["amount"] = $amount;
 													$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
 													unset($arrOrderEdis[$m]);
-													$arrOrderEdis = array_values($arrOrderEdis);
 
 												}
 
 											}
+											$arrOrderEdis = array_values($arrOrderEdis);
 
 										}
 
@@ -3933,23 +3901,19 @@ class ApisController extends AppController
 					for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
 						if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-/*
-							echo "<pre>";
-							print_r("同一です".$arrOrderEdis[$m]["product_code"]." ".$arrOrderEdis[$l]["amount"]." + ".$arrOrderEdis[$m]["amount"]);
-							echo "</pre>";
-*/
+
 							$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + 1;
+							$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
 							$arrOrderEdis[$l]["amount"] = $amount;
 							$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
 							unset($arrOrderEdis[$m]);
-							$arrOrderEdis = array_values($arrOrderEdis);
 
 						}
 
 					}
+					$arrOrderEdis = array_values($arrOrderEdis);
 
 				}
 

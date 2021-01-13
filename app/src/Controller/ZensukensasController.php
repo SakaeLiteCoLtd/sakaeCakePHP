@@ -854,7 +854,7 @@ class ZensukensasController extends AppController
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
        $data = $this->request->getData();
-       /*
+/*
        echo "<pre>";
        print_r($data);
        echo "</pre>";
@@ -995,13 +995,13 @@ class ZensukensasController extends AppController
             }
 
             $arrZensuHeads = array_intersect($arrZensuHeads, $arrZensustaff);//共通部分だけを取り出す
+            $arrZensuHeads = array_values($arrZensuHeads);
 
          }else{//staffの入力がない場合
 
            $arrZensuHeads = $arrZensuHeads;
 
          }
-
 
          if(isset($arrZensuHeads[0])){
 
@@ -1045,6 +1045,7 @@ class ZensukensasController extends AppController
             }
 
             $arrFooder = array_intersect($arrFooder, $arrZensuContRejection);//共通部分だけを取り出す
+            $arrFooder = array_values($arrFooder);
 
          }else{//ContRejectionの入力がない場合
 
@@ -1075,6 +1076,7 @@ class ZensukensasController extends AppController
             }
 
             $arrFooder = array_intersect($arrFooder, $arrZensuamount);//共通部分だけを取り出す
+            $arrFooder = array_values($arrFooder);
 
          }else{//amountの入力がない場合
 
@@ -1105,6 +1107,7 @@ class ZensukensasController extends AppController
             }
 
             $arrFooder = array_intersect($arrFooder, $arrZensucheck);//共通部分だけを取り出す
+            $arrFooder = array_values($arrFooder);
 
          }else{//checkがない場合
 
@@ -1135,6 +1138,7 @@ class ZensukensasController extends AppController
             }
 
             $arrFooder = array_intersect($arrFooder, $arrZensubik);//共通部分だけを取り出す
+            $arrFooder = array_values($arrFooder);
 
          }else{//bikの入力がない場合
 
@@ -1164,8 +1168,8 @@ class ZensukensasController extends AppController
 
               $product_code = $ResultZensuHeads[0]->product_code;
               $lot_num = $ResultZensuHeads[0]->lot_num;
-              $date_sta = $ResultZensuHeads[0]->datetime_start->format('Y-m-d H:i:s');
-              $date_fin = $ResultZensuHeads[0]->datetime_finish->format('Y-m-d H:i:s');
+              $date_sta = $ResultZensuHeads[0]->datetime_start;
+              $date_fin = $ResultZensuHeads[0]->datetime_finish;
 
               $from = strtotime($date_sta);
               $to   = strtotime($date_fin);
@@ -1238,7 +1242,7 @@ class ZensukensasController extends AppController
         //    $fp = fopen('zensu_csv/zenken_test.csv', 'w');
             $fp = fopen('/home/centosuser/zensu_csv/zenken_test.csv', 'w');
               foreach ($arrichiran_csv as $line) {
-                $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+        //        $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
                 fputcsv($fp, $line);
               }
               fclose($fp);

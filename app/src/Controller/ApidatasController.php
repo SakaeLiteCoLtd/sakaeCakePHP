@@ -463,21 +463,18 @@ class ApidatasController extends AppController
 																	//http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28 08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
 			public function vbakoutei()//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28 08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
 			{
+
 				$access_url = $_SERVER['REQUEST_URI'];
 
 				//URLをデコードして表示
-				$data = urldecode($_SERVER['REQUEST_URI']);
+				$data = urldecode($_SERVER['REQUEST_URI']);//urlのベタ打ちなら読み込めるが、VBAからだと日本語が読めない
 				//	 echo Router::reverse($this->request, false);//文字化けする
 
 				$urlarr = explode("/",$data);//切り離し
 				$dataarr = explode("_",$urlarr[4]);//切り離し
 
-					if(isset($dataarr[2])){//ScheduleKouteisTests登録
-/*
-						echo "<pre>";
-						print_r(" if ");
-						echo "</pre>";
-*/
+					if(isset($dataarr[2])){//ScheduleKouteisTests登録用の配列に追加
+
 						$datetime = str_replace("%20", " ", $dataarr[0]);//datetimeの取得
 						$datetime = str_replace("%3A", ":", $datetime);//datetimeの取得
 						$seikeiki = $dataarr[1];//seikeikiの取得
@@ -499,7 +496,7 @@ class ApidatasController extends AppController
 						$kouteivba['seikeiki'] = $seikeiki;
 						$kouteivba['product_code'] = $product_code;
 						$kouteivba['present_kensahyou'] = $present_kensahyou;
-						$kouteivba['product_name'] = $product_name;
+						$kouteivba['product_name'] = date('Y-m-d H:i:s');
 						$kouteivba['tantou'] = $tantou;
 
 						$this->set([
@@ -507,33 +504,12 @@ class ApidatasController extends AppController
 						'_serialize' => ['tourokutest']
 						]);
 
-						//新しいデータを登録
-						$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $kouteivba);
-						$connection = ConnectionManager::get('default');//トランザクション1
-						// トランザクション開始2
-						$connection->begin();//トランザクション3
-						try {//トランザクション4
-							if ($this->ScheduleKouteisTests->save($ScheduleKouteisTests)) {
+						session_start();
+						$session = $this->request->getSession();
+						$_SESSION['kouteivba'][] = $kouteivba;
 
-								$connection->commit();// コミット5
+					}elseif(isset($dataarr[1])){//ScheduleKouteisTestsのdelete_flagを1に変更
 
-							} else {
-
-								$this->Flash->error(__('The data could not be saved. Please, try again.'));
-								throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-
-							}
-						} catch (Exception $e) {//トランザクション7
-						//ロールバック8
-							$connection->rollback();//トランザクション9
-						}//トランザクション10
-
-					}else{//ScheduleKouteisTestsのdelete_flagを1に変更
-/*
-						echo "<pre>";
-						print_r(" else ");
-						echo "</pre>";
-*/
 						$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
 						$dayfinish = $dataarr[1]." 07:59:59";//1週間の終わりの日付の取得
 
@@ -552,6 +528,45 @@ class ApidatasController extends AppController
 							}
 
 						}
+
+					}elseif($dataarr[0] == "end.xml"){//終了の時に一括でデータを登録してセッションを削除
+
+						session_start();
+						$session = $this->request->getSession();
+/*
+						$present_kensahyou = 0;
+
+						$kouteivba = [
+							'datetime' => date('Y-m-d H:i:s'),
+							'seikeiki' => 1,
+							'product_code' => 'end',
+							'present_kensahyou' => $present_kensahyou,
+							'product_name' => 'end',
+							'tantou' => 'end'
+						];
+*/
+						//新しいデータを登録
+						$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntities($this->ScheduleKouteisTests->newEntity(), $_SESSION['kouteivba']);
+						$connection = ConnectionManager::get('default');//トランザクション1
+						// トランザクション開始2
+						$connection->begin();//トランザクション3
+						try {//トランザクション4
+							if ($this->ScheduleKouteisTests->saveMany($ScheduleKouteisTests)) {
+
+								$connection->commit();// コミット5
+								$this->request->session()->destroy(); // セッションの破棄
+
+							} else {
+
+								$this->Flash->error(__('The data could not be saved. Please, try again.'));
+								throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+								$this->request->session()->destroy(); // セッションの破棄
+
+							}
+						} catch (Exception $e) {//トランザクション7
+						//ロールバック8
+							$connection->rollback();//トランザクション9
+						}//トランザクション10
 
 					}
 

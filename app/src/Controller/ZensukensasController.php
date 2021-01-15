@@ -920,9 +920,11 @@ class ZensukensasController extends AppController
          if($data['check'] == 0){
            $check = "不良数ゼロ検索";
            $this->set('check',$check);
+           $this->set('checknum',$data['check']);
          }else{
            $check = "不良数ゼロを省いて検索";
            $this->set('check',$check);
+           $this->set('checknum',$data['check']);
          }
 
          $bik = $data['bik'];

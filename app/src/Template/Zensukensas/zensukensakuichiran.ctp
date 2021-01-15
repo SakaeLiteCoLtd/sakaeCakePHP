@@ -63,6 +63,7 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
 <?= $this->Form->control('check', array('type'=>'hidden', 'value'=>$check, 'label'=>false)) ?>
 <?= $this->Form->control('bik', array('type'=>'hidden', 'value'=>$bik, 'label'=>false)) ?>
 
+<?= $this->Form->control('check', array('type'=>'hidden', 'value'=>$checknum, 'label'=>false)) ?>
 
 <br><br><br>
 <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

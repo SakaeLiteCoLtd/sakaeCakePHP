@@ -8,7 +8,7 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 
 use Cake\Utility\Xml;//xmlのファイルを読み込みために必要
-
+use Cake\Utility\Text;
 use Cake\Routing\Router;//urlの取得
 use Cake\Http\Client;//httpの読取に必要
 //use Cake\Http\ServerRequest;
@@ -39,6 +39,13 @@ class ApidatasController extends AppController
 
 		public function preadd()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apidatas/preadd
 		{
+
+			session_start();
+			$session = $this->request->getSession();
+			echo "<pre>";
+			print_r($_SESSION);
+			echo "</pre>";
+
 			$staff = $this->Products->newEntity();//newentityに$staffという名前を付ける
 			$this->set('staff',$staff);//1行上の$staffをctpで使えるようにセット
 /*
@@ -78,7 +85,7 @@ class ApidatasController extends AppController
 			$xml = Xml::build('xmls/test.xml');
 
 */
-
+/*
 		//		$xmlArray = Xml::toArray(Xml::build('http://localhost:5000/Apidatas/test/api/test.xml'));
 				$http = new Client();
 
@@ -98,7 +105,7 @@ class ApidatasController extends AppController
 				echo "<pre>";
 				print_r($array["tourokutestproduct"]["product_name"]);
 				echo "</pre>";
-
+*/
 		}
 
 	 public function login()
@@ -461,15 +468,17 @@ class ApidatasController extends AppController
 	}
 
 																	//http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28 08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
-			public function vbakoutei()//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28 08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
+			public function vbakoutei210115()//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28 08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
 			{
-
-				$access_url = $_SERVER['REQUEST_URI'];
-
 				//URLをデコードして表示
-				$data = urldecode($_SERVER['REQUEST_URI']);//urlのベタ打ちなら読み込めるが、VBAからだと日本語が読めない
-				//	 echo Router::reverse($this->request, false);//文字化けする
-
+		//		$data = urldecode($_SERVER['REQUEST_URI']);//urlのベタ打ちなら読み込めるが、VBAからだと日本語が読めない
+				$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+				$data = urldecode($data);
+/*
+				echo "<pre>";
+				print_r($data);
+				echo "</pre>";
+*/
 				$urlarr = explode("/",$data);//切り離し
 				$dataarr = explode("_",$urlarr[4]);//切り離し
 
@@ -489,6 +498,7 @@ class ApidatasController extends AppController
 						$tantouarr = explode(".",$dataarr[3]);//切り離し
 
 						$tantou = $tantouarr[0];//tantouの取得
+						$tantou = mb_convert_encoding($tantou,"UTF-8",mb_detect_encoding($tantou, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true));
 
 						$present_kensahyou = 0;
 
@@ -510,11 +520,22 @@ class ApidatasController extends AppController
 
 					}elseif(isset($dataarr[1])){//ScheduleKouteisTestsのdelete_flagを1に変更
 
-						$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
-						$dayfinish = $dataarr[1]." 07:59:59";//1週間の終わりの日付の取得
+						$this->request->session()->destroy(); // セッションの破棄
 
+						$dayarr = explode(".",$dataarr[1]);//切り離し
+						$dayfinish = $dayarr[0];//tantouの取得
+
+						$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
+						$dayfinish = $dayfinish." 07:59:59";//1週間の終わりの日付の取得
+
+						session_start();
+						$session = $this->request->getSession();
+						$_SESSION['deleteday'][0] = $daystart;
+						$_SESSION['deleteday'][1] = $dayfinish;
+
+/*
 						//1週間分のデータを削除
-						$ScheduleKouteisTestsdelete = $this->ScheduleKouteisTests->find()->where(['datetime >=' => $daystart, 'datetime <=' => $dayfinish, 'delete_flag' => 0])->toArray();
+						$ScheduleKouteisTestsdelete = $this->ScheduleKouteisTests->find()->where(['datetime >=' => $_SESSION['deleteday'][0], 'datetime <=' => $_SESSION['deleteday'][1], 'delete_flag' => 0])->toArray();
 						if(isset($ScheduleKouteisTestsdelete[0])){
 
 							for($k=0; $k<count($ScheduleKouteisTestsdelete); $k++){
@@ -528,7 +549,7 @@ class ApidatasController extends AppController
 							}
 
 						}
-
+*/
 					}elseif($dataarr[0] == "end.xml"){//終了の時に一括でデータを登録してセッションを削除
 
 						session_start();
@@ -551,6 +572,22 @@ class ApidatasController extends AppController
 						// トランザクション開始2
 						$connection->begin();//トランザクション3
 						try {//トランザクション4
+
+							$ScheduleKouteisTestsdelete = $this->ScheduleKouteisTests->find()->where(['datetime >=' => $_SESSION['deleteday'][0], 'datetime <=' => $_SESSION['deleteday'][1], 'delete_flag' => 0])->toArray();
+							if(isset($ScheduleKouteisTestsdelete[0])){
+
+								for($k=0; $k<count($ScheduleKouteisTestsdelete); $k++){
+									$id = $ScheduleKouteisTestsdelete[$k]->id;
+
+									$this->ScheduleKouteisTests->updateAll(
+									['delete_flag' => 1],
+									['id'   => $id]
+									);
+
+								}
+
+							}
+
 							if ($this->ScheduleKouteisTests->saveMany($ScheduleKouteisTests)) {
 
 								$connection->commit();// コミット5
@@ -571,5 +608,147 @@ class ApidatasController extends AppController
 					}
 
 			}
+
+															 //http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28 08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
+		public function vbakoutei()//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28 08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+/*
+			echo "<pre>";
+			print_r($data);
+			echo "</pre>";
+*/
+			$urlarr = explode("/",$data);//切り離し
+			$dataarr = explode("_",$urlarr[4]);//切り離し
+
+				if(isset($dataarr[4])){//ScheduleKouteisTests登録用の配列に追加
+
+					$daystart = $dataarr[0];//1週間の初めの日付の取得
+					$dayfinish = $dataarr[1];//1週間の終わりの日付の取得
+
+					$datetime = str_replace("%20", " ", $dataarr[2]);//datetimeの取得
+					$datetime = str_replace("%3A", ":", $datetime);//datetimeの取得
+					$seikeiki = $dataarr[3];//seikeikiの取得
+					$product_code = $dataarr[4];//product_codeの取得
+					$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+					if(isset($Product[0])){
+					$product_name = $Product[0]->product_name;
+					}else{
+					$product_name = "";
+					}
+
+					$tantouarr = explode(".",$dataarr[5]);//切り離し
+
+					$tantou = $tantouarr[0];//tantouの取得
+					$tantou = mb_convert_encoding($tantou,"UTF-8",mb_detect_encoding($tantou, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true));
+
+					$present_kensahyou = 0;
+
+					$kouteivba['datetime'] = $datetime;
+					$kouteivba['seikeiki'] = $seikeiki;
+					$kouteivba['product_code'] = $product_code;
+					$kouteivba['present_kensahyou'] = $present_kensahyou;
+					$kouteivba['product_name'] = $product_name;
+					$kouteivba['tantou'] = $tantou;
+
+					$this->set([
+					'tourokutest' => $kouteivba,
+					'_serialize' => ['tourokutest']
+					]);
+
+					session_start();
+					$session = $this->request->getSession();
+					$_SESSION['kouteivba'.$daystart.$dayfinish][] = $kouteivba;
+
+				}elseif(!isset($dataarr[2])){//まずここにくる
+
+					session_start();
+					$session = $this->request->getSession();
+
+					if(isset($_SESSION['session'][0])){//誰かがボタンを押して終了していない場合
+
+						return $this->redirect(['action' => 'vbaredirect',
+		        's' => ['returndata' => $urlarr[4]]]);
+
+					}else{//同時に誰もスタートしていない場合
+
+						$_SESSION['session'][0] = 0;
+
+					}
+
+					$dayarr = explode(".",$dataarr[1]);//切り離し
+					$dayfinish = $dayarr[0];
+
+					$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
+					$dayfinish = $dayfinish." 07:59:59";//1週間の終わりの日付の取得
+
+					$_SESSION['deleteday'.$dataarr[0]][0] = $daystart;
+					$_SESSION['deleteday'.$dayarr[0]][0] = $dayfinish;
+
+				}elseif($dataarr[2] == "end.xml"){//終了の時に一括でデータを登録してそのセッションを削除
+
+					session_start();
+					$session = $this->request->getSession();
+
+					$daystart = $dataarr[0];//1週間の初めの日付の取得
+					$dayfinish = $dataarr[1];//1週間の終わりの日付の取得
+
+					//新しいデータを登録
+					$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntities($this->ScheduleKouteisTests->newEntity(), $_SESSION['kouteivba'.$daystart.$dayfinish]);
+					$connection = ConnectionManager::get('default');//トランザクション1
+					// トランザクション開始2
+					$connection->begin();//トランザクション3
+					try {//トランザクション4
+
+						$ScheduleKouteisTestsdelete = $this->ScheduleKouteisTests->find()->where(['datetime >=' => $_SESSION['deleteday'.$daystart][0], 'datetime <=' => $_SESSION['deleteday'.$dayfinish][0], 'delete_flag' => 0])->toArray();
+						if(isset($ScheduleKouteisTestsdelete[0])){
+
+							for($k=0; $k<count($ScheduleKouteisTestsdelete); $k++){
+								$id = $ScheduleKouteisTestsdelete[$k]->id;
+
+								$this->ScheduleKouteisTests->updateAll(
+								['delete_flag' => 1],
+								['id'   => $id]
+								);
+
+							}
+
+						}
+
+						if ($this->ScheduleKouteisTests->saveMany($ScheduleKouteisTests)) {
+
+							$connection->commit();// コミット5
+
+						} else {
+
+							$this->Flash->error(__('The data could not be saved. Please, try again.'));
+							throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+						}
+					} catch (Exception $e) {//トランザクション7
+					//ロールバック8
+						$connection->rollback();//トランザクション9
+					}//トランザクション10
+
+					$_SESSION['kouteivba'.$daystart.$dayfinish] = array();
+					$_SESSION['deleteday'.$daystart] = array();
+					$_SESSION['deleteday'.$dayfinish] = array();
+					$_SESSION['session'] = array();
+
+				}
+
+		}
+
+		public function vbaredirect()
+		{
+
+			$Data = $this->request->query('s');
+			$returndata = $Data["returndata"];
+//			$this->request->session()->destroy(); // セッションの破棄
+
+			return $this->redirect(['action' => 'vbakoutei/api/'.$returndata]);
+
+		}
 
 	}

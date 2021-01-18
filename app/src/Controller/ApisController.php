@@ -171,6 +171,7 @@ class ApisController extends AppController
 			print_r($daya);
 			echo "</pre>";
 */
+
 			$date1d = $day." 08:00:00";
 			$date1d0 = strtotime($date1d);
 			$date1d0 = date('Y-m-d', strtotime('+1 day', $date1d0));
@@ -208,7 +209,8 @@ class ApisController extends AppController
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $product_name,
-					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　",
+					'date' => $ScheduleKouteis[$k]->datetime->format('Y-m-d')
 			 ];
 
 			}
@@ -279,7 +281,8 @@ class ApisController extends AppController
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $product_name,
-					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
+					'tantou' => $ScheduleKouteis[$k]["tantou"]."　",
+					'date' => $ScheduleKouteis[$k]->datetime->format('Y-m-d')
 			 ];
 
 			}

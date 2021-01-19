@@ -7,13 +7,13 @@ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
 
 $this->Products = TableRegistry::get('products');//productsテーブルを使う
 ?>
-        <?php
-          $username = $this->request->Session()->read('Auth.User.username');
+<?php
+  $username = $this->request->Session()->read('Auth.User.username');
 
-          header('Expires:-1');
-          header('Cache-Control:');
-          header('Pragma:');
-          echo $this->Form->create($products, ['url' => ['action' => 'imtaiouform']]);
+  header('Expires:-1');
+  header('Cache-Control:');
+  header('Pragma:');
+  echo $this->Form->create($products, ['url' => ['action' => 'imtaiouform']]);
 ?>
 <?php
  use App\myClass\EDImenus\htmlEDImenu;//myClassフォルダに配置したクラスを使用

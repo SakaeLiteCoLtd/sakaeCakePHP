@@ -6,7 +6,7 @@
  * @var \App\Model\Entity\User $user
  */
 ?>
-
+<?php phpinfo(); ?>
 <br>
     <?= $this->Flash->render() ?>
     <?= $this->Form->create($staff, ['url' => ['action' => 'login']]) ?>

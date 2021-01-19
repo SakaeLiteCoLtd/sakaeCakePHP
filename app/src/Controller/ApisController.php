@@ -178,7 +178,7 @@ class ApisController extends AppController
 			$date1d0 = $date1d0." 07:59:59";
 
 			$ScheduleKouteis = $this->ScheduleKouteis->find()
-			->where(['datetime >=' => $date1d, 'datetime <=' => $date1d0])->toArray();
+			->where(['datetime >=' => $date1d, 'datetime <=' => $date1d0, 'delete_flag' => 0])->toArray();
 
 			if(isset($ScheduleKouteis[0])){
 
@@ -241,7 +241,7 @@ class ApisController extends AppController
 			$date1w0 = $date1w0." 07:59:59";
 
 			$ScheduleKouteis = $this->ScheduleKouteis->find()
-			->where(['datetime >=' => $date1w, 'datetime <=' => $date1w0])->order(["datetime"=>"ASC"])->toArray();
+			->where(['datetime >=' => $date1w, 'datetime <=' => $date1w0, 'delete_flag' => 0])->order(["datetime"=>"ASC"])->toArray();
 
 			for($k=0; $k<count($ScheduleKouteis); $k++){
 

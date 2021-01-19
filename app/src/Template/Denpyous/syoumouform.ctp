@@ -88,12 +88,12 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
       <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
         <tr style="border-bottom: solid;border-width: 1px">
           <td width='10'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue"></strong></td>
-          <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">仕入項目</strong></td>
-          <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">品番、機械番号etc</strong></td>
-          <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">品名、または発注名</strong></td>
-          <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">単価（円）</strong></td>
-          <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">数量</strong></td>
-          <td width='80'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">納入日</strong></td>
+          <td bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">仕入項目</strong></td>
+          <td bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">品番、機械番号etc</strong></td>
+          <td bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">品名、または発注名</strong></td>
+          <td bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">単価（円）</strong></td>
+          <td bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">数量</strong></td>
+          <td width='250' bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">納入日</strong></td>
         </tr>
 
         <?php for($i=0; $i<1; $i++): ?>

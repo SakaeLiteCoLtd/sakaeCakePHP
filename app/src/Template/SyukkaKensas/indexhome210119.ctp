@@ -13,7 +13,17 @@
 
 <?= $this->Form->create($imKikakus, ['url' => ['action' => 'torikomi']]) ?>
 <fieldset>
+
+<table width="600" border="1" align="center" bordercolor="#000000" bgcolor="#FFDEAD">
+    <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+    <tr>
+      <td width="450" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><div align="center"><strong><font color="blue" size="4">ＩＭデータ取り込み</font></strong></div></td>
+      <td nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><?= $this->Form->submit(__('ＩＭデータ取り込み'), array('name' => 'top')) ?></td>
+    </tr>
+</table>
 <br>
+<br>
+
 
 <div align="center"><font color="red" size="4">＊下記の製品が未検査です</font></div>
 <br>

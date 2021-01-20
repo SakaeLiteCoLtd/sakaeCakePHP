@@ -58,7 +58,9 @@ class ApisController extends AppController
           $tmp_datetime[$key] = $row["datetime"];
         }
 
-				array_multisort($tmp_seikeiki, SORT_ASC, $tmp_datetime, SORT_ASC, $ScheduleKouteis);
+				if(isset($kensabi)){
+					array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+				}
 
 				$time = $ScheduleKouteis[0]->datetime->format('H:i');
 
@@ -367,7 +369,9 @@ class ApisController extends AppController
 					 $datetime_finish[$key] = $value["datetime_finish"];
 				 }
 
-				array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
+				 if(isset($datetime_finish)){
+					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
+				 }
 
 				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
@@ -786,7 +790,9 @@ class ApisController extends AppController
   							 $kensabi[$key] = $value["kensabi"];
   						 }
 
-							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 if(isset($kensabi)){
+								 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 }
 
 						}
 
@@ -1122,7 +1128,9 @@ class ApisController extends AppController
 						  							 $kensabi[$key] = $value["kensabi"];
 						  						 }
 
-													 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+													 if(isset($kensabi)){
+														 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+													 }
 
 												}
 
@@ -1430,7 +1438,9 @@ class ApisController extends AppController
   							 $kensabi[$key] = $value["kensabi"];
   						 }
 
-							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 if(isset($kensabi)){
+								 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 }
 
 						}
 
@@ -1737,7 +1747,9 @@ class ApisController extends AppController
   							 $kensabi[$key] = $value["kensabi"];
   						 }
 
-							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 if(isset($kensabi)){
+								 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 }
 
 						}
 
@@ -2041,7 +2053,9 @@ class ApisController extends AppController
   							 $kensabi[$key] = $value["kensabi"];
   						 }
 
-							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 if(isset($kensabi)){
+								 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 }
 
 						}
 
@@ -2353,7 +2367,9 @@ class ApisController extends AppController
 						  							 $kensabi[$key] = $value["kensabi"];
 						  						 }
 
-													 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+													 if(isset($kensabi)){
+														 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+													 }
 
 												}
 
@@ -2660,7 +2676,9 @@ class ApisController extends AppController
   							 $kensabi[$key] = $value["kensabi"];
   						 }
 
-							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 if(isset($kensabi)){
+								 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 }
 
 						}
 
@@ -2968,7 +2986,9 @@ class ApisController extends AppController
 						  							 $kensabi[$key] = $value["kensabi"];
 						  						 }
 
-													 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+													 if(isset($kensabi)){
+														 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+													 }
 
 												}
 
@@ -3276,7 +3296,9 @@ class ApisController extends AppController
 						  							 $kensabi[$key] = $value["kensabi"];
 						  						 }
 
-													 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+													 if(isset($kensabi)){
+														 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+													 }
 
 												}
 
@@ -3585,7 +3607,9 @@ class ApisController extends AppController
 						  							 $kensabi[$key] = $value["kensabi"];
 						  						 }
 
-													 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+													 if(isset($kensabi)){
+														 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+													 }
 
 												}
 
@@ -3889,7 +3913,9 @@ class ApisController extends AppController
   							 $kensabi[$key] = $value["kensabi"];
   						 }
 
-							 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 if(isset($kensabi)){
+								 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
+							 }
 
 						}
 

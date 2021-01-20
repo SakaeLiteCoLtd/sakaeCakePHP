@@ -46,6 +46,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
     <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_w.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'yobidashipanaw')));?></td>
       <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_h.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'yobidashipanah')));?></td>
         <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_re.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'yobidashipanare')));?></td>
+          <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/mark_ar.gif',array('width'=>'70','height'=>'36','url'=>array('action'=>'yobidashipanaar')));?></td>
   </tr>
 </table>
 

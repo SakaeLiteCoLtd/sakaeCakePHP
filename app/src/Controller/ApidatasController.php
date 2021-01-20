@@ -607,8 +607,6 @@ class ApidatasController extends AppController
 		{
 			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
 			$data = urldecode($data);
-
-
 /*
 			echo "<pre>";
 			print_r($data);

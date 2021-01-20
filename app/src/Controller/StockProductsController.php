@@ -221,6 +221,35 @@ class StockProductsController extends AppController
 			 $this->set('daymoto',$daymoto);
     }
 
+		public function yobidashipanaar()
+		{
+			$StockProducts = $this->StockProducts->newEntity();
+			$this->set('StockProducts',$StockProducts);
+
+			$Products = $this->Products->find()->where(['delete_flag' => 0, "status" => 0])->order(['product_code' => 'ASC'])->toArray();
+
+			 $count = count($Products);
+
+			 $arrProduct = array();
+
+			 for ($k=0; $k<$count; $k++) {
+				 $product_code = $Products[$k]["product_code"];
+				 if((0 === strpos($product_code, "AR"))){
+						 $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
+				 }
+			 }
+
+			 $this->set('arrProduct',$arrProduct);
+
+			 $Data=$this->request->query('s');
+			 if(isset($Data["data"])){
+				 $daymoto = $Data["data"];
+				}else{
+				 $daymoto = date('Y-m-d');
+			 }
+			 $this->set('daymoto',$daymoto);
+		}
+
 		public function yobidashidnp()
     {
       $StockProducts = $this->StockProducts->newEntity();

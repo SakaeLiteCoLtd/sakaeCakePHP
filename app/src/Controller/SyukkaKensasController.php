@@ -984,7 +984,7 @@ class SyukkaKensasController extends AppController {
       $this->set('imKikakus', $imKikakus);
 
       $today = date("Y-m-d");
-
+/*
       $connection = ConnectionManager::get('DB_ikou_test');//旧DBを参照
       $table = TableRegistry::get('schedule_koutei');
       $table->setConnection($connection);
@@ -1033,7 +1033,7 @@ class SyukkaKensasController extends AppController {
           $connection->rollback();//トランザクション9
         }//トランザクション10
       }
-
+*/
 
       $KadouSeikeiDatab = $this->KadouSeikeis->find()->where(['present_kensahyou' => 0])->order(["product_code"=>"ASC"])->toArray();//'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
 

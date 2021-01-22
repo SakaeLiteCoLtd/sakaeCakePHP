@@ -12,6 +12,11 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
             $htmlShinkimenu = new htmlShinkimenu();
             $htmlShinkis = $htmlShinkimenu->Shinkimenus();
             $htmldenpyomenus = $htmlShinkimenu->denpyomenus();
+
+            header('Expires:-1');
+            header('Cache-Control:');
+            header('Pragma:');
+
         ?>
         <hr size="5" style="margin: 0.5rem">
         <table style="margin-bottom:0px" width="1200" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
@@ -40,9 +45,9 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
     <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
       <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
         <tr>
-          <td width="250" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">発注日付</strong></div></td>
+          <td width="300" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">発注日付</strong></div></td>
         </tr>
-          <td width="250" colspan="20" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date_order", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></div></td>
+          <td width="300" colspan="20" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date_order", array('type' => 'date', 'monthNames' => false, 'label'=>false)); ?></div></td>
     </table>
     <br><br><br><br>
     <br><br><br><br>
@@ -92,7 +97,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
     <td bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">品名、または発注名</strong></td>
     <td bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">単価（円）</strong></td>
     <td bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">数量</strong></td>
-    <td width='250' bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">納入日</strong></td>
+    <td width='300' bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">納入日</strong></td>
   </tr>
 
   <?php for($i=0; $i<=$tuika; $i++): ?>

@@ -21,6 +21,10 @@ class ApigenryousController extends AppController
 		 $this->Products = TableRegistry::get('products');
 		 $this->Users = TableRegistry::get('users');
 		 $this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
+		 $this->OrderMaterials = TableRegistry::get('orderMaterials');
+		 $this->OrderSpecials = TableRegistry::get('orderSpecials');
+		 $this->PriceMaterials = TableRegistry::get('priceMaterials');
+		 $this->DeliverCompanies = TableRegistry::get('deliverCompanies');
 
 		 $this->ScheduleKouteisTests = TableRegistry::get('scheduleKouteisTests');
 
@@ -43,7 +47,7 @@ class ApigenryousController extends AppController
 */
 			$present_kensahyou = 0;
 
-			$kouteivba = [
+			$genryouvba = [
 				'datetime' => date('Y-m-d H:i:s'),
 				'seikeiki' => 1,
 				'product_code' => 'genryou',
@@ -52,16 +56,19 @@ class ApigenryousController extends AppController
 				'tantou' => $urlarr[4]
 			];
 
-			$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $kouteivba);
+			$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $genryouvba);
 			$this->ScheduleKouteisTests->save($ScheduleKouteisTests);
 
 			$this->set([
-				'kouteivba' => $kouteivba,
-				'_serialize' => ['kouteivba']
+				'genryouvba' => $genryouvba,
+				'_serialize' => ['genryouvba']
 			]);
 		}
 
-		public function vbagenryouinsert()//http://localhost:5000/Apigenryous/vbagenryouinsert/api/2020-10-28_2020-11-4.xml　//http://localhost:5000/Apigenryous/vbagenryouinsert/api/2020-10-28_08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
+		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/20210208_02_AP03B_N_200_2021-2-8_2_1001.xml
+		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/20210208_02_AP03B_N_200_2021-2-8_2_1001.xml
+		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/20210208_02_AP03B_N_200_2021-2-8_2_1001.xml
+		public function vbagenryouinsert()
 		{
 			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
 			$data = urldecode($data);
@@ -76,142 +83,185 @@ class ApigenryousController extends AppController
 			}
 			$dataarr = explode("_",$urlarr[4]);//切り離し
 
-				if(isset($dataarr[4])){//ScheduleKouteis登録用の配列に追加
+			if($dataarr[0] == "start.xml"){
 
-					$datetime = $dataarr[0]." ".$dataarr[1];//datetimeの取得
-					$seikeiki = $dataarr[2];//seikeikiの取得
-					$product_code = $dataarr[3];//product_codeの取得
-					$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
-					if(isset($Product[0])){
-					$product_name = $Product[0]->product_name;
-					}else{
-					$product_name = "";
-					}
+				session_start();
+				if(isset($_SESSION['session'][0])){//誰かがボタンを押して終了していない場合
 
-					$tantouarr = explode(".",$dataarr[4]);//切り離し
+					sleep(20);//20秒待機
 
-					$tantou = $tantouarr[0];//tantouの取得
-					$tantou = mb_convert_encoding($tantou,"UTF-8",mb_detect_encoding($tantou, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
-					$product_code = mb_convert_encoding($product_code,"UTF-8",mb_detect_encoding($product_code, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
+					$this->request->session()->destroy();//セッションの破棄
+					$_SESSION['session'][0] = 0;
 
-/*
-					echo "<pre>";
-					print_r($product_code);
-					echo "</pre>";
-*/
-					$present_kensahyou = 0;
+				}else{//同時に誰もスタートしていない場合
 
-					$kouteivba['datetime'] = $datetime;
-					$kouteivba['seikeiki'] = $seikeiki;
-					$kouteivba['product_code'] = $product_code;
-					$kouteivba['present_kensahyou'] = $present_kensahyou;
-					$kouteivba['product_name'] = $product_name;
-					$kouteivba['tantou'] = $tantou;
-					$kouteivba['created_at'] = date('Y-m-d H:i:s');
-
-					$this->set([
-					'tourokutest' => $kouteivba,
-					'_serialize' => ['tourokutest']
-					]);
-
-					session_start();
-					$session = $this->request->getSession();
-					$_SESSION['kouteivba'][] = $kouteivba;
-
-				}elseif(!isset($dataarr[2])){//まずここにくる
-
-					session_start();
-					$session = $this->request->getSession();
-
-					$dayarr = explode(".",$dataarr[1]);//切り離し
-					$dayfinish = $dayarr[0];
-
-					$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
-					$dayfinish = $dayfinish." 07:59:59";//1週間の終わりの日付の取得
-
-					if(isset($_SESSION['session'][0])){//誰かがボタンを押して終了していない場合
-
-						sleep(20);//20秒待機
-
-						$this->request->session()->destroy();//セッションの破棄
-						$_SESSION['session'][0] = 0;
-						$_SESSION['sessionstarttime'] = date('Y-m-d H:i:s');
-
-					}else{//同時に誰もスタートしていない場合
-
-						$_SESSION['session'][0] = 0;
-						$_SESSION['sessionstarttime'] = date('Y-m-d H:i:s');
-
-					}
-
-					$_SESSION['deletesta'][0] = $daystart;
-					$_SESSION['deletefin'][0] = $dayfinish;
-
-				}elseif($dataarr[0] == "end.xml"){//終了の時に一括でデータを登録してそのセッションを削除
-
-					session_start();
-					$session = $this->request->getSession();
-
-					$daystart = $dataarr[0];//1週間の初めの日付の取得
-					$dayfinish = $dataarr[1];//1週間の終わりの日付の取得
-
-					//新しいデータを登録
-					$ScheduleKouteis = $this->ScheduleKouteis->patchEntities($this->ScheduleKouteis->newEntity(), $_SESSION['kouteivba']);
-					$connection = ConnectionManager::get('default');//トランザクション1
-					// トランザクション開始2
-					$connection->begin();//トランザクション3
-					try {//トランザクション4
-
-						$ScheduleKouteisdelete = $this->ScheduleKouteis->find()->where(['datetime >=' => $_SESSION['deletesta'][0], 'datetime <=' => $_SESSION['deletefin'][0], 'delete_flag' => 0])->toArray();
-						if(isset($ScheduleKouteisdelete[0])){
-
-							for($k=0; $k<count($ScheduleKouteisdelete); $k++){
-								$id = $ScheduleKouteisdelete[$k]->id;
-
-								$this->ScheduleKouteis->updateAll(
-								['delete_flag' => 1],
-								['id'   => $id]
-								);
-
-							}
-
-						}
-
-						if ($this->ScheduleKouteis->saveMany($ScheduleKouteis)) {
-
-							$connection->commit();// コミット5
-							$this->request->session()->destroy(); // セッションの破棄
-
-						} else {
-
-							$this->Flash->error(__('The data could not be saved. Please, try again.'));
-							throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-							$this->request->session()->destroy(); // セッションの破棄
-
-						}
-					} catch (Exception $e) {//トランザクション7
-					//ロールバック8
-						$connection->rollback();//トランザクション9
-					}//トランザクション10
+					$_SESSION['session'][0] = 0;
 
 				}
 
+			}elseif(isset($dataarr[2])){
+
+				$grade = $dataarr[2];
+				$color = $dataarr[3];
+				$purchaserarr = explode(".",$dataarr[7]);//切り離し
+				$purchaser = $purchaserarr[0];//tantouの取得
+
+				$PriceMaterials = $this->PriceMaterials->find('all')->where(['grade' => $grade, 'color' => $color])->toArray();
+				if(isset($PriceMaterials[0])){
+					$sup_id = $PriceMaterials[0]->sup_id;
+					$price = $PriceMaterials[0]->price;
+				}else{
+					$sup_id = "";
+					$price = "";
+				}
+
+				$Staffs = $this->Staffs->find('all')->where(['staff_code' => $purchaser])->toArray();
+				$staffid = $Staffs[0]->id;
+
+				$genryouvba['id_order'] = $dataarr[0]."_".$dataarr[1];
+				$genryouvba['grade'] = $grade;
+				$genryouvba['color'] = $color;
+				$genryouvba['date_order'] = date('Y-m-d');
+				$genryouvba['amount'] = $dataarr[4];
+				$genryouvba['date_stored'] = $dataarr[5];
+				$genryouvba['sup_id'] = $sup_id;
+				$genryouvba['deliv_cp'] = $dataarr[6];
+				$genryouvba['purchaser'] = $purchaser;
+				$genryouvba['price'] = $price;
+				$genryouvba['first_date_st'] = $dataarr[5];
+				$genryouvba['created_at'] = date('Y-m-d H:i:s');
+				$genryouvba['created_staff'] = $staffid;
+
+				$this->set([
+				'tourokutest' => $genryouvba,
+				'_serialize' => ['tourokutest']
+				]);
+
+				session_start();
+				$session = $this->request->getSession();
+				$_SESSION['genryouvba'][] = $genryouvba;
+
+				if($dataarr[6] > 1){
+
+					$DeliverCompanies = $this->DeliverCompanies->find('all')->where(['id' => $dataarr[6]])->toArray();
+					$cs_id = $DeliverCompanies[0]->customer_code;
+
+					$specialvba['date_order'] = date('Y-m-d');
+					$specialvba['num_order'] = $dataarr[0]."_".$dataarr[1];
+					$specialvba['order_name'] = $grade."  ".$color."(genryou)";
+					$specialvba['price'] = $price;
+					$specialvba['date_deliver'] = $dataarr[5];
+					$specialvba['amount'] = $dataarr[4];
+					$specialvba['cs_id'] = $cs_id;
+					$specialvba['kannou'] = 0;
+					$specialvba['created_at'] = date('Y-m-d H:i:s');
+					$specialvba['created_staff'] = $staffid;
+
+					$_SESSION['specialvba'][] = $specialvba;
+
+				}
+
+			}elseif($dataarr[0] == "end.xml"){//終了の時に一括でデータを登録してそのセッションを削除
+
+				session_start();
+				$session = $this->request->getSession();
+
+				//新しいデータを登録
+				$OrderMaterials = $this->OrderMaterials->patchEntities($this->OrderMaterials->newEntity(), $_SESSION['genryouvba']);
+				$connection = ConnectionManager::get('default');//トランザクション1
+				// トランザクション開始2
+				$connection->begin();//トランザクション3
+				try {//トランザクション4
+
+					if ($this->OrderMaterials->saveMany($OrderMaterials)) {
+
+						if(isset($_SESSION['specialvba'][0])){
+							$OrderSpecials = $this->OrderSpecials->patchEntities($this->OrderSpecials->newEntity(), $_SESSION['specialvba']);
+							$this->OrderSpecials->saveMany($OrderSpecials);
+						}
+
+						$connection->commit();// コミット5
+						$this->request->session()->destroy(); // セッションの破棄
+
+					} else {
+
+						$this->Flash->error(__('The data could not be saved. Please, try again.'));
+						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+						$this->request->session()->destroy(); // セッションの破棄
+
+					}
+				} catch (Exception $e) {//トランザクション7
+				//ロールバック8
+					$connection->rollback();//トランザクション9
+				}//トランザクション10
+
+			}
+
 		}
 
-		public function vbaredirect()
+		public function vbaredirect()//http://localhost:5000/Apigenryous/vbaredirect/api/20210208_02_AP03B2_N_200_2021-2-8_2_1001.xml
 		{
+			session_start();
+	//		$this->request->session()->destroy(); // セッションの破棄
+/*
+			$session = $this->request->getSession();
+
+			echo "<pre>";
+			print_r($_SESSION);
+			echo "</pre>";
+
+			$this->set([
+			'tourokutest' => $_SESSION,
+			'_serialize' => ['tourokutest']
+			]);
+
+			$OrderMaterials = $this->OrderMaterials->patchEntity($this->ScheduleKouteisTests->newEntity(), $_SESSION["genryouvba"][0]);
+			$this->OrderMaterials->save($OrderMaterials);
+*/
 
 			$Data = $this->request->query('s');
 			$returndata = $Data["returndata"];
-			$dataarr = explode("_",$returndata);//切り離し
+//			$dataarr = explode("_",$returndata);//切り離し
+
+			sleep(10);
+
+			return $this->redirect(['action' => 'vbagenryouinsert/api/'.$returndata.".xml"]);
+
+		}
+
+		public function vbayobidashi()//http://localhost:5000/Apigenryous/vbayobidashi/api/2021-1-18.xml
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+
+			$urlarr = explode("/",$data);//切り離し
+			if(isset($urlarr[5])){
+				$urlarr[4] = $urlarr[4]."/".$urlarr[5];
+			}
+			$dataarr = explode(".",$urlarr[4]);//切り離し
 /*
 			echo "<pre>";
-			print_r($dataarr);
+			print_r($dataarr[0]);
 			echo "</pre>";
 */
-	//		sleep(10);
+			$OrderMaterials = $this->OrderMaterials->find()->where(['date_order' => $dataarr[0]])->toArray();
+			$arrOrderMaterials = array();
+			for($k=0; $k<count($OrderMaterials); $k++){
 
-	//		return $this->redirect(['action' => 'vbagenryouinsert/api/'.$dataarr[0]."=".$dataarr[1].".xml"]);
+				$arrOrderMaterials[] = [
+					'id_order' => $OrderMaterials[$k]["id_order"],
+					'grade' => $OrderMaterials[$k]["grade"],
+					'color' => $OrderMaterials[$k]["color"],
+					'amount' => $OrderMaterials[$k]["amount"],
+					'date_stored' => $OrderMaterials[$k]["date_stored"]->format('m月d日')
+			 ];
+
+			}
+
+			$this->set([
+					'OrderMaterials' => $arrOrderMaterials,
+					'_serialize' => ['OrderMaterials']
+			]);
 
 		}
 

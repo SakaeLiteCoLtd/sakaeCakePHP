@@ -968,13 +968,13 @@ class ZensukensasController extends AppController
             }
 
             $arrZensuHeads = array_intersect($arrZensuHeads, $arrZensuproduct);//共通部分だけを取り出す
+            $arrZensuHeads = array_values($arrZensuHeads);
 
          }else{//productの入力がない場合
 
            $arrZensuHeads = $arrZensuHeads;
 
          }
-
 
          $arrZensustaff =  array();
          if($data['staff'] !== "0"){//staffの入力がある場合
@@ -1150,7 +1150,11 @@ class ZensukensasController extends AppController
          }
 
          $arrFooder = array_values($arrFooder);//連番振り直し
-
+/*
+         echo "<pre>";
+         print_r($arrFooder);
+         echo "</pre>";
+*/
         //セットする
         $arrichiran =  array();
          if(isset($arrFooder[0])){

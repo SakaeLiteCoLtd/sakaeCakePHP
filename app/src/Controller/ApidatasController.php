@@ -668,6 +668,9 @@ class ApidatasController extends AppController
 					$dayarr = explode(".",$dataarr[1]);//切り離し
 					$dayfinish = $dayarr[0];
 
+					$dayfinish = strtotime($dayfinish);
+					$dayfinish = date('Y-m-d', strtotime('+1 day', $dayfinish));
+
 					$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
 					$dayfinish = $dayfinish." 07:59:59";//1週間の終わりの日付の取得
 

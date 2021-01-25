@@ -25,6 +25,7 @@ class ApigenryousController extends AppController
 		 $this->OrderSpecials = TableRegistry::get('orderSpecials');
 		 $this->PriceMaterials = TableRegistry::get('priceMaterials');
 		 $this->DeliverCompanies = TableRegistry::get('deliverCompanies');
+		 $this->Suppliers = TableRegistry::get('suppliers');
 
 		 $this->ScheduleKouteisTests = TableRegistry::get('scheduleKouteisTests');
 
@@ -264,5 +265,98 @@ class ApigenryousController extends AppController
 			]);
 
 		}
+
+		public function vbasyousya()//http://localhost:5000/Apigenryous/vbasyousya/api/2021-1-18.xml
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+
+			$urlarr = explode("/",$data);//切り離し
+			if(isset($urlarr[5])){
+				$urlarr[4] = $urlarr[4]."/".$urlarr[5];
+			}
+			$dataarr = explode(".",$urlarr[4]);//切り離し
+/*
+			echo "<pre>";
+			print_r($dataarr[0]);
+			echo "</pre>";
+*/
+			$OrderMaterials = $this->OrderMaterials->find()->where(['date_order' => $dataarr[0]])->toArray();
+			$arrSuppliers = array();
+			for($k=0; $k<count($OrderMaterials); $k++){
+
+				$sup_id = $OrderMaterials[$k]["sup_id"];
+
+				$Suppliers = $this->Suppliers->find()->where(['id' => $sup_id])->toArray();
+				$sup_name = $Suppliers[0]->name;
+
+				$arrSuppliers[] = [
+					'sup_id' => $sup_id,
+					'sup_name' => $sup_name
+			 ];
+
+			}
+
+			$arrSuppliers = array_unique($arrSuppliers, SORT_REGULAR);
+			$arrSuppliers = array_values($arrSuppliers);
+
+			$this->set([
+					'Suppliers' => $arrSuppliers,
+					'_serialize' => ['Suppliers']
+			]);
+
+		}
+
+		public function vbatyuumonsyo()//http://localhost:5000/Apigenryous/vbatyuumonsyo/api/2021-1-22_14.xml
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+
+			$urlarr = explode("/",$data);//切り離し
+			$dataarr = explode("_",$urlarr[4]);//切り離し
+			$suparr = explode(".",$dataarr[1]);//切り離し
+
+			$OrderMaterials = $this->OrderMaterials->find()->where(['date_order' => $dataarr[0], 'sup_id' => $suparr[0]])->order(['date_stored' => 'DESC'])->toArray();
+			$arrTyuumons = array();
+
+			for($k=0; $k<count($OrderMaterials); $k++){
+
+				$sup_id = $OrderMaterials[$k]["sup_id"];
+
+				$Suppliers = $this->Suppliers->find()->where(['id' => $sup_id])->toArray();
+				$sup_name = $Suppliers[0]->name;
+				$charge_p = $Suppliers[0]->charge_p;
+
+				$deliv_cp = $OrderMaterials[$k]["deliv_cp"];
+				$DeliverCompanies = $this->DeliverCompanies->find()->where(['id' => $deliv_cp])->toArray();
+				$company = $DeliverCompanies[0]->company;
+
+				$PriceMaterials = $this->PriceMaterials->find('all')->where(['grade' => $OrderMaterials[$k]["grade"], 'color' => $OrderMaterials[$k]["color"]])->toArray();
+				if(isset($PriceMaterials[0])){
+					$tani = $PriceMaterials[0]->tani;
+				}else{
+					$tani = "";
+				}
+
+				$arrTyuumons[] = [
+					'grade' => $OrderMaterials[$k]["grade"],
+					'color' => $OrderMaterials[$k]["color"],
+					'amount' => $OrderMaterials[$k]["amount"],
+					'tani' => $tani,
+					'date_stored' => $OrderMaterials[$k]["date_stored"]->format('m/d'),
+					'company' => $company,
+					'sup_name' => $sup_name,
+					'charge_p' => $charge_p
+			 ];
+
+			}
+
+			$this->set([
+					'Tyuumons' => $arrTyuumons,
+					'_serialize' => ['Tyuumons']
+			]);
+
+		}
+
 
 	}

@@ -296,7 +296,6 @@ class ApisController extends AppController
 
 		}
 
-
 		public function zaikocyou()
 		{
 			$data = Router::reverse($this->request, false);//urlを取得

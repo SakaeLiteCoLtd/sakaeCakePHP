@@ -20,6 +20,10 @@
 <?= $this->Form->create($product, ['url' => ['action' => 'form']]) ?>
 <fieldset>
 
+  <br>
+     <div align="center"><font color="red" size="4"><?= __($mes) ?></font></div>
+  <br><br>
+
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td width="280" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">納期</strong></td>
@@ -61,8 +65,7 @@
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('登録', array('name' => 'kakunin')); ?></div></td>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('TOP', array('name' => 'top')); ?></div></td>
     </tr>
     </table>
 <br>

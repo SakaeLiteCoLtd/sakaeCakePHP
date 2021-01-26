@@ -24,6 +24,7 @@ class SyukkaprintsController extends AppController {
      $this->Users = TableRegistry::get('users');
      $this->KouteiKensahyouHeads = TableRegistry::get('kouteiKensahyouHeads');
      $this->OrderEdis = TableRegistry::get('orderEdis');
+     $this->KensahyouJyunbiInsatsus = TableRegistry::get('kensahyouJyunbiInsatsus');
     }
 
     public function form()
@@ -168,10 +169,84 @@ class SyukkaprintsController extends AppController {
       $session = $this->request->getSession();
       $data = $session->read();
 
-      echo "<pre>";
-      print_r($data["insatsu"]);
-      echo "</pre>";
       $this->set('orderEdis',$data["insatsu"]);
+
+      $arrtouroku = array();
+      for ($k=0; $k<count($data["insatsu"]); $k++){
+
+        if($data["insatsu"][$k]['field'] == "PDF草津食洗"){
+          $field = 10001;
+        }else{
+          $field = 99999;
+        }
+
+        $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
+        ->where(['product_code' => $data["insatsu"][$k]["product_code"], 'manu_date' => $data["insatsu"][$k]["manu_date"]])->toArray();
+        $kensahyou_heads_id = $KensahyouSokuteidatas[0]->kensahyou_heads_id;
+
+          $arrtouroku[] = [
+            'kensahyou_heads_id' => $kensahyou_heads_id,
+            'amount' => $data["insatsu"][$k]["amount"],
+            'place_line' => $data["insatsu"][$k]["place_line"],
+            'field' => $field,
+            'date_deliver' => $data["insatsu"][$k]["date_deliver"]
+         ];
+      }
+/*
+      echo "<pre>";
+      print_r($arrtouroku);
+      echo "</pre>";
+*/
+      //新しいデータを登録
+      $KensahyouJyunbiInsatsus = $this->KensahyouJyunbiInsatsus->patchEntities($this->KensahyouJyunbiInsatsus->newEntity(), $arrtouroku);
+      $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->KensahyouJyunbiInsatsus->saveMany($KensahyouJyunbiInsatsus)) {
+
+          //旧DBに登録
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $table = TableRegistry::get('kensahyou_jyunbi_insatsu');
+          $table->setConnection($connection);
+
+          for($k=0; $k<count($data["insatsu"]); $k++){
+
+            $sql = "SELECT kensahyou_sokuteidata_head_id FROM kensahyou_sokuteidata_head".
+                  " where product_id = '".$data["insatsu"][$k]["product_code"]."' and manu_date = '".$data["insatsu"][$k]["manu_date"]."'";
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $kensahyou_sokuteidata_heads = $connection->execute($sql)->fetchAll('assoc');
+            $kensahyou_sokuteidata_head = $kensahyou_sokuteidata_heads[0]["kensahyou_sokuteidata_head_id"];
+
+            $connection->insert('kensahyou_jyunbi_insatsu', [
+              'kensahyou_sokuteidata_head_id' => $kensahyou_sokuteidata_head,
+              'amount' => $data["insatsu"][$k]["amount"],
+              'place_line' => $data["insatsu"][$k]["place_line"],
+              'field' => $field,
+              'date_deliver' => $data["insatsu"][$k]["date_deliver"]
+            ]);
+
+          }
+
+          $connection = ConnectionManager::get('default');
+          $table->setConnection($connection);
+
+          $connection->commit();// コミット5
+          $mes = "※登録されました";
+          $this->set('mes',$mes);
+
+        } else {
+
+          $this->Flash->error(__('The data could not be saved. Please, try again.'));
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+          $mes = "※登録されませんでした";
+          $this->set('mes',$mes);
+
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
 
     }
 

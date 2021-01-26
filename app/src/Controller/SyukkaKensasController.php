@@ -29,6 +29,7 @@ class SyukkaKensasController extends AppController {
      $this->KouteiKensahyouHeads = TableRegistry::get('kouteiKensahyouHeads');
      $this->FileCopyChecks = TableRegistry::get('fileCopyChecks');
      $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');
+     $this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
     }
 
     public function index()
@@ -1034,7 +1035,6 @@ class SyukkaKensasController extends AppController {
         }//トランザクション10
       }
 */
-
       $KadouSeikeiDatab = $this->KadouSeikeis->find()->where(['present_kensahyou' => 0])->order(["product_code"=>"ASC"])->toArray();//'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
 
       $arrProduct = array();
@@ -1099,7 +1099,7 @@ class SyukkaKensasController extends AppController {
       $countnamed = 1;//昨日までのデータをカウントする変数
       $this->set('countnamed',$countnamed);//セット
 
-      $ScheduleKouteisDatac = $this->ScheduleKouteis->find()->where(['datetime >=' => $today." 8:00", 'datetime <=' => $today."23:59", 'present_kensahyou' => 0])->order(["datetime"=>"desc"])->toArray();
+      $ScheduleKouteisDatac = $this->ScheduleKouteis->find()->where(['datetime >=' => $today." 8:00", 'datetime <=' => $today."23:59", 'present_kensahyou' => 0, 'delete_flag' => 0])->order(["datetime"=>"desc"])->toArray();
 
       for($i=0; $i<count($ScheduleKouteisDatac); $i++){//既に検査済みの場合は'present_kensahyou' => 1に更新する
 
@@ -1176,7 +1176,6 @@ class SyukkaKensasController extends AppController {
           }
 
       }
-
 
       $KadouSeikeiDatac = $this->KadouSeikeis->find()->where(['present_kensahyou' => 0])->toArray();//'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
       for($i=1; $i<=count($KadouSeikeiDatac); $i++){//KadouSeikeisテーブルの'present_kensahyou' => 0のデータに対して
@@ -1276,6 +1275,154 @@ class SyukkaKensasController extends AppController {
               $this->set('countnamed',$countnamed);//セット
             }
           }
+      }
+
+      $KariKadouSeikeiData = $this->KariKadouSeikeis->find()->where(['present_kensahyou' => 0])->order(["product_code"=>"ASC"])->toArray();
+
+      for($j=0; $j<count($KariKadouSeikeiData); $j++){
+
+        $KadouSeikeicheck = $this->KadouSeikeis->find()->where(['starting_tm <' => $KariKadouSeikeiData[$j]["starting_tm"], 'product_code' => $KariKadouSeikeiData[$j]["product_code"]])->order(["starting_tm"=>"desc"])->toArray();
+
+        $zenkaihikaku = strtotime($KariKadouSeikeiData[$j]["starting_tm"]) - strtotime($KadouSeikeicheck[0]["starting_tm"]);
+
+        if($zenkaihikaku <= 86400){//この場合'present_kensahyou' => 1にする
+
+          $KariKadouSeikeis = $this->KariKadouSeikeis->patchEntity($this->KariKadouSeikeis->newEntity(), $this->request->getData());
+          $connection = ConnectionManager::get('default');//トランザクション1
+          // トランザクション開始2
+          $connection->begin();//トランザクション3
+          try {//トランザクション4
+            if ($this->KariKadouSeikeis->updateAll(//検査終了時間の更新
+              ['present_kensahyou' => 1, 'updated_at' => date('Y-m-d H:i:s')],
+              ['id'  => $KariKadouSeikeiData[$j]["id"]]
+            )){
+
+                $connection = ConnectionManager::get('DB_ikou_test');
+                $table = TableRegistry::get('kari_kadou_seikei');
+                $table->setConnection($connection);
+
+                $num = 1;
+                $updater = "UPDATE kari_kadou_seikei set present_kensahyou ='".$num."'
+                 where product_id ='".$KariKadouSeikeiData[$j]['product_code']."' and seikeiki_id ='".$KariKadouSeikeiData[$j]['seikeiki_code']."' and starting_tm ='".$KariKadouSeikeiData[$j]['starting_tm']."'";
+                 $connection->execute($updater);
+
+                $connection = ConnectionManager::get('default');//新DBに戻る
+                $table->setConnection($connection);
+
+                $connection->commit();// コミット5
+
+              } else {
+                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+              }
+
+            } catch (Exception $e) {//トランザクション7
+            //ロールバック8
+              $connection->rollback();//トランザクション9
+            }//トランザクション10
+
+        }else{
+
+          $KariKadouSeikeisId = $KariKadouSeikeiData[$j]->id;
+          $KariKadouSeikeispro = $KariKadouSeikeiData[$j]->product_code;
+          $KariKadouSeikeisdaymoto = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d_H_:i:s');
+
+          list($a, $h, $c) = explode('_', $KariKadouSeikeisdaymoto);
+          if(8 <= intval($h) && intval($h) <= 23){//開始時間が８時～２３時の場合はその日がmanu_date
+
+            $KariKadouSeikeisday = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d');
+
+          }else{//開始時間が８時～２３時でない場合はその前日がmanu_date
+
+            $KariKadouSeikeisdayymd = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d');
+            $KariKadouSeikeisday = date("Y-m-d", strtotime("-1 day", strtotime($KariKadouSeikeisdayymd)));
+
+          }
+
+          $KariKensahyouSokuteidatasData = $this->KensahyouSokuteidatas->find()->where(['product_code' => $KariKadouSeikeispro, 'manu_date' => $KariKadouSeikeisday])->order(["product_code"=>"desc"])->toArray();
+
+          if(isset($KariKensahyouSokuteidatasData[0])){//検査済みの場合は'present_kensahyou' => 1
+
+            $KadouSeikeis = $this->KariKadouSeikeis->patchEntity($this->KariKadouSeikeis->newEntity(), $this->request->getData());
+            $connection = ConnectionManager::get('default');//トランザクション1
+            // トランザクション開始2
+            $connection->begin();//トランザクション3
+            try {//トランザクション4
+              if ($this->KariKadouSeikeis->updateAll(//検査終了時間の更新
+                ['present_kensahyou' => 1, 'updated_at' => date('Y-m-d H:i:s')],
+                ['id'  => $KariKadouSeikeiData[$j]["id"]]
+              )){
+
+                  $connection = ConnectionManager::get('DB_ikou_test');
+                  $table = TableRegistry::get('kari_kadou_seikei');
+                  $table->setConnection($connection);
+
+                  $num = 1;
+                  $KadouSeikeispro = $KariKadouSeikeiData[$j]->product_code;
+                  $KadouSeikeisseikeiki = $KariKadouSeikeiData[$j]->seikeiki_code;
+                  $KadouSeikeisstartingtm = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d H:i:s');
+  /*
+                  echo "<pre>";
+                  print_r($KadouSeikeisstartingtm);
+                  echo "</pre>";
+  */
+                  $updater = "UPDATE kari_kadou_seikei set present_kensahyou ='".$num."'
+                   where product_id ='".$KadouSeikeispro."' and seikeiki_id ='".$KadouSeikeisseikeiki."' and starting_tm ='".$KadouSeikeisstartingtm."'";
+                   $connection->execute($updater);
+
+                  $connection = ConnectionManager::get('default');//新DBに戻る
+                  $table->setConnection($connection);
+
+                  $connection->commit();// コミット5
+
+                } else {
+                  throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                }
+
+              } catch (Exception $e) {//トランザクション7
+              //ロールバック8
+                $connection->rollback();//トランザクション9
+              }//トランザクション10
+
+            }else{//検査していない場合
+
+            ${"KadouSeikeifinishing_tm".$j} = $KariKadouSeikeiData[$j]->finishing_tm->format('Y-m-d H:i:s');
+            ${"KadouSeikeifinishing_date".$j} = substr(${"KadouSeikeifinishing_tm".$j},0,4)."-".substr(${"KadouSeikeifinishing_tm".$j},5,2)."-".substr(${"KadouSeikeifinishing_tm".$j},8,2);//finishing_tmの年月日を取得
+
+              if(substr(${"KadouSeikeifinishing_date".$j},0,10) === substr($today,0,10)){//今日のデータの場合は表示しない
+                $countnamec = $countnamec;
+              }else{//今日ではないデータの場合
+                ${"product_codec".$countnamec} = $KariKadouSeikeiData[$j]->product_code;
+                ${"ProductDatac".$countnamec} = $this->Products->find()->where(['product_code' => ${"product_codec".$countnamec}])->toArray();
+                if(isset(${"ProductDatac".$countnamec}[0])){
+                  ${"product_namec".$countnamec} = ${"ProductDatac".$countnamec}[0]->product_name;
+                }else{
+                  ${"product_namec".$countnamec} = "";
+                }
+
+                ${"KadouSeikeiidc".$countnamec} = "kari=".$KariKadouSeikeiData[$j]->id;
+
+                $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});
+
+                ${"KadouSeikeifinishing_tm".$countnamec} = $KariKadouSeikeiData[$j]->finishing_tm->format('Y-m-d H:i:s');
+                ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
+
+                $this->set('product_codec'.$countnamec,${"product_codec".$countnamec});
+                $this->set('product_namec'.$countnamec,${"product_namec".$countnamec});
+                $this->set('KadouSeikeifinishing_datec'.$countnamec,${"KadouSeikeifinishing_datec".$countnamec});
+
+                $session = $this->request->session();
+                $session->write('product_codec', ${"product_codec".$countnamec});
+                $session->write('product_namec', ${"product_namec".$countnamec});
+
+                $countnamec += 1;//ファイル名の日付を識別するためカウント
+                $this->set('countnamec',$countnamec);//セット
+
+              }
+
+            }
+
+        }
+
       }
 
     }
@@ -2709,33 +2856,61 @@ class SyukkaKensasController extends AppController {
                $connection = ConnectionManager::get('default');//新DBに戻る
                $table->setConnection($connection);
 
-             }else{
+             }elseif(strpos($_SESSION['kadouseikeiId'],'=') !== false){
+                 $kari_id = explode("=",$_SESSION['kadouseikeiId']);
 
-               $KadouSeikeiData = $this->KadouSeikeis->find()->where(['id' => $_SESSION['kadouseikeiId']])->toArray();
-               $KadouSeikeistarting_tm = $KadouSeikeiData[0]->starting_tm->format('Y-m-d H:i:s');
-               $KadouSeikeifinishing_tm = $KadouSeikeiData[0]->finishing_tm->format('Y-m-d H:i:s');
-               $KadouSeikeicreated_at = $KadouSeikeiData[0]->created_at->format('Y-m-d H:i:s');
-               $KadouSeikeiseikeiki_code = $KadouSeikeiData[0]->seikeiki_code;
-               $KadouSeikeiproduct_code = $KadouSeikeiData[0]->product_code;
+                 $this->KariKadouSeikeis->updateAll(
+                 ['present_kensahyou' => 1],
+                 ['id'   => $kari_id[1]]
+                 );
 
-               $this->KadouSeikeis->updateAll(
-               ['present_kensahyou' => 1 ,'starting_tm' => $KadouSeikeistarting_tm ,'finishing_tm' => $KadouSeikeifinishing_tm ,'created_at' => $KadouSeikeicreated_at ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
-               ['id'   => $_SESSION['kadouseikeiId'] ]
-               );
+                 $KariKadouSeikeisData = $this->KariKadouSeikeis->find()->where(['id' => $kari_id[1]])->toArray();
 
-               $connection = ConnectionManager::get('DB_ikou_test');
-               $table = TableRegistry::get('kadou_seikei');
-               $table->setConnection($connection);
+                 $KariKadouSeikeistarting_tm = $KariKadouSeikeisData[0]->starting_tm->format('Y-m-d H:i:s');
+                 $KariKadouSeikeifinishing_tm = $KariKadouSeikeisData[0]->finishing_tm->format('Y-m-d H:i:s');
+                 $KariKadouSeikeicreated_at = $KariKadouSeikeisData[0]->created_at->format('Y-m-d H:i:s');
+                 $KariKadouSeikeiseikeiki_code = $KariKadouSeikeisData[0]->seikeiki_code;
+                 $KariKadouSeikeiproduct_code = $KariKadouSeikeisData[0]->product_code;
 
-               $num = 1;
-               $updater = "UPDATE kadou_seikei set present_kensahyou ='".$num."'
-                where pro_num ='".$KadouSeikeiproduct_code."' and seikeiki_id ='".$KadouSeikeiseikeiki_code."' and starting_tm ='".$KadouSeikeistarting_tm."'";
-                $connection->execute($updater);
+                 $connection = ConnectionManager::get('DB_ikou_test');
+                 $table = TableRegistry::get('kari_kadou_seikei');
+                 $table->setConnection($connection);
 
-               $connection = ConnectionManager::get('default');//新DBに戻る
-               $table->setConnection($connection);
+                 $num = 1;
+                 $updater = "UPDATE kari_kadou_seikei set present_kensahyou ='".$num."'
+                  where product_id ='".$KariKadouSeikeiproduct_code."' and seikeiki_id ='".$KariKadouSeikeiseikeiki_code."' and starting_tm ='".$KariKadouSeikeistarting_tm."'";
+                  $connection->execute($updater);
 
-             }
+                 $connection = ConnectionManager::get('default');//新DBに戻る
+                 $table->setConnection($connection);
+
+               }else{
+
+                 $KadouSeikeiData = $this->KadouSeikeis->find()->where(['id' => $_SESSION['kadouseikeiId']])->toArray();
+                 $KadouSeikeistarting_tm = $KadouSeikeiData[0]->starting_tm->format('Y-m-d H:i:s');
+                 $KadouSeikeifinishing_tm = $KadouSeikeiData[0]->finishing_tm->format('Y-m-d H:i:s');
+                 $KadouSeikeicreated_at = $KadouSeikeiData[0]->created_at->format('Y-m-d H:i:s');
+                 $KadouSeikeiseikeiki_code = $KadouSeikeiData[0]->seikeiki_code;
+                 $KadouSeikeiproduct_code = $KadouSeikeiData[0]->product_code;
+
+                 $this->KadouSeikeis->updateAll(
+                 ['present_kensahyou' => 1 ,'starting_tm' => $KadouSeikeistarting_tm ,'finishing_tm' => $KadouSeikeifinishing_tm ,'created_at' => $KadouSeikeicreated_at ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
+                 ['id'   => $_SESSION['kadouseikeiId'] ]
+                 );
+
+                 $connection = ConnectionManager::get('DB_ikou_test');
+                 $table = TableRegistry::get('kadou_seikei');
+                 $table->setConnection($connection);
+
+                 $num = 1;
+                 $updater = "UPDATE kadou_seikei set present_kensahyou ='".$num."'
+                  where pro_num ='".$KadouSeikeiproduct_code."' and seikeiki_id ='".$KadouSeikeiseikeiki_code."' and starting_tm ='".$KadouSeikeistarting_tm."'";
+                  $connection->execute($updater);
+
+                 $connection = ConnectionManager::get('default');//新DBに戻る
+                 $table->setConnection($connection);
+
+               }
 
              $mes = "＊下記のように登録されました";
              $this->set('mes',$mes);

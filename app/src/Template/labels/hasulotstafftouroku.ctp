@@ -22,7 +22,9 @@
  </table>
     <?= $this->Flash->render() ?>
     <?= $this->Form->create($MotoLots, ['url' => ['action' => 'hasulotlogin']]) ?>
-    <br><br>
+    <br>
+     <div align="center"><font color="red" size="2"><?= __($mess) ?></font></div>
+     <br>
     <legend align="center"><strong style="font-size: 11pt; color:blue"><?= __("端数登録　社員ID登録") ?></strong></legend>
     <fieldset>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">

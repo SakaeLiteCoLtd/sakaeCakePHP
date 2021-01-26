@@ -25,14 +25,8 @@ class htmlSyukkakensamenu extends AppController
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/KensahyouSokuteidatas/yobidashicustomer'>\n".
                   "<img src='/img/ShinkiTourokuMenu/kensahyou_yobidashi.gif' width=115 height=40>\n".
                   "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/kensahyouHeads/misakusei'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/analyze_dist.gif' width=115 height=40>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/kensahyouHeads/misakusei'>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Syukkaprints/form'>\n".
                   "<img src='/img/ShinkiTourokuMenu/kensa_jyunbi_insatsu.gif' width=115 height=40>\n".
-                  "</a>\n".
-                  "<td style='padding: 0.1rem 0.1rem;'><a href='/SyukkaKensas/torikomitest'>\n".
-                  "<img src='/img/ShinkiTourokuMenu/syukka_qr.gif' width=100 height=40>\n".
                   "</a>\n";
 
     		return $html;

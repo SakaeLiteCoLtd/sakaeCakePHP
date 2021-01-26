@@ -3292,6 +3292,16 @@ class LabelsController extends AppController
       $this->request->session()->destroy();// セッションの破棄
       $MotoLots = $this->MotoLots->newEntity();
       $this->set('MotoLots',$MotoLots);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function hasulotlogin()
@@ -3356,6 +3366,8 @@ class LabelsController extends AppController
         $this->set('lot_num',$lot_num);
         $staff_id = $ary[7];
         $this->set('staff_id',$staff_id);
+
+
         $staffData = $this->Staffs->find()->where(['id' => $staff_id])->toArray();
         $Staff = $staffData[0]->staff_code." : ".$staffData[0]->f_name." ".$staffData[0]->l_name;
         $this->set('Staff',$Staff);
@@ -3461,9 +3473,15 @@ class LabelsController extends AppController
              $amount_sum = $amount_sum + ${"amount_moto".$i};
              $this->set('amount_sum',$amount_sum);
 
-
              ${"CheckLot".$i} = $this->CheckLots->find()->where(['lot_num' => ${"lot_moto".$i},  'product_code' => ${"product_moto".$i}])->toArray();
-             ${"CheckLotflag_used".$i} = ${"CheckLot".$i}[0]->flag_used;
+
+             if(isset(${"CheckLot".$i}[0])){
+               ${"CheckLotflag_used".$i} = ${"CheckLot".$i}[0]->flag_used;
+             }else{
+               return $this->redirect(
+                 ['action' => 'hasulotstafftouroku', 's' => ['mess' => "品番:".${"product_moto".$i}."　ロット番号:".${"lot_moto".$i}." のロットはcheck_lotsテーブルに登録されていません。管理者に報告してください。"]]
+               );
+             }
 
              if(${"CheckLotflag_used".$i} == 0){
                $check_product = $check_product;

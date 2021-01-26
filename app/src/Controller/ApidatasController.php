@@ -712,9 +712,10 @@ class ApidatasController extends AppController
 
 							for($k=0; $k<count($ScheduleKouteisdelete); $k++){
 								$id = $ScheduleKouteisdelete[$k]->id;
+								$created_at_moto = $ScheduleKouteisdelete[$k]->created_at;
 
 								$this->ScheduleKouteis->updateAll(
-								['delete_flag' => 1],
+								['delete_flag' => 1, 'created_at' => $created_at_moto, 'updated_at' => date('Y-m-d H:i:s')],
 								['id'   => $id]
 								);
 

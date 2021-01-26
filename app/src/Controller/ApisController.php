@@ -512,7 +512,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 
@@ -859,7 +859,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 /*
@@ -1170,7 +1170,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 
@@ -1480,7 +1480,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 
@@ -1526,7 +1526,7 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 
-					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
+					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込み　primary
 
 					if(isset($Product[0])){
 
@@ -1789,7 +1789,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 
@@ -2095,7 +2095,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 
@@ -2409,7 +2409,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 
@@ -2718,7 +2718,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 
@@ -3028,7 +3028,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 
@@ -3338,7 +3338,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 
@@ -3649,7 +3649,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 
@@ -3955,7 +3955,7 @@ class ApisController extends AppController
 					$tmp_date_deliver_array[$key] = $row["date_deliver"];
 				}
 
-				if(count($OrderEdis) > 0){
+				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 

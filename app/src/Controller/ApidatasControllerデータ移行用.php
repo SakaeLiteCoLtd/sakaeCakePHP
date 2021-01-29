@@ -28,10 +28,12 @@ class ApidatasController extends AppController
 		 $this->Katakouzous = TableRegistry::get('katakouzous');
 		 $this->AssembleProducts = TableRegistry::get('assembleProducts');
 		 $this->Customers = TableRegistry::get('customers');
-		 $this->Users = TableRegistry::get('users');//staffsテーブルを使う
+		 $this->Users = TableRegistry::get('users');
 
-		 $this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
+		 $this->Staffs = TableRegistry::get('staffs');
 		 $this->OrderSyoumouShiireHeaders = TableRegistry::get('orderSyoumouShiireHeaders');
+		 $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');
+		 $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');
 
 		}
 
@@ -295,5 +297,146 @@ class ApidatasController extends AppController
 */
 
 	 }
+
+	 public function kensahyou()//Apidatas/kensahyou
+ 	{
+		$count1 = 0;
+		$count2 = 0;
+		$tourokuarr = array();
+
+		$connection = ConnectionManager::get('DB_ikou_test');//旧DBを参照
+		$table = TableRegistry::get('kensahyou_sokuteidata_head');
+		$table->setConnection($connection);
+
+		$date_start = "2020-12-01";//start
+		  $date_end = "2021-01-01";//end
+/*
+		$date_2021 = "2021-01-01";
+		$date_2020 = "2020-01-01";
+		$date_2019 = "2019-01-01";
+		$date_2018 = "2018-01-01";
+		$date_2017 = "2017-01-01";
+		$date_2016 = "2016-01-01";
+		$date_2015 = "2015-01-01";
+		$date_2014 = "2014-01-01";
+		$date_2013 = "2013-01-01";
+		$date_2012 = "2012-01-01";
+		$date_2011 = "2011-01-01";
+		$date_2010 = "2010-01-01";
+		$date_2009 = "2009-01-01";
+		$date_2008 = "2008-01-01";
+*/
+		$sql = "SELECT kensahyou_sokuteidata_head_id,product_id,manu_date,inspec_date,lot_num,timestamp
+		FROM kensahyou_sokuteidata_head".
+//		" where manu_date >= '".$date_2021."'";
+		" where manu_date >= '".$date_start."' and manu_date < '".$date_end."'";
+		$connection = ConnectionManager::get('DB_ikou_test');
+		$kensahyou_sokuteidata_heads = $connection->execute($sql)->fetchAll('assoc');
+/*
+		echo "<pre>";
+		print_r(count($kensahyou_sokuteidata_heads));
+		echo "</pre>";
+*/
+		for($k=0; $k<count($kensahyou_sokuteidata_heads); $k++){
+
+			$connection = ConnectionManager::get('DB_ikou_test');//旧DBを参照
+			$table = TableRegistry::get('kensahyou_sokuteidata_head');
+			$table->setConnection($connection);
+
+			$sql = "SELECT kensahyou_sokuteidata_result_id,cavi_num,result_size_a,result_size_b,result_size_c,result_size_d,result_size_e,result_size_f,result_size_g,result_size_h,result_size_i
+			,result_text_j,result_text_k,result_size_12,result_size_13,result_size_14,result_size_15,result_size_16,result_size_17,result_size_18,result_size_19
+			,result_size_20,result_weight
+			FROM kensahyou_sokuteidata_result".
+			" where kensahyou_sokuteidata_result_id = '".$kensahyou_sokuteidata_heads[$k]["kensahyou_sokuteidata_head_id"]."'";
+			$connection = ConnectionManager::get('DB_ikou_test');
+			$kensahyou_sokuteidata_results = $connection->execute($sql)->fetchAll('assoc');
+/*
+			echo "<pre>";
+			print_r(count($kensahyou_sokuteidata_results));
+			echo "</pre>";
+*/
+			$connection = ConnectionManager::get('default');
+			$table->setConnection($connection);
+
+			for($m=0; $m<count($kensahyou_sokuteidata_results); $m++){
+				$count1 = $count1 + 1;
+
+				$KensahyouHeads = $this->KensahyouHeads->find()->where(['product_code' => $kensahyou_sokuteidata_heads[$k]["product_id"]])->toArray();
+				$KensahyouHeadsId = $KensahyouHeads[0]->id;
+
+			//	$tourokuarr = [
+				$tourokuarr[] = [
+					'kensahyou_heads_id' => $KensahyouHeadsId,
+					'product_code' => $kensahyou_sokuteidata_heads[$k]["product_id"],
+					'lot_num' => $kensahyou_sokuteidata_heads[$k]["lot_num"],
+					'manu_date' => $kensahyou_sokuteidata_heads[$k]["manu_date"],
+					'inspec_date' => $kensahyou_sokuteidata_heads[$k]["inspec_date"],
+					'cavi_num' => $kensahyou_sokuteidata_results[$m]["cavi_num"],
+					'result_size_1' => $kensahyou_sokuteidata_results[$m]["result_size_a"],
+					'result_size_2' => $kensahyou_sokuteidata_results[$m]["result_size_b"],
+					'result_size_3' => $kensahyou_sokuteidata_results[$m]["result_size_c"],
+					'result_size_4' => $kensahyou_sokuteidata_results[$m]["result_size_d"],
+					'result_size_5' => $kensahyou_sokuteidata_results[$m]["result_size_e"],
+					'result_size_6' => $kensahyou_sokuteidata_results[$m]["result_size_f"],
+					'result_size_7' => $kensahyou_sokuteidata_results[$m]["result_size_g"],
+					'result_size_8' => $kensahyou_sokuteidata_results[$m]["result_size_h"],
+					'result_size_9' => $kensahyou_sokuteidata_results[$m]["result_size_i"],
+					'result_size_10' => "",
+					'result_size_11' => "",
+					'result_size_12' => $kensahyou_sokuteidata_results[$m]["result_size_12"],
+					'result_size_13' => $kensahyou_sokuteidata_results[$m]["result_size_13"],
+					'result_size_14' => $kensahyou_sokuteidata_results[$m]["result_size_14"],
+					'result_size_15' => $kensahyou_sokuteidata_results[$m]["result_size_15"],
+					'result_size_16' => $kensahyou_sokuteidata_results[$m]["result_size_16"],
+					'result_size_17' => $kensahyou_sokuteidata_results[$m]["result_size_17"],
+					'result_size_18' => $kensahyou_sokuteidata_results[$m]["result_size_18"],
+					'result_size_19' => $kensahyou_sokuteidata_results[$m]["result_size_19"],
+					'result_size_20' => $kensahyou_sokuteidata_results[$m]["result_size_20"],
+					'result_weight' => $kensahyou_sokuteidata_results[$m]["result_weight"],
+					'situation_dist1' => $kensahyou_sokuteidata_results[$m]["result_text_j"],
+					'situation_dist2' => $kensahyou_sokuteidata_results[$m]["result_text_k"],
+					'delete_flag' => 0,
+//					'created_at' => $kensahyou_sokuteidata_heads[$k]["timestamp"]
+					'created_at' => date('Y-m-d H:i:s')
+				];
+/*
+				echo "<pre>";
+				print_r($tourokuarr);
+				echo "</pre>";
+
+				$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->patchEntity($this->KensahyouSokuteidatas->newEntity(), $tourokuarr);
+				$this->KensahyouSokuteidatas->save($KensahyouSokuteidatas);
+*/
+
+			}
+
+		}
+/*
+		$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->patchEntities($this->KensahyouSokuteidatas->newEntity(), $tourokuarr);
+		$connection = ConnectionManager::get('default');//トランザクション1
+		// トランザクション開始2
+		$connection->begin();//トランザクション3
+		try {//トランザクション4
+			if ($this->KensahyouSokuteidatas->saveMany($KensahyouSokuteidatas)) {
+
+				$connection->commit();// コミット5
+
+			} else {
+
+				$this->Flash->error(__('The data could not be saved. Please, try again.'));
+				throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+			}
+		} catch (Exception $e) {//トランザクション7
+		//ロールバック8
+			$connection->rollback();//トランザクション9
+		}//トランザクション10
+*/
+		echo "<pre>";
+		print_r($date_start." ~ ".$date_end." ".$count1." ".count($tourokuarr));
+		echo "</pre>";
+
+	}
+
 
 	}

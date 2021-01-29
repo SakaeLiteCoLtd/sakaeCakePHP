@@ -24,6 +24,9 @@ class GenryousController extends AppController
 
 		public function menu()
     {
+
+//			echo phpinfo();
+
 			$Data=$this->request->query('s');//セッションが切れて戻ってきた場合
       if(isset($Data["mess"])){
         $mess = $Data["mess"];

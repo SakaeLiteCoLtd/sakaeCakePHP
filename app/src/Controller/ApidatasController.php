@@ -8,7 +8,7 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 
 use Cake\Utility\Xml;//xmlのファイルを読み込みために必要
-use Cake\Utility\Text;
+
 use Cake\Routing\Router;//urlの取得
 use Cake\Http\Client;//httpの読取に必要
 //use Cake\Http\ServerRequest;
@@ -28,24 +28,17 @@ class ApidatasController extends AppController
 		 $this->Katakouzous = TableRegistry::get('katakouzous');
 		 $this->AssembleProducts = TableRegistry::get('assembleProducts');
 		 $this->Customers = TableRegistry::get('customers');
-		 $this->Users = TableRegistry::get('users');//staffsテーブルを使う
+		 $this->Users = TableRegistry::get('users');
 
-		 $this->Staffs = TableRegistry::get('staffs');//staffsテーブルを使う
+		 $this->Staffs = TableRegistry::get('staffs');
 		 $this->OrderSyoumouShiireHeaders = TableRegistry::get('orderSyoumouShiireHeaders');
-
-		 $this->ScheduleKouteisTests = TableRegistry::get('scheduleKouteisTests');
+		 $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');
+		 $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');
 
 		}
 
-		public function preadd()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apidatas/preadd
+		public function preadd()//http://localhost:5000 http://192.168.4.246  http://localhost:5000/Apidatas/preadd
 		{
-
-			session_start();
-			$session = $this->request->getSession();
-			echo "<pre>";
-			print_r($_SESSION);
-			echo "</pre>";
-
 			$staff = $this->Products->newEntity();//newentityに$staffという名前を付ける
 			$this->set('staff',$staff);//1行上の$staffをctpで使えるようにセット
 /*
@@ -85,7 +78,7 @@ class ApidatasController extends AppController
 			$xml = Xml::build('xmls/test.xml');
 
 */
-/*
+
 		//		$xmlArray = Xml::toArray(Xml::build('http://localhost:5000/Apidatas/test/api/test.xml'));
 				$http = new Client();
 
@@ -95,8 +88,7 @@ class ApidatasController extends AppController
 
 		//		$response = $http->post('https://qiita.com/api/v2/users/TakahiRoyte');//参考https://book.cakephp.org/3/ja/core-libraries/httpclient.html
 
-		$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.json');//参考https://codelab.website/cakephp3-api/
-	//	$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.json');//参考https://codelab.website/cakephp3-api/
+				$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.json');//参考https://codelab.website/cakephp3-api/
 				$array = json_decode($response->body(), true);//trueがあれば配列として受け取れる　参考https://qiita.com/muramount/items/6be585bf9c031a997d9a
 
 				echo "<pre>";
@@ -105,7 +97,7 @@ class ApidatasController extends AppController
 				echo "<pre>";
 				print_r($array["tourokutestproduct"]["product_name"]);
 				echo "</pre>";
-*/
+
 		}
 
 	 public function login()
@@ -172,68 +164,27 @@ class ApidatasController extends AppController
  		 ]);
 
 		}
-													//http://192.168.4.246/Apidatas/test/api/2020-10-28_2020-11-4_2020-10-28 08:00:00_2_CAS-NDS-20002_0_粉砕量注意！.xml
-		public function test()//http://localhost:5000/Apidatas/test/api/2020-10-28_2020-11-4_2020-10-28 08:00:00_2_CAS-NDS-20002_0_粉砕量注意！.xml
+
+		public function test()//http://localhost:5000/Apidatas/test/api/test.xml
  	 {
-		 			$access_url = $_SERVER['REQUEST_URI'];
 
-		 			//URLをデコードして表示
-		 			$data = urldecode($_SERVER['REQUEST_URI']);
-		 			//	 echo Router::reverse($this->request, false);//文字化けする
+		 $tourokutestproduct = [
+			 'product_code' => date('Y-m-d H:i:s').'acbd',
+			 'product_name' => 'APIテスト192',
+			 'weight' => '9999',
+			 'primary_p' => '0',
+			 'status' => '0',
+			 'delete_flag' => '0',
+			 'created_at' => date('Y-m-d H:i:s'),
+			 'created_staff' => '9999',
+		 ];
 
-		 			$urlarr = explode("/",$data);//切り離し
-		 			$dataarr = explode("_",$urlarr[4]);//切り離し
+	//	 mb_convert_variables('UTF-8','SJIS-win',$tourokutestproduct);//文字コードを変換
 
-		 			$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
-		 			$dayfinish = $dataarr[1]." 07:59:59";//1週間の終わりの日付の取得
-		 			$datetime = str_replace("%20", " ", $dataarr[2]);//datetimeの取得
-		 			$datetime = str_replace("%3A", ":", $datetime);//datetimeの取得
-		 			$seikeiki = $dataarr[3];//seikeikiの取得
-		 			$product_code = $dataarr[4];//product_codeの取得
-		 			$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
-		 			if(isset($Product[0])){
-		 			$product_name = $Product[0]->product_name;
-		 			}else{
-		 			$product_name = "";
-		 			}
-
-		 			$present_kensahyou = $dataarr[5];//present_kensahyouの取得
-
-		 			$tantouarr = explode(".",$dataarr[6]);//切り離し
-
-		 			$tantou = $tantouarr[0];//tantouの取得
-
-		 			$kouteivba['datetime'] = date('Y-m-d H:i:s');
-		 			$kouteivba['seikeiki'] = $seikeiki;
-		 			$kouteivba['product_code'] = $product_code;
-		 			$kouteivba['present_kensahyou'] = $present_kensahyou;
-		 			$kouteivba['product_name'] = $product_name;
-		 			$kouteivba['tantou'] = $tantou;
-
-		 			$this->set([
-		 			'tourokutest' => $kouteivba,
-		 			'_serialize' => ['tourokutest']
-		 			]);
-/*
-		 			//1週間分のデータを削除
-		 			$ScheduleKouteisdelete = $this->ScheduleKouteis->find()->where(['datetime >=' => $daystart, 'datetime <=' => $dayfinish, 'delete_flag' => 0])->toArray();
-		 			if(isset($ScheduleKouteisdelete[0])){
-
-		 				for($k=0; $k<count($ScheduleKouteisdelete); $k++){
-		 					$id = $ScheduleKouteisdelete[$k]->id;
-
-		 					$this->ScheduleKouteis->updateAll(
-		 					['delete_flag' => 1],
-		 					['id'   => $id]
-		 					);
-
-		 				}
-
-		 			}
-*/
-		 			//新しいデータを登録
-					$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $kouteivba);
-		 			$this->ScheduleKouteisTests->save($ScheduleKouteisTests);
+		 $this->set([
+			 'tourokutestproduct' => $tourokutestproduct,
+			 '_serialize' => ['tourokutestproduct']
+		 ]);
 
 	 }
 
@@ -347,418 +298,145 @@ class ApidatasController extends AppController
 
 	 }
 
-	 public function vbatest()//http://localhost:5000/Apidatas/vbatest/api/test.xml
-	{
-/*
-		$http = new Client();
+	 public function kensahyou()//Apidatas/kensahyou
+ 	{
+		$count1 = 0;
+		$count2 = 0;
+		$tourokuarr = array();
 
-		$response = $http->put('http://192.168.4.246/Apidatas/vbatest/api/test.xml');//参考https://codelab.website/cakephp3-api/
-		$array = json_decode($response->body(), true);//trueがあれば配列として受け取れる　参考https://qiita.com/muramount/items/6be585bf9c031a997d9a
+		$connection = ConnectionManager::get('DB_ikou_test');//旧DBを参照
+		$table = TableRegistry::get('kensahyou_sokuteidata_head');
+		$table->setConnection($connection);
+
+		$date_start = "2021-01-28";//start
+		  $date_end = "2021-01-01";//end
+/*
+		$date_2021 = "2021-01-01";
+		$date_2020 = "2020-01-01";
+		$date_2019 = "2019-01-01";
+		$date_2018 = "2018-01-01";
+		$date_2017 = "2017-01-01";
+		$date_2016 = "2016-01-01";
+		$date_2015 = "2015-01-01";
+		$date_2014 = "2014-01-01";
+		$date_2013 = "2013-01-01";
+		$date_2012 = "2012-01-01";
+		$date_2011 = "2011-01-01";
+		$date_2010 = "2010-01-01";
+		$date_2009 = "2009-01-01";
+		$date_2008 = "2008-01-01";
+*/
+		$sql = "SELECT kensahyou_sokuteidata_head_id,product_id,manu_date,inspec_date,lot_num,timestamp
+		FROM kensahyou_sokuteidata_head".
+		" where manu_date = '".$date_start."'";
+//		" where manu_date >= '".$date_start."' and manu_date < '".$date_end."'";
+		$connection = ConnectionManager::get('DB_ikou_test');
+		$kensahyou_sokuteidata_heads = $connection->execute($sql)->fetchAll('assoc');
+/*
+		echo "<pre>";
+		print_r(count($kensahyou_sokuteidata_heads));
+		echo "</pre>";
+*/
+		for($k=0; $k<count($kensahyou_sokuteidata_heads); $k++){
+
+			$connection = ConnectionManager::get('DB_ikou_test');//旧DBを参照
+			$table = TableRegistry::get('kensahyou_sokuteidata_head');
+			$table->setConnection($connection);
+
+			$sql = "SELECT kensahyou_sokuteidata_result_id,cavi_num,result_size_a,result_size_b,result_size_c,result_size_d,result_size_e,result_size_f,result_size_g,result_size_h,result_size_i
+			,result_text_j,result_text_k,result_size_12,result_size_13,result_size_14,result_size_15,result_size_16,result_size_17,result_size_18,result_size_19
+			,result_size_20,result_weight
+			FROM kensahyou_sokuteidata_result".
+			" where kensahyou_sokuteidata_result_id = '".$kensahyou_sokuteidata_heads[$k]["kensahyou_sokuteidata_head_id"]."'";
+			$connection = ConnectionManager::get('DB_ikou_test');
+			$kensahyou_sokuteidata_results = $connection->execute($sql)->fetchAll('assoc');
+/*
+			echo "<pre>";
+			print_r(count($kensahyou_sokuteidata_results));
+			echo "</pre>";
+*/
+			$connection = ConnectionManager::get('default');
+			$table->setConnection($connection);
+
+			for($m=0; $m<count($kensahyou_sokuteidata_results); $m++){
+				$count1 = $count1 + 1;
+
+				$KensahyouHeads = $this->KensahyouHeads->find()->where(['product_code' => $kensahyou_sokuteidata_heads[$k]["product_id"]])->toArray();
+				$KensahyouHeadsId = $KensahyouHeads[0]->id;
+
+			//	$tourokuarr = [
+				$tourokuarr[] = [
+					'kensahyou_heads_id' => $KensahyouHeadsId,
+					'product_code' => $kensahyou_sokuteidata_heads[$k]["product_id"],
+					'lot_num' => $kensahyou_sokuteidata_heads[$k]["lot_num"],
+					'manu_date' => $kensahyou_sokuteidata_heads[$k]["manu_date"],
+					'inspec_date' => $kensahyou_sokuteidata_heads[$k]["inspec_date"],
+					'cavi_num' => $kensahyou_sokuteidata_results[$m]["cavi_num"],
+					'result_size_1' => $kensahyou_sokuteidata_results[$m]["result_size_a"],
+					'result_size_2' => $kensahyou_sokuteidata_results[$m]["result_size_b"],
+					'result_size_3' => $kensahyou_sokuteidata_results[$m]["result_size_c"],
+					'result_size_4' => $kensahyou_sokuteidata_results[$m]["result_size_d"],
+					'result_size_5' => $kensahyou_sokuteidata_results[$m]["result_size_e"],
+					'result_size_6' => $kensahyou_sokuteidata_results[$m]["result_size_f"],
+					'result_size_7' => $kensahyou_sokuteidata_results[$m]["result_size_g"],
+					'result_size_8' => $kensahyou_sokuteidata_results[$m]["result_size_h"],
+					'result_size_9' => $kensahyou_sokuteidata_results[$m]["result_size_i"],
+					'result_size_10' => "",
+					'result_size_11' => "",
+					'result_size_12' => $kensahyou_sokuteidata_results[$m]["result_size_12"],
+					'result_size_13' => $kensahyou_sokuteidata_results[$m]["result_size_13"],
+					'result_size_14' => $kensahyou_sokuteidata_results[$m]["result_size_14"],
+					'result_size_15' => $kensahyou_sokuteidata_results[$m]["result_size_15"],
+					'result_size_16' => $kensahyou_sokuteidata_results[$m]["result_size_16"],
+					'result_size_17' => $kensahyou_sokuteidata_results[$m]["result_size_17"],
+					'result_size_18' => $kensahyou_sokuteidata_results[$m]["result_size_18"],
+					'result_size_19' => $kensahyou_sokuteidata_results[$m]["result_size_19"],
+					'result_size_20' => $kensahyou_sokuteidata_results[$m]["result_size_20"],
+					'result_weight' => $kensahyou_sokuteidata_results[$m]["result_weight"],
+					'situation_dist1' => $kensahyou_sokuteidata_results[$m]["result_text_j"],
+					'situation_dist2' => $kensahyou_sokuteidata_results[$m]["result_text_k"],
+					'delete_flag' => 0,
+//					'created_at' => $kensahyou_sokuteidata_heads[$k]["timestamp"]
+					'created_at' => date('Y-m-d H:i:s')
+				];
+/*
+				echo "<pre>";
+				print_r($tourokuarr);
+				echo "</pre>";
+
+				$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->patchEntity($this->KensahyouSokuteidatas->newEntity(), $tourokuarr);
+				$this->KensahyouSokuteidatas->save($KensahyouSokuteidatas);
+*/
+
+			}
+
+		}
+
+		$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->patchEntities($this->KensahyouSokuteidatas->newEntity(), $tourokuarr);
+		$connection = ConnectionManager::get('default');//トランザクション1
+		// トランザクション開始2
+		$connection->begin();//トランザクション3
+		try {//トランザクション4
+			if ($this->KensahyouSokuteidatas->saveMany($KensahyouSokuteidatas)) {
+
+				$connection->commit();// コミット5
+
+			} else {
+
+				$this->Flash->error(__('The data could not be saved. Please, try again.'));
+				throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+			}
+		} catch (Exception $e) {//トランザクション7
+		//ロールバック8
+			$connection->rollback();//トランザクション9
+		}//トランザクション10
 
 		echo "<pre>";
-		print_r($array);
+		print_r($date_start." ~ ".$date_end." ".$count1." ".count($tourokuarr));
 		echo "</pre>";
-
-		$this->set([
-				'message' => $array["tourokutestproduct"],
-				'_serialize' => ['message']
-		]);
-
-		$Products = $this->Products->newEntity($this->request->getData());
-		if ($this->Products->save($Products)) {
-				$message = '登録されました。';
-		} else {
-				$message = '登録されませんでした。';
-		}
-		$this->set([
-				'message' => $message,
-				'Products' => $Products,
-				'_serialize' => ['message', 'Products']
-		]);
-*/
-		if ($this->request->is(['post'])) {//post,put,get
-/*
-			echo "<pre>";
-			print_r('post');
-			echo "</pre>";
-*/
-			$name = $response->getHeaderLine('content-type');
-			$count = $response->headers;
-			$count = count($count);
-
-			$present_kensahyou = 0;
-
-			$kouteivba = [
-				'datetime' => date('Y-m-d H:i:s'),
-				'seikeiki' => 1,
-				'product_code' => 'post',
-				'present_kensahyou' => $present_kensahyou,
-				'product_name' => 'post',
-				'tantou' => 'post'
-			];
-
-			$ScheduleKouteis = $this->ScheduleKouteis->patchEntity($this->ScheduleKouteis->newEntity(), $kouteivba);
-			$this->ScheduleKouteis->save($ScheduleKouteis);
-
-		}elseif($this->request->is(['put'])){
-/*
-			echo "<pre>";
-			print_r('put');
-			echo "</pre>";
-*/
-			$jsonData = $this->request->input('json_decode');
-			$data = $this->request->input('Cake\Utility\Xml::build', ['return' => 'domdocument']);
-
-			$present_kensahyou = 0;
-
-			$kouteivba = [
-				'datetime' => date('Y-m-d H:i:s'),
-				'seikeiki' => 1,
-				'product_code' => 'put',
-				'present_kensahyou' => $present_kensahyou,
-				'product_name' => 'put',
-				'tantou' => $data
-			];
-
-			$ScheduleKouteis = $this->ScheduleKouteis->patchEntity($this->ScheduleKouteis->newEntity(), $kouteivba);
-			$this->ScheduleKouteis->save($ScheduleKouteis);
-
-		}elseif($this->request->is(['get'])){
-/*
-			echo "<pre>";
-			print_r('get');
-			echo "</pre>";
-*/
-			$jsonData = $this->request->input('json_decode');
-
-/*
-			$http = new Client();
-			$response = $http->get('http://localhost:5000/Apidatas/vbatest/api/test.json');
-			$name = $response->json;
-*/
-
-			$present_kensahyou = 0;
-
-			$kouteivba = [
-				'datetime' => date('Y-m-d H:i:s'),
-				'seikeiki' => 1,
-				'product_code' => 'get',
-				'present_kensahyou' => $present_kensahyou,
-				'product_name' => 'get',
-				'tantou' => $jsonData
-			];
-
-			$ScheduleKouteis = $this->ScheduleKouteis->patchEntity($this->ScheduleKouteis->newEntity(), $kouteivba);
-			$this->ScheduleKouteis->save($ScheduleKouteis);
-
-		}
-
-		$this->set([
-		'tourokutest' => $kouteivba,
-		'_serialize' => ['tourokutest']
-		]);
 
 	}
 
-																	//http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28 08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
-			public function vbakoutei210115()//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
-			{
-				//URLをデコードして表示
-		//		$data = urldecode($_SERVER['REQUEST_URI']);//urlのベタ打ちなら読み込めるが、VBAからだと日本語が読めない
-				$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
-				$data = urldecode($data);
-/*
-				echo "<pre>";
-				print_r($data);
-				echo "</pre>";
-*/
-				$urlarr = explode("/",$data);//切り離し
-				$dataarr = explode("_",$urlarr[4]);//切り離し
-
-					if(isset($dataarr[2])){//ScheduleKouteis登録用の配列に追加
-
-						$datetime = str_replace("%20", " ", $dataarr[0]);//datetimeの取得
-						$datetime = str_replace("%3A", ":", $datetime);//datetimeの取得
-						$seikeiki = $dataarr[1];//seikeikiの取得
-						$product_code = $dataarr[2];//product_codeの取得
-						$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
-						if(isset($Product[0])){
-						$product_name = $Product[0]->product_name;
-						}else{
-						$product_name = "";
-						}
-
-						$tantouarr = explode(".",$dataarr[3]);//切り離し
-
-						$tantou = $tantouarr[0];//tantouの取得
-						$tantou = mb_convert_encoding($tantou,"UTF-8",mb_detect_encoding($tantou, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true));
-
-						$present_kensahyou = 0;
-
-						$kouteivba['datetime'] = $datetime;
-						$kouteivba['seikeiki'] = $seikeiki;
-						$kouteivba['product_code'] = $product_code;
-						$kouteivba['present_kensahyou'] = $present_kensahyou;
-						$kouteivba['product_name'] = date('Y-m-d H:i:s');
-						$kouteivba['tantou'] = $tantou;
-
-						$this->set([
-						'tourokutest' => $kouteivba,
-						'_serialize' => ['tourokutest']
-						]);
-
-						session_start();
-						$session = $this->request->getSession();
-						$_SESSION['kouteivba'][] = $kouteivba;
-
-					}elseif(isset($dataarr[1])){//ScheduleKouteisのdelete_flagを1に変更
-
-						$this->request->session()->destroy(); // セッションの破棄
-
-						$dayarr = explode(".",$dataarr[1]);//切り離し
-						$dayfinish = $dayarr[0];//tantouの取得
-
-						$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
-						$dayfinish = $dayfinish." 07:59:59";//1週間の終わりの日付の取得
-
-						session_start();
-						$session = $this->request->getSession();
-						$_SESSION['deleteday'][0] = $daystart;
-						$_SESSION['deleteday'][1] = $dayfinish;
-
-/*
-						//1週間分のデータを削除
-						$ScheduleKouteisdelete = $this->ScheduleKouteis->find()->where(['datetime >=' => $_SESSION['deleteday'][0], 'datetime <=' => $_SESSION['deleteday'][1], 'delete_flag' => 0])->toArray();
-						if(isset($ScheduleKouteisdelete[0])){
-
-							for($k=0; $k<count($ScheduleKouteisdelete); $k++){
-								$id = $ScheduleKouteisdelete[$k]->id;
-
-								$this->ScheduleKouteis->updateAll(
-								['delete_flag' => 1],
-								['id'   => $id]
-								);
-
-							}
-
-						}
-*/
-					}elseif($dataarr[0] == "end.xml"){//終了の時に一括でデータを登録してセッションを削除
-
-						session_start();
-						$session = $this->request->getSession();
-/*
-						$present_kensahyou = 0;
-
-						$kouteivba = [
-							'datetime' => date('Y-m-d H:i:s'),
-							'seikeiki' => 1,
-							'product_code' => 'end',
-							'present_kensahyou' => $present_kensahyou,
-							'product_name' => 'end',
-							'tantou' => 'end'
-						];
-*/
-						//新しいデータを登録
-						$ScheduleKouteis = $this->ScheduleKouteis->patchEntities($this->ScheduleKouteis->newEntity(), $_SESSION['kouteivba']);
-						$connection = ConnectionManager::get('default');//トランザクション1
-						// トランザクション開始2
-						$connection->begin();//トランザクション3
-						try {//トランザクション4
-
-							$ScheduleKouteisdelete = $this->ScheduleKouteis->find()->where(['datetime >=' => $_SESSION['deleteday'][0], 'datetime <=' => $_SESSION['deleteday'][1], 'delete_flag' => 0])->toArray();
-							if(isset($ScheduleKouteisdelete[0])){
-
-								for($k=0; $k<count($ScheduleKouteisdelete); $k++){
-									$id = $ScheduleKouteisdelete[$k]->id;
-
-									$this->ScheduleKouteis->updateAll(
-									['delete_flag' => 1],
-									['id'   => $id]
-									);
-
-								}
-
-							}
-
-							if ($this->ScheduleKouteis->saveMany($ScheduleKouteis)) {
-
-								$connection->commit();// コミット5
-								$this->request->session()->destroy(); // セッションの破棄
-
-							} else {
-
-								$this->Flash->error(__('The data could not be saved. Please, try again.'));
-								throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-								$this->request->session()->destroy(); // セッションの破棄
-
-							}
-						} catch (Exception $e) {//トランザクション7
-						//ロールバック8
-							$connection->rollback();//トランザクション9
-						}//トランザクション10
-
-					}
-
-			}
-
-															 //http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28_08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
-		public function vbakoutei()//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_2020-11-4.xml　//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
-		{
-			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
-			$data = urldecode($data);
-/*
-			echo "<pre>";
-			print_r($data);
-			echo "</pre>";
-*/
-			$urlarr = explode("/",$data);//切り離し
-			if(isset($urlarr[5])){
-				$urlarr[4] = $urlarr[4]."/".$urlarr[5];
-			}
-			$dataarr = explode("_",$urlarr[4]);//切り離し
-
-				if(isset($dataarr[4])){//ScheduleKouteis登録用の配列に追加
-
-					$datetime = $dataarr[0]." ".$dataarr[1];//datetimeの取得
-					$seikeiki = $dataarr[2];//seikeikiの取得
-					$product_code = $dataarr[3];//product_codeの取得
-					$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
-					if(isset($Product[0])){
-					$product_name = $Product[0]->product_name;
-					}else{
-					$product_name = "";
-					}
-
-					$tantouarr = explode(".",$dataarr[4]);//切り離し
-
-					$tantou = $tantouarr[0];//tantouの取得
-					$tantou = mb_convert_encoding($tantou,"UTF-8",mb_detect_encoding($tantou, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
-					$product_code = mb_convert_encoding($product_code,"UTF-8",mb_detect_encoding($product_code, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
-
-/*
-					echo "<pre>";
-					print_r($product_code);
-					echo "</pre>";
-*/
-					$present_kensahyou = 0;
-
-					$kouteivba['datetime'] = $datetime;
-					$kouteivba['seikeiki'] = $seikeiki;
-					$kouteivba['product_code'] = $product_code;
-					$kouteivba['present_kensahyou'] = $present_kensahyou;
-					$kouteivba['product_name'] = $product_name;
-					$kouteivba['tantou'] = $tantou;
-					$kouteivba['created_at'] = date('Y-m-d H:i:s');
-
-					$this->set([
-					'tourokutest' => $kouteivba,
-					'_serialize' => ['tourokutest']
-					]);
-
-					session_start();
-					$session = $this->request->getSession();
-					$_SESSION['kouteivba'][] = $kouteivba;
-
-				}elseif(!isset($dataarr[2])){//まずここにくる
-
-					session_start();
-					$session = $this->request->getSession();
-
-					$dayarr = explode(".",$dataarr[1]);//切り離し
-					$dayfinish = $dayarr[0];
-
-					$dayfinish = strtotime($dayfinish);
-					$dayfinish = date('Y-m-d', strtotime('+1 day', $dayfinish));
-
-					$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
-					$dayfinish = $dayfinish." 07:59:59";//1週間の終わりの日付の取得
-
-					if(isset($_SESSION['session'][0])){//誰かがボタンを押して終了していない場合
-
-						sleep(20);//20秒待機
-
-						$this->request->session()->destroy();//セッションの破棄
-						$_SESSION['session'][0] = 0;
-						$_SESSION['sessionstarttime'] = date('Y-m-d H:i:s');
-
-					}else{//同時に誰もスタートしていない場合
-
-						$_SESSION['session'][0] = 0;
-						$_SESSION['sessionstarttime'] = date('Y-m-d H:i:s');
-
-					}
-
-					$_SESSION['deletesta'][0] = $daystart;
-					$_SESSION['deletefin'][0] = $dayfinish;
-
-				}elseif($dataarr[2] == "end.xml"){//終了の時に一括でデータを登録してそのセッションを削除
-
-					session_start();
-					$session = $this->request->getSession();
-
-					$daystart = $dataarr[0];//1週間の初めの日付の取得
-					$dayfinish = $dataarr[1];//1週間の終わりの日付の取得
-
-					//新しいデータを登録
-					$ScheduleKouteis = $this->ScheduleKouteis->patchEntities($this->ScheduleKouteis->newEntity(), $_SESSION['kouteivba']);
-					$connection = ConnectionManager::get('default');//トランザクション1
-					// トランザクション開始2
-					$connection->begin();//トランザクション3
-					try {//トランザクション4
-
-						$ScheduleKouteisdelete = $this->ScheduleKouteis->find()->where(['datetime >=' => $_SESSION['deletesta'][0], 'datetime <=' => $_SESSION['deletefin'][0], 'delete_flag' => 0])->toArray();
-						if(isset($ScheduleKouteisdelete[0])){
-
-							for($k=0; $k<count($ScheduleKouteisdelete); $k++){
-								$id = $ScheduleKouteisdelete[$k]->id;
-								$created_at_moto = $ScheduleKouteisdelete[$k]->created_at;
-
-								$this->ScheduleKouteis->updateAll(
-								['delete_flag' => 1, 'created_at' => $created_at_moto, 'updated_at' => date('Y-m-d H:i:s')],
-								['id'   => $id]
-								);
-
-							}
-
-						}
-
-						if ($this->ScheduleKouteis->saveMany($ScheduleKouteis)) {
-
-							$connection->commit();// コミット5
-							$this->request->session()->destroy(); // セッションの破棄
-
-						} else {
-
-							$this->Flash->error(__('The data could not be saved. Please, try again.'));
-							throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-							$this->request->session()->destroy(); // セッションの破棄
-
-						}
-					} catch (Exception $e) {//トランザクション7
-					//ロールバック8
-						$connection->rollback();//トランザクション9
-					}//トランザクション10
-
-				}
-
-		}
-
-		public function vbaredirect()
-		{
-
-			$Data = $this->request->query('s');
-			$returndata = $Data["returndata"];
-			$dataarr = explode("_",$returndata);//切り離し
-/*
-			echo "<pre>";
-			print_r($dataarr);
-			echo "</pre>";
-*/
-	//		sleep(10);
-
-	//		return $this->redirect(['action' => 'vbakoutei/api/'.$dataarr[0]."=".$dataarr[1].".xml"]);
-
-		}
 
 	}

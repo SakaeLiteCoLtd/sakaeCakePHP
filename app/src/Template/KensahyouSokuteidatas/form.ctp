@@ -49,7 +49,7 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
           <td colspan="9"><?= h($KensahyouHeadver) ?></td>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
-          <td colspan="9"><?= h($this->request->getData('lot_num')) ?></td>
+          <td colspan="9"><?= $this->Form->input("lot_num", array('type' => 'text', 'pattern' => '^[0-9A-Za-z]+$', 'title' => "半角英数字で入力して下さい。", 'label'=>false, 'value'=>$this->request->getData('lot_num'), 'autofocus'=>true)); ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
@@ -115,7 +115,7 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
                     }
                     echo "</select></div></td>\n";
                     echo "<td colspan='2'>\n";
-                    echo "<input type='text' name=result_weight_".$j." value='' size='6'/>\n";
+                    echo "<input type='text' 'pattern'='^[0-9A-Za-z]+$' 'title'='半角英数字で入力して下さい。'  name=result_weight_".$j." value='' size='6'/>\n";
                     echo "</td>\n";
             }
         ?>
@@ -137,7 +137,7 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
 </table>
         <?php
         echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
-        echo $this->Form->hidden('lot_num' ,['value'=>$this->request->getData('lot_num')]);
+  //      echo $this->Form->hidden('lot_num' ,['value'=>$this->request->getData('lot_num')]);
         echo $this->Form->hidden('product_code' ,['value'=>$product_code]) ;
         echo $this->Form->hidden('delete_flag' ,['value'=>0]);
         echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);

@@ -1158,10 +1158,25 @@ class SyukkaKensasController extends AppController {
               $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});
 
               ${"KadouSeikeifinishing_tm".$countnamec} = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d H:i:s');
-              ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
+      //        ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
 
               $this->set('product_codec'.$countnamec,${"product_codec".$countnamec});
               $this->set('product_namec'.$countnamec,${"product_namec".$countnamec});
+//
+              $ScheduleKouteisDatacmoto = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d_H_:i:s');
+
+              list($a, $h, $c) = explode('_', $ScheduleKouteisDatacmoto);
+              if(8 <= intval($h) && intval($h) <= 23){//開始時間が８時～２３時の場合はその日がmanu_date
+
+                ${"KadouSeikeifinishing_datec".$countnamec} = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d');
+
+              }else{//開始時間が８時～２３時でない場合はその前日がmanu_date
+
+                $ScheduleKouteisDatacdayymd = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d');
+                ${"KadouSeikeifinishing_datec".$countnamec} = date("Y-m-d", strtotime("-1 day", strtotime($ScheduleKouteisDatacdayymd)));
+
+              }
+//
               $this->set('KadouSeikeifinishing_datec'.$countnamec,${"KadouSeikeifinishing_datec".$countnamec});
 
               $session = $this->request->session();
@@ -1261,8 +1276,26 @@ class SyukkaKensasController extends AppController {
                 ${"product_named".$countnamed} = "";//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
                 $this->set('product_named'.$countnamed,${"product_named".$countnamed});//セット
               }
-              ${"KadouSeikeifinishing_tm".$countnamed} = $KadouSeikeiDatac[$i-1]->finishing_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
-              ${"KadouSeikeifinishing_dated".$countnamed} = substr(${"KadouSeikeifinishing_tm".$countnamed},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},8,2);//finishing_tmの年月日を取得
+
+
+              ${"KadouSeikeifinishing_tm".$countnamed} = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
+        //      ${"KadouSeikeifinishing_dated".$countnamed} = substr(${"KadouSeikeifinishing_tm".$countnamed},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},8,2);//finishing_tmの年月日を取得
+
+//
+              $KadouSeikeiDatacmoto = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d_H_:i:s');
+
+              list($a, $h, $c) = explode('_', $KadouSeikeiDatacmoto);
+              if(8 <= intval($h) && intval($h) <= 23){//開始時間が８時～２３時の場合はその日がmanu_date
+
+                ${"KadouSeikeifinishing_dated".$countnamed} = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d');
+
+              }else{//開始時間が８時～２３時でない場合はその前日がmanu_date
+
+                $KadouSeikeiDatacdayymd = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d');
+                ${"KadouSeikeifinishing_dated".$countnamed} = date("Y-m-d", strtotime("-1 day", strtotime($KadouSeikeiDatacdayymd)));
+
+              }
+//
 
               $this->set('product_coded'.$countnamed,${"product_coded".$countnamed});//セット
 
@@ -1404,10 +1437,26 @@ class SyukkaKensasController extends AppController {
                 $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});
 
                 ${"KadouSeikeifinishing_tm".$countnamec} = $KariKadouSeikeiData[$j]->finishing_tm->format('Y-m-d H:i:s');
-                ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
+    //            ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
 
                 $this->set('product_codec'.$countnamec,${"product_codec".$countnamec});
                 $this->set('product_namec'.$countnamec,${"product_namec".$countnamec});
+
+//
+                $KadouSeikeisdaymoto = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d_H_:i:s');
+
+                list($a, $h, $c) = explode('_', $KadouSeikeisdaymoto);
+                if(8 <= intval($h) && intval($h) <= 23){//開始時間が８時～２３時の場合はその日がmanu_date
+
+                  ${"KadouSeikeifinishing_datec".$countnamec} = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d');
+
+                }else{//開始時間が８時～２３時でない場合はその前日がmanu_date
+
+                  $KariKadouSeikeisdayymd = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d');
+                  ${"KadouSeikeifinishing_datec".$countnamec} = date("Y-m-d", strtotime("-1 day", strtotime($KariKadouSeikeisdayymd)));
+
+                }
+//
                 $this->set('KadouSeikeifinishing_datec'.$countnamec,${"KadouSeikeifinishing_datec".$countnamec});
 
                 $session = $this->request->session();

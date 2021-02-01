@@ -88,6 +88,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                   echo '</div></td>';
               }
               echo "<td colspan='2'>\n";
+              echo $_SESSION['sokuteidata']["{$q}"]["result_size_9"];
               echo "</td>\n";
               echo "<td colspan='2'>\n";
               echo $_SESSION['sokuteidata']["{$q}"]["situation_dist1"];

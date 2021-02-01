@@ -83,26 +83,61 @@ class SyukkaprintsController extends AppController {
         $OrderEdis = $this->OrderEdis->find()->where(['date_deliver' => $date_deliver, 'customer_code not like' => '10001%'])->order(['product_code' => 'ASC'])->toArray();
 
       }
+
+      for($l=0; $l<count($OrderEdis); $l++){
+
+        for($m=$l+1; $m<count($OrderEdis); $m++){
+
+          if($OrderEdis[$l]["product_code"] == $OrderEdis[$m]["product_code"]){
+
+            $amount = $OrderEdis[$l]["amount"] + $OrderEdis[$m]["amount"];
+
+            $OrderEdis[$l]["amount"] = $amount;
+
+            unset($OrderEdis[$m]);
+
+          }
+
+        }
+        $OrderEdis = array_values($OrderEdis);
+
+      }
+
       $this->set('orderEdis',$OrderEdis);
 
       if(isset($data['kakunin'])){
 
         for ($k=2; $k<=$data["nummax"]; $k++){
           if(isset($data["check".$k])){
-            $array[] = [
-              'product_code' => $data["product_code".$k],
-              'product_name' => $data["product_name".$k],
-              'amount' => $data["amount".$k],
-              'place_line' => $data["place_line".$k],
-              'manu_date' => $data["manu_date".$k],
-              'field' => $data["field"],
-              'date_deliver' => $data["date_deliver"]
-           ];
+            if(isset($data["manu_date".$k])){
+              $array[] = [
+                'product_code' => $data["product_code".$k],
+                'product_name' => $data["product_name".$k],
+                'amount' => $data["amount".$k],
+                'place_line' => $data["place_line".$k],
+                'manu_date' => $data["manu_date".$k],
+                'field' => $data["field"],
+                'date_deliver' => $data["date_deliver"]
+             ];
+           }else{
+             $num = $k - 1;
+
+             echo "<pre>";
+             print_r($num."行目の製造年月日が選択されていません。チェックを外してください。");
+             echo "</pre>";
+
+           }
           }
         }
 
-        return $this->redirect(['action' => 'confirm',
-        's' => ['arrinsatsu' => $array]]);
+        session_start();
+        $session = $this->request->getSession();
+        $_SESSION['insatsu'] = $array;
+
+        return $this->redirect(['action' => 'confirm']);
+
+//        return $this->redirect(['action' => 'confirm',
+//        's' => ['arrinsatsu' => $array]]);
 
       }
 
@@ -113,9 +148,13 @@ class SyukkaprintsController extends AppController {
       $product = $this->Products->newEntity();
 			$this->set('product',$product);
 
-      $Data=$this->request->query('s');
+      $session = $this->request->getSession();
+      $data = $session->read();
 
-      $arrinsatsu = $Data['arrinsatsu'];
+
+  //    $Data=$this->request->query('s');
+
+      $arrinsatsu = $data["insatsu"];
 /*
       echo "<pre>";
       print_r($arrinsatsu);
@@ -123,9 +162,9 @@ class SyukkaprintsController extends AppController {
 */
       $this->set('orderEdis',$arrinsatsu);
 
-      session_start();
-      $session = $this->request->getSession();
-      $_SESSION['insatsu'] = $arrinsatsu;
+  //    session_start();
+  //    $session = $this->request->getSession();
+  //    $_SESSION['insatsu'] = $arrinsatsu;
 
     }
 
@@ -243,6 +282,7 @@ class SyukkaprintsController extends AppController {
           $this->set('mes',$mes);
 
         }
+
       } catch (Exception $e) {//トランザクション7
       //ロールバック8
         $connection->rollback();//トランザクション9

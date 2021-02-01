@@ -1234,7 +1234,6 @@ class KensahyouSokuteidatasController  extends AppController
 
               $connection = ConnectionManager::get('default');
 
-
               $mes = "※登録されました。";
    						$this->set('mes',$mes);
     					$connection->commit();// コミット5

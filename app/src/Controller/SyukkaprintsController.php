@@ -88,7 +88,15 @@ class SyukkaprintsController extends AppController {
 
         for($m=$l+1; $m<count($OrderEdis); $m++){
 
-          if($OrderEdis[$l]["product_code"] == $OrderEdis[$m]["product_code"]){
+          if($OrderEdis[$l]["product_code"] != 'W002' && $OrderEdis[$l]["product_code"] == $OrderEdis[$m]["product_code"]){
+
+            $amount = $OrderEdis[$l]["amount"] + $OrderEdis[$m]["amount"];
+
+            $OrderEdis[$l]["amount"] = $amount;
+
+            unset($OrderEdis[$m]);
+
+          }elseif($OrderEdis[$l]["product_code"] == 'W002' && $OrderEdis[$m]["product_code"] == 'W002' && $OrderEdis[$l]["place_line"] == $OrderEdis[$m]["place_line"]){
 
             $amount = $OrderEdis[$l]["amount"] + $OrderEdis[$m]["amount"];
 
@@ -120,11 +128,8 @@ class SyukkaprintsController extends AppController {
                 'date_deliver' => $data["date_deliver"]
              ];
            }else{
-             $num = $k - 1;
 
-             echo "<pre>";
-             print_r($num."行目の製造年月日が選択されていません。チェックを外してください。");
-             echo "</pre>";
+             $num = $k - 1;
 
            }
           }
@@ -219,8 +224,10 @@ class SyukkaprintsController extends AppController {
           $field = 99999;
         }
 
+        $manudate = substr($data["insatsu"][$k]["manu_date"], 0, 10);
+
         $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
-        ->where(['product_code' => $data["insatsu"][$k]["product_code"], 'manu_date' => $data["insatsu"][$k]["manu_date"]])->toArray();
+        ->where(['product_code' => $data["insatsu"][$k]["product_code"], 'manu_date' => $manudate])->toArray();
         $kensahyou_heads_id = $KensahyouSokuteidatas[0]->kensahyou_heads_id;
 
           $arrtouroku[] = [
@@ -231,11 +238,8 @@ class SyukkaprintsController extends AppController {
             'date_deliver' => $data["insatsu"][$k]["date_deliver"]
          ];
       }
-/*
-      echo "<pre>";
-      print_r($arrtouroku);
-      echo "</pre>";
-*/
+
+
       //新しいデータを登録
       $KensahyouJyunbiInsatsus = $this->KensahyouJyunbiInsatsus->patchEntities($this->KensahyouJyunbiInsatsus->newEntity(), $arrtouroku);
       $connection = ConnectionManager::get('default');//トランザクション1
@@ -250,9 +254,10 @@ class SyukkaprintsController extends AppController {
           $table->setConnection($connection);
 
           for($k=0; $k<count($data["insatsu"]); $k++){
+            $manudate = substr($data["insatsu"][$k]["manu_date"], 0, 10);
 
             $sql = "SELECT kensahyou_sokuteidata_head_id FROM kensahyou_sokuteidata_head".
-                  " where product_id = '".$data["insatsu"][$k]["product_code"]."' and manu_date = '".$data["insatsu"][$k]["manu_date"]."'";
+                  " where product_id = '".$data["insatsu"][$k]["product_code"]."' and manu_date = '".$manudate."'";
             $connection = ConnectionManager::get('sakaeMotoDB');
             $kensahyou_sokuteidata_heads = $connection->execute($sql)->fetchAll('assoc');
             $kensahyou_sokuteidata_head = $kensahyou_sokuteidata_heads[0]["kensahyou_sokuteidata_head_id"];

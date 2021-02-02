@@ -17,9 +17,18 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
               echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'preadd']]);
               $session = $this->request->getSession();
-
+              $_SESSION['sokuteidata'] = array();
+              $dotcheck = 0;
+              $result_weight_total = 0;
+              $result_weight_count = 0;
+              $nyuuryokucount = 0;
+              $mess = "";
+              $nyuuryokucountcheck = 0;
 
               for($n=1; $n<=8; $n++){
+                $nyuuryokucount = 0;
+                $gyou_check = 0;
+                $size_count = 0;
                       $resultArray = Array();
                         $result_weight = $_POST["result_weight_{$n}"];
                         $_SESSION['sokuteidata'][$n] = array(
@@ -46,31 +55,92 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                           'situation_dist1' => $_POST["situation_dist1_{$n}"],
                           'situation_dist2' => $_POST["situation_dist2_{$n}"],
                         );
-              }
+
+                        for($m=1; $m<=9; $m++){
+
+                          $dot1 = substr($_POST["result_size_{$n}_{$m}"], 0, 1);
+                          $dot2 = substr($_POST["result_size_{$n}_{$m}"], -1, 1);
+
+                          if($dot1 == "." || $dot2 == "."){
+                            $dotcheck = $dotcheck + 1;
+                          }
+                        }
+
+                        for($m=1; $m<=8; $m++){
+
+                          if(strlen($_POST["result_size_{$n}_{$m}"]) > 0){
+                            $gyou_check = 1;
+                            $size_count = $size_count + 1;
+                            $nyuuryokucount = $nyuuryokucount + 1;
+                          }
+
+                        }
+
+                        if($gyou_check == 1 && $size_count != $count_size){
+                          $mess = $mess.$n."行目の測定データの個数が合いません。入力忘れ、余分な入力がないか確認してください。<br>";
+                        }
+
+                        if(strlen($_POST["result_size_{$n}_9"]) > 0){
+                          $nyuuryokucount = $nyuuryokucount + 1;
+                        }
+
+                        if($gyou_check == 1 && $count_sori == 1 && strlen($_POST["result_size_{$n}_9"]) < 1){
+                          $mess = $mess.$n."行目のソリ・フレがありません。入力漏れがないか確認してください。<br>";
+                        }
+
+                        if($_POST["situation_dist1_{$n}"] == "OK" || $_POST["situation_dist1_{$n}"] == "out"){
+                          $nyuuryokucount = $nyuuryokucount + 1;
+                        }
+
+                        if($gyou_check == 1 && $count_text_10 == 1 && $_POST["situation_dist1_{$n}"] == ""){
+                          $mess = $mess.$n."行目の外観１が選択されていません。漏れがないか確認してください。<br>";
+                        }
+
+                        if($_POST["situation_dist2_{$n}"] == "OK" || $_POST["situation_dist2_{$n}"] == "out"){
+                          $nyuuryokucount = $nyuuryokucount + 1;
+                        }
+
+                        if($gyou_check == 1 && $count_text_11 == 1 && $_POST["situation_dist2_{$n}"] == ""){
+                          $mess = $mess.$n."行目の外観２が選択されていません。漏れがないか確認してください。<br>";
+                        }
+
+                        if(strlen($_POST["result_weight_{$n}"]) > 0){
+
+                          $dot1 = substr($_POST["result_weight_{$n}"], 0, 1);
+                          $dot2 = substr($_POST["result_weight_{$n}"], -1, 1);
+
+                          if($dot1 == "." || $dot2 == "."){
+                            $dotcheck = $dotcheck + 1;
+                          }else{
+                            $result_weight_total = $result_weight_total + $_POST["result_weight_{$n}"];
+                            $result_weight_count = $result_weight_count + 1;
+                            $nyuuryokucount = $nyuuryokucount + 1;
+                          }
+
+                        }
+
+                        if($gyou_check == 1 && strlen($_POST["result_weight_{$n}"]) < 1){
+                          $mess = $mess.$n."行目の単重がありません。入力漏れがないか確認してください。<br>";
+                        }
 /*
-              for($n=1; $n<=8; $n++){
-                      $resultArray = Array();
-                      for($k=1; $k<=9; $k++){
-                          echo "<input type='hidden' name=sokuteidata[$n][kensahyou_heads_id] value='$KensahyouHeadid' />\n";
-                          echo "<input type='hidden' name=sokuteidata[$n][product_code] value='$product_code' />\n";
-                          echo "<input type='hidden' name=sokuteidata[$n][lot_num] value='$lot_num' />\n";
-                          echo "<input type='hidden' name=sokuteidata[$n][manu_date] value='$manu_date' size='6'/>\n";
-                          echo "<input type='hidden' name=sokuteidata[$n][inspec_date] value='$inspec_date' size='6'/>\n";
-                          echo "<input type='hidden' name=sokuteidata[$n][cavi_num] value='{$n}' size='6'/>\n";
-                          echo "<input type='hidden' name=sokuteidata[$n][delete_flag] value='$delete_flag' size='6'/>\n";
-                    //      echo "<input type='hidden' name=sokuteidata[$n][created_staff] value='$created_staff' size='6'/>\n";
-                          echo "<input type='hidden' name=sokuteidata[$n][updated_staff] value='$updated_staff' size='6'/>\n";
-
-                          $result_size = $_POST["result_size_{$n}_{$k}"];
-
-                          echo "<input type='hidden' name=sokuteidata[$n][result_size_$k] value='$result_size' size='6'/>\n";
-
-                          $result_weight = $_POST["result_weight_{$n}"];
-
-                          echo "<input type='hidden' name=sokuteidata[$n][result_weight] value='$result_weight' size='6'/>\n";
-                      }
-              }
+                        echo "<pre>";
+                        print_r($nyuuryokucount);
+                        echo "</pre>";
 */
+                        if($nyuuryokucount > 0 && $nyuuryokucount != $count_total){
+                          $nyuuryokucountcheck = $nyuuryokucountcheck + 1;
+                        }
+
+              }
+
+              if($result_weight_count == 0){
+                $result_weight_ave = 0;
+                $result_weight_20 = 0;
+              }else{
+                $result_weight_ave = round($result_weight_total / $result_weight_count, 1);
+                $result_weight_20 = round($result_weight_ave * 0.2, 1);
+              }
+
 ?>
 
 <?php
@@ -86,7 +156,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
  </table>
  <hr size="5" style="margin: 0.5rem">
 
- <br>
+ <?php if ($dotcheck < 1 && $nyuuryokucountcheck < 1): ?>
+
+   <br>
+   <legend align="left"><font color="red"><?= __($mess) ?></font></legend>
+  <br>
 <div align="center"><strong><font color="red">＊下記のように登録します</font></strong></div>
 <br>
 
@@ -163,9 +237,24 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 echo "<td colspan='2'>\n";
                 echo $this->request->getData("situation_dist2_{$q}");
                 echo "</td>\n";
-                echo "<td colspan='2'><div align='center'>\n";
+
+                //データが平均プラスマイナス平均×0.2以内のときはOKそうでなければ赤文字
+                if($this->request->getData("result_weight_{$q}") <= $result_weight_ave + $result_weight_20 && $this->request->getData("result_weight_{$q}") >= $result_weight_ave - $result_weight_20){
+                  echo "<td colspan='2'><div align='center'>\n";
+                  echo $this->request->getData("result_weight_{$q}");
+                  echo "</td>\n";
+                } else {
+                echo '<td colspan="2"><div align="center"><font color="red">';
                 echo $this->request->getData("result_weight_{$q}");
-                echo "</td>\n";
+                echo '</div></td>';
+                }
+
+
+        //        echo "<td colspan='2'><div align='center'>\n";
+        //        echo $this->request->getData("result_weight_{$q}");
+        //        echo "</td>\n";
+
+
                 echo "<td colspan='2'><div align='center'>\n";
                 echo ${"hikaku_".$q};
                 echo "</td>\n";
@@ -190,3 +279,23 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 </table>
 <br>
 <?= $this->Form->end() ?>
+
+<?php else : ?>
+  <?php
+    if($dotcheck > 0){
+      $mess = $mess."「 . 」で始まっているデータまたは「 . 」で終わっているデータがあります。　";
+    }
+  ?>
+
+  <br>
+  <legend align="center"><font color="red"><?= __($mess) ?></font></legend>
+ <br>
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+  <tr>
+    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+  </tr>
+  </table>
+  <br>
+  <?= $this->Form->end() ?>
+
+<?php endif; ?>

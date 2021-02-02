@@ -25,7 +25,6 @@ class KouteisController extends AppController {
      $this->KouteiImKikakuTaious = TableRegistry::get('kouteiImKikakuTaious');
      $this->KouteiKensahyouHeads = TableRegistry::get('kouteiKensahyouHeads');
      $this->KouteiFileCopyChecks = TableRegistry::get('kouteiFileCopyChecks');
-     $this->KouteiKensahyouHeads = TableRegistry::get('kouteiKensahyouHeads');
      $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
      $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouSokuteidatasテーブルを使う
     }
@@ -1442,6 +1441,7 @@ class KouteisController extends AppController {
       $this->set('KouteiKensahyouHeads', $KouteiKensahyouHeads);
     }
 
+/*
      public function torikomi()//取り込み（画面なし自動で次のページへ）
     {
 
@@ -2320,6 +2320,7 @@ class KouteisController extends AppController {
       return $this->redirect(['action' => 'indexhome']);
 
     }
+*/
 
     public function preform()//「出荷検査表登録」ページで検査結果を入力
     {

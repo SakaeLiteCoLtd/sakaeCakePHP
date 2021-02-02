@@ -501,7 +501,7 @@ class KensahyouSokuteidatasController  extends AppController
      for ($k=0; $k<$count; $k++) {
        $product_code = $Products[$k]["product_code"];
        $customer_id = $Products[$k]["customer_id"];
-       if((0 === strpos($product_code, "W")) && ($customer_id == 2)){
+       if(((0 === strpos($product_code, "W")) && ($customer_id == 2)) || ((0 === strpos($product_code, "AW")) && ($customer_id == 2))){
            $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
        }
      }
@@ -784,11 +784,17 @@ class KensahyouSokuteidatasController  extends AppController
 
       $KensahyouHead = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
 
+            $text_10 = $KensahyouHead[0]->text_10;
+          	$this->set('text_10',$text_10);//セット
+            $text_11 = $KensahyouHead[0]->text_11;
+          	$this->set('text_11',$text_11);//セット
+
               for($i=1; $i<=9; $i++){//size_1～9までセット
                 ${"kind_kensa".$i} = "ノギス";
                 $this->set('kind_kensa'.$i,${"kind_kensa".$i});//セット
             		${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
             		$this->set('size_'.$i,${"size_".$i});//セット
+
                 for($j=0; $j<=20; $j++){//size_1～9までセット
                   if(isset($ImKikaku[$j])){//
                     if(${"size_".$i} == $ImKikaku[$j]['size'] and ${"size_".$i} != 0){//KensahyouHeadのsize$iと$ImKikaku[$j]['size']が同じ場合
@@ -987,6 +993,43 @@ class KensahyouSokuteidatasController  extends AppController
     		${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
     		$this->set('size_'.$i,${"size_".$i});//セット
     	}
+
+      $count_size = 0;
+      for($i=1; $i<=8; $i++){//size_1～8までセット
+        ${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
+        $this->set('size_'.$i,${"size_".$i});//セット
+
+        if(${"size_".$i} > 0){
+          $count_size = $count_size + 1;
+        }
+
+      }
+      $this->set('count_size',$count_size);
+
+      $count_sori = 0;
+      if($KensahyouHead[0]->size_9 > 0){
+        $count_sori = 1;
+      }
+      $this->set('count_sori',$count_sori);
+
+      $count_text_10 = 0;
+      if($KensahyouHead[0]->text_10 == "外観1"){
+        $count_text_10 = 1;
+      }
+      $this->set('count_text_10',$count_text_10);
+
+      $count_text_11 = 0;
+      if($KensahyouHead[0]->text_11 == "外観2"){
+        $count_text_11 = 1;
+      }
+      $this->set('count_text_11',$count_text_11);
+/*
+      echo "<pre>";
+      print_r($count_size." ".$count_sori." ".$count_text_10." ".$count_text_11);
+      echo "</pre>";
+*/
+      $count_total = $count_size + $count_sori + $count_text_10 + $count_text_11 + 1;
+      $this->set('count_total',$count_total);
 
     	for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
     		${"upper_".$j} = $KensahyouHead[0]->{"upper_{$j}"};//KensahyouHeadのupper_1～8まで

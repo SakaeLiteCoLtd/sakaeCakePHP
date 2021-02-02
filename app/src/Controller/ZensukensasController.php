@@ -1174,8 +1174,12 @@ class ZensukensasController extends AppController
 
               $product_code = $ResultZensuHeads[0]->product_code;
               $lot_num = $ResultZensuHeads[0]->lot_num;
-              $date_sta = $ResultZensuHeads[0]->datetime_start;
-              $date_fin = $ResultZensuHeads[0]->datetime_finish;
+              $date_sta = $ResultZensuHeads[0]->datetime_start->format('Y-m-d H:i:s');
+              if(isset($ResultZensuHeads[0]->datetime_finish)){
+                $date_fin = $ResultZensuHeads[0]->datetime_finish->format('Y-m-d H:i:s');
+              }else{
+                $date_fin = $ResultZensuHeads[0]->datetime_finish;
+              }
 
               $from = strtotime($date_sta);
               $to   = strtotime($date_fin);

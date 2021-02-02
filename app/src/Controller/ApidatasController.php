@@ -298,7 +298,7 @@ class ApidatasController extends AppController
 
 	 }
 
-	 public function kensahyou()//Apidatas/kensahyou
+	 public function kensahyou()//Apidatas/kensahyou //Tableファイルを名前変更
  	{
 		$count1 = 0;
 		$count2 = 0;
@@ -308,7 +308,7 @@ class ApidatasController extends AppController
 		$table = TableRegistry::get('kensahyou_sokuteidata_head');
 		$table->setConnection($connection);
 
-		$date_start = "2021-01-28";//start
+		$date_start = "2021-02-01";//start
 		  $date_end = "2021-01-01";//end
 /*
 		$date_2021 = "2021-01-01";
@@ -328,7 +328,7 @@ class ApidatasController extends AppController
 */
 		$sql = "SELECT kensahyou_sokuteidata_head_id,product_id,manu_date,inspec_date,lot_num,timestamp
 		FROM kensahyou_sokuteidata_head".
-		" where manu_date = '".$date_start."'";
+		" where manu_date < '".$date_start."' and inspec_date = '".$date_start."'";
 //		" where manu_date >= '".$date_start."' and manu_date < '".$date_end."'";
 		$connection = ConnectionManager::get('DB_ikou_test');
 		$kensahyou_sokuteidata_heads = $connection->execute($sql)->fetchAll('assoc');

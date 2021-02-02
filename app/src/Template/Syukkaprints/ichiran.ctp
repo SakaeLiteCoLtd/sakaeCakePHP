@@ -131,7 +131,7 @@ echo $this->Form->hidden('field' ,['value'=>$field]);
                   <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品名</strong></div></td>
                   <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品数</strong></div></td>
                   <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品ID</strong></div></td>
-                  <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">製造年月日</strong></td>
+                  <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">製造年月日:ロット番号</strong></td>
                 </tr>
             </thead>
             <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -149,7 +149,7 @@ echo $this->Form->hidden('field' ,['value'=>$field]);
                   for($k=0; $k<100; $k++){
 
                     if(isset($KensahyouSokuteidatas[$k])){
-                      ${"manudateuniq".$i}[] = array($KensahyouSokuteidatas[$k]["manu_date"]->format('Y-m-d'));
+                      ${"manudateuniq".$i}[] = array($KensahyouSokuteidatas[$k]["manu_date"]->format('Y-m-d')." : ".$KensahyouSokuteidatas[$k]["lot_num"]);
                     }
 
                   }
@@ -159,6 +159,8 @@ echo $this->Form->hidden('field' ,['value'=>$field]);
                   for($k=0; $k<10; $k++){
 
                     if(isset(${"manudateuniq".$i}[$k])){
+        //              $manudate = substr(${"manudateuniq".$i}[$k][0], 0, 9);
+
                       ${"manudate".$i}[] = array(${"manudateuniq".$i}[$k][0]=>${"manudateuniq".$i}[$k][0]);
                     }
 
@@ -185,7 +187,7 @@ echo $this->Form->hidden('field' ,['value'=>$field]);
                   <td width="250" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
                   <td width="100" colspan="20" nowrap="nowrap"><?= h($orderEdis->amount) ?></td>
                   <td width="150" colspan="20" nowrap="nowrap"><?= h($orderEdis->place_line) ?></td>
-                  <td width="150" colspan="20" nowrap="nowrap"><?= $this->Form->input("manu_date".$i, ["type"=>"select", "options"=>${"manudate".$i}, 'label'=>false]) ?></td>
+                  <td width="250" colspan="20" nowrap="nowrap"><?= $this->Form->input("manu_date".$i, ["type"=>"select", "options"=>${"manudate".$i}, 'label'=>false]) ?></td>
                 </tr>
                 <?php endforeach; ?>
 

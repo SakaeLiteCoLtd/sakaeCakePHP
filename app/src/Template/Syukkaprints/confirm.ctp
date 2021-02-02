@@ -40,7 +40,7 @@
               <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品名</strong></div></td>
               <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品数</strong></div></td>
               <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品ID</strong></div></td>
-              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">製造年月日</strong></td>
+              <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">製造年月日:ロット番号</strong></td>
             </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -51,7 +51,7 @@
               <td width="250" colspan="20" nowrap="nowrap"><?= h($orderEdis[$i]["product_name"]) ?></td>
               <td width="100" colspan="20" nowrap="nowrap"><?= h($orderEdis[$i]["amount"]) ?></td>
               <td width="150" colspan="20" nowrap="nowrap"><?= h($orderEdis[$i]["place_line"]) ?></td>
-              <td width="150" colspan="20" nowrap="nowrap"><?= h($orderEdis[$i]["manu_date"]) ?></td>
+              <td width="250" colspan="20" nowrap="nowrap"><?= h($orderEdis[$i]["manu_date"]) ?></td>
             </tr>
           <?php endfor;?>
 

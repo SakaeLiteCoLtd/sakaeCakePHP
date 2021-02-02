@@ -48,7 +48,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
           <td colspan="9"><?= h($KensahyouHeadver) ?></td>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
-          <td colspan="7"><?= $this->Form->input("lot_num", array('pattern' => '^[0-9A-Za-z]+$', 'title' => "半角英数字で入力して下さい。", 'type' => 'text', 'label'=>false, 'autofocus'=>true)); ?></td>
+          <td colspan="7"><?= $this->Form->input("lot_num", array('pattern' => '^[0-9A-Za-z.-]+$', 'title' => "半角英数字で入力して下さい。", 'type' => 'text', 'label'=>false, 'autofocus'=>true)); ?></td>
           <td colspan="2" nowrap="nowrap"><div align="center"><?= $this->Form->submit(__('取り込み'), array('name' => 'top')); ?></div></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">

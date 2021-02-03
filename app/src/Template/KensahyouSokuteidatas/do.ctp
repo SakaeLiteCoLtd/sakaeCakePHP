@@ -44,9 +44,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>製造年月日</strong></div></td>
-          <td colspan="9"><?= h($_SESSION['sokuteidata'][1]['manu_date']) ?></td>
+          <td colspan="9"><?= h($data[1]['manu_date']) ?></td>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>検査年月日</strong></div></td>
-          <td colspan="9"><?= h($_SESSION['sokuteidata'][1]['inspec_date']) ?></td>
+          <td colspan="9"><?= h($data[1]['inspec_date']) ?></td>
         </tr>
 
 <?php
@@ -84,20 +84,20 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               $lowerArray = Array();
               for($r=1; $r<=8; $r++){
                   echo '<td colspan="2"><div align="center">';
-                  echo $_SESSION['sokuteidata']["{$q}"]["result_size_{$r}"] ;
+                  echo $data["{$q}"]["result_size_{$r}"] ;
                   echo '</div></td>';
               }
               echo "<td colspan='2'>\n";
-              echo $_SESSION['sokuteidata']["{$q}"]["result_size_9"];
+              echo $data["{$q}"]["result_size_9"];
               echo "</td>\n";
               echo "<td colspan='2'>\n";
-              echo $_SESSION['sokuteidata']["{$q}"]["situation_dist1"];
+              echo $data["{$q}"]["situation_dist1"];
               echo "</td>\n";
               echo "<td colspan='2'>\n";
-              echo $_SESSION['sokuteidata']["{$q}"]["situation_dist2"];
+              echo $data["{$q}"]["situation_dist2"];
               echo "</td>\n";
               echo "<td colspan='2'>\n";
-              echo $_SESSION['sokuteidata']["{$q}"]["result_weight"];
+              echo $data["{$q}"]["result_weight"];
               echo "</td>\n";
               echo "<td colspan='2'><div align='center'>\n";
               echo ${"hikaku_".$q};

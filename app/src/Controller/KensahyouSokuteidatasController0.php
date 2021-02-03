@@ -709,11 +709,8 @@ class KensahyouSokuteidatasController  extends AppController
     {
     	$data = $this->request->getData();//postデータを$dataに
       echo "<pre>";
-      print_r(date('Y-m-d H:i:s'));
-      echo "</pre>";
-
-      $today = strtotime(date('Y-m-d'));
-      $date2back = date('Y-m-d', strtotime('-2 day', $today));
+  		print_r(date('Y-m-d H:i:s'));
+  		echo "</pre>";
 
       $product_code = $data['product_code1'];
       $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
@@ -726,7 +723,7 @@ class KensahyouSokuteidatasController  extends AppController
     	->select(['product_code','delete_flag' => '0'])
     	->group('product_code');
 
-      $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num, 'inspec_date' > $date2back])->toArray();
+      $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();
       if(isset($ImSokuteidataHead[0])){
 
         $ImSokuteidataHead_id = $ImSokuteidataHead[0]->id;
@@ -741,7 +738,7 @@ class KensahyouSokuteidatasController  extends AppController
         }
         $ImSokuteidataHead_id = $ImKikaku[0]->id;
         $ImSokuteidataHeadId = $ImKikaku[0]->im_sokuteidata_head_id;
-        $ImSokuteidataResult = $this->ImSokuteidataResults->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHeadId, 'inspec_datetime' > $date2back])->toArray();
+        $ImSokuteidataResult = $this->ImSokuteidataResults->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHeadId])->toArray();
 
       }
 
@@ -797,20 +794,26 @@ class KensahyouSokuteidatasController  extends AppController
           	$this->set('text_11',$text_11);//セット
 
             $count_total = 0;
-            $ImSokuteidataHeaddata = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num, 'product_code' => $product_code])->toArray();
+            $ImSokuteidataHeaddata = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num, 'product_code' => $product_code, 'kind_kensa' => $ImSokuteidataHead_kind])->toArray();
 
             for($k=0; $k<count($ImSokuteidataHeaddata); $k++){
+
+              for($i=1; $i<=9; $i++){//size_1～9までセット
+                ${"kind_kensa".$i} = "ノギス";
+                $this->set('kind_kensa'.$i,${"kind_kensa".$i});//セット
+            		${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
+            		$this->set('size_'.$i,${"size_".$i});//セット
 
                 for($j=0; $j<=count($ImKikaku); $j++){//size_1～9までセット
                   if(isset($ImKikaku[$j])){
 
-                    for($i=1; $i<=9; $i++){//size_1～9までセット
-                      ${"kind_kensa".$i} = "ノギス";
-                      $this->set('kind_kensa'.$i,${"kind_kensa".$i});//セット
-                  		${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
-                  		$this->set('size_'.$i,${"size_".$i});//セット
 
-                    if(${"size_".$i} == $ImKikaku[$j]['size'] and ${"size_".$i} != 0 && $ImSokuteidataHeaddata[$k]->id == $ImKikaku[$j]['im_sokuteidata_head_id']){
+
+                    if(${"size_".$i} == $ImKikaku[$j]['size'] and ${"size_".$i} != 0){
+
+                      echo "<pre>";
+                      print_r(${"size_".$i});
+                      echo "</pre>";
 
                 //      $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['id' => $ImKikaku[$j]['im_sokuteidata_head_id']])->toArray();
                       $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['id' => $ImSokuteidataHeaddata[$k]->id])->toArray();
@@ -818,8 +821,7 @@ class KensahyouSokuteidatasController  extends AppController
 
                       $this->set('kind_kensa'.$i,${"kind_kensa".$i});//セット
 
-                      $ImSokuteidataResult = $this->ImSokuteidataResults->find()
-                      ->where(['im_sokuteidata_head_id' => $ImSokuteidataHeaddata[$k]->id , 'size_num' => $ImKikaku[$j]['size_num'], 'inspec_datetime' > $date2back])->toArray();
+                      $ImSokuteidataResult = $this->ImSokuteidataResults->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHeaddata[$k]->id , 'size_num' => $ImKikaku[$j]['size_num']])->toArray();
                       $ImSokuteidataResultarry = array();//空の配列を作る
 
                       foreach ((array)$ImSokuteidataResult as $key => $value) {//serialで並び替え
@@ -833,7 +835,6 @@ class KensahyouSokuteidatasController  extends AppController
                         for($r=1; $r<=$cnt; $r++){
                           $r1 = $r-1;
                           $r0 = $r + $count_total;
-
                           ${"ImSokuteidata_result_".$i."_".$r0} = $ImSokuteidataResultarry[$r1][1];
                           ${"ImSokuteidata_result_".$i."_".$r0} = round(${"ImSokuteidata_result_".$i."_".$r0},2);
                           $this->set('ImSokuteidata_result_'.$i.'_'.$r0,${"ImSokuteidata_result_".$i."_".$r0});//セット
@@ -846,11 +847,11 @@ class KensahyouSokuteidatasController  extends AppController
                 }
             	}
 
-              if(($k < count($ImSokuteidataHeaddata)-1) &&($ImSokuteidataHeaddata[$k+1]->kind_kensa == $ImSokuteidataHeaddata[$k]->kind_kensa)){
-                $count_total = $count_total + count($ImSokuteidataResultarry);
-              }
+              $count_total = $count_total + count($ImSokuteidataResultarry);
 
             }
+
+
 
             	$staff_id = $this->Auth->user('staff_id');//created_staffの登録用
             	$this->set('staff_id',$staff_id);//セット
@@ -902,8 +903,8 @@ class KensahyouSokuteidatasController  extends AppController
               $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
 
               echo "<pre>";
-              print_r(date('Y-m-d H:i:s'));
-              echo "</pre>";
+          		print_r(date('Y-m-d H:i:s'));
+          		echo "</pre>";
 
     }
 
@@ -1086,14 +1087,15 @@ class KensahyouSokuteidatasController  extends AppController
     {
       $kensahyouSokuteidata = $this->KensahyouSokuteidatas->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
       $this->set('kensahyouSokuteidata',$kensahyouSokuteidata);//セット
-  //    $this->request->session()->destroy();// セッションの破棄
+
+     $session = $this->request->getSession();
+     $data = $session->read();//postデータ取得し、$dataと名前を付ける
     }
 
    public function login()
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
        $ary = explode(',', $str);//$strを配列に変換
 
@@ -1102,43 +1104,7 @@ class KensahyouSokuteidatasController  extends AppController
        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
 
        $staff_id = $this->Auth->user('staff_id');//created_staffの登録用
-       $this->set('staff_id',$staff_id);//セット
-
-       if(isset($_POST["kensahyou_heads_id"])){
-
-         if(!isset($_SESSION)){
-         session_start();
-         }
-         $session = $this->request->getSession();
-         $_SESSION['sokuteidata'.$username] = array();
-         for($n=1; $n<=8; $n++){
-           $_SESSION['sokuteidata'.$username][$n] = array(
-             'kensahyou_heads_id' => $_POST["kensahyou_heads_id"],
-             'product_code' => $_POST["product_code"],
-             'lot_num' => $_POST["lot_num"],
-             'manu_date' => $_POST["manu_date"],
-             'inspec_date' => $_POST["inspec_date"],
-             'cavi_num' => $n,
-             'delete_flag' => $_POST["delete_flag"],
-             'updated_staff' => $_POST["updated_staff"],
-
-             "result_size_1" => $_POST["result_size_{$n}_1"],
-             "result_size_2" => $_POST["result_size_{$n}_2"],
-             "result_size_3" => $_POST["result_size_{$n}_3"],
-             "result_size_4" => $_POST["result_size_{$n}_4"],
-             "result_size_5" => $_POST["result_size_{$n}_5"],
-             "result_size_6" => $_POST["result_size_{$n}_6"],
-             "result_size_7" => $_POST["result_size_{$n}_7"],
-             "result_size_8" => $_POST["result_size_{$n}_8"],
-             "result_size_9" => $_POST["result_size_{$n}_9"],
-
-             'result_weight' => $_POST["result_weight_{$n}"],
-             'situation_dist1' => $_POST["situation_dist1_{$n}"],
-             'situation_dist2' => $_POST["situation_dist2_{$n}"],
-           );
-
-         }
-       }
+     	$this->set('staff_id',$staff_id);//セット
 
          if(empty($Userdata)){
            $delete_flag = "";
@@ -1148,10 +1114,8 @@ class KensahyouSokuteidatasController  extends AppController
          }
            $user = $this->Auth->identify();
          if ($user) {
-
            $this->Auth->setUser($user);
            return $this->redirect(['action' => 'do']);
-
          }
        }
    }
@@ -1165,18 +1129,13 @@ class KensahyouSokuteidatasController  extends AppController
      public function do()//「出荷検査表登録」登録画面
     {
       $session = $this->request->getSession();
-      $sessiondata = $session->read();
+      $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
 
       for($n=1; $n<=8; $n++){
         $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
-        $_SESSION['sokuteidata'.$this->Auth->user('username')][$n] = array_merge($created_staff,$_SESSION['sokuteidata'.$this->Auth->user('username')][$n]);
+        $_SESSION['sokuteidata'][$n] = array_merge($created_staff,$_SESSION['sokuteidata'][$n]);
       }
-      $data = $_SESSION['sokuteidata'.$this->Auth->user('username')];
-      $this->set('data',$data);//セット
-
-      echo "<pre>";
-      print_r($sessiondata);
-      echo "</pre>";
+      $data = $_SESSION['sokuteidata'];
 
       $product_code = $data[1]['product_code'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
       $this->set('product_code',$product_code);//セット
@@ -1282,6 +1241,10 @@ class KensahyouSokuteidatasController  extends AppController
       $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
       $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
 /*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
     	if ($this->request->is('get')) {
     		$kensahyouSokuteidata = $this->KensahyouSokuteidatas->patchEntities($kensahyouSokuteidata, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
     		$connection = ConnectionManager::get('default');//トランザクション1
@@ -1358,8 +1321,6 @@ class KensahyouSokuteidatasController  extends AppController
     			$connection->rollback();//トランザクション9
     		}//トランザクション10
     	}
-
-      */
     }
 
     public function edit($id = null)

@@ -28,6 +28,7 @@ class ApisController extends AppController
 		 $this->Customers = TableRegistry::get('customers');
 		 $this->Konpous = TableRegistry::get('konpous');
 		 $this->ResultZensuHeads = TableRegistry::get('resultZensuHeads');
+		 $this->RironStockProducts = TableRegistry::get('rironStockProducts');
 //		 $this->belongsTo('Customers');
 		}
 
@@ -332,6 +333,13 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
+					$riron_check = 0;
+					$date16 = $day."-16";//選択した月の初日
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
+
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -340,7 +348,8 @@ class ApisController extends AppController
 						'price' => "",
 						'date_deliver' => "",
 						'amount' => "",
-						'denpyoumaisu' => ""
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
 				 ];
 
 				}
@@ -440,7 +449,13 @@ class ApisController extends AppController
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -450,7 +465,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -686,6 +702,13 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
+					$riron_check = 0;
+					$date16 = $day."-16";//選択した月の初日
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
+
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -694,7 +717,8 @@ class ApisController extends AppController
 						'price' => "",
 						'date_deliver' => "",
 						'amount' => "",
-						'denpyoumaisu' => ""
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
 				 ];
 
 				}
@@ -714,7 +738,13 @@ class ApisController extends AppController
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -724,7 +754,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -1024,6 +1055,13 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
+					$riron_check = 0;
+					$date16 = $day."-16";//選択した月の初日
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
+
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -1032,7 +1070,8 @@ class ApisController extends AppController
 						'price' => "",
 						'date_deliver' => "",
 						'amount' => "",
-						'denpyoumaisu' => ""
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
 				 ];
 
 				}
@@ -1052,7 +1091,13 @@ class ApisController extends AppController
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -1062,7 +1107,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -1248,16 +1294,16 @@ class ApisController extends AppController
 				}
 
 				//並べかえ
-								$tmp_product_array = array();
-								$tmp_date_deliver_array = array();
-								foreach($arrSyoyouKeikakus as $key => $row ) {
-									$tmp_product_array[$key] = $row["product_code"];
-									$tmp_date_deliver_array[$key] = $row["date_deliver"];
-								}
+				$tmp_product_array = array();
+				$tmp_date_deliver_array = array();
+				foreach($arrSyoyouKeikakus as $key => $row ) {
+					$tmp_product_array[$key] = $row["product_code"];
+					$tmp_date_deliver_array[$key] = $row["date_deliver"];
+				}
 
-								if(count($arrSyoyouKeikakus) > 0){
-									array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
-								}
+				if(count($arrSyoyouKeikakus) > 0){
+					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
+				}
 
 				$daystart = $date1." 08:00:00";
 				$dayfin = $datenext1." 07:59:59";
@@ -1334,16 +1380,24 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
-					$arrProductsmoto[] = [
-						'date_order' => "",
-						'num_order' => "",
-						'product_code' => $arrProducts[$k]["product_code"],
-						'product_name' => $arrProducts[$k]["product_name"],
-						'price' => "",
-						'date_deliver' => "",
-						'amount' => "",
-						'denpyoumaisu' => ""
-				 ];
+										$riron_check = 0;
+										$date16 = $day."-16";//選択した月の初日
+										$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+										if(isset($RironStockProducts[0])){
+											$riron_check = 1;
+										}
+
+										$arrProductsmoto[] = [
+											'date_order' => "",
+											'num_order' => "",
+											'product_code' => $arrProducts[$k]["product_code"],
+											'product_name' => $arrProducts[$k]["product_name"],
+											'price' => "",
+											'date_deliver' => "",
+											'amount' => "",
+											'denpyoumaisu' => "",
+											'riron_zaiko_check' => $riron_check
+									 ];
 
 				}
 
@@ -1362,7 +1416,13 @@ class ApisController extends AppController
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -1372,7 +1432,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -1643,16 +1704,24 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
-					$arrProductsmoto[] = [
-						'date_order' => "",
-						'num_order' => "",
-						'product_code' => $arrProducts[$k]["product_code"],
-						'product_name' => $arrProducts[$k]["product_name"],
-						'price' => "",
-						'date_deliver' => "",
-						'amount' => "",
-						'denpyoumaisu' => ""
-				 ];
+										$riron_check = 0;
+										$date16 = $day."-16";//選択した月の初日
+										$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+										if(isset($RironStockProducts[0])){
+											$riron_check = 1;
+										}
+
+										$arrProductsmoto[] = [
+											'date_order' => "",
+											'num_order' => "",
+											'product_code' => $arrProducts[$k]["product_code"],
+											'product_name' => $arrProducts[$k]["product_name"],
+											'price' => "",
+											'date_deliver' => "",
+											'amount' => "",
+											'denpyoumaisu' => "",
+											'riron_zaiko_check' => $riron_check
+									 ];
 
 				}
 
@@ -1671,7 +1740,13 @@ class ApisController extends AppController
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -1681,7 +1756,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -1949,6 +2025,13 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
+					$riron_check = 0;
+					$date16 = $day."-16";//選択した月の初日
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
+
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -1957,7 +2040,8 @@ class ApisController extends AppController
 						'price' => "",
 						'date_deliver' => "",
 						'amount' => "",
-						'denpyoumaisu' => ""
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
 				 ];
 
 				}
@@ -1977,7 +2061,13 @@ class ApisController extends AppController
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -1987,7 +2077,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -2261,6 +2352,13 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
+					$riron_check = 0;
+					$date16 = $day."-16";//選択した月の初日
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
+
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -2269,7 +2367,8 @@ class ApisController extends AppController
 						'price' => "",
 						'date_deliver' => "",
 						'amount' => "",
-						'denpyoumaisu' => ""
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
 				 ];
 
 				}
@@ -2291,7 +2390,13 @@ class ApisController extends AppController
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -2301,7 +2406,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -2572,6 +2678,13 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
+					$riron_check = 0;
+					$date16 = $day."-16";//選択した月の初日
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
+
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -2580,7 +2693,8 @@ class ApisController extends AppController
 						'price' => "",
 						'date_deliver' => "",
 						'amount' => "",
-						'denpyoumaisu' => ""
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
 				 ];
 
 				}
@@ -2600,7 +2714,13 @@ class ApisController extends AppController
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -2610,7 +2730,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -2882,6 +3003,13 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
+					$riron_check = 0;
+					$date16 = $day."-16";//選択した月の初日
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
+
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -2890,7 +3018,8 @@ class ApisController extends AppController
 						'price' => "",
 						'date_deliver' => "",
 						'amount' => "",
-						'denpyoumaisu' => ""
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
 				 ];
 
 				}
@@ -2910,7 +3039,13 @@ class ApisController extends AppController
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -2920,7 +3055,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -3192,6 +3328,13 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
+					$riron_check = 0;
+					$date16 = $day."-16";//選択した月の初日
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
+
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -3200,7 +3343,8 @@ class ApisController extends AppController
 						'price' => "",
 						'date_deliver' => "",
 						'amount' => "",
-						'denpyoumaisu' => ""
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
 				 ];
 
 				}
@@ -3220,7 +3364,13 @@ class ApisController extends AppController
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -3230,7 +3380,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -3503,6 +3654,13 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
+					$riron_check = 0;
+					$date16 = $day."-16";//選択した月の初日
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
+
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -3511,7 +3669,8 @@ class ApisController extends AppController
 						'price' => "",
 						'date_deliver' => "",
 						'amount' => "",
-						'denpyoumaisu' => ""
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
 				 ];
 
 				}
@@ -3531,7 +3690,13 @@ class ApisController extends AppController
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -3541,7 +3706,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -3810,6 +3976,13 @@ class ApisController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
+					$riron_check = 0;
+					$date16 = $day."-16";//選択した月の初日
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
+
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -3818,7 +3991,8 @@ class ApisController extends AppController
 						'price' => "",
 						'date_deliver' => "",
 						'amount' => "",
-						'denpyoumaisu' => ""
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
 				 ];
 
 				}
@@ -3836,8 +4010,15 @@ class ApisController extends AppController
 
 					if(isset($Product[0])){
 
+						//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
 						$product_name = $Product[0]->product_name;
-			//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
+
+						$riron_check = 0;
+						$date16 = $day."-16";//選択した月の初日
+						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+						if(isset($RironStockProducts[0])){
+							$riron_check = 1;
+						}
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -3847,7 +4028,8 @@ class ApisController extends AppController
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1
+								'denpyoumaisu' => 1,
+								'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){

@@ -16,8 +16,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               header('Pragma:');
 
               echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'preadd']]);
-              $session = $this->request->getSession();
-              $_SESSION['sokuteidata'] = array();
+    //          $session = $this->request->getSession();
+    //          $_SESSION['sokuteidata'] = array();
               $dotcheck = 0;
               $result_weight_total = 0;
               $result_weight_count = 0;
@@ -31,6 +31,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 $size_count = 0;
                       $resultArray = Array();
                         $result_weight = $_POST["result_weight_{$n}"];
+                        /*
                         $_SESSION['sokuteidata'][$n] = array(
                           'kensahyou_heads_id' => $KensahyouHeadid,
                           'product_code' => $product_code,
@@ -55,7 +56,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                           'situation_dist1' => $_POST["situation_dist1_{$n}"],
                           'situation_dist2' => $_POST["situation_dist2_{$n}"],
                         );
-
+*/
                         for($m=1; $m<=9; $m++){
 
                           $dot1 = substr($_POST["result_size_{$n}_{$m}"], 0, 1);
@@ -122,11 +123,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                         if($gyou_check == 1 && strlen($_POST["result_weight_{$n}"]) < 1){
                           $mess = $mess.$n."行目の単重がありません。入力漏れがないか確認してください。<br>";
                         }
-/*
-                        echo "<pre>";
-                        print_r($nyuuryokucount);
-                        echo "</pre>";
-*/
+
                         if($nyuuryokucount > 0 && $nyuuryokucount != $count_total){
                           $nyuuryokucountcheck = $nyuuryokucountcheck + 1;
                         }
@@ -268,6 +265,33 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         </tr>
        <tr>
 </table>
+
+<?= $this->Form->control('kensahyou_heads_id', array('type'=>'hidden', 'value'=>$KensahyouHeadid, 'label'=>false)) ?>
+<?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
+<?= $this->Form->control('lot_num', array('type'=>'hidden', 'value'=>$lot_num, 'label'=>false)) ?>
+<?= $this->Form->control('manu_date', array('type'=>'hidden', 'value'=>$manu_date, 'label'=>false)) ?>
+<?= $this->Form->control('inspec_date', array('type'=>'hidden', 'value'=>$inspec_date, 'label'=>false)) ?>
+<?= $this->Form->control('delete_flag', array('type'=>'hidden', 'value'=>$delete_flag, 'label'=>false)) ?>
+<?= $this->Form->control('updated_staff', array('type'=>'hidden', 'value'=>$updated_staff, 'label'=>false)) ?>
+
+
+<?php for($n=1; $n<=8; $n++): ?>
+
+  <?= $this->Form->control('cavi_num_'.$n, array('type'=>'hidden', 'value'=>$n, 'label'=>false)) ?>
+  <?= $this->Form->control('result_size_'.$n.'_1', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_1"], 'label'=>false)) ?>
+  <?= $this->Form->control('result_size_'.$n.'_2', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_2"], 'label'=>false)) ?>
+  <?= $this->Form->control('result_size_'.$n.'_3', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_3"], 'label'=>false)) ?>
+  <?= $this->Form->control('result_size_'.$n.'_4', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_4"], 'label'=>false)) ?>
+  <?= $this->Form->control('result_size_'.$n.'_5', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_5"], 'label'=>false)) ?>
+  <?= $this->Form->control('result_size_'.$n.'_6', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_6"], 'label'=>false)) ?>
+  <?= $this->Form->control('result_size_'.$n.'_7', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_7"], 'label'=>false)) ?>
+  <?= $this->Form->control('result_size_'.$n.'_8', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_8"], 'label'=>false)) ?>
+  <?= $this->Form->control('result_size_'.$n.'_9', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_9"], 'label'=>false)) ?>
+  <?= $this->Form->control('result_weight_'.$n, array('type'=>'hidden', 'value'=>$_POST["result_weight_{$n}"], 'label'=>false)) ?>
+  <?= $this->Form->control('situation_dist1_'.$n, array('type'=>'hidden', 'value'=>$_POST["situation_dist1_{$n}"], 'label'=>false)) ?>
+  <?= $this->Form->control('situation_dist2_'.$n, array('type'=>'hidden', 'value'=>$_POST["situation_dist2_{$n}"], 'label'=>false)) ?>
+
+<?php endfor;?>
 
 <br>
 <br>

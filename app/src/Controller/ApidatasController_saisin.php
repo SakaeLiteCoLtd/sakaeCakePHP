@@ -509,11 +509,12 @@ class ApidatasController extends AppController
 
 						session_start();
 						$session = $this->request->getSession();
+						$_SESSION['kouteivba'] = array();
 						$_SESSION['kouteivba'][] = $kouteivba;
 
 					}elseif(isset($dataarr[1])){//ScheduleKouteisのdelete_flagを1に変更
 
-						$this->request->session()->destroy(); // セッションの破棄
+			//			$this->request->session()->destroy(); // セッションの破棄
 
 						$dayarr = explode(".",$dataarr[1]);//切り離し
 						$dayfinish = $dayarr[0];//tantouの取得
@@ -523,6 +524,7 @@ class ApidatasController extends AppController
 
 						session_start();
 						$session = $this->request->getSession();
+						$_SESSION['deleteday'] = array();
 						$_SESSION['deleteday'][0] = $daystart;
 						$_SESSION['deleteday'][1] = $dayfinish;
 
@@ -584,13 +586,21 @@ class ApidatasController extends AppController
 							if ($this->ScheduleKouteis->saveMany($ScheduleKouteis)) {
 
 								$connection->commit();// コミット5
-								$this->request->session()->destroy(); // セッションの破棄
+				//				$this->request->session()->destroy(); // セッションの破棄
+								$_SESSION['kouteivba'] = array();
+								$_SESSION['deleteday'] = array();
+								$_SESSION['session'] = array();
+								$_SESSION['sessionstarttime'] = array();
 
 							} else {
 
 								$this->Flash->error(__('The data could not be saved. Please, try again.'));
 								throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-								$this->request->session()->destroy(); // セッションの破棄
+				//				$this->request->session()->destroy(); // セッションの破棄
+								$_SESSION['kouteivba'] = array();
+								$_SESSION['deleteday'] = array();
+								$_SESSION['session'] = array();
+								$_SESSION['sessionstarttime'] = array();
 
 							}
 						} catch (Exception $e) {//トランザクション7
@@ -678,7 +688,12 @@ class ApidatasController extends AppController
 
 						sleep(20);//20秒待機
 
-						$this->request->session()->destroy();//セッションの破棄
+				//		$this->request->session()->destroy();//セッションの破棄
+						$_SESSION['kouteivba'] = array();
+						$_SESSION['deleteday'] = array();
+						$_SESSION['session'] = array();
+						$_SESSION['sessionstarttime'] = array();
+
 						$_SESSION['session'][0] = 0;
 						$_SESSION['sessionstarttime'] = date('Y-m-d H:i:s');
 
@@ -726,13 +741,21 @@ class ApidatasController extends AppController
 						if ($this->ScheduleKouteis->saveMany($ScheduleKouteis)) {
 
 							$connection->commit();// コミット5
-							$this->request->session()->destroy(); // セッションの破棄
+			//				$this->request->session()->destroy(); // セッションの破棄
+							$_SESSION['kouteivba'] = array();
+							$_SESSION['deleteday'] = array();
+							$_SESSION['session'] = array();
+							$_SESSION['sessionstarttime'] = array();
 
 						} else {
 
 							$this->Flash->error(__('The data could not be saved. Please, try again.'));
 							throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-							$this->request->session()->destroy(); // セッションの破棄
+			//				$this->request->session()->destroy(); // セッションの破棄
+							$_SESSION['kouteivba'] = array();
+							$_SESSION['deleteday'] = array();
+							$_SESSION['session'] = array();
+							$_SESSION['sessionstarttime'] = array();
 
 						}
 					} catch (Exception $e) {//トランザクション7

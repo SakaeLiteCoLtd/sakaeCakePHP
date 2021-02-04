@@ -46,7 +46,7 @@ class KadousController extends AppController
         $this->set('mess',$mess);
       }
 
-      $this->request->session()->destroy(); // セッションの破棄
+    //  $this->request->session()->destroy(); // セッションの破棄
 
 			$KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
 			$this->set('KariKadouSeikeis',$KariKadouSeikeis);//
@@ -63,7 +63,7 @@ class KadousController extends AppController
         $this->set('mess',$mess);
       }
 
-      $this->request->session()->destroy(); // セッションの破棄
+    //  $this->request->session()->destroy(); // セッションの破棄
 
 			$KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
 			$this->set('KariKadouSeikeis',$KariKadouSeikeis);//
@@ -246,8 +246,10 @@ class KadousController extends AppController
 
     public function kariconfirm()
     {
-      $this->request->session()->destroy(); // セッションの破棄
+  //    $this->request->session()->destroy(); // セッションの破棄
       session_start();
+      $_SESSION['karikadouseikei'] = array();
+
       $KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
 			$this->set('KariKadouSeikeis',$KariKadouSeikeis);
       $Data = $this->request->query('s');
@@ -418,7 +420,7 @@ class KadousController extends AppController
 
    public function index()
    {
-     $this->request->session()->destroy(); // セッションの破棄
+  //   $this->request->session()->destroy(); // セッションの破棄
 
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);
@@ -426,7 +428,7 @@ class KadousController extends AppController
 
    public function form()
    {
-     $this->request->session()->destroy(); // セッションの破棄
+  //   $this->request->session()->destroy(); // セッションの破棄
 
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);
@@ -490,8 +492,9 @@ class KadousController extends AppController
 
    public function confirm()
    {
-     $this->request->session()->destroy(); // セッションの破棄
+//     $this->request->session()->destroy(); // セッションの破棄
      session_start();
+     $_SESSION['kadouseikei'] = array();
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);//
    }
@@ -538,7 +541,7 @@ class KadousController extends AppController
 
 		public function logout()
 		{
-			$this->request->session()->destroy(); // セッションの破棄
+//			$this->request->session()->destroy(); // セッションの破棄
 			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
 		}
 
@@ -807,7 +810,7 @@ class KadousController extends AppController
 
   public function syuuseiday()//ロット検索
   {
-    $this->request->session()->destroy(); // セッションの破棄
+  //  $this->request->session()->destroy(); // セッションの破棄
     $KadouSeikeis = $this->KadouSeikeis->newEntity();
     $this->set('KadouSeikeis',$KadouSeikeis);
   }
@@ -864,7 +867,10 @@ class KadousController extends AppController
 
   public function kensakuform()//ロット検索
   {
-    $this->request->session()->destroy(); // セッションの破棄
+  //  $this->request->session()->destroy(); // セッションの破棄
+      $_SESSION['imgdata'] = array();
+      $_SESSION['imgnum'] = array();
+
     $KadouSeikeis = $this->KadouSeikeis->newEntity();
     $this->set('KadouSeikeis',$KadouSeikeis);
 
@@ -2163,7 +2169,7 @@ for($n=0; $n<count($KadouSeikeis); $n++){
 
     public function syuuseiform()//ロット検索
     {
-      $this->request->session()->destroy(); // セッションの破棄
+  //    $this->request->session()->destroy(); // セッションの破棄
       $KadouSeikeis = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikeis',$KadouSeikeis);
 
@@ -2199,8 +2205,10 @@ for($n=0; $n<count($KadouSeikeis); $n++){
 
     public function syuuseiconfirm()//ロット検索
     {
-      $this->request->session()->destroy(); // セッションの破棄
+  //    $this->request->session()->destroy(); // セッションの破棄
       session_start();
+      $_SESSION['kadouseikeisyuusei'] = array();
+      $_SESSION['kadouseikeiid'] = array();
 
       $KadouSeikeis = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikeis',$KadouSeikeis);

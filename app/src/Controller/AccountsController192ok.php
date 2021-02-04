@@ -43,7 +43,7 @@ class AccountsController extends AppController
 		 public function index()
      {
  	//		$this->request->session()->destroy(); // セッションの破棄
-			$user = $this->Users->newEntity();
+      $user = $this->Users->newEntity();
 			$this->set('user',$user);
 
       if(!isset($_SESSION)){
@@ -52,7 +52,6 @@ class AccountsController extends AppController
       $session = $this->request->getSession();
       $data = $session->read();
       $data['login'] = array();
-
      }
 
     public function login()
@@ -254,7 +253,7 @@ class AccountsController extends AppController
         if ($this->AccountUrikakes->save($AccountUrikakes)) {
 
           //旧DBに製品登録
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_urikake');
           $table->setConnection($connection);
 
@@ -319,13 +318,13 @@ class AccountsController extends AppController
           if ($this->AccountUrikakeZaikohosyous->save($AccountUrikakeZaikohosyous)) {
 
             //旧DBに製品登録
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('account_urikake');
             $table->setConnection($connection);
 
             $sql = "SELECT id FROM account_urikake".
             " where cs_id = '".$CustomerData[0]->customer_code."' and kingaku = '".$price."' and date = '".$dateYMD."'";
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $account_urikake = $connection->execute($sql)->fetchAll('assoc');
             $id = $account_urikake[0]['id'];
 
@@ -587,7 +586,7 @@ class AccountsController extends AppController
         )){
 
           //旧DBも更新
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_urikake');
           $table->setConnection($connection);
 
@@ -734,7 +733,7 @@ class AccountsController extends AppController
         if ($this->AccountUrikakeMaterials->save($AccountUrikakeMaterials)) {
 
           //旧DBに製品登録
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_urikake_material');
           $table->setConnection($connection);
 
@@ -991,7 +990,7 @@ class AccountsController extends AppController
         )){
 
           //旧DBも更新
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_urikake_material');
           $table->setConnection($connection);
 
@@ -1142,7 +1141,7 @@ class AccountsController extends AppController
         if ($this->AccountProductKaikakes->save($AccountProductKaikakes)) {
 
           //旧DBに製品登録
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_product_kaikake');
           $table->setConnection($connection);
 
@@ -1405,7 +1404,7 @@ class AccountsController extends AppController
         )){
 
           //旧DBも更新
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_product_kaikake');
           $table->setConnection($connection);
 
@@ -1556,7 +1555,7 @@ class AccountsController extends AppController
         if ($this->AccountMaterialKaikakes->save($AccountMaterialKaikakes)) {
 
           //旧DBに製品登録
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_material_kaikake');
           $table->setConnection($connection);
 
@@ -1820,7 +1819,7 @@ class AccountsController extends AppController
         )){
 
           //旧DBも更新
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_material_kaikake');
           $table->setConnection($connection);
 
@@ -2103,7 +2102,7 @@ class AccountsController extends AppController
         )){
 
           //旧DBも更新
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('stock_inout_worklog');
           $table->setConnection($connection);
 
@@ -2259,7 +2258,7 @@ class AccountsController extends AppController
         if ($this->AccountYusyouzaiMasters->save($AccountYusyouzaiMasters)) {
 
           //旧DBに製品登録
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_yusyouzai_master');
           $table->setConnection($connection);
 
@@ -2450,7 +2449,7 @@ class AccountsController extends AppController
         )){
 
           //旧DBも更新
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_yusyouzai_master');
           $table->setConnection($connection);
 
@@ -2698,7 +2697,7 @@ class AccountsController extends AppController
         )){
 
           //旧DBも更新
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('order_material');
           $table->setConnection($connection);
 
@@ -2892,7 +2891,7 @@ class AccountsController extends AppController
         )){
 
           //旧DBも更新
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('price_material');
           $table->setConnection($connection);
 
@@ -3117,7 +3116,7 @@ class AccountsController extends AppController
         )){
 
           //旧DBも更新
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_yusyouzai_ukeire');
           $table->setConnection($connection);
 
@@ -3285,7 +3284,7 @@ class AccountsController extends AppController
         if ($this->AccountYusyouzaiUkeires->save($AccountYusyouzaiUkeires)) {
 
           //旧DBに製品登録
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('account_yusyouzai_ukeire');
           $table->setConnection($connection);
 

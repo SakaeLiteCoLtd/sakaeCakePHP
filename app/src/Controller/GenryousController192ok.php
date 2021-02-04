@@ -171,8 +171,9 @@ class GenryousController extends AppController
 
 		public function nyuukopreadd()
     {
-			$this->request->session()->destroy();// セッションの破棄
+//			$this->request->session()->destroy();// セッションの破棄
       session_start();//セッションの開始
+
 			$OrderMaterials = $this->OrderMaterials->newEntity();
 	    $this->set('OrderMaterials',$OrderMaterials);
     }
@@ -698,8 +699,9 @@ class GenryousController extends AppController
 
 			}
 
-			$this->request->session()->destroy();// セッションの破棄
+	//		$this->request->session()->destroy();// セッションの破棄
 			session_start();
+			$_SESSION['ScheduleKoutei_csv'] = array();
 
 			for($k=0; $k<count($ScheduleKouteis); $k++){
 
@@ -849,8 +851,9 @@ class GenryousController extends AppController
 
 			}
 
-			$this->request->session()->destroy();// セッションの破棄
+		//	$this->request->session()->destroy();// セッションの破棄
 			session_start();
+			$_SESSION['ScheduleKoutei_csv'] = array();
 
 			for($k=0; $k<count($ScheduleKouteis); $k++){
 

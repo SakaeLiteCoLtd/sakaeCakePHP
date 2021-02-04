@@ -223,13 +223,13 @@ class ApidatasController extends AppController
 		 			]);
 
 		 			//1週間分のデータを削除
-		 			$ScheduleKouteisTestsdelete = $this->ScheduleKouteisTests->find()->where(['datetime >=' => $daystart, 'datetime <=' => $dayfinish, 'delete_flag' => 0])->toArray();
-		 			if(isset($ScheduleKouteisTestsdelete[0])){
+		 			$ScheduleKouteisdelete = $this->ScheduleKouteis->find()->where(['datetime >=' => $daystart, 'datetime <=' => $dayfinish, 'delete_flag' => 0])->toArray();
+		 			if(isset($ScheduleKouteisdelete[0])){
 
-		 				for($k=0; $k<count($ScheduleKouteisTestsdelete); $k++){
-		 					$id = $ScheduleKouteisTestsdelete[$k]->id;
+		 				for($k=0; $k<count($ScheduleKouteisdelete); $k++){
+		 					$id = $ScheduleKouteisdelete[$k]->id;
 
-		 					$this->ScheduleKouteisTests->updateAll(
+		 					$this->ScheduleKouteis->updateAll(
 		 					['delete_flag' => 1],
 		 					['id'   => $id]
 		 					);
@@ -239,8 +239,8 @@ class ApidatasController extends AppController
 		 			}
 
 		 			//新しいデータを登録
-		 			$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $kouteivba);
-		 			$this->ScheduleKouteisTests->save($ScheduleKouteisTests);
+		 			$ScheduleKouteis = $this->ScheduleKouteis->patchEntity($this->ScheduleKouteis->newEntity(), $kouteivba);
+		 			$this->ScheduleKouteis->save($ScheduleKouteis);
 
 	 }
 
@@ -404,8 +404,8 @@ class ApidatasController extends AppController
 				'tantou' => 'post'
 			];
 
-			$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $kouteivba);
-			$this->ScheduleKouteisTests->save($ScheduleKouteisTests);
+			$ScheduleKouteis = $this->ScheduleKouteis->patchEntity($this->ScheduleKouteis->newEntity(), $kouteivba);
+			$this->ScheduleKouteis->save($ScheduleKouteis);
 
 		}elseif($this->request->is(['put'])){
 /*
@@ -427,8 +427,8 @@ class ApidatasController extends AppController
 				'tantou' => $data
 			];
 
-			$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $kouteivba);
-			$this->ScheduleKouteisTests->save($ScheduleKouteisTests);
+			$ScheduleKouteis = $this->ScheduleKouteis->patchEntity($this->ScheduleKouteis->newEntity(), $kouteivba);
+			$this->ScheduleKouteis->save($ScheduleKouteis);
 
 		}elseif($this->request->is(['get'])){
 /*
@@ -455,8 +455,8 @@ class ApidatasController extends AppController
 				'tantou' => $jsonData
 			];
 
-			$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $kouteivba);
-			$this->ScheduleKouteisTests->save($ScheduleKouteisTests);
+			$ScheduleKouteis = $this->ScheduleKouteis->patchEntity($this->ScheduleKouteis->newEntity(), $kouteivba);
+			$this->ScheduleKouteis->save($ScheduleKouteis);
 
 		}
 
@@ -482,7 +482,7 @@ class ApidatasController extends AppController
 				$urlarr = explode("/",$data);//切り離し
 				$dataarr = explode("_",$urlarr[4]);//切り離し
 
-					if(isset($dataarr[2])){//ScheduleKouteisTests登録用の配列に追加
+					if(isset($dataarr[2])){//ScheduleKouteis登録用の配列に追加
 
 						$datetime = str_replace("%20", " ", $dataarr[0]);//datetimeの取得
 						$datetime = str_replace("%3A", ":", $datetime);//datetimeの取得
@@ -518,9 +518,9 @@ class ApidatasController extends AppController
 						$session = $this->request->getSession();
 						$_SESSION['kouteivba'][] = $kouteivba;
 
-					}elseif(isset($dataarr[1])){//ScheduleKouteisTestsのdelete_flagを1に変更
+					}elseif(isset($dataarr[1])){//ScheduleKouteisのdelete_flagを1に変更
 
-						$this->request->session()->destroy(); // セッションの破棄
+			//			$this->request->session()->destroy(); // セッションの破棄
 
 						$dayarr = explode(".",$dataarr[1]);//切り離し
 						$dayfinish = $dayarr[0];//tantouの取得
@@ -530,18 +530,19 @@ class ApidatasController extends AppController
 
 						session_start();
 						$session = $this->request->getSession();
+						$_SESSION['deleteday'] = array();
 						$_SESSION['deleteday'][0] = $daystart;
 						$_SESSION['deleteday'][1] = $dayfinish;
 
 /*
 						//1週間分のデータを削除
-						$ScheduleKouteisTestsdelete = $this->ScheduleKouteisTests->find()->where(['datetime >=' => $_SESSION['deleteday'][0], 'datetime <=' => $_SESSION['deleteday'][1], 'delete_flag' => 0])->toArray();
-						if(isset($ScheduleKouteisTestsdelete[0])){
+						$ScheduleKouteisdelete = $this->ScheduleKouteis->find()->where(['datetime >=' => $_SESSION['deleteday'][0], 'datetime <=' => $_SESSION['deleteday'][1], 'delete_flag' => 0])->toArray();
+						if(isset($ScheduleKouteisdelete[0])){
 
-							for($k=0; $k<count($ScheduleKouteisTestsdelete); $k++){
-								$id = $ScheduleKouteisTestsdelete[$k]->id;
+							for($k=0; $k<count($ScheduleKouteisdelete); $k++){
+								$id = $ScheduleKouteisdelete[$k]->id;
 
-								$this->ScheduleKouteisTests->updateAll(
+								$this->ScheduleKouteis->updateAll(
 								['delete_flag' => 1],
 								['id'   => $id]
 								);
@@ -567,19 +568,19 @@ class ApidatasController extends AppController
 						];
 */
 						//新しいデータを登録
-						$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntities($this->ScheduleKouteisTests->newEntity(), $_SESSION['kouteivba']);
+						$ScheduleKouteis = $this->ScheduleKouteis->patchEntities($this->ScheduleKouteis->newEntity(), $_SESSION['kouteivba']);
 						$connection = ConnectionManager::get('default');//トランザクション1
 						// トランザクション開始2
 						$connection->begin();//トランザクション3
 						try {//トランザクション4
 
-							$ScheduleKouteisTestsdelete = $this->ScheduleKouteisTests->find()->where(['datetime >=' => $_SESSION['deleteday'][0], 'datetime <=' => $_SESSION['deleteday'][1], 'delete_flag' => 0])->toArray();
-							if(isset($ScheduleKouteisTestsdelete[0])){
+							$ScheduleKouteisdelete = $this->ScheduleKouteis->find()->where(['datetime >=' => $_SESSION['deleteday'][0], 'datetime <=' => $_SESSION['deleteday'][1], 'delete_flag' => 0])->toArray();
+							if(isset($ScheduleKouteisdelete[0])){
 
-								for($k=0; $k<count($ScheduleKouteisTestsdelete); $k++){
-									$id = $ScheduleKouteisTestsdelete[$k]->id;
+								for($k=0; $k<count($ScheduleKouteisdelete); $k++){
+									$id = $ScheduleKouteisdelete[$k]->id;
 
-									$this->ScheduleKouteisTests->updateAll(
+									$this->ScheduleKouteis->updateAll(
 									['delete_flag' => 1],
 									['id'   => $id]
 									);
@@ -588,16 +589,24 @@ class ApidatasController extends AppController
 
 							}
 
-							if ($this->ScheduleKouteisTests->saveMany($ScheduleKouteisTests)) {
+							if ($this->ScheduleKouteis->saveMany($ScheduleKouteis)) {
 
 								$connection->commit();// コミット5
-								$this->request->session()->destroy(); // セッションの破棄
+				//				$this->request->session()->destroy(); // セッションの破棄
+								$_SESSION['kouteivba'] = array();
+								$_SESSION['deleteday'] = array();
+								$_SESSION['session'] = array();
+								$_SESSION['sessionstarttime'] = array();
 
 							} else {
 
 								$this->Flash->error(__('The data could not be saved. Please, try again.'));
 								throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-								$this->request->session()->destroy(); // セッションの破棄
+				//				$this->request->session()->destroy(); // セッションの破棄
+								$_SESSION['kouteivba'] = array();
+								$_SESSION['deleteday'] = array();
+								$_SESSION['session'] = array();
+								$_SESSION['sessionstarttime'] = array();
 
 							}
 						} catch (Exception $e) {//トランザクション7
@@ -620,9 +629,12 @@ class ApidatasController extends AppController
 			echo "</pre>";
 */
 			$urlarr = explode("/",$data);//切り離し
+			if(isset($urlarr[5])){
+				$urlarr[4] = $urlarr[4]."/".$urlarr[5];
+			}
 			$dataarr = explode("_",$urlarr[4]);//切り離し
 
-				if(isset($dataarr[4])){//ScheduleKouteisTests登録用の配列に追加
+				if(isset($dataarr[4])){//ScheduleKouteis登録用の配列に追加
 
 					$datetime = $dataarr[0]." ".$dataarr[1];//datetimeの取得
 					$seikeiki = $dataarr[2];//seikeikiの取得
@@ -637,9 +649,14 @@ class ApidatasController extends AppController
 					$tantouarr = explode(".",$dataarr[4]);//切り離し
 
 					$tantou = $tantouarr[0];//tantouの取得
-					$tantou = mb_convert_encoding($tantou,"UTF-8",mb_detect_encoding($tantou, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true));
-					$product_code = mb_convert_encoding($product_code,"UTF-8",mb_detect_encoding($product_code, "ASCII,JIS,UTF-8,CP51932,SJIS-win", true));
+					$tantou = mb_convert_encoding($tantou,"UTF-8",mb_detect_encoding($tantou, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
+					$product_code = mb_convert_encoding($product_code,"UTF-8",mb_detect_encoding($product_code, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
 
+/*
+					echo "<pre>";
+					print_r($product_code);
+					echo "</pre>";
+*/
 					$present_kensahyou = 0;
 
 					$kouteivba['datetime'] = $datetime;
@@ -648,6 +665,7 @@ class ApidatasController extends AppController
 					$kouteivba['present_kensahyou'] = $present_kensahyou;
 					$kouteivba['product_name'] = $product_name;
 					$kouteivba['tantou'] = $tantou;
+					$kouteivba['created_at'] = date('Y-m-d H:i:s');
 
 					$this->set([
 					'tourokutest' => $kouteivba,
@@ -660,51 +678,30 @@ class ApidatasController extends AppController
 
 				}elseif(!isset($dataarr[2])){//まずここにくる
 
-					$this->request->session()->destroy(); // セッションの破棄//
-
 					session_start();
 					$session = $this->request->getSession();
 
-					if(!isset($dataarr[1])){
-
-						$dataarr = explode("=",$urlarr[4]);//切り離し
-
-					}
-
 					$dayarr = explode(".",$dataarr[1]);//切り離し
 					$dayfinish = $dayarr[0];
+
+					$dayfinish = strtotime($dayfinish);
+					$dayfinish = date('Y-m-d', strtotime('+1 day', $dayfinish));
 
 					$daystart = $dataarr[0]." 08:00:00";//1週間の初めの日付の取得
 					$dayfinish = $dayfinish." 07:59:59";//1週間の終わりの日付の取得
 
 					if(isset($_SESSION['session'][0])){//誰かがボタンを押して終了していない場合
 
-						$from = strtotime($_SESSION['sessionstarttime']);
-						$to = strtotime(date('Y-m-d H:i:s'));
-						$diff = $to - $from;
+						sleep(20);//20秒待機
 
-						if($diff < 20){
+		//				$this->request->session()->destroy();//セッションの破棄
+						$_SESSION['kouteivba'] = array();
+						$_SESSION['deleteday'] = array();
+						$_SESSION['session'] = array();
+						$_SESSION['sessionstarttime'] = array();
 
-							sleep(10);
-
-							return $this->redirect(['action' => 'vbaredirect',
-			        's' => ['returndata' => $dataarr[0]."=".$dayarr[0]]]);
-
-						}else{
-/*
-							echo "<pre>";
-							print_r($_SESSION['sessionstarttime']." - ".date('Y-m-d H:i:s')." = ".$diff);
-							echo "</pre>";
-*/
-							$this->request->session()->destroy(); // セッションの破棄//
-							$_SESSION['session'][0] = 0;
-							$_SESSION['sessionstarttime'] = date('Y-m-d H:i:s');
-/*
-							echo "<pre>";
-							print_r($_SESSION);
-							echo "</pre>";
-*/
-						}
+						$_SESSION['session'][0] = 0;
+						$_SESSION['sessionstarttime'] = date('Y-m-d H:i:s');
 
 					}else{//同時に誰もスタートしていない場合
 
@@ -713,13 +710,9 @@ class ApidatasController extends AppController
 
 					}
 
-					$_SESSION['deleteday'.$dataarr[0]][0] = $daystart;
-					$_SESSION['deleteday'.$dayarr[0]][0] = $dayfinish;
-/*
-					echo "<pre>";
-					print_r($_SESSION);
-					echo "</pre>";
-*/
+					$_SESSION['deletesta'][0] = $daystart;
+					$_SESSION['deletefin'][0] = $dayfinish;
+
 				}elseif($dataarr[2] == "end.xml"){//終了の時に一括でデータを登録してそのセッションを削除
 
 					session_start();
@@ -729,20 +722,21 @@ class ApidatasController extends AppController
 					$dayfinish = $dataarr[1];//1週間の終わりの日付の取得
 
 					//新しいデータを登録
-					$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntities($this->ScheduleKouteisTests->newEntity(), $_SESSION['kouteivba']);
+					$ScheduleKouteis = $this->ScheduleKouteis->patchEntities($this->ScheduleKouteis->newEntity(), $_SESSION['kouteivba']);
 					$connection = ConnectionManager::get('default');//トランザクション1
 					// トランザクション開始2
 					$connection->begin();//トランザクション3
 					try {//トランザクション4
 
-						$ScheduleKouteisTestsdelete = $this->ScheduleKouteisTests->find()->where(['datetime >=' => $_SESSION['deleteday'.$daystart][0], 'datetime <=' => $_SESSION['deleteday'.$dayfinish][0], 'delete_flag' => 0])->toArray();
-						if(isset($ScheduleKouteisTestsdelete[0])){
+						$ScheduleKouteisdelete = $this->ScheduleKouteis->find()->where(['datetime >=' => $_SESSION['deletesta'][0], 'datetime <=' => $_SESSION['deletefin'][0], 'delete_flag' => 0])->toArray();
+						if(isset($ScheduleKouteisdelete[0])){
 
-							for($k=0; $k<count($ScheduleKouteisTestsdelete); $k++){
-								$id = $ScheduleKouteisTestsdelete[$k]->id;
+							for($k=0; $k<count($ScheduleKouteisdelete); $k++){
+								$id = $ScheduleKouteisdelete[$k]->id;
+								$created_at_moto = $ScheduleKouteisdelete[$k]->created_at;
 
-								$this->ScheduleKouteisTests->updateAll(
-								['delete_flag' => 1],
+								$this->ScheduleKouteis->updateAll(
+								['delete_flag' => 1, 'created_at' => $created_at_moto, 'updated_at' => date('Y-m-d H:i:s')],
 								['id'   => $id]
 								);
 
@@ -750,27 +744,30 @@ class ApidatasController extends AppController
 
 						}
 
-						if ($this->ScheduleKouteisTests->saveMany($ScheduleKouteisTests)) {
+						if ($this->ScheduleKouteis->saveMany($ScheduleKouteis)) {
 
 							$connection->commit();// コミット5
-							$this->request->session()->destroy(); // セッションの破棄
+		//					$this->request->session()->destroy(); // セッションの破棄
+							$_SESSION['kouteivba'] = array();
+							$_SESSION['deleteday'] = array();
+							$_SESSION['session'] = array();
+							$_SESSION['sessionstarttime'] = array();
 
 						} else {
 
 							$this->Flash->error(__('The data could not be saved. Please, try again.'));
 							throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-							$this->request->session()->destroy(); // セッションの破棄
+		//					$this->request->session()->destroy(); // セッションの破棄
+							$_SESSION['kouteivba'] = array();
+							$_SESSION['deleteday'] = array();
+							$_SESSION['session'] = array();
+							$_SESSION['sessionstarttime'] = array();
 
 						}
 					} catch (Exception $e) {//トランザクション7
 					//ロールバック8
 						$connection->rollback();//トランザクション9
 					}//トランザクション10
-
-					$_SESSION['kouteivba'] = array();
-					$_SESSION['deleteday'.$daystart] = array();
-					$_SESSION['deleteday'.$dayfinish] = array();
-					$_SESSION['session'] = array();
 
 				}
 
@@ -789,7 +786,7 @@ class ApidatasController extends AppController
 */
 	//		sleep(10);
 
-			return $this->redirect(['action' => 'vbakoutei/api/'.$dataarr[0]."=".$dataarr[1].".xml"]);
+	//		return $this->redirect(['action' => 'vbakoutei/api/'.$dataarr[0]."=".$dataarr[1].".xml"]);
 
 		}
 

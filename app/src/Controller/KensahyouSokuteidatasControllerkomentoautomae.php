@@ -729,22 +729,14 @@ class KensahyouSokuteidatasController  extends AppController
 
 //      $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num, 'created_at' > $date2back])->toArray();
 
-      echo "<pre>";
-      print_r("検索前".date(' Y-m-d H:i:s'));
-      echo "</pre>";
-
       $ImKikaku = $this->ImKikakus->find()->contain(["ImSokuteidataHeads"])//早い
       ->where(['product_code' => $product_code, 'lot_num' => $lot_num, 'imSokuteidataHeads.created_at' > $date2back])->toArray();
-
-      echo "<pre>";
-      print_r("ImKikakus検索".date(' Y-m-d H:i:s'));
-      echo "</pre>";
 
       $ImSokuteidataResults = $this->ImSokuteidataResults->find()
       ->where(['lot_num' => $lot_num,  'inspec_datetime' > $date2back])->toArray();
 
       echo "<pre>";
-      print_r("ImSokuteidataResults検索".date(' Y-m-d H:i:s'));
+      print_r(count($ImSokuteidataResults));
       echo "</pre>";
 
 /*
@@ -838,8 +830,24 @@ class KensahyouSokuteidatasController  extends AppController
             if(isset($ImKikaku[$j])){
 
               for($i=1; $i<=9; $i++){//size_1～9までセット
-
+/*
+                echo "<pre>";
+                print_r("3 - ".$k.$j.$i.date('- Y-m-d H:i:s'));
+                echo "</pre>";
+*/
                 if(${"size_".$i} == $ImKikaku[$j]['size'] and ${"size_".$i} != 0 && $ImSokuteidataHeaddata[$k]->id == $ImKikaku[$j]['im_sokuteidata_head_id']){
+
+            //      $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['id' => $ImKikaku[$j]['im_sokuteidata_head_id']])->toArray();
+            //      $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['id' => $ImSokuteidataHeaddata[$k]->id])->toArray();
+            //      ${"kind_kensa".$i} = $ImKikaku[0]->kind_kensa;
+            //      $this->set('kind_kensa'.$i,${"kind_kensa".$i});//セット
+            echo "<pre>";
+            print_r("if1 - ".$k.$j.$i.date('- Y-m-d H:i:s'));
+            echo "</pre>";
+
+          //        $ImSokuteidataResult = $this->ImSokuteidataResults->find()
+          //        ->where(['im_sokuteidata_head_id' => $ImSokuteidataHeaddata[$k]->id , 'size_num' => $ImKikaku[$j]['size_num'], 'inspec_datetime' > $date2back])->toArray();
+
 
                   $ImSokuteidataResult = array();
                   for($l=0; $l<count($ImSokuteidataResults); $l++){
@@ -848,27 +856,35 @@ class KensahyouSokuteidatasController  extends AppController
                     }
                   }
 
-                  $ImSokuteidataResultarry = array();//空の配列を作る
+                      $ImSokuteidataResultarry = array();//空の配列を作る
 
-                  foreach ((array)$ImSokuteidataResult as $key => $value) {//serialで並び替え
-                       $sort[$key] = $value['serial'];
-                        array_push($ImSokuteidataResultarry, [$value['serial'], $value['result']]);
-                   }
+                      echo "<pre>";
+                      print_r("if1.5 - ".$k.$j.$i.date('- Y-m-d H:i:s'));
+                      echo "</pre>";
 
-                   if(isset($ImSokuteidataResultarry[0])){
-                      array_multisort($ImSokuteidataResultarry, SORT_ASC, $ImSokuteidataResultarry);
-                      $cnt = count($ImSokuteidataResultarry);
-
-                      for($r=1; $r<=$cnt; $r++){
-                        $r1 = $r-1;
-                        $r0 = $r + $count_total;
-
-                        ${"ImSokuteidata_result_".$i."_".$r0} = $ImSokuteidataResultarry[$r1][1];
-                        ${"ImSokuteidata_result_".$i."_".$r0} = round(${"ImSokuteidata_result_".$i."_".$r0},2);
-                        $this->set('ImSokuteidata_result_'.$i.'_'.$r0,${"ImSokuteidata_result_".$i."_".$r0});//セット
+                      foreach ((array)$ImSokuteidataResult as $key => $value) {//serialで並び替え
+                           $sort[$key] = $value['serial'];
+                            array_push($ImSokuteidataResultarry, [$value['serial'], $value['result']]);
                        }
 
-                     }
+                       if(isset($ImSokuteidataResultarry[0])){
+                          array_multisort($ImSokuteidataResultarry, SORT_ASC, $ImSokuteidataResultarry);
+                          $cnt = count($ImSokuteidataResultarry);
+
+                          for($r=1; $r<=$cnt; $r++){
+                            $r1 = $r-1;
+                            $r0 = $r + $count_total;
+
+                            ${"ImSokuteidata_result_".$i."_".$r0} = $ImSokuteidataResultarry[$r1][1];
+                            ${"ImSokuteidata_result_".$i."_".$r0} = round(${"ImSokuteidata_result_".$i."_".$r0},2);
+                            $this->set('ImSokuteidata_result_'.$i.'_'.$r0,${"ImSokuteidata_result_".$i."_".$r0});//セット
+                           }
+
+                         }
+
+                         echo "<pre>";
+                         print_r("if2 - ".$k.$j.$i.date('- Y-m-d H:i:s'));
+                         echo "</pre>";
 
                 }
             }
@@ -878,11 +894,7 @@ class KensahyouSokuteidatasController  extends AppController
         if(($k < count($ImSokuteidataHeaddata)-1) &&($ImSokuteidataHeaddata[$k+1]->kind_kensa == $ImSokuteidataHeaddata[$k]->kind_kensa)){
           $count_total = $count_total + count($ImSokuteidataResultarry);
         }
-        /*
-        echo "<pre>";
-        print_r($k.date(' Y-m-d H:i:s'));
-        echo "</pre>";
-*/
+
       }
 
             	$staff_id = $this->Auth->user('staff_id');//created_staffの登録用

@@ -91,7 +91,7 @@ class ApigenryousController extends AppController
 
 					sleep(20);//20秒待機
 
-		//			$this->request->session()->destroy();//セッションの破棄
+			//		$this->request->session()->destroy();//セッションの破棄
 					$_SESSION['sessiongenryou'] = array();
 
 					$_SESSION['sessiongenryou'][0] = 0;
@@ -184,7 +184,7 @@ class ApigenryousController extends AppController
 						}
 
 						$connection->commit();// コミット5
-		//				$this->request->session()->destroy(); // セッションの破棄
+			//			$this->request->session()->destroy(); // セッションの破棄
 						$_SESSION['specialvba'] = array();
 						$_SESSION['genryouvba'] = array();
 						$_SESSION['sessiongenryou'] = array();
@@ -193,7 +193,7 @@ class ApigenryousController extends AppController
 
 						$this->Flash->error(__('The data could not be saved. Please, try again.'));
 						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-		//				$this->request->session()->destroy(); // セッションの破棄
+			//			$this->request->session()->destroy(); // セッションの破棄
 						$_SESSION['specialvba'] = array();
 						$_SESSION['genryouvba'] = array();
 						$_SESSION['sessiongenryou'] = array();

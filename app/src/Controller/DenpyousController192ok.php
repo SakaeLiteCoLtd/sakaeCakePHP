@@ -40,11 +40,11 @@ class DenpyousController extends AppController
 			 }
 
 	//		 $this->request->session()->destroy();// セッションの破棄
-					if(!isset($_SESSION)){
-					session_start();
-					}
-					$_SESSION['tourokusyoumouheader'] = array();
-					$_SESSION['tourokusyoumoufooder'] = array();
+			 if(!isset($_SESSION)){
+			 session_start();
+			 }
+			 $_SESSION['tourokusyoumouheader'] = array();
+			 $_SESSION['tourokusyoumoufooder'] = array();
 		 }
 
 		 public function syoumoupreadd()
@@ -411,7 +411,7 @@ class DenpyousController extends AppController
 					if ($this->OrderSyoumouShiireHeaders->save($OrderSyoumouShiireHeaders)) {
 
 						//旧DBに登録
-						$connection = ConnectionManager::get('DB_ikou_test');
+						$connection = ConnectionManager::get('sakaeMotoDB');
 						$table = TableRegistry::get('order_syoumou_shiire_header');
 						$table->setConnection($connection);
 
@@ -451,14 +451,14 @@ class DenpyousController extends AppController
 								$this->OrderSyoumouShiireFooders->save($OrderSyoumouShiireFooders);
 
 								//旧DBに登録
-								$connection = ConnectionManager::get('DB_ikou_test');
+								$connection = ConnectionManager::get('sakaeMotoDB');
 								$table = TableRegistry::get('order_syoumou_shiire_header');
 								$table->setConnection($connection);
 
 								$sql = "SELECT id FROM order_syoumou_shiire_header".
 				              " where date_order ='".$sessiondata["tourokusyoumouheader"]["date_order"]."' and num_order = '".$sessiondata["tourokusyoumouheader"]["num_order"].
 											"' and kannou = '".$sessiondata["tourokusyoumouheader"]["kannou"]."' order by id desc";
-				        $connection = ConnectionManager::get('DB_ikou_test');
+				        $connection = ConnectionManager::get('sakaeMotoDB');
 				        $order_syoumou_shiire_header = $connection->execute($sql)->fetchAll('assoc');
 								$order_syoumou_shiire_header_id = $order_syoumou_shiire_header[0]['id'];
 
@@ -1080,7 +1080,7 @@ class DenpyousController extends AppController
 					 )){
 
 						 //旧DBに単価登録
-						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $connection = ConnectionManager::get('sakaeMotoDB');
 						 $table = TableRegistry::get('order_syoumou_shiire_header');
 						 $table->setConnection($connection);
 
@@ -1132,7 +1132,7 @@ class DenpyousController extends AppController
                );
 
 							 //旧DBに登録
-							 $connection = ConnectionManager::get('DB_ikou_test');
+							 $connection = ConnectionManager::get('sakaeMotoDB');
 							 $table = TableRegistry::get('order_syoumou_shiire_fooder');
 							 $table->setConnection($connection);
 
@@ -1375,7 +1375,7 @@ class DenpyousController extends AppController
 					if ($this->OrderSpecialShiires->save($OrderSpecialShiires)) {
 
             //旧DBに製品登録
-						$connection = ConnectionManager::get('DB_ikou_test');
+						$connection = ConnectionManager::get('sakaeMotoDB');
 						$table = TableRegistry::get('order_special_shiire');
 						$table->setConnection($connection);
 
@@ -1477,7 +1477,7 @@ class DenpyousController extends AppController
 
 		public function shiiresyuuseipreadd()
 		{
-//			$this->request->session()->destroy();// セッションの破棄
+	//		$this->request->session()->destroy();// セッションの破棄
 
 			$data = $this->request->getData();
 			$data = array_keys($data, '編集');
@@ -1705,14 +1705,14 @@ class DenpyousController extends AppController
 					 )){
 
 						 //旧DBに単価登録
-						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $connection = ConnectionManager::get('sakaeMotoDB');
 						 $table = TableRegistry::get('order_special_shiire');
 						 $table->setConnection($connection);
 
 						 $sql = "SELECT id,order_name,date_order,num_order,ps_id
 						 FROM order_special_shiire".
 						 " where order_name = '".$moto_order_name."' and date_order = '".$moto_date_order."' and num_order = '".$moto_num_order."' and ps_id = '".$moto_product_supplier_id."'";
-						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $connection = ConnectionManager::get('sakaeMotoDB');
 						 $order_special_shiire_id = $connection->execute($sql)->fetchAll('assoc');
 						 $moto_id = $order_special_shiire_id[0]["id"];
 

@@ -39,7 +39,12 @@ class ImKikakusTable extends Table
 
         $this->belongsTo('ImSokuteidataHeads', [
             'foreignKey' => 'im_sokuteidata_head_id',
-            'joinType' => 'INNER'
+            'joinType' => 'LEFT'
+        ]);
+
+        $this->belongsTo('ImSokuteidataResults', [
+            'foreignKey' => 'im_sokuteidata_head_id',
+            'joinType' => 'LEFT'
         ]);
     }
 
@@ -87,6 +92,7 @@ class ImKikakusTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['im_sokuteidata_head_id'], 'ImSokuteidataHeads'));
+        $rules->add($rules->existsIn(['im_sokuteidata_head_id'], 'ImSokuteidataResults'));
 
         return $rules;
     }

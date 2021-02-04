@@ -328,7 +328,7 @@ class KensahyouHeadsController  extends AppController
 
    public function logout()
    {
-     $this->request->session()->destroy(); // セッションの破棄
+  //   $this->request->session()->destroy(); // セッションの破棄
    }
 
      public function do()
@@ -449,7 +449,7 @@ class KensahyouHeadsController  extends AppController
 
     public function edit($id = null)
     {
-      $this->request->session()->destroy(); // セッションの破棄
+  //    $this->request->session()->destroy(); // セッションの破棄
 
       $kensahyouHead = $this->KensahyouHeads->get($id);
     	$this->set('kensahyouHead', $kensahyouHead);//$kensahyouHeadをctpで使えるようにセット

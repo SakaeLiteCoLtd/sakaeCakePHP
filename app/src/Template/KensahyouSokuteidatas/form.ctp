@@ -159,6 +159,7 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
         echo $this->Form->hidden('delete_flag' ,['value'=>0]);
         echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);
         echo $this->Form->hidden('updated_staff');
+        echo $this->Form->hidden('kadouseikeiId' ,['value'=>$kadouseikeiId]);
         ?>
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

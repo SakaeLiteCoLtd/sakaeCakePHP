@@ -29,6 +29,9 @@ class KensahyouSokuteidatasController  extends AppController
       $this->ImSokuteidataResults = TableRegistry::get('imSokuteidataResults');//ImKikakuTaiousテーブルを使う
       $this->ImKikakuTaious = TableRegistry::get('imKikakuTaious');//ImKikakuTaiousテーブルを使う
       $this->Users = TableRegistry::get('users');//Usersテーブルを使う
+      $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');//Usersテーブルを使う
+      $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');//KadouSeikeisテーブルを使う
+      $this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
      }
 
      public function yobidashicustomer()//「出荷検査用呼出」ページトップ
@@ -605,12 +608,22 @@ class KensahyouSokuteidatasController  extends AppController
   {
     $data = $this->request->query();
 
-    if(isset($data["name"])){
+    if(isset($data["value"])){
       $product_code = $data["name"];
+      $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
+      $kadouseikeiId = $data["value"];
+      $this->set('kadouseikeiId',$kadouseikeiId);//セット
+    }elseif(isset($data["name"])){
+      $product_code = $data["name"];
+      $kadouseikeiId = "aaa";
+      $this->set('kadouseikeiId',$kadouseikeiId);//セット
     }else{
       $data = $this->request->getData();
       $product_code = $data["product_code"];
+      $kadouseikeiId = "aaa";
+      $this->set('kadouseikeiId',$kadouseikeiId);//セット
     }
+
     $this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
 
     $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
@@ -710,9 +723,16 @@ class KensahyouSokuteidatasController  extends AppController
     	$data = $this->request->getData();//postデータを$dataに
 
       echo "<pre>";
-      print_r("start".date('Y-m-d H:i:s'));
+      print_r("start  ".date('Y-m-d H:i:s'));
       echo "</pre>";
 
+      $kadouseikeiId = $data["kadouseikeiId"];
+      $this->set('kadouseikeiId',$kadouseikeiId);
+/*
+      echo "<pre>";
+      print_r($kadouseikeiId);
+      echo "</pre>";
+*/
       $today = strtotime(date('Y-m-d'));
       $date2back = date('Y-m-d', strtotime('-2 day', $today));
 
@@ -726,27 +746,29 @@ class KensahyouSokuteidatasController  extends AppController
 //    	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
 //    	->select(['product_code','delete_flag' => '0'])
 //    	->group('product_code');
-
-//      $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num, 'created_at' > $date2back])->toArray();
-
+/*
       echo "<pre>";
-      print_r("検索前".date(' Y-m-d H:i:s'));
+      print_r("ImSokuteidataHeads検索前".date(' Y-m-d H:i:s'));
       echo "</pre>";
 
+      $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num, 'created_at' > $date2back])->toArray();
+
+      echo "<pre>";
+      print_r("ImKikakus検索前".date(' Y-m-d H:i:s'));
+      echo "</pre>";
+*/
       $ImKikaku = $this->ImKikakus->find()->contain(["ImSokuteidataHeads"])//早い
-      ->where(['product_code' => $product_code, 'lot_num' => $lot_num, 'imSokuteidataHeads.created_at' > $date2back])->toArray();
-
-      echo "<pre>";
-      print_r("ImKikakus検索".date(' Y-m-d H:i:s'));
-      echo "</pre>";
+  //    ->where(['product_code' => $product_code, 'lot_num' => $lot_num, 'imSokuteidataHeads.created_at' > $date2back])->toArray();
+      ->where(['product_code' => $product_code, 'lot_num' => $lot_num])->toArray();
 
       $ImSokuteidataResults = $this->ImSokuteidataResults->find()
-      ->where(['lot_num' => $lot_num,  'inspec_datetime' > $date2back])->toArray();
-
+  //    ->where(['lot_num' => $lot_num, 'inspec_datetime' > $date2back])->toArray();
+      ->where(['lot_num' => $lot_num])->toArray();
+/*
       echo "<pre>";
       print_r("ImSokuteidataResults検索".date(' Y-m-d H:i:s'));
       echo "</pre>";
-
+*/
 /*
       if(isset($ImKikakus[0])){
 
@@ -796,7 +818,7 @@ class KensahyouSokuteidatasController  extends AppController
         array_multisort($sort, SORT_ASC, $ImKikakus);
       }
 
-      for($i=0; $i<=8; $i++){
+      for($i=0; $i<count($ImKikakus); $i++){
         $j = $i + 1;
       if(isset($ImKikakus[$i])) {
         $kensahyuo_num = $ImKikakus[$i]["kensahyuo_num"];
@@ -808,6 +830,7 @@ class KensahyouSokuteidatasController  extends AppController
 
         }
       }
+
 /*
       echo "<pre>";
       print_r("2 ".date('Y-m-d H:i:s'));
@@ -939,7 +962,7 @@ class KensahyouSokuteidatasController  extends AppController
               $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
 
               echo "<pre>";
-              print_r("end".date('Y-m-d H:i:s'));
+              print_r("finish ".date('Y-m-d H:i:s'));
               echo "</pre>";
 
     }
@@ -947,6 +970,9 @@ class KensahyouSokuteidatasController  extends AppController
      public function confirm()//「出荷検査表登録」確認画面
     {
     	$data = $this->request->getData();//postデータを$dataに
+
+      $kadouseikeiId = $data["kadouseikeiId"];
+      $this->set('kadouseikeiId',$kadouseikeiId);
 
     	$product_code = $data['product_code'];//$dataの'product_code'を$product_codeに
     	$this->set('product_code',$product_code);//セット
@@ -1065,7 +1091,7 @@ class KensahyouSokuteidatasController  extends AppController
         ${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
         $this->set('size_'.$i,${"size_".$i});//セット
 
-        if(${"size_".$i} > 0){
+        if(strlen(${"size_".$i}) > 0){
           $count_size = $count_size + 1;
         }
 
@@ -1073,7 +1099,7 @@ class KensahyouSokuteidatasController  extends AppController
       $this->set('count_size',$count_size);
 
       $count_sori = 0;
-      if($KensahyouHead[0]->size_9 > 0){
+      if(strlen($KensahyouHead[0]->size_9) > 0){
         $count_sori = 1;
       }
       $this->set('count_sori',$count_sori);
@@ -1148,6 +1174,7 @@ class KensahyouSokuteidatasController  extends AppController
          }
          $session = $this->request->getSession();
          $_SESSION['sokuteidata'.$username] = array();
+         $_SESSION['kadouseikeiId'.$username] = array();
          for($n=1; $n<=8; $n++){
            $_SESSION['sokuteidata'.$username][$n] = array(
              'kensahyou_heads_id' => $_POST["kensahyou_heads_id"],
@@ -1175,6 +1202,9 @@ class KensahyouSokuteidatasController  extends AppController
            );
 
          }
+
+         $_SESSION['kadouseikeiId'.$username][] = $_POST["kadouseikeiId"];
+
        }
 
          if(empty($Userdata)){
@@ -1210,11 +1240,9 @@ class KensahyouSokuteidatasController  extends AppController
       }
       $data = $_SESSION['sokuteidata'.$this->Auth->user('username')];
       $this->set('data',$data);//セット
-/*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
+
+      $kousin_id = $_SESSION['kadouseikeiId'.$this->Auth->user('username')][0];
+
       $product_code = $data[1]['product_code'];//sokuteidata（全部で8つ）の1番目の配列のproduct_codeをとる（product_codeはどれも同じ）
       $this->set('product_code',$product_code);//セット
 
@@ -1319,6 +1347,7 @@ class KensahyouSokuteidatasController  extends AppController
       $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
       $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
 
+
     	if ($this->request->is('get')) {
     		$kensahyouSokuteidata = $this->KensahyouSokuteidatas->patchEntities($kensahyouSokuteidata, $data);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
     		$connection = ConnectionManager::get('default');//トランザクション1
@@ -1378,6 +1407,88 @@ class KensahyouSokuteidatasController  extends AppController
                 ]);
 
               }
+
+
+              if($kousin_id != "aaa" && strpos($kousin_id,'_') !== false){
+                $sch_id = explode("_",$kousin_id);
+
+                $this->ScheduleKouteis->updateAll(
+                ['present_kensahyou' => 1],
+                ['id'   => $sch_id[1]]
+                );
+
+                $ScheduleKouteiData = $this->ScheduleKouteis->find()->where(['id' => $sch_id[1]])->toArray();
+
+                $ScheduleKouteidatetime = $ScheduleKouteiData[0]->datetime->format('Y-m-d H:i:s');
+                $ScheduleKouteiseikeiki = $ScheduleKouteiData[0]->seikeiki;
+
+                $connection = ConnectionManager::get('sakaeMotoDB');
+                $table = TableRegistry::get('schedule_koutei');
+                $table->setConnection($connection);
+
+                $num = 1;
+                $updater = "UPDATE schedule_koutei set present_kensahyou ='".$num."'
+                 where datetime ='".$ScheduleKouteidatetime."' and seikeiki ='".$ScheduleKouteiseikeiki."'";
+                 $connection->execute($updater);
+
+                $connection = ConnectionManager::get('default');//新DBに戻る
+                $table->setConnection($connection);
+
+              }elseif($kousin_id != "aaa" && strpos($kousin_id,'=') !== false){
+                  $kari_id = explode("=",$kousin_id);
+
+                  $this->KariKadouSeikeis->updateAll(
+                  ['present_kensahyou' => 1],
+                  ['id'   => $kari_id[1]]
+                  );
+
+                  $KariKadouSeikeisData = $this->KariKadouSeikeis->find()->where(['id' => $kari_id[1]])->toArray();
+
+                  $KariKadouSeikeistarting_tm = $KariKadouSeikeisData[0]->starting_tm->format('Y-m-d H:i:s');
+                  $KariKadouSeikeifinishing_tm = $KariKadouSeikeisData[0]->finishing_tm->format('Y-m-d H:i:s');
+                  $KariKadouSeikeicreated_at = $KariKadouSeikeisData[0]->created_at->format('Y-m-d H:i:s');
+                  $KariKadouSeikeiseikeiki_code = $KariKadouSeikeisData[0]->seikeiki_code;
+                  $KariKadouSeikeiproduct_code = $KariKadouSeikeisData[0]->product_code;
+
+                  $connection = ConnectionManager::get('sakaeMotoDB');
+                  $table = TableRegistry::get('kari_kadou_seikei');
+                  $table->setConnection($connection);
+
+                  $num = 1;
+                  $updater = "UPDATE kari_kadou_seikei set present_kensahyou ='".$num."'
+                   where product_id ='".$KariKadouSeikeiproduct_code."' and seikeiki_id ='".$KariKadouSeikeiseikeiki_code."' and starting_tm ='".$KariKadouSeikeistarting_tm."'";
+                   $connection->execute($updater);
+
+                  $connection = ConnectionManager::get('default');//新DBに戻る
+                  $table->setConnection($connection);
+
+                }elseif($kousin_id != "aaa"){
+
+                  $KadouSeikeiData = $this->KadouSeikeis->find()->where(['id' => $kousin_id])->toArray();
+                  $KadouSeikeistarting_tm = $KadouSeikeiData[0]->starting_tm->format('Y-m-d H:i:s');
+                  $KadouSeikeifinishing_tm = $KadouSeikeiData[0]->finishing_tm->format('Y-m-d H:i:s');
+                  $KadouSeikeicreated_at = $KadouSeikeiData[0]->created_at->format('Y-m-d H:i:s');
+                  $KadouSeikeiseikeiki_code = $KadouSeikeiData[0]->seikeiki_code;
+                  $KadouSeikeiproduct_code = $KadouSeikeiData[0]->product_code;
+
+                  $this->KadouSeikeis->updateAll(
+                  ['present_kensahyou' => 1 ,'starting_tm' => $KadouSeikeistarting_tm ,'finishing_tm' => $KadouSeikeifinishing_tm ,'created_at' => $KadouSeikeicreated_at ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
+                  ['id' => $kousin_id]
+                  );
+
+                  $connection = ConnectionManager::get('sakaeMotoDB');
+                  $table = TableRegistry::get('kadou_seikei');
+                  $table->setConnection($connection);
+
+                  $num = 1;
+                  $updater = "UPDATE kadou_seikei set present_kensahyou ='".$num."'
+                   where pro_num ='".$KadouSeikeiproduct_code."' and seikeiki_id ='".$KadouSeikeiseikeiki_code."' and starting_tm ='".$KadouSeikeistarting_tm."'";
+                   $connection->execute($updater);
+
+                  $connection = ConnectionManager::get('default');//新DBに戻る
+                  $table->setConnection($connection);
+
+                }
 
               $connection = ConnectionManager::get('default');
 

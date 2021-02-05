@@ -37,7 +37,8 @@
         echo '</div></td>';
         echo '<td><div align="center"><font color="blue">';
     //    echo (${"inspec_dateb".$i}) ;
-        echo $this->Html->link(${"KadouSeikeifinishing_dated".$i}, ['action'=>'preform', 'name' => ${"KadouSeikeifinishing_dated".$i}, 'value1' => ${"product_coded".$i}, 'value2' => ${"product_named".$i}, 'value3' => ${"KadouSeikeiidd".$i}]) ;
+    echo $this->Html->link(${"KadouSeikeifinishing_dated".$i}, ['controller'=>'KensahyouSokuteidatas', 'action'=>'preform', 'namemoto' => ${"KadouSeikeifinishing_dated".$i}, 'name' => ${"product_coded".$i}, 'value' => ${"KadouSeikeiidd".$i}]) ;
+  //  echo $this->Html->link(${"KadouSeikeifinishing_dated".$i}, ['controller'=>'KensahyouSokuteidatas', 'action'=>'preform', 'name' => ${"product_coded".$i}]) ;
         echo '</div></font></td></tr>';
       }
     }
@@ -70,7 +71,8 @@
         echo '</div></td>';
         echo '<td><div align="center"><font color="blue">';
     //    echo (${"inspec_dateb".$i}) ;
-        echo $this->Html->link(${"KadouSeikeifinishing_datec".$i}, ['action'=>'preform', 'name' => ${"KadouSeikeifinishing_datec".$i}, 'value1' => ${"product_codec".$i}, 'value2' => ${"product_namec".$i}, 'value3' => ${"KadouSeikeiidc".$i}]) ;
+    //    echo $this->Html->link(${"KadouSeikeifinishing_datec".$i}, ['action'=>'preform', 'name' => ${"KadouSeikeifinishing_datec".$i}, 'value1' => ${"product_codec".$i}, 'value2' => ${"product_namec".$i}, 'value3' => ${"KadouSeikeiidc".$i}]) ;
+        echo $this->Html->link(${"KadouSeikeifinishing_datec".$i}, ['controller'=>'KensahyouSokuteidatas', 'action'=>'preform', 'namemoto' => ${"KadouSeikeifinishing_datec".$i}, 'name' => ${"product_codec".$i}, 'value' => ${"KadouSeikeiidc".$i}]) ;
         echo '</div></font></td></tr>';
       }
     }

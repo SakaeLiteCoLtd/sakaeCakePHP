@@ -33,6 +33,7 @@
 <?= $this->Form->control('inspec_date', array('type'=>'hidden', 'value'=>$_POST["inspec_date"], 'label'=>false)) ?>
 <?= $this->Form->control('delete_flag', array('type'=>'hidden', 'value'=>$_POST["delete_flag"], 'label'=>false)) ?>
 <?= $this->Form->control('updated_staff', array('type'=>'hidden', 'value'=>$_POST["updated_staff"], 'label'=>false)) ?>
+<?= $this->Form->control('kadouseikeiId', array('type'=>'hidden', 'value'=>$_POST["kadouseikeiId"], 'label'=>false)) ?>
 
 <?php for($n=1; $n<=8; $n++): ?>
 

@@ -129,6 +129,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
     <fieldset>
     <?= $this->Form->control('product_code1', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
     <?= $this->Form->control('product_name1', array('type'=>'hidden', 'value'=>$Productname, 'label'=>false)) ?>
+    <?= $this->Form->control('kadouseikeiId', array('type'=>'hidden', 'value'=>$kadouseikeiId, 'label'=>false)) ?>
     </fieldset>
 
     <?= $this->Form->end() ?>

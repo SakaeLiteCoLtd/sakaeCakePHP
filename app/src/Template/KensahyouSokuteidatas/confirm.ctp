@@ -134,9 +134,10 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 $result_weight_ave = 0;
                 $result_weight_20 = 0;
               }else{
-                $result_weight_ave = round($result_weight_total / $result_weight_count, 1);
-                $result_weight_20 = round($result_weight_ave * 0.2, 1);
+                $result_weight_ave = round($result_weight_total / $result_weight_count, 3);
+                $result_weight_20 = round($result_weight_ave * 0.2, 3);
               }
+
 
 ?>
 
@@ -273,7 +274,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <?= $this->Form->control('inspec_date', array('type'=>'hidden', 'value'=>$inspec_date, 'label'=>false)) ?>
 <?= $this->Form->control('delete_flag', array('type'=>'hidden', 'value'=>$delete_flag, 'label'=>false)) ?>
 <?= $this->Form->control('updated_staff', array('type'=>'hidden', 'value'=>$updated_staff, 'label'=>false)) ?>
-
+<?= $this->Form->control('kadouseikeiId', array('type'=>'hidden', 'value'=>$kadouseikeiId, 'label'=>false)) ?>
 
 <?php for($n=1; $n<=8; $n++): ?>
 

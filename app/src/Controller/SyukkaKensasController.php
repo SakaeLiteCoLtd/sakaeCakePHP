@@ -2443,6 +2443,253 @@ class SyukkaKensasController extends AppController {
 
     public function form()//「出荷検査表登録」ページで検査結果を入力
     {
+
+      $data = $this->request->getData();//postデータを$dataに
+
+      echo "<pre>";
+      print_r("start".date('Y-m-d H:i:s'));
+      echo "</pre>";
+
+      $today = strtotime(date('Y-m-d'));
+      $date2back = date('Y-m-d', strtotime('-2 day', $today));
+
+      $product_code = $data['product_code1'];
+      $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
+      $product_name = $data['product_name1'];
+      $this->set('Productname',$product_name);//セット
+      $lot_num = $data['lot_num'];
+      $this->set('lot_num',$lot_num);//セット
+
+//    	$KensahyouHeads = $this->KensahyouHeads->find()//KensahyouSokuteidatasテーブルの中で
+//    	->select(['product_code','delete_flag' => '0'])
+//    	->group('product_code');
+/*
+      echo "<pre>";
+      print_r("ImSokuteidataHeads検索前".date(' Y-m-d H:i:s'));
+      echo "</pre>";
+
+      $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num, 'created_at' > $date2back])->toArray();
+
+      echo "<pre>";
+      print_r("ImKikakus検索前".date(' Y-m-d H:i:s'));
+      echo "</pre>";
+*/
+      $ImKikaku = $this->ImKikakus->find()->contain(["ImSokuteidataHeads"])//早い
+      ->where(['product_code' => $product_code, 'lot_num' => $lot_num, 'imSokuteidataHeads.created_at' > $date2back])->toArray();
+
+      echo "<pre>";
+      print_r($product_code." ".$lot_num." ".count($ImKikaku));
+      echo "</pre>";
+
+      $ImSokuteidataResults = $this->ImSokuteidataResults->find()
+      ->where(['lot_num' => $lot_num, 'inspec_datetime' > $date2back])->toArray();
+/*
+      echo "<pre>";
+      print_r("ImSokuteidataResults検索".date(' Y-m-d H:i:s'));
+      echo "</pre>";
+*/
+/*
+      if(isset($ImKikakus[0])){
+
+    //    $ImSokuteidataHead_id = $ImSokuteidataHead[0]->id;
+    //    $ImSokuteidataHead_kind = $ImSokuteidataHead[0]->kind_kensa;
+    //    $ImKikaku = $this->ImKikakus->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHead_id])->toArray();
+        for($i=1; $i<=count($ImKikaku); $i++){//size_1～9までセット
+          if(isset($ImKikaku[$i])){
+            ${"ImSokuteidataHead_id_".$i} = $ImKikaku[$i]->im_sokuteidata_head_id;
+            $ImKikakutuika = $this->ImKikakus->find()->where(['im_sokuteidata_head_id' => ${"ImSokuteidataHead_id_".$i}])->toArray();
+            $ImKikaku = array_merge($ImKikaku, $ImKikakutuika);
+          }
+        }
+    //    $ImSokuteidataHead_id = $ImKikaku[0]->id;
+    //    $ImSokuteidataHeadId = $ImKikaku[0]->im_sokuteidata_head_id;
+    //    $ImSokuteidataResult = $this->ImSokuteidataResults->find()->where(['im_sokuteidata_head_id' => $ImSokuteidataHeadId, 'inspec_datetime' > $date2back])->toArray();
+      }
+/*
+      $product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $productId = $product[0]->id;
+      $this->set('productId',$productId);//セット
+*/
+      $ImKikakuid_1 = "ノギス";
+      $this->set('ImKikakuid_1',$ImKikakuid_1);
+      $ImKikakuid_2 = "ノギス";
+      $this->set('ImKikakuid_2',$ImKikakuid_2);
+      $ImKikakuid_3 = "ノギス";
+      $this->set('ImKikakuid_3',$ImKikakuid_3);
+      $ImKikakuid_4 = "ノギス";
+      $this->set('ImKikakuid_4',$ImKikakuid_4);
+      $ImKikakuid_5 = "ノギス";
+      $this->set('ImKikakuid_5',$ImKikakuid_5);
+      $ImKikakuid_6 = "ノギス";
+      $this->set('ImKikakuid_6',$ImKikakuid_6);
+      $ImKikakuid_7 = "ノギス";
+      $this->set('ImKikakuid_7',$ImKikakuid_7);
+      $ImKikakuid_8 = "ノギス";
+      $this->set('ImKikakuid_8',$ImKikakuid_8);
+      $ImKikakuid_9 = "ノギス";
+      $this->set('ImKikakuid_9',$ImKikakuid_9);
+
+      $ImKikakus = $this->ImKikakuTaious->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_code_idとなるデータをProductsテーブルから配列で取得（プルダウン）
+      foreach ((array)$ImKikakus as $key => $value) {
+           $sort[$key] = $value['kensahyuo_num'];
+       }
+       if(isset($ImKikakus[0])){
+        array_multisort($sort, SORT_ASC, $ImKikakus);
+      }
+
+      for($i=0; $i<count($ImKikakus); $i++){
+        $j = $i + 1;
+      if(isset($ImKikakus[$i])) {
+        $kensahyuo_num = $ImKikakus[$i]["kensahyuo_num"];
+
+          if($ImKikakus[$i]['kind_kensa'] != "") {
+            ${"ImKikakuid_".$kensahyuo_num} = $ImKikakus[$i]['kind_kensa'];
+            $this->set('ImKikakuid_'.$kensahyuo_num,${"ImKikakuid_".$kensahyuo_num});//セット
+          }
+
+        }
+      }
+
+      echo "<pre>";
+      print_r(count($ImKikakus));
+      echo "</pre>";
+
+/*
+      echo "<pre>";
+      print_r("2 ".date('Y-m-d H:i:s'));
+      echo "</pre>";
+*/
+      $KensahyouHead = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
+
+      for($i=1; $i<=9; $i++){//size_1～9までセット
+
+        ${"kind_kensa".$i} = "ノギス";
+        $this->set('kind_kensa'.$i,${"kind_kensa".$i});//セット
+        ${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
+        $this->set('size_'.$i,${"size_".$i});//セット
+
+      }
+
+      $text_10 = $KensahyouHead[0]->text_10;
+      $this->set('text_10',$text_10);//セット
+      $text_11 = $KensahyouHead[0]->text_11;
+      $this->set('text_11',$text_11);//セット
+
+      $count_total = 0;
+      $ImSokuteidataHeaddata = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num, 'product_code' => $product_code])->toArray();
+      for($k=0; $k<count($ImSokuteidataHeaddata); $k++){
+
+          for($j=0; $j<=count($ImKikaku); $j++){
+
+            if(isset($ImKikaku[$j])){
+
+              for($i=1; $i<=9; $i++){//size_1～9までセット
+
+                if(${"size_".$i} == $ImKikaku[$j]['size'] and ${"size_".$i} != 0 && $ImSokuteidataHeaddata[$k]->id == $ImKikaku[$j]['im_sokuteidata_head_id']){
+
+                  $ImSokuteidataResult = array();
+                  for($l=0; $l<count($ImSokuteidataResults); $l++){
+                    if($ImSokuteidataResults[$l]['im_sokuteidata_head_id'] == $ImSokuteidataHeaddata[$k]->id && $ImSokuteidataResults[$l]['size_num'] == $ImKikaku[$j]['size_num']){
+                      $ImSokuteidataResult[] = $ImSokuteidataResults[$l];
+                    }
+                  }
+
+                  $ImSokuteidataResultarry = array();//空の配列を作る
+
+                  foreach ((array)$ImSokuteidataResult as $key => $value) {//serialで並び替え
+                       $sort[$key] = $value['serial'];
+                        array_push($ImSokuteidataResultarry, [$value['serial'], $value['result']]);
+                   }
+
+                   if(isset($ImSokuteidataResultarry[0])){
+                      array_multisort($ImSokuteidataResultarry, SORT_ASC, $ImSokuteidataResultarry);
+                      $cnt = count($ImSokuteidataResultarry);
+
+                      for($r=1; $r<=$cnt; $r++){
+                        $r1 = $r-1;
+                        $r0 = $r + $count_total;
+
+                        ${"ImSokuteidata_result_".$i."_".$r0} = $ImSokuteidataResultarry[$r1][1];
+                        ${"ImSokuteidata_result_".$i."_".$r0} = round(${"ImSokuteidata_result_".$i."_".$r0},2);
+                        $this->set('ImSokuteidata_result_'.$i.'_'.$r0,${"ImSokuteidata_result_".$i."_".$r0});//セット
+                       }
+
+                     }
+
+                }
+            }
+          }
+        }
+
+        if(($k < count($ImSokuteidataHeaddata)-1) &&($ImSokuteidataHeaddata[$k+1]->kind_kensa == $ImSokuteidataHeaddata[$k]->kind_kensa)){
+          $count_total = $count_total + count($ImSokuteidataResultarry);
+        }
+        /*
+        echo "<pre>";
+        print_r($k.date(' Y-m-d H:i:s'));
+        echo "</pre>";
+*/
+      }
+
+              $staff_id = $this->Auth->user('staff_id');//created_staffの登録用
+              $this->set('staff_id',$staff_id);//セット
+
+              $this->set('kensahyouSokuteidata',$this->KensahyouSokuteidatas->newEntity());//空のカラムに$KensahyouSokuteidataと名前を付け、ctpで使えるようにセット
+/*
+              $Products = $this->Products->find('all',[
+                'conditions' => ['product_code =' => $product_code]//Productsテーブルの'product_code' = $product_codeとなるものを$Productsとする
+              ]);
+
+               foreach ($Products as $value) {//$Productsそれぞれに対し
+                $product_id= $value->id;//idに$product_idと名前を付ける
+              }
+              $this->set('product_id',$product_id);//セット
+*/
+              $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+              $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+              $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+/*
+              echo "<pre>";
+              print_r("4 ".date('Y-m-d H:i:s'));
+              echo "</pre>";
+*/
+              $Producti = $this->Products->find()->where(['product_code' => $product_code])->toArray();//Productsテーブルからproduct_code＝$product_codeとなるデータを見つけ、$Productiと名前を付ける
+              $Productid = $Producti[0]->id;//$Productiの0番目のデータ（0番目のデータしかない）のidに$Productidと名前を付ける
+              $KensahyouHead = $this->KensahyouHeads->find()->where(['product_code' => $product_code])->toArray();//KensahyouHeadsテーブルからproduct_id＝$Productidとなるデータを見つけ、$KensahyouHeadと名前を付ける
+              $this->set('KensahyouHead',$KensahyouHead);//セット
+              $Productname = $Producti[0]->product_name;//$Productiの0番目のデータ（0番目のデータしかない）のproduct_nameに$Productnameと名前を付ける
+              $this->set('Productname',$Productname);//セット
+
+              $KensahyouHeadver = $KensahyouHead[0]->version+1;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+              $this->set('KensahyouHeadver',$KensahyouHeadver);//セット
+
+              $KensahyouHeadid = $KensahyouHead[0]->id;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のidに$KensahyouHeadidと名前を付ける
+              $this->set('KensahyouHeadid',$KensahyouHeadid);//セット
+
+              for($i=1; $i<=9; $i++){//size_1～9までセット
+                ${"size_".$i} = $KensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
+                $this->set('size_'.$i,${"size_".$i});//セット
+              }
+
+              for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
+                ${"upper_".$j} = $KensahyouHead[0]->{"upper_{$j}"};//KensahyouHeadのupper_1～8まで
+                $this->set('upper_'.$j,${"upper_".$j});//セット
+                ${"lower_".$j} = $KensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
+                $this->set('lower_'.$j,${"lower_".$j});//セット
+              }
+
+              $arrhantei = [''=>'','OK'=>'OK','out'=>'out'];
+              $this->set('arrhantei',$arrhantei);//セット
+
+              $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+              $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
+
+              echo "<pre>";
+              print_r("end".date('Y-m-d H:i:s'));
+              echo "</pre>";
+
+
+      /*
         $data = $this->request->getData();//postデータを$dataに
 
         $product_code = $data['product_code1'];
@@ -2518,11 +2765,7 @@ class SyukkaKensasController extends AppController {
         for($j=0; $j<=20; $j++){//size_1～9までセット
           if(isset($ImKikaku[$j])){//
             if(${"size_".$i} == $ImKikaku[$j]['size'] and ${"size_".$i} != 0){//KensahyouHeadのsize$iと$ImKikaku[$j]['size']が同じ場合
-/*
-              echo "<pre>";
-              print_r(${"size_".$i}."-".$ImKikaku[$j]['size']);
-              echo "</pre>";
-*/
+
               $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['id' => $ImKikaku[$j]['im_sokuteidata_head_id']])->toArray();
               ${"kind_kensa".$i} = $ImSokuteidataHead[0]->kind_kensa;
 
@@ -2538,11 +2781,7 @@ class SyukkaKensasController extends AppController {
              if(isset($ImSokuteidataResultarry[0])){
                 array_multisort($ImSokuteidataResultarry, SORT_ASC, $ImSokuteidataResultarry);
                 $cnt = count($ImSokuteidataResultarry);
-/*
-                echo "<pre>";
-                print_r($ImSokuteidataResultarry);
-                echo "</pre>";
-*/
+
                 for($r=1; $r<=$cnt; $r++){
                   $r1 = $r-1;
                   ${"ImSokuteidata_result_".$i."_".$r} = $ImSokuteidataResultarry[$r1][1];
@@ -2569,7 +2808,7 @@ class SyukkaKensasController extends AppController {
 
       $arrhantei = [''=>'','OK'=>'OK','out'=>'out'];
       $this->set('arrhantei',$arrhantei);//セット
-
+*/
     }
 
 

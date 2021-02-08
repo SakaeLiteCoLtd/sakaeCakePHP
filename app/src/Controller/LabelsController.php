@@ -49,24 +49,41 @@ class LabelsController extends AppController
  }
      public function indexMenu()
      {
-       $this->request->session()->destroy(); // セッションの破棄
+       //$this->request->session()->destroy(); // セッションの破棄
+       if(!isset($_SESSION)){//sessionsyuuseituika
+       session_start();
+       }
+       $_SESSION['labellayouts'] = array();
+       $_SESSION['labelplaces'] = array();
+       $_SESSION['labelnashis'] = array();
+       $_SESSION['labelsetikkatsus'] = array();
+       $_SESSION['labelinsideouts'] = array();
+       $_SESSION['labelunits'] = array();
+       $_SESSION['lotdate'] = array();
+       $_SESSION['labeljunbi'] = array();
+       $_SESSION['kadouseikei'] = array();
+       $_SESSION['hyouji'] = array();
+       $_SESSION['check_lot_id'] = array();
+       $_SESSION['lot_hasu'] = array();
+       $_SESSION['oldDBtouroku'] = array();
      }
+
      public function indexShinki()
      {
-       $this->request->session()->destroy(); // セッションの破棄
+       //$this->request->session()->destroy(); // セッションの破棄
      }
      public function labelhakkoumenu()
      {
-       $this->request->session()->destroy(); // セッションの破棄
+       //$this->request->session()->destroy(); // セッションの破棄
      }
      public function lotmenu()
      {
-       $this->request->session()->destroy(); // セッションの破棄
+       //$this->request->session()->destroy(); // セッションの破棄
      }
 
    public function layouttypeform()//レイアウト入力
    {
-     $this->request->session()->destroy(); // セッションの破棄
+     //$this->request->session()->destroy(); // セッションの破棄
      $labelTypeProducts = $this->LabelTypeProducts->newEntity();
      $this->set('labelTypeProducts',$labelTypeProducts);
       $arrLabelTypes = $this->LabelTypes->find('all', ['conditions' => ['delete_flag' => '0']])->order(['type_id' => 'ASC']);
@@ -79,7 +96,6 @@ class LabelsController extends AppController
 
    public function layoutform()//レイアウト入力
    {
-
      $data = $this->request->getData();
      /*
      echo "<pre>";
@@ -116,6 +132,13 @@ class LabelsController extends AppController
    {
      $labelTypeProducts = $this->LabelTypeProducts->newEntity();
      $this->set('labelTypeProducts',$labelTypeProducts);
+
+     //$this->request->session()->destroy(); // セッションの破棄
+     if(!isset($_SESSION)){//sessionsyuuseituika
+     session_start();
+     }
+     $_SESSION['labellayouts'] = array();
+
    }
 
    public function layoutpreadd()//レイアウトログイン
@@ -199,7 +222,7 @@ class LabelsController extends AppController
 
    public function placeform()//納品場所入力
    {
-     $this->request->session()->destroy(); // セッションの破棄
+//     $this->request->session()->destroy(); // セッションの破棄
      $labelElementPlaces = $this->LabelElementPlaces->newEntity();
      $this->set('labelElementPlaces',$labelElementPlaces);
    }
@@ -215,6 +238,12 @@ class LabelsController extends AppController
      $this->set('place_code',$place_code);
      $labelElementPlaces = $this->LabelElementPlaces->newEntity();
      $this->set('labelElementPlaces',$labelElementPlaces);
+
+     if(!isset($_SESSION)){//sessionsyuuseituika
+     session_start();
+     }
+     $_SESSION['labelplaces'] = array();
+
    }
 
    public function placepreadd()//納品場所ログイン
@@ -298,13 +327,18 @@ class LabelsController extends AppController
 
    public function nashiform()//ラベル無し入力
    {
-     $this->request->session()->destroy(); // セッションの破棄
+    // $this->request->session()->destroy(); // セッションの破棄
      $labelNashies = $this->LabelNashies->newEntity();
      $this->set('labelNashies',$labelNashies);
    }
 
    public function nashiconfirm()//セット取り確認
    {
+     if(!isset($_SESSION)){//sessionsyuuseituika
+     session_start();
+     }
+     $_SESSION['labelnashis'] = array();
+
      $labelNashies = $this->LabelNashies->newEntity();
      $this->set('labelNashies',$labelNashies);
 
@@ -400,13 +434,18 @@ class LabelsController extends AppController
 
    public function setikkatsuform()//セット取り入力
    {
-     $this->request->session()->destroy(); // セッションの破棄
+    // $this->request->session()->destroy(); // セッションの破棄
      $labelSetikkatsues = $this->LabelSetikkatsues->newEntity();
      $this->set('labelSetikkatsues',$labelSetikkatsues);
    }
 
    public function setikkatsuconfirm()//セット取り確認
    {
+     if(!isset($_SESSION)){//sessionsyuuseituika
+     session_start();
+     }
+     $_SESSION['labelsetikkatsus'] = array();
+
      $labelSetikkatsues = $this->LabelSetikkatsues->newEntity();
      $this->set('labelSetikkatsues',$labelSetikkatsues);
      $data = $this->request->getData();
@@ -515,13 +554,18 @@ class LabelsController extends AppController
 
    public function insideoutform()//外箱中身入力
    {
-     $this->request->session()->destroy(); // セッションの破棄
+  //   $this->request->session()->destroy(); // セッションの破棄
      $labelInsideouts = $this->LabelInsideouts->newEntity();
      $this->set('labelInsideouts',$labelInsideouts);
    }
 
    public function insideoutconfirm()//外箱中身確認
    {
+     if(!isset($_SESSION)){//sessionsyuuseituika
+     session_start();
+     }
+     $_SESSION['labelinsideouts'] = array();
+
      $labelInsideouts = $this->LabelInsideouts->newEntity();
      $this->set('labelInsideouts',$labelInsideouts);
      $data = $this->request->getData();
@@ -620,13 +664,18 @@ class LabelsController extends AppController
 
    public function unitform()//数量単位入力
    {
-     $this->request->session()->destroy(); // セッションの破棄
+  //   $this->request->session()->destroy(); // セッションの破棄
      $labelElementUnits = $this->LabelElementUnits->newEntity();
      $this->set('labelElementUnits',$labelElementUnits);
    }
 
    public function unitconfirm()//数量単位確認
    {
+     if(!isset($_SESSION)){//sessionsyuuseituika
+     session_start();
+     }
+     $_SESSION['labelunits'] = array();
+
      $labelElementUnits = $this->LabelElementUnits->newEntity();
      $this->set('labelElementUnits',$labelElementUnits);
    }
@@ -708,7 +757,7 @@ class LabelsController extends AppController
    }
    public function ikkatsupreform()//一括ラベル発行
    {
-     $this->request->session()->destroy(); // セッションの破棄
+  //   $this->request->session()->destroy(); // セッションの破棄
      $scheduleKouteis = $this->ScheduleKouteis->newEntity();
      $this->set('scheduleKouteis',$scheduleKouteis);
 /*
@@ -1408,7 +1457,7 @@ class LabelsController extends AppController
 
     public function logout()
 		{
-			$this->request->session()->destroy(); // セッションの破棄
+	//		$this->request->session()->destroy(); // セッションの破棄
 			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
 		}
 
@@ -1884,7 +1933,7 @@ class LabelsController extends AppController
 
      public function kobetupreform()//個別成形時間
      {
-       $this->request->session()->destroy(); // セッションの破棄
+    //   $this->request->session()->destroy(); // セッションの破棄
        $scheduleKouteis = $this->ScheduleKouteis->newEntity();
        $this->set('scheduleKouteis',$scheduleKouteis);
      }
@@ -2714,14 +2763,14 @@ class LabelsController extends AppController
 
     public function fushiyouMenu()
 		{
-      $this->request->session()->destroy(); // セッションの破棄
+  //    $this->request->session()->destroy(); // セッションの破棄
       $checkLots = $this->CheckLots->newEntity();
       $this->set('checkLots',$checkLots);
 		}
 
     public function fushiyoupreadd()
 		{
-      $this->request->session()->destroy(); // セッションの破棄
+  //    $this->request->session()->destroy(); // セッションの破棄
       $checkLots = $this->CheckLots->newEntity();
       $this->set('checkLots',$checkLots);
 		}
@@ -2807,7 +2856,6 @@ class LabelsController extends AppController
        $this->set('checkLots',$checkLots);
        $data = $this->request->getData();
        $maisuu = $data["maisuu"];
-
 
        $CheckLots = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
          ->where(['product_code' => $data["product_code"], 'lot_num' => $data["lot_num_0"]])->toArray();
@@ -2923,7 +2971,7 @@ class LabelsController extends AppController
 
      public function kensakuform()//ロット検索
      {
-       $this->request->session()->destroy(); // セッションの破棄
+  //     $this->request->session()->destroy(); // セッションの破棄
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
      }
@@ -3032,7 +3080,7 @@ class LabelsController extends AppController
 
      public function hasuform()//ラベル発行の端数登録（日程絞り込み画面）
      {
-       $this->request->session()->destroy();// セッションの破棄
+  //     $this->request->session()->destroy();// セッションの破棄
        $orderEdis = $this->OrderEdis->newEntity();
        $this->set('orderEdis',$orderEdis);
      }
@@ -3111,6 +3159,18 @@ class LabelsController extends AppController
 
      public function hasuconfirm()//ラベル発行の端数登録（確認画面）
      {
+       if(!isset($_SESSION)){//sessionsyuuseituika
+       session_start();
+       }
+       $_SESSION['labelhasu'] = array();
+       $_SESSION['lotdate'] = array();
+       $_SESSION['labeljunbi'] = array();
+       $_SESSION['kadouseikei'] = array();
+       $_SESSION['hyouji'] = array();
+       $_SESSION['check_lot_id'] = array();
+       $_SESSION['lot_hasu'] = array();
+       $_SESSION['oldDBtouroku'] = array();
+
        $data = $this->request->getData();
 
        if(isset($data['yobidasi'])){//もう一度検索（絞り込み）をした場合
@@ -3289,7 +3349,7 @@ class LabelsController extends AppController
 
      public function hasulotstafftouroku()
     {
-      $this->request->session()->destroy();// セッションの破棄
+  //    $this->request->session()->destroy();// セッションの破棄
       $MotoLots = $this->MotoLots->newEntity();
       $this->set('MotoLots',$MotoLots);
 
@@ -3514,6 +3574,23 @@ class LabelsController extends AppController
 
       public function hasulotconfirm()
      {
+       if(!isset($_SESSION)){//sessionsyuuseituika
+       session_start();
+       }
+       $_SESSION['labellayouts'] = array();
+       $_SESSION['labelplaces'] = array();
+       $_SESSION['labelnashis'] = array();
+       $_SESSION['labelsetikkatsus'] = array();
+       $_SESSION['labelinsideouts'] = array();
+       $_SESSION['labelunits'] = array();
+       $_SESSION['lotdate'] = array();
+       $_SESSION['labeljunbi'] = array();
+       $_SESSION['kadouseikei'] = array();
+       $_SESSION['hyouji'] = array();
+       $_SESSION['check_lot_id'] = array();
+       $_SESSION['lot_hasu'] = array();
+       $_SESSION['oldDBtouroku'] = array();
+
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
        $MotoLots = $this->MotoLots->newEntity();
@@ -3697,7 +3774,7 @@ class LabelsController extends AppController
 
     public function hasukensakuform()
    {
-     $this->request->session()->destroy();// セッションの破棄
+//     $this->request->session()->destroy();// セッションの破棄
      $MotoLots = $this->MotoLots->newEntity();
      $this->set('MotoLots',$MotoLots);
    }
@@ -3745,12 +3822,12 @@ class LabelsController extends AppController
 
       public function genzaijoukyoumenu()
      {
-       $this->request->session()->destroy();// セッションの破棄
+    //   $this->request->session()->destroy();// セッションの破棄
      }
 
      public function genzaijoukyouform()
     {
-      $this->request->session()->destroy();// セッションの破棄
+  //    $this->request->session()->destroy();// セッションの破棄
       $checkLots = $this->CheckLots->newEntity();
       $this->set('checkLots',$checkLots);
     }
@@ -3930,7 +4007,7 @@ class LabelsController extends AppController
 
         public function syukkajoukyouform()
        {
-         $this->request->session()->destroy();// セッションの破棄
+    //     $this->request->session()->destroy();// セッションの破棄
          $orderEdis = $this->OrderEdis->newEntity();
          $this->set('orderEdis',$orderEdis);
        }
@@ -4142,7 +4219,7 @@ class LabelsController extends AppController
 
     public function doubletourokuform()
    {
-     $this->request->session()->destroy();// セッションの破棄
+  //   $this->request->session()->destroy();// セッションの破棄
      $CheckLotsDoubles = $this->CheckLotsDoubles->newEntity();
      $this->set('CheckLotsDoubles',$CheckLotsDoubles);
 
@@ -4158,7 +4235,7 @@ class LabelsController extends AppController
 
    public function doubletourokuichiran()
   {
-    $this->request->session()->destroy();// セッションの破棄
+//    $this->request->session()->destroy();// セッションの破棄
     $CheckLotsDoubles = $this->CheckLotsDoubles->newEntity();
     $this->set('CheckLotsDoubles',$CheckLotsDoubles);
 

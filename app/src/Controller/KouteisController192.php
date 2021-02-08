@@ -1055,7 +1055,11 @@ class KouteisController extends AppController {
 
     public function typeimtaiouform()//IMtaiou
     {
-      $this->request->session()->destroy();// セッションの破棄
+  //    $this->request->session()->destroy();// セッションの破棄
+      if(!isset($_SESSION)){
+      session_start();
+      }
+      $_SESSION['imdatanew'] = array();
 
       $data = $this->request->query();
 
@@ -1439,7 +1443,15 @@ class KouteisController extends AppController {
 
     public function indexhome()//取り込み画面
     {
-      $this->request->session()->destroy(); // セッションの破棄
+      //      $this->request->session()->destroy(); // セッションの破棄
+
+            if(!isset($_SESSION)){
+            session_start();
+            }
+            $_SESSION['kikakudata'] = array();
+            $_SESSION['sokuteidata'] = array();
+            $_SESSION['kousinn_flag'] = array();
+            $_SESSION['imdatanew'] = array();
 
       $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->newEntity();
       $this->set('KouteiKensahyouHeads', $KouteiKensahyouHeads);
@@ -2423,7 +2435,7 @@ class KouteisController extends AppController {
 
   public function logout()
   {
-    $this->request->session()->destroy(); // セッションの破棄
+//    $this->request->session()->destroy(); // セッションの破棄
   }
 
       public function do()
@@ -2549,7 +2561,7 @@ class KouteisController extends AppController {
 
      public function edit($id = null)
      {
-       $this->request->session()->destroy(); // セッションの破棄
+//       $this->request->session()->destroy(); // セッションの破棄
 
        $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->get($id);
        $this->set('KouteiKensahyouHeads', $KouteiKensahyouHeads);//$kensahyouHeadをctpで使えるようにセット
@@ -2573,7 +2585,12 @@ class KouteisController extends AppController {
 
      public function imtaiouedit($id = null)
      {
-       $this->request->session()->destroy(); // セッションの破棄
+       //   $this->request->session()->destroy(); // セッションの破棄
+
+          if(!isset($_SESSION)){
+          session_start();
+          }
+          $_SESSION['kikakudata'] = array();
 
        $KouteiImKikakuTaious = $this->KouteiImKikakuTaious->get($id);
        $this->set('KouteiImKikakuTaious', $KouteiImKikakuTaious);//$kensahyouHeadをctpで使えるようにセット

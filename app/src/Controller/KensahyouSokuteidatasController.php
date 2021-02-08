@@ -757,18 +757,27 @@ class KensahyouSokuteidatasController  extends AppController
       print_r("ImKikakus検索前".date(' Y-m-d H:i:s'));
       echo "</pre>";
 */
-      $ImKikaku = $this->ImKikakus->find()->contain(["ImSokuteidataHeads"])//早い
+      $ImKikaku = $this->ImKikakus->find()
+      ->contain(["ImSokuteidataHeads"])//早い
+      ->select(['im_sokuteidata_head_id', 'size',  'size_num', 'ImSokuteidataHeads.lot_num', 'ImSokuteidataHeads.product_code'])
   //    ->where(['product_code' => $product_code, 'lot_num' => $lot_num, 'imSokuteidataHeads.created_at' > $date2back])->toArray();
       ->where(['product_code' => $product_code, 'lot_num' => $lot_num])->toArray();
-
-      $ImSokuteidataResults = $this->ImSokuteidataResults->find()
-  //    ->where(['lot_num' => $lot_num, 'inspec_datetime' > $date2back])->toArray();
-      ->where(['lot_num' => $lot_num])->toArray();
 /*
       echo "<pre>";
-      print_r("ImSokuteidataResults検索".date(' Y-m-d H:i:s'));
+      print_r("ImKikakus検索後".date(' Y-m-d H:i:s'));
+      echo "</pre>";
+      echo "<pre>";
+      print_r("ImSokuteidataResults検索前".date(' Y-m-d H:i:s'));
       echo "</pre>";
 */
+      $ImSokuteidataResults = $this->ImSokuteidataResults->find()
+  //    ->where(['lot_num' => $lot_num, 'inspec_datetime' > $date2back])->toArray();
+      ->select(['im_sokuteidata_head_id', 'size_num', 'lot_num', 'serial', 'result'])->where(['lot_num' => $lot_num])->toArray();
+/*
+      echo "<pre>";
+      print_r("ImSokuteidataResults検索後".date(' Y-m-d H:i:s'));
+      echo "</pre>";
+
 /*
       if(isset($ImKikakus[0])){
 

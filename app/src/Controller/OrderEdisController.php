@@ -49,11 +49,16 @@ class OrderEdisController extends AppController
 
      public function indexmenu()
      {
-       $this->request->session()->destroy();// セッションの破棄
+       //$this->request->session()->destroy();// セッションの破棄
      }
 
      public function hattyucsv()//発注CSV
      {
+       if(!isset($_SESSION)){//sessionsyuuseituika
+       session_start();
+       }
+       $_SESSION['order_edi_kumitate'] = array();
+
        $orderEdis = $this->OrderEdis->newEntity();
        $this->set('orderEdis',$orderEdis);
 
@@ -333,7 +338,7 @@ class OrderEdisController extends AppController
 
      public function hattyucsvpreadd()
  		{
-      $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy();// セッションの破棄
       session_start();//セッションの開始
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
@@ -366,7 +371,7 @@ class OrderEdisController extends AppController
 
     public function dnpcsvpreadd()
     {
-      $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy();// セッションの破棄
       session_start();//セッションの開始
      $orderEdis = $this->OrderEdis->newEntity();
      $this->set('orderEdis',$orderEdis);
@@ -1208,7 +1213,7 @@ echo "</pre>";
 
     public function keikakucsvpreadd()
     {
-      $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy();// セッションの破棄
       session_start();//セッションの開始
      $orderEdis = $this->OrderEdis->newEntity();
      $this->set('orderEdis',$orderEdis);
@@ -1241,29 +1246,29 @@ echo "</pre>";
 
     public function henkoutop()//登録呼出変更のトップ
     {
-      $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy();// セッションの破棄
     }
 
     public function henkousentakucustomer()//登録呼出変更のpana,dnp,others選択画面
     {
-      $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy();// セッションの破棄
     }
 
     public function henkoupanaselectproduct()//登録呼出変更のpanaの、p関係とかの選択
     {
-      $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy();// セッションの破棄
     }
 
     public function henkoupanasearch()//登録呼出変更のpanaの、納期絞り込み
     {
-      $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy();// セッションの破棄
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
     }
 
     public function henkoupanaichiran()
     {
-      $this->request->session()->destroy();//セッションの破棄
+      //$this->request->session()->destroy();//セッションの破棄
       $data = $this->request->getData();
       $Data = $this->request->query('s');//1度henkoupanaformへ行って戻ってきたとき（検索を押したとき）
       if(isset($Data)){
@@ -1421,7 +1426,11 @@ echo "</pre>";
 
     public function henkoupanabunnou()
     {
+      if(!isset($_SESSION)){//sessionsyuuseituika
       session_start();
+      }
+      $_SESSION['orderEdis'] = array();
+
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
@@ -1463,7 +1472,11 @@ echo "</pre>";
 
     public function henkoupanaconfirm()
     {
+      if(!isset($_SESSION)){//sessionsyuuseituika
       session_start();
+      }
+      $_SESSION['orderEdis'] = array();
+
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
     }
@@ -1752,19 +1765,19 @@ echo "</pre>";
 
     public function henkoudnpselectproduct()
     {
-      $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy();// セッションの破棄
     }
 
     public function henkoudnpsearch()
     {
-      $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy();// セッションの破棄
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
     }
 
     public function henkoudnpichiran()
     {
-      $this->request->session()->destroy();//セッションの破棄
+      //$this->request->session()->destroy();//セッションの破棄
       $data = $this->request->getData();
       $Data=$this->request->query('s');//1度henkoupanaformへ行って戻ってきたとき（検索を押したとき）
       if(isset($Data)){
@@ -1897,7 +1910,11 @@ echo "</pre>";
 
     public function henkoudnpbunnou()
     {
+      if(!isset($_SESSION)){//sessionsyuuseituika
       session_start();
+      }
+      $_SESSION['orderEdis'] = array();
+
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
@@ -1936,7 +1953,11 @@ echo "</pre>";
 
     public function henkoudnpconfirm()
     {
+      if(!isset($_SESSION)){//sessionsyuuseituika
       session_start();
+      }
+      $_SESSION['orderEdis'] = array();
+
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
     }
@@ -2498,14 +2519,14 @@ echo "</pre>";
 
     public function henkouothersearch()
     {
-      $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy();// セッションの破棄
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
     }
 
     public function henkouotherichiran()
     {
-      $this->request->session()->destroy();//セッションの破棄
+      //$this->request->session()->destroy();//セッションの破棄
       $data = $this->request->getData();
 
       $Data=$this->request->query('s');//1度henkou5otherへ行って戻ってきたとき（検索を押したとき）
@@ -2624,7 +2645,11 @@ echo "</pre>";
 
     public function henkouotherbunnou()
     {
+      if(!isset($_SESSION)){//sessionsyuuseituika
       session_start();
+      }
+      $_SESSION['orderEdis'] = array();
+
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
@@ -2666,7 +2691,11 @@ echo "</pre>";
 
     public function henkouotherconfirm()
     {
+      if(!isset($_SESSION)){//sessionsyuuseituika
       session_start();
+      }
+      $_SESSION['orderEdis'] = array();
+
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();
@@ -2957,7 +2986,7 @@ echo "</pre>";
 
     public function chokusetsuformpro()
     {
-      $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy();// セッションの破棄
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
@@ -3088,7 +3117,11 @@ echo "</pre>";
 
     public function chokusetsupanapreadd()
     {
+      if(!isset($_SESSION)){//sessionsyuuseituika
       session_start();
+      }
+      $_SESSION['order_edi'] = array();
+
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
 
@@ -3156,6 +3189,13 @@ echo "</pre>";
 
     public function chokusetsupanado()
     {
+      if(!isset($_SESSION)){//sessionsyuuseituika
+      session_start();
+      }
+      $_SESSION['ProductGaityu'] = array();
+      $_SESSION['order_edi_kumitate'] = array();
+      $_SESSION['ProductGaityu_kumitate'] = array();
+
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
@@ -3533,6 +3573,11 @@ echo "</pre>";
 
     public function chokusetsudnpdo()
     {
+      if(!isset($_SESSION)){//sessionsyuuseituika
+      session_start();
+      }
+      $_SESSION['order_edi_kumitate'] = array();
+
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
@@ -3767,14 +3812,14 @@ echo "</pre>";
 
     public function denpyouindex()
     {
-      $this->request->session()->destroy(); // セッションの破棄
+      //$this->request->session()->destroy(); // セッションの破棄
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
     }
 
     public function denpyouhattyu()
     {
-      $this->request->session()->destroy(); // セッションの破棄
+      //$this->request->session()->destroy(); // セッションの破棄
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
     }
@@ -3819,7 +3864,7 @@ echo "</pre>";
 
     public function denpyouhenkouform()
     {
-      $this->request->session()->destroy(); // セッションの破棄
+      //$this->request->session()->destroy(); // セッションの破棄
 
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
@@ -3877,7 +3922,11 @@ echo "</pre>";
 
       $data = $this->request->getData();
 
+      if(!isset($_SESSION)){//sessionsyuuseituika
       session_start();
+      }
+      $_SESSION['orderToSuppliers'] = array();
+
       for($k=0; $k<$data["num"]; $k++){
         $_SESSION['orderToSuppliers'][$k] = array(
           'id' => $data["id{$k}"],
@@ -4017,7 +4066,7 @@ echo "</pre>";
 
     public function yobizaikopreadd()
     {
-      $this->request->session()->destroy(); // セッションの破棄
+      //$this->request->session()->destroy(); // セッションの破棄
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
     }
@@ -4180,8 +4229,11 @@ echo "</pre>";
       }
       $this->set('arrOrderToSupplier',$arrOrderToSupplier);
 
-      $this->request->session()->destroy(); // セッションの破棄
+      //$this->request->session()->destroy(); // セッションの破棄
+      if(!isset($_SESSION)){//sessionsyuuseituika
       session_start();
+      }
+      $_SESSION['orderyobistock'] = array();
       $_SESSION['orderyobistock'] = $arrOrderToSupplier;
 /*
       echo "<pre>";

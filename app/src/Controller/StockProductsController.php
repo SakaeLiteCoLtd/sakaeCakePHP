@@ -316,8 +316,11 @@ class StockProductsController extends AppController
 
 		public function confirm()
 	 {
-		 $this->request->session()->destroy(); // セッションの破棄
+	//	 $this->request->session()->destroy(); // セッションの破棄
+		 if(!isset($_SESSION)){//sessionsyuuseituika
 		 session_start();
+		 }
+		 $_SESSION['tourokustock'] = array();
 
 		 $StockProducts = $this->StockProducts->newEntity();
 		 $this->set('StockProducts',$StockProducts);

@@ -160,7 +160,7 @@ class ZensukensasController extends AppController
            if ($this->ResultZensuHeads->saveMany($ResultZensuHead)) {
 
              //insert 旧DB
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('result_zensu_head');
              $table->setConnection($connection);
 
@@ -208,7 +208,7 @@ class ZensukensasController extends AppController
               if ($this->ResultZensuHeads->saveMany($ResultZensuHead)) {
 
                 //insert 旧DB
-                $connection = ConnectionManager::get('DB_ikou_test');
+                $connection = ConnectionManager::get('sakaeMotoDB');
                 $table = TableRegistry::get('result_zensu_head');
                 $table->setConnection($connection);
 
@@ -489,13 +489,13 @@ class ZensukensasController extends AppController
        //旧DBのresult_zensu_head_idが必要
        //新DBの$result_zensu_head_idのデータと同じ$product_code、$lot_num、created_staff、'datetime_finish IS' => Nullのものを拾ってくる
 
-       $connection = ConnectionManager::get('DB_ikou_test');
+       $connection = ConnectionManager::get('sakaeMotoDB');
        $table = TableRegistry::get('result_zensu_head');
        $table->setConnection($connection);
 
        $sql = "SELECT id FROM result_zensu_head".
              " where product_id ='".$product_code."' and lot_num = '".$lot_num."' and emp_id = '".$staff_code."' and datetime_finish IS NULL";
-       $connection = ConnectionManager::get('DB_ikou_test');
+       $connection = ConnectionManager::get('sakaeMotoDB');
        $result_zensu_head_id_moto = $connection->execute($sql)->fetchAll('assoc');
 /*
        echo "<pre>";
@@ -546,7 +546,7 @@ class ZensukensasController extends AppController
        $this->set('data',$data);
 /*
        echo "<pre>";
-       print_r($_SESSION);
+       print_r($_SESSION['zensufooder']);
        echo "</pre>";
 */
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
@@ -572,7 +572,7 @@ class ZensukensasController extends AppController
            if ($this->ResultZensuFooders->saveMany($ResultZensuFooders)) {//saveManyで一括登録
 
              //insert 旧DB
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('result_zensu_fooder');
              $table->setConnection($connection);
 
@@ -595,7 +595,7 @@ class ZensukensasController extends AppController
              )){
 
                //insert 旧DB
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('result_zensu_head');
                $table->setConnection($connection);
 
@@ -632,7 +632,7 @@ class ZensukensasController extends AppController
                  )){
 
                    //insert 旧DB
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('check_lots');
                    $table->setConnection($connection);
 
@@ -757,7 +757,7 @@ class ZensukensasController extends AppController
                         ['id'  => $arrCheckLotoya[$bangou_arr_oya_lot]['id']]);
 
                         //insert 旧DB
-                        $connection = ConnectionManager::get('DB_ikou_test');
+                        $connection = ConnectionManager::get('sakaeMotoDB');
                         $table = TableRegistry::get('check_lots');
                         $table->setConnection($connection);
 
@@ -866,11 +866,6 @@ class ZensukensasController extends AppController
 
      public function zensukensakuichiran()
      {
-
-       echo "<pre>";
-       print_r("1  ".date('Y-m-d H:i:s'));
-       echo "</pre>";
-
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
        $data = $this->request->getData();
@@ -902,6 +897,7 @@ class ZensukensasController extends AppController
            $Kensakuday = "：　ラベル発行年月日";
            $this->set('Kensakuday',$Kensakuday);
          }
+
 
          if(isset($data['datesta']['year'])){
            $datesta = $data['datesta']['year']."-".$data['datesta']['month']."-".$data['datesta']['day']." ".$data['datesta']['hour'].":".$data['datesta']['minute'];
@@ -953,32 +949,18 @@ class ZensukensasController extends AppController
 
          $arrFooder =  array();
          $arrZensuHeads =  array();
-
-    //     $ResultZensuHeads = $this->ResultZensuHeads->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
-    //      ->where(['delete_flag' => '0','datetime_start >=' => $datesta, 'datetime_start <=' => $datefin])->toArray();
-
-          $ResultZensuHeads = $this->ResultZensuFooders->find()
-           ->contain(["ResultZensuHeads"])//join
-           ->select(['result_zensu_head_id', 'cont_rejection_id',  'amount',
-            'ResultZensuHeads.product_code', 'ResultZensuHeads.lot_num',  'ResultZensuHeads.staff_id',
-             'ResultZensuHeads.datetime_start', 'ResultZensuHeads.datetime_finish', 'ResultZensuHeads.delete_flag'])
-           ->where(['ResultZensuHeads.delete_flag' => '0','datetime_start >=' => $datesta, 'datetime_start <=' => $datefin])->toArray();
-
+         $ResultZensuHeads = $this->ResultZensuHeads->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
+          ->where(['delete_flag' => '0','datetime_start >=' => $datesta, 'datetime_start <=' => $datefin])->toArray();
 
           if(isset($ResultZensuHeads[0])){
 
             for($j=0; $j<count($ResultZensuHeads); $j++){
 
-        //      $arrZensuHeads[] = $ResultZensuHeads[$j]->id;
-              $arrZensuHeads[] = $ResultZensuHeads[$j]->result_zensu_head_id;
+              $arrZensuHeads[] = $ResultZensuHeads[$j]->id;
 
             }
 
           }
-
-          echo "<pre>";
-          print_r(count($ResultZensuHeads)."  ".date('Y-m-d H:i:s'));
-          echo "</pre>";
 
           $arrZensuproduct =  array();
          if(!empty($data['product'])){//productの入力がある場合
@@ -1009,6 +991,7 @@ class ZensukensasController extends AppController
 
          }
 
+
          $arrZensustaff =  array();
          if($data['staff'] !== "0"){//staffの入力がある場合
 
@@ -1038,16 +1021,11 @@ class ZensukensasController extends AppController
 
          }
 
-         echo "<pre>";
-         print_r(count($arrZensuHeads)."  ".date('Y-m-d H:i:s'));
-         echo "</pre>";
-
          if(isset($arrZensuHeads[0])){
 
            for($j=0; $j<count($arrZensuHeads); $j++){
 
              ${"ResultZensuFooders".$j} = $this->ResultZensuFooders->find()
-              ->select(['id'])
               ->where(['result_zensu_head_id' => $arrZensuHeads[$j],'delete_flag' => '0'])->toArray();
 
               if(isset($arrZensuHeads[0])){
@@ -1063,10 +1041,6 @@ class ZensukensasController extends AppController
            }
 
          }
-
-         echo "<pre>";
-         print_r("1-9  ".date('Y-m-d H:i:s'));
-         echo "</pre>";
 
          $arrZensuContRejection =  array();
          if($data['ContRejection'] !== "11111"){//ContRejectionの入力がある場合
@@ -1098,9 +1072,6 @@ class ZensukensasController extends AppController
 
          }
 
-         echo "<pre>";
-         print_r("1-10  ".date('Y-m-d H:i:s'));
-         echo "</pre>";
 
          $arrZensuamount =  array();
          if(!empty($data['amount'])){//amountの入力がある場合
@@ -1132,9 +1103,6 @@ class ZensukensasController extends AppController
 
          }
 
-         echo "<pre>";
-         print_r("1-11  ".date('Y-m-d H:i:s'));
-         echo "</pre>";
 
          $arrZensucheck =  array();
          if($data['check'] == 1){//checkがある場合
@@ -1196,27 +1164,14 @@ class ZensukensasController extends AppController
            $arrFooder = $arrFooder;
 
          }
-         echo "<pre>";
-         print_r("1-12  ".date('Y-m-d H:i:s'));
-         echo "</pre>";
 
          $arrFooder = array_values($arrFooder);//連番振り直し
-/*
-         echo "<pre>";
-         print_r($arrFooder);
-         echo "</pre>";
-*/
+
         //セットする
         $arrichiran =  array();
-
-        echo "<pre>";
-        print_r("2  ".date('Y-m-d H:i:s'));
-        echo "</pre>";
-
          if(isset($arrFooder[0])){
            for($j=0; $j<count($arrFooder); $j++){
              $ResultZensuFooders = $this->ResultZensuFooders->find()
-             ->select(['id', 'result_zensu_head_id','amount', 'bik', 'cont_rejection_id'])
               ->where(['id' => $arrFooder[$j],'delete_flag' => '0'])->toArray();
 
               $amount = $ResultZensuFooders[0]->amount;
@@ -1266,10 +1221,6 @@ class ZensukensasController extends AppController
 
          }
 
-         echo "<pre>";
-         print_r("3  ".date('Y-m-d H:i:s'));
-         echo "</pre>";
-
          $this->set('arrichiran',$arrichiran);
 
        if(isset($data['product_sort'])){//並び変え
@@ -1309,15 +1260,11 @@ class ZensukensasController extends AppController
        echo "</pre>";
 */
 
-echo "<pre>";
-print_r("4  ".date('Y-m-d H:i:s'));
-echo "</pre>";
-
         if(isset($data['csv'])){//csv出力
         //    $fp = fopen('zensu_csv/zenken_test.csv', 'w');
             $fp = fopen('/home/centosuser/zensu_csv/zenken_test.csv', 'w');
               foreach ($arrichiran_csv as $line) {
-        //        $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+          //      $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
                 fputcsv($fp, $line);
               }
               fclose($fp);

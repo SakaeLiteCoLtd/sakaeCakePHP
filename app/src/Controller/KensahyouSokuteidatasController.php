@@ -610,18 +610,48 @@ class KensahyouSokuteidatasController  extends AppController
 
     if(isset($data["value"])){
       $product_code = $data["name"];
-      $this->set('product_code',$product_code);//部品番号の表示のため1行上の$product_codeをctpで使えるようにセット
+      $this->set('product_code',$product_code);
       $kadouseikeiId = $data["value"];
       $this->set('kadouseikeiId',$kadouseikeiId);//セット
+
+      if(strpos($kadouseikeiId,'_') !== false){
+        $arr_id = explode("_",$data["value"]);
+      }else{
+        $arr_id = explode("=",$data["value"]);
+      }
+
+      if(!isset($arr_id[1])){
+        $KadouSeikeis = $this->KadouSeikeis->find()->where(['id' => $kadouseikeiId])->toArray();
+        $KadouSeikeisdaymoto = $KadouSeikeis[0]->starting_tm->format('Y-m-d_H_:i:s');
+        list($a, $h, $c) = explode('_', $KadouSeikeisdaymoto);
+        if(8 <= intval($h) && intval($h) <= 23){//開始時間が８時～２３時の場合はその日がmanu_date
+          $manu_date = $KadouSeikeis[0]->starting_tm->format('Y-m-d');
+        }else{//開始時間が８時～２３時でない場合はその前日がmanu_date
+          $KariKadouSeikeisdayymd = $KadouSeikeis[0]->starting_tm->format('Y-m-d');
+          $manu_date = date("Y-m-d", strtotime("-1 day", strtotime($KariKadouSeikeisdayymd)));
+        }
+        $this->set('manu_date',$manu_date);//セット
+
+      }else{
+
+        $manu_date = date("Y-m-d");
+        $this->set('manu_date',$manu_date);//セット
+
+      }
+
     }elseif(isset($data["name"])){
       $product_code = $data["name"];
       $kadouseikeiId = "aaa";
       $this->set('kadouseikeiId',$kadouseikeiId);//セット
+      $manu_date = date("Y-m-d");
+      $this->set('manu_date',$manu_date);//セット
     }else{
       $data = $this->request->getData();
       $product_code = $data["product_code"];
       $kadouseikeiId = "aaa";
       $this->set('kadouseikeiId',$kadouseikeiId);//セット
+      $manu_date = date("Y-m-d");
+      $this->set('manu_date',$manu_date);//セット
     }
 
     $this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット

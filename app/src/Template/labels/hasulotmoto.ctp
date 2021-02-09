@@ -66,7 +66,7 @@
 <br><br><br><br><br><br><br>
 <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr bgcolor="#E6FFFF" >
-  <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="left"><?= $this->Form->submit(__('行追加'), array('name' => 'tuika')); ?></div></td>
+  <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="left"><?= $this->Form->submit(__('行追加'), array('name' => 'tuika', 'onsubmit'=>'false')); ?></div></td>
   <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="left"><?= $this->Form->submit(__('行削除'), array('name' => 'sakujo')); ?></div></td>
   <td align="left" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="left"><?= $this->Form->submit(__('数量登録'), array('name' => 'suuryou')); ?></div></td>
   <td width="250" colspan="40" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>

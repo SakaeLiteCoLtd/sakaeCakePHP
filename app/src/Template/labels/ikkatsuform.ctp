@@ -77,15 +77,24 @@ if(null == ($this->request->getData("11gouki")) && null == ($this->request->getD
     if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
     $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-    if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
-      $torisu = $Product[0]->torisu;
-      $cycle = $Product[0]->cycle;
+    if(isset($Product[0])){
+      if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
+        $torisu = $Product[0]->torisu;
+        $cycle = $Product[0]->cycle;
+      }else{
+        $cycle = 1;
+        $torisu = 0;
+      }
     }else{
       $cycle = 1;
       $torisu = 0;
     }
     $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-    $irisu = $Konpou[0]->irisu;
+    if(isset($Konpou[0])){
+      $irisu = $Konpou[0]->irisu;
+    }else{
+      $irisu = 0;
+    }
     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
     if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
@@ -216,15 +225,24 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
     if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
     $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-    if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
-      $torisu = $Product[0]->torisu;
-      $cycle = $Product[0]->cycle;
+    if(isset($Product[0])){
+      if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
+        $torisu = $Product[0]->torisu;
+        $cycle = $Product[0]->cycle;
+      }else{
+        $cycle = 1;
+        $torisu = 0;
+      }
     }else{
       $cycle = 1;
       $torisu = 0;
     }
     $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-    $irisu = $Konpou[0]->irisu;
+    if(isset($Konpou[0])){
+      $irisu = $Konpou[0]->irisu;
+    }else{
+      $irisu = 0;
+    }
     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
     if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
@@ -354,15 +372,24 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
     if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
     ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
     $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-    if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
-      $torisu = $Product[0]->torisu;
-      $cycle = $Product[0]->cycle;
+    if(isset($Product[0])){
+      if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
+        $torisu = $Product[0]->torisu;
+        $cycle = $Product[0]->cycle;
+      }else{
+        $cycle = 1;
+        $torisu = 0;
+      }
     }else{
       $cycle = 1;
       $torisu = 0;
     }
     $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-    $irisu = $Konpou[0]->irisu;
+    if(isset($Konpou[0])){
+      $irisu = $Konpou[0]->irisu;
+    }else{
+      $irisu = 0;
+    }
     ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
     ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
     if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
@@ -493,15 +520,24 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
      if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
      ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
      $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
-       $torisu = $Product[0]->torisu;
-       $cycle = $Product[0]->cycle;
+     if(isset($Product[0])){
+       if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
+         $torisu = $Product[0]->torisu;
+         $cycle = $Product[0]->cycle;
+       }else{
+         $cycle = 1;
+         $torisu = 0;
+       }
      }else{
        $cycle = 1;
        $torisu = 0;
      }
      $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     $irisu = $Konpou[0]->irisu;
+     if(isset($Konpou[0])){
+       $irisu = $Konpou[0]->irisu;
+     }else{
+       $irisu = 0;
+     }
      ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
      ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
      if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
@@ -632,15 +668,24 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
      if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
      ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
      $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
-       $torisu = $Product[0]->torisu;
-       $cycle = $Product[0]->cycle;
+     if(isset($Product[0])){
+       if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
+         $torisu = $Product[0]->torisu;
+         $cycle = $Product[0]->cycle;
+       }else{
+         $cycle = 1;
+         $torisu = 0;
+       }
      }else{
        $cycle = 1;
        $torisu = 0;
      }
      $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     $irisu = $Konpou[0]->irisu;
+     if(isset($Konpou[0])){
+       $irisu = $Konpou[0]->irisu;
+     }else{
+       $irisu = 0;
+     }
      ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
      ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
      if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
@@ -771,15 +816,24 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
      if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
      ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
      $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
-       $torisu = $Product[0]->torisu;
-       $cycle = $Product[0]->cycle;
+     if(isset($Product[0])){
+       if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
+         $torisu = $Product[0]->torisu;
+         $cycle = $Product[0]->cycle;
+       }else{
+         $cycle = 1;
+         $torisu = 0;
+       }
      }else{
        $cycle = 1;
        $torisu = 0;
      }
      $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     $irisu = $Konpou[0]->irisu;
+     if(isset($Konpou[0])){
+       $irisu = $Konpou[0]->irisu;
+     }else{
+       $irisu = 0;
+     }
      ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
      ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
      if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
@@ -910,15 +964,24 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
      if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
      ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
      $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
-       $torisu = $Product[0]->torisu;
-       $cycle = $Product[0]->cycle;
+     if(isset($Product[0])){
+       if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
+         $torisu = $Product[0]->torisu;
+         $cycle = $Product[0]->cycle;
+       }else{
+         $cycle = 1;
+         $torisu = 0;
+       }
      }else{
        $cycle = 1;
        $torisu = 0;
      }
      $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     $irisu = $Konpou[0]->irisu;
+     if(isset($Konpou[0])){
+       $irisu = $Konpou[0]->irisu;
+     }else{
+       $irisu = 0;
+     }
      ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
      ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
      if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
@@ -1049,15 +1112,24 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
      if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
      ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
      $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
-       $torisu = $Product[0]->torisu;
-       $cycle = $Product[0]->cycle;
+     if(isset($Product[0])){
+       if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
+         $torisu = $Product[0]->torisu;
+         $cycle = $Product[0]->cycle;
+       }else{
+         $cycle = 1;
+         $torisu = 0;
+       }
      }else{
        $cycle = 1;
        $torisu = 0;
      }
      $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     $irisu = $Konpou[0]->irisu;
+     if(isset($Konpou[0])){
+       $irisu = $Konpou[0]->irisu;
+     }else{
+       $irisu = 0;
+     }
      ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
      ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
      if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する
@@ -1188,15 +1260,24 @@ if(null == ($this->request->getData("1gouki")) && null == ($this->request->getDa
      if(null == ($this->request->getData('check'.$j.$i))){//削除のチェックがついていなかった場合
      ${"product_code".$i} = ${"arrP".$j.$i}['product_code'];
      $Product = $this->Products->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
-       $torisu = $Product[0]->torisu;
-       $cycle = $Product[0]->cycle;
+     if(isset($Product[0])){
+       if(($Product[0]->torisu) > 0 && ($Product[0]->cycle) > 0){
+         $torisu = $Product[0]->torisu;
+         $cycle = $Product[0]->cycle;
+       }else{
+         $cycle = 1;
+         $torisu = 0;
+       }
      }else{
        $cycle = 1;
        $torisu = 0;
      }
      $Konpou = $this->Konpous->find()->where(['product_code' => ${"product_code".$i}])->toArray();
-     $irisu = $Konpou[0]->irisu;
+     if(isset($Konpou[0])){
+       $irisu = $Konpou[0]->irisu;
+     }else{
+       $irisu = 0;
+     }
      ${"hyoujistarting_tm".$i} = substr(${"arrP".$j.$i}['starting_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['starting_tm'], 11, 5);
      ${"hyoujifinishing_tm".$i} = substr(${"arrP".$j.$i}['finishing_tm'], 0, 10)."T".substr(${"arrP".$j.$i}['finishing_tm'], 11, 5);
      if($i == 1){//i=1のときはそのまま、i>1のときは時間を-1する

@@ -65,13 +65,13 @@ class UsersController extends AppController
 
     public function logout()
     {
-			$this->request->session()->destroy(); // セッションの破棄
+	//		$this->request->session()->destroy(); // セッションの破棄
 			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
     }
 
     public function index()
     {
-			$this->request->session()->destroy(); // セッションの破棄
+	//		$this->request->session()->destroy(); // セッションの破棄
 
 			$this->set('users', $this->Users->find('all'));//テーブルから'delete_flag' => '0'となるものを見つける※ページネーションに条件を追加してある
 			$this->set('users', $this->paginate());//定義したページネーションを使用
@@ -102,6 +102,11 @@ class UsersController extends AppController
 
      public function confirm()
     {
+			if(!isset($_SESSION)){//sessionsyuuseituika
+      session_start();
+      }
+      $_SESSION['userdata'] = array();
+
 			$user = $this->Users->newEntity();//newentityに$userという名前を付ける
 			$this->set('user',$user);//1行上の$userをctpで使えるようにセット
 

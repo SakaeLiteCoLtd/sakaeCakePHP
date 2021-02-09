@@ -5,6 +5,7 @@
  $htmlzensusubs = $htmlzensumenu->zensussubmenus();
  $htmlzensustartends = $htmlzensumenu->zensustartend();
  ?>
+
  <hr size="5" style="margin: 0.5rem">
  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
  <?php
@@ -30,10 +31,23 @@
 </table>
     </fieldset>
 
+
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-    <tr>
-    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('開始', array('name' => 'login')); ?></div></td>
+      
+<?php
+/*
+  <tr>
+   <form method="post" onclick=”submit();”>
+    <td style="border-style: none;"><div align="center"><?= $this->Form->button('開始', array('name' => 'login')); ?></div></td>
+   </form>
   </tr>
+*/
+?>
+
+  <form onsubmit="return false;">
+    <button type="submit" onclick="submit();">開始</button>
+  </form>
+
   </table>
 <br>
     <?= $this->Form->end() ?>

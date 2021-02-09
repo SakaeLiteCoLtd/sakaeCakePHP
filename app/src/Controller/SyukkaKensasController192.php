@@ -29,6 +29,7 @@ class SyukkaKensasController extends AppController {
      $this->KouteiKensahyouHeads = TableRegistry::get('kouteiKensahyouHeads');
      $this->FileCopyChecks = TableRegistry::get('fileCopyChecks');
      $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');
+     $this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
     }
 
     public function index()
@@ -598,7 +599,7 @@ class SyukkaKensasController extends AppController {
 
     public function typeimtaiouform()//IMtaiou
     {
-      $this->request->session()->destroy();// セッションの破棄
+    //  $this->request->session()->destroy();// セッションの破棄
 
       $data = $this->request->query();
 
@@ -650,6 +651,11 @@ class SyukkaKensasController extends AppController {
 
     public function imtaiouconfirm()//IMtaiou
     {
+      if(!isset($_SESSION)){//sessionsyuuseituika
+      session_start();
+      }
+      $_SESSION['kikakudata'] = array();
+
      $data = $this->request->getData();
      $product_code = $data["product_code"];
 
@@ -978,13 +984,13 @@ class SyukkaKensasController extends AppController {
 
     public function indexhome()//取り込み画面
     {
-      $this->request->session()->destroy(); // セッションの破棄
+    //  $this->request->session()->destroy(); // セッションの破棄
 
       $imKikakus = $this->ImKikakus->newEntity();
       $this->set('imKikakus', $imKikakus);
 
       $today = date("Y-m-d");
-
+/*
       $connection = ConnectionManager::get('sakaeMotoDB');//旧DBを参照
       $table = TableRegistry::get('schedule_koutei');
       $table->setConnection($connection);
@@ -1033,8 +1039,7 @@ class SyukkaKensasController extends AppController {
           $connection->rollback();//トランザクション9
         }//トランザクション10
       }
-
-
+*/
       $KadouSeikeiDatab = $this->KadouSeikeis->find()->where(['present_kensahyou' => 0])->order(["product_code"=>"ASC"])->toArray();//'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
 
       $arrProduct = array();
@@ -1099,7 +1104,7 @@ class SyukkaKensasController extends AppController {
       $countnamed = 1;//昨日までのデータをカウントする変数
       $this->set('countnamed',$countnamed);//セット
 
-      $ScheduleKouteisDatac = $this->ScheduleKouteis->find()->where(['datetime >=' => $today." 8:00", 'datetime <=' => $today."23:59", 'present_kensahyou' => 0])->order(["datetime"=>"desc"])->toArray();
+      $ScheduleKouteisDatac = $this->ScheduleKouteis->find()->where(['datetime >=' => $today." 8:00", 'datetime <=' => $today."23:59", 'present_kensahyou' => 0, 'delete_flag' => 0])->order(["datetime"=>"desc"])->toArray();
 
       for($i=0; $i<count($ScheduleKouteisDatac); $i++){//既に検査済みの場合は'present_kensahyou' => 1に更新する
 
@@ -1158,10 +1163,25 @@ class SyukkaKensasController extends AppController {
               $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});
 
               ${"KadouSeikeifinishing_tm".$countnamec} = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d H:i:s');
-              ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
+      //        ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
 
               $this->set('product_codec'.$countnamec,${"product_codec".$countnamec});
               $this->set('product_namec'.$countnamec,${"product_namec".$countnamec});
+//
+              $ScheduleKouteisDatacmoto = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d_H_:i:s');
+
+              list($a, $h, $c) = explode('_', $ScheduleKouteisDatacmoto);
+              if(8 <= intval($h) && intval($h) <= 23){//開始時間が８時～２３時の場合はその日がmanu_date
+
+                ${"KadouSeikeifinishing_datec".$countnamec} = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d');
+
+              }else{//開始時間が８時～２３時でない場合はその前日がmanu_date
+
+                $ScheduleKouteisDatacdayymd = $ScheduleKouteisDatac[$i]->datetime->format('Y-m-d');
+                ${"KadouSeikeifinishing_datec".$countnamec} = date("Y-m-d", strtotime("-1 day", strtotime($ScheduleKouteisDatacdayymd)));
+
+              }
+//
               $this->set('KadouSeikeifinishing_datec'.$countnamec,${"KadouSeikeifinishing_datec".$countnamec});
 
               $session = $this->request->session();
@@ -1176,7 +1196,6 @@ class SyukkaKensasController extends AppController {
           }
 
       }
-
 
       $KadouSeikeiDatac = $this->KadouSeikeis->find()->where(['present_kensahyou' => 0])->toArray();//'present_kensahyou' => 0となるデータをKadouSeikeisテーブルから配列で取得
       for($i=1; $i<=count($KadouSeikeiDatac); $i++){//KadouSeikeisテーブルの'present_kensahyou' => 0のデータに対して
@@ -1262,8 +1281,26 @@ class SyukkaKensasController extends AppController {
                 ${"product_named".$countnamed} = "";//配列の0番目（0番目しかない）のcustomer_codeとnameをつなげたものに$Productと名前を付ける
                 $this->set('product_named'.$countnamed,${"product_named".$countnamed});//セット
               }
-              ${"KadouSeikeifinishing_tm".$countnamed} = $KadouSeikeiDatac[$i-1]->finishing_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
-              ${"KadouSeikeifinishing_dated".$countnamed} = substr(${"KadouSeikeifinishing_tm".$countnamed},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},8,2);//finishing_tmの年月日を取得
+
+
+              ${"KadouSeikeifinishing_tm".$countnamed} = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
+        //      ${"KadouSeikeifinishing_dated".$countnamed} = substr(${"KadouSeikeifinishing_tm".$countnamed},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamed},8,2);//finishing_tmの年月日を取得
+
+//
+              $KadouSeikeiDatacmoto = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d_H_:i:s');
+
+              list($a, $h, $c) = explode('_', $KadouSeikeiDatacmoto);
+              if(8 <= intval($h) && intval($h) <= 23){//開始時間が８時～２３時の場合はその日がmanu_date
+
+                ${"KadouSeikeifinishing_dated".$countnamed} = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d');
+
+              }else{//開始時間が８時～２３時でない場合はその前日がmanu_date
+
+                $KadouSeikeiDatacdayymd = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d');
+                ${"KadouSeikeifinishing_dated".$countnamed} = date("Y-m-d", strtotime("-1 day", strtotime($KadouSeikeiDatacdayymd)));
+
+              }
+//
 
               $this->set('product_coded'.$countnamed,${"product_coded".$countnamed});//セット
 
@@ -1278,13 +1315,177 @@ class SyukkaKensasController extends AppController {
           }
       }
 
+      $KariKadouSeikeiData = $this->KariKadouSeikeis->find()->where(['present_kensahyou' => 0])->order(["product_code"=>"ASC"])->toArray();
+
+      for($j=0; $j<count($KariKadouSeikeiData); $j++){
+
+        $KadouSeikeicheck = $this->KadouSeikeis->find()->where(['starting_tm <' => $KariKadouSeikeiData[$j]["starting_tm"], 'product_code' => $KariKadouSeikeiData[$j]["product_code"]])->order(["starting_tm"=>"desc"])->toArray();
+
+        $zenkaihikaku = strtotime($KariKadouSeikeiData[$j]["starting_tm"]) - strtotime($KadouSeikeicheck[0]["starting_tm"]);
+
+        if($zenkaihikaku <= 86400){//この場合'present_kensahyou' => 1にする
+
+          $KariKadouSeikeis = $this->KariKadouSeikeis->patchEntity($this->KariKadouSeikeis->newEntity(), $this->request->getData());
+          $connection = ConnectionManager::get('default');//トランザクション1
+          // トランザクション開始2
+          $connection->begin();//トランザクション3
+          try {//トランザクション4
+            if ($this->KariKadouSeikeis->updateAll(//検査終了時間の更新
+              ['present_kensahyou' => 1, 'updated_at' => date('Y-m-d H:i:s')],
+              ['id'  => $KariKadouSeikeiData[$j]["id"]]
+            )){
+
+                $connection = ConnectionManager::get('sakaeMotoDB');
+                $table = TableRegistry::get('kari_kadou_seikei');
+                $table->setConnection($connection);
+
+                $num = 1;
+                $updater = "UPDATE kari_kadou_seikei set present_kensahyou ='".$num."'
+                 where product_id ='".$KariKadouSeikeiData[$j]['product_code']."' and seikeiki_id ='".$KariKadouSeikeiData[$j]['seikeiki_code']."' and starting_tm ='".$KariKadouSeikeiData[$j]['starting_tm']."'";
+                 $connection->execute($updater);
+
+                $connection = ConnectionManager::get('default');//新DBに戻る
+                $table->setConnection($connection);
+
+                $connection->commit();// コミット5
+
+              } else {
+                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+              }
+
+            } catch (Exception $e) {//トランザクション7
+            //ロールバック8
+              $connection->rollback();//トランザクション9
+            }//トランザクション10
+
+        }else{
+
+          $KariKadouSeikeisId = $KariKadouSeikeiData[$j]->id;
+          $KariKadouSeikeispro = $KariKadouSeikeiData[$j]->product_code;
+          $KariKadouSeikeisdaymoto = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d_H_:i:s');
+
+          list($a, $h, $c) = explode('_', $KariKadouSeikeisdaymoto);
+          if(8 <= intval($h) && intval($h) <= 23){//開始時間が８時～２３時の場合はその日がmanu_date
+
+            $KariKadouSeikeisday = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d');
+
+          }else{//開始時間が８時～２３時でない場合はその前日がmanu_date
+
+            $KariKadouSeikeisdayymd = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d');
+            $KariKadouSeikeisday = date("Y-m-d", strtotime("-1 day", strtotime($KariKadouSeikeisdayymd)));
+
+          }
+
+          $KariKensahyouSokuteidatasData = $this->KensahyouSokuteidatas->find()->where(['product_code' => $KariKadouSeikeispro, 'manu_date' => $KariKadouSeikeisday])->order(["product_code"=>"desc"])->toArray();
+
+          if(isset($KariKensahyouSokuteidatasData[0])){//検査済みの場合は'present_kensahyou' => 1
+
+            $KadouSeikeis = $this->KariKadouSeikeis->patchEntity($this->KariKadouSeikeis->newEntity(), $this->request->getData());
+            $connection = ConnectionManager::get('default');//トランザクション1
+            // トランザクション開始2
+            $connection->begin();//トランザクション3
+            try {//トランザクション4
+              if ($this->KariKadouSeikeis->updateAll(//検査終了時間の更新
+                ['present_kensahyou' => 1, 'updated_at' => date('Y-m-d H:i:s')],
+                ['id'  => $KariKadouSeikeiData[$j]["id"]]
+              )){
+
+                  $connection = ConnectionManager::get('sakaeMotoDB');
+                  $table = TableRegistry::get('kari_kadou_seikei');
+                  $table->setConnection($connection);
+
+                  $num = 1;
+                  $KadouSeikeispro = $KariKadouSeikeiData[$j]->product_code;
+                  $KadouSeikeisseikeiki = $KariKadouSeikeiData[$j]->seikeiki_code;
+                  $KadouSeikeisstartingtm = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d H:i:s');
+  /*
+                  echo "<pre>";
+                  print_r($KadouSeikeisstartingtm);
+                  echo "</pre>";
+  */
+                  $updater = "UPDATE kari_kadou_seikei set present_kensahyou ='".$num."'
+                   where product_id ='".$KadouSeikeispro."' and seikeiki_id ='".$KadouSeikeisseikeiki."' and starting_tm ='".$KadouSeikeisstartingtm."'";
+                   $connection->execute($updater);
+
+                  $connection = ConnectionManager::get('default');//新DBに戻る
+                  $table->setConnection($connection);
+
+                  $connection->commit();// コミット5
+
+                } else {
+                  throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                }
+
+              } catch (Exception $e) {//トランザクション7
+              //ロールバック8
+                $connection->rollback();//トランザクション9
+              }//トランザクション10
+
+            }else{//検査していない場合
+
+            ${"KadouSeikeifinishing_tm".$j} = $KariKadouSeikeiData[$j]->finishing_tm->format('Y-m-d H:i:s');
+            ${"KadouSeikeifinishing_date".$j} = substr(${"KadouSeikeifinishing_tm".$j},0,4)."-".substr(${"KadouSeikeifinishing_tm".$j},5,2)."-".substr(${"KadouSeikeifinishing_tm".$j},8,2);//finishing_tmの年月日を取得
+
+              if(substr(${"KadouSeikeifinishing_date".$j},0,10) === substr($today,0,10)){//今日のデータの場合は表示しない
+                $countnamec = $countnamec;
+              }else{//今日ではないデータの場合
+                ${"product_codec".$countnamec} = $KariKadouSeikeiData[$j]->product_code;
+                ${"ProductDatac".$countnamec} = $this->Products->find()->where(['product_code' => ${"product_codec".$countnamec}])->toArray();
+                if(isset(${"ProductDatac".$countnamec}[0])){
+                  ${"product_namec".$countnamec} = ${"ProductDatac".$countnamec}[0]->product_name;
+                }else{
+                  ${"product_namec".$countnamec} = "";
+                }
+
+                ${"KadouSeikeiidc".$countnamec} = "kari=".$KariKadouSeikeiData[$j]->id;
+
+                $this->set('KadouSeikeiidc'.$countnamec,${"KadouSeikeiidc".$countnamec});
+
+                ${"KadouSeikeifinishing_tm".$countnamec} = $KariKadouSeikeiData[$j]->finishing_tm->format('Y-m-d H:i:s');
+    //            ${"KadouSeikeifinishing_datec".$countnamec} = substr(${"KadouSeikeifinishing_tm".$countnamec},0,4)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},5,2)."-".substr(${"KadouSeikeifinishing_tm".$countnamec},8,2);
+
+                $this->set('product_codec'.$countnamec,${"product_codec".$countnamec});
+                $this->set('product_namec'.$countnamec,${"product_namec".$countnamec});
+
+//
+                $KadouSeikeisdaymoto = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d_H_:i:s');
+
+                list($a, $h, $c) = explode('_', $KadouSeikeisdaymoto);
+                if(8 <= intval($h) && intval($h) <= 23){//開始時間が８時～２３時の場合はその日がmanu_date
+
+                  ${"KadouSeikeifinishing_datec".$countnamec} = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d');
+
+                }else{//開始時間が８時～２３時でない場合はその前日がmanu_date
+
+                  $KariKadouSeikeisdayymd = $KariKadouSeikeiData[$j]->starting_tm->format('Y-m-d');
+                  ${"KadouSeikeifinishing_datec".$countnamec} = date("Y-m-d", strtotime("-1 day", strtotime($KariKadouSeikeisdayymd)));
+
+                }
+//
+                $this->set('KadouSeikeifinishing_datec'.$countnamec,${"KadouSeikeifinishing_datec".$countnamec});
+
+                $session = $this->request->session();
+                $session->write('product_codec', ${"product_codec".$countnamec});
+                $session->write('product_namec', ${"product_namec".$countnamec});
+
+                $countnamec += 1;//ファイル名の日付を識別するためカウント
+                $this->set('countnamec',$countnamec);//セット
+
+              }
+
+            }
+
+        }
+
+      }
+
     }
 
      public function torikomi()//取り込み（画面なし自動で次のページへ）
     {
 
-  //    $dirName = 'data_IM測定/';//ローカル//IM測定器ナンバー１のフォルダ
-      $dirName = '/data/share/syukkaIM/data_IMsokutei/';//192//IM測定器ナンバー１のフォルダ
+      $dirName = 'data_IM測定/';//ローカル//IM測定器ナンバー１のフォルダ
+  //    $dirName = '/data/share/syukkaIM/data_IM測定/';//192//IM測定器ナンバー１のフォルダ
       $countname = 0;//ファイル名のかぶりを防ぐため
 
       if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
@@ -1306,18 +1507,18 @@ class SyukkaKensasController extends AppController {
                                if($file != "." && $file != ".."){//ファイルなら
                                 if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
 
-                          //        $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
-                                  $fp = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, "r");//kesuyatu
+                                  $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
+                          //        $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
 
                                    if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
                                     $countname += 1;//ファイル名がかぶらないようにカウントしておく
 
-                          //          $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//ローカル
-                                    $fp = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, "r");//192
+                                    $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");//ローカル
+                          //          $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");//192
                               			$this->set('fp',$fp);
 
-                          //          $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
-                                    $fpcount = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, 'r' );
+                                    $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
+                          //          $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
                               			for( $count = 0; fgets( $fpcount ); $count++ );
 
                               			$arrFp = array();//空の配列を作る
@@ -1535,8 +1736,8 @@ class SyukkaKensasController extends AppController {
                                   }
 
 
-                          //        $output_dir = 'backupData_IM測定/'.$folder;
-                                  $output_dir = '/data/share/syukkaIM/backupData_IMsokutei/'.$folder;
+                                  $output_dir = 'backupData_IM測定/'.$folder;
+                          //        $output_dir = '/data/share/syukkaIM/backupData_IM測定/'.$folder;
 
                                   if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
                                    if (mkdir($output_dir)) {
@@ -1555,10 +1756,10 @@ class SyukkaKensasController extends AppController {
                                         $this->FileCopyChecks->save($fileCopyCheck);
 
                                         fclose($fp);
-                            //            $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");
-                                        $fp = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, "r");
-                            //            $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
-                                        $fpcount = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, 'r' );
+                                        $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");
+                            //            $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");
+                                        $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
+                            //            $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
                                   			for( $count = 0; fgets( $fpcount ); $count++ );
 
                                   			$arrFpmoto = array();//空の配列を作る
@@ -1638,10 +1839,10 @@ class SyukkaKensasController extends AppController {
                                       $this->FileCopyChecks->save($fileCopyCheck);//FileCopyChecksテーブルに登録
 
                                       fclose($fp);
-                            //          $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");
-                                      $fp = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, "r");
-                            //          $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
-                                      $fpcount = fopen('/data/share/syukkaIM/data_IMsokutei/'.$folder.'/'.$file, 'r' );
+                                      $fp = fopen('data_IM測定/'.$folder.'/'.$file, "r");
+                            //          $fp = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, "r");
+                                      $fpcount = fopen('data_IM測定/'.$folder.'/'.$file, 'r' );
+                            //          $fpcount = fopen('/data/share/syukkaIM/data_IM測定/'.$folder.'/'.$file, 'r' );
                                       for( $count = 0; fgets( $fpcount ); $count++ );
 
                                       $arrFpmoto = array();//空の配列を作る
@@ -1719,8 +1920,8 @@ class SyukkaKensasController extends AppController {
     	}
 
 
-  //    $dirName = 'data_2_IM測定/';//ローカル//IM測定器ナンバー２のフォルダ
-      $dirName = '/data/share/syukkaIM/data_2_IMsokutei/';//192//IM測定器ナンバー２のフォルダ
+      $dirName = 'data_2_IM測定/';//ローカル//IM測定器ナンバー２のフォルダ
+  //    $dirName = '/data/share/syukkaIM/data_2_IMsokutei/';//192//IM測定器ナンバー２のフォルダ
 
       if(is_dir($dirName)){//ファイルがディレクトリかどうかを調べる(ディレクトリであるので次へ)
     	  if($dir = opendir($dirName)){//opendir でディレクトリ・ハンドルをオープンし、readdir でディレクトリ（フォルダ）内のファイル一覧を取得する。（という定石）
@@ -1745,18 +1946,18 @@ class SyukkaKensasController extends AppController {
                                if($file != "." && $file != ".."){//ファイルなら
                                 if(substr($file, -4, 4) == ".csv" ){//csvファイルだけOPEN
 
-                      //            $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
-                                  $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");//kesuyatu
+                                  $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");//kesuyatu
+                      //            $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");//kesuyatu
 
                                    if(substr($file, 0, 5) != "sumi_" ){//sumi_でないファイルだけOPEN
                                     $countname += 1;//ファイル名がかぶらないようにカウントしておく
 
-                      //              $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
-                                    $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
+                                    $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
+                      //              $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");//csvファイルはwebrootに入れる
                               			$this->set('fp',$fp);
 
-                      //              $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
-                                    $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
+                                    $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
+                      //              $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
                               			for( $count = 0; fgets( $fpcount ); $count++ );
 
                               			$arrFp = array();//空の配列を作る
@@ -1820,7 +2021,7 @@ class SyukkaKensasController extends AppController {
                                     $connection->begin();//トランザクション3
                                     try {//トランザクション4
                                       if ($this->ImSokuteidataHeads->saveMany($imSokuteidataHeads)) {//ImKikakusをsaveできた時（saveManyで一括登録）
-/*
+
                                         $connection = ConnectionManager::get('sakaeMotoDB');
                                         $table = TableRegistry::get('im_sokuteidata_head');
                                         $table->setConnection($connection);
@@ -1833,7 +2034,7 @@ class SyukkaKensasController extends AppController {
                                             'torikomi' => $arrIm_head[0]['torikomi']
                                         ]);
                                         $connection = ConnectionManager::get('default');
-*/
+
                                           //ImKikakusの登録用データをセット
                                           $cnt = count($arrFp[1]);
                                           $arrImKikakus = array_slice($arrFp , 1, 3);
@@ -1876,7 +2077,7 @@ class SyukkaKensasController extends AppController {
 
                                           $imKikakus = $this->ImKikakus->patchEntities($imKikakus, $arrIm_kikaku);
                                              if ($this->ImKikakus->saveMany($imKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
-/*
+
                                                $connection = ConnectionManager::get('sakaeMotoDB');
                                                $table = TableRegistry::get('im_kikaku');
                                                $table->setConnection($connection);
@@ -1899,7 +2100,7 @@ class SyukkaKensasController extends AppController {
                                                }
 
                                                $connection = ConnectionManager::get('default');
-*/
+
 
                                                 //ImSokuteidataResultsの登録用データをセット
                                                 $inspec_datetime = substr($arrFp[4][1],0,4)."-".substr($arrFp[4][1],5,2)."-".substr($arrFp[4][1],8,mb_strlen($arrFp[4][1])-8);
@@ -1936,7 +2137,7 @@ class SyukkaKensasController extends AppController {
 
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->patchEntities($imSokuteidataResults, $arrIm_Result);
                                                   if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
-/*
+
                                                     $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $table = TableRegistry::get('im_sokuteidata_result');
                                                     $table->setConnection($connection);
@@ -1969,7 +2170,7 @@ class SyukkaKensasController extends AppController {
                                                     }
 
                                                     $connection = ConnectionManager::get('default');
-*/
+
                                                     } else {
                                                       $this->Flash->error(__('This data1 could not be saved. Please, try again.'));
                                                       throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
@@ -1994,8 +2195,8 @@ class SyukkaKensasController extends AppController {
                               }
 
 
-                      //        $output_dir = 'backupData_2_IM測定/'.$folder;
-                              $output_dir = '/data/share/syukkaIM/backupData_2_IMsokutei/'.$folder;
+                              $output_dir = 'backupData_2_IM測定/'.$folder;
+                      //        $output_dir = '/data/share/syukkaIM/backupData_2_IMsokutei/'.$folder;
 
                                   if (! file_exists($output_dir)) {//backupData_IM測定の中に$folderがないとき
                                    if (mkdir($output_dir)) {
@@ -2014,10 +2215,10 @@ class SyukkaKensasController extends AppController {
                                         $this->FileCopyChecks->save($fileCopyCheck);
 
                                         fclose($fp);
-                                  //      $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");
-                                        $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");
-                                  //      $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
-                                        $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
+                                        $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");
+                                  //      $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");
+                                        $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
+                                  //      $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
                                   			for( $count = 0; fgets( $fpcount ); $count++ );
 
                                   			$arrFpmoto = array();//空の配列を作る
@@ -2097,10 +2298,10 @@ class SyukkaKensasController extends AppController {
                                       $this->FileCopyChecks->save($fileCopyCheck);//FileCopyChecksテーブルに登録
 
                                       fclose($fp);
-                          //            $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");
-                                      $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");
-                          //            $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
-                                      $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
+                                      $fp = fopen('data_2_IM測定/'.$folder.'/'.$file, "r");
+                          //            $fp = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, "r");
+                                      $fpcount = fopen('data_2_IM測定/'.$folder.'/'.$file, 'r' );
+                          //            $fpcount = fopen('/data/share/syukkaIM/data_2_IMsokutei/'.$folder.'/'.$file, 'r' );
                                       for( $count = 0; fgets( $fpcount ); $count++ );
 
                                       $arrFpmoto = array();//空の配列を作る
@@ -2487,7 +2688,7 @@ class SyukkaKensasController extends AppController {
 
   public function logout()
   {
-    $this->request->session()->destroy(); // セッションの破棄
+  //  $this->request->session()->destroy(); // セッションの破棄
   }
 
       public function do()//「出荷検査表登録」登録画面
@@ -2709,33 +2910,61 @@ class SyukkaKensasController extends AppController {
                $connection = ConnectionManager::get('default');//新DBに戻る
                $table->setConnection($connection);
 
-             }else{
+             }elseif(strpos($_SESSION['kadouseikeiId'],'=') !== false){
+                 $kari_id = explode("=",$_SESSION['kadouseikeiId']);
 
-               $KadouSeikeiData = $this->KadouSeikeis->find()->where(['id' => $_SESSION['kadouseikeiId']])->toArray();
-               $KadouSeikeistarting_tm = $KadouSeikeiData[0]->starting_tm->format('Y-m-d H:i:s');
-               $KadouSeikeifinishing_tm = $KadouSeikeiData[0]->finishing_tm->format('Y-m-d H:i:s');
-               $KadouSeikeicreated_at = $KadouSeikeiData[0]->created_at->format('Y-m-d H:i:s');
-               $KadouSeikeiseikeiki_code = $KadouSeikeiData[0]->seikeiki_code;
-               $KadouSeikeiproduct_code = $KadouSeikeiData[0]->product_code;
+                 $this->KariKadouSeikeis->updateAll(
+                 ['present_kensahyou' => 1],
+                 ['id'   => $kari_id[1]]
+                 );
 
-               $this->KadouSeikeis->updateAll(
-               ['present_kensahyou' => 1 ,'starting_tm' => $KadouSeikeistarting_tm ,'finishing_tm' => $KadouSeikeifinishing_tm ,'created_at' => $KadouSeikeicreated_at ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
-               ['id'   => $_SESSION['kadouseikeiId'] ]
-               );
+                 $KariKadouSeikeisData = $this->KariKadouSeikeis->find()->where(['id' => $kari_id[1]])->toArray();
 
-               $connection = ConnectionManager::get('sakaeMotoDB');
-               $table = TableRegistry::get('kadou_seikei');
-               $table->setConnection($connection);
+                 $KariKadouSeikeistarting_tm = $KariKadouSeikeisData[0]->starting_tm->format('Y-m-d H:i:s');
+                 $KariKadouSeikeifinishing_tm = $KariKadouSeikeisData[0]->finishing_tm->format('Y-m-d H:i:s');
+                 $KariKadouSeikeicreated_at = $KariKadouSeikeisData[0]->created_at->format('Y-m-d H:i:s');
+                 $KariKadouSeikeiseikeiki_code = $KariKadouSeikeisData[0]->seikeiki_code;
+                 $KariKadouSeikeiproduct_code = $KariKadouSeikeisData[0]->product_code;
 
-               $num = 1;
-               $updater = "UPDATE kadou_seikei set present_kensahyou ='".$num."'
-                where pro_num ='".$KadouSeikeiproduct_code."' and seikeiki_id ='".$KadouSeikeiseikeiki_code."' and starting_tm ='".$KadouSeikeistarting_tm."'";
-                $connection->execute($updater);
+                 $connection = ConnectionManager::get('sakaeMotoDB');
+                 $table = TableRegistry::get('kari_kadou_seikei');
+                 $table->setConnection($connection);
 
-               $connection = ConnectionManager::get('default');//新DBに戻る
-               $table->setConnection($connection);
+                 $num = 1;
+                 $updater = "UPDATE kari_kadou_seikei set present_kensahyou ='".$num."'
+                  where product_id ='".$KariKadouSeikeiproduct_code."' and seikeiki_id ='".$KariKadouSeikeiseikeiki_code."' and starting_tm ='".$KariKadouSeikeistarting_tm."'";
+                  $connection->execute($updater);
 
-             }
+                 $connection = ConnectionManager::get('default');//新DBに戻る
+                 $table->setConnection($connection);
+
+               }else{
+
+                 $KadouSeikeiData = $this->KadouSeikeis->find()->where(['id' => $_SESSION['kadouseikeiId']])->toArray();
+                 $KadouSeikeistarting_tm = $KadouSeikeiData[0]->starting_tm->format('Y-m-d H:i:s');
+                 $KadouSeikeifinishing_tm = $KadouSeikeiData[0]->finishing_tm->format('Y-m-d H:i:s');
+                 $KadouSeikeicreated_at = $KadouSeikeiData[0]->created_at->format('Y-m-d H:i:s');
+                 $KadouSeikeiseikeiki_code = $KadouSeikeiData[0]->seikeiki_code;
+                 $KadouSeikeiproduct_code = $KadouSeikeiData[0]->product_code;
+
+                 $this->KadouSeikeis->updateAll(
+                 ['present_kensahyou' => 1 ,'starting_tm' => $KadouSeikeistarting_tm ,'finishing_tm' => $KadouSeikeifinishing_tm ,'created_at' => $KadouSeikeicreated_at ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],//この方法だとupdated_atは自動更新されない
+                 ['id'   => $_SESSION['kadouseikeiId'] ]
+                 );
+
+                 $connection = ConnectionManager::get('sakaeMotoDB');
+                 $table = TableRegistry::get('kadou_seikei');
+                 $table->setConnection($connection);
+
+                 $num = 1;
+                 $updater = "UPDATE kadou_seikei set present_kensahyou ='".$num."'
+                  where pro_num ='".$KadouSeikeiproduct_code."' and seikeiki_id ='".$KadouSeikeiseikeiki_code."' and starting_tm ='".$KadouSeikeistarting_tm."'";
+                  $connection->execute($updater);
+
+                 $connection = ConnectionManager::get('default');//新DBに戻る
+                 $table->setConnection($connection);
+
+               }
 
              $mes = "＊下記のように登録されました";
              $this->set('mes',$mes);
@@ -2754,7 +2983,7 @@ class SyukkaKensasController extends AppController {
 
      public function imtaiouedit($id = null)
      {
-       $this->request->session()->destroy(); // セッションの破棄
+  //     $this->request->session()->destroy(); // セッションの破棄
 
        $ImKikakuTaious = $this->ImKikakuTaious->get($id);
        $this->set('ImKikakuTaious', $ImKikakuTaious);//$kensahyouHeadをctpで使えるようにセット
@@ -2799,6 +3028,11 @@ class SyukkaKensasController extends AppController {
 
      public function imtaioueditconfirm()
      {
+       if(!isset($_SESSION)){//sessionsyuuseituika
+       session_start();
+       }
+       $_SESSION['kikakudata'] = array();
+
       $data = $this->request->getData();
       $product_code = $data["product_code"];
 

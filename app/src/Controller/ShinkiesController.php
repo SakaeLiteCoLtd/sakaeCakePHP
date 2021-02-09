@@ -38,7 +38,7 @@ class ShinkiesController extends AppController {
 
   public function index()
   {
-   $this->request->session()->destroy(); // セッションの破棄
+//   $this->request->session()->destroy(); // セッションの破棄
    $user = $this->Users->newEntity();
    $this->set('user',$user);
   }

@@ -89,7 +89,7 @@ class MaterialTypesController extends AppController
 
 	 public function logout()
 	 {
-		 $this->request->session()->destroy(); // セッションの破棄
+	//	 $this->request->session()->destroy(); // セッションの破棄
 		 return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
 	 }
 

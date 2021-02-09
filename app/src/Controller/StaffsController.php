@@ -30,7 +30,7 @@ class StaffsController extends AppController
 
     public function index()
     {
-			$this->request->session()->destroy(); // セッションの破棄
+	//		$this->request->session()->destroy(); // セッションの破棄
 
 			if ($this->request->is('post')) {//postの場合
 				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
@@ -62,6 +62,12 @@ class StaffsController extends AppController
     {
 			$staff = $this->Staffs->newEntity();//newentityに$staffという名前を付ける
 			$this->set('staff',$staff);//1行上の$staffをctpで使えるようにセット
+
+			if(!isset($_SESSION)){//sessionsyuuseituika
+			session_start();
+			}
+			$_SESSION['staffdata'] = array();
+
     }
 
 		public function preadd()
@@ -98,7 +104,7 @@ class StaffsController extends AppController
 
 	 public function logout()
 	 {
-		 $this->request->session()->destroy(); // セッションの破棄
+//		 $this->request->session()->destroy(); // セッションの破棄
 		 return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
 	 }
 

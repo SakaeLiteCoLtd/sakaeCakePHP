@@ -746,6 +746,11 @@ class LabelsController extends AppController
    public function ikkatsupreform()//一括ラベル発行
    {
   //   $this->request->session()->destroy(); // セッションの破棄
+  if(!isset($_SESSION)){//sessionsyuuseituika
+  session_start();
+  }
+  $_SESSION['labeljunbi'] = array();
+
      $scheduleKouteis = $this->ScheduleKouteis->newEntity();
      $this->set('scheduleKouteis',$scheduleKouteis);
 /*
@@ -767,7 +772,7 @@ class LabelsController extends AppController
      if(!isset($_SESSION)){//sessionsyuuseituika
      session_start();
      }
-     $_SESSION['labeljunbi'] = array();
+     //     $_SESSION['labeljunbi'] = array();
 
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);

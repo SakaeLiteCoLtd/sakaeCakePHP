@@ -24,9 +24,9 @@ class htmlProductcheck extends AppController
          $product_code = $product_code;
          $product_code_check = 0;
        }else{
-         echo "<pre>";
-         print_r("製品「".$product_code."」はproductテーブルに登録されていません。製品登録からやり直してください。");
-         echo "</pre>";
+    //     echo "<pre>";
+    //     print_r("製品「".$product_code."」はproductテーブルに登録されていません。製品登録からやり直してください。");
+    //     echo "</pre>";
          $product_code_check = 1;
        }
      }

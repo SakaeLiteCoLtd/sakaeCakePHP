@@ -39,97 +39,28 @@ class ApidatasController extends AppController
 
 		public function preadd()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apidatas/preadd
 		{
+		//	session_start();
+		//	$session = $this->request->getSession();
 
+		//	echo "<pre>";
+		//	print_r($_SESSION);
+		//	echo "</pre>";
+
+	//		$this->request->session()->destroy();
+			$staff = $this->Products->newEntity();//newentityに$staffという名前を付ける
+			$this->set('staff',$staff);//1行上の$staffをctpで使えるようにセット
+
+//実験
 			session_start();
 			$session = $this->request->getSession();
+			$_SESSION['test'][0] = 1;
+
 			echo "<pre>";
 			print_r($_SESSION);
 			echo "</pre>";
-	//		$_SESSION['kouteivba'] = array();
-/*
-			$connection = ConnectionManager::get('DB_ikou_test');
-			$table = TableRegistry::get('schedule_koutei');
-			$table->setConnection($connection);
 
-			$delete_schedule_koutei= "DELETE FROM schedule_koutei where datetime >= '".$_SESSION['deletesta'][0]."' and datetime <= '".$_SESSION['deletefin'][0]."'";
-			$connection->execute($delete_schedule_koutei);
-
-			for($k=0; $k<count($_SESSION['kouteivba']); $k++){
-				$connection->insert('schedule_koutei', [
-						'datetime' => $_SESSION['kouteivba'][$k]["datetime"],
-						'seikeiki' => $_SESSION['kouteivba'][$k]["seikeiki"],
-						'product_id' => $_SESSION['kouteivba'][$k]["product_code"],
-						'present_kensahyou' => $_SESSION['kouteivba'][$k]["present_kensahyou"],
-						'product_name' => $_SESSION['kouteivba'][$k]["product_name"],
-						'tantou' => $_SESSION['kouteivba'][$k]["tantou"],
-				]);
-			}
-
-			$connection = ConnectionManager::get('default');//新DBに戻る
-			$table->setConnection($connection);
-*/
-
-			$staff = $this->Products->newEntity();//newentityに$staffという名前を付ける
-			$this->set('staff',$staff);//1行上の$staffをctpで使えるようにセット
-/*
-			$xmlArray = Xml::toArray(Xml::build('xmls/test.xml'));//これでxmlファイルがあれば表示は可能 https://book.cakephp.org/3/ja/core-libraries/xml.html
-			echo "<pre>";
-			print_r($xmlArray["response"]);
-			echo "</pre>";
-*/
-/*
-			$url = 'http://localhost:5000/Apidatas/test/api/test.xml';
-			$curl = curl_init($url);
-			$xml = curl_exec($curl);
-
-			// 受け取ったXMLレスポンスをPHPの連想配列へ変換
-			$xmlObj = simplexml_load_string($xml);
-			$json = json_encode($xmlObj);
-			$response = json_decode($json, true);
-
-			echo "<pre>";
-			print_r($response);
-			echo "</pre>";
-
-/*
-			$xmlString = 'http://localhost:5000/Apidatas/test/api/test.xml';
-			$xmlArray = Xml::toArray(Xml::build($xmlString));
-
-			$xmlArray = [
-					'root' => [
-							'xmlns:' => 'http://localhost:5000/Apidatas/test/api/test.xml',
-							'child' => 'value'
-					]
-			];
-
-			$xml1 = Xml::fromArray($xmlArray);
-
-			$xml = Xml::build('http://localhost:5000/Apidatas/test/api/test.xml');
-			$xml = Xml::build('xmls/test.xml');
-
-*/
-/*
-		//		$xmlArray = Xml::toArray(Xml::build('http://localhost:5000/Apidatas/test/api/test.xml'));
-				$http = new Client();
-
-				//			$response = $http->get('http://192.168.4.246/Apidatas/test/api/test.xml');//参考https://book.cakephp.org/3/ja/core-libraries/httpclient.html
-				//			$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.xml');//参考https://book.cakephp.org/3/ja/core-libraries/httpclient.html
-				//			$response = $http->put('http://192.168.4.246/Apidatas/test/api/test.xml');//参考https://book.cakephp.org/3/ja/core-libraries/httpclient.html
-
-		//		$response = $http->post('https://qiita.com/api/v2/users/TakahiRoyte');//参考https://book.cakephp.org/3/ja/core-libraries/httpclient.html
-
-		$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.json');//参考https://codelab.website/cakephp3-api/
-	//	$response = $http->post('http://192.168.4.246/Apidatas/test/api/test.json');//参考https://codelab.website/cakephp3-api/
-				$array = json_decode($response->body(), true);//trueがあれば配列として受け取れる　参考https://qiita.com/muramount/items/6be585bf9c031a997d9a
-
-				echo "<pre>";
-				print_r($array);
-				echo "</pre>";
-				echo "<pre>";
-				print_r($array["tourokutestproduct"]["product_name"]);
-				echo "</pre>";
-*/
 		}
+
 
 	 public function login()
 	 {

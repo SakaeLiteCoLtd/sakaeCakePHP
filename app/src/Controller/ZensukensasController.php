@@ -928,7 +928,7 @@ class ZensukensasController extends AppController
      {
 
        echo "<pre>";
-       print_r("start  ".date('Y-m-d H:i:s'));
+       print_r(date('Y-m-d H:i:s'));
        echo "</pre>";
 
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
@@ -1172,10 +1172,6 @@ class ZensukensasController extends AppController
         //セットする
         $arrichiran =  array();
 
-        echo "<pre>";
-        print_r("2  ".date('Y-m-d H:i:s'));
-        echo "</pre>";
-
         $ResultZensuFooders = $ResultZensuHeads;
 
          if(isset($arrFooder[0])){
@@ -1274,7 +1270,7 @@ class ZensukensasController extends AppController
 */
 
 echo "<pre>";
-print_r(count($arrichiran)."  ".date('Y-m-d H:i:s'));
+print_r(date('Y-m-d H:i:s'));
 echo "</pre>";
 
         if(isset($data['csv'])){//csv出力

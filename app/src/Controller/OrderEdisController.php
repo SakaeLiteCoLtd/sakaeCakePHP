@@ -1092,6 +1092,10 @@ echo "</pre>";
          $keys[array_search('20',$keys)]='amount';
          $keys[array_search('22',$keys)]='num_keikaku';
          $sample = array_combine( $keys, $sample );
+         $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
+         $created_at = array('created_at'=>date('Y-m-d H:i:s'));
+         $sample = array_merge($sample,$created_staff);
+         $sample = array_merge($sample,$created_at);
 
          unset($sample['0'],$sample['1'],$sample['4'],$sample['3'],$sample['5'],$sample['6'],$sample['7'],$sample['8']);
          unset($sample['9'],$sample['10'],$sample['11'],$sample['12'],$sample['13'],$sample['14'],$sample['15']);
@@ -1142,11 +1146,11 @@ echo "</pre>";
         }
       }
 */
-
-//      echo "<pre>";
-//      print_r($arrSyoyouKeikaku);
-//      echo "</pre>";
-
+/*
+      echo "<pre>";
+      print_r($arrSyoyouKeikaku);
+      echo "</pre>";
+*/
 //         rename($source_file,$source_file."test");
 
          $syoyouKeikakus = $this->SyoyouKeikakus->patchEntities($syoyouKeikakus, $arrSyoyouKeikaku);//patchEntitiesで一括登録
@@ -1160,9 +1164,14 @@ echo "</pre>";
 
              $SyoyouKeikaku= $this->SyoyouKeikakus->find()->where(['product_code' => $arrSyoyouKeikaku[$k]['product_code']])->toArray();
 
-             if(isset($SyoyouKeikaku[0])){
-               $this->SyoyouKeikakus->deleteAll(['product_code' => $arrSyoyouKeikaku[$k]['product_code']]);
-             }
+        //     if(isset($SyoyouKeikaku[0])){
+        //       $this->SyoyouKeikakus->deleteAll(['product_code' => $arrSyoyouKeikaku[$k]['product_code']]);
+        //     }
+
+             $this->SyoyouKeikakus->updateAll(
+             ['delete_flag' => 1, 'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],
+             ['product_code' => $arrSyoyouKeikaku[$k]['product_code']]
+             );
 
              $connection = ConnectionManager::get('DB_ikou_test');
              $table = TableRegistry::get('syoyou_keikaku');

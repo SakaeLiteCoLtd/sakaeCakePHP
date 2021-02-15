@@ -229,13 +229,34 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 echo "<td colspan='2'><div align='center'>\n";
                 echo $this->request->getData("result_size_{$q}_9");
                 echo "</td>\n";
+
+                if($this->request->getData("situation_dist1_{$q}") == "OK"){
+                  echo "<td colspan='2'><div align='center'>\n";
+                  echo $this->request->getData("situation_dist1_{$q}");
+                  echo "</td>\n";
+                } else {
+                echo '<td colspan="2"><div align="center"><font color="red">';
+                echo $this->request->getData("situation_dist1_{$q}");
+                echo '</div></td>';
+                }
+
+                if($this->request->getData("situation_dist2_{$q}") == "OK"){
+                  echo "<td colspan='2'><div align='center'>\n";
+                  echo $this->request->getData("situation_dist2_{$q}");
+                  echo "</td>\n";
+                } else {
+                echo '<td colspan="2"><div align="center"><font color="red">';
+                echo $this->request->getData("situation_dist2_{$q}");
+                echo '</div></td>';
+                }
+/*
                 echo "<td colspan='2'>\n";
                 echo $this->request->getData("situation_dist1_{$q}");
                 echo "</td>\n";
                 echo "<td colspan='2'>\n";
                 echo $this->request->getData("situation_dist2_{$q}");
                 echo "</td>\n";
-
+*/
                 //データが平均プラスマイナス平均×0.2以内のときはOKそうでなければ赤文字
                 if($this->request->getData("result_weight_{$q}") <= $result_weight_ave + $result_weight_20 && $this->request->getData("result_weight_{$q}") >= $result_weight_ave - $result_weight_20){
                   echo "<td colspan='2'><div align='center'>\n";

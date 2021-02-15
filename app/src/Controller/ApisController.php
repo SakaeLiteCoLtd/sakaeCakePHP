@@ -567,7 +567,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -932,7 +932,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -1255,7 +1255,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -1580,7 +1580,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -1903,7 +1903,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -2224,7 +2224,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -2554,7 +2554,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -2878,7 +2878,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -3203,7 +3203,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -3528,7 +3528,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -3853,7 +3853,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -4176,7 +4176,7 @@ class ApisController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_deliver"=>"ASC"])->toArray();
 

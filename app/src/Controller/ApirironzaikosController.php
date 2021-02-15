@@ -24,16 +24,16 @@ class ApirironzaikosController extends AppController
 
 		public function preadd()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apirironzaikos/preadd
 		{
-			//				$this->request->session()->destroy(); // セッションの破棄
+		//$this->request->session()->destroy(); // セッションの破棄
 
 			session_start();
 			$session = $this->request->getSession();
-			$_SESSION['test'][0] = 0;
+	//		$_SESSION['test'][0] = 0;
 
 			echo "<pre>";
 			print_r($_SESSION);
 			echo "</pre>";
-
+/*
 			for($k=0; $k<3; $k++){
 
 				if($_SESSION['test'][0] < 5){
@@ -48,7 +48,7 @@ class ApirironzaikosController extends AppController
 				echo "</pre>";
 
 			}
-
+*/
 		}
 
 		public function test()//http://localhost:5000/Apirironzaikos/test/api/start.xml
@@ -285,6 +285,35 @@ class ApirironzaikosController extends AppController
 					$_SESSION['rironzaikoupdate'] = array();
 
 				}
+
+		}
+
+		public function dajikken()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apirironzaikos/preadd
+		{//http://localhost:5000/Apirironzaikos/dajikken/api/start.xml
+			
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+			$urlarr = explode("/",$data);//切り離し
+			$dataarr = explode(".",$urlarr[4]);//切り離し
+			$datest = $dataarr[0];
+			$datest = mb_convert_encoding($datest,"UTF-8",mb_detect_encoding($datest, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
+
+			if(!isset($_SESSION)){
+			session_start();
+			}
+			$session = $this->request->getSession();
+			$_SESSION['dajikken'] = array();
+			$_SESSION['dajikken'] = $datest;
+
+			$tourokuarr = array();
+			$tourokuarr['date_culc'] = '2022-01-16';
+			$tourokuarr['product_code'] = $datest;
+			$tourokuarr['amount'] = 9999;
+			$tourokuarr['created_at'] = date('Y-m-d H:i:s');
+
+			//新しいデータを登録
+	//		$RironStockProducts = $this->RironStockProducts->patchEntity($this->RironStockProducts->newEntity(), $tourokuarr);
+	//		$this->RironStockProducts->save($RironStockProducts);
 
 		}
 

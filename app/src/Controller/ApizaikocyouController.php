@@ -70,8 +70,8 @@ class ApizaikocyouController extends AppController
 			print_r($datestart." ".$dateend);
 			echo "</pre>";
 */
-			//http://192.168.4.246/Apizaikocyou/zaikocyou/api/2020-10-3_primary.xml
-			//http://localhost:5000/Apizaikocyou/zaikocyou/api/2020-9-13_primary.xml
+			//http://192.168.4.246/Apizaikocyou/zaikocyou/api/2020-12-3_primary.xml
+			//http://localhost:5000/Apizaikocyou/zaikocyou/api/2020-12-13_primary.xml
 
 			if($sheet === "primary"){
 
@@ -127,7 +127,7 @@ class ApizaikocyouController extends AppController
 				 }
 
 				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
+					 array_multisort($product_code, array_map("strtotime", $datetime_finish), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
 				 }
 
 				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
@@ -277,6 +277,8 @@ class ApizaikocyouController extends AppController
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
 
+				//$arrOrderEdis完成
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
@@ -312,7 +314,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -464,7 +466,7 @@ class ApizaikocyouController extends AppController
 				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => [['customer_code like' => '2%']]])//productsの絞込みprimary_dnp
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -511,7 +513,7 @@ class ApizaikocyouController extends AppController
 
 						//組立品呼び出し
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -595,32 +597,6 @@ class ApizaikocyouController extends AppController
 
 				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
 
-/*
-				for($j=0; $j<count($arrProducts); $j++){
-
-					for($k=0; $k<count($OrderEdis); $k++){
-
-						if($arrProducts[$j]["product_code"] === $OrderEdis[$k]["product_code"]){
-
-							$product_name = $Product[0]->product_name;
-				//			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
-
-							$arrOrderEdis[] = [
-								'date_order' => "",
-								'num_order' => "",
-								'product_code' => $arrProducts[$j]["product_code"],
-								'product_name' => $product_name,
-								'price' => "",
-								'date_deliver' => "",
-								'amount' => ""
-						 ];
-
-						}
-
-					}
-
-				}
-*/
 
 				//並べかえ
 				$tmp_product_array = array();
@@ -633,11 +609,7 @@ class ApizaikocyouController extends AppController
 				if(count($arrOrderEdis) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
 				}
-/*
-				echo "<pre>";
-				print_r($arrOrderEdis);
-				echo "</pre>";
-*/
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
 				->order(["date_stock"=>"ASC"])->toArray();
@@ -672,7 +644,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -777,6 +749,8 @@ class ApizaikocyouController extends AppController
 						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
 					}
 
+
+
 			}elseif($sheet === "primary_w"){
 
 				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -808,7 +782,7 @@ class ApizaikocyouController extends AppController
 				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0, 'customer_code' => '10002',
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -855,7 +829,7 @@ class ApizaikocyouController extends AppController
 
 												//組立品呼び出し
 												$ResultZensuHeads = $this->ResultZensuHeads->find()
-												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
 												->order(["datetime_finish"=>"DESC"])->toArray();
 
 												if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -986,7 +960,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -1102,29 +1076,29 @@ class ApizaikocyouController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
-										$riron_check = 0;
-										$date16 = $yaermonth."-16";
-										$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
-										if(isset($RironStockProducts[0])){
-											$riron_check = 1;
-										}
+					$riron_check = 0;
+					$date16 = $yaermonth."-16";
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
 
-										$arrProductsmoto[] = [
-											'date_order' => "",
-											'num_order' => "",
-											'product_code' => $arrProducts[$k]["product_code"],
-											'product_name' => $arrProducts[$k]["product_name"],
-											'price' => "",
-											'date_deliver' => "",
-											'amount' => "",
-											'denpyoumaisu' => "",
-											'riron_zaiko_check' => $riron_check
-									 ];
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
+				 ];
 
 				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0, 'customer_code' => '10002',
 				'OR' => [['product_code like' => 'H%']]])//productsの絞込みprimary_h
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -1171,7 +1145,7 @@ class ApizaikocyouController extends AppController
 
 						//組立品呼び出し
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -1302,7 +1276,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -1417,29 +1391,29 @@ class ApizaikocyouController extends AppController
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
-										$riron_check = 0;
-										$date16 = $yaermonth."-16";
-										$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
-										if(isset($RironStockProducts[0])){
-											$riron_check = 1;
-										}
+					$riron_check = 0;
+					$date16 = $yaermonth."-16";
+					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+					if(isset($RironStockProducts[0])){
+						$riron_check = 1;
+					}
 
-										$arrProductsmoto[] = [
-											'date_order' => "",
-											'num_order' => "",
-											'product_code' => $arrProducts[$k]["product_code"],
-											'product_name' => $arrProducts[$k]["product_name"],
-											'price' => "",
-											'date_deliver' => "",
-											'amount' => "",
-											'denpyoumaisu' => "",
-											'riron_zaiko_check' => $riron_check
-									 ];
+					$arrProductsmoto[] = [
+						'date_order' => "",
+						'num_order' => "",
+						'product_code' => $arrProducts[$k]["product_code"],
+						'product_name' => $arrProducts[$k]["product_name"],
+						'price' => "",
+						'date_deliver' => "",
+						'amount' => "",
+						'denpyoumaisu' => "",
+						'riron_zaiko_check' => $riron_check
+				 ];
 
 				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => [['customer_code' => '10005']]])//productsの絞込みreizouko
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -1486,7 +1460,7 @@ class ApizaikocyouController extends AppController
 
 						//組立品呼び出し
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -1616,7 +1590,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -1751,7 +1725,7 @@ class ApizaikocyouController extends AppController
 				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => [['customer_code' => '10003']]])//productsの絞込みuwawaku
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -1798,7 +1772,7 @@ class ApizaikocyouController extends AppController
 
 						//組立品呼び出し
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -1928,7 +1902,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -2039,11 +2013,7 @@ class ApizaikocyouController extends AppController
 		//		->where(['products.status' => 0, 'customer_code not like' => '1%', 'customer_code not like' => '2%'])->toArray();
 				->where(['products.status' => 0,
 				'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])->toArray();
-/*
-				echo "<pre>";
-				print_r($arrProducts);
-				echo "</pre>";
-*/
+
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
@@ -2070,7 +2040,7 @@ class ApizaikocyouController extends AppController
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 		//		->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code not like' => '1%', 'customer_code not like' => '2%'])//productsの絞込みother
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
@@ -2118,7 +2088,7 @@ class ApizaikocyouController extends AppController
 
 												//組立品呼び出し
 												$ResultZensuHeads = $this->ResultZensuHeads->find()
-												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
 												->order(["datetime_finish"=>"DESC"])->toArray();
 
 												if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -2249,7 +2219,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -2386,7 +2356,7 @@ class ApizaikocyouController extends AppController
 				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10001',
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0, 'customer_code' => '10001',
 				'OR' => [['product_code like' => 'P0%']]])//productsの絞込みp0
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -2433,7 +2403,7 @@ class ApizaikocyouController extends AppController
 
 						//組立品呼び出し
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -2564,7 +2534,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -2702,7 +2672,7 @@ class ApizaikocyouController extends AppController
 				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10001',
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0, 'customer_code' => '10001',
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -2749,7 +2719,7 @@ class ApizaikocyouController extends AppController
 
 												//組立品呼び出し
 												$ResultZensuHeads = $this->ResultZensuHeads->find()
-												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
 												->order(["datetime_finish"=>"DESC"])->toArray();
 
 												if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -2880,7 +2850,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -3018,7 +2988,7 @@ class ApizaikocyouController extends AppController
 				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0, 'customer_code' => '10002',
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -3065,7 +3035,7 @@ class ApizaikocyouController extends AppController
 
 												//組立品呼び出し
 												$ResultZensuHeads = $this->ResultZensuHeads->find()
-												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
 												->order(["datetime_finish"=>"DESC"])->toArray();
 
 												if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -3196,7 +3166,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -3335,7 +3305,7 @@ class ApizaikocyouController extends AppController
 				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => [['customer_code like' => '2%']]])//productsの絞込みdnp
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -3382,7 +3352,7 @@ class ApizaikocyouController extends AppController
 
 												//組立品呼び出し
 												$ResultZensuHeads = $this->ResultZensuHeads->find()
-												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+												->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
 												->order(["datetime_finish"=>"DESC"])->toArray();
 
 												if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -3512,7 +3482,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast])
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -3648,7 +3618,7 @@ class ApizaikocyouController extends AppController
 				}
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -3695,7 +3665,7 @@ class ApizaikocyouController extends AppController
 
 						//組立品呼び出し
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -3826,7 +3796,7 @@ class ApizaikocyouController extends AppController
 					}
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast,
+				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_deliver"=>"ASC"])->toArray();
 

@@ -614,7 +614,6 @@ class ApidatasController extends AppController
 					}
 
 					$tantouarr = explode(".",$dataarr[4]);//切り離し
-
 					$tantou = $tantouarr[0];//tantouの取得
 					$tantou = mb_convert_encoding($tantou,"UTF-8",mb_detect_encoding($tantou, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
 					$product_code = mb_convert_encoding($product_code,"UTF-8",mb_detect_encoding($product_code, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));

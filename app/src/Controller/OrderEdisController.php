@@ -636,15 +636,15 @@ echo "</pre>";
                   for($m=0; $m<count($arrFp); $m++){
 
                     $sql = "SELECT bunnou FROM order_edi".//
-                          " where date_order ='".$arrEDI[$k]["date_order"]."' and num_order = '".$arrEDI[$k]["num_order"]."'
-                           and product_id = '".$arrEDI[$k]["product_code"]."' order by bunnou desc limit 1";//
+                          " where date_order ='".$arrFp[$m]["date_order"]."' and num_order = '".$arrFp[$m]["num_order"]."'
+                           and product_id = '".$arrFp[$m]["product_code"]."' order by bunnou desc limit 1";//
                     $connection = ConnectionManager::get('DB_ikou_test');//
                     $bunnoumoto = $connection->execute($sql)->fetchAll('assoc');//
       //
                     if(isset($bunnoumoto[0]["bunnou"])){//
                       $bunnou = $bunnoumoto[0]["bunnou"] + 1;//
                     }else{//
-                      $bunnou = $arrEDI[$k]["bunnou"];//
+                      $bunnou = $arrFp[$m]["bunnou"];//
                     }//
 
                     $connection->insert('order_edi', [
@@ -696,7 +696,8 @@ echo "</pre>";
               $connection = ConnectionManager::get('DB_ikou_test');//
               $bunnoumoto = $connection->execute($sql)->fetchAll('assoc');//
 //
-              if(isset($bunnoumoto[0]["bunnou"])){//
+              if(isset($bunnoumoto[0]["bunnou"])){//strlen($_POST["result_size_{$n}_9"]) > 0
+
                 $bunnou = $bunnoumoto[0]["bunnou"] + 1;//
               }else{//
                 $bunnou = $arrEDI[$k]["bunnou"];//

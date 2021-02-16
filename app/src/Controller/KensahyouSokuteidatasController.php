@@ -1189,6 +1189,24 @@ class KensahyouSokuteidatasController  extends AppController
       $kensahyouSokuteidata = $this->KensahyouSokuteidatas->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
       $this->set('kensahyouSokuteidata',$kensahyouSokuteidata);//セット
   //    $this->request->session()->destroy();// セッションの破棄
+
+      $data = $this->request->getData();
+
+      $gaikancount = 0;
+      for($n=1; $n<=8; $n++){
+
+        if($data["situation_dist1_{$n}"] == "out"){
+          $gaikancount = $gaikancount + 1;
+        }
+
+        if($data["situation_dist2_{$n}"] == "out"){
+          $gaikancount = $gaikancount + 1;
+        }
+
+      }
+
+      $this->set('gaikancount',$gaikancount);//セット
+
     }
 
    public function login()

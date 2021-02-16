@@ -24,6 +24,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               $nyuuryokucount = 0;
               $mess = "";
               $nyuuryokucountcheck = 0;
+              $gaikancount = 0;
 
               for($n=1; $n<=8; $n++){
                 $nyuuryokucount = 0;
@@ -126,6 +127,13 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
                         if($nyuuryokucount > 0 && $nyuuryokucount != $count_total){
                           $nyuuryokucountcheck = $nyuuryokucountcheck + 1;
+                        }
+
+                        if($_POST["situation_dist1_{$n}"] == "out"){
+                          $gaikancount = $gaikancount + 1;
+                        }
+                        if($_POST["situation_dist2_{$n}"] == "out"){
+                          $gaikancount = $gaikancount + 1;
                         }
 
               }
@@ -320,10 +328,22 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr>
   <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+
+  <?php if ($gaikancount < 1): ?>
+
   <td style="border-style: none;"><div align="center"><?= $this->Form->submit('追加', array('name' => 'kakunin')); ?></div></td>
+
+<?php else : ?>
+
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('追加', ['onclick' => "alert('外観に「out」が含まれています。このまま続ける場合はOKで進めてください。戻る場合はブラウザの戻るボタンを押してください。')", 'type' => 'submit']); ?></div></td>
+
+<?php endif; ?>
+
 </tr>
 </table>
 <br>
+
+
 <?= $this->Form->end() ?>
 
 <?php else : ?>

@@ -290,7 +290,7 @@ class ApirironzaikosController extends AppController
 
 		public function dajikken()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apirironzaikos/preadd
 		{//http://localhost:5000/Apirironzaikos/dajikken/api/start.xml
-			
+
 			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
 			$data = urldecode($data);
 			$urlarr = explode("/",$data);//切り離し
@@ -311,9 +311,14 @@ class ApirironzaikosController extends AppController
 			$tourokuarr['amount'] = 9999;
 			$tourokuarr['created_at'] = date('Y-m-d H:i:s');
 
+
+
 			//新しいデータを登録
-	//		$RironStockProducts = $this->RironStockProducts->patchEntity($this->RironStockProducts->newEntity(), $tourokuarr);
-	//		$this->RironStockProducts->save($RironStockProducts);
+			$RironStockProducts = $this->RironStockProducts->patchEntity($this->RironStockProducts->newEntity(), $tourokuarr);
+			$this->RironStockProducts->save($RironStockProducts);
+
+//			sleep(5);//20秒待機
+
 
 		}
 

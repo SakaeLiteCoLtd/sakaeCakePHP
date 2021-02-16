@@ -599,6 +599,7 @@ class ApidatasController extends AppController
 			if(isset($urlarr[5])){
 				$urlarr[4] = $urlarr[4]."/".$urlarr[5];
 			}
+			$urlarr[4] = mb_convert_encoding($urlarr[4],"UTF-8",mb_detect_encoding($urlarr[4], "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
 			$dataarr = explode("_",$urlarr[4]);//切り離し
 
 				if(isset($dataarr[4])){//ScheduleKouteis登録用の配列に追加
@@ -615,9 +616,8 @@ class ApidatasController extends AppController
 
 					$tantouarr = explode(".",$dataarr[4]);//切り離し
 					$tantou = $tantouarr[0];//tantouの取得
-					$tantou = mb_convert_encoding($tantou,"UTF-8",mb_detect_encoding($tantou, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
-					$product_code = mb_convert_encoding($product_code,"UTF-8",mb_detect_encoding($product_code, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
-
+		//			$tantou = mb_convert_encoding($tantou,"UTF-8",mb_detect_encoding($tantou, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
+		//			$product_code = mb_convert_encoding($product_code,"UTF-8",mb_detect_encoding($product_code, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
 /*
 					echo "<pre>";
 					print_r($product_code);
@@ -711,7 +711,7 @@ class ApidatasController extends AppController
 						}
 
 						if ($this->ScheduleKouteis->saveMany($ScheduleKouteis)) {
-
+/*
 							$connection = ConnectionManager::get('DB_ikou_test');
 							$table = TableRegistry::get('schedule_koutei');
 							$table->setConnection($connection);
@@ -732,7 +732,7 @@ class ApidatasController extends AppController
 
 							$connection = ConnectionManager::get('default');//新DBに戻る
 							$table->setConnection($connection);
-
+*/
 							$connection->commit();// コミット5
 			//				$this->request->session()->destroy(); // セッションの破棄
 							$_SESSION['kouteivba'] = array();

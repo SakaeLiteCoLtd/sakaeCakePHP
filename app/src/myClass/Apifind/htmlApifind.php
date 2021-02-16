@@ -16,24 +16,19 @@ class htmlApifind extends AppController
         $this->Customers = TableRegistry::get('customers');
         $this->Konpous = TableRegistry::get('konpous');
         $this->ResultZensuHeads = TableRegistry::get('resultZensuHeads');
+        $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');
+        $this->Products = TableRegistry::get('products');
+        $this->OrderEdis = TableRegistry::get('orderEdis');
+        $this->StockProducts = TableRegistry::get('stockProducts');
+        $this->SyoyouKeikakus = TableRegistry::get('syoyouKeikakus');
+        $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');
+        $this->Katakouzous = TableRegistry::get('katakouzous');
+        $this->Customers = TableRegistry::get('customers');
+        $this->RironStockProducts = TableRegistry::get('rironStockProducts');
     }
 
     public function Assemble($arrAssembleProducts)
    {
-
-     /*//controllerへ
-     						//組立品呼び出し//クラス使用
-     						$arrAssembleProducts[10000] = [
-     							'product_code' => $OrderEdis[$k]["product_code"],
-     							'kensabi' => $date1,
-     							'amount' => 0
-     					 ];
-
-     						$htmlApifind = new htmlApifind();//クラスを使用
-     						$arrAssembleProducts = $htmlApifind->Assemble($arrAssembleProducts);//クラスを使用
-     */
-
-
        $product_code = $arrAssembleProducts["10000"]["product_code"];
        $date1 = $arrAssembleProducts["10000"]["kensabi"];
        $date1st = strtotime($date1);
@@ -109,6 +104,138 @@ class htmlApifind extends AppController
       return $arrAssembleProducts;
    }
 
+   public function OrderEdis($date16)
+  {
+    $arrProductsmoto = $_SESSION['classarrProductsmoto'];
+    $OrderEdis = $_SESSION['classOrderEdis'];
+    $arrOrderEdis = $_SESSION['classarrOrderEdis'];
+
+    //同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+    for($l=0; $l<count($arrOrderEdis); $l++){
+
+      for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+        if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+
+          $amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+          $denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
+
+          $arrOrderEdis[$l]["amount"] = $amount;
+          $arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+          unset($arrOrderEdis[$m]);
+
+        }
+
+      }
+      $arrOrderEdis = array_values($arrOrderEdis);
+
+    }
+
+    $arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+
+    //並べかえ
+    $tmp_product_array = array();
+    $tmp_date_deliver_array = array();
+    foreach($arrOrderEdis as $key => $row ) {
+      $tmp_product_array[$key] = $row["product_code"];
+      $tmp_date_deliver_array[$key] = $row["date_deliver"];
+    }
+
+    if(count($arrOrderEdis) > 0){
+      array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
+    }
+
+     return $arrOrderEdis;
+  }
+
+
+      public function Productsmoto($date16)
+     {
+       $arrOrderEdis = array();//注文呼び出し
+
+       $arrProducts = $_SESSION['classarrProducts'];
+
+       $arrProductsmoto = array();
+       for($k=0; $k<count($arrProducts); $k++){
+
+         $riron_check = 0;
+      //   $date16 = $yaermonth."-16";
+         $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
+         if(isset($RironStockProducts[0])){
+           $riron_check = 1;
+         }
+
+         $arrProductsmoto[] = [
+           'date_order' => "",
+           'num_order' => "",
+           'product_code' => $arrProducts[$k]["product_code"],
+           'product_name' => $arrProducts[$k]["product_name"],
+           'price' => "",
+           'date_deliver' => "",
+           'amount' => "",
+           'denpyoumaisu' => "",
+           'riron_zaiko_check' => $riron_check
+        ];
+
+       }
+
+        return $arrProductsmoto;
+     }
+
+
+     public function ResultZensuHeadsmoto($dateend)
+    {
+      $datestart = $_SESSION['classarrdatestart'];
+
+      $ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
+      ->where(['datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
+      ->order(["datetime_finish"=>"DESC"])->toArray();
+
+      $arrResultZensuHeadsmoto = array();
+      for($k=0; $k<count($ResultZensuHeads); $k++){
+
+        $arrResultZensuHeadsmoto[] = [
+          'product_code' => $ResultZensuHeads[$k]["product_code"],
+          'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
+          'count' => 1
+       ];
+
+      }
+
+      $product_code_moto = array();//ここから配列の並び変え
+      $datetime_finish_moto = array();
+      foreach ($arrResultZensuHeadsmoto as $key => $value) {
+         $product_code[$key] = $value['product_code'];
+         $datetime_finish[$key] = $value["datetime_finish"];
+       }
+
+       if(isset($datetime_finish)){
+         array_multisort($product_code, array_map("strtotime", $datetime_finish), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
+       }
+
+      //同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
+      for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
+
+        for($m=$l+1; $m<count($arrResultZensuHeadsmoto); $m++){
+
+          if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
+
+            $count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
+
+            $arrResultZensuHeadsmoto[$l]["count"] = $count;
+
+            unset($arrResultZensuHeadsmoto[$m]);
+
+          }
+
+        }
+        $arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
+
+      }
+
+       return $arrResultZensuHeadsmoto;
+    }
 
 }
 

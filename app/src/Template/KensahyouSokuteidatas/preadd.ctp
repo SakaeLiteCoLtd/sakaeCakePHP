@@ -3,6 +3,14 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\User $user
  */
+/*
+if($gaikancount > 0){
+  $test_alert =
+  "<script type='text/javascript'>alert('
+  外観に「out」が含まれています。このまま続ける場合はOKで進めてください。戻る場合はブラウザの戻るボタンを押してください。');</script>";
+  echo $test_alert;
+}
+*/
 ?>
 
 <br>

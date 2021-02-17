@@ -6,7 +6,16 @@
  * @var \App\Model\Entity\User $user
  */
 ?>
-<?php phpinfo(); ?>
+<?php //phpinfo();
+?>
+
+<?= $this->Html->css('cake.css') ?>
+
+<div id="modal-content">
+	<p>「閉じる」か「背景」をクリックするとモーダルウィンドウを終了します。</p>
+	<p><a id="modal-close" class="button-link">閉じる</a></p>
+</div>
+
 <br>
     <?= $this->Flash->render() ?>
     <?= $this->Form->create($staff, ['url' => ['action' => 'login']]) ?>

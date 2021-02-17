@@ -54,11 +54,11 @@ class ApidatasController extends AppController
 			session_start();
 			$session = $this->request->getSession();
 			$_SESSION['test'][0] = 1;
-
+/*
 			echo "<pre>";
 			print_r($_SESSION);
 			echo "</pre>";
-
+*/
 		}
 
 

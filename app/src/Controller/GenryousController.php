@@ -180,6 +180,47 @@ class GenryousController extends AppController
 
 			$OrderMaterials = $this->OrderMaterials->newEntity();
 	    $this->set('OrderMaterials',$OrderMaterials);
+
+			$data = $this->request->getData();
+
+			$num = array_keys($data, '更新');
+			$num = $num[0];
+
+			$date_stored = $data['date_stored'.$num]['year']."-".$data['date_stored'.$num]['month']."-".$data['date_stored'.$num]['day'];
+			$num_lot = $data['num_lot'.$num];
+			$check_flag = $data['check_flag'.$num];
+			$flg = $data['flg'.$num];
+			$id = $data['id'.$num];
+/*
+			echo "<pre>";
+			print_r($date_stored);
+			echo "</pre>";
+			echo "<pre>";
+			print_r($num_lot);
+			echo "</pre>";
+			echo "<pre>";
+			print_r($check_flag);
+			echo "</pre>";
+			echo "<pre>";
+			print_r($flg);
+			echo "</pre>";
+			echo "<pre>";
+			print_r($id);
+			echo "</pre>";
+*/
+			$_SESSION['nyuukotyoukaupdate'] = array();
+			$_SESSION['nyuukotyoukaupdate'] = array(
+				'id' => $id,
+				'date_stored' => $date_stored,
+				'num_lot' => $num_lot,
+				'check_flag' => $check_flag,
+				'flg' => $flg
+			);
+/*
+			echo "<pre>";
+			print_r($_SESSION['nyuukotyoukaupdate']);
+			echo "</pre>";
+*/
     }
 
 		public function nyuukologin()
@@ -202,7 +243,7 @@ class GenryousController extends AppController
 
  					if ($user) {
  						$this->Auth->setUser($user);
-            return $this->redirect(['action' => 'nyuukomenu']);//nyuukomenuへ移動
+            return $this->redirect(['action' => 'nyuukotyoukakousin']);
  					}
  				}
     }
@@ -211,11 +252,12 @@ class GenryousController extends AppController
     {
 			$session = $this->request->getSession();
 			$datasession = $session->read();
-
+/*
 			if(!isset($datasession['Auth'])){
         return $this->redirect(['action' => 'menu',
         's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
       }
+*/
     }
 
 		public function nyuukotyouka()
@@ -225,12 +267,12 @@ class GenryousController extends AppController
 
 			$session = $this->request->getSession();
 			$datasession = $session->read();
-
+/*
 			if(!isset($datasession['Auth'])){
         return $this->redirect(['action' => 'menu',
         's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
       }
-
+*/
 			$dateYMD = date('Y-m-d');
 
 			$arrOrderMaterials = $this->OrderMaterials->find()
@@ -267,6 +309,12 @@ class GenryousController extends AppController
 
 			$data = $this->request->getData();
 
+			$data = $_SESSION['nyuukotyoukaupdate'];
+/*
+			echo "<pre>";
+			print_r($data);
+			echo "</pre>";
+
 			$num = array_keys($data, '更新');
 			$num = $num[0];
 
@@ -274,7 +322,7 @@ class GenryousController extends AppController
 			$num_lot = $data['num_lot'.$num];
 			$check_flag = $data['check_flag'.$num];
 			$flg = $data['flg'.$num];
-/*
+
 			echo "<pre>";
 			print_r($datasession['Auth']['User']['staff_id']);
 			echo "</pre>";
@@ -289,20 +337,52 @@ class GenryousController extends AppController
 			 $connection->begin();//トランザクション3
 			 try {//トランザクション4
 				 if ($this->OrderMaterials->updateAll(//検査終了時間の更新
-					 ['date_stored' => $date_stored, 'num_lot' => $num_lot, 'check_flag' => $check_flag,
-					  'flg' => $flg, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $datasession['Auth']['User']['staff_id']],
+					 ['date_stored' => $data['date_stored'], 'num_lot' => $data['num_lot'], 'check_flag' => $data['check_flag'],
+					  'flg' => $data['flg'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $datasession['Auth']['User']['staff_id']],
 					 ['id'  => $data['id']]
 				 )){
 
-					 //旧DBに単価登録
-					 $connection = ConnectionManager::get('DB_ikou_test');
+					 //旧DB
+					 $connection = ConnectionManager::get('sakaeMotoDB');
 					 $table = TableRegistry::get('order_material');
 					 $table->setConnection($connection);
 
-					 $updater = "UPDATE order_material set date_stored ='".$date_stored."', num_lot ='".$num_lot."',
-					  check_flag ='".$check_flag."', flg ='".$flg."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$datasession['Auth']['User']['staff_id']."'
-					 where id ='".$moto_id_order."'";
-					 $connection->execute($updater);
+					 $sql = "SELECT id FROM order_material".
+		 						" where id ='".$moto_id_order."'";
+								$connection = ConnectionManager::get('sakaeMotoDB');
+					 			$order_material_moto = $connection->execute($sql)->fetchAll('assoc');
+
+		 			if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
+
+						$updater = "UPDATE order_material set date_stored ='".$data['date_stored']."', num_lot ='".$data['num_lot']."',
+ 					  check_flag ='".$data['check_flag']."', flg ='".$data['flg']."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$datasession['Auth']['User']['staff_id']."'
+						where id ='".$moto_id_order."'";
+						$connection->execute($updater);
+
+				 }else{//なければinsert
+
+					 $connection->insert('order_material', [
+						 'id' => $motoOrderMaterials[0]->id_order,
+						 'grade' => $motoOrderMaterials[0]->grade,
+						 'color' => $motoOrderMaterials[0]->color,
+						 'date_order' => $motoOrderMaterials[0]->date_order,
+						 'date_stored' => $data['date_stored'],
+						 'amount' => $motoOrderMaterials[0]->amount,
+						 'sup_id' => $motoOrderMaterials[0]->sup_id,
+						 'deliv_cp' => $motoOrderMaterials[0]->deliv_cp,
+						 'purchaser' => $motoOrderMaterials[0]->purchaser,
+						 'check_flag' => $data['check_flag'],
+						 'flg' => $data['flg'],
+						 'first_date_st' => $motoOrderMaterials[0]->first_date_st,
+						 'real_date_st' => $motoOrderMaterials[0]->real_date_st,
+						 'num_lot' => $data['num_lot'],
+						 'price' => $motoOrderMaterials[0]->price,
+						 'updated_staff' => $datasession['Auth']['User']['staff_id'],
+			//			 'delete_flg' => 0,
+						 'updated_at' => date("Y-m-d H:i:s")
+					 ]);
+
+		 			}
 
 					 $connection = ConnectionManager::get('default');//新DBに戻る
 					 $table->setConnection($connection);
@@ -347,7 +427,6 @@ class GenryousController extends AppController
 
 		}
 
-
 		public function nyuukominyuuka()
 		{
 			$OrderMaterials = $this->OrderMaterials->newEntity();
@@ -355,12 +434,12 @@ class GenryousController extends AppController
 
 			$session = $this->request->getSession();
 			$datasession = $session->read();
-
+/*
 			if(!isset($datasession['Auth'])){
         return $this->redirect(['action' => 'menu',
         's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
       }
-
+*/
 			$arrOrderMaterials = $this->OrderMaterials->find()
 			->where(['flg !=' => 1])->order(["date_stored"=>"ASC"])->toArray();
 			$this->set('arrOrderMaterials',$arrOrderMaterials);
@@ -380,6 +459,60 @@ class GenryousController extends AppController
 			$this->set('arrFlag',$arrFlag);
 		}
 
+		public function nyuukominyuukapreadd()
+    {
+      session_start();//セッションの開始
+
+			$OrderMaterials = $this->OrderMaterials->newEntity();
+	    $this->set('OrderMaterials',$OrderMaterials);
+
+			$data = $this->request->getData();
+
+			$num = array_keys($data, '更新');
+			$num = $num[0];
+
+			$date_stored = $data['date_stored'.$num]['year']."-".$data['date_stored'.$num]['month']."-".$data['date_stored'.$num]['day'];
+			$num_lot = $data['num_lot'.$num];
+			$check_flag = $data['check_flag'.$num];
+			$flg = $data['flg'.$num];
+			$id = $data['id'.$num];
+
+			$_SESSION['nyuukominyuukaupdate'] = array();
+			$_SESSION['nyuukominyuukaupdate'] = array(
+				'id' => $id,
+				'date_stored' => $date_stored,
+				'num_lot' => $num_lot,
+				'check_flag' => $check_flag,
+				'flg' => $flg
+			);
+
+    }
+
+		public function nyuukominyuukalogin()
+    {
+			if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
+
+        $htmllogin = new htmlLogin();//クラスを使用
+        $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();
+
+ 					if ($user) {
+ 						$this->Auth->setUser($user);
+            return $this->redirect(['action' => 'nyuukominyuukakousin']);
+ 					}
+ 				}
+    }
+
 		public function nyuukominyuukakousin()
 		{
 			$OrderMaterials = $this->OrderMaterials->newEntity();
@@ -395,18 +528,8 @@ class GenryousController extends AppController
 
 			$data = $this->request->getData();
 
-			$num = array_keys($data, '更新');
-			$num = $num[0];
+			$data = $_SESSION['nyuukominyuukaupdate'];
 
-			$date_stored = $data['date_stored'.$num]['year']."-".$data['date_stored'.$num]['month']."-".$data['date_stored'.$num]['day'];
-			$num_lot = $data['num_lot'.$num];
-			$check_flag = $data['check_flag'.$num];
-			$flg = $data['flg'.$num];
-/*
-			echo "<pre>";
-			print_r($datasession['Auth']['User']['staff_id']);
-			echo "</pre>";
-*/
 			$motoOrderMaterials = $this->OrderMaterials->find()
 			->where(['id' => $data['id']])->toArray();
 			$moto_id_order = $motoOrderMaterials[0]->id_order;
@@ -417,20 +540,52 @@ class GenryousController extends AppController
 			 $connection->begin();//トランザクション3
 			 try {//トランザクション4
 				 if ($this->OrderMaterials->updateAll(//検査終了時間の更新
-					 ['date_stored' => $date_stored, 'num_lot' => $num_lot, 'check_flag' => $check_flag,
-					  'flg' => $flg, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $datasession['Auth']['User']['staff_id']],
+					 ['date_stored' => $data['date_stored'], 'num_lot' => $data['num_lot'], 'check_flag' => $data['check_flag'],
+					  'flg' => $data['flg'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $datasession['Auth']['User']['staff_id']],
 					 ['id'  => $data['id']]
 				 )){
 
-					 //旧DBに単価登録
-					 $connection = ConnectionManager::get('DB_ikou_test');
+					 //旧DB
+					 $connection = ConnectionManager::get('sakaeMotoDB');
 					 $table = TableRegistry::get('order_material');
 					 $table->setConnection($connection);
 
-					 $updater = "UPDATE order_material set date_stored ='".$date_stored."', num_lot ='".$num_lot."',
-					  check_flag ='".$check_flag."', flg ='".$flg."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$datasession['Auth']['User']['staff_id']."'
-					 where id ='".$moto_id_order."'";
-					 $connection->execute($updater);
+					 $sql = "SELECT id FROM order_material".
+		 						" where id ='".$moto_id_order."'";
+								$connection = ConnectionManager::get('sakaeMotoDB');
+					 			$order_material_moto = $connection->execute($sql)->fetchAll('assoc');
+
+		 			if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
+
+						$updater = "UPDATE order_material set date_stored ='".$data['date_stored']."', num_lot ='".$data['num_lot']."',
+ 					  check_flag ='".$data['check_flag']."', flg ='".$data['flg']."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$datasession['Auth']['User']['staff_id']."'
+						where id ='".$moto_id_order."'";
+						$connection->execute($updater);
+
+				 }else{//なければinsert
+
+					 $connection->insert('order_material', [
+						 'id' => $motoOrderMaterials[0]->id_order,
+						 'grade' => $motoOrderMaterials[0]->grade,
+						 'color' => $motoOrderMaterials[0]->color,
+						 'date_order' => $motoOrderMaterials[0]->date_order,
+						 'date_stored' => $data['date_stored'],
+						 'amount' => $motoOrderMaterials[0]->amount,
+						 'sup_id' => $motoOrderMaterials[0]->sup_id,
+						 'deliv_cp' => $motoOrderMaterials[0]->deliv_cp,
+						 'purchaser' => $motoOrderMaterials[0]->purchaser,
+						 'check_flag' => $data['check_flag'],
+						 'flg' => $data['flg'],
+						 'first_date_st' => $motoOrderMaterials[0]->first_date_st,
+						 'real_date_st' => $motoOrderMaterials[0]->real_date_st,
+						 'num_lot' => $data['num_lot'],
+						 'price' => $motoOrderMaterials[0]->price,
+						 'updated_staff' => $datasession['Auth']['User']['staff_id'],
+			//			 'delete_flg' => 0,
+						 'updated_at' => date("Y-m-d H:i:s")
+					 ]);
+
+		 			}
 
 					 $connection = ConnectionManager::get('default');//新DBに戻る
 					 $table->setConnection($connection);
@@ -480,12 +635,12 @@ class GenryousController extends AppController
 
 			$session = $this->request->getSession();
 			$datasession = $session->read();
-
+/*
 			if(!isset($datasession['Auth'])){
 				return $this->redirect(['action' => 'menu',
 				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
 			}
-
+*/
 		}
 
 		public function nyuukonoukiitiran()
@@ -498,12 +653,12 @@ class GenryousController extends AppController
 
 			$session = $this->request->getSession();
 			$datasession = $session->read();
-
+/*
 			if(!isset($datasession['Auth'])){
 				return $this->redirect(['action' => 'menu',
 				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
 			}
-
+*/
 			$data = $this->request->getData();
 
 			$dateYMD = date('Y-m-d');
@@ -587,7 +742,7 @@ class GenryousController extends AppController
 				 )){
 
 					 //旧DBに単価登録
-					 $connection = ConnectionManager::get('DB_ikou_test');
+					 $connection = ConnectionManager::get('sakaeMotoDB');
 					 $table = TableRegistry::get('order_material');
 					 $table->setConnection($connection);
 

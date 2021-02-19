@@ -69,7 +69,16 @@ class ApizaikocyouController extends AppController
 			$dateendnext = date('Y-m-d', strtotime('+32 day', $datestartstr));//kodouseikeisで使用
 /*
 			echo "<pre>";
-			print_r($datestart." ".$dateend);
+			print_r($date1);
+			echo "</pre>";
+			echo "<pre>";
+			print_r($datenext1);
+			echo "</pre>";
+			echo "<pre>";
+			print_r($datestart);
+			echo "</pre>";
+			echo "<pre>";
+			print_r($dateend);
 			echo "</pre>";
 */
 			//http://192.168.4.246/Apizaikocyou/zaikocyou/api/2020-12-3_primary.xml
@@ -227,7 +236,8 @@ class ApizaikocyouController extends AppController
 //$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し//210216更新
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1,
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day,
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
 				->order(["date_culc"=>"ASC"])->toArray();
 
@@ -276,7 +286,7 @@ class ApizaikocyouController extends AppController
 //$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -538,7 +548,8 @@ class ApizaikocyouController extends AppController
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1])
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				->order(["date_culc"=>"ASC"])->toArray();
 
 				if(count($StockProducts) < 1){
@@ -588,7 +599,7 @@ class ApizaikocyouController extends AppController
 				//$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0])
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -645,7 +656,7 @@ class ApizaikocyouController extends AppController
 				//$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
-				$dayfin = $datenext1." 07:59:59";
+				$dayfin = $dateend." 07:59:59";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
@@ -852,7 +863,8 @@ class ApizaikocyouController extends AppController
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1,
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day,
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_culc"=>"ASC"])->toArray();
 
@@ -901,7 +913,7 @@ class ApizaikocyouController extends AppController
 				//$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -956,7 +968,7 @@ class ApizaikocyouController extends AppController
 				//$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
-				$dayfin = $datenext1." 07:59:59";
+				$dayfin = $dateend." 07:59:59";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
@@ -1163,7 +1175,8 @@ class ApizaikocyouController extends AppController
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1,
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day,
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 				->order(["date_culc"=>"ASC"])->toArray();
 
@@ -1212,7 +1225,7 @@ class ApizaikocyouController extends AppController
 				//$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -1267,7 +1280,7 @@ class ApizaikocyouController extends AppController
 				//$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
-				$dayfin = $datenext1." 07:59:59";
+				$dayfin = $dateend." 07:59:59";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
@@ -1473,7 +1486,8 @@ class ApizaikocyouController extends AppController
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1])
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
 
 				if(count($StockProducts) < 1){
@@ -1520,7 +1534,7 @@ class ApizaikocyouController extends AppController
 					//$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0])
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -1576,7 +1590,7 @@ class ApizaikocyouController extends AppController
 				//$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
-				$dayfin = $datenext1." 07:59:59";
+				$dayfin = $dateend." 07:59:59";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
@@ -1781,7 +1795,8 @@ class ApizaikocyouController extends AppController
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1])
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
 
 				if(count($StockProducts) < 1){
@@ -1828,7 +1843,7 @@ class ApizaikocyouController extends AppController
 					//$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0])
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -1884,7 +1899,7 @@ class ApizaikocyouController extends AppController
 				//$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
-				$dayfin = $datenext1." 07:59:59";
+				$dayfin = $dateend." 07:59:59";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
@@ -2088,7 +2103,8 @@ class ApizaikocyouController extends AppController
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1])
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
 
 				if(count($StockProducts) < 1){
@@ -2136,7 +2152,7 @@ class ApizaikocyouController extends AppController
 					//$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0])
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -2193,7 +2209,7 @@ class ApizaikocyouController extends AppController
 				//$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
-				$dayfin = $datenext1." 07:59:59";
+				$dayfin = $dateend." 07:59:59";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
@@ -2400,7 +2416,8 @@ class ApizaikocyouController extends AppController
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1,
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day,
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 				->order(["date_culc"=>"ASC"])->toArray();
 
@@ -2449,7 +2466,7 @@ class ApizaikocyouController extends AppController
 					//$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -2504,7 +2521,7 @@ class ApizaikocyouController extends AppController
 				//$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
-				$dayfin = $datenext1." 07:59:59";
+				$dayfin = $dateend." 07:59:59";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
@@ -2711,7 +2728,8 @@ class ApizaikocyouController extends AppController
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1,
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day,
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_culc"=>"ASC"])->toArray();
 
@@ -2760,7 +2778,7 @@ class ApizaikocyouController extends AppController
 					//$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -2815,7 +2833,7 @@ class ApizaikocyouController extends AppController
 				//$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
-				$dayfin = $datenext1." 07:59:59";
+				$dayfin = $dateend." 07:59:59";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
@@ -3022,7 +3040,8 @@ class ApizaikocyouController extends AppController
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1,
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day,
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_culc"=>"ASC"])->toArray();
 
@@ -3071,7 +3090,7 @@ class ApizaikocyouController extends AppController
 					//$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -3126,7 +3145,7 @@ class ApizaikocyouController extends AppController
 				//$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
-				$dayfin = $datenext1." 07:59:59";
+				$dayfin = $dateend." 07:59:59";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
@@ -3333,7 +3352,8 @@ class ApizaikocyouController extends AppController
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1])
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
 
 				if(count($StockProducts) < 1){
@@ -3380,7 +3400,7 @@ class ApizaikocyouController extends AppController
 					//$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0])
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -3436,7 +3456,7 @@ class ApizaikocyouController extends AppController
 				//$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
-				$dayfin = $datenext1." 07:59:59";
+				$dayfin = $dateend." 07:59:59";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
@@ -3641,7 +3661,8 @@ class ApizaikocyouController extends AppController
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
-				->where(['date_culc >=' => $day, 'date_culc <=' => $datenext1,
+				->where(['date_culc >=' => $day, 'date_culc <=' => $day,
+				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_culc"=>"ASC"])->toArray();
 
@@ -3690,7 +3711,7 @@ class ApizaikocyouController extends AppController
 					//$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $datenext1, 'delete_flag' => 0,
+				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_deliver"=>"ASC"])->toArray();
 
@@ -3745,7 +3766,7 @@ class ApizaikocyouController extends AppController
 				//$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
-				$dayfin = $datenext1." 07:59:59";
+				$dayfin = $dateend." 07:59:59";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,

@@ -33,14 +33,16 @@ class htmlGenryoumenu extends AppController
                   "<img src='/img/Labelimg/report_stock_mate.gif' width=115 height=40>\n".
                   "</a>\n".
 */
-"<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/nyuukopreadd'>\n".
+"<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/nyuukomenu'>\n".
 "<img src='/img/Labelimg/gen_nyuuko.gif' width=115 height=40>\n".
+
 "</a>\n".
 "<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/csvtest'>\n".
 "<img src='/img/Labelimg/testcsv.gif' width=115 height=40>\n".
 "</a>\n".
 "<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/gazoutest'>\n".
 "<img src='/img/Labelimg/testgazou.gif' width=115 height=40>\n".
+
 "</a>\n";
 
     		return $html;
@@ -55,9 +57,11 @@ class htmlGenryoumenu extends AppController
                  "</a>\n".
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/nyuukominyuuka'>\n".
                  "<img src='/img/Labelimg/nyuukominyuka.gif' width=100 height=40>\n".
+                 /*
                  "</a>\n".
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/nyuukonouki'>\n".
                  "<img src='/img/Labelimg/nyuukonouki.gif' width=100 height=40>\n".
+                 */
                  "</a>\n";
 
        return $html;

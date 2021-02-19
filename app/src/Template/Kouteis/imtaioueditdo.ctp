@@ -100,5 +100,5 @@ echo "</strong></div></td>\n";
 
 <br>
 <br>
-        <p align="center"><?= $this->Form->button(__('トップ'), array('name' => 'top')) ?></p>
+        <p align="center"><?= $this->Form->submit(__('トップ'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>

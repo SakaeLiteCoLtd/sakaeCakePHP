@@ -21,10 +21,10 @@
  ?>
  </table>
  <hr size="5" style="margin: 0.5rem">
-    <div align="left"><font color="blue" size="3"><?= __("　　　期限超過一覧") ?></font></div>
+    <div align="left"><font color="blue" size="3"><?= __("　　　未入荷一覧") ?></font></div>
  <br>
 
-<?=$this->Form->create($OrderMaterials, ['url' => ['action' => 'nyuukominyuukakousin']]) ?>
+<?=$this->Form->create($OrderMaterials, ['url' => ['action' => 'nyuukominyuukapreadd']]) ?>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
         <thead>
@@ -69,10 +69,10 @@
             <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->control("flg".$i, array('type' => 'select', "options"=>$arrFlag, 'label'=>false)); ?></div></td>
             <?php
             echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
-            echo $this->Form->submit("更新" , ['action'=>'nyuukotyoukakousin', 'name' => $i]) ;
+            echo $this->Form->submit("更新" , ['action'=>'nyuukominyuukapreadd', 'name' => $i]) ;
             echo "</div></td>";
             ?>
-            <?= $this->Form->control('id', array('type'=>'hidden', 'value'=>$arrOrderMaterials[$i]["id"], 'label'=>false)) ?>
+            <?= $this->Form->control('id'.$i, array('type'=>'hidden', 'value'=>$arrOrderMaterials[$i]["id"], 'label'=>false)) ?>
 
           </tr>
         <?php endfor;?>

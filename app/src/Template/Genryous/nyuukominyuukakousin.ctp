@@ -21,7 +21,7 @@
  ?>
  </table>
  <hr size="5" style="margin: 0.5rem">
-    <div align="left"><font color="blue" size="3"><?= __("　　　期限超過一覧") ?></font></div>
+    <div align="left"><font color="blue" size="3"><?= __("　　　未入荷一覧") ?></font></div>
  <br>
     <div align="center"><font color="red" size="3"><?= __($mes) ?></font></div>
  <br>

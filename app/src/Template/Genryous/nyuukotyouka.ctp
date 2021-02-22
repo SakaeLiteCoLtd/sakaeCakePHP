@@ -39,7 +39,10 @@
             <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">実際入荷日</strong></div></td>
             <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">ロットNO.</strong></div></td>
             <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">入荷確認</strong></div></td>
-            <td width="60" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF"></strong></div></td>
+            <?php
+        //    <td width="60" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 9pt; color:#FF66FF"></strong></div></td>
+            ?>
+
           </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -68,14 +71,22 @@
             <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->control("num_lot".$i, array('type' => 'text', 'label'=>false)); ?></div></td>
             <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->control("flg".$i, array('type' => 'select', "options"=>$arrFlag, 'label'=>false)); ?></div></td>
             <?php
-            echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
-            echo $this->Form->submit("更新" , ['action'=>'nyuukopreadd', 'name' => $i]) ;
-            echo "</div></td>";
+      //      echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
+      //      echo $this->Form->submit("更新" , ['action'=>'nyuukopreadd', 'name' => $i]) ;
+      //      echo "</div></td>";
             ?>
             <?= $this->Form->control('id'.$i, array('type'=>'hidden', 'value'=>$arrOrderMaterials[$i]["id"], 'label'=>false)) ?>
+            <?= $this->Form->control('num', array('type'=>'hidden', 'value'=>$i, 'label'=>false)) ?>
 
           </tr>
         <?php endfor;?>
         </tbody>
     </table>
-<br><br>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+<td style="border-style: none;"><div align="center"><?= $this->Form->submit('更新', array('name' => 'kousin')); ?></div></td>
+</tr>
+</table>
+
+<br>

@@ -87,7 +87,11 @@ class ApizaikocyouController extends AppController
 			if($sheet === "primary"){
 
 //$arrProductsmotoスタート
-
+/*
+echo "<pre>";
+print_r("1".date('Y-m-d H:i:s'));
+echo "</pre>";
+*/
 				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 				->where(['products.status' => 0, 'primary_p' => 1,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])->toArray();
@@ -104,6 +108,11 @@ class ApizaikocyouController extends AppController
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
 
 //$arrProductsmoto完成
+/*
+echo "<pre>";
+print_r("1".date('Y-m-d H:i:s'));
+echo "</pre>";
+*/
 
 //$arrResultZensuHeadsmotoスタート
 
@@ -114,7 +123,11 @@ class ApizaikocyouController extends AppController
 				$arrResultZensuHeadsmoto = $htmlApifind->ResultZensuHeadsmoto($dateend);//クラスを使用
 
 //$arrResultZensuHeadsmoto完成
-
+/*
+echo "<pre>";
+print_r("1".date('Y-m-d H:i:s'));
+echo "</pre>";
+*/
 
 //$arrAssembleProductsスタート
 
@@ -164,6 +177,11 @@ class ApizaikocyouController extends AppController
 				}
 
 //$arrAssembleProducts完成
+/*
+echo "<pre>";
+print_r("1".date('Y-m-d H:i:s'));
+echo "</pre>";
+*/
 
 //$arrOrderEdisスタート
 
@@ -231,7 +249,11 @@ class ApizaikocyouController extends AppController
 				$arrOrderEdis = $htmlApifind->OrderEdis($date16);//クラスを使用
 
 //$arrOrderEdis完成
-
+/*
+echo "<pre>";
+print_r("1".date('Y-m-d H:i:s'));
+echo "</pre>";
+*/
 
 //$StockProductsスタート
 
@@ -240,14 +262,14 @@ class ApizaikocyouController extends AppController
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 					'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -282,6 +304,11 @@ class ApizaikocyouController extends AppController
 					}
 
 //$StockProducts完成
+/*
+echo "<pre>";
+print_r("1".date('Y-m-d H:i:s'));
+echo "</pre>";
+*/
 
 //$SyoyouKeikakusスタート
 
@@ -337,7 +364,11 @@ class ApizaikocyouController extends AppController
 				}
 
 //$SyoyouKeikakus完成
-
+/*
+echo "<pre>";
+print_r("1".date('Y-m-d H:i:s'));
+echo "</pre>";
+*/
 //$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
@@ -397,6 +428,11 @@ class ApizaikocyouController extends AppController
 					}
 
 //$arrSeisans完成
+/*
+echo "<pre>";
+print_r("1".date('Y-m-d H:i:s'));
+echo "</pre>";
+*/
 
 			}elseif($sheet === "primary_dnp"){
 
@@ -551,13 +587,13 @@ class ApizaikocyouController extends AppController
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 				$arrStockProducts = array();
 				for($k=0; $k<count($StockProducts); $k++){
 
@@ -867,14 +903,14 @@ class ApizaikocyouController extends AppController
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 				$arrStockProducts = array();
 				for($k=0; $k<count($StockProducts); $k++){
 
@@ -1179,14 +1215,14 @@ class ApizaikocyouController extends AppController
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 					'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 				$arrStockProducts = array();
 				for($k=0; $k<count($StockProducts); $k++){
 
@@ -1489,13 +1525,13 @@ class ApizaikocyouController extends AppController
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -1798,13 +1834,13 @@ class ApizaikocyouController extends AppController
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -2106,13 +2142,13 @@ class ApizaikocyouController extends AppController
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -2420,14 +2456,14 @@ class ApizaikocyouController extends AppController
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 					'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -2732,14 +2768,14 @@ class ApizaikocyouController extends AppController
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 					'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -3044,14 +3080,14 @@ class ApizaikocyouController extends AppController
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -3355,13 +3391,13 @@ class ApizaikocyouController extends AppController
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -3665,14 +3701,14 @@ class ApizaikocyouController extends AppController
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_culc"=>"ASC"])->toArray();
-
+/*
 				if(count($StockProducts) < 1){
 					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
 					'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 					->order(["date_stock"=>"ASC"])->toArray();
 				}
-
+*/
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 

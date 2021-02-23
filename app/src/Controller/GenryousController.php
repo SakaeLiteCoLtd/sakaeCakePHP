@@ -75,6 +75,15 @@ class GenryousController extends AppController
 			];
 			$this->set('arrDelivCp',$arrDelivCp);
 
+			$arrOrderMaterials = $this->OrderMaterials->find()
+			->select(['grade', 'color'])
+			->where(['delete_flag' => 0])->order(["grade"=>"ASC"])->toArray();
+
+			$arrOrderMaterials = array_unique($arrOrderMaterials, SORT_REGULAR);
+			$arrOrderMaterials = array_values($arrOrderMaterials);
+
+			$this->set('arrOrderMaterials',$arrOrderMaterials);
+
     }
 
 		public function tourokuzumiitiran()
@@ -100,13 +109,13 @@ class GenryousController extends AppController
 					if(empty($data['deliv_cp'])){//m_grade,col_num,deliv_cpがNULLの場合　//全部null
 
 						$arrOrderMaterials = $this->OrderMaterials->find()
-	          ->where(['date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin])->order(["date_order"=>"ASC"])->toArray();
+	          ->where(['date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin, 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
 	          $this->set('arrOrderMaterials',$arrOrderMaterials);
 
 					}else{//m_grade,col_numがNULL　deliv_cpはあり　//deliv_cp〇
 
 						$arrOrderMaterials = $this->OrderMaterials->find()
-	          ->where(['deliv_cp' => $deliv_cp, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin])->order(["date_order"=>"ASC"])->toArray();
+	          ->where(['deliv_cp' => $deliv_cp, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin, 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
 	          $this->set('arrOrderMaterials',$arrOrderMaterials);
 
 					}
@@ -116,13 +125,13 @@ class GenryousController extends AppController
 					if(empty($data['deliv_cp'])){//col_num〇
 
 						$arrOrderMaterials = $this->OrderMaterials->find()
-	          ->where(['color' => $col_num, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin])->order(["date_order"=>"ASC"])->toArray();
+	          ->where(['color' => $col_num, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin, 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
 	          $this->set('arrOrderMaterials',$arrOrderMaterials);
 
 					}else{//col_num、deliv_cp〇
 
 						$arrOrderMaterials = $this->OrderMaterials->find()
-	          ->where(['color' => $col_num, 'deliv_cp' => $deliv_cp, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin])->order(["date_order"=>"ASC"])->toArray();
+	          ->where(['color' => $col_num, 'deliv_cp' => $deliv_cp, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin, 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
 	          $this->set('arrOrderMaterials',$arrOrderMaterials);
 
 					}
@@ -136,13 +145,13 @@ class GenryousController extends AppController
 					if(empty($data['deliv_cp'])){//m_grade〇
 
 						$arrOrderMaterials = $this->OrderMaterials->find()
-	          ->where(['grade' => $m_grade, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin])->order(["date_order"=>"ASC"])->toArray();
+	          ->where(['grade' => $m_grade, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin, 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
 	          $this->set('arrOrderMaterials',$arrOrderMaterials);
 
 					}else{//m_grade、deliv_cp〇
 
 						$arrOrderMaterials = $this->OrderMaterials->find()
-	          ->where(['deliv_cp' => $deliv_cp, 'grade' => $m_grade, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin])->order(["date_order"=>"ASC"])->toArray();
+	          ->where(['deliv_cp' => $deliv_cp, 'grade' => $m_grade, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin, 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
 	          $this->set('arrOrderMaterials',$arrOrderMaterials);
 
 					}
@@ -152,13 +161,13 @@ class GenryousController extends AppController
 					if(empty($data['deliv_cp'])){//m_grade、col_num〇
 
 						$arrOrderMaterials = $this->OrderMaterials->find()
-	          ->where(['grade' => $m_grade, 'color' => $col_num, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin])->order(["date_order"=>"ASC"])->toArray();
+	          ->where(['grade' => $m_grade, 'color' => $col_num, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin, 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
 	          $this->set('arrOrderMaterials',$arrOrderMaterials);
 
 					}else{//m_grade、col_num、deliv_cp〇
 
 						$arrOrderMaterials = $this->OrderMaterials->find()
-	          ->where(['grade' => $m_grade, 'color' => $col_num, 'deliv_cp' => $deliv_cp, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin])->order(["date_order"=>"ASC"])->toArray();
+	          ->where(['grade' => $m_grade, 'color' => $col_num, 'deliv_cp' => $deliv_cp, 'date_order >=' => $hattyu_date_sta, 'date_order <=' => $hattyu_date_fin, 'date_stored >=' => $nyuuko_date_sta, 'date_stored <=' => $nyuuko_date_fin, 'delete_flag' => 0])->order(["date_order"=>"ASC"])->toArray();
 	          $this->set('arrOrderMaterials',$arrOrderMaterials);
 
 					}
@@ -280,7 +289,7 @@ class GenryousController extends AppController
 			$dateYMD = date('Y-m-d');
 
 			$arrOrderMaterials = $this->OrderMaterials->find()
-			->where(['flg !=' => 1, 'date_stored <=' => $dateYMD])->order(["date_stored"=>"ASC"])->toArray();
+			->where(['flg !=' => 1, 'date_stored <=' => $dateYMD, 'delete_flag' => 0])->order(["date_stored"=>"ASC"])->toArray();
 			$this->set('arrOrderMaterials',$arrOrderMaterials);
 
 			$arrGyousya = [
@@ -326,10 +335,10 @@ class GenryousController extends AppController
 					 ->where(['id' => $data[$n]['id']])->toArray();
 					 $moto_id_order = $motoOrderMaterials[0]->id_order;
 
-					 if($data[$n]['check_flag'] == 3 || $data[$n]['flg'] == 1){//date_stored更新
+					 if($data[$n]['flg'] == 1){//date_stored,realdate更新
 
 						 if ($this->OrderMaterials->updateAll(//検査終了時間の更新
-							 ['date_stored' => $data[$n]['date_stored'], 'num_lot' => $data[$n]['num_lot'], 'check_flag' => $data[$n]['check_flag'],
+							 ['date_stored' => $data[$n]['date_stored'], 'real_date_st' => $data[$n]['date_stored'], 'num_lot' => $data[$n]['num_lot'], 'check_flag' => $data[$n]['check_flag'],
 							  'flg' => $data[$n]['flg'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $datasession['Auth']['User']['staff_id']],
 							 ['id'  => $data[$n]['id']]
 						 )){
@@ -346,7 +355,7 @@ class GenryousController extends AppController
 
 							 if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
 
-								$updater = "UPDATE order_material set date_stored ='".$data[$n]['date_stored']."', num_lot ='".$data[$n]['num_lot']."',
+								$updater = "UPDATE order_material set date_stored ='".$data[$n]['date_stored']."', real_date_st ='".$data[$n]['date_stored']."', num_lot ='".$data[$n]['num_lot']."',
 		 					  check_flag ='".$data[$n]['check_flag']."', flg ='".$data[$n]['flg']."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$datasession['Auth']['User']['staff_id']."'
 								where id ='".$moto_id_order."'";
 								$connection->execute($updater);
@@ -359,6 +368,7 @@ class GenryousController extends AppController
 										 'color' => $motoOrderMaterials[0]->color,
 										 'date_order' => $motoOrderMaterials[0]->date_order,
 										 'date_stored' => $data[$n]['date_stored'],
+										 'real_date_st' => $data[$n]['date_stored'],
 										 'amount' => $motoOrderMaterials[0]->amount,
 										 'sup_id' => $motoOrderMaterials[0]->sup_id,
 										 'deliv_cp' => $motoOrderMaterials[0]->deliv_cp,
@@ -388,7 +398,69 @@ class GenryousController extends AppController
 
 					 }
 
-					 }else{//date_stored更新しない
+				 }elseif($data[$n]['check_flag'] == 3){//date_stored更新
+
+					 if ($this->OrderMaterials->updateAll(//検査終了時間の更新
+						 ['date_stored' => $data[$n]['date_stored'], 'num_lot' => $data[$n]['num_lot'], 'check_flag' => $data[$n]['check_flag'],
+							'flg' => $data[$n]['flg'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $datasession['Auth']['User']['staff_id']],
+						 ['id'  => $data[$n]['id']]
+					 )){
+
+						 //旧DB
+						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $table = TableRegistry::get('order_material');
+						 $table->setConnection($connection);
+
+						 $sql = "SELECT id FROM order_material".
+									" where id ='".$moto_id_order."'";
+									$connection = ConnectionManager::get('DB_ikou_test');
+									$order_material_moto = $connection->execute($sql)->fetchAll('assoc');
+
+						 if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
+
+							$updater = "UPDATE order_material set date_stored ='".$data[$n]['date_stored']."', num_lot ='".$data[$n]['num_lot']."',
+							check_flag ='".$data[$n]['check_flag']."', flg ='".$data[$n]['flg']."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$datasession['Auth']['User']['staff_id']."'
+							where id ='".$moto_id_order."'";
+							$connection->execute($updater);
+
+							 }else{//なければinsert
+
+								 $connection->insert('order_material', [
+									 'id' => $motoOrderMaterials[0]->id_order,
+									 'grade' => $motoOrderMaterials[0]->grade,
+									 'color' => $motoOrderMaterials[0]->color,
+									 'date_order' => $motoOrderMaterials[0]->date_order,
+									 'date_stored' => $data[$n]['date_stored'],
+									 'amount' => $motoOrderMaterials[0]->amount,
+									 'sup_id' => $motoOrderMaterials[0]->sup_id,
+									 'deliv_cp' => $motoOrderMaterials[0]->deliv_cp,
+									 'purchaser' => $motoOrderMaterials[0]->purchaser,
+									 'check_flag' => $data[$n]['check_flag'],
+									 'flg' => $data[$n]['flg'],
+									 'first_date_st' => $motoOrderMaterials[0]->first_date_st,
+									 'real_date_st' => $motoOrderMaterials[0]->real_date_st,
+									 'num_lot' => $data[$n]['num_lot'],
+									 'price' => $motoOrderMaterials[0]->price,
+									 'updated_staff' => $datasession['Auth']['User']['staff_id'],
+						//			 'delete_flg' => 0,
+									 'updated_at' => date("Y-m-d H:i:s")
+								 ]);
+
+								}
+
+								 $connection = ConnectionManager::get('default');//新DBに戻る
+								 $table->setConnection($connection);
+
+				 } else {
+
+					 $mes = "※更新されませんでした";
+					 $this->set('mes',$mes);
+					 $this->Flash->error(__('The date could not be saved. Please, try again.'));
+					 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+				 }
+
+				 }else{//date_stored更新しない
 
 							 if ($this->OrderMaterials->updateAll(//検査終了時間の更新
 								 ['num_lot' => $data[$n]['num_lot'], 'check_flag' => $data[$n]['check_flag'],
@@ -498,7 +570,7 @@ class GenryousController extends AppController
       }
 */
 			$arrOrderMaterials = $this->OrderMaterials->find()
-			->where(['flg !=' => 1])->order(["date_stored"=>"ASC"])->toArray();
+			->where(['flg !=' => 1, 'delete_flag' => 0])->order(["date_stored"=>"ASC"])->toArray();
 			$this->set('arrOrderMaterials',$arrOrderMaterials);
 
 			$arrGyousya = [
@@ -598,10 +670,10 @@ class GenryousController extends AppController
 					 ->where(['id' => $data[$n]['id']])->toArray();
 					 $moto_id_order = $motoOrderMaterials[0]->id_order;
 
-					 if($data[$n]['check_flag'] == 3 || $data[$n]['flg'] == 1){//date_stored更新
+					 if($data[$n]['flg'] == 1){//date_stored,realdate更新
 
 						 if ($this->OrderMaterials->updateAll(//検査終了時間の更新
-							 ['date_stored' => $data[$n]['date_stored'], 'num_lot' => $data[$n]['num_lot'], 'check_flag' => $data[$n]['check_flag'],
+							 ['date_stored' => $data[$n]['date_stored'], 'real_date_st' => $data[$n]['date_stored'], 'num_lot' => $data[$n]['num_lot'], 'check_flag' => $data[$n]['check_flag'],
 							  'flg' => $data[$n]['flg'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $datasession['Auth']['User']['staff_id']],
 							 ['id'  => $data[$n]['id']]
 						 )){
@@ -618,7 +690,7 @@ class GenryousController extends AppController
 
 							 if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
 
-								$updater = "UPDATE order_material set date_stored ='".$data[$n]['date_stored']."', num_lot ='".$data[$n]['num_lot']."',
+								$updater = "UPDATE order_material set date_stored ='".$data[$n]['date_stored']."', real_date_st ='".$data[$n]['date_stored']."', num_lot ='".$data[$n]['num_lot']."',
 		 					  check_flag ='".$data[$n]['check_flag']."', flg ='".$data[$n]['flg']."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$datasession['Auth']['User']['staff_id']."'
 								where id ='".$moto_id_order."'";
 								$connection->execute($updater);
@@ -631,6 +703,7 @@ class GenryousController extends AppController
 										 'color' => $motoOrderMaterials[0]->color,
 										 'date_order' => $motoOrderMaterials[0]->date_order,
 										 'date_stored' => $data[$n]['date_stored'],
+										 'real_date_st' => $data[$n]['date_stored'],
 										 'amount' => $motoOrderMaterials[0]->amount,
 										 'sup_id' => $motoOrderMaterials[0]->sup_id,
 										 'deliv_cp' => $motoOrderMaterials[0]->deliv_cp,
@@ -660,7 +733,69 @@ class GenryousController extends AppController
 
 					 }
 
-					 }else{//date_stored更新しない
+				 }elseif($data[$n]['check_flag'] == 3){//date_stored更新
+
+					 if ($this->OrderMaterials->updateAll(//検査終了時間の更新
+						 ['date_stored' => $data[$n]['date_stored'], 'num_lot' => $data[$n]['num_lot'], 'check_flag' => $data[$n]['check_flag'],
+							'flg' => $data[$n]['flg'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $datasession['Auth']['User']['staff_id']],
+						 ['id'  => $data[$n]['id']]
+					 )){
+
+						 //旧DB
+						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $table = TableRegistry::get('order_material');
+						 $table->setConnection($connection);
+
+						 $sql = "SELECT id FROM order_material".
+									" where id ='".$moto_id_order."'";
+									$connection = ConnectionManager::get('DB_ikou_test');
+									$order_material_moto = $connection->execute($sql)->fetchAll('assoc');
+
+						 if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
+
+							$updater = "UPDATE order_material set date_stored ='".$data[$n]['date_stored']."', num_lot ='".$data[$n]['num_lot']."',
+							check_flag ='".$data[$n]['check_flag']."', flg ='".$data[$n]['flg']."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$datasession['Auth']['User']['staff_id']."'
+							where id ='".$moto_id_order."'";
+							$connection->execute($updater);
+
+							 }else{//なければinsert
+
+								 $connection->insert('order_material', [
+									 'id' => $motoOrderMaterials[0]->id_order,
+									 'grade' => $motoOrderMaterials[0]->grade,
+									 'color' => $motoOrderMaterials[0]->color,
+									 'date_order' => $motoOrderMaterials[0]->date_order,
+									 'date_stored' => $data[$n]['date_stored'],
+									 'amount' => $motoOrderMaterials[0]->amount,
+									 'sup_id' => $motoOrderMaterials[0]->sup_id,
+									 'deliv_cp' => $motoOrderMaterials[0]->deliv_cp,
+									 'purchaser' => $motoOrderMaterials[0]->purchaser,
+									 'check_flag' => $data[$n]['check_flag'],
+									 'flg' => $data[$n]['flg'],
+									 'first_date_st' => $motoOrderMaterials[0]->first_date_st,
+									 'real_date_st' => $motoOrderMaterials[0]->real_date_st,
+									 'num_lot' => $data[$n]['num_lot'],
+									 'price' => $motoOrderMaterials[0]->price,
+									 'updated_staff' => $datasession['Auth']['User']['staff_id'],
+						//			 'delete_flg' => 0,
+									 'updated_at' => date("Y-m-d H:i:s")
+								 ]);
+
+								}
+
+								 $connection = ConnectionManager::get('default');//新DBに戻る
+								 $table->setConnection($connection);
+
+				 } else {
+
+					 $mes = "※更新されませんでした";
+					 $this->set('mes',$mes);
+					 $this->Flash->error(__('The date could not be saved. Please, try again.'));
+					 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+				 }
+
+				 }else{//date_stored更新しない
 
 							 if ($this->OrderMaterials->updateAll(//検査終了時間の更新
 								 ['num_lot' => $data[$n]['num_lot'], 'check_flag' => $data[$n]['check_flag'],
@@ -735,7 +870,7 @@ class GenryousController extends AppController
 		 }//トランザクション10
 
 		 $arrOrderMaterials = $this->OrderMaterials->find()
-		 ->where(['flg !=' => 1])->order(["date_stored"=>"ASC"])->toArray();
+		 ->where(['flg !=' => 1, 'delete_flag' => 0])->order(["date_stored"=>"ASC"])->toArray();
 		 $this->set('arrOrderMaterials',$arrOrderMaterials);
 
 		 $arrGyousya = [
@@ -825,6 +960,58 @@ class GenryousController extends AppController
 
 		}
 
+		public function nyuukonoukipreadd()
+    {
+      session_start();//セッションの開始
+			$_SESSION['nyuukonouki'] = array();
+
+			$OrderMaterials = $this->OrderMaterials->newEntity();
+	    $this->set('OrderMaterials',$OrderMaterials);
+
+			$data = $this->request->getData();
+
+			$num = array_keys($data, '更新');
+			$num = $num[0];
+
+			$date_stored = $data['date_stored'.$num]['year']."-".$data['date_stored'.$num]['month']."-".$data['date_stored'.$num]['day'];
+			$id = $data['id'.$num];
+
+			$_SESSION['nyuukonouki'] = array(
+				'date_stored' => $date_stored,
+				'id' => $id,
+			);
+/*
+			echo "<pre>";
+			print_r($_SESSION['nyuukonouki']);
+			echo "</pre>";
+*/
+    }
+
+		public function nyuukonoukilogin()
+    {
+			if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+        $this->set('data',$data);//セット
+        $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
+
+        $htmllogin = new htmlLogin();//クラスを使用
+        $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();
+
+ 					if ($user) {
+ 						$this->Auth->setUser($user);
+            return $this->redirect(['action' => 'nyuukonoukikousin']);
+ 					}
+ 				}
+    }
+
 		public function nyuukonoukikousin()
 		{
 			$OrderMaterials = $this->OrderMaterials->newEntity();
@@ -838,20 +1025,8 @@ class GenryousController extends AppController
 				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
 			}
 
-			$data = $this->request->getData();
+			$data = $_SESSION['nyuukonouki'];
 
-			$num = array_keys($data, '更新');
-			$num = $num[0];
-
-			$date_stored = $data['date_stored'.$num]['year']."-".$data['date_stored'.$num]['month']."-".$data['date_stored'.$num]['day'];
-			$num_lot = $data['num_lot'.$num];
-			$check_flag = $data['check_flag'.$num];
-			$flg = $data['flg'.$num];
-/*
-			echo "<pre>";
-			print_r($datasession['Auth']['User']['staff_id']);
-			echo "</pre>";
-*/
 			$motoOrderMaterials = $this->OrderMaterials->find()
 			->where(['id' => $data['id']])->toArray();
 			$moto_id_order = $motoOrderMaterials[0]->id_order;
@@ -862,8 +1037,8 @@ class GenryousController extends AppController
 			 $connection->begin();//トランザクション3
 			 try {//トランザクション4
 				 if ($this->OrderMaterials->updateAll(//検査終了時間の更新
-					 ['date_stored' => $date_stored, 'num_lot' => $num_lot, 'check_flag' => $check_flag,
-					  'flg' => $flg, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $datasession['Auth']['User']['staff_id']],
+					 ['date_stored' => $data['date_stored'], 'updated_at' => date('Y-m-d H:i:s'),
+					  'updated_staff' => $datasession['Auth']['User']['staff_id']],
 					 ['id'  => $data['id']]
 				 )){
 
@@ -872,8 +1047,8 @@ class GenryousController extends AppController
 					 $table = TableRegistry::get('order_material');
 					 $table->setConnection($connection);
 
-					 $updater = "UPDATE order_material set date_stored ='".$date_stored."', num_lot ='".$num_lot."',
-					  check_flag ='".$check_flag."', flg ='".$flg."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$datasession['Auth']['User']['staff_id']."'
+					 $updater = "UPDATE order_material set date_stored ='".$data['date_stored']."',
+					  updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$datasession['Auth']['User']['staff_id']."'
 					 where id ='".$moto_id_order."'";
 					 $connection->execute($updater);
 
@@ -899,7 +1074,7 @@ class GenryousController extends AppController
 		 }//トランザクション10
 
 		 $arrOrderMaterials = $this->OrderMaterials->find()
-		 ->where(['flg !=' => 1])->order(["date_stored"=>"ASC"])->toArray();
+		 ->where(['flg !=' => 1, 'delete_flag' => 0])->order(["date_stored"=>"ASC"])->toArray();
 		 $this->set('arrOrderMaterials',$arrOrderMaterials);
 
 		 $arrGyousya = [

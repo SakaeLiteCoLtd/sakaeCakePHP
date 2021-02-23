@@ -8,6 +8,11 @@
  $this->Products = TableRegistry::get('products');//productsテーブルを使う
  $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouSokuteidatasテーブルを使う
  $i = 1 ;
+
+ header('Expires:-1');
+ header('Cache-Control:');
+ header('Pragma:');
+
  ?>
  <hr size="5" style="margin: 0.5rem">
  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
@@ -55,7 +60,7 @@ echo $this->Form->hidden('field' ,['value'=>$field]);
                 <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品名</strong></div></td>
                 <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品数</strong></div></td>
                 <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品ID</strong></div></td>
-                <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">製造年月日</strong></td>
+                <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">製造年月日:ロット番号</strong></td>
               </tr>
           </thead>
           <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -73,7 +78,7 @@ echo $this->Form->hidden('field' ,['value'=>$field]);
                 for($k=0; $k<100; $k++){
 
                   if(isset($KensahyouSokuteidatas[$k])){
-                    ${"manudateuniq".$i}[] = array($KensahyouSokuteidatas[$k]["manu_date"]->format('Y-m-d'));
+                    ${"manudateuniq".$i}[] = array($KensahyouSokuteidatas[$k]["manu_date"]->format('Y-m-d')." : ".$KensahyouSokuteidatas[$k]["lot_num"]);
                   }
 
                 }

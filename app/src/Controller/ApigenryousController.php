@@ -73,6 +73,7 @@ class ApigenryousController extends AppController
 		{
 			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
 			$data = urldecode($data);
+			$data = mb_convert_encoding($data,"UTF-8",mb_detect_encoding($data, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
 /*
 			echo "<pre>";
 			print_r($data);
@@ -82,17 +83,26 @@ class ApigenryousController extends AppController
 			if(isset($urlarr[5])){
 				$urlarr[4] = $urlarr[4]."/".$urlarr[5];
 			}
-			$dataarr = explode("_",$urlarr[4]);//切り離し
 
+			$dataarr = explode("_",$urlarr[4]);//切り離し
+/*
+			echo "<pre>";
+			print_r($urlarr[4]);
+			echo "</pre>";
+*/
 			if($dataarr[0] == "start.xml"){
+				$alertcheck = 0;
 
 				session_start();
 				if(isset($_SESSION['sessiongenryou'][0])){//誰かがボタンを押して終了していない場合
 
-					sleep(20);//20秒待機
+					sleep(5);//20秒待機
 
 		//			$this->request->session()->destroy();//セッションの破棄
 					$_SESSION['sessiongenryou'] = array();
+					$_SESSION['alertcheck'] = array();
+					$_SESSION['specialvba'] = array();
+					$_SESSION['genryouvba'] = array();
 
 					$_SESSION['sessiongenryou'][0] = 0;
 
@@ -102,14 +112,29 @@ class ApigenryousController extends AppController
 
 				}
 
+				$_SESSION['alertcheck'] = $alertcheck;
+				$this->set([
+						'alert' => $_SESSION['alertcheck'],
+						'_serialize' => ['alert']
+				]);
+
+			}if($dataarr[0] == "stop.xml"){
+
+				session_start();
+				$_SESSION['specialvba'] = array();
+				$_SESSION['genryouvba'] = array();
+				$_SESSION['sessiongenryou'] = array();
+				$_SESSION['alertcheck'] = array();
+
 			}elseif(isset($dataarr[2])){
+				$alertcheck = 0;
 
 				$grade = $dataarr[2];
 				$color = $dataarr[3];
 				$purchaserarr = explode(".",$dataarr[7]);//切り離し
 				$purchaser = $purchaserarr[0];//tantouの取得
 
-				$PriceMaterials = $this->PriceMaterials->find('all')->where(['grade' => $grade, 'color' => $color])->toArray();
+				$PriceMaterials = $this->PriceMaterials->find('all')->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
 				if(isset($PriceMaterials[0])){
 					$sup_id = $PriceMaterials[0]->sup_id;
 					$price = $PriceMaterials[0]->price;
@@ -121,48 +146,114 @@ class ApigenryousController extends AppController
 				$Staffs = $this->Staffs->find('all')->where(['staff_code' => $purchaser])->toArray();
 				$staffid = $Staffs[0]->id;
 
-				$genryouvba['id_order'] = $dataarr[0]."_".$dataarr[1];
-				$genryouvba['grade'] = $grade;
-				$genryouvba['color'] = $color;
-				$genryouvba['date_order'] = date('Y-m-d');
-				$genryouvba['amount'] = $dataarr[4];
-				$genryouvba['date_stored'] = $dataarr[5];
-				$genryouvba['sup_id'] = $sup_id;
-				$genryouvba['deliv_cp'] = $dataarr[6];
-				$genryouvba['purchaser'] = $purchaser;
-				$genryouvba['price'] = $price;
-				$genryouvba['first_date_st'] = $dataarr[5];
-				$genryouvba['created_at'] = date('Y-m-d H:i:s');
-				$genryouvba['created_staff'] = $staffid;
+				$id_order = $dataarr[0]."_".$dataarr[1];
+				$checkOrderMaterials = $this->OrderMaterials->find('all')->where(['id_order' => $id_order])
+				->order(["id_order"=>"DESC"])->toArray();
 
-				$this->set([
-				'tourokutest' => $genryouvba,
-				'_serialize' => ['tourokutest']
-				]);
+				if(!isset($checkOrderMaterials[0])){
 
-				session_start();
-				$session = $this->request->getSession();
-				$_SESSION['genryouvba'][] = $genryouvba;
+						$genryouvba['id_order'] = $dataarr[0]."_".$dataarr[1];
+						$genryouvba['grade'] = $grade;
+						$genryouvba['color'] = $color;
+						$genryouvba['date_order'] = date('Y-m-d');
+						$genryouvba['amount'] = $dataarr[4];
+						$genryouvba['date_stored'] = $dataarr[5];
+						$genryouvba['sup_id'] = $sup_id;
+						$genryouvba['deliv_cp'] = $dataarr[6];
+						$genryouvba['purchaser'] = $purchaser;
+						$genryouvba['price'] = $price;
+						$genryouvba['first_date_st'] = $dataarr[5];
+						$genryouvba['created_at'] = date('Y-m-d H:i:s');
+						$genryouvba['created_staff'] = $staffid;
 
-				if($dataarr[6] > 1){
+						$this->set([
+						'tourokutest' => $genryouvba,
+						'_serialize' => ['tourokutest']
+						]);
 
-					$DeliverCompanies = $this->DeliverCompanies->find('all')->where(['id' => $dataarr[6]])->toArray();
-					$cs_id = $DeliverCompanies[0]->customer_code;
+						session_start();
+						$session = $this->request->getSession();
+						$_SESSION['genryouvba'][] = $genryouvba;
 
-					$specialvba['date_order'] = date('Y-m-d');
-					$specialvba['num_order'] = $dataarr[0]."_".$dataarr[1];
-					$specialvba['order_name'] = $grade."  ".$color."(genryou)";
-					$specialvba['price'] = $price;
-					$specialvba['date_deliver'] = $dataarr[5];
-					$specialvba['amount'] = $dataarr[4];
-					$specialvba['cs_id'] = $cs_id;
-					$specialvba['kannou'] = 0;
-					$specialvba['created_at'] = date('Y-m-d H:i:s');
-					$specialvba['created_staff'] = $staffid;
+						if($dataarr[6] > 1){
 
-					$_SESSION['specialvba'][] = $specialvba;
+							$DeliverCompanies = $this->DeliverCompanies->find('all')->where(['id' => $dataarr[6]])->toArray();
+							$cs_id = $DeliverCompanies[0]->customer_code;
 
-				}
+							$specialvba['date_order'] = date('Y-m-d');
+							$specialvba['num_order'] = $dataarr[0]."_".$dataarr[1];
+							$specialvba['order_name'] = $grade."  ".$color."(genryou)";
+							$specialvba['price'] = $price;
+							$specialvba['date_deliver'] = $dataarr[5];
+							$specialvba['amount'] = $dataarr[4];
+							$specialvba['cs_id'] = $cs_id;
+							$specialvba['kannou'] = 0;
+							$specialvba['created_at'] = date('Y-m-d H:i:s');
+							$specialvba['created_staff'] = $staffid;
+
+							$_SESSION['specialvba'][] = $specialvba;
+
+						}
+
+					}else{
+
+						$id_order_moto = $checkOrderMaterials[0]->id_order;
+						$id_order_moto_arr = explode("_",$id_order_moto);//切り離し
+						$count = str_pad(count($checkOrderMaterials)+1, 2, 0, STR_PAD_LEFT);
+						$id_order = $id_order_moto_arr[0]."_".$count;
+
+						$genryouvba['id_order'] = $id_order;
+						$genryouvba['grade'] = $grade;
+						$genryouvba['color'] = $color;
+						$genryouvba['date_order'] = date('Y-m-d');
+						$genryouvba['amount'] = $dataarr[4];
+						$genryouvba['date_stored'] = $dataarr[5];
+						$genryouvba['sup_id'] = $sup_id;
+						$genryouvba['deliv_cp'] = $dataarr[6];
+						$genryouvba['purchaser'] = $purchaser;
+						$genryouvba['price'] = $price;
+						$genryouvba['first_date_st'] = $dataarr[5];
+						$genryouvba['created_at'] = date('Y-m-d H:i:s');
+						$genryouvba['created_staff'] = $staffid;
+
+						$this->set([
+						'tourokutest' => $genryouvba,
+						'_serialize' => ['tourokutest']
+						]);
+
+						session_start();
+						$session = $this->request->getSession();
+						$_SESSION['genryouvba'][] = $genryouvba;
+
+						if($dataarr[6] > 1){
+
+							$DeliverCompanies = $this->DeliverCompanies->find('all')->where(['id' => $dataarr[6]])->toArray();
+							$cs_id = $DeliverCompanies[0]->customer_code;
+
+							$specialvba['date_order'] = date('Y-m-d');
+							$specialvba['num_order'] = $id_order;
+							$specialvba['order_name'] = $grade."  ".$color."(genryou)";
+							$specialvba['price'] = $price;
+							$specialvba['date_deliver'] = $dataarr[5];
+							$specialvba['amount'] = $dataarr[4];
+							$specialvba['cs_id'] = $cs_id;
+							$specialvba['kannou'] = 0;
+							$specialvba['created_at'] = date('Y-m-d H:i:s');
+							$specialvba['created_staff'] = $staffid;
+
+							$_SESSION['specialvba'][] = $specialvba;
+
+						}
+
+						$alertcheck = $alertcheck + 1;
+
+					}
+
+					$_SESSION['alertcheck'] = $alertcheck;
+					$this->set([
+							'alert' => $_SESSION['alertcheck'],
+							'_serialize' => ['alert']
+					]);
 
 			}elseif($dataarr[0] == "end.xml"){//終了の時に一括でデータを登録してそのセッションを削除
 
@@ -188,6 +279,8 @@ class ApigenryousController extends AppController
 						$_SESSION['specialvba'] = array();
 						$_SESSION['genryouvba'] = array();
 						$_SESSION['sessiongenryou'] = array();
+						$_SESSION['alertcheck'] = array();
+						$alertcheck = 0;
 
 					} else {
 
@@ -197,12 +290,20 @@ class ApigenryousController extends AppController
 						$_SESSION['specialvba'] = array();
 						$_SESSION['genryouvba'] = array();
 						$_SESSION['sessiongenryou'] = array();
+						$_SESSION['alertcheck'] = array();
+						$alertcheck = 0;
 
 					}
+
 				} catch (Exception $e) {//トランザクション7
 				//ロールバック8
 					$connection->rollback();//トランザクション9
 				}//トランザクション10
+
+				$this->set([
+						'alert' => 0,
+						'_serialize' => ['alert']
+				]);
 
 			}
 
@@ -339,7 +440,7 @@ class ApigenryousController extends AppController
 				$DeliverCompanies = $this->DeliverCompanies->find()->where(['id' => $deliv_cp])->toArray();
 				$company = $DeliverCompanies[0]->company;
 
-				$PriceMaterials = $this->PriceMaterials->find('all')->where(['grade' => $OrderMaterials[$k]["grade"], 'color' => $OrderMaterials[$k]["color"]])->toArray();
+				$PriceMaterials = $this->PriceMaterials->find('all')->where(['delete_flag' => 0, 'grade' => $OrderMaterials[$k]["grade"], 'color' => $OrderMaterials[$k]["color"]])->toArray();
 				if(isset($PriceMaterials[0])){
 					$tani = $PriceMaterials[0]->tani;
 				}else{

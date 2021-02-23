@@ -8,6 +8,11 @@
  $this->Products = TableRegistry::get('products');//productsテーブルを使う
  $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouSokuteidatasテーブルを使う
  $i = 1 ;
+
+ header('Expires:-1');
+ header('Cache-Control:');
+ header('Pragma:');
+
  ?>
  <hr size="5" style="margin: 0.5rem">
  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">

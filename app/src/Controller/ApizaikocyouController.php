@@ -87,11 +87,11 @@ class ApizaikocyouController extends AppController
 			if($sheet === "primary"){
 
 //$arrProductsmotoスタート
-/*
+
 echo "<pre>";
 print_r("1".date('Y-m-d H:i:s'));
 echo "</pre>";
-*/
+
 				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 				->where(['products.status' => 0, 'primary_p' => 1,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])->toArray();
@@ -108,11 +108,10 @@ echo "</pre>";
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
 
 //$arrProductsmoto完成
-/*
+
 echo "<pre>";
-print_r("1".date('Y-m-d H:i:s'));
+print_r("2".date('Y-m-d H:i:s'));
 echo "</pre>";
-*/
 
 //$arrResultZensuHeadsmotoスタート
 
@@ -123,11 +122,10 @@ echo "</pre>";
 				$arrResultZensuHeadsmoto = $htmlApifind->ResultZensuHeadsmoto($dateend);//クラスを使用
 
 //$arrResultZensuHeadsmoto完成
-/*
+
 echo "<pre>";
-print_r("1".date('Y-m-d H:i:s'));
+print_r("3".date('Y-m-d H:i:s'));
 echo "</pre>";
-*/
 
 //$arrAssembleProductsスタート
 
@@ -177,11 +175,10 @@ echo "</pre>";
 				}
 
 //$arrAssembleProducts完成
-/*
+
 echo "<pre>";
-print_r("1".date('Y-m-d H:i:s'));
+print_r("4 ".date('Y-m-d H:i:s'));
 echo "</pre>";
-*/
 
 //$arrOrderEdisスタート
 
@@ -189,6 +186,10 @@ echo "</pre>";
 				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_deliver"=>"ASC"])->toArray();
+
+				echo "<pre>";
+				print_r("41 ".date('Y-m-d H:i:s'));
+				echo "</pre>";
 
 				$arrOrderEdis = array();//注文呼び出し
 		    for($k=0; $k<count($OrderEdis); $k++){
@@ -200,12 +201,13 @@ echo "</pre>";
 		        $product_name = $Product[0]->product_name;
 
 		        $riron_check = 0;
+/*210223
 		        $date16 = $yaermonth."-16";
 		        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 		        if(isset($RironStockProducts[0])){
 		          $riron_check = 1;
 		        }
-
+*/
 		          $arrOrderEdis[] = [
 		            'date_order' => $OrderEdis[$k]["date_order"],
 		            'num_order' => $OrderEdis[$k]["num_order"],
@@ -214,8 +216,8 @@ echo "</pre>";
 		            'price' => $OrderEdis[$k]["price"],
 		            'date_deliver' => $OrderEdis[$k]["date_deliver"],
 		            'amount' => $OrderEdis[$k]["amount"],
-		            'denpyoumaisu' => 1,
-		            'riron_zaiko_check' => $riron_check
+		            'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 		         ];
 
 		         for($l=0; $l<count($arrProductsmoto); $l++){
@@ -233,6 +235,10 @@ echo "</pre>";
 
 		    }
 
+				echo "<pre>";
+				print_r("42 ".date('Y-m-d H:i:s'));
+				echo "</pre>";
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -249,11 +255,6 @@ echo "</pre>";
 				$arrOrderEdis = $htmlApifind->OrderEdis($date16);//クラスを使用
 
 //$arrOrderEdis完成
-/*
-echo "<pre>";
-print_r("1".date('Y-m-d H:i:s'));
-echo "</pre>";
-*/
 
 //$StockProductsスタート
 
@@ -304,11 +305,6 @@ echo "</pre>";
 					}
 
 //$StockProducts完成
-/*
-echo "<pre>";
-print_r("1".date('Y-m-d H:i:s'));
-echo "</pre>";
-*/
 
 //$SyoyouKeikakusスタート
 
@@ -364,11 +360,7 @@ echo "</pre>";
 				}
 
 //$SyoyouKeikakus完成
-/*
-echo "<pre>";
-print_r("1".date('Y-m-d H:i:s'));
-echo "</pre>";
-*/
+
 //$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
@@ -428,11 +420,11 @@ echo "</pre>";
 					}
 
 //$arrSeisans完成
-/*
+
 echo "<pre>";
-print_r("1".date('Y-m-d H:i:s'));
+print_r("8".date('Y-m-d H:i:s'));
 echo "</pre>";
-*/
+
 
 			}elseif($sheet === "primary_dnp"){
 
@@ -531,11 +523,13 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $yaermonth."-16";
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){
-							$riron_check = 1;
-						}
+						/*210223
+								        $date16 = $yaermonth."-16";
+								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+								        if(isset($RironStockProducts[0])){
+								          $riron_check = 1;
+								        }
+						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -545,8 +539,8 @@ echo "</pre>";
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1,
-								'riron_zaiko_check' => $riron_check
+								'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -846,11 +840,13 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $yaermonth."-16";
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){
-							$riron_check = 1;
-						}
+						/*210223
+								        $date16 = $yaermonth."-16";
+								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+								        if(isset($RironStockProducts[0])){
+								          $riron_check = 1;
+								        }
+						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -860,8 +856,8 @@ echo "</pre>";
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1,
-								'riron_zaiko_check' => $riron_check
+								'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -1158,11 +1154,13 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $yaermonth."-16";
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){
-							$riron_check = 1;
-						}
+						/*210223
+								        $date16 = $yaermonth."-16";
+								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+								        if(isset($RironStockProducts[0])){
+								          $riron_check = 1;
+								        }
+						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -1172,8 +1170,8 @@ echo "</pre>";
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1,
-								'riron_zaiko_check' => $riron_check
+								'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -1469,11 +1467,13 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $yaermonth."-16";
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){
-							$riron_check = 1;
-						}
+						/*210223
+								        $date16 = $yaermonth."-16";
+								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+								        if(isset($RironStockProducts[0])){
+								          $riron_check = 1;
+								        }
+						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -1483,8 +1483,8 @@ echo "</pre>";
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1,
-								'riron_zaiko_check' => $riron_check
+								'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -1778,11 +1778,13 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $yaermonth."-16";
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){
-							$riron_check = 1;
-						}
+						/*210223
+								        $date16 = $yaermonth."-16";
+								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+								        if(isset($RironStockProducts[0])){
+								          $riron_check = 1;
+								        }
+						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -1792,8 +1794,8 @@ echo "</pre>";
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1,
-								'riron_zaiko_check' => $riron_check
+								'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -2086,11 +2088,13 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $yaermonth."-16";
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){
-							$riron_check = 1;
-						}
+						/*210223
+								        $date16 = $yaermonth."-16";
+								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+								        if(isset($RironStockProducts[0])){
+								          $riron_check = 1;
+								        }
+						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -2100,8 +2104,8 @@ echo "</pre>";
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1,
-								'riron_zaiko_check' => $riron_check
+								'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -2399,11 +2403,13 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $yaermonth."-16";
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){
-							$riron_check = 1;
-						}
+						/*210223
+								        $date16 = $yaermonth."-16";
+								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+								        if(isset($RironStockProducts[0])){
+								          $riron_check = 1;
+								        }
+						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -2413,8 +2419,8 @@ echo "</pre>";
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1,
-								'riron_zaiko_check' => $riron_check
+								'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -2711,11 +2717,13 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $yaermonth."-16";
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){
-							$riron_check = 1;
-						}
+						/*210223
+								        $date16 = $yaermonth."-16";
+								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+								        if(isset($RironStockProducts[0])){
+								          $riron_check = 1;
+								        }
+						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -2725,8 +2733,8 @@ echo "</pre>";
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1,
-								'riron_zaiko_check' => $riron_check
+								'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -3023,11 +3031,13 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $yaermonth."-16";
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){
-							$riron_check = 1;
-						}
+						/*210223
+								        $date16 = $yaermonth."-16";
+								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+								        if(isset($RironStockProducts[0])){
+								          $riron_check = 1;
+								        }
+						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -3037,8 +3047,8 @@ echo "</pre>";
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1,
-								'riron_zaiko_check' => $riron_check
+								'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -3335,11 +3345,13 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $yaermonth."-16";
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){
-							$riron_check = 1;
-						}
+						/*210223
+								        $date16 = $yaermonth."-16";
+								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+								        if(isset($RironStockProducts[0])){
+								          $riron_check = 1;
+								        }
+						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -3349,8 +3361,8 @@ echo "</pre>";
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1,
-								'riron_zaiko_check' => $riron_check
+								'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -3644,11 +3656,13 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $yaermonth."-16";
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){
-							$riron_check = 1;
-						}
+						/*210223
+								        $date16 = $yaermonth."-16";
+								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
+								        if(isset($RironStockProducts[0])){
+								          $riron_check = 1;
+								        }
+						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -3658,8 +3672,8 @@ echo "</pre>";
 								'price' => $OrderEdis[$k]["price"],
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
-								'denpyoumaisu' => 1,
-								'riron_zaiko_check' => $riron_check
+								'denpyoumaisu' => 1
+		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){

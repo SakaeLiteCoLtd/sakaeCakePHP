@@ -160,12 +160,13 @@ class htmlApifind extends AppController
        for($k=0; $k<count($arrProducts); $k++){
 
          $riron_check = 0;
-      //   $date16 = $yaermonth."-16";
+/*//210223
+         $date16 = $yaermonth."-16";
          $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
          if(isset($RironStockProducts[0])){
            $riron_check = 1;
          }
-
+*/
          $arrProductsmoto[] = [
            'date_order' => "",
            'num_order' => "",
@@ -174,8 +175,8 @@ class htmlApifind extends AppController
            'price' => "",
            'date_deliver' => "",
            'amount' => "",
-           'denpyoumaisu' => "",
-           'riron_zaiko_check' => $riron_check
+           'denpyoumaisu' => ""
+    //       'riron_zaiko_check' => $riron_check
         ];
 
        }

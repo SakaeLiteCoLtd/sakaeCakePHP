@@ -156,7 +156,6 @@ class SyukkaprintsController extends AppController {
       $session = $this->request->getSession();
       $data = $session->read();
 
-
   //    $Data=$this->request->query('s');
 
       $arrinsatsu = $data["insatsu"];
@@ -249,7 +248,7 @@ class SyukkaprintsController extends AppController {
         if ($this->KensahyouJyunbiInsatsus->saveMany($KensahyouJyunbiInsatsus)) {
 
           //旧DBに登録
-          $connection = ConnectionManager::get('sakaeMotoDB');
+          $connection = ConnectionManager::get('DB_ikou_test');
           $table = TableRegistry::get('kensahyou_jyunbi_insatsu');
           $table->setConnection($connection);
 
@@ -258,7 +257,7 @@ class SyukkaprintsController extends AppController {
 
             $sql = "SELECT kensahyou_sokuteidata_head_id FROM kensahyou_sokuteidata_head".
                   " where product_id = '".$data["insatsu"][$k]["product_code"]."' and manu_date = '".$manudate."'";
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $kensahyou_sokuteidata_heads = $connection->execute($sql)->fetchAll('assoc');
             $kensahyou_sokuteidata_head = $kensahyou_sokuteidata_heads[0]["kensahyou_sokuteidata_head_id"];
 

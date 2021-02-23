@@ -102,4 +102,41 @@
      </table>
    </fieldset>
 
+   <br>
+   <br>
+      <div align="center"><font color="blue" size="3"><?= __("登録済一覧") ?></font></div>
+   <br>
+   <table align="center" border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" cellpadding="0" cellspacing="0">
+     <tbody border="2" bordercolor="#E6FFFF" style="border-bottom: solid;border-width: 1px">
+           <thead>
+             <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+               <td width="200" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">グレード</strong></div></td>
+               <td width="200" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 10pt; color:#FF66FF">色番号</strong></div></td>
+             </tr>
+           </thead>
+           <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFBB">
+             <?php for($i=0; $i<count($arrOrderMaterials); $i++): ?>
+               <?php if($i % 2 < 1): ?>
+
+                 <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFDD">
+                   <td colspan="20" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><font color="blue"><?= h($arrOrderMaterials[$i]["grade"]) ?></font></td>
+                   <td colspan="20" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><font color="blue"><?= h($arrOrderMaterials[$i]["color"]) ?></font></td>
+                 </tr>
+
+             <?php else: ?>
+
+               <tr border="2" bordercolor="#FFFFCC" bgcolor="#FFFF99">
+                 <td colspan="20" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><font color="blue"><?= h($arrOrderMaterials[$i]["grade"]) ?></font></td>
+                 <td colspan="20" nowrap="nowrap" style="border-bottom: solid;border-width: 1px"><font color="blue"><?= h($arrOrderMaterials[$i]["color"]) ?></font></td>
+               </tr>
+
+             <?php endif; ?>
+
+             </tr>
+           <?php endfor;?>
+           </tbody>
+       </table>
+       <br>
+
+
  <?=$this->Form->end() ?>

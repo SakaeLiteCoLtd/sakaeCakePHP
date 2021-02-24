@@ -57,8 +57,8 @@ class ApigenryousController extends AppController
 				'tantou' => $urlarr[4]
 			];
 
-			$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $genryouvba);
-			$this->ScheduleKouteisTests->save($ScheduleKouteisTests);
+	//		$ScheduleKouteisTests = $this->ScheduleKouteisTests->patchEntity($this->ScheduleKouteisTests->newEntity(), $genryouvba);
+	//		$this->ScheduleKouteisTests->save($ScheduleKouteisTests);
 
 			$this->set([
 				'genryouvba' => $genryouvba,

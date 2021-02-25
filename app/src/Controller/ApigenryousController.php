@@ -85,36 +85,39 @@ class ApigenryousController extends AppController
 			}
 
 			$dataarr = explode("_",$urlarr[4]);//切り離し
+
 /*
 			echo "<pre>";
 			print_r($urlarr[4]);
 			echo "</pre>";
 */
 			if($dataarr[0] == "start.xml"){
-				$alertcheck = 0;
-
 				session_start();
 				if(isset($_SESSION['sessiongenryou'][0])){//誰かがボタンを押して終了していない場合
 
-					sleep(5);//20秒待機
+					sleep(5);//5秒待機
 
 		//			$this->request->session()->destroy();//セッションの破棄
 					$_SESSION['sessiongenryou'] = array();
-					$_SESSION['alertcheck'] = array();
+					$_SESSION['alertcheck1'] = array();
+					$_SESSION['alertcheck2'] = array();
 					$_SESSION['specialvba'] = array();
 					$_SESSION['genryouvba'] = array();
+					$_SESSION['alertcheck1'] = 0;
+					$_SESSION['alertcheck2'] = 0;
 
 					$_SESSION['sessiongenryou'][0] = 0;
 
 				}else{//同時に誰もスタートしていない場合
 
 					$_SESSION['sessiongenryou'][0] = 0;
+					$_SESSION['alertcheck1'] = 0;
+					$_SESSION['alertcheck2'] = 0;
 
 				}
 
-				$_SESSION['alertcheck'] = $alertcheck;
 				$this->set([
-						'alert' => $_SESSION['alertcheck'],
+						'alert' => $_SESSION['alertcheck1'],
 						'_serialize' => ['alert']
 				]);
 
@@ -124,11 +127,13 @@ class ApigenryousController extends AppController
 				$_SESSION['specialvba'] = array();
 				$_SESSION['genryouvba'] = array();
 				$_SESSION['sessiongenryou'] = array();
-				$_SESSION['alertcheck'] = array();
+				$_SESSION['alertcheck1'] = array();
+				$_SESSION['alertcheck2'] = array();
 
 			}elseif(isset($dataarr[2])){
-				$alertcheck = 0;
 
+				session_start();
+				$session = $this->request->getSession();
 				$grade = $dataarr[2];
 				$color = $dataarr[3];
 				$purchaserarr = explode(".",$dataarr[7]);//切り離し
@@ -136,11 +141,17 @@ class ApigenryousController extends AppController
 
 				$PriceMaterials = $this->PriceMaterials->find('all')->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
 				if(isset($PriceMaterials[0])){
+
 					$sup_id = $PriceMaterials[0]->sup_id;
 					$price = $PriceMaterials[0]->price;
+
 				}else{
+
 					$sup_id = "";
 					$price = "";
+
+					$_SESSION['alertcheck2'] = 1;
+
 				}
 
 				$Staffs = $this->Staffs->find('all')->where(['staff_code' => $purchaser])->toArray();
@@ -171,8 +182,6 @@ class ApigenryousController extends AppController
 						'_serialize' => ['tourokutest']
 						]);
 
-						session_start();
-						$session = $this->request->getSession();
 						$_SESSION['genryouvba'][] = $genryouvba;
 
 						if($dataarr[6] > 1){
@@ -199,7 +208,11 @@ class ApigenryousController extends AppController
 
 						$id_order_moto = $checkOrderMaterials[0]->id_order;
 						$id_order_moto_arr = explode("_",$id_order_moto);//切り離し
-						$count = str_pad(count($checkOrderMaterials)+1, 2, 0, STR_PAD_LEFT);
+
+						$countOrderMaterials = $this->OrderMaterials->find('all')->where(['id_order like' => '%'.$id_order_moto_arr[0].'%'])
+						->order(["id_order"=>"DESC"])->toArray();
+
+						$count = str_pad(count($_SESSION['genryouvba']) + count($countOrderMaterials) + 1, 2, 0, STR_PAD_LEFT);
 						$id_order = $id_order_moto_arr[0]."_".$count;
 
 						$genryouvba['id_order'] = $id_order;
@@ -221,8 +234,6 @@ class ApigenryousController extends AppController
 						'_serialize' => ['tourokutest']
 						]);
 
-						session_start();
-						$session = $this->request->getSession();
 						$_SESSION['genryouvba'][] = $genryouvba;
 
 						if($dataarr[6] > 1){
@@ -245,13 +256,18 @@ class ApigenryousController extends AppController
 
 						}
 
-						$alertcheck = $alertcheck + 1;
+						$_SESSION['alertcheck1'] = 1;
 
 					}
 
-					$_SESSION['alertcheck'] = $alertcheck;
+					if($_SESSION['alertcheck2'] > 0){
+
+						$_SESSION['alertcheck1'] = 2;
+
+					}
+
 					$this->set([
-							'alert' => $_SESSION['alertcheck'],
+							'alert' => $_SESSION['alertcheck1'],
 							'_serialize' => ['alert']
 					]);
 
@@ -279,7 +295,7 @@ class ApigenryousController extends AppController
 						$_SESSION['specialvba'] = array();
 						$_SESSION['genryouvba'] = array();
 						$_SESSION['sessiongenryou'] = array();
-						$_SESSION['alertcheck'] = array();
+						$_SESSION['alertcheck1'] = array();
 						$alertcheck = 0;
 
 					} else {
@@ -290,7 +306,7 @@ class ApigenryousController extends AppController
 						$_SESSION['specialvba'] = array();
 						$_SESSION['genryouvba'] = array();
 						$_SESSION['sessiongenryou'] = array();
-						$_SESSION['alertcheck'] = array();
+						$_SESSION['alertcheck1'] = array();
 						$alertcheck = 0;
 
 					}

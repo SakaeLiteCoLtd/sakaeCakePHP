@@ -29,6 +29,10 @@ class ApirironzaikosController extends AppController
 			session_start();
 			$session = $this->request->getSession();
 	//		$_SESSION['test'][0] = 0;
+	$_SESSION['rironzaiko'] = array();
+	$_SESSION['rironzaikoupdate'] = array();
+	$_SESSION['checkrironzaiko'] = array();
+	$_SESSION['sessionronzaikostarttime'] = array();
 
 			echo "<pre>";
 			print_r($_SESSION);
@@ -141,6 +145,8 @@ class ApirironzaikosController extends AppController
 
 					$_SESSION['checkrironzaiko'][0] = 0;
 					$_SESSION['sessionronzaikostarttime'] = date('Y-m-d H:i:s');
+					$_SESSION['rironzaiko'] = array();
+					$_SESSION['rironzaikoupdate'] = array();
 
 				}
 
@@ -180,7 +186,12 @@ class ApirironzaikosController extends AppController
 				echo "</pre>";
 */
 					//新しいデータを登録
-					$RironStockProducts = $this->RironStockProducts->patchEntities($this->RironStockProducts->newEntity(), $_SESSION['rironzaiko']);
+					if(count($_SESSION['rironzaiko']) > 0) {
+
+						$RironStockProducts = $this->RironStockProducts->patchEntities($this->RironStockProducts->newEntity(), $_SESSION['rironzaiko']);
+
+					}
+
 					$connection = ConnectionManager::get('default');//トランザクション1
 					// トランザクション開始2
 					$connection->begin();//トランザクション3
@@ -212,7 +223,7 @@ class ApirironzaikosController extends AppController
 
 						}
 
-						if ($this->RironStockProducts->saveMany($RironStockProducts)) {
+						if(count($_SESSION['rironzaiko']) > 0 && $this->RironStockProducts->saveMany($RironStockProducts)) {
 
 							if(isset($_SESSION['rironzaikoupdate'][0])){
 

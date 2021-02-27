@@ -29,24 +29,26 @@ class ApikouteisController extends AppController
      $this->KouteiKensahyouHeads = TableRegistry::get('kouteiKensahyouHeads');
      $this->KouteiFileCopyChecks = TableRegistry::get('kouteiFileCopyChecks');
      $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');
-     $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');
+		 $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');
+		 $this->CheckKouteis = TableRegistry::get('checkKouteis');
+		 $this->ResultCheckKouteis = TableRegistry::get('resultCheckKouteis');
 		}
 
 //http://192.168.4.246/Apikouteis/test/api/test.xml  http://localhost:5000/Apikouteis/test/api/test.xml
 		public function test()
 		{
-	//		$this->request->session()->destroy();//セッションの破棄
+		//	$this->request->session()->destroy();//セッションの破棄
 //実験
 			session_start();
 			$session = $this->request->getSession();
 			$_SESSION['test'][0] = 1;
 
-	//		echo "<pre>";
-	//		print_r($_SESSION);
-	//		echo "</pre>";
+			echo "<pre>";
+			print_r($_SESSION);
+			echo "</pre>";
 
 			$this->set([
-  			 'test' => "aaa",
+  			 'test' => "セッション表示中",
   			 '_serialize' => ['test']
   		 ]);
 
@@ -211,6 +213,199 @@ class ApikouteisController extends AppController
 
 		}
 
+		//http://192.168.4.246/Apikouteis/kouteicheck/api/IN.210217-112_MLD-MD-20035.xml
+		public function kouteicheck()//http://localhost:5000/Apikouteis/kouteicheck/api/IN.210217-112_MLD-MD-20035_hirokawa.xml
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+
+			$urlarr = explode("/",$data);//切り離し
+			$dataarr = explode("_",$urlarr[4]);//切り離し
+			$lot_num = $dataarr[0];
+			$product_code = $dataarr[1];
+
+			$emp_arr = explode(".",$dataarr[2]);//切り離し
+			$emp = $emp_arr[0];
+/*
+			echo "<pre>";
+			print_r($lot_num);
+			echo "</pre>";
+			echo "<pre>";
+			print_r($product_code);
+			echo "</pre>";
+			echo "<pre>";
+			print_r($emp);
+			echo "</pre>";
+*/
+			$kouteicheck['product_code'] = $product_code;
+			$kouteicheck['lot_num'] = $lot_num;
+			$kouteicheck['emp'] = $emp;
+			$kouteicheck['datetime_graph'] = date('Y-m-d H:i:s');
+
+			$CheckKouteis = $this->CheckKouteis->patchEntity($this->CheckKouteis->newEntity(), $kouteicheck);
+			$connection = ConnectionManager::get('default');//トランザクション1
+			 // トランザクション開始2
+			 $connection->begin();//トランザクション3
+			 try {//トランザクション4
+				 if ($this->CheckKouteis->save($CheckKouteis)) {
+				 $connection->commit();// コミット5
+
+			 } else {
+
+				 $this->Flash->error(__('The product could not be saved. Please, try again.'));
+				 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+			 }
+
+		 } catch (Exception $e) {//トランザクション7
+		 //ロールバック8
+			 $connection->rollback();//トランザクション9
+		 }//トランザクション10
+
+			$this->set([
+					'kikakuyobidashi' => $kouteicheck,
+					'_serialize' => ['kikakuyobidashi']
+			]);
+
+		}
+
+		//http://localhost:5000/Apikouteis/bunpujoukyou/api/start.xml
+		//http://localhost:5000/Apikouteis/bunpujoukyou/api/IN.210217-112_MLD-MD-20035_3_0.xml
+		//http://localhost:5000/Apikouteis/bunpujoukyou/api/IN.210217-112_BON-MD-20023_4_1.xml
+		//http://localhost:5000/Apikouteis/bunpujoukyou/api/end.xml
+
+		//http://192.168.4.246/Apikouteis/bunpujoukyou/api/start.xml
+		//http://192.168.4.246/Apikouteis/bunpujoukyou/api/IN.210217-112_MLD-MD-20035_3_0.xml
+		//http://192.168.4.246/Apikouteis/bunpujoukyou/api/IN.210217-112_BON-MD-20023_4_1.xml
+		//http://192.168.4.246/Apikouteis/bunpujoukyou/api/end.xml
+		public function bunpujoukyou()
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+
+			$urlarr = explode("/",$data);//切り離し
+
+			$dataarr = explode("_",$urlarr[4]);//切り離し
+
+			if($dataarr[0] == "start.xml"){
+
+				session_start();
+				if(isset($_SESSION['sessionbunpu'][0])){//誰かがボタンを押して終了していない場合
+
+					sleep(5);//5秒待機
+
+					$_SESSION['sessionbunpu'] = array();
+					$_SESSION['bunpuvba'] = array();
+					$_SESSION['resultbunpu'] = array();
+					$_SESSION['sessionbunpu'][0] = 0;
+
+				}else{//同時に誰もスタートしていない場合
+
+					$_SESSION['bunpuvba'] = array();
+					$_SESSION['resultbunpu'] = array();
+					$_SESSION['sessionbunpu'][0] = 0;
+
+				}
+				$bunpujoukyou['start'] = "start";
+
+			}elseif(isset($dataarr[2])){
+
+				session_start();
+				$session = $this->request->getSession();
+
+				$lot_num = $dataarr[0];
+				$product_code = $dataarr[1];
+				$size_num = $dataarr[2];
+
+				$status_arr = explode(".",$dataarr[3]);//切り離し
+				$status = $status_arr[0];
+
+				$bunpujoukyou['product_code'] = $product_code;
+				$bunpujoukyou['lot_num'] = $lot_num;
+				$bunpujoukyou['status'] = $status;
+				$bunpujoukyou['update_datetime'] = date('Y-m-d H:i:s');
+
+				$_SESSION['bunpuvba'][] = $bunpujoukyou;
+
+				if($status > 0){
+
+					$CheckKouteis = $this->CheckKouteis->find('all')
+					->where(['product_code' => $product_code, 'lot_num' => $lot_num])->toArray();
+
+					for($l=0; $l<count($CheckKouteis); $l++){
+
+						$check_koutei_id = $CheckKouteis[$l]->id;
+
+						$resultbunpu['check_koutei_id'] = $check_koutei_id;
+						$resultbunpu['size_num'] = $size_num;
+						$resultbunpu['status'] = $status;
+						$resultbunpu['update_datetime'] = date('Y-m-d H:i:s');
+
+						$_SESSION['resultbunpu'][] = $resultbunpu;
+
+					}
+
+				}
+
+				$this->set([
+						'kikakuyobidashi' => $bunpujoukyou,
+						'_serialize' => ['kikakuyobidashi']
+				]);
+
+			}elseif($dataarr[0] == "end.xml"){//終了の時に一括でデータを登録してそのセッションを削除
+
+				$bunpujoukyou['end'] = "end";
+
+				session_start();
+				$session = $this->request->getSession();
+
+				for($k=0; $k<count($_SESSION['bunpuvba']); $k++){
+
+					$this->CheckKouteis->updateAll(
+					['status' => $_SESSION['bunpuvba'][$k]["status"],
+					 'update_datetime' => date('Y-m-d H:i:s')],
+					['product_code' => $_SESSION['bunpuvba'][$k]["product_code"], 'lot_num' => $_SESSION['bunpuvba'][$k]["lot_num"]]
+					);
+
+				}
+
+				//新しいデータを登録
+				$ResultCheckKouteis = $this->ResultCheckKouteis->patchEntities($this->ResultCheckKouteis->newEntity(), $_SESSION['resultbunpu']);
+				$connection = ConnectionManager::get('default');//トランザクション1
+				// トランザクション開始2
+				$connection->begin();//トランザクション3
+				try {//トランザクション4
+
+					if ($this->ResultCheckKouteis->saveMany($ResultCheckKouteis)) {
+
+						$connection->commit();// コミット5
+						$_SESSION['sessionbunpu'] = array();
+						$_SESSION['bunpuvba'] = array();
+						$_SESSION['resultbunpu'] = array();
+
+					} else {
+
+						$this->Flash->error(__('The data could not be saved. Please, try again.'));
+						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+						$_SESSION['sessionbunpu'] = array();
+						$_SESSION['bunpuvba'] = array();
+						$_SESSION['resultbunpu'] = array();
+
+					}
+
+				} catch (Exception $e) {//トランザクション7
+				//ロールバック8
+					$connection->rollback();//トランザクション9
+				}//トランザクション10
+
+			}
+
+			$this->set([
+					'kikakuyobidashi' => $bunpujoukyou,
+					'_serialize' => ['kikakuyobidashi']
+			]);
+
+		}
 
 
 	}

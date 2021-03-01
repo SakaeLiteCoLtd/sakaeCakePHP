@@ -87,29 +87,49 @@ class ApikouteisController extends AppController
 
 			$KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['product_code' => $product_code, 'delete_flag' => 0])->toArray();
 			if(isset($KouteiKensahyouHeads[0])){
-
+/*
 				for($i=1; $i<=9; $i++){//size_1～9までセット
-          $kikakuyobidashi["size_".$i] = $KouteiKensahyouHeads[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
+          $kikakuyobidashi["size_".$i] = $KouteiKensahyouHeads[0]->{"size_{$i}"};
         }
-
+*/
 				for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
-          $kikakuyobidashi["upper_".$j] = $KouteiKensahyouHeads[0]->{"upper_{$j}"};//KensahyouHeadのupper_1～8まで
-          $kikakuyobidashi["lower_".$j] = $KouteiKensahyouHeads[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
+
+					$KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code, 'kensahyou_size' => $j])->toArray();
+
+					if(isset($KouteiImKikakuTaious[0])){
+						$kikakuyobidashi["kind_kensa_".$j] = $KouteiImKikakuTaious[0]->kind_kensa;
+					}else{
+						$kikakuyobidashi["kind_kensa_".$j] = "";
+					}
+					$kikakuyobidashi["size_".$j] = $KouteiKensahyouHeads[0]->{"size_{$j}"};
+          $kikakuyobidashi["upper_".$j] = $KouteiKensahyouHeads[0]->{"upper_{$j}"};
+          $kikakuyobidashi["lower_".$j] = $KouteiKensahyouHeads[0]->{"lower_{$j}"};
         }
 
+				$KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code, 'kensahyou_size' => 9])->toArray();
+				if(isset($KouteiImKikakuTaious[0])){
+					$kikakuyobidashi["kind_kensa_9"] = $KouteiImKikakuTaious[0]->kind_kensa;
+				}else{
+					$kikakuyobidashi["kind_kensa_9"] = "";
+				}
+				$kikakuyobidashi["size_9"] = $KouteiKensahyouHeads[0]->size_9;
 				$kikakuyobidashi['text_10'] = $KouteiKensahyouHeads[0]->text_10;
 				$kikakuyobidashi['text_11'] = $KouteiKensahyouHeads[0]->text_11;
 				$kikakuyobidashi['bik'] = $KouteiKensahyouHeads[0]->bik;
 
 			}else{
-
+/*
 				for($i=1; $i<=9; $i++){//size_1～9までセット
           $kikakuyobidashi["size_".$i] = "";
         }
+	*/
 				for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
-          $kikakuyobidashi["upper_".$i] = "";
-          $kikakuyobidashi["lower_".$i] = "";
+					$kikakuyobidashi["size_".$j] = "";
+          $kikakuyobidashi["upper_".$j] = "";
+          $kikakuyobidashi["lower_".$j] = "";
         }
+
+				$kikakuyobidashi["size_9"] = "";
 				$kikakuyobidashi['text_10'] = "";
 				$kikakuyobidashi['text_11'] = "";
 				$kikakuyobidashi['bik'] = "";
@@ -176,7 +196,8 @@ class ApikouteisController extends AppController
 					$sokutei['im_size_num'] = $KouteiImKikakuTaious[$i]->im_size_num;
 
 					$KouteiImSokuteidataHeads = $this->KouteiImSokuteidataHeads->find()
-					->where(['kind_kensa' => $product_code."_".$KouteiImKikakuTaious[$i]->kind_kensa, 'lot_num' => $lot_num])->toArray();
+					->where(['kind_kensa' => $product_code."_".$KouteiImKikakuTaious[$i]->kind_kensa, 'lot_num' => $lot_num])
+					->order(["id"=>"DESC"])->toArray();
 					$check_kind_kensa = $KouteiImSokuteidataHeads[0]->kind_kensa;
 /*
 					echo "<pre>";
@@ -186,12 +207,19 @@ class ApikouteisController extends AppController
 					for($j=0; $j<count($KouteiImSokuteidataHeads); $j++){
 
 						$KouteiImSokuteidataResults = $this->KouteiImSokuteidataResults->find()
-						->where(['im_sokuteidata_head_id' => $KouteiImSokuteidataHeads[0]->id, 'size_num' => $KouteiImKikakuTaious[$i]->im_size_num])->toArray();
+						->where(['im_sokuteidata_head_id' => $KouteiImSokuteidataHeads[0]->id, 'size_num' => $KouteiImKikakuTaious[$i]->im_size_num])
+						->toArray();
 
 						for($k=0; $k<count($KouteiImSokuteidataResults); $k++){
 
 							$sokutei['type_im'] = $KouteiImSokuteidataHeads[$j]['type_im'];
 							$sokutei['result'] = $KouteiImSokuteidataResults[$k]['result'];
+							$sokutei['serial'] = floor($KouteiImSokuteidataResults[$k]['serial']);
+							$sokutei['koutei_im_sokuteidata_results_id'] = $KouteiImSokuteidataResults[$k]['id'];
+							$sokutei['inspec_datetime'] = $KouteiImSokuteidataResults[$k]['inspec_datetime'];
+				//			$sokutei['Headsid'] = floor($KouteiImSokuteidataHeads[$j]['id']);
+							$sokutei['Headsid'] = floor(-$KouteiImSokuteidataHeads[$j]['id']);
+							$sokutei['Resultsid'] = floor(-$KouteiImSokuteidataResults[$k]['id']);
 
 							$sokuteiyobidashi[] = $sokutei;
 						}
@@ -202,10 +230,42 @@ class ApikouteisController extends AppController
 
 			}
 /*
+			$Headsid = array();
+			$Resultsid = array();
+			foreach($sokuteiyobidashi as $key => $row ) {
+				$Headsid[$key] = $row["Headsid"];
+				$Resultsid[$key] = $row["Resultsid"];
+			}
+
+			if(count($sokuteiyobidashi) > 0){
+				array_multisort($Headsid, $Resultsid, SORT_DESC, SORT_NUMERIC, $sokuteiyobidashi);
+			}
+*/
+			$Headsid = array();
+			$serialarr = array();
+			foreach($sokuteiyobidashi as $key => $row ) {
+				$Headsid[$key] = $row["Headsid"];
+				$serialarr[$key] = $row["serial"];
+			}
+
+			if(count($sokuteiyobidashi) > 0){
+				array_multisort($Headsid, $serialarr, SORT_ASC, SORT_NUMERIC, $sokuteiyobidashi);
+			}
+
+/*
 			echo "<pre>";
 			print_r($sokuteiyobidashi);
 			echo "</pre>";
 */
+
+			for($k=0; $k<count($sokuteiyobidashi); $k++){
+
+				unset($sokuteiyobidashi[$k]['Headsid']);
+				unset($sokuteiyobidashi[$k]['Resultsid']);
+
+			}
+
+
 			$this->set([
 					'kikakuyobidashi' => $sokuteiyobidashi,
 					'_serialize' => ['kikakuyobidashi']

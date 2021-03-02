@@ -376,7 +376,7 @@ class GenryousController extends AppController
 										 'check_flag' => $data[$n]['check_flag'],
 										 'flg' => $data[$n]['flg'],
 										 'first_date_st' => $motoOrderMaterials[0]->first_date_st,
-										 'real_date_st' => $motoOrderMaterials[0]->real_date_st,
+				//						 'real_date_st' => $motoOrderMaterials[0]->real_date_st,
 										 'num_lot' => $data[$n]['num_lot'],
 										 'price' => $motoOrderMaterials[0]->price,
 										 'updated_staff' => $datasession['Auth']['User']['staff_id'],
@@ -711,7 +711,7 @@ class GenryousController extends AppController
 										 'check_flag' => $data[$n]['check_flag'],
 										 'flg' => $data[$n]['flg'],
 										 'first_date_st' => $motoOrderMaterials[0]->first_date_st,
-										 'real_date_st' => $motoOrderMaterials[0]->real_date_st,
+								//		 'real_date_st' => $motoOrderMaterials[0]->real_date_st,
 										 'num_lot' => $data[$n]['num_lot'],
 										 'price' => $motoOrderMaterials[0]->price,
 										 'updated_staff' => $datasession['Auth']['User']['staff_id'],
@@ -753,7 +753,7 @@ class GenryousController extends AppController
 
 						 if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
 
-							$updater = "UPDATE order_material set date_stored ='".$data[$n]['date_stored']."', num_lot ='".$data[$n]['num_lot']."',
+							$updater = "UPDATE order_material set date_stored ='".$data[$n]['date_stored']."', 'real_date_st' => $data[$n]['date_stored'], num_lot ='".$data[$n]['num_lot']."',
 							check_flag ='".$data[$n]['check_flag']."', flg ='".$data[$n]['flg']."', updated_at ='".date('Y-m-d H:i:s')."', updated_staff ='".$datasession['Auth']['User']['staff_id']."'
 							where id ='".$moto_id_order."'";
 							$connection->execute($updater);

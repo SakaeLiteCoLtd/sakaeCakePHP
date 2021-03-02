@@ -352,22 +352,22 @@ class KensahyouHeadsController  extends AppController
       $this->set('type_im',$type_im);
 
       for($i=1; $i<=9; $i++){
-        if(empty($data["size_".$i])){
+        if(strlen($data["size_".$i]) < 1){
           $data["size_".$i] = null;
         }
     	}
 
     	for($j=1; $j<=8; $j++){
-        if(empty($data["upper_".$j])){
+        if(strlen($data["upper_".$j]) < 1){
           $data["upper_".$j] = null;
         }
-        if(empty($data["lower_".$j])){
+        if(strlen($data["lower_".$j]) < 1){
           $data["lower_".$j] = null;
         }
     	}
 
       for($i=10; $i<=11; $i++){
-        if(empty($data["text_".$i])){
+        if(strlen($data["text_".$i]) < 1){
           $data["text_".$i] = null;
         }
     	}

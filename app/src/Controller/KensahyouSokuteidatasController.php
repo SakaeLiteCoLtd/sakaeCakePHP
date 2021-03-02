@@ -175,7 +175,14 @@ class KensahyouSokuteidatasController  extends AppController
 
     public function search()//「出荷検査用呼出」の日付で絞り込むページ
     {
-      $data = $this->request->query();
+      $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->newEntity();
+      $this->set('KensahyouSokuteidatas',$KensahyouSokuteidatas);
+
+      if($this->request->is('post')){
+        $data = $this->request->getData();
+      }else{
+        $data = $this->request->query();
+      }
 
       if(isset($data["name"])){
         $product_code = $data["name"];
@@ -185,7 +192,8 @@ class KensahyouSokuteidatasController  extends AppController
       }
     	$this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
 
-    	if ($this->request->is('post') && isset($data['start'])) {//データがpostで送られたとき（日付を選んだ場合）
+      if (isset($data['start'])) {//データがpostで送られたとき（日付を選んだ場合）
+      //  if ($this->request->is('post') && isset($data['start'])) {//データがpostで送られたとき（日付を選んだ場合）
 
     		$data = $this->request->data;//postで送られたデータの呼び出し
 

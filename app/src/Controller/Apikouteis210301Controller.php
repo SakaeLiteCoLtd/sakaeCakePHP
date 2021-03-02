@@ -12,7 +12,7 @@ use Cake\Utility\Text;
 use Cake\Routing\Router;//urlの取得
 use Cake\Http\Client;//httpの読取に必要
 
-class ApikouteisController extends AppController
+class Apikouteis210301Controller extends AppController
 	{
 
 		public function initialize()
@@ -264,52 +264,10 @@ class ApikouteisController extends AppController
 				unset($sokuteiyobidashi[$k]['Resultsid']);
 
 			}
-/*
+
+
 			$this->set([
 					'kikakuyobidashi' => $sokuteiyobidashi,
-					'_serialize' => ['kikakuyobidashi']
-			]);
-*/
-
-			$sokuteiyobidashidatas = array();
-			$KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code])
-			->order(["kensahyou_size"=>"DESC"])->toArray();
-			$kensahyou_size_max = $KouteiImKikakuTaious[0]->kensahyou_size;
-			$type_im = $sokuteiyobidashi[0]['type_im'];
-
-		//	$sokuteiyobidashidatas = $kensahyou_size_max." ".$torisu." ".$type_im;
-
-			for($j=1; $j<=$torisu; $j++){
-
-				$sokuteituika = array();
-				$kensahyou_size = array();
-
-				for($k=1; $k<=$kensahyou_size_max; $k++){
-
-					for($m=0; $m<count($sokuteiyobidashi); $m++){
-
-						if($sokuteiyobidashi[$m]["type_im"] == $type_im && $sokuteiyobidashi[$m]["serial"] == $j && $sokuteiyobidashi[$m]["kensahyou_size"] == $k){
-
-							$kensahyou_size["kensahyou_size_".$j][] = $sokuteiyobidashi[$m]["kensahyou_size"];
-							$sokuteituika["result_".$j."_".$k][] = $sokuteiyobidashi[$m]["result"];
-/*
-							echo "<pre>";
-							print_r($sokuteiyobidashi[$m]["result"]);
-							echo "</pre>";
-*/
-						}
-
-					}
-
-				}
-
-				$sokuteiyobidashidatas[] = $kensahyou_size;
-				$sokuteiyobidashidatas[] = $sokuteituika;
-
-			}
-
-			$this->set([
-					'kikakuyobidashi' => $sokuteiyobidashidatas,
 					'_serialize' => ['kikakuyobidashi']
 			]);
 

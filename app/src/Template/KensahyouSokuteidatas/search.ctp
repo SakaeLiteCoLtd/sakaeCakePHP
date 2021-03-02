@@ -45,8 +45,10 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
 <div align="center">
      <?=$this->Form->create() ?>
      <fieldset>
+
+       <?= $this->Form->create($KensahyouSokuteidatas, ['url' => ['action' => 'search']]) ?>
+
 <div align="center"><strong><font color="blue"><?php echo "製造年月日";?></font></strong></div>
-            <?=$this->Form->create('TimeSearch', ['url' => ['action' => 'search', 'type' => 'post']])?>
             <?=$this->Form->input("start", array('type' => 'date', 'monthNames' => false, 'value' => $dayye)); ?>
             <?=$this->Form->input("end", array('type' => 'date', 'monthNames' => false, 'value' => $dateYMD)); ?>
             <?=$this->Form->hidden("product_code", array('type' => 'value', 'value' => $product_code)); ?>

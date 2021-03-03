@@ -89,7 +89,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             <td colspan="20" nowrap="nowrap"><?= h($i+1) ?></td>
             <td colspan="20" nowrap="nowrap"><?= h($product_code) ?></td>
             <td colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
-            <td colspan="20" nowrap="nowrap"><?= $this->Form->control('amount'.$i, array('type'=>'text', 'value'=>0, 'label'=>false)) ?></td>
+            <td colspan="20" nowrap="nowrap"><?= $this->Form->control('amount'.$i, array('type'=>'text', 'label'=>false)) ?></td>
             <td colspan="20" nowrap="nowrap"><div align="center"><?= $this->Form->input("date".$i, array('type' => 'date', 'monthNames' => false, 'value'=>$daymoto, 'label'=>false)); ?></div></td>
           </tr>
           <?= $this->Form->control('product_code'.$i, array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>

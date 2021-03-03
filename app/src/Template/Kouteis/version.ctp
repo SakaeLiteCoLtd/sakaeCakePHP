@@ -158,14 +158,28 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             echo '<input name=" size_' . $i . '" type="text"  value="" size="6"/>';
             echo '</div></td>';
             }
+
+                      $arrtext10 = [
+                        '' => '',
+                        '外観1' => '外観1'
+                      ];
+                      $arrtext11 = [
+                        '' => '',
+                        '外観2' => '外観2'
+                      ];
+
+
+            /*
             echo '<td colspan="2"><div align="center">';
             echo '<input name="text_10" type="text"  value="" size="6"/>';
             echo '</div></td>';
             echo '<td colspan="2"><div align="center">';
             echo '<input name="text_11" type="text"  value="" size="6"/>';
             echo '</div></td>';
-
+*/
         ?>
+        <td colspan="2"><div align="center"><?= $this->Form->input('text_10', ["type"=>"select", "options"=>$arrtext10, 'label'=>false]); ?></div></td>
+        <td colspan="2"><div align="center"><?= $this->Form->input('text_11', ["type"=>"select", "options"=>$arrtext11, 'label'=>false]); ?></div></td>
 
         </tr>
 
@@ -191,7 +205,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         ?>
 
     </fieldset>
-    <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
+    <center><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>
     <br>
     <br>

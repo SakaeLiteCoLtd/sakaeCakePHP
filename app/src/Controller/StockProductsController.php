@@ -321,6 +321,7 @@ class StockProductsController extends AppController
 		 session_start();
 		 }
 		 $_SESSION['tourokustock'] = array();
+		 $_SESSION['tourokustockupdate'] = array();
 
 		 $StockProducts = $this->StockProducts->newEntity();
 		 $this->set('StockProducts',$StockProducts);
@@ -337,26 +338,53 @@ class StockProductsController extends AppController
 		 }
 
 		 $tourokustock = array();
+		 $tourokustockupdate = array();
 		 for ($k=0; $k<=$data["num"]; $k++) {
+
+			 if(strlen($data["amount".$k]) > 0){
 
 				 $date = $data["date".$k]["year"]."-".$data["date".$k]["month"]."-".$data["date".$k]["day"];
 
-				 $tourokustock[] = [
- 					'product_code' => $data["product_code".$k],
-					'amount' => $data["amount".$k],
- 					'date_stock' => $date,
-					'created_staff' => "",
-					'created_at' => date('Y-m-d H:i:s')
- 			 ];
+				 $StockProducts = $this->StockProducts->find()
+				 ->where(['date_stock' => $date, "product_code" => $data["product_code".$k], "delete_flag" => 0])
+				 ->toArray();
+
+				 if(isset($StockProducts[0])){
+
+					 $tourokustockupdate[] = [
+						 'id' => $StockProducts[0]->id,
+						 'product_code' => $data["product_code".$k],
+						 'amount' => $data["amount".$k],
+						 'date_stock' => $date,
+						 'updated_staff' => "",
+						 'updated_at' => date('Y-m-d H:i:s')
+					];
+
+				 }else{
+
+					 $tourokustock[] = [
+	 					'product_code' => $data["product_code".$k],
+						'amount' => $data["amount".$k],
+	 					'date_stock' => $date,
+						'created_staff' => "",
+						'created_at' => date('Y-m-d H:i:s')
+	 			 ];
+
+				 }
+
+			 }
+
 
 		 }
 		 $session = $this->request->getSession();
 		 $_SESSION['tourokustock'] = $tourokustock;
+		 $_SESSION['tourokustockupdate'] = $tourokustockupdate;
 
+		 $tourokustock = array_merge($tourokustock, $tourokustockupdate);
 		 $this->set('tourokustock',$tourokustock);
 /*
 		 		 echo "<pre>";
-		 		 print_r($tourokustock);
+		 		 print_r($_SESSION);
 		 		 echo "</pre>";
 */
 	 }
@@ -407,61 +435,140 @@ class StockProductsController extends AppController
 
 		   }
 
-			 $StockProduct = $this->StockProducts->patchEntities($this->StockProducts->newEntity(), $_SESSION['tourokustock']);
+			 for ($k=0; $k<count($_SESSION['tourokustockupdate']); $k++) {
+
+ 				$_SESSION['tourokustockupdate'][$k]['updated_staff'] = $_SESSION['Auth']['User']['staff_id'];//created_staffを$staff_idにする
+
+		   }
+
+			 if(count($_SESSION['tourokustock']) > 0) {
+
+				 $StockProduct = $this->StockProducts->patchEntities($this->StockProducts->newEntity(), $_SESSION['tourokustock']);
+
+			 }
+
 			 $connection = ConnectionManager::get('default');//トランザクション1
 			 // トランザクション開始2
 			 $connection->begin();//トランザクション3
 			 try {//トランザクション4
-				 if ($this->StockProducts->saveMany($StockProduct)) {
 
-					 //旧DBに登録
-					$connection = ConnectionManager::get('DB_ikou_test');
-					$table = TableRegistry::get('stock_product');
-					$table->setConnection($connection);
+				 if(isset($_SESSION['tourokustockupdate'][0])){
 
-					 for ($k=0; $k<count($_SESSION['tourokustock']); $k++) {
+					 for($k=0; $k<count($_SESSION['tourokustockupdate']); $k++){
+
+						 $this->StockProducts->updateAll(
+						 ['product_code' => $_SESSION['tourokustockupdate'][$k]["product_code"],
+							'amount' => $_SESSION['tourokustockupdate'][$k]["amount"],
+							'date_stock' => $_SESSION['tourokustockupdate'][$k]["date_stock"],
+							'updated_staff' => $_SESSION['tourokustockupdate'][$k]["updated_staff"],
+							'updated_at' => $_SESSION['tourokustockupdate'][$k]["updated_at"]],
+						 ['id' => $_SESSION['tourokustockupdate'][$k]["id"]]
+						 );
+
+
+						 //旧DBに登録
+						$connection = ConnectionManager::get('DB_ikou_test');
+						$table = TableRegistry::get('stock_product');
+						$table->setConnection($connection);
 
 						 $sql = "SELECT product_id,date_stock FROM stock_product".
-						 " where product_id = '".$_SESSION['tourokustock'][$k]["product_code"]."' and date_stock = '".$_SESSION['tourokustock'][$k]["date_stock"]."'";
+						 " where product_id = '".$_SESSION['tourokustockupdate'][$k]["product_code"]."' and date_stock = '".$_SESSION['tourokustockupdate'][$k]["date_stock"]."'";
 						 $connection = ConnectionManager::get('DB_ikou_test');
 						 $date_stock_moto = $connection->execute($sql)->fetchAll('assoc');
 
-						 if(isset($date_stock_moto[0])){//updateする場合
+						 $updater = "UPDATE stock_product set amount = '".$_SESSION['tourokustockupdate'][$k]["amount"]."'
+						 where product_id ='".$_SESSION['tourokustockupdate'][$k]["product_code"]."' and date_stock ='".$_SESSION['tourokustockupdate'][$k]["date_stock"]."'";
+						 $connection->execute($updater);
 
-							 $updater = "UPDATE stock_product set amount = '".$_SESSION['tourokustock'][$k]["amount"]."'
-               where product_id ='".$_SESSION['tourokustock'][$k]["product_code"]."' and date_stock ='".$_SESSION['tourokustock'][$k]["date_stock"]."'";
-               $connection->execute($updater);
-
-						}else{//insertする場合
-
-							$connection->insert('stock_product', [
-									'product_id' => $_SESSION['tourokustock'][$k]["product_code"],
-									'date_stock' => $_SESSION['tourokustock'][$k]["date_stock"],
-									'amount' => $_SESSION['tourokustock'][$k]["amount"]
-							]);
-
-						}
+						 $connection = ConnectionManager::get('default');//新DBに戻る
+						 $table->setConnection($connection);
 
 					 }
 
-					 $connection = ConnectionManager::get('default');//新DBに戻る
-					 $table->setConnection($connection);
+					 if(count($_SESSION['tourokustock']) > 0) {
 
-					 $mes = "※以下のように登録されました";
-					 $this->set('mes',$mes);
-					 $connection->commit();// コミット5
-				 } else {
-					 $mes = "※登録されませんでした";
-					 $this->set('mes',$mes);
-					 $this->Flash->error(__('The data could not be saved. Please, try again.'));
-					 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+						 if ($this->StockProducts->saveMany($StockProduct)) {
+
+							 //旧DBに登録
+							$connection = ConnectionManager::get('DB_ikou_test');
+							$table = TableRegistry::get('stock_product');
+							$table->setConnection($connection);
+
+							 for ($k=0; $k<count($_SESSION['tourokustock']); $k++) {
+
+									$connection->insert('stock_product', [
+											'product_id' => $_SESSION['tourokustock'][$k]["product_code"],
+											'date_stock' => $_SESSION['tourokustock'][$k]["date_stock"],
+											'amount' => $_SESSION['tourokustock'][$k]["amount"]
+									]);
+
+							 }
+
+							 $connection = ConnectionManager::get('default');//新DBに戻る
+							 $table->setConnection($connection);
+
+							 $mes = "※以下のように登録されました";
+							 $this->set('mes',$mes);
+							 $connection->commit();// コミット5
+
+						 } else {
+
+							 $mes = "※登録されませんでした";
+							 $this->set('mes',$mes);
+							 $this->Flash->error(__('The data could not be saved. Please, try again.'));
+							 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+						 }
+
+					 }else{
+
+						 $mes = "※以下のように更新されました";
+						 $this->set('mes',$mes);
+						 $connection->commit();// コミット5
+
+					 }
+
+				 }else{
+
+					 if ($this->StockProducts->saveMany($StockProduct)) {
+
+						 //旧DBに登録
+						$connection = ConnectionManager::get('DB_ikou_test');
+						$table = TableRegistry::get('stock_product');
+						$table->setConnection($connection);
+
+						 for ($k=0; $k<count($_SESSION['tourokustock']); $k++) {
+
+								$connection->insert('stock_product', [
+										'product_id' => $_SESSION['tourokustock'][$k]["product_code"],
+										'date_stock' => $_SESSION['tourokustock'][$k]["date_stock"],
+										'amount' => $_SESSION['tourokustock'][$k]["amount"]
+								]);
+
+						 }
+
+						 $connection = ConnectionManager::get('default');//新DBに戻る
+						 $table->setConnection($connection);
+
+						 $mes = "※以下のように登録されました";
+						 $this->set('mes',$mes);
+						 $connection->commit();// コミット5
+
+					 } else {
+
+						 $mes = "※登録されませんでした";
+						 $this->set('mes',$mes);
+						 $this->Flash->error(__('The data could not be saved. Please, try again.'));
+						 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+					 }
+
 				 }
+
 			 } catch (Exception $e) {//トランザクション7
 			 //ロールバック8
 				 $connection->rollback();//トランザクション9
 			 }//トランザクション10
 
-			 $tourokustock = $_SESSION['tourokustock'];
+			 $tourokustock = array_merge($_SESSION['tourokustock'], $_SESSION['tourokustockupdate']);
 			 $this->set('tourokustock',$tourokustock);
 		 }
 

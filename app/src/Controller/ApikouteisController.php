@@ -290,7 +290,11 @@ class ApikouteisController extends AppController
 
 						if($sokuteiyobidashi[$m]["type_im"] == $type_im && $sokuteiyobidashi[$m]["serial"] == $j && $sokuteiyobidashi[$m]["kensahyou_size"] == $k){
 
-							$kensahyou_size["kensahyou_size_".$j][] = $sokuteiyobidashi[$m]["kensahyou_size"];
+							$kensahyou_size["kensahyou_size"][] = "";
+							$kensahyou_size["kensahyou_size"][] = "";
+							$kensahyou_size["kensahyou_size"][] = $sokuteiyobidashi[$m]["kensahyou_size"];
+							$sokuteituika["result_".$j."_".$k."_id"][] = $sokuteiyobidashi[$m]["koutei_im_sokuteidata_heads_id"];
+							$sokuteituika["result_".$j."_".$k."_type_im"][] = $sokuteiyobidashi[$m]["type_im"];
 							$sokuteituika["result_".$j."_".$k][] = $sokuteiyobidashi[$m]["result"];
 /*
 							echo "<pre>";
@@ -303,14 +307,23 @@ class ApikouteisController extends AppController
 
 				}
 
-				$sokuteiyobidashidatas[] = $kensahyou_size;
+
+				if(!isset($sokuteiyobidashinum[0])){
+					$sokuteiyobidashinum[] = $kensahyou_size;
+				}
+
 				$sokuteiyobidashidatas[] = $sokuteituika;
 
 			}
-
+/*
+			echo "<pre>";
+			print_r($sokuteiyobidashidatas);
+			echo "</pre>";
+*/
 			$this->set([
-					'kikakuyobidashi' => $sokuteiyobidashidatas,
-					'_serialize' => ['kikakuyobidashi']
+				'kikakuyobidashinum' => $sokuteiyobidashinum,
+				'kikakuyobidashi' => $sokuteiyobidashidatas,
+				'_serialize' => ['kikakuyobidashinum','kikakuyobidashi']
 			]);
 
 		}

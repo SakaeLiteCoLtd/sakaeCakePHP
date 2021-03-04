@@ -283,19 +283,30 @@ class ApikouteisController extends AppController
 
 				$sokuteituika = array();
 				$kensahyou_size = array();
+				$check_sokutei = 0;
 
 				for($k=1; $k<=$kensahyou_size_max; $k++){
 
 					for($m=0; $m<count($sokuteiyobidashi); $m++){
 
+
 						if($sokuteiyobidashi[$m]["type_im"] == $type_im && $sokuteiyobidashi[$m]["serial"] == $j && $sokuteiyobidashi[$m]["kensahyou_size"] == $k){
 
-							$kensahyou_size["kensahyou_size"][] = "";
-							$kensahyou_size["kensahyou_size"][] = "";
-							$kensahyou_size["kensahyou_size"][] = $sokuteiyobidashi[$m]["kensahyou_size"];
-							$sokuteituika["result_".$j."_".$k."_id"][] = $sokuteiyobidashi[$m]["koutei_im_sokuteidata_heads_id"];
-							$sokuteituika["result_".$j."_".$k."_type_im"][] = $sokuteiyobidashi[$m]["type_im"];
+							if($check_sokutei == 0){
+
+								$sokuteituika["result_".$j."_id"][] = $sokuteiyobidashi[$m]["koutei_im_sokuteidata_heads_id"];
+								$sokuteituika["result_".$j."_type_im"][] = $sokuteiyobidashi[$m]["type_im"];
+								$sokuteituika["result_".$j."_inspec_datetime"][] = $sokuteiyobidashi[$m]["inspec_datetime"];
+								$check_sokutei = 1;
+
+								$kensahyou_size["kensahyou_size"][] = "";
+								$kensahyou_size["kensahyou_size"][] = "";
+								$kensahyou_size["kensahyou_size"][] = "";
+
+							}
 							$sokuteituika["result_".$j."_".$k][] = $sokuteiyobidashi[$m]["result"];
+							$kensahyou_size["kensahyou_size"][] = $sokuteiyobidashi[$m]["kensahyou_size"];
+
 /*
 							echo "<pre>";
 							print_r($sokuteiyobidashi[$m]["result"]);
@@ -445,9 +456,11 @@ class ApikouteisController extends AppController
 				if($status > 0){
 
 					$CheckKouteis = $this->CheckKouteis->find('all')
-					->where(['product_code' => $product_code, 'lot_num' => $lot_num])->toArray();
+					->where(['product_code' => $product_code, 'lot_num' => $lot_num])
+					->order(["datetime_graph"=>"DESC"])->toArray();
 
-					for($l=0; $l<count($CheckKouteis); $l++){
+					for($l=0; $l<1; $l++){
+						//for($l=0; $l<count($CheckKouteis); $l++){
 
 						$check_koutei_id = $CheckKouteis[$l]->id;
 
@@ -476,10 +489,14 @@ class ApikouteisController extends AppController
 
 				for($k=0; $k<count($_SESSION['bunpuvba']); $k++){
 
+					$CheckKouteisId = $this->CheckKouteis->find('all')
+					->where(['product_code' => $_SESSION['bunpuvba'][$k]["product_code"], 'lot_num' => $_SESSION['bunpuvba'][$k]["lot_num"]])
+					->order(["datetime_graph"=>"DESC"])->toArray();
+
 					$this->CheckKouteis->updateAll(
 					['status' => $_SESSION['bunpuvba'][$k]["status"],
 					 'update_datetime' => date('Y-m-d H:i:s')],
-					['product_code' => $_SESSION['bunpuvba'][$k]["product_code"], 'lot_num' => $_SESSION['bunpuvba'][$k]["lot_num"]]
+					['id' => $CheckKouteisId[0]->id]
 					);
 
 				}

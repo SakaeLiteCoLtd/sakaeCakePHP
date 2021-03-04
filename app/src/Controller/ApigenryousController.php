@@ -158,6 +158,7 @@ class ApigenryousController extends AppController
 				$staffid = $Staffs[0]->id;
 
 				$id_order = $dataarr[0]."_".$dataarr[1];
+				$id_order_moto = $id_order;
 				$checkOrderMaterials = $this->OrderMaterials->find('all')->where(['id_order' => $id_order])
 				->order(["id_order"=>"DESC"])->toArray();
 
@@ -256,7 +257,13 @@ class ApigenryousController extends AppController
 
 						}
 
-						$_SESSION['alertcheck1'] = 1;
+						$daburicheckOrderMaterials = $this->OrderMaterials->find('all')
+						->where(['id_order' => $id_order_moto, 'grade' => $grade, 'color' => $color])
+						->order(["id_order"=>"DESC"])->toArray();
+						
+						if(isset($daburicheckOrderMaterials[0])){
+							$_SESSION['alertcheck1'] = 1;
+						}
 
 					}
 

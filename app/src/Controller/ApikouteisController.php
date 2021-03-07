@@ -397,7 +397,9 @@ class ApikouteisController extends AppController
 
 		//http://localhost:5000/Apikouteis/bunpujoukyou/api/start.xml
 		//http://localhost:5000/Apikouteis/bunpujoukyou/api/IN.210217-112_MLD-MD-20035_3_0.xml
-		//http://localhost:5000/Apikouteis/bunpujoukyou/api/IN.210217-112_BON-MD-20023_4_1.xml
+		//http://localhost:5000/Apikouteis/bunpujoukyou/api/IN.210217-112_BON-MD-20023_1_1.xml
+		//http://localhost:5000/Apikouteis/bunpujoukyou/api/IN.210217-112_BON-MD-20023_2_2.xml
+		//http://localhost:5000/Apikouteis/bunpujoukyou/api/IN.210217-112_BON-MD-20023_3_1.xml
 		//http://localhost:5000/Apikouteis/bunpujoukyou/api/end.xml
 
 		//http://192.168.4.246/Apikouteis/bunpujoukyou/api/start.xml
@@ -475,6 +477,12 @@ class ApikouteisController extends AppController
 
 				}
 
+				foreach($_SESSION['bunpuvba'] as $key => $value)
+				{
+				    $sort_keys[$key] = $value['status'];
+				}
+				array_multisort($sort_keys, SORT_ASC, $_SESSION['bunpuvba']);
+
 				$this->set([
 						'kikakuyobidashi' => $bunpujoukyou,
 						'_serialize' => ['kikakuyobidashi']
@@ -486,6 +494,12 @@ class ApikouteisController extends AppController
 
 				session_start();
 				$session = $this->request->getSession();
+
+				foreach($_SESSION['bunpuvba'] as $key => $value)
+				{
+				    $sort_keys[$key] = $value['status'];
+				}
+				array_multisort($sort_keys, SORT_ASC, $_SESSION['bunpuvba']);
 
 				for($k=0; $k<count($_SESSION['bunpuvba']); $k++){
 

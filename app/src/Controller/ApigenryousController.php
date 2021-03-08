@@ -164,7 +164,16 @@ class ApigenryousController extends AppController
 
 				if(!isset($checkOrderMaterials[0])){
 
-						$genryouvba['id_order'] = $dataarr[0]."_".$dataarr[1];
+					$countOrderMaterials = $this->OrderMaterials->find('all')->where(['id_order like' => '%'.$dataarr[0].'%'])
+					->order(["id_order"=>"DESC"])->toArray();
+
+					$count = str_pad(count($_SESSION['genryouvba']) + count($countOrderMaterials) + 1, 2, 0, STR_PAD_LEFT);//3桁で表示
+					$id_order = $dataarr[0]."_".$count;
+
+					$genryouvba['id_order'] = $id_order;
+
+		//			$genryouvba['id_order'] = $dataarr[0]."_".$dataarr[1];
+
 						$genryouvba['grade'] = $grade;
 						$genryouvba['color'] = $color;
 						$genryouvba['date_order'] = date('Y-m-d');
@@ -213,7 +222,7 @@ class ApigenryousController extends AppController
 						$countOrderMaterials = $this->OrderMaterials->find('all')->where(['id_order like' => '%'.$id_order_moto_arr[0].'%'])
 						->order(["id_order"=>"DESC"])->toArray();
 
-						$count = str_pad(count($_SESSION['genryouvba']) + count($countOrderMaterials) + 1, 2, 0, STR_PAD_LEFT);
+						$count = str_pad(count($_SESSION['genryouvba']) + count($countOrderMaterials) + 1, 2, 0, STR_PAD_LEFT);//3桁で表示
 						$id_order = $id_order_moto_arr[0]."_".$count;
 
 						$genryouvba['id_order'] = $id_order;
@@ -260,7 +269,7 @@ class ApigenryousController extends AppController
 						$daburicheckOrderMaterials = $this->OrderMaterials->find('all')
 						->where(['id_order' => $id_order_moto, 'grade' => $grade, 'color' => $color])
 						->order(["id_order"=>"DESC"])->toArray();
-						
+
 						if(isset($daburicheckOrderMaterials[0])){
 							$_SESSION['alertcheck1'] = 1;
 						}

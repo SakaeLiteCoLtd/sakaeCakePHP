@@ -94,7 +94,7 @@ class ApikouteisController extends AppController
 */
 				for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
 
-					$KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code, 'kensahyou_size' => $j])->toArray();
+					$KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => 0, 'kensahyou_size' => $j])->toArray();
 
 					if(isset($KouteiImKikakuTaious[0])){
 						$kikakuyobidashi["kind_kensa_".$j] = $KouteiImKikakuTaious[0]->kind_kensa;
@@ -106,7 +106,7 @@ class ApikouteisController extends AppController
           $kikakuyobidashi["lower_".$j] = $KouteiKensahyouHeads[0]->{"lower_{$j}"};
         }
 
-				$KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code, 'kensahyou_size' => 9])->toArray();
+				$KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => 0, 'kensahyou_size' => 9])->toArray();
 				if(isset($KouteiImKikakuTaious[0])){
 					$kikakuyobidashi["kind_kensa_9"] = $KouteiImKikakuTaious[0]->kind_kensa;
 				}else{
@@ -183,11 +183,16 @@ class ApikouteisController extends AppController
 
 			$sokuteiyobidashi = array();
 
-			$KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code])->toArray();
+			$KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => 0])->toArray();
+
 			if(isset($KouteiImKikakuTaious[0])){
 
 				for($i=0; $i<count($KouteiImKikakuTaious); $i++){
-
+/*
+					echo "<pre>";
+					print_r($KouteiImKikakuTaious[$i]);
+					echo "</pre>";
+*/
 					$sokutei['product_code'] = $product_code;
 					$sokutei['product_name'] = $product_name;
 					$sokutei['torisu'] = $torisu;
@@ -251,13 +256,11 @@ class ApikouteisController extends AppController
 			if(count($sokuteiyobidashi) > 0){
 				array_multisort($Headsid, $serialarr, SORT_ASC, SORT_NUMERIC, $sokuteiyobidashi);
 			}
-
 /*
 			echo "<pre>";
 			print_r($sokuteiyobidashi);
 			echo "</pre>";
 */
-
 			for($k=0; $k<count($sokuteiyobidashi); $k++){
 
 				unset($sokuteiyobidashi[$k]['Headsid']);
@@ -272,7 +275,7 @@ class ApikouteisController extends AppController
 */
 
 			$sokuteiyobidashidatas = array();
-			$KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code])
+			$KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => 0])
 			->order(["kensahyou_size"=>"DESC"])->toArray();
 			$kensahyou_size_max = $KouteiImKikakuTaious[0]->kensahyou_size;
 			$type_im = $sokuteiyobidashi[0]['type_im'];
@@ -288,7 +291,6 @@ class ApikouteisController extends AppController
 				for($k=1; $k<=$kensahyou_size_max; $k++){
 
 					for($m=0; $m<count($sokuteiyobidashi); $m++){
-
 
 						if($sokuteiyobidashi[$m]["type_im"] == $type_im && $sokuteiyobidashi[$m]["serial"] == $j && $sokuteiyobidashi[$m]["kensahyou_size"] == $k){
 

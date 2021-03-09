@@ -22,12 +22,19 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           $_POST["shape_detection_{$n}"] = 1;
         }
 
+        $kind_kensa_arr = explode("_",$_POST["kind_kensa_{$n}"]);//切り離し
+        if(isset($kind_kensa_arr[1])){
+          $kind_kensa = $kind_kensa_arr[1];
+        }else{
+          $kind_kensa = $_POST["kind_kensa_{$n}"];
+        }
+
         $resultArray = Array();
         $_SESSION['kikakudata'][$n] = array(
           'product_code' => $_POST['product_code'],
           'version' => 0,
           'kensahyou_size' => $n,
-          "kind_kensa" => $_POST["kind_kensa_{$n}"],
+          "kind_kensa" => $kind_kensa,
           "shape_detection" => $_POST["shape_detection_{$n}"],
           "im_size_num" => $_POST["size_num_{$n}"],
           'status' => 0,
@@ -125,7 +132,13 @@ echo "</strong></div></td>\n";
       echo $this->Form->hidden('product_code' ,['value'=>$product_code]);
 ?>
 </fieldset>
-        <p align="center"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
-        <?= $this->Form->button(__('登録'), array('name' => 'touroku')) ?></p>
-
+<br>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('追加', array('name' => 'kakunin')); ?></div></td>
+</tr>
+</table>
+<br>
         <?= $this->Form->end() ?>

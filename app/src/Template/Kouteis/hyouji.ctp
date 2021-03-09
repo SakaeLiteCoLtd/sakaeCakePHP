@@ -1,21 +1,18 @@
 <?php
 /**
- * AuthHelper: Authの変数にアクセスできる
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Staff $staff
  */
-use Cake\ORM\TableRegistry;//独立したテーブルを扱う
-$this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//productsテーブルを使う
+ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
+$this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
 $this->Products = TableRegistry::get('products');//productsテーブルを使う
 ?>
 
-<?php
-          $username = $this->request->Session()->read('Auth.User.username');
-          echo $this->Form->create($KouteiImKikakuTaious, ['url' => ['action' => 'indexhome']]);
+<?= $this->Form->create($KensahyouHeads, ['url' => ['action' => 'hyouji']]) ?>
 
-          $session = $this->request->getSession();
-          $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
-          $data = $sessiondata['kikakudata'];
+<?php
+      $username = $this->request->Session()->read('Auth.User.username');
+      $session = $this->request->getSession();
 ?>
 <?php
  use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
@@ -30,8 +27,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
  </table>
  <hr size="5" style="margin: 0.5rem">
 <br>
-<legend align="center"><font color="red"><?= __($mes) ?></font></legend>
-<br>
+
     <table width="1200" border="1" align="center" bordercolor="#000000" style="background-color: #FFFFFF">
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="28" nowrap="nowrap"><div align="center"><strong>検査表</strong></div></td>
@@ -54,7 +50,7 @@ echo "</strong></div></td>\n";
     $resultArray = Array();
     for($i=1; $i<=9; $i++){
         echo "<td colspan='2'><div align='center'>\n";
-        echo $data["{$i}"]["shape_detection"] ;
+        echo ${"shape_detection_".$i};
         echo "</div></td>\n";
     }
     echo "<td colspan='2'>\n";
@@ -63,14 +59,14 @@ echo "</strong></div></td>\n";
     echo "</td>\n";
     echo "<td colspan='2'>\n";
     echo "</td>\n";
-
     echo "<tr style='border-bottom: solid;border-width: 1px'><td nowrap='nowrap' colspan='4'><div align='center'><strong>\n";
+
     echo "ＩＭ検査";
     echo "</strong></div></td>\n";
         $resultArray = Array();
         for($i=1; $i<=9; $i++){
             echo "<td colspan='2'><div align='center'>\n";
-            echo $data["{$i}"]["kind_kensa"] ;
+            echo ${"kind_kensa".$i};
             echo "</div></td>\n";
         }
         echo "<td colspan='2'>\n";
@@ -79,14 +75,14 @@ echo "</strong></div></td>\n";
         echo "</td>\n";
         echo "<td colspan='2'>\n";
         echo "</td>\n";
-
     echo "<tr style='border-bottom: solid;border-width: 1px'><td nowrap='nowrap' colspan='4'><div align='center'><strong>\n";
+
     echo "検査Ｎｏ";
     echo "</strong></div></td>\n";
         $resultArray = Array();
         for($i=1; $i<=9; $i++){
             echo "<td colspan='2'><div align='center'>\n";
-            echo $data["{$i}"]["im_size_num"] ;
+            echo ${"size_num_".$i};
             echo "</div></td>\n";
         }
     echo "<td colspan='2'>\n";
@@ -99,6 +95,11 @@ echo "</strong></div></td>\n";
 </table>
 
 <br>
+</fieldset>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+</tr>
+</table>
 <br>
-        <p align="center"><?= $this->Form->submit(__('トップ'), array('name' => 'top')) ?></p>
         <?= $this->Form->end() ?>

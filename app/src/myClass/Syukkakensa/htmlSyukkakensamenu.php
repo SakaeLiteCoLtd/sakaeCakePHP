@@ -44,7 +44,7 @@ class htmlSyukkakensamenu extends AppController
                  "<img src='/img/Labelimg/im_taiou_touroku.gif' width=115 height=40>\n".
                  "</a>\n".
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/Kouteis/headyobidashicustomer'>\n".
-                 "<img src='/img/Labelimg/koutei_header_yobidashi.gif' width=100 height=40>\n".
+                 "<img src='/img/Labelimg/koutei_header_yobidashi.gif' width=115 height=40>\n".
                  "</a>\n";
 
        return $html;

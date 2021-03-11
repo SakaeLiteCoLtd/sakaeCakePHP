@@ -152,7 +152,7 @@ $this->ImKikakuTaious = TableRegistry::get('imKikakuTaious');//productsテーブ
               echo $this->Form->hidden('product_code' ,['value'=>$product_code]);
         ?>
     </fieldset>
-    <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
+    <center><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')) ?></center>
     <?= $this->Form->end() ?>
     <br>
 

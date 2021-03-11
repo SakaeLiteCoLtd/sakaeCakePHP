@@ -19,12 +19,21 @@ $this->ImKikakuTaious = TableRegistry::get('imKikakuTaious');
       $version = $ImKikakuTaious[0]->version + 1;
 
       for($n=1; $n<=9; $n++){
+
+        $kind_kensa_arr = explode("_",$_POST["kind_kensa_{$n}"]);//切り離し
+        if(isset($kind_kensa_arr[1])){
+          $kind_kensa = $kind_kensa_arr[1];
+        }else{
+          $kind_kensa = $_POST["kind_kensa_{$n}"];
+        }
+
         $resultArray = Array();
         $_SESSION['kikakudata'][$n] = array(
           'product_code' => $_POST['product_code'],
           'kensahyuo_num' => $n,
           'version' => $version,
-          "kind_kensa" => $_POST["kind_kensa_{$n}"],
+    //      "kind_kensa" => $_POST["kind_kensa_{$n}"],
+          "kind_kensa" => $kind_kensa,
           "size_num" => $_POST["size_num_{$n}"],
           "created_staff" => "",
           "created_at" => ""
@@ -109,7 +118,11 @@ $this->ImKikakuTaious = TableRegistry::get('imKikakuTaious');
       echo $this->Form->hidden('product_code' ,['value'=>$product_code]);
 ?>
 </fieldset>
-        <p align="center"><?= $this->Form->button('戻る', ['onclick' => 'history.back()', 'type' => 'button']) ?>
-        <?= $this->Form->button(__('登録'), array('name' => 'touroku')) ?></p>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+<tr>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('追加', array('name' => 'kakunin')); ?></div></td>
+</tr>
+</table>
 
         <?= $this->Form->end() ?>

@@ -88,7 +88,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           echo $this->Form->hidden('newversion' ,['value'=>$newversion]);
           ?>
       </fieldset>
-      <center><?= $this->Form->button(__('確認'), array('name' => 'kakunin')) ?></center>
+      <center><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')) ?></center>
       <?= $this->Form->end() ?>
 <br>
     <?= $this->Form->end() ?>

@@ -23,6 +23,7 @@ class ApidenpyouchecksController extends AppController
      $this->Customers = TableRegistry::get('customers');
      $this->Users = TableRegistry::get('users');
 		 $this->OrderEdis = TableRegistry::get('orderEdis');
+		 $this->DenpyouDnpMinoukannous = TableRegistry::get('denpyouDnpMinoukannous');
 		}
 
 //http://192.168.4.246/Apidenpyouchecks/test/api/test.xml  http://localhost:5000/Apidenpyouchecks/test/api/test.xml
@@ -96,11 +97,121 @@ class ApidenpyouchecksController extends AppController
 
 			}
 
+			$count = 0;
+			$total = 0;
+			for($l=1; $l<count($denpyoucheckyobidashi); $l++){
+
+				if($denpyoucheckyobidashi[$l-1]['product_code'] == $denpyoucheckyobidashi[$l]['product_code'] && $denpyoucheckyobidashi[$l-1]['place_line'] == $denpyoucheckyobidashi[$l]['place_line']){
+
+					$count = $count + 1;
+
+					$denpyoucheckyobidashi[$l-1]['hakosu'] = 0;
+					$denpyoucheckyobidashi[$l-1]['amari'] = 0;
+
+				}elseif($count > 0){
+
+					for($m=0; $m<=$count; $m++){
+
+						$total = $total + $denpyoucheckyobidashi[$l-$m-1]['amount'];
+
+					}
+
+					$Konpous = $this->Konpous->find()
+					->where(['product_code' => $denpyoucheckyobidashi[$l-1]['product_code'], 'delete_flag' => 0])->toArray();
+					if(isset($Konpous[0])){
+						$hakosu = floor($total / $Konpous[0]->irisu);
+						$amari = $total % $Konpous[0]->irisu;
+					}else{
+						$hakosu = "";
+						$amari = "";
+					}
+					$denpyoucheckyobidashi[$l-1]['hakosu'] = $hakosu;
+					$denpyoucheckyobidashi[$l-1]['amari'] = $amari;
+/*
+					echo "<pre>";
+					print_r($total." / ".$Konpous[0]->irisu." = ".$hakosu." ... ".$amari);
+					echo "</pre>";
+*/
+					$count = 0;
+					$total = 0;
+
+				}
+
+			}
+
+
 			$this->set([
 					'kikakuyobidashi' => $denpyoucheckyobidashi,
 					'_serialize' => ['kikakuyobidashi']
 			]);
 
 		}
+
+
+		public function dnpnouhin()//http://localhost:5000/Apidenpyouchecks/dnpnouhin/api/2021-1-6.xml
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+
+			$urlarr = explode("/",$data);//切り離し
+			if(isset($urlarr[5])){
+				$urlarr[4] = $urlarr[4]."/".$urlarr[5];
+			}
+			$dataarr = explode(".",$urlarr[4]);//切り離し
+			$check_date = $dataarr[0];
+
+			$DenpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->find()->contain(["OrderEdis"])
+			->where(['date_deliver' => $check_date])
+			->order(["product_code"=>"ASC"])->toArray();
+/*
+			echo "<pre>";
+			print_r($DenpyouDnpMinoukannous);
+			echo "</pre>";
+*/
+			$arrdnpyobidashi = array();
+
+			for($k=0; $k<count($DenpyouDnpMinoukannous); $k++){
+
+				$Konpous = $this->Konpous->find()
+				->where(['product_code' => $DenpyouDnpMinoukannous[$k]['order_edi']->product_code, 'delete_flag' => 0])->toArray();
+				if(isset($Konpous[0])){
+					$irisu = $Konpous[0]->irisu;
+				}else{
+					$irisu = "入数が登録されていません";
+				}
+
+				$dnpyobidashi['num_order'] = $DenpyouDnpMinoukannous[$k]['order_edi']->num_order;
+				$dnpyobidashi['product_code'] = $DenpyouDnpMinoukannous[$k]['order_edi']->product_code;
+				$dnpyobidashi['name_order'] = $DenpyouDnpMinoukannous[$k]->name_order;
+				$dnpyobidashi['line_code'] = $DenpyouDnpMinoukannous[$k]['order_edi']->line_code;
+				$dnpyobidashi['place_line'] = $DenpyouDnpMinoukannous[$k]['order_edi']->place_line;
+				$dnpyobidashi['date_order'] = $DenpyouDnpMinoukannous[$k]['order_edi']->date_order;
+				$dnpyobidashi['amount'] = $DenpyouDnpMinoukannous[$k]['order_edi']->amount;
+				$dnpyobidashi['date_deliver'] = $DenpyouDnpMinoukannous[$k]['order_edi']->date_deliver;
+				$dnpyobidashi['kannou'] = $DenpyouDnpMinoukannous[$k]['order_edi']->kannou;
+				$dnpyobidashi['irisu'] = $irisu;
+
+				$arrdnpyobidashi[] = $dnpyobidashi;
+
+			}
+
+			$product_code = array();
+			$num_order = array();
+			foreach ($arrdnpyobidashi as $key => $value) {
+				 $product_code[$key] = $value['product_code'];
+				 $num_order[$key] = $value["num_order"];
+			 }
+
+			 if(isset($product_code)){
+				 array_multisort($product_code, $num_order, SORT_ASC, SORT_NUMERIC, $arrdnpyobidashi);
+			 }
+
+			$this->set([
+  			 'test' => $arrdnpyobidashi,
+  			 '_serialize' => ['test']
+  		 ]);
+
+		}
+
 
 	}

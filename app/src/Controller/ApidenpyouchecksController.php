@@ -24,6 +24,9 @@ class ApidenpyouchecksController extends AppController
      $this->Users = TableRegistry::get('users');
 		 $this->OrderEdis = TableRegistry::get('orderEdis');
 		 $this->DenpyouDnpMinoukannous = TableRegistry::get('denpyouDnpMinoukannous');
+		 $this->KensahyouJyunbiInsatsus = TableRegistry::get('kensahyouJyunbiInsatsus');
+		 $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');
+		 $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
 		}
 
 //http://192.168.4.246/Apidenpyouchecks/test/api/test.xml  http://localhost:5000/Apidenpyouchecks/test/api/test.xml
@@ -213,5 +216,247 @@ class ApidenpyouchecksController extends AppController
 
 		}
 
+//http://localhost:5000/Apidenpyouchecks/insatsujunbi/api/kusatsu.xml
+//http://localhost:5000/Apidenpyouchecks/insatsujunbi/api/other.xml
+//http://localhost:5000/Apidenpyouchecks/insatsujunbi/api/dnp.xml
+		public function insatsujunbi()
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+
+			$urlarr = explode("/",$data);//切り離し
+			$dataarr = explode(".",$urlarr[4]);//切り離し
+			$check_kind = $dataarr[0];
+
+			$KensahyouJyunbiInsatsus = $this->KensahyouJyunbiInsatsus->find('all')->toArray();
+
+			$arrinsatsujunbi = array();
+
+			if($check_kind == "kusatsu"){//草津
+
+				for($k=0; $k<count($KensahyouJyunbiInsatsus); $k++){
+
+					if($KensahyouJyunbiInsatsus[$k]["field"] == "10001"){
+
+						$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
+		        ->where(['id' => $KensahyouJyunbiInsatsus[$k]["kensahyou_heads_id"]])->toArray();
+						$product_code = $KensahyouSokuteidatas[0]->product_code;
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $product_code])->toArray();
+
+						$insatsujunbi['kensahyou_heads_id'] = $KensahyouJyunbiInsatsus[$k]->kensahyou_heads_id;
+						$insatsujunbi['product_code'] = $product_code;
+						$insatsujunbi['product_name'] = $Product[0]->product_name;
+						$insatsujunbi['date_deliver'] = $KensahyouJyunbiInsatsus[$k]->date_deliver;
+						$insatsujunbi['amount'] = $KensahyouJyunbiInsatsus[$k]->amount;
+						$insatsujunbi['manu_date'] = $KensahyouSokuteidatas[0]->manu_date;
+						$insatsujunbi['place_line'] = $KensahyouJyunbiInsatsus[$k]->place_line;
+
+						$arrinsatsujunbi[] = $insatsujunbi;
+
+					}
+
+				}
+
+			}elseif($check_kind == "other"){//その他
+
+				for($k=0; $k<count($KensahyouJyunbiInsatsus); $k++){
+
+					if($KensahyouJyunbiInsatsus[$k]["field"] == "99999"){
+
+						$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
+						->where(['id' => $KensahyouJyunbiInsatsus[$k]["kensahyou_heads_id"]])->toArray();
+						$product_code = $KensahyouSokuteidatas[0]->product_code;
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $product_code,
+						'OR' => [['customer_code not like' => '2%']]])->toArray();
+
+						if(isset($Product[0])){
+
+							$insatsujunbi['kensahyou_heads_id'] = $KensahyouJyunbiInsatsus[$k]->kensahyou_heads_id;
+							$insatsujunbi['product_code'] = $product_code;
+							$insatsujunbi['product_name'] = $Product[0]->product_name;
+							$insatsujunbi['date_deliver'] = $KensahyouJyunbiInsatsus[$k]->date_deliver;
+							$insatsujunbi['amount'] = $KensahyouJyunbiInsatsus[$k]->amount;
+							$insatsujunbi['manu_date'] = $KensahyouSokuteidatas[0]->manu_date;
+			//				$insatsujunbi['place_line'] = $KensahyouJyunbiInsatsus[$k]->place_line;
+
+							$arrinsatsujunbi[] = $insatsujunbi;
+
+						}
+
+					}
+
+				}
+
+			}else{//dnp
+
+				for($k=0; $k<count($KensahyouJyunbiInsatsus); $k++){
+
+					if($KensahyouJyunbiInsatsus[$k]["field"] == "99999"){
+
+						$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
+						->where(['id' => $KensahyouJyunbiInsatsus[$k]["kensahyou_heads_id"]])->toArray();
+						$product_code = $KensahyouSokuteidatas[0]->product_code;
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $product_code,
+						'OR' => [['customer_code like' => '2%']]])->toArray();
+
+						if(isset($Product[0])){
+
+							$insatsujunbi['kensahyou_heads_id'] = $KensahyouJyunbiInsatsus[$k]->kensahyou_heads_id;
+							$insatsujunbi['product_code'] = $product_code;
+							$insatsujunbi['product_name'] = $Product[0]->product_name;
+							$insatsujunbi['date_deliver'] = $KensahyouJyunbiInsatsus[$k]->date_deliver;
+							$insatsujunbi['amount'] = $KensahyouJyunbiInsatsus[$k]->amount;
+							$insatsujunbi['manu_date'] = $KensahyouSokuteidatas[0]->manu_date;
+							$insatsujunbi['place_line'] = $KensahyouJyunbiInsatsus[$k]->place_line;
+
+							$arrinsatsujunbi[] = $insatsujunbi;
+
+						}
+
+					}
+
+				}
+
+			}
+
+			$this->set([
+  			 'insatsujunbi' => $arrinsatsujunbi,
+  			 '_serialize' => ['insatsujunbi']
+  		 ]);
+
+		}
+
+		//http://localhost:5000/Apidenpyouchecks/kensahyousyuturyoku/api/87621.xml
+		public function kensahyousyuturyoku()
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+
+			$urlarr = explode("/",$data);//切り離し
+			$dataarr = explode(".",$urlarr[4]);//切り離し
+			$sokuteidata_id = $dataarr[0];
+
+			$arrkensahyousyuturyoku = array();
+
+			$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
+			->where(['id' => $sokuteidata_id])->toArray();
+
+			$kensahyousyuturyoku['code'] = $KensahyouSokuteidatas[0]->product_code."-".$KensahyouSokuteidatas[0]->lot_num;
+			$kensahyousyuturyoku['lot_num'] = $KensahyouSokuteidatas[0]->lot_num;
+			$kensahyousyuturyoku['manu_date'] = $KensahyouSokuteidatas[0]->manu_date;
+			$kensahyousyuturyoku['inspec_date'] = $KensahyouSokuteidatas[0]->inspec_date;
+
+			$arrkensahyousyuturyoku[] = $kensahyousyuturyoku;
+
+			$this->set([
+  			 'test' => $arrkensahyousyuturyoku,
+  			 '_serialize' => ['test']
+  		 ]);
+
+		}
+
+		//http://localhost:5000/Apidenpyouchecks/kensahyoukikaku/api/P002X-05Z20.xml
+		public function kensahyoukikaku()
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+
+			$urlarr = explode("/",$data);//切り離し
+			$dataarr = explode(".",$urlarr[4]);//切り離し
+			$product_code = $dataarr[0];
+
+			$KensahyouHeads = $this->KensahyouHeads->find()
+			->where(['product_code' => $product_code])->order(["version"=>"DESC"])->toArray();
+
+			$arrkensahyoukikaku = array();
+
+			$kensahyoukikaku['size_1'] = $KensahyouHeads[0]->size_1;
+			$kensahyoukikaku['upper_1'] = $KensahyouHeads[0]->upper_1;
+			$kensahyoukikaku['lower_1'] = $KensahyouHeads[0]->lower_1;
+			$kensahyoukikaku['size_2'] = $KensahyouHeads[0]->size_2;
+			$kensahyoukikaku['upper_2'] = $KensahyouHeads[0]->upper_2;
+			$kensahyoukikaku['lower_2'] = $KensahyouHeads[0]->lower_2;
+			$kensahyoukikaku['size_3'] = $KensahyouHeads[0]->size_3;
+			$kensahyoukikaku['upper_3'] = $KensahyouHeads[0]->upper_3;
+			$kensahyoukikaku['lower_3'] = $KensahyouHeads[0]->lower_3;
+			$kensahyoukikaku['size_4'] = $KensahyouHeads[0]->size_4;
+			$kensahyoukikaku['upper_4'] = $KensahyouHeads[0]->upper_4;
+			$kensahyoukikaku['lower_4'] = $KensahyouHeads[0]->lower_4;
+			$kensahyoukikaku['size_5'] = $KensahyouHeads[0]->size_5;
+			$kensahyoukikaku['upper_5'] = $KensahyouHeads[0]->upper_5;
+			$kensahyoukikaku['lower_5'] = $KensahyouHeads[0]->lower_5;
+			$kensahyoukikaku['size_6'] = $KensahyouHeads[0]->size_6;
+			$kensahyoukikaku['upper_6'] = $KensahyouHeads[0]->upper_6;
+			$kensahyoukikaku['lower_6'] = $KensahyouHeads[0]->lower_6;
+			$kensahyoukikaku['size_7'] = $KensahyouHeads[0]->size_7;
+			$kensahyoukikaku['upper_7'] = $KensahyouHeads[0]->upper_7;
+			$kensahyoukikaku['lower_7'] = $KensahyouHeads[0]->lower_7;
+			$kensahyoukikaku['size_8'] = $KensahyouHeads[0]->size_8;
+			$kensahyoukikaku['upper_8'] = $KensahyouHeads[0]->upper_8;
+			$kensahyoukikaku['lower_8'] = $KensahyouHeads[0]->lower_8;
+			$kensahyoukikaku['size_9'] = $KensahyouHeads[0]->size_9;
+			$kensahyoukikaku['bik'] = $KensahyouHeads[0]->bik;
+
+			$arrkensahyoukikaku[] = $kensahyoukikaku;
+
+			$this->set([
+  			 'KensahyouHeads' => $arrkensahyoukikaku,
+  			 '_serialize' => ['KensahyouHeads']
+  		 ]);
+
+		}
+
+		//http://localhost:5000/Apidenpyouchecks/kensahyousokutei/api/87621.xml
+		public function kensahyousokutei()
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+
+			$urlarr = explode("/",$data);//切り離し
+			$dataarr = explode(".",$urlarr[4]);//切り離し
+			$sokuteidata_id = $dataarr[0];
+
+			$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
+			->where(['id' => $sokuteidata_id])->toArray();
+			$product_code = $KensahyouSokuteidatas[0]->product_code;
+			$lot_num = $KensahyouSokuteidatas[0]->lot_num;
+
+			$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
+			->where(['product_code' => $product_code, 'lot_num' => $lot_num])->order(["cavi_num"=>"ASC"])->toArray();
+
+			$arrkensahyousokutei = array();
+
+			for($k=0; $k<count($KensahyouSokuteidatas); $k++){
+
+//				$kensahyousokutei['cavi_num'] = $KensahyouSokuteidatas[$k]->cavi_num;
+				$kensahyousokutei['result_size_1'] = $KensahyouSokuteidatas[$k]->result_size_1;
+				$kensahyousokutei['result_size_2'] = $KensahyouSokuteidatas[$k]->result_size_2;
+				$kensahyousokutei['result_size_3'] = $KensahyouSokuteidatas[$k]->result_size_3;
+				$kensahyousokutei['result_size_4'] = $KensahyouSokuteidatas[$k]->result_size_4;
+				$kensahyousokutei['result_size_5'] = $KensahyouSokuteidatas[$k]->result_size_5;
+				$kensahyousokutei['result_size_6'] = $KensahyouSokuteidatas[$k]->result_size_6;
+				$kensahyousokutei['result_size_7'] = $KensahyouSokuteidatas[$k]->result_size_7;
+				$kensahyousokutei['result_size_8'] = $KensahyouSokuteidatas[$k]->result_size_8;
+				$kensahyousokutei['result_size_9'] = $KensahyouSokuteidatas[$k]->result_size_9;
+				$kensahyousokutei['situation_dist1'] = $KensahyouSokuteidatas[$k]->situation_dist1;
+				$kensahyousokutei['situation_dist2'] = $KensahyouSokuteidatas[$k]->situation_dist2;
+				$kensahyousokutei['result_weight'] = $KensahyouSokuteidatas[$k]->result_weight;
+
+				$arrkensahyousokutei[] = $kensahyousokutei;
+
+			}
+
+			$this->set([
+  			 'test' => $arrkensahyousokutei,
+  			 '_serialize' => ['test']
+  		 ]);
+
+		}
 
 	}

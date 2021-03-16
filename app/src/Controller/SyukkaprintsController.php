@@ -227,7 +227,7 @@ class SyukkaprintsController extends AppController {
 
         $KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
         ->where(['product_code' => $data["insatsu"][$k]["product_code"], 'manu_date' => $manudate])->toArray();
-        $kensahyou_heads_id = $KensahyouSokuteidatas[0]->kensahyou_heads_id;
+        $kensahyou_heads_id = $KensahyouSokuteidatas[0]->id;
 
           $arrtouroku[] = [
             'kensahyou_heads_id' => $kensahyou_heads_id,

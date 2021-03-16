@@ -427,6 +427,9 @@ class ApidenpyouchecksController extends AppController
 			$product_code = $KensahyouSokuteidatas[0]->product_code;
 			$lot_num = $KensahyouSokuteidatas[0]->lot_num;
 
+			$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+			->where(['product_code' => $product_code])->toArray();
+
 			$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
 			->where(['product_code' => $product_code, 'lot_num' => $lot_num])->order(["cavi_num"=>"ASC"])->toArray();
 
@@ -447,6 +450,8 @@ class ApidenpyouchecksController extends AppController
 				$kensahyousokutei['situation_dist1'] = $KensahyouSokuteidatas[$k]->situation_dist1;
 				$kensahyousokutei['situation_dist2'] = $KensahyouSokuteidatas[$k]->situation_dist2;
 				$kensahyousokutei['result_weight'] = $KensahyouSokuteidatas[$k]->result_weight;
+
+				$kensahyousokutei['customer_code'] = $Product[0]["customer"]->customer_code;
 
 				$arrkensahyousokutei[] = $kensahyousokutei;
 

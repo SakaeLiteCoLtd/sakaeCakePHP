@@ -241,6 +241,7 @@ class ApidenpyouchecksController extends AppController
 						$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
 		        ->where(['id' => $KensahyouJyunbiInsatsus[$k]["kensahyou_heads_id"]])->toArray();
 						$product_code = $KensahyouSokuteidatas[0]->product_code;
+						$lot_num = $KensahyouSokuteidatas[0]->lot_num;
 
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $product_code])->toArray();
@@ -254,6 +255,21 @@ class ApidenpyouchecksController extends AppController
 						$insatsujunbi['place_line'] = $KensahyouJyunbiInsatsus[$k]->place_line;
 
 						$arrinsatsujunbi[] = $insatsujunbi;
+
+						$this->KensahyouJyunbiInsatsus->deleteAll(['id' => $KensahyouJyunbiInsatsus[$k]["id"]]);
+
+						$kensahyou_sokuteidata_head_id = $product_code."-".$lot_num;
+
+						$connection = ConnectionManager::get('DB_ikou_test');
+						$table = TableRegistry::get('kensahyou_jyunbi_insatsu');
+						$table->setConnection($connection);
+
+						$delete_kensahyou_jyunbi_insatsu = "DELETE FROM kensahyou_jyunbi_insatsu where kensahyou_sokuteidata_head_id = '".$kensahyou_sokuteidata_head_id."'";
+						$connection->execute($delete_kensahyou_jyunbi_insatsu);
+
+						$connection = ConnectionManager::get('default');//新DBに戻る
+						$table->setConnection($connection);
+
 
 					}
 
@@ -284,7 +300,21 @@ class ApidenpyouchecksController extends AppController
 			//				$insatsujunbi['place_line'] = $KensahyouJyunbiInsatsus[$k]->place_line;
 
 							$arrinsatsujunbi[] = $insatsujunbi;
+/*
+							$this->KensahyouJyunbiInsatsus->deleteAll(['id' => $KensahyouJyunbiInsatsus[$k]["id"]]);
 
+							$kensahyou_sokuteidata_head_id = $product_code."-".$lot_num;
+
+							$connection = ConnectionManager::get('DB_ikou_test');
+							$table = TableRegistry::get('kensahyou_jyunbi_insatsu');
+							$table->setConnection($connection);
+
+							$delete_kensahyou_jyunbi_insatsu = "DELETE FROM kensahyou_jyunbi_insatsu where kensahyou_sokuteidata_head_id = '".$kensahyou_sokuteidata_head_id."'";
+							$connection->execute($delete_kensahyou_jyunbi_insatsu);
+
+							$connection = ConnectionManager::get('default');//新DBに戻る
+							$table->setConnection($connection);
+*/
 						}
 
 					}
@@ -316,7 +346,21 @@ class ApidenpyouchecksController extends AppController
 							$insatsujunbi['place_line'] = $KensahyouJyunbiInsatsus[$k]->place_line;
 
 							$arrinsatsujunbi[] = $insatsujunbi;
+/*
+							$this->KensahyouJyunbiInsatsus->deleteAll(['id' => $KensahyouJyunbiInsatsus[$k]["id"]]);
 
+							$kensahyou_sokuteidata_head_id = $product_code."-".$lot_num;
+
+							$connection = ConnectionManager::get('DB_ikou_test');
+							$table = TableRegistry::get('kensahyou_jyunbi_insatsu');
+							$table->setConnection($connection);
+
+							$delete_kensahyou_jyunbi_insatsu = "DELETE FROM kensahyou_jyunbi_insatsu where kensahyou_sokuteidata_head_id = '".$kensahyou_sokuteidata_head_id."'";
+							$connection->execute($delete_kensahyou_jyunbi_insatsu);
+
+							$connection = ConnectionManager::get('default');//新DBに戻る
+							$table->setConnection($connection);
+*/
 						}
 
 					}

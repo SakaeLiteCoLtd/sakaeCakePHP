@@ -76,7 +76,7 @@ class OrderEdisController extends AppController
           $sample = explode(',',$line);//$lineを','毎に配列に入れる
 
            $keys=array_keys($sample);
-           $keys[array_search('3',$keys)]='place_deliver_code';//名前の変更（3?place_deliver_code）$place_deliver_codehennkou
+           $keys[array_search('3',$keys)]='place_deliver_code';//名前の変更（3?place_deliver_code）
            $keys[array_search('10',$keys)]='date_order';
            $keys[array_search('12',$keys)]='price';
            $keys[array_search('14',$keys)]='amount';
@@ -558,7 +558,9 @@ echo "</pre>";
       print_r("arrEDI");
       print_r($arrEDI);
       echo "</pre>";
-*/
+  */
+  //    $_SESSION['order_edi_kumitate'] = array();//空の配列を作る
+
       $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrEDI);//patchEntitiesで一括登録
       $connection = ConnectionManager::get('default');//トランザクション1
       // トランザクション開始2
@@ -696,8 +698,7 @@ echo "</pre>";
               $connection = ConnectionManager::get('DB_ikou_test');//
               $bunnoumoto = $connection->execute($sql)->fetchAll('assoc');//
 //
-              if(isset($bunnoumoto[0]["bunnou"])){//strlen($_POST["result_size_{$n}_9"]) > 0
-
+              if(isset($bunnoumoto[0]["bunnou"])){//
                 $bunnou = $bunnoumoto[0]["bunnou"] + 1;//
               }else{//
                 $bunnou = $arrEDI[$k]["bunnou"];//
@@ -1057,6 +1058,9 @@ echo "</pre>";
       }//トランザクション10
 
       }
+
+      $_SESSION['order_edi_kumitate'] = array();//空の配列を作る
+
     }
 
     public function keikakucsv()
@@ -1147,11 +1151,11 @@ echo "</pre>";
         }
       }
 */
-/*
-      echo "<pre>";
-      print_r($arrSyoyouKeikaku);
-      echo "</pre>";
-*/
+
+//      echo "<pre>";
+//      print_r($arrSyoyouKeikaku);
+//      echo "</pre>";
+
 //         rename($source_file,$source_file."test");
 
          $syoyouKeikakus = $this->SyoyouKeikakus->patchEntities($syoyouKeikakus, $arrSyoyouKeikaku);//patchEntitiesで一括登録
@@ -1891,6 +1895,7 @@ echo "</pre>";
         $num_order0 = $orderEdis0[0]->num_order;
         $line_code0 = $orderEdis0[0]->line_code;
         $product_code0 = $orderEdis0[0]->product_code;
+
         $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'line_code' => $line_code0,'product_code' => $product_code0])->toArray();
         for($n=0; $n<=100; $n++){
           if(isset($orderEdis[$n])){
@@ -2043,7 +2048,6 @@ echo "</pre>";
             $connection->execute($updater);
 
             $connection = ConnectionManager::get('default');
-
             //ここまで
           }else{
             $mes = "※更新されませんでした";
@@ -3079,9 +3083,11 @@ echo "</pre>";
         $place_deliver_code = $PlaceDeliver[0]->id_from_order;
       }
 
-  //    $place_deliver_code = $PlaceDeliver[0]->id_from_order;//$place_deliver_codehennkou
       $this->set('place_deliver_code',$place_deliver_code);
 
+//      $place_deliver_code = $PlaceDeliver[0]->id_from_order;
+//      $this->set('place_deliver_code',$place_deliver_code);
+  //    $line_code = $data["line_code"];
       $this->set('line_code',$line_code);
       $product_code = $data["product_code"];
       $this->set('product_code',$product_code);

@@ -284,6 +284,7 @@ class ApidenpyouchecksController extends AppController
 						$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
 						->where(['id' => $KensahyouJyunbiInsatsus[$k]["kensahyou_heads_id"]])->toArray();
 						$product_code = $KensahyouSokuteidatas[0]->product_code;
+						$lot_num = $KensahyouSokuteidatas[0]->lot_num;
 
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $product_code,
@@ -300,7 +301,7 @@ class ApidenpyouchecksController extends AppController
 			//				$insatsujunbi['place_line'] = $KensahyouJyunbiInsatsus[$k]->place_line;
 
 							$arrinsatsujunbi[] = $insatsujunbi;
-/*
+
 							$this->KensahyouJyunbiInsatsus->deleteAll(['id' => $KensahyouJyunbiInsatsus[$k]["id"]]);
 
 							$kensahyou_sokuteidata_head_id = $product_code."-".$lot_num;
@@ -314,7 +315,7 @@ class ApidenpyouchecksController extends AppController
 
 							$connection = ConnectionManager::get('default');//新DBに戻る
 							$table->setConnection($connection);
-*/
+
 						}
 
 					}
@@ -330,6 +331,7 @@ class ApidenpyouchecksController extends AppController
 						$KensahyouSokuteidatas = $this->KensahyouSokuteidatas->find()
 						->where(['id' => $KensahyouJyunbiInsatsus[$k]["kensahyou_heads_id"]])->toArray();
 						$product_code = $KensahyouSokuteidatas[0]->product_code;
+						$lot_num = $KensahyouSokuteidatas[0]->lot_num;
 
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $product_code,
@@ -346,7 +348,7 @@ class ApidenpyouchecksController extends AppController
 							$insatsujunbi['place_line'] = $KensahyouJyunbiInsatsus[$k]->place_line;
 
 							$arrinsatsujunbi[] = $insatsujunbi;
-/*
+
 							$this->KensahyouJyunbiInsatsus->deleteAll(['id' => $KensahyouJyunbiInsatsus[$k]["id"]]);
 
 							$kensahyou_sokuteidata_head_id = $product_code."-".$lot_num;
@@ -360,7 +362,7 @@ class ApidenpyouchecksController extends AppController
 
 							$connection = ConnectionManager::get('default');//新DBに戻る
 							$table->setConnection($connection);
-*/
+
 						}
 
 					}

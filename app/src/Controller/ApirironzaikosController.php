@@ -325,8 +325,8 @@ class ApirironzaikosController extends AppController
 
 
 			//新しいデータを登録
-			$RironStockProducts = $this->RironStockProducts->patchEntity($this->RironStockProducts->newEntity(), $tourokuarr);
-			$this->RironStockProducts->save($RironStockProducts);
+//			$RironStockProducts = $this->RironStockProducts->patchEntity($this->RironStockProducts->newEntity(), $tourokuarr);
+//			$this->RironStockProducts->save($RironStockProducts);
 
 //			sleep(5);//20秒待機
 

@@ -20,6 +20,7 @@ class ApirironzaikosController extends AppController
 		{
 		 parent::initialize();
 		 $this->RironStockProducts = TableRegistry::get('rironStockProducts');
+		 $this->MinusRironStockProducts = TableRegistry::get('minusRironStockProducts');
 		}
 
 		public function preadd()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apirironzaikos/preadd
@@ -29,11 +30,12 @@ class ApirironzaikosController extends AppController
 			session_start();
 			$session = $this->request->getSession();
 	//		$_SESSION['test'][0] = 0;
+	/*
 	$_SESSION['rironzaiko'] = array();
 	$_SESSION['rironzaikoupdate'] = array();
 	$_SESSION['checkrironzaiko'] = array();
 	$_SESSION['sessionronzaikostarttime'] = array();
-
+*/
 			echo "<pre>";
 			print_r($_SESSION);
 			echo "</pre>";
@@ -240,22 +242,7 @@ class ApirironzaikosController extends AppController
 								}
 
 							}
-/*//旧DBは不要
-							$connection = ConnectionManager::get('DB_ikou_test');
-							$table = TableRegistry::get('riron_stock_product');
-							$table->setConnection($connection);
 
-							for($k=0; $k<count($_SESSION['rironzaiko']); $k++){
-								$connection->insert('riron_stock_product', [
-										'date_culc' => $_SESSION['rironzaiko'][$k]["date_culc"],
-										'product_id' => $_SESSION['rironzaiko'][$k]["product_code"],
-										'amount' => $_SESSION['rironzaiko'][$k]["amount"]
-								]);
-							}
-
-							$connection = ConnectionManager::get('default');//新DBに戻る
-							$table->setConnection($connection);
-*/
 							$connection->commit();// コミット5
 							$_SESSION['rironzaiko'] = array();
 							$_SESSION['checkrironzaiko'] = array();
@@ -298,6 +285,169 @@ class ApirironzaikosController extends AppController
 				}
 
 		}
+
+		//http://localhost:5000/Apirironzaikos/minuszaiko/api/start.xml
+		//http://192.168.4.246/Apirironzaikos/minuszaiko/api/start.xml
+		//http://localhost:5000/Apirironzaikos/minuszaiko/api/主要_2021-3-12_P002X-15310_2021-3-20_-500.xml
+		//http://192.168.4.246/Apirironzaikos/minuszaiko/api/「シートID」_「理論在庫日」_「品番」_「マイナス日」_「マイナス数量」.xml
+		//http://localhost:5000/Apirironzaikos/minuszaiko/api/end.xml
+		//http://192.168.4.246/Apirironzaikos/minuszaiko/api/end.xml
+		public function minuszaiko()
+		{
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+
+			$urlarr = explode("/",$data);//切り離し
+			$dataarr = explode("_",$urlarr[4]);//切り離し
+/*
+			echo "<pre>";
+			print_r($dataarr);
+			echo "</pre>";
+*/
+			$this->set([
+			'minuszaiko' => $urlarr[4],
+			'_serialize' => ['minuszaiko']
+			]);
+
+			if(!isset($_SESSION)){
+			session_start();
+			}
+
+			if($urlarr[4] == "start.xml"){
+
+				$_SESSION['minusrironzaiko'] = array();
+				$_SESSION['minusrironzaikoupdate'] = array();
+
+			}elseif(isset($dataarr[2])){
+
+				$arramount = explode(".",$dataarr[4]);//切り離し
+				$amount = $arramount[0];
+
+				$minusrironzaikovba['sheet_id'] = $dataarr[0];
+				$minusrironzaikovba['date_riron_stock'] = $dataarr[1];
+				$minusrironzaikovba['product_code'] = $dataarr[2];
+				$minusrironzaikovba['date_minus'] = $dataarr[3];
+				$minusrironzaikovba['amount_minus'] = $amount;
+				$minusrironzaikovba['created_at'] = date('Y-m-d H:i:s');
+
+				$MinusRironStockProducts = $this->MinusRironStockProducts->find()->where(['date_riron_stock' => $dataarr[1], 'product_code' => $dataarr[2]])->toArray();
+				if(!isset($MinusRironStockProducts[0])){
+
+					$session = $this->request->getSession();
+					$_SESSION['minusrironzaiko'][] = $minusrironzaikovba;
+
+				}else{
+
+					$minusrironzaikovba['id'] = $MinusRironStockProducts[0]->id;
+
+					$session = $this->request->getSession();
+					$_SESSION['minusrironzaikoupdate'][] = $minusrironzaikovba;
+
+				}
+
+			}elseif($urlarr[4] == "end.xml"){
+
+				$session = $this->request->getSession();
+
+				//新しいデータを登録
+				if(count($_SESSION['minusrironzaiko']) > 0) {
+
+					$MinusRironStockProducts = $this->MinusRironStockProducts->patchEntities($this->MinusRironStockProducts->newEntity(), $_SESSION['minusrironzaiko']);
+
+				}
+
+				$connection = ConnectionManager::get('default');//トランザクション1
+				// トランザクション開始2
+				$connection->begin();//トランザクション3
+				try {//トランザクション4
+
+					if(count($_SESSION['minusrironzaiko']) < 1){//新規登録データがない場合
+
+						if(isset($_SESSION['minusrironzaikoupdate'][0])){
+
+							for($k=0; $k<count($_SESSION['minusrironzaikoupdate']); $k++){
+
+								$this->MinusRironStockProducts->updateAll(
+								['sheet_id' => $_SESSION['minusrironzaikoupdate'][$k]["sheet_id"],
+								 'date_riron_stock' => $_SESSION['minusrironzaikoupdate'][$k]["date_riron_stock"],
+								 'product_code' => $_SESSION['minusrironzaikoupdate'][$k]["product_code"],
+								 'date_minus' => $_SESSION['minusrironzaikoupdate'][$k]["date_minus"],
+								 'amount_minus' => $_SESSION['minusrironzaikoupdate'][$k]["amount_minus"],
+								 'updated_at' => date('Y-m-d H:i:s')],
+								['id' => $_SESSION['minusrironzaikoupdate'][$k]["id"]]
+								);
+
+							}
+
+						}
+
+						$connection->commit();// コミット5
+						$_SESSION['minusrironzaiko'] = array();
+						$_SESSION['minusrironzaikoupdate'] = array();
+
+					}
+
+					if(count($_SESSION['minusrironzaiko']) > 0 && $this->MinusRironStockProducts->saveMany($MinusRironStockProducts)) {
+
+						if(isset($_SESSION['minusrironzaikoupdate'][0])){
+
+							for($k=0; $k<count($_SESSION['minusrironzaikoupdate']); $k++){
+
+								$this->MinusRironStockProducts->updateAll(
+									['sheet_id' => $_SESSION['minusrironzaikoupdate'][$k]["sheet_id"],
+									 'date_riron_stock' => $_SESSION['minusrironzaikoupdate'][$k]["date_riron_stock"],
+									 'product_code' => $_SESSION['minusrironzaikoupdate'][$k]["product_code"],
+									 'date_minus' => $_SESSION['minusrironzaikoupdate'][$k]["date_minus"],
+									 'amount_minus' => $_SESSION['minusrironzaikoupdate'][$k]["amount_minus"],
+									 'updated_at' => date('Y-m-d H:i:s')],
+									['id' => $_SESSION['minusrironzaikoupdate'][$k]["id"]]
+								);
+
+							}
+
+						}
+
+						$connection->commit();// コミット5
+						$_SESSION['minusrironzaiko'] = array();
+						$_SESSION['minusrironzaikoupdate'] = array();
+
+					} else {
+
+						for($k=0; $k<count($_SESSION['minusrironzaikoupdate']); $k++){
+
+							$this->MinusRironStockProducts->updateAll(
+								['sheet_id' => $_SESSION['minusrironzaikoupdate'][$k]["sheet_id"],
+								 'date_riron_stock' => $_SESSION['minusrironzaikoupdate'][$k]["date_riron_stock"],
+								 'product_code' => $_SESSION['minusrironzaikoupdate'][$k]["product_code"],
+								 'date_minus' => $_SESSION['minusrironzaikoupdate'][$k]["date_minus"],
+								 'amount_minus' => $_SESSION['minusrironzaikoupdate'][$k]["amount_minus"],
+								 'updated_at' => date('Y-m-d H:i:s')],
+								['id' => $_SESSION['minusrironzaikoupdate'][$k]["id"]]
+							);
+
+						}
+
+						$this->Flash->error(__('The data could not be saved. Please, try again.'));
+						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+						$_SESSION['minusrironzaiko'] = array();
+						$_SESSION['minusrironzaikoupdate'] = array();
+
+					}
+
+				} catch (Exception $e) {//トランザクション7
+				//ロールバック8
+					$connection->rollback();//トランザクション9
+				}//トランザクション10
+
+				$_SESSION['minusrironzaiko'] = array();
+				$_SESSION['minusrironzaikoupdate'] = array();
+
+			}
+
+		}
+
+
 
 		public function dajikken()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apirironzaikos/preadd
 		{//http://localhost:5000/Apirironzaikos/dajikken/api/start.xml

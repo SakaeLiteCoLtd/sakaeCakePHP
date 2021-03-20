@@ -53,7 +53,7 @@ class ApidatasController extends AppController
 //実験
 			session_start();
 			$session = $this->request->getSession();
-			$_SESSION['test'][0] = 1;
+	//		$_SESSION['test'][0] = 1;
 
 			echo "<pre>";
 			print_r($_SESSION);
@@ -711,7 +711,7 @@ class ApidatasController extends AppController
 						}
 
 						if ($this->ScheduleKouteis->saveMany($ScheduleKouteis)) {
-/*
+/*//これがあると登録されない時がある
 							$connection = ConnectionManager::get('DB_ikou_test');
 							$table = TableRegistry::get('schedule_koutei');
 							$table->setConnection($connection);

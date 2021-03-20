@@ -57,6 +57,38 @@ class ApirironzaikosController extends AppController
 */
 		}
 
+		public function dajikken()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apirironzaikos/preadd
+		{//http://localhost:5000/Apirironzaikos/dajikken/api/start.xml
+
+			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
+			$data = urldecode($data);
+			$urlarr = explode("/",$data);//切り離し
+			$dataarr = explode(".",$urlarr[4]);//切り離し
+			$datest = $dataarr[0];
+			$datest = mb_convert_encoding($datest,"UTF-8",mb_detect_encoding($datest, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
+
+			if(!isset($_SESSION)){
+			session_start();
+			}
+			$session = $this->request->getSession();
+			$_SESSION['dajikken'] = array();
+			$_SESSION['dajikken'] = $datest;
+
+			$tourokuarr = array();
+			$tourokuarr['date_culc'] = '2022-01-16';
+			$tourokuarr['product_code'] = $datest;
+			$tourokuarr['amount'] = 9999;
+			$tourokuarr['created_at'] = date('Y-m-d H:i:s');
+
+			//新しいデータを登録
+//			$RironStockProducts = $this->RironStockProducts->patchEntity($this->RironStockProducts->newEntity(), $tourokuarr);
+//			$this->RironStockProducts->save($RironStockProducts);
+
+//			sleep(5);//20秒待機
+
+
+		}
+
 		public function test()//http://localhost:5000/Apirironzaikos/test/api/start.xml
 		//http://localhost:5000/Apirironzaikos/test/api/2021-01-16_AWW1097A1ZS0_406.xml
 		//http://localhost:5000/Apirironzaikos/test/api/end.xml
@@ -286,12 +318,13 @@ class ApirironzaikosController extends AppController
 
 		}
 
-		//http://localhost:5000/Apirironzaikos/minuszaiko/api/start.xml
-		//http://192.168.4.246/Apirironzaikos/minuszaiko/api/start.xml
-		//http://localhost:5000/Apirironzaikos/minuszaiko/api/主要_2021-3-12_P002X-15310_2021-3-20_-500.xml
+		//http://localhost:5000/Apirironzaikos/minuszaiko/api/start_sheet1.xml
+		//http://192.168.4.246/Apirironzaikos/minuszaiko/api/start_sheet1.xml
+		//http://localhost:5000/Apirironzaikos/minuszaiko/api/sheet1_2021-3-20_P002X-15310_2021-3-21_-500.xml
+		//http://192.168.4.246/Apirironzaikos/minuszaiko/api/sheet1_P002X-15310_2021-3-20_-500.xml
 		//http://192.168.4.246/Apirironzaikos/minuszaiko/api/「シートID」_「理論在庫日」_「品番」_「マイナス日」_「マイナス数量」.xml
-		//http://localhost:5000/Apirironzaikos/minuszaiko/api/end.xml
-		//http://192.168.4.246/Apirironzaikos/minuszaiko/api/end.xml
+		//http://localhost:5000/Apirironzaikos/minuszaiko/api/end_sheet1.xml
+		//http://192.168.4.246/Apirironzaikos/minuszaiko/api/end_sheet1.xml
 		public function minuszaiko()
 		{
 			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
@@ -313,99 +346,58 @@ class ApirironzaikosController extends AppController
 			session_start();
 			}
 
-			if($urlarr[4] == "start.xml"){
+			if($dataarr[0] == "start"){
 
 				$_SESSION['minusrironzaiko'] = array();
-				$_SESSION['minusrironzaikoupdate'] = array();
 
-			}elseif(isset($dataarr[2])){
+			}elseif(isset($dataarr[4])){
 
-				$arramount = explode(".",$dataarr[4]);//切り離し
-				$amount = $arramount[0];
+				if(isset($dataarr[5])){
 
-				$minusrironzaikovba['sheet_id'] = $dataarr[0];
-				$minusrironzaikovba['date_riron_stock'] = $dataarr[1];
-				$minusrironzaikovba['product_code'] = $dataarr[2];
-				$minusrironzaikovba['date_minus'] = $dataarr[3];
-				$minusrironzaikovba['amount_minus'] = $amount;
-				$minusrironzaikovba['created_at'] = date('Y-m-d H:i:s');
+					$arramount = explode(".",$dataarr[5]);//切り離し
+					$amount = $arramount[0];
 
-				$MinusRironStockProducts = $this->MinusRironStockProducts->find()->where(['date_riron_stock' => $dataarr[1], 'product_code' => $dataarr[2]])->toArray();
-				if(!isset($MinusRironStockProducts[0])){
-
-					$session = $this->request->getSession();
-					$_SESSION['minusrironzaiko'][] = $minusrironzaikovba;
+					$minusrironzaikovba['sheet_id'] = $dataarr[0]."_".$dataarr[1];
+					$minusrironzaikovba['date_riron_stock'] = $dataarr[2];
+					$minusrironzaikovba['product_code'] = $dataarr[3];
+					$minusrironzaikovba['date_minus'] = $dataarr[4];
+					$minusrironzaikovba['amount_minus'] = $amount;
+					$minusrironzaikovba['created_at'] = date('Y-m-d H:i:s');
 
 				}else{
 
-					$minusrironzaikovba['id'] = $MinusRironStockProducts[0]->id;
+					$arramount = explode(".",$dataarr[4]);//切り離し
+					$amount = $arramount[0];
 
-					$session = $this->request->getSession();
-					$_SESSION['minusrironzaikoupdate'][] = $minusrironzaikovba;
+					$minusrironzaikovba['sheet_id'] = $dataarr[0];
+					$minusrironzaikovba['date_riron_stock'] = $dataarr[1];
+					$minusrironzaikovba['product_code'] = $dataarr[2];
+					$minusrironzaikovba['date_minus'] = $dataarr[3];
+					$minusrironzaikovba['amount_minus'] = $amount;
+					$minusrironzaikovba['created_at'] = date('Y-m-d H:i:s');
 
 				}
 
-			}elseif($urlarr[4] == "end.xml"){
+	//			$MinusRironStockProducts = $this->MinusRironStockProducts->find()->where(['date_minus' => $dataarr[3], 'product_code' => $dataarr[2]])->toArray();
+
+				$session = $this->request->getSession();
+				$_SESSION['minusrironzaiko'][] = $minusrironzaikovba;
+
+			}elseif($dataarr[0] == "end"){
 
 				$session = $this->request->getSession();
 
-				//新しいデータを登録
-				if(count($_SESSION['minusrironzaiko']) > 0) {
+				$sheet_id = $_SESSION['minusrironzaiko'][0]['sheet_id'];
 
-					$MinusRironStockProducts = $this->MinusRironStockProducts->patchEntities($this->MinusRironStockProducts->newEntity(), $_SESSION['minusrironzaiko']);
-
-				}
-
+				$MinusRironStockProducts = $this->MinusRironStockProducts->patchEntities($this->MinusRironStockProducts->newEntity(), $_SESSION['minusrironzaiko']);
 				$connection = ConnectionManager::get('default');//トランザクション1
 				// トランザクション開始2
 				$connection->begin();//トランザクション3
 				try {//トランザクション4
 
-					if(count($_SESSION['minusrironzaiko']) < 1){//新規登録データがない場合
+					$this->MinusRironStockProducts->deleteAll(['sheet_id' => $sheet_id]);
 
-						if(isset($_SESSION['minusrironzaikoupdate'][0])){
-
-							for($k=0; $k<count($_SESSION['minusrironzaikoupdate']); $k++){
-
-								$this->MinusRironStockProducts->updateAll(
-								['sheet_id' => $_SESSION['minusrironzaikoupdate'][$k]["sheet_id"],
-								 'date_riron_stock' => $_SESSION['minusrironzaikoupdate'][$k]["date_riron_stock"],
-								 'product_code' => $_SESSION['minusrironzaikoupdate'][$k]["product_code"],
-								 'date_minus' => $_SESSION['minusrironzaikoupdate'][$k]["date_minus"],
-								 'amount_minus' => $_SESSION['minusrironzaikoupdate'][$k]["amount_minus"],
-								 'updated_at' => date('Y-m-d H:i:s')],
-								['id' => $_SESSION['minusrironzaikoupdate'][$k]["id"]]
-								);
-
-							}
-
-						}
-
-						$connection->commit();// コミット5
-						$_SESSION['minusrironzaiko'] = array();
-						$_SESSION['minusrironzaikoupdate'] = array();
-
-					}
-
-					if(count($_SESSION['minusrironzaiko']) > 0 && $this->MinusRironStockProducts->saveMany($MinusRironStockProducts)) {
-
-						if(isset($_SESSION['minusrironzaikoupdate'][0])){
-
-							for($k=0; $k<count($_SESSION['minusrironzaikoupdate']); $k++){
-
-								$this->MinusRironStockProducts->updateAll(
-									['sheet_id' => $_SESSION['minusrironzaikoupdate'][$k]["sheet_id"],
-									 'date_riron_stock' => $_SESSION['minusrironzaikoupdate'][$k]["date_riron_stock"],
-									 'product_code' => $_SESSION['minusrironzaikoupdate'][$k]["product_code"],
-									 'date_minus' => $_SESSION['minusrironzaikoupdate'][$k]["date_minus"],
-									 'amount_minus' => $_SESSION['minusrironzaikoupdate'][$k]["amount_minus"],
-									 'updated_at' => date('Y-m-d H:i:s')],
-									['id' => $_SESSION['minusrironzaikoupdate'][$k]["id"]]
-								);
-
-							}
-
-						}
+					if($this->MinusRironStockProducts->saveMany($MinusRironStockProducts)) {
 
 						$connection->commit();// コミット5
 						$_SESSION['minusrironzaiko'] = array();
@@ -413,25 +405,10 @@ class ApirironzaikosController extends AppController
 
 					} else {
 
-						for($k=0; $k<count($_SESSION['minusrironzaikoupdate']); $k++){
-
-							$this->MinusRironStockProducts->updateAll(
-								['sheet_id' => $_SESSION['minusrironzaikoupdate'][$k]["sheet_id"],
-								 'date_riron_stock' => $_SESSION['minusrironzaikoupdate'][$k]["date_riron_stock"],
-								 'product_code' => $_SESSION['minusrironzaikoupdate'][$k]["product_code"],
-								 'date_minus' => $_SESSION['minusrironzaikoupdate'][$k]["date_minus"],
-								 'amount_minus' => $_SESSION['minusrironzaikoupdate'][$k]["amount_minus"],
-								 'updated_at' => date('Y-m-d H:i:s')],
-								['id' => $_SESSION['minusrironzaikoupdate'][$k]["id"]]
-							);
-
-						}
-
 						$this->Flash->error(__('The data could not be saved. Please, try again.'));
 						throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
 
 						$_SESSION['minusrironzaiko'] = array();
-						$_SESSION['minusrironzaikoupdate'] = array();
 
 					}
 
@@ -441,46 +418,42 @@ class ApirironzaikosController extends AppController
 				}//トランザクション10
 
 				$_SESSION['minusrironzaiko'] = array();
-				$_SESSION['minusrironzaikoupdate'] = array();
 
 			}
 
 		}
 
-
-
-		public function dajikken()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apirironzaikos/preadd
-		{//http://localhost:5000/Apirironzaikos/dajikken/api/start.xml
-
+		//http://localhost:5000/Apirironzaikos/minuszaikoyobidashi/api/2021-3-10_m-zaiko0-1_primary.xml
+		//http://192.168.4.246/Apirironzaikos/minuszaikoyobidashi/api/2021-3-10_m-zaiko0-1_primary.xml
+		public function minuszaikoyobidashi()
+		{
 			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
 			$data = urldecode($data);
+
 			$urlarr = explode("/",$data);//切り離し
-			$dataarr = explode(".",$urlarr[4]);//切り離し
-			$datest = $dataarr[0];
-			$datest = mb_convert_encoding($datest,"UTF-8",mb_detect_encoding($datest, "ASCII,SJIS,UTF-8,CP51932,SJIS-win", true));
+			$dataarr = explode("_",$urlarr[4]);//切り離し
 
-			if(!isset($_SESSION)){
-			session_start();
+			if($dataarr[1] == "m-zaiko0-1.xml"){//その日から1週間分のデータを日の近い順に表示
+
+				$day = $dataarr[0];
+
+
+			}else{//その日の１週間後から1週間分のデータを日の近い順に表示
+
+				$day = $dataarr[0];
+				$day = strtotime($day);
+				$day = date('Y-m-d', strtotime('+7 day', $day));
+
+
+
 			}
-			$session = $this->request->getSession();
-			$_SESSION['dajikken'] = array();
-			$_SESSION['dajikken'] = $datest;
 
-			$tourokuarr = array();
-			$tourokuarr['date_culc'] = '2022-01-16';
-			$tourokuarr['product_code'] = $datest;
-			$tourokuarr['amount'] = 9999;
-			$tourokuarr['created_at'] = date('Y-m-d H:i:s');
-
-
-
-			//新しいデータを登録
-//			$RironStockProducts = $this->RironStockProducts->patchEntity($this->RironStockProducts->newEntity(), $tourokuarr);
-//			$this->RironStockProducts->save($RironStockProducts);
-
-//			sleep(5);//20秒待機
-
+			$this->set([
+			'minuszaiko' => $day,
+			'_serialize' => ['minuszaiko']
+			]);
 
 		}
+
 
 	}

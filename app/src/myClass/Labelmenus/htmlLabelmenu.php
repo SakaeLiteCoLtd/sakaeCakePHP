@@ -40,16 +40,17 @@ class htmlLabelmenu extends AppController
     public function LabelLabelsubmenus()
    {
        $html =
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/ikkatsupreform'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/ikkatsupreadd'>\n".
                  "<img src='/img/Labelimg/label_ikkatsu.gif' width=85 height=36>\n".
                  "</a></td>\n".
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/kobetujikanform'>\n".
+      //           "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/kobetujikanform'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/kobetujikanformpreadd'>\n".
                  "<img src='/img/Labelimg/label_kobetsu_seikei_t.gif' width=85 height=36>\n".
                  "</a>\n".
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/kobetuform'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/kobetuformpreadd'>\n".
                  "<img src='/img/Labelimg/label_kobetsu.gif' width=85 height=36>\n".
                  "</a></td>\n".
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/hasuform'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Labels/hasupreadd'>\n".
                  "<img src='/img/Labelimg/label_hasu.gif' width=85 height=36>\n".
                  "</a>\n";
 

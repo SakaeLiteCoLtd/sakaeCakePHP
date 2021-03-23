@@ -94,7 +94,8 @@ echo "</pre>";
 
 				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 				->where(['products.status' => 0, 'primary_p' => 1,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])->toArray();
+				'OR' => [['product_code like' => 'P%']]])->toArray();
+	//			'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])->toArray();
 
 				if(!isset($_SESSION)){
 				session_start();
@@ -138,7 +139,8 @@ echo "</pre>";
 
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'delete_flag' => 0,
-						'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+//						'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+						'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
 						->toArray();
 
 						if(isset($OrderEdisAssemble[0])){
@@ -184,7 +186,8 @@ echo "</pre>";
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+	//			'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+				'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				echo "<pre>";
@@ -261,7 +264,8 @@ echo "</pre>";
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し//210216更新
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day,
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
+	//			'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
+				'OR' => [['product_code like' => 'P%']]])
 				->order(["date_culc"=>"ASC"])->toArray();
 /*
 				if(count($StockProducts) < 1){
@@ -310,7 +314,8 @@ echo "</pre>";
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+				'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
+	//			'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -368,7 +373,8 @@ echo "</pre>";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+			//	'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+				'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
 				->order(["starting_tm"=>"ASC"])->toArray();
 
 					$arrSeisans = array();

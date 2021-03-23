@@ -149,7 +149,7 @@ class LabelCsvsTable extends Table
                         ->notEmpty('created_at');
             */
         $validator
-            ->uuid('created_staff')
+            ->integer('created_staff')
 //            ->requirePresence('created_staff', 'create')
             ->allowEmpty('created_staff');
             /*

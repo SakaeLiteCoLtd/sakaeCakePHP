@@ -457,7 +457,7 @@ class ApigenryousController extends AppController
 			$dataarr = explode("_",$urlarr[4]);//切り離し
 			$suparr = explode(".",$dataarr[1]);//切り離し
 
-			$OrderMaterials = $this->OrderMaterials->find()->where(['date_order' => $dataarr[0], 'sup_id' => $suparr[0]])->order(['date_stored' => 'DESC'])->toArray();
+			$OrderMaterials = $this->OrderMaterials->find()->where(['date_order' => $dataarr[0], 'sup_id' => $suparr[0]])->order(['date_stored' => 'ASC'])->toArray();
 			$arrTyuumons = array();
 
 			for($k=0; $k<count($OrderMaterials); $k++){

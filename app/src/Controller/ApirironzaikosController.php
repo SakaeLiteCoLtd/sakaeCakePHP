@@ -35,6 +35,8 @@ class ApirironzaikosController extends AppController
 		 $this->Konpous = TableRegistry::get('konpous');
 		 $this->ResultZensuHeads = TableRegistry::get('resultZensuHeads');
 		 $this->RironStockProducts = TableRegistry::get('rironStockProducts');
+		 $this->LabelSetikkatsues = TableRegistry::get('labelSetikkatsues');
+
 		}
 
 		public function preadd()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apirironzaikos/preadd
@@ -410,7 +412,8 @@ class ApirironzaikosController extends AppController
 				$connection->begin();//トランザクション3
 				try {//トランザクション4
 
-					$param = array('sheet_id' => $sheet_id, 'date_riron_stock' => $date_riron_stock);
+					$param = array('sheet_id' => $sheet_id);
+		//			$param = array('sheet_id' => $sheet_id, 'date_riron_stock' => $date_riron_stock);
 					$this->MinusRironStockProducts->deleteAll($param);
 
 					if($this->MinusRironStockProducts->saveMany($MinusRironStockProducts)) {
@@ -439,6 +442,36 @@ class ApirironzaikosController extends AppController
 
 		}
 
+		//http://localhost:5000/Apirironzaikos/dateminus/api/m-zaiko0-1.xml
+		public function dateminus()
+		{
+
+			$MinusRironStockProducts = $this->MinusRironStockProducts->find()
+			->order(["date_riron_stock"=>"DESC"])->toArray();
+			$dateminus = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-n-j');
+
+			$arryaermonthday = explode("-",$dateminus);
+			$arr = array();
+			$arr[] = [
+				'yaer' => $arryaermonthday[0],
+				'month' => $arryaermonthday[1],
+				'day' => $arryaermonthday[2],
+		 ];
+/*
+			$this->set([
+				'yaer' => $arryaermonthday[0],
+				'month' => $arryaermonthday[1],
+				'day' => $arryaermonthday[2],
+			'_serialize' => ['yaer', 'month', 'day']
+			]);
+*/
+			$this->set([
+				'arryaermonthday' => $arr,
+				'_serialize' => ['arryaermonthday']
+			]);
+
+		}
+
 		//http://localhost:5000/Apirironzaikos/minuszaikoyobidashi/api/m-zaiko0-1.xml
 		//http://192.168.4.246/Apirironzaikos/minuszaikoyobidashi/api/m-zaiko0-1.xml
 		public function minuszaikoyobidashi()
@@ -452,8 +485,8 @@ class ApirironzaikosController extends AppController
 			$dateminusstr = strtotime($dateminus);
 
 			if($urlarr[4] == "m-zaiko0-1.xml"){
-				$dateminussta = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-m-d');
-				$dateminusstr = strtotime($dateminussta);
+	//			$dateminussta = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-m-d');
+				$dateminussta = date('Y-m-d', strtotime('-2 day', $dateminusstr));
 				$dateminusfin = date('Y-m-d', strtotime('+7 day', $dateminusstr));
 			}else{
 				$dateminussta = date('Y-m-d', strtotime('+8 day', $dateminusstr));
@@ -486,9 +519,13 @@ class ApirironzaikosController extends AppController
 			$dateendnext = date('Y-m-d', strtotime('+32 day', $datestartstr));//kodouseikeisで使用
 
 //$arrProductsmotoスタート
-
+/*
+echo "<pre>";
+print_r($dateminus);
+echo "</pre>";
+*/
 				$StockProducts = $this->MinusRironStockProducts->find()//MinusRironStockProductsテーブルで、date_riron_stockから1週間以内（１～２週間以内）にマイナスになる品番を絞り込み
-				->where(['date_minus >=' => $dateminussta, 'date_minus <=' => $dateminusfin])
+				->where(['date_riron_stock' => $dateminus, 'date_minus >=' => $dateminussta, 'date_minus <=' => $dateminusfin])
 				->order(["date_minus"=>"ASC"])->toArray();
 
 					$arrProducts = array();
@@ -911,6 +948,29 @@ echo "</pre>";
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
 						 ];
+
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code']])->toArray();
+						 $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code']])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+									'dateseikei' => $nippouday,
+									'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+									'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+									'torisu' => $torisu
+							 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+									'dateseikei' => $nippouday,
+									'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+									'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+									'torisu' => $torisu
+							 ];
+
+						 }
 
 						}
 

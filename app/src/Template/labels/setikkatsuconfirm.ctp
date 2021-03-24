@@ -15,6 +15,7 @@
             $session->write('labelsetikkatsus.product_id1', $_POST['product_id1']);
             $session->write('labelsetikkatsus.product_id2', $_POST['product_id2']);
             $session->write('labelsetikkatsus.tourokubi', $today);
+            $session->write('labelsetikkatsus.created_at', date('Y-m-d H:i:s'));
             $session->write('labelsetikkatsus.delete_flag', 0);
         ?>
         <?php

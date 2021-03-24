@@ -949,8 +949,8 @@ echo "</pre>";
 								'torisu' => $torisu
 						 ];
 
-						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code']])->toArray();
-						 $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code']])->toArray();
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+						 $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
 
 						 if(isset($LabelSetikkatsu1[0])){
 
@@ -975,7 +975,7 @@ echo "</pre>";
 						}
 
 					}
-
+/*
 					//並べかえ
 					$tmp_product_array2 = array();
 					$tmp_dateseikei_array = array();
@@ -987,9 +987,12 @@ echo "</pre>";
 					if(count($arrSeisans) > 0){
 						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
 					}
-
+*/
 //$arrSeisans完成
 /*
+echo "<pre>";
+print_r($arrProductsmotominus);
+echo "</pre>";
 echo "<pre>";
 print_r($arrSeisans);
 echo "</pre>";

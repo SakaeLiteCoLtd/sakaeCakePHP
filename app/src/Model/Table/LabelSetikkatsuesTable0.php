@@ -69,15 +69,25 @@ class LabelSetikkatsuesTable extends Table
             ->requirePresence('product_id2', 'create')
             ->notEmpty('product_id2');
 
+            $validator
+                ->scalar('product_id3')
+                ->maxLength('product_id3', 30)
+                ->allowEmpty('updated_staff');
+
         $validator
             ->date('tourokubi')
             ->requirePresence('tourokubi', 'create')
             ->notEmpty('tourokubi');
 
-        $validator
-            ->integer('delete_flag')
-            ->requirePresence('delete_flag', 'create')
-            ->notEmpty('delete_flag');
+            $validator
+                ->integer('delete_flag')
+                ->requirePresence('delete_flag', 'create')
+                ->notEmpty('delete_flag');
+
+                $validator
+                    ->integer('kind_set_assemble')
+                    ->requirePresence('kind_set_assemble', 'create')
+                    ->notEmpty('kind_set_assemble');
             /*
                     $validator
                         ->dateTime('created_at')

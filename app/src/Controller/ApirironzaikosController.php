@@ -449,6 +449,8 @@ class ApirironzaikosController extends AppController
 			$MinusRironStockProducts = $this->MinusRironStockProducts->find()
 			->order(["date_riron_stock"=>"DESC"])->toArray();
 			$dateminus = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-n-j');
+	//		$dateminus = strtotime($dateminus);
+	//		$dateminus = date('Y-m-d', strtotime('-2 day', $dateminus));
 
 			$arryaermonthday = explode("-",$dateminus);
 			$arr = array();
@@ -486,10 +488,12 @@ class ApirironzaikosController extends AppController
 
 			if($urlarr[4] == "m-zaiko0-1.xml"){
 	//			$dateminussta = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-m-d');
-				$dateminussta = date('Y-m-d', strtotime('-2 day', $dateminusstr));
+				$dateminussta = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-m-d');
+				$dateminusstaminus = date('Y-m-d', strtotime('-2 day', $dateminusstr));
 				$dateminusfin = date('Y-m-d', strtotime('+7 day', $dateminusstr));
 			}else{
 				$dateminussta = date('Y-m-d', strtotime('+8 day', $dateminusstr));
+				$dateminusstaminus = date('Y-m-d', strtotime('+8 day', $dateminusstr));
 				$dateminusstr = strtotime($dateminussta);
 				$dateminusfin = date('Y-m-d', strtotime('+14 day', $dateminusstr));
 			}
@@ -525,7 +529,7 @@ print_r($dateminus);
 echo "</pre>";
 */
 				$StockProducts = $this->MinusRironStockProducts->find()//MinusRironStockProductsテーブルで、date_riron_stockから1週間以内（１～２週間以内）にマイナスになる品番を絞り込み
-				->where(['date_riron_stock' => $dateminus, 'date_minus >=' => $dateminussta, 'date_minus <=' => $dateminusfin])
+				->where(['date_riron_stock' => $dateminus, 'date_minus >=' => $dateminusstaminus, 'date_minus <=' => $dateminusfin])
 				->order(["date_minus"=>"ASC"])->toArray();
 
 					$arrProducts = array();
@@ -551,7 +555,7 @@ echo "</pre>";
 				$_SESSION['classarrProducts'] = $arrProducts;
 				$date16 = $yaermonth."-16";
 
-				//OrderEdisクラス使用
+				//Productsmotoクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
 				$arrProductsmotominus = $arrProductsmoto;
@@ -559,7 +563,7 @@ echo "</pre>";
 //$arrProductsmoto完成
 /*
 echo "<pre>";
-print_r($arrProductsmoto);
+print_r($arrProductsmotominus);
 echo "</pre>";
 */
 //$arrResultZensuHeadsmotoスタート
@@ -648,7 +652,7 @@ echo "</pre>";
 
 							$arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
 							$arrAssembleProducts = array_values($arrAssembleProducts);
-
+/*
 							$product_code = array();
 							$kensabi = array();
 							foreach ($arrAssembleProducts as $key => $value) {
@@ -659,7 +663,7 @@ echo "</pre>";
 							 if(isset($kensabi)){
 								 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
 							 }
-
+*/
 						}
 
 					}
@@ -748,11 +752,29 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
-				//OrderEdisクラス使用
-				$htmlApifind = new htmlApifind();//クラスを使用
-				$arrOrderEdis = $htmlApifind->OrderEdis($date16);//クラスを使用
+				for($l=0; $l<count($arrOrderEdis); $l++){
+
+		      for($m=$l+1; $m<count($arrOrderEdis); $m++){
+
+		        if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+
+		          $amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+		          $denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
+
+		          $arrOrderEdis[$l]["amount"] = $amount;
+		          $arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+		          unset($arrOrderEdis[$m]);
+
+		        }
+
+		      }
+		      $arrOrderEdis = array_values($arrOrderEdis);
+
+		    }
+
+		    $arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
 
 //$arrOrderEdis完成
 /*
@@ -801,7 +823,7 @@ echo "</pre>";
 					}
 
 				}
-
+/*
 				//並べかえ
 				$tmp_product_array = array();
 				$tmp_date_stock_array = array();
@@ -813,7 +835,7 @@ echo "</pre>";
 				if(count($arrStockProducts) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
 				}
-
+*/
 //$StockProducts完成
 /*
 echo "<pre>";
@@ -874,7 +896,7 @@ echo "</pre>";
 					}
 
 				}
-
+/*
 				//並べかえ
 				$tmp_product_array = array();
 				$tmp_date_deliver_array = array();
@@ -886,7 +908,7 @@ echo "</pre>";
 				if(count($arrSyoyouKeikakus) > 0){
 					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
 				}
-
+*/
 //$SyoyouKeikakus完成
 /*
 echo "<pre>";

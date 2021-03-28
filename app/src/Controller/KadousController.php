@@ -31,6 +31,7 @@ class KadousController extends AppController
        $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
        $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
        $this->KadouritsuSeikeikis = TableRegistry::get('kadouritsuSeikeikis');
+       $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');
 
        $this->Auth->allow();
      }
@@ -81,11 +82,6 @@ class KadousController extends AppController
       		$this->set('tuika'.$i,${"tuika".$i});//セット
       	}
 
-        //旧DB参照
-        $connection = ConnectionManager::get('DB_ikou_test');
-        $table = TableRegistry::get('scheduleKoutei');
-        $table->setConnection($connection);
-
          for($j=1; $j<=9; $j++){
            $daytomo = date('Y-m-d', strtotime('+1 day', $dateYMD1));
            $dateYMDs = mb_substr($dateYMD, 0, 10);
@@ -93,13 +89,10 @@ class KadousController extends AppController
            ${"tuika".$j} = 0;
            $this->set('tuika'.$j,${"tuika".$j});//セット
 
-           $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM schedule_koutei".
-                 " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
-           $connection = ConnectionManager::get('DB_ikou_test');
-           $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
+           $scheduleKoutei = $this->ScheduleKouteis->find()->where(['datetime >=' => $dateYMDs, 'datetime <=' => $dateYMDf, 'seikeiki' => $j, 'delete_flag' => 0])->toArray();
 /*
            echo "<pre>";
-           print_r(count($scheduleKoutei));
+           print_r($scheduleKoutei);
            echo "</pre>";
 */
               ${"arrP".$j} = array();
@@ -109,14 +102,14 @@ class KadousController extends AppController
                  ${"arrP".$j.$i} = array();
                  if(isset($scheduleKoutei[$i-1])) {
                    ${"ScheduleKoutei_id".$i} = 0;
-                   ${"datetime".$i} = $scheduleKoutei[$i-1]["datetime"];
-                   $dateYMD = $scheduleKoutei[$i-1]["datetime"];
+                   ${"datetime".$i} = $scheduleKoutei[$i-1]["datetime"]->format('Y-m-d H:i:s');
+                   $dateYMD = $scheduleKoutei[$i-1]["datetime"]->format('Y-m-d H:i:s');
                    $dateYMD1 = strtotime($dateYMD);
                    $dayto = date('Y-m-d', strtotime('+1 day', $dateYMD1));
                    $dateHI = date("08:00");
                    ${"finishing_tm".$i} = $dayto." ".$dateHI;
                    ${"seikeiki".$i} = $scheduleKoutei[$i-1]["seikeiki"];
-                   ${"product_code".$i} = $scheduleKoutei[$i-1]["product_id"];
+                   ${"product_code".$i} = $scheduleKoutei[$i-1]["product_code"];
                    ${"present_kensahyou".$i} = $scheduleKoutei[$i-1]["present_kensahyou"];
                    ${"product_name".$i} = $scheduleKoutei[$i-1]["product_name"];
                    ${"amount_shot".$j.$i} = "";

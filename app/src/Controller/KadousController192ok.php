@@ -31,6 +31,7 @@ class KadousController extends AppController
        $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
        $this->GenjyouSeikeikis = TableRegistry::get('genjyouSeikeikis');
        $this->KadouritsuSeikeikis = TableRegistry::get('kadouritsuSeikeikis');
+       $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');
 
        $this->Auth->allow();
      }
@@ -90,87 +91,79 @@ class KadousController extends AppController
       		$this->set('tuika'.$i,${"tuika".$i});//セット
       	}
 
-        //旧DB参照
-        $connection = ConnectionManager::get('sakaeMotoDB');
-        $table = TableRegistry::get('scheduleKoutei');
-        $table->setConnection($connection);
+        for($j=1; $j<=9; $j++){
+          $daytomo = date('Y-m-d', strtotime('+1 day', $dateYMD1));
+          $dateYMDs = mb_substr($dateYMD, 0, 10);
+          $dateYMDf = mb_substr($daytomo, 0, 10);
+          ${"tuika".$j} = 0;
+          $this->set('tuika'.$j,${"tuika".$j});//セット
 
-         for($j=1; $j<=9; $j++){
-           $daytomo = date('Y-m-d', strtotime('+1 day', $dateYMD1));
-           $dateYMDs = mb_substr($dateYMD, 0, 10);
-           $dateYMDf = mb_substr($daytomo, 0, 10);
-           ${"tuika".$j} = 0;
-           $this->set('tuika'.$j,${"tuika".$j});//セット
-
-           $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM schedule_koutei".
-                 " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
-           $connection = ConnectionManager::get('sakaeMotoDB');
-           $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
+          $scheduleKoutei = $this->ScheduleKouteis->find()->where(['datetime >=' => $dateYMDs, 'datetime <=' => $dateYMDf, 'seikeiki' => $j, 'delete_flag' => 0])->toArray();
 /*
-           echo "<pre>";
-           print_r(count($scheduleKoutei));
-           echo "</pre>";
+          echo "<pre>";
+          print_r($scheduleKoutei);
+          echo "</pre>";
 */
-              ${"arrP".$j} = array();
-              ${"n".$j} = count($scheduleKoutei);
-              $this->set('n'.$j,${"n".$j});
-               for($i=1; $i<=count($scheduleKoutei); $i++){
-                 ${"arrP".$j.$i} = array();
-                 if(isset($scheduleKoutei[$i-1])) {
-                   ${"ScheduleKoutei_id".$i} = 0;
-                   ${"datetime".$i} = $scheduleKoutei[$i-1]["datetime"];
-                   $dateYMD = $scheduleKoutei[$i-1]["datetime"];
-                   $dateYMD1 = strtotime($dateYMD);
-                   $dayto = date('Y-m-d', strtotime('+1 day', $dateYMD1));
-                   $dateHI = date("08:00");
-                   ${"finishing_tm".$i} = $dayto." ".$dateHI;
-                   ${"seikeiki".$i} = $scheduleKoutei[$i-1]["seikeiki"];
-                   ${"product_code".$i} = $scheduleKoutei[$i-1]["product_id"];
-                   ${"present_kensahyou".$i} = $scheduleKoutei[$i-1]["present_kensahyou"];
-                   ${"product_name".$i} = $scheduleKoutei[$i-1]["product_name"];
-                   ${"amount_shot".$j.$i} = "";
-                   $this->set('amount_shot'.$j.$i,${"amount_shot".$j.$i});
-                   ${"cycle_shot".$j.$i} = "";
-                   $this->set('cycle_shot'.$j.$i,${"cycle_shot".$j.$i});
+             ${"arrP".$j} = array();
+             ${"n".$j} = count($scheduleKoutei);
+             $this->set('n'.$j,${"n".$j});
+              for($i=1; $i<=count($scheduleKoutei); $i++){
+                ${"arrP".$j.$i} = array();
+                if(isset($scheduleKoutei[$i-1])) {
+                  ${"ScheduleKoutei_id".$i} = 0;
+                  ${"datetime".$i} = $scheduleKoutei[$i-1]["datetime"]->format('Y-m-d H:i:s');
+                  $dateYMD = $scheduleKoutei[$i-1]["datetime"]->format('Y-m-d H:i:s');
+                  $dateYMD1 = strtotime($dateYMD);
+                  $dayto = date('Y-m-d', strtotime('+1 day', $dateYMD1));
+                  $dateHI = date("08:00");
+                  ${"finishing_tm".$i} = $dayto." ".$dateHI;
+                  ${"seikeiki".$i} = $scheduleKoutei[$i-1]["seikeiki"];
+                  ${"product_code".$i} = $scheduleKoutei[$i-1]["product_code"];
+                  ${"present_kensahyou".$i} = $scheduleKoutei[$i-1]["present_kensahyou"];
+                  ${"product_name".$i} = $scheduleKoutei[$i-1]["product_name"];
+                  ${"amount_shot".$j.$i} = "";
+                  $this->set('amount_shot'.$j.$i,${"amount_shot".$j.$i});
+                  ${"cycle_shot".$j.$i} = "";
+                  $this->set('cycle_shot'.$j.$i,${"cycle_shot".$j.$i});
 
-                     ${"arrP".$j}[] = ['id' => ${"ScheduleKoutei_id".$i}, 'datetime' => ${"datetime".$i},
-                      'product_code' => ${"product_code".$i},'seikeiki' => ${"seikeiki".$i},
-                      'present_kensahyou' => ${"present_kensahyou".$i},'product_name' => ${"product_name".$i},
-                      'finishing_tm' => ${"finishing_tm".$i}];
+                    ${"arrP".$j}[] = ['id' => ${"ScheduleKoutei_id".$i}, 'datetime' => ${"datetime".$i},
+                     'product_code' => ${"product_code".$i},'seikeiki' => ${"seikeiki".$i},
+                     'present_kensahyou' => ${"present_kensahyou".$i},'product_name' => ${"product_name".$i},
+                     'finishing_tm' => ${"finishing_tm".$i}];
 
-                 }
                 }
-                ${"ScheduleKouteisarry".$j} = array();//空の配列を作る
-                foreach ((array)${"arrP".$j} as $key => $value) {//datetimeで並び替え
-                     $sort[$key] = $value['datetime'];
-                      array_push(${"ScheduleKouteisarry".$j}, ['id' => $value['id'], 'starting_tm' => $value['datetime'],
-                       'seikeiki' => $value['seikeiki'], 'product_code' => $value['product_code'],
-                        'present_kensahyou' => $value['present_kensahyou'], 'product_name' => $value['product_name'],
-                      'finishing_tm' => $value['finishing_tm']]);
-                }
+               }
+               ${"ScheduleKouteisarry".$j} = array();//空の配列を作る
+               foreach ((array)${"arrP".$j} as $key => $value) {//datetimeで並び替え
+                    $sort[$key] = $value['datetime'];
+                     array_push(${"ScheduleKouteisarry".$j}, ['id' => $value['id'], 'starting_tm' => $value['datetime'],
+                      'seikeiki' => $value['seikeiki'], 'product_code' => $value['product_code'],
+                       'present_kensahyou' => $value['present_kensahyou'], 'product_name' => $value['product_name'],
+                     'finishing_tm' => $value['finishing_tm']]);
+               }
 
-                 if(isset(${"ScheduleKouteisarry".$j}[0])){
-                    array_multisort(array_map("strtotime", array_column( ${"ScheduleKouteisarry".$j}, "starting_tm" ) ), SORT_ASC, ${"ScheduleKouteisarry".$j});
-                for($m=1; $m<=${"n".$j}; $m++){//同じ成型機で製品が作られている個数分
-                  ${"arrP".$j.$m}[] = ${"ScheduleKouteisarry".$j}[$m-1];
-                  $this->set('arrP'.$j.$m,${"arrP".$j.$m});//セット
-                    if($m>=2){//同じ成型機で２つ以上の製品ができているときfinishing_tmを修正
-                      $m1 = $m-1 ;
-                      ${"arrP".$j.$m1} = array();//m-1の配列を空にする
-                      $replacements = array('finishing_tm' => ${"ScheduleKouteisarry".$j}[$m-1]['starting_tm']);//１つ前のfin_tmを後のsta_tmに変更する
-                      ${"ScheduleKouteisarry".$j}[$m-2] = array_replace(${"ScheduleKouteisarry".$j}[$m-2], $replacements);
-                      ${"arrP".$j.$m1}[] = ${"ScheduleKouteisarry".$j}[$m-2];
-                      $this->set('arrP'.$j.$m1,${"arrP".$j.$m1});//セット
-                    }
-           /*
-                    echo "<pre>";
-                    print_r($j."---".$m."---");
-                    print_r(${"arrP".$j.$m});
-                    echo "</pre>";
-           */
-                }
+                if(isset(${"ScheduleKouteisarry".$j}[0])){
+                   array_multisort(array_map("strtotime", array_column( ${"ScheduleKouteisarry".$j}, "starting_tm" ) ), SORT_ASC, ${"ScheduleKouteisarry".$j});
+               for($m=1; $m<=${"n".$j}; $m++){//同じ成型機で製品が作られている個数分
+                 ${"arrP".$j.$m}[] = ${"ScheduleKouteisarry".$j}[$m-1];
+                 $this->set('arrP'.$j.$m,${"arrP".$j.$m});//セット
+                   if($m>=2){//同じ成型機で２つ以上の製品ができているときfinishing_tmを修正
+                     $m1 = $m-1 ;
+                     ${"arrP".$j.$m1} = array();//m-1の配列を空にする
+                     $replacements = array('finishing_tm' => ${"ScheduleKouteisarry".$j}[$m-1]['starting_tm']);//１つ前のfin_tmを後のsta_tmに変更する
+                     ${"ScheduleKouteisarry".$j}[$m-2] = array_replace(${"ScheduleKouteisarry".$j}[$m-2], $replacements);
+                     ${"arrP".$j.$m1}[] = ${"ScheduleKouteisarry".$j}[$m-2];
+                     $this->set('arrP'.$j.$m1,${"arrP".$j.$m1});//セット
+                   }
+          /*
+                   echo "<pre>";
+                   print_r($j."---".$m."---");
+                   print_r(${"arrP".$j.$m});
+                   echo "</pre>";
+          */
+               }
 
-              }
+             }
 
               for($i=1; $i<=count($scheduleKoutei); $i++){
                 ${"product_code".$j.$i} = ${"arrP".$j.$i}[0]['product_code'];

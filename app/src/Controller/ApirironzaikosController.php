@@ -701,6 +701,19 @@ echo "</pre>";
 
 						}
 
+					}else{
+
+						$OrderEdis[] = [
+							'date_order' => "",
+	            'num_order' => "",
+	            'product_code' => $arrProductsmoto[$j]["product_code"],
+	            'product_name' => $arrProductsmoto[$j]["product_name"],
+	            'price' => "",
+	            'date_deliver' => "",
+	            'amount' => "",
+	            'denpyoumaisu' => ""
+					 ];
+
 					}
 
 				}
@@ -732,8 +745,8 @@ echo "</pre>";
 
 		           if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
 
-		             unset($arrProductsmoto[$l]);
-		             $arrProductsmoto = array_values($arrProductsmoto);
+		     //        unset($arrProductsmoto[$l]);
+		      //       $arrProductsmoto = array_values($arrProductsmoto);
 
 		           }
 
@@ -774,14 +787,17 @@ echo "</pre>";
 
 		    }
 
-		    $arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+		//    $arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
 
 //$arrOrderEdis完成
-/*
+
+echo "<pre>";
+print_r(count($arrOrderEdis));
+echo "</pre>";
 echo "<pre>";
 print_r($arrOrderEdis);
 echo "</pre>";
-*/
+
 //$StockProductsスタート
 
 			$StockProducts = array();

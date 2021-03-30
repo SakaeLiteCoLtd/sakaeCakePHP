@@ -29,7 +29,7 @@ class ApisController extends AppController
 		 $this->Konpous = TableRegistry::get('konpous');
 		 $this->ResultZensuHeads = TableRegistry::get('resultZensuHeads');
 		 $this->RironStockProducts = TableRegistry::get('rironStockProducts');
-//		 $this->belongsTo('Customers');
+		 $this->LabelSetikkatsues = TableRegistry::get('labelSetikkatsues');
 		}
 
 		public function xmlday()
@@ -664,6 +664,29 @@ class ApisController extends AppController
 								'torisu' => $torisu
 						 ];
 
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
+
 						}
 
 					}
@@ -1021,6 +1044,29 @@ class ApisController extends AppController
 								'torisu' => $torisu
 						 ];
 
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
+
 						}
 
 					}
@@ -1345,6 +1391,29 @@ class ApisController extends AppController
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
 						 ];
+
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
 
 						}
 
@@ -1671,6 +1740,29 @@ class ApisController extends AppController
 								'torisu' => $torisu
 						 ];
 
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
+
 						}
 
 					}
@@ -1992,6 +2084,29 @@ class ApisController extends AppController
 								'torisu' => $torisu
 						 ];
 
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
+
 						}
 
 					}
@@ -2312,6 +2427,29 @@ class ApisController extends AppController
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
 						 ];
+
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
 
 						}
 
@@ -2644,6 +2782,29 @@ class ApisController extends AppController
 								'torisu' => $torisu
 						 ];
 
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
+
 						}
 
 					}
@@ -2972,6 +3133,29 @@ class ApisController extends AppController
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
 						 ];
+
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
 
 						}
 
@@ -3302,6 +3486,29 @@ class ApisController extends AppController
 								'torisu' => $torisu
 						 ];
 
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
+
 						}
 
 					}
@@ -3631,6 +3838,29 @@ class ApisController extends AppController
 								'torisu' => $torisu
 						 ];
 
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
+
 						}
 
 					}
@@ -3956,6 +4186,29 @@ class ApisController extends AppController
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
 						 ];
+
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
 
 						}
 
@@ -4284,6 +4537,29 @@ class ApisController extends AppController
 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
 								'torisu' => $torisu
 						 ];
+
+						 $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+	           $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
+
+						 if(isset($LabelSetikkatsu1[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu1[0]["product_id2"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }elseif(isset($LabelSetikkatsu2[0])){
+
+							 $arrSeisans[] = [
+ 								'dateseikei' => $nippouday,
+ 								'product_code' => $LabelSetikkatsu2[0]["product_id1"],
+ 								'amount_shot' => $KadouSeikeis[$k]["amount_shot"],
+ 								'torisu' => $torisu
+ 						 ];
+
+						 }
 
 						}
 

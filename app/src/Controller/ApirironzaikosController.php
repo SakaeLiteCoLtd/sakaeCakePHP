@@ -532,6 +532,10 @@ echo "</pre>";
 				->where(['date_riron_stock' => $dateminus, 'date_minus >=' => $dateminusstaminus, 'date_minus <=' => $dateminusfin])
 				->order(["date_minus"=>"ASC"])->toArray();
 
+				echo "<pre>";
+				print_r($StockProducts);
+				echo "</pre>";
+
 					$arrProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -561,11 +565,11 @@ echo "</pre>";
 				$arrProductsmotominus = $arrProductsmoto;
 
 //$arrProductsmoto完成
-/*
+
 echo "<pre>";
 print_r($arrProductsmotominus);
 echo "</pre>";
-*/
+
 //$arrResultZensuHeadsmotoスタート
 
 		$arrResultZensuHeadsmoto = array();
@@ -586,7 +590,7 @@ echo "</pre>";
 			}
 
 		}
-
+/*
 		$product_code_moto = array();//ここから配列の並び変え
 		$datetime_finish_moto = array();
 		foreach ($arrResultZensuHeadsmoto as $key => $value) {
@@ -597,7 +601,7 @@ echo "</pre>";
 		 if(isset($datetime_finish)){
 			 array_multisort($product_code, array_map("strtotime", $datetime_finish), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
 		 }
-
+*/
 		//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
 		for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
 
@@ -790,14 +794,14 @@ echo "</pre>";
 		//    $arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
 
 //$arrOrderEdis完成
-
+/*
 echo "<pre>";
 print_r(count($arrOrderEdis));
 echo "</pre>";
 echo "<pre>";
 print_r($arrOrderEdis);
 echo "</pre>";
-
+*/
 //$StockProductsスタート
 
 			$StockProducts = array();
@@ -839,6 +843,10 @@ echo "</pre>";
 					}
 
 				}
+
+				$arrStockProducts = array_unique($arrStockProducts, SORT_REGULAR);
+				$arrStockProducts = array_values($arrStockProducts);
+
 /*
 				//並べかえ
 				$tmp_product_array = array();
@@ -854,6 +862,9 @@ echo "</pre>";
 */
 //$StockProducts完成
 /*
+echo "<pre>";
+print_r(count($StockProducts));
+echo "</pre>";
 echo "<pre>";
 print_r($StockProducts);
 echo "</pre>";

@@ -520,7 +520,7 @@ class ApirironzaikosController extends AppController
 			$datestart = $dateminussta;
 			$datestartstr = strtotime($dateminussta);
 			$dateend = date('Y-m-d', strtotime('+31 day', $datestartstr));
-			$dateendnext = date('Y-m-d', strtotime('+32 day', $datestartstr));//kodouseikeisで使用
+			$dateendnext = date('Y-m-d', strtotime('+31 day', $datestartstr));//kodouseikeisで使用
 
 //$arrProductsmotoスタート
 /*
@@ -531,11 +531,11 @@ echo "</pre>";
 				$StockProducts = $this->MinusRironStockProducts->find()//MinusRironStockProductsテーブルで、date_riron_stockから1週間以内（１～２週間以内）にマイナスになる品番を絞り込み
 				->where(['date_riron_stock' => $dateminus, 'date_minus >=' => $dateminusstaminus, 'date_minus <=' => $dateminusfin])
 				->order(["date_minus"=>"ASC"])->toArray();
-
+/*
 				echo "<pre>";
 				print_r($StockProducts);
 				echo "</pre>";
-
+*/
 					$arrProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -565,11 +565,11 @@ echo "</pre>";
 				$arrProductsmotominus = $arrProductsmoto;
 
 //$arrProductsmoto完成
-
+/*
 echo "<pre>";
 print_r($arrProductsmotominus);
 echo "</pre>";
-
+*/
 //$arrResultZensuHeadsmotoスタート
 
 		$arrResultZensuHeadsmoto = array();
@@ -878,15 +878,21 @@ echo "</pre>";
 					->where(['product_code' => $arrProductsmotominus[$j]["product_code"], 'date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0])
 					->order(["date_deliver"=>"ASC"])->toArray();
 
-					if(isset($SyoyouKeikakusdata[0])){
+					for($k=0; $k<count($SyoyouKeikakusdata); $k++){
 
-						$SyoyouKeikakus[] = [
-							'product_code' => $SyoyouKeikakusdata[0]["product_code"],
-							'date_deliver' => $SyoyouKeikakusdata[0]["date_deliver"],
-							'amount' => $SyoyouKeikakusdata[0]["amount"]
-					 ];
+						if(isset($SyoyouKeikakusdata[$k])){
+
+							$SyoyouKeikakus[] = [
+								'product_code' => $SyoyouKeikakusdata[$k]["product_code"],
+								'date_deliver' => $SyoyouKeikakusdata[$k]["date_deliver"],
+								'amount' => $SyoyouKeikakusdata[$k]["amount"]
+						 ];
+
+						}
 
 					}
+
+
 
 				}
 
@@ -954,13 +960,17 @@ echo "</pre>";
 					->where(['product_code' => $arrProductsmotominus[$j]["product_code"], 'starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
 					->order(["starting_tm"=>"ASC"])->toArray();
 
-					if(isset($KadouSeikeisdata[0])){
+					for($k=0; $k<count($KadouSeikeisdata); $k++){
 
-						$KadouSeikeis[] = [
-							'product_code' => $KadouSeikeisdata[0]["product_code"],
-							'amount_shot' => $KadouSeikeisdata[0]["amount_shot"],
-							'starting_tm' => $KadouSeikeisdata[0]['starting_tm']
-					 ];
+							if(isset($KadouSeikeisdata[$k])){
+
+								$KadouSeikeis[] = [
+									'product_code' => $KadouSeikeisdata[$k]["product_code"],
+									'amount_shot' => $KadouSeikeisdata[$k]["amount_shot"],
+									'starting_tm' => $KadouSeikeisdata[$k]['starting_tm']
+							 ];
+
+						 }
 
 					}
 
@@ -1024,6 +1034,10 @@ echo "</pre>";
 						}
 
 					}
+
+					$arrSeisans = array_unique($arrSeisans, SORT_REGULAR);
+					$arrSeisans = array_values($arrSeisans);
+
 /*
 					//並べかえ
 					$tmp_product_array2 = array();

@@ -34,6 +34,7 @@ class ShinkiesController extends AppController {
    $this->PlaceDelivers = TableRegistry::get('placeDelivers');
    $this->Customers = TableRegistry::get('customers');
    $this->CustomersHandys = TableRegistry::get('customersHandys');
+   $this->ZensuProducts = TableRegistry::get('zensuProducts');
   }
 
   public function index()
@@ -41,6 +42,7 @@ class ShinkiesController extends AppController {
 //   $this->request->session()->destroy(); // セッションの破棄
    $user = $this->Users->newEntity();
    $this->set('user',$user);
+
   }
 
    public function login()
@@ -97,6 +99,11 @@ class ShinkiesController extends AppController {
 
     $session = $this->request->getSession();
     $data = $session->read();
+/*
+    echo "<pre>";
+    print_r($data);
+    echo "</pre>";
+*/
    }
 
    public function materialsform()//原料
@@ -1779,5 +1786,137 @@ class ShinkiesController extends AppController {
     }//トランザクション10
 
    }
+
+   public function zensuproductform()
+   {
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }else{
+       $staff_id = $sessionData['login']['staff_id'];
+       $htmlRolecheck = new htmlRolecheck();//クラスを使用
+       $roleCheck = $htmlRolecheck->Rolecheck($staff_id);//管理者なら「２」そうでなければ「１」
+       $this->set('roleCheck',$roleCheck);
+     }
+
+
+/*
+     echo "<pre>";
+     print_r($roleCheck);
+     echo "</pre>";
+*/
+   }
+
+   public function zensuproductconfirm()
+   {
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $data = $this->request->getData();
+     $ZensuProducts = $this->ZensuProducts->find()->where(['product_code' => $data["product_code"], 'delete_flag' => 0])->toArray();
+     if(isset($ZensuProducts[0])){//存在するなら「２」そうでなければ「１」
+       $tourokucheck = 2;
+
+       if($ZensuProducts[0]->status == 1){
+         $mes1 = "運用中（status = 1）";
+         $this->set('mes1',$mes1);
+         $mes2 = "不使用（status = 0）";
+         $this->set('mes2',$mes2);
+       }else{
+         $mes1 = "不使用（status = 0）";
+         $this->set('mes1',$mes1);
+         $mes2 = "運用中（status = 1）";
+         $this->set('mes2',$mes2);
+       }
+
+     }else{
+       $tourokucheck = 1;
+     }
+     $this->set('tourokucheck',$tourokucheck);
+
+
+   }
+
+   public function zensuproductdo()
+   {
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     if(!isset($sessionData['login'])){
+       return $this->redirect(['action' => 'index']);
+     }
+
+     $data = $this->request->getData();
+     $ZensuProducts = $this->ZensuProducts->find()->where(['product_code' => $data["product_code"], 'delete_flag' => 0])->toArray();
+
+     if($ZensuProducts[0]->status == 1){
+       $mes = "不使用（status = 0）";
+       $this->set('mes',$mes);
+       $newstatus = 0;
+     }else{
+       $mes = "運用中（status = 1）";
+       $this->set('mes',$mes);
+       $newstatus = 1;
+     }
+
+     $ZensuProducts = $this->ZensuProducts->patchEntity($this->ZensuProducts->newEntity(), $data);
+     $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->ZensuProducts->updateAll(//検査終了時間の更新
+          ['status' => $newstatus,
+           'update_at' => date('Y-m-d H:i:s'), 'update_staff' => $sessionData['login']['staff_id']],
+          ['product_code' => $data["product_code"], 'delete_flag' => 0]
+        )){
+
+          //旧DB
+          $connection = ConnectionManager::get('sakaeMotoDB');
+          $table = TableRegistry::get('zensu_product');
+          $table->setConnection($connection);
+
+          $updater = "UPDATE zensu_product set status = '".$newstatus."' , update_at ='".date('Y-m-d H:i:s')."'
+          , update_staff = '".$sessionData['login']['staff_id']."'
+          where product_id ='".$data["product_code"]."'";
+          $connection->execute($updater);
+
+          $connection = ConnectionManager::get('default');//新DBに戻る
+          $table->setConnection($connection);
+
+          $mess = "以下のように変更されました。";
+          $this->set('mess',$mess);
+          $connection->commit();// コミット5
+
+      } else {
+
+        $mess = "※更新されませんでした";
+        $this->set('mess',$mess);
+        $this->Flash->error(__('The product could not be saved. Please, try again.'));
+        throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+      }
+
+    } catch (Exception $e) {//トランザクション7
+    //ロールバック8
+      $connection->rollback();//トランザクション9
+    }//トランザクション10
+
+   }
+
 
 }

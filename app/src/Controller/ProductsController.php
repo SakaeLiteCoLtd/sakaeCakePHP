@@ -296,7 +296,7 @@ class ProductsController extends AppController
 
 			$staff_code = $Created[0]->staff_code;
 			$data['zensudata']['staff_code'] = $staff_code;
-
+/*
 			echo "<pre>";
 	    print_r($data['zensudata']);
 	    echo "</pre>";
@@ -304,7 +304,7 @@ class ProductsController extends AppController
 			echo "<pre>";
 	    print_r($data['pricedata']);
 	    echo "</pre>";
-
+*/
 			$_SESSION['hyoujitourokudata'] = $data['productdata'];
 
 			if ($this->request->is('post')) {

@@ -3042,7 +3042,7 @@ echo "</pre>";
       echo "</pre>";
 */
       $PlaceDelivers = $this->PlaceDelivers->find()
-        ->where(['cs_code not like' => '%'."20".'%'])->toArray();
+        ->where(['cs_code not like' => '%'."200".'%'])->toArray();
         $arrPlaceDeliver = array();//配列の初期化
       	foreach ($PlaceDelivers as $value) {
       		$arrPlaceDeliver[] = array($value->id=>$value->name);

@@ -66,6 +66,7 @@ class ApigenryousController extends AppController
 			]);
 		}
 
+		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/start.xml
 		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/20210208_02_AP03B_N_200_2021-2-8_2_1001.xml
 		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/20210208_02_AP03B_N_200_2021-2-8_2_1001.xml
 		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/20210208_02_AP03B_N_200_2021-2-8_2_1001.xml
@@ -139,7 +140,13 @@ class ApigenryousController extends AppController
 				$purchaserarr = explode(".",$dataarr[7]);//切り離し
 				$purchaser = $purchaserarr[0];//tantouの取得
 
-				$PriceMaterials = $this->PriceMaterials->find('all')->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+				$PriceMaterials = $this->PriceMaterials->find('all')->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])
+				->order(["id"=>"DESC"])->toArray();
+/*
+				echo "<pre>";
+				print_r($PriceMaterials);
+				echo "</pre>";
+*/
 				if(isset($PriceMaterials[0])){
 
 					$sup_id = $PriceMaterials[0]->sup_id;

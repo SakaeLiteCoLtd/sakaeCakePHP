@@ -492,14 +492,14 @@ class ApirironzaikosController extends AppController
 				$dateminusstaminus = date('Y-m-d', strtotime('-2 day', $dateminusstr));
 				$dateminusfin = date('Y-m-d', strtotime('+7 day', $dateminusstr));
 			}else{
-				$dateminussta = date('Y-m-d', strtotime('+8 day', $dateminusstr));
+				$dateminussta = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-m-d');
 				$dateminusstaminus = date('Y-m-d', strtotime('+8 day', $dateminusstr));
-				$dateminusstr = strtotime($dateminussta);
 				$dateminusfin = date('Y-m-d', strtotime('+14 day', $dateminusstr));
+				$dateminusstr = strtotime($dateminussta);
 			}
 /*
 			echo "<pre>";
-			print_r($dateminussta);
+			print_r($dateminusstaminus);
 			echo "</pre>";
 			echo "<pre>";
 			print_r($dateminusfin);

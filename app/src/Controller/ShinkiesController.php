@@ -191,6 +191,19 @@ class ShinkiesController extends AppController {
      // トランザクション開始2
      $connection->begin();//トランザクション3
      try {//トランザクション4
+
+//既に登録されている場合はdeleteする
+       $deletePriceMaterials = $this->PriceMaterials->find('all')
+       ->where(['grade' => $arrtouroku[0]["grade"], 'color' => $arrtouroku[0]["color"], 'delete_flag' => 0])->toArray();
+       if(isset($deletePriceMaterials[0])){
+
+         $this->PriceMaterials->updateAll(
+           ['delete_flag' => 1, 'updated_staff' => $arrtouroku[0]["created_staff"], 'updated_at' => date('Y-m-d H:i:s')],
+           ['grade' => $arrtouroku[0]["grade"], 'color' => $arrtouroku[0]["color"]]
+         );
+
+       }
+
        if ($this->PriceMaterials->save($PriceMaterials)) {
 
          //旧DBに製品登録

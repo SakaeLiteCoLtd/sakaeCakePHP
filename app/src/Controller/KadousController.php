@@ -230,18 +230,88 @@ class KadousController extends AppController
 
     public function kariconfirm()
     {
-//      $this->request->session()->destroy(); // セッションの破棄
+
       session_start();
       $_SESSION['karikadouseikei'] = array();
 
       $KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
 			$this->set('KariKadouSeikeis',$KariKadouSeikeis);
       $Data = $this->request->query('s');
-/*
-      echo "<pre>";
-      print_r($Data);
-      echo "</pre>";
-*/
+
+      $time_check = 0;
+      $mess = "";
+      $this->set('time_check',$time_check);
+      $this->set('mess',$mess);
+
+      for($j=1; $j<=9; $j++){//8:00で開始、終了されていない場合
+
+        ${"n".$j} = $Data["data"]["n".$j];
+        $this->set('n'.$j,${"n".$j});
+
+        for($i=1; $i<=${"n".$j}; $i++){
+
+          if(strtotime($Data["data"]["finishing_tm".$j.$i]) <= strtotime($Data["data"]["starting_tm".$j.$i])){
+
+            $time_check = 1;
+            $mess = $j."号機の時間の前後関係に誤りがあります。確認してください。";
+            $this->set('time_check',$time_check);
+            $this->set('mess',$mess);
+
+          }
+
+          if($i > 1){
+
+            $i1 = $i-1;
+            if(strtotime($Data["data"]["starting_tm".$j.$i]) < strtotime($Data["data"]["finishing_tm".$j.$i1])){
+
+              $time_check = 1;
+              $mess = $j."号機の時間の前後関係に誤りがあります。確認してください。";
+              $this->set('time_check',$time_check);
+              $this->set('mess',$mess);
+
+            }
+
+          }
+
+          if($i == 1){
+
+            ${"starting_tm".$j.$i} = $Data["data"]["starting_tm".$j.$i];
+            ${"starting_tm_check".$j} = substr(${"starting_tm".$j.$i}, -5, 5);
+
+            if(${"starting_tm_check".$j} != "08:00"){
+
+              $time_check = 1;
+              $mess = $j."号機の開始時間が8:00になっていません。確認してください。";
+              $this->set('time_check',$time_check);
+              $this->set('mess',$mess);
+
+            }
+
+          }
+
+          if($i == ${"n".$j}){
+
+            ${"finishing_tm".$j.$i} = $Data["data"]["finishing_tm".$j.$i];
+            ${"finishing_tm_check".$j} = substr(${"finishing_tm".$j.$i}, -5, 5);
+
+            if(${"finishing_tm_check".$j} != "08:00"){
+
+              $time_check = 1;
+              $mess = $j."号機の終了時間が8:00になっていません。確認してください。";
+              $this->set('time_check',$time_check);
+              $this->set('mess',$mess);
+
+            }
+
+          }
+
+        }
+
+      }
+
+
+
+
       for($j=1; $j<=9; $j++){
 
       ${"n".$j} = $Data["data"]["n".$j];
@@ -481,6 +551,85 @@ class KadousController extends AppController
      $_SESSION['kadouseikei'] = array();
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);//
+
+     $data = $this->request->getData();
+     /*
+     echo "<pre>";
+     print_r($data);
+     echo "</pre>";
+*/
+     $time_check = 0;
+     $mess = "";
+     $this->set('time_check',$time_check);
+     $this->set('mess',$mess);
+
+     for($j=1; $j<=9; $j++){//8:00で開始、終了されていない場合
+
+       ${"n".$j} = $data["n".$j];
+       $this->set('n'.$j,${"n".$j});
+
+       for($i=1; $i<=${"n".$j}; $i++){
+
+         if(strtotime($data["finishing_tm".$j.$i]) <= strtotime($data["starting_tm".$j.$i])){
+
+           $time_check = 1;
+           $mess = $j."号機の時間の前後関係に誤りがあります。確認してください。";
+           $this->set('time_check',$time_check);
+           $this->set('mess',$mess);
+
+         }
+
+         if($i > 1){
+
+           $i1 = $i-1;
+           if(strtotime($data["starting_tm".$j.$i]) < strtotime($data["finishing_tm".$j.$i1])){
+
+             $time_check = 1;
+             $mess = $j."号機の時間の前後関係に誤りがあります。確認してください。";
+             $this->set('time_check',$time_check);
+             $this->set('mess',$mess);
+
+           }
+
+         }
+
+         if($i == 1){
+
+           ${"starting_tm".$j.$i} = $data["starting_tm".$j.$i];
+           ${"starting_tm_check".$j} = substr(${"starting_tm".$j.$i}, -5, 5);
+
+           if(${"starting_tm_check".$j} != "08:00"){
+
+             $time_check = 1;
+             $mess = $j."号機の開始時間が8:00になっていません。確認してください。";
+             $this->set('time_check',$time_check);
+             $this->set('mess',$mess);
+
+           }
+
+         }
+
+         if($i == ${"n".$j}){
+
+           ${"finishing_tm".$j.$i} = $data["finishing_tm".$j.$i];
+           ${"finishing_tm_check".$j} = substr(${"finishing_tm".$j.$i}, -5, 5);
+
+           if(${"finishing_tm_check".$j} != "08:00"){
+
+             $time_check = 1;
+             $mess = $j."号機の終了時間が8:00になっていません。確認してください。";
+             $this->set('time_check',$time_check);
+             $this->set('mess',$mess);
+
+           }
+
+         }
+
+       }
+
+     }
+
+
    }
 
 		public function preadd()

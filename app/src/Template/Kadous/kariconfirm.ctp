@@ -36,6 +36,20 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
  </table>
  <hr size="5" style="margin: 0.5rem">
 
+<?php if ($time_check == 1): ?>
+
+  <br><br>
+  <legend align="center"><font color="red"><?= __($mess) ?></font></legend>
+  <br>
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+  <tr bgcolor="#E6FFFF" >
+    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+  </tr>
+  </table>
+  <br><br>
+
+<?php else : ?>
+
   <br>
   <br>
 <br>
@@ -1249,3 +1263,4 @@ $this->Konpous = TableRegistry::get('konpous');//productsテーブルを使う
   </table>
 
   <br>
+<?php endif; ?>

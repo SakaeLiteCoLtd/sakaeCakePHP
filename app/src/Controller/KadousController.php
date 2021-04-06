@@ -230,7 +230,6 @@ class KadousController extends AppController
 
     public function kariconfirm()
     {
-
       session_start();
       $_SESSION['karikadouseikei'] = array();
 

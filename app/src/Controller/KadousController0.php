@@ -1135,25 +1135,6 @@ class KadousController extends AppController
 
     }
 
-    $flag_start = 0;
-    $connection = ConnectionManager::get('big_DB');//旧DBを参照
-    $table = TableRegistry::get('shotdata_sensors');
-    $table->setConnection($connection);
-
-    $sql = "SELECT datetime,seikeiki,product_code,shot_cycle,flag_start_finish
-    FROM shotdata_sensors".
-    " where datetime >= '".$starting_tm_search."' and datetime < '".$finishing_tm_search."'
-     and flag_start_finish > '".$flag_start."' order by datetime asc";
-    $connection = ConnectionManager::get('big_DB');
-    $arrFlag_check = $connection->execute($sql)->fetchAll('assoc');
-
-    $connection = ConnectionManager::get('default');
-    $table->setConnection($connection);
-
-    if(count($arrFlag_check) < 1){
-      $check_product = 1;
-    }
-
     $this->set('check_product',$check_product);
 /*
     echo "<pre>";
@@ -1186,10 +1167,6 @@ class KadousController extends AppController
           " where starting_tm_nippou = '".$KadouSeikeis[$k]["starting_tm"]."' and product_code = '".$KadouSeikeis[$k]["product_code"]."' and seikeiki = '".$KadouSeikeis[$k]["seikeiki"]."' order by product_code asc";
           $connection = ConnectionManager::get('big_DB');
           $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
-
-          $connection = ConnectionManager::get('default');
-          $table->setConnection($connection);
-
 /*
           echo "<pre>";
           print_r($k);
@@ -1198,6 +1175,9 @@ class KadousController extends AppController
 */
           if(isset($log_confirm_kadou_seikeikis[0])){
             $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
+
+            $connection = ConnectionManager::get('default');
+            $table->setConnection($connection);
 
             $arramount_programming = array('amount_programming'=>$amount_programming);
             $KadouSeikeis[$k] = array_merge($KadouSeikeis[$k]->toArray(), $arramount_programming);

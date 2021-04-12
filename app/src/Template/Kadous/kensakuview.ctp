@@ -59,6 +59,8 @@
 
         $kadouritutotal1 = $kadouritutotal1 + $KadouSeikeis[$num1-1]["kadouritsu"] * 100;
 
+      }else{
+        $numcell1 = 1;
       }
 
     }
@@ -94,6 +96,8 @@
 
         $kadouritutotal1 = $kadouritutotal1 + $KadouSeikeis[$num1-1]["kadouritsu"] * 100;
 
+      }else{
+        $numcell1 = 1;
       }
 
     }
@@ -215,6 +219,9 @@
             <td colspan="20" nowrap="nowrap"><font color="red"><font color="blue"><?= h("-") ?></font></td>
 
             <?php
+            
+            $numcell = 1;
+
                 echo "<td colspan='20' nowrap='nowrap' rowspan=$numcell><div align='center'><font color='red'>";
                 echo "データがありません";
                 echo "</font></div></td>";

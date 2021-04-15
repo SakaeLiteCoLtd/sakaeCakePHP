@@ -278,6 +278,7 @@ class StockProductsController extends AppController
 				 $daymoto = date('Y-m-d');
 			 }
 			 $this->set('daymoto',$daymoto);
+
     }
 
 		public function yobidashiothers()
@@ -383,9 +384,9 @@ class StockProductsController extends AppController
 		 $tourokustock = array_merge($tourokustock, $tourokustockupdate);
 		 $this->set('tourokustock',$tourokustock);
 /*
-		 		 echo "<pre>";
-		 		 print_r($_SESSION);
-		 		 echo "</pre>";
+		 echo "<pre>";
+		 print_r($_SESSION);
+		 echo "</pre>";
 */
 	 }
 
@@ -428,6 +429,7 @@ class StockProductsController extends AppController
 
 			 session_start();
 			 $session = $this->request->getSession();
+			 $_SESSION = $session->read();//postデータ取得し、$dataと名前を付ける
 
 			 for ($k=0; $k<count($_SESSION['tourokustock']); $k++) {
 
@@ -446,7 +448,14 @@ class StockProductsController extends AppController
 				 $StockProduct = $this->StockProducts->patchEntities($this->StockProducts->newEntity(), $_SESSION['tourokustock']);
 
 			 }
-
+/*
+			 echo "<pre>";
+	     print_r($_SESSION['tourokustock']);
+	     echo "</pre>";
+			 echo "<pre>";
+	     print_r($_SESSION['tourokustockupdate']);
+	     echo "</pre>";
+*/
 			 $connection = ConnectionManager::get('default');//トランザクション1
 			 // トランザクション開始2
 			 $connection->begin();//トランザクション3
@@ -464,33 +473,42 @@ class StockProductsController extends AppController
 							'updated_at' => $_SESSION['tourokustockupdate'][$k]["updated_at"]],
 						 ['id' => $_SESSION['tourokustockupdate'][$k]["id"]]
 						 );
-
-
+/*
 						 //旧DBに登録
-						$connection = ConnectionManager::get('DB_ikou_test');
+						$connection = ConnectionManager::get('sakaeMotoDB');
 						$table = TableRegistry::get('stock_product');
 						$table->setConnection($connection);
 
 						 $sql = "SELECT product_id,date_stock FROM stock_product".
 						 " where product_id = '".$_SESSION['tourokustockupdate'][$k]["product_code"]."' and date_stock = '".$_SESSION['tourokustockupdate'][$k]["date_stock"]."'";
-						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $connection = ConnectionManager::get('sakaeMotoDB');
 						 $date_stock_moto = $connection->execute($sql)->fetchAll('assoc');
 
-						 $updater = "UPDATE stock_product set amount = '".$_SESSION['tourokustockupdate'][$k]["amount"]."'
-						 where product_id ='".$_SESSION['tourokustockupdate'][$k]["product_code"]."' and date_stock ='".$_SESSION['tourokustockupdate'][$k]["date_stock"]."'";
-						 $connection->execute($updater);
+						 if(isset($date_stock_moto[0])){
+							 $updater = "UPDATE stock_product set amount = '".$_SESSION['tourokustockupdate'][$k]["amount"]."'
+							 where product_id ='".$_SESSION['tourokustockupdate'][$k]["product_code"]."' and date_stock ='".$_SESSION['tourokustockupdate'][$k]["date_stock"]."'";
+							 $connection->execute($updater);
+						 }else{
+
+							 $connection->insert('stock_product', [
+									 'product_id' => $_SESSION['tourokustockupdate'][$k]["product_code"],
+									 'date_stock' => $_SESSION['tourokustockupdate'][$k]["date_stock"],
+									 'amount' => $_SESSION['tourokustockupdate'][$k]["amount"]
+							 ]);
+
+						 }
 
 						 $connection = ConnectionManager::get('default');//新DBに戻る
 						 $table->setConnection($connection);
-
+*/
 					 }
 
 					 if(count($_SESSION['tourokustock']) > 0) {
 
 						 if ($this->StockProducts->saveMany($StockProduct)) {
-
+/*
 							 //旧DBに登録
-							$connection = ConnectionManager::get('DB_ikou_test');
+							$connection = ConnectionManager::get('sakaeMotoDB');
 							$table = TableRegistry::get('stock_product');
 							$table->setConnection($connection);
 
@@ -506,7 +524,7 @@ class StockProductsController extends AppController
 
 							 $connection = ConnectionManager::get('default');//新DBに戻る
 							 $table->setConnection($connection);
-
+*/
 							 $mes = "※以下のように登録されました";
 							 $this->set('mes',$mes);
 							 $connection->commit();// コミット5
@@ -530,9 +548,9 @@ class StockProductsController extends AppController
 				 }else{
 
 					 if ($this->StockProducts->saveMany($StockProduct)) {
-
+/*
 						 //旧DBに登録
-						$connection = ConnectionManager::get('DB_ikou_test');
+						$connection = ConnectionManager::get('sakaeMotoDB');
 						$table = TableRegistry::get('stock_product');
 						$table->setConnection($connection);
 
@@ -548,7 +566,7 @@ class StockProductsController extends AppController
 
 						 $connection = ConnectionManager::get('default');//新DBに戻る
 						 $table->setConnection($connection);
-
+*/
 						 $mes = "※以下のように登録されました";
 						 $this->set('mes',$mes);
 						 $connection->commit();// コミット5
@@ -562,6 +580,8 @@ class StockProductsController extends AppController
 					 }
 
 				 }
+
+				 $connection->commit();// コミット5
 
 			 } catch (Exception $e) {//トランザクション7
 			 //ロールバック8

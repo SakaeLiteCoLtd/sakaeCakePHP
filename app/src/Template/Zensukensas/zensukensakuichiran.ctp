@@ -107,7 +107,7 @@ $htmlzensusubs = $htmlzensumenu->zensussubmenus();
                 <td colspan="20" nowrap="nowrap"><?= h($arrichiran[$i]['date_sta']) ?></td>
                 <td colspan="20" nowrap="nowrap"><?= h($arrichiran[$i]['date_fin']) ?></td>
                 <td colspan="20" nowrap="nowrap"><?= h($arrichiran[$i]['diff']) ?></td>
-                <td colspan="20" nowrap="nowrap">0</td>
+                <td colspan="20" nowrap="nowrap"><?= h($arrichiran[$i]['nextkensatime']) ?></td>
                 <td colspan="20" nowrap="nowrap"><?= h($arrichiran[$i]['cont_rejection']) ?></td>
                 <td colspan="20" nowrap="nowrap"><?= h($arrichiran[$i]['amount']) ?></td>
                 <td colspan="20" nowrap="nowrap"><?= h($arrichiran[$i]['bik']) ?></td>

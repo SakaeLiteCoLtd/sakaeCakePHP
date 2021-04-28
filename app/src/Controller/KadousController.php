@@ -1864,10 +1864,16 @@ class KadousController extends AppController
 
 $katagae_time = 0;
 $seisan_time = 0;
+$total_loss_time = 0;
+
 for($n=0; $n<count($KadouSeikeis); $n++){
 
     if(($n > 0) && ($KadouSeikeis[$n]["numkadouritu"] == $KadouSeikeis[$n-1]["numkadouritu"])){
-
+/*
+      echo "<pre>";
+      print_r("if".$n);
+      echo "</pre>";
+*/
 //      $starting_tm_kadou = strtotime($KadouSeikeis[$n]["starting_tm"]);
 //      $finishing_tm_kadou = strtotime($KadouSeikeis[$n-1]["finishing_tm"]);
 
@@ -1907,15 +1913,24 @@ for($n=0; $n<count($KadouSeikeis); $n++){
 
       }
 
-      $total_loss_time = round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
-
+  //    $total_loss_time = round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
+      $total_loss_time = $total_loss_time + round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
+/*
+      echo "<pre>";
+      print_r($total_loss_time);
+      echo "</pre>";
+*/
       $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
       $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrtotal_loss_time);
 
       $kadouritsu = round(1 - (($total_loss_time * 60) / 86400), 3);
       $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
       $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkadouritsu);
-
+/*
+      echo "<pre>";
+      print_r($kadouritsu);
+      echo "</pre>";
+*/
       $katagae_time_touroku = $katagae_time * 60 ;
 /*
       echo "<pre>";
@@ -1978,6 +1993,11 @@ for($n=0; $n<count($KadouSeikeis); $n++){
     }
 
 }
+/*
+echo "<pre>";
+print_r($KadouSeikeis);
+echo "</pre>";
+*/
 
       session_start();
       for($n=0; $n<count($KadouSeikeis); $n++){
@@ -2038,15 +2058,15 @@ for($n=0; $n<count($KadouSeikeis); $n++){
         $KadouritsuSeikeikidata = $this->KadouritsuSeikeikis->find()
         ->where(['seikeiki' => $KadouSeikeis[$countfin-1]['seikeiki'], 'date' => substr($KadouSeikeis[$countfin-1]['starting_tm'], 0, 10)])->toArray();
 
-        if(isset($KadouritsuSeikeikidata[0])){//既にデータが存在する場合
+//210428        if(isset($KadouritsuSeikeikidata[0])){//既にデータが存在する場合
 
-          $kadouritsu = $KadouritsuSeikeikidata[0]["kadouritus"];
+//210428          $kadouritsu = $KadouritsuSeikeikidata[0]["kadouritus"];
 
-        }else{
+//210428        }else{
 
           $kadouritsu = round(1 - (($KadouSeikeis[$countfin-1]['total_loss_time'] * 60) / 86400), 3);
 
-        }
+//210428        }
 
         $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
         $KadouSeikeis[$countfin-1] = array_merge($KadouSeikeis[$countfin-1], $arrkadouritsu);
@@ -2092,6 +2112,11 @@ for($n=0; $n<count($KadouSeikeis); $n++){
         }
 
       }
+
+      echo "<pre>";
+      print_r($arrTouroku);
+      echo "</pre>";
+
 
       for($n=0; $n<count($arrTouroku); $n++){
 

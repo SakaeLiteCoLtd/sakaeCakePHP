@@ -8,6 +8,7 @@ use Cake\Core\Configure;//トランザクション
 
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 use App\myClass\EDItouroku\htmlEDItouroku;//myClassフォルダに配置したクラスを使用
+use App\myClass\Productcheck\htmlProductcheck;
 /*
 $htmllogin = new htmlLogin();
 $htmllogin = $htmllogin->htmllogin();
@@ -3006,6 +3007,17 @@ echo "</pre>";
       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
       if(isset($data["syousai"])){
+
+        $product_code = $data['product_code'];
+
+        $htmlProductcheck = new htmlProductcheck();//クラスを使用
+        $product_code_check = $htmlProductcheck->Productcheck($product_code);
+        if($product_code_check == 1){
+          return $this->redirect(
+           ['controller' => 'Products', 'action' => 'producterror', 's' => ['product_code' => $product_code]]
+          );
+        }
+
         $Product = $this->Products->find()->where(['product_code' => $data['product_code']])->toArray();
         $customer_id = $Product[0]->customer_id;
         $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();

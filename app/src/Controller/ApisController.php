@@ -311,6 +311,8 @@ class ApisController extends AppController
 			}
 
 			$day = $dayarr[0];//日付の取得
+			$todaySyoyouKeikakus = date('Y-m-d');
+			$this->SyoyouKeikakus->deleteAll(['date_deliver <' => $todaySyoyouKeikakus]);//当日の前日までの所要計画のデータは削除する
 
 			//http://192.168.4.246/Apis/zaikocyou/api/2020-10_primary.xml
 			//http://localhost:5000/Apis/zaikocyou/api/2020-10_primary.xml

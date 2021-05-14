@@ -870,6 +870,8 @@ print_r($StockProducts);
 echo "</pre>";
 */
 //$SyoyouKeikakusスタート
+				$todaySyoyouKeikakus = date('Y-m-d');
+				$this->SyoyouKeikakus->deleteAll(['date_deliver <' => $todaySyoyouKeikakus]);//当日の前日までの所要計画のデータは削除する
 
 				$SyoyouKeikakus = array();
 				for($j=0; $j<count($arrProductsmotominus); $j++){

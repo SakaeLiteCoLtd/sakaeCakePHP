@@ -68,6 +68,10 @@ class ApizaikocyouController extends AppController
 			$datestartstr = strtotime($datestart);
 			$dateend = date('Y-m-d', strtotime('+31 day', $datestartstr));
 			$dateendnext = date('Y-m-d', strtotime('+32 day', $datestartstr));//kodouseikeisで使用
+
+			$todaySyoyouKeikakus = date('Y-m-d');
+			$this->SyoyouKeikakus->deleteAll(['date_deliver <' => $todaySyoyouKeikakus]);//当日の前日までの所要計画のデータは削除する
+
 /*
 			echo "<pre>";
 			print_r($date1);

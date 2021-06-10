@@ -231,7 +231,7 @@ class ApisController extends AppController
 
 		}
 
-		public function kouteihyouweek()
+		public function kouteihyouweek()//http://192.168.4.246/Apis/kouteihyouweek/api/2021-6-5.xml
 		{
 			$data = Router::reverse($this->request, false);
 			$urlarr = explode("/",$data);//切り離し

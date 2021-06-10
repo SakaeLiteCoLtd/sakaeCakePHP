@@ -19,9 +19,7 @@
  </table>
     <?= $this->Flash->render() ?>
     <?= $this->Form->create($ResultZensuHeads, ['url' => ['action' => 'zensuendstafflogin']]) ?>
-    <br>
-    <legend align="center"><font color="red"><?= __($me) ?></font></legend>
-    <br>
+    <br><br>
     <legend align="center"><strong style="font-size: 11pt; color:blue"><?= __("終了　社員ID登録") ?></strong></legend>
     <fieldset>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
@@ -40,5 +38,4 @@
 <br>
 <legend align="center"><font color="red"><?= __($mess) ?></font></legend>
 <br>
-
     <?= $this->Form->end() ?>

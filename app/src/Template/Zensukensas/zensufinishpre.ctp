@@ -60,6 +60,7 @@
   <td align="right" rowspan="2" width="50" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('行削除'), array('name' => 'sakujo')); ?></div></td>
 </tr>
 </table>
+<br><br><br>
 
 <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr style="border-bottom: solid;border-width: 1px">
@@ -97,9 +98,9 @@
 <br><br><br><br><br><br><br><br><br><br>
 
 <?php
-echo "<pre>";
-print_r($data);
-echo "</pre>";
+//echo "<pre>";
+//print_r($data);
+//echo "</pre>";
 ?>
 
     <?= $this->Form->end() ?>

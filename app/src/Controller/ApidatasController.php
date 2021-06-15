@@ -37,11 +37,21 @@ class ApidatasController extends AppController
 
 		}
 
-		public function preadd0()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apidatas/preadd
+		public function preadd0()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apidatas/preadd0
 		{
 
 			session_start();
 			$session = $this->request->getSession();
+
+			$arr[] = [
+				'check1' => 11,
+				'check2' => 12,
+			];
+
+
+			$kouteivba['datetime'] = "abc";
+			$kouteivba['seikeiki'] = $arr;
+
 			echo "<pre>";
 			print_r($_SESSION);
 			echo "</pre>";
@@ -140,7 +150,20 @@ class ApidatasController extends AppController
 			{
 				session_start();
 				$session = $this->request->getSession();
-//				$_SESSION['kouteivba'] = array();
+				session_regenerate_id();//セッションIDを更新
+		//		$session = $this->request->getSession()->renew();
+
+				$arr[] = [
+					'check1' => 11,
+					'check2' => 12,
+				];
+
+				$_SESSION['kouteivba1'] = $arr;
+				$_SESSION['kouteivba2'] = "bbb";
+
+				echo "<pre>";
+				print_r(session_id());
+				echo "</pre>";
 				echo "<pre>";
 				print_r($_SESSION);
 				echo "</pre>";
@@ -176,6 +199,7 @@ class ApidatasController extends AppController
 				if(isset($dataarr[4])){//ScheduleKouteis登録用の配列に追加
 
 					session_start();
+					session_regenerate_id();//セッションIDを更新
 					$session = $this->request->getSession();
 
 					if($dataarr[5] == $_SESSION['sessionstartstaff']){

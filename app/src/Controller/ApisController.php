@@ -30,6 +30,7 @@ class ApisController extends AppController
 		 $this->ResultZensuHeads = TableRegistry::get('resultZensuHeads');
 		 $this->RironStockProducts = TableRegistry::get('rironStockProducts');
 		 $this->LabelSetikkatsues = TableRegistry::get('labelSetikkatsues');
+		 $this->StockInoutWorklogs = TableRegistry::get('stockInoutWorklogs');
 		}
 
 		public function xmlday()
@@ -700,6 +701,28 @@ class ApisController extends AppController
 
 					}
 
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
+
+						}
+
+					}
+
 					//並べかえ
 					$tmp_product_array2 = array();
 					$tmp_dateseikei_array = array();
@@ -1068,6 +1091,28 @@ echo "</pre>";
  						 ];
 
 						 }
+
+						}
+
+					}
+
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1])
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code like' => '2%'])->toArray();//productsの絞込みprimary_dnp
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
 
 						}
 
@@ -1446,6 +1491,29 @@ echo "</pre>";
 
 					}
 
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_w
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
+
+						}
+
+					}
+
 					//並べかえ
 					$tmp_product_array2 = array();
 					$tmp_dateseikei_array = array();
@@ -1816,6 +1884,29 @@ echo "</pre>";
 
 					}
 
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_h
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
+
+						}
+
+					}
+
 					//並べかえ
 					$tmp_product_array2 = array();
 					$tmp_dateseikei_array = array();
@@ -2181,6 +2272,28 @@ echo "</pre>";
 
 					}
 
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1])
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10005'])->toArray();//productsの絞込みreizouko
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
+
+						}
+
+					}
+
 					//並べかえ
 					$tmp_product_array2 = array();
 					$tmp_dateseikei_array = array();
@@ -2541,6 +2654,28 @@ echo "</pre>";
  						 ];
 
 						 }
+
+						}
+
+					}
+
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1])
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10003'])->toArray();//productsの絞込みuwawaku
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
 
 						}
 
@@ -2921,6 +3056,29 @@ echo "</pre>";
 
 					}
 
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1])
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
+						->toArray();//productsの絞込みother
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
+
+						}
+
+					}
+
 					//並べかえ
 					$tmp_product_array2 = array();
 					$tmp_dateseikei_array = array();
@@ -3289,6 +3447,29 @@ echo "</pre>";
  						 ];
 
 						 }
+
+						}
+
+					}
+
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
 
 						}
 
@@ -3667,6 +3848,29 @@ echo "</pre>";
 
 					}
 
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp1
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
+
+						}
+
+					}
+
 					//並べかえ
 					$tmp_product_array2 = array();
 					$tmp_dateseikei_array = array();
@@ -4035,6 +4239,29 @@ echo "</pre>";
  						 ];
 
 						 }
+
+						}
+
+					}
+
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
 
 						}
 
@@ -4410,6 +4637,28 @@ echo "</pre>";
 
 					}
 
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1])
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
+
+						}
+
+					}
+
 					//並べかえ
 					$tmp_product_array2 = array();
 					$tmp_dateseikei_array = array();
@@ -4777,6 +5026,28 @@ echo "</pre>";
  						 ];
 
 						 }
+
+						}
+
+					}
+
+					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
+					->order(["date_work"=>"ASC"])->toArray();
+
+					for($k=0; $k<count($StockInoutWorklogs); $k++){
+
+						$Product = $this->Products->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込みsinsei
+
+						if(isset($Product[0])){
+
+							$arrSeisans[] = [
+								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
+								'product_code' => $StockInoutWorklogs[$k]["product_code"],
+								'amount_shot' => $StockInoutWorklogs[$k]["amount"],
+								'torisu' => 1
+						 ];
 
 						}
 

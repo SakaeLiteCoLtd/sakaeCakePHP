@@ -318,7 +318,11 @@ class ApisController extends AppController
 			//http://localhost:5000/Apis/zaikocyou/api/2020-10_primary.xml
 
 			if($sheet === "primary"){
-
+/*
+				echo "<pre>";
+				print_r("sta".date('Y-m-d H:i:s'));
+				echo "</pre>";
+*/
 				$date1 = $day."-1";//選択した月の初日
 				$date1st = strtotime($date1);
 				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
@@ -333,15 +337,27 @@ class ApisController extends AppController
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])->toArray();
 
 				$arrProductsmoto = array();//対象の製品全部の器を作っておく（OrderEdisに存在しないものも表示するため）
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
-					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
-					if(isset($RironStockProducts[0])){//理論在庫に登録されているかチェック//ここは在庫帳のプログラムにはない
-						$riron_check = 1;//登録されていれば「１」
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
 					}
 
+					/*
+					$RironStockProducts = $this->RironStockProducts->find()//210615削除
+					->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();//210615削除
+					if(isset($RironStockProducts[0])){//理論在庫に登録されているかチェック//ここは在庫帳のプログラムにはない//210615削除
+						$riron_check = 1;//登録されていれば「１」
+					}
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -441,6 +457,10 @@ class ApisController extends AppController
 
 				$arrOrderEdis = array();//注文呼び出し
 
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
@@ -450,12 +470,18 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
-						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-						if(isset($RironStockProducts[0])){//理論在庫に登録されているかチェック//ここは在庫帳のプログラムにはない
-							$riron_check = 1;//登録されていれば「１」
-						}
 
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+/*
+						$RironStockProducts = $this->RironStockProducts->find()//210615削除
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();//210615削除
+						if(isset($RironStockProducts[0])){//理論在庫に登録されているかチェック//ここは在庫帳のプログラムにはない//210615削除
+							$riron_check = 1;//登録されていれば「１」//210615削除
+						}
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -686,7 +712,11 @@ class ApisController extends AppController
 						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
 					}
 //arrSeisansここまで
-
+/*
+echo "<pre>";
+print_r("end".date('Y-m-d H:i:s'));
+echo "</pre>";
+*/
 			}elseif($sheet === "primary_dnp"){
 
 				$date1 = $day."-1";//選択した月の初日
@@ -702,16 +732,26 @@ class ApisController extends AppController
 				->where(['products.status' => 0, 'primary_p' => 1,
 				'OR' => [['customer_code like' => '2%']]])->toArray();
 
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				$arrProductsmoto = array();
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
+					}
+
+/*
 					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
 					if(isset($RironStockProducts[0])){
 						$riron_check = 1;
 					}
-
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -732,7 +772,11 @@ class ApisController extends AppController
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -743,12 +787,17 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
+
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+						/*
 						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 						if(isset($RironStockProducts[0])){
 							$riron_check = 1;
 						}
-
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -773,6 +822,7 @@ class ApisController extends AppController
 						}
 
 						//組立品呼び出し
+						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
 						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
@@ -1052,15 +1102,26 @@ class ApisController extends AppController
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])->toArray();
 
 				$arrProductsmoto = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
+					}
+
+/*
 					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
 					if(isset($RironStockProducts[0])){
 						$riron_check = 1;
 					}
-
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -1081,7 +1142,11 @@ class ApisController extends AppController
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -1092,12 +1157,17 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
+
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+/*
 						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 						if(isset($RironStockProducts[0])){
 							$riron_check = 1;
 						}
-
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -1122,6 +1192,7 @@ class ApisController extends AppController
 						}
 
 						//組立品呼び出し
+						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
 						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
@@ -1404,15 +1475,26 @@ class ApisController extends AppController
 				'OR' => [['product_code like' => 'H%']]])->toArray();
 
 				$arrProductsmoto = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
+					}
+
+/*
 					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
 					if(isset($RironStockProducts[0])){
 						$riron_check = 1;
 					}
-
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -1433,7 +1515,11 @@ class ApisController extends AppController
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -1444,12 +1530,17 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
+
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+/*
 						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 						if(isset($RironStockProducts[0])){
 							$riron_check = 1;
 						}
-
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -1474,6 +1565,7 @@ class ApisController extends AppController
 						}
 
 						//組立品呼び出し
+						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
 						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
@@ -1751,15 +1843,26 @@ class ApisController extends AppController
 				->where(['products.status' => 0, 'customer_code' => '10005'])->toArray();
 
 				$arrProductsmoto = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
+					}
+
+/*
 					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
 					if(isset($RironStockProducts[0])){
 						$riron_check = 1;
 					}
-
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -1780,7 +1883,11 @@ class ApisController extends AppController
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -1791,12 +1898,17 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
+
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+/*
 						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 						if(isset($RironStockProducts[0])){
 							$riron_check = 1;
 						}
-
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -1821,6 +1933,7 @@ class ApisController extends AppController
 						}
 
 						//組立品呼び出し
+						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
 						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
@@ -2095,15 +2208,26 @@ class ApisController extends AppController
 				->where(['products.status' => 0, 'customer_code' => '10003'])->toArray();
 
 				$arrProductsmoto = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
+					}
+
+/*
 					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
 					if(isset($RironStockProducts[0])){
 						$riron_check = 1;
 					}
-
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -2124,7 +2248,11 @@ class ApisController extends AppController
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -2135,12 +2263,17 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
+
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+/*
 						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 						if(isset($RironStockProducts[0])){
 							$riron_check = 1;
 						}
-
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -2165,6 +2298,7 @@ class ApisController extends AppController
 						}
 
 						//組立品呼び出し
+						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
 						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
@@ -2445,15 +2579,26 @@ class ApisController extends AppController
 				echo "</pre>";
 */
 				$arrProductsmoto = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
+					}
+
+/*
 					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
 					if(isset($RironStockProducts[0])){
 						$riron_check = 1;
 					}
-
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -2474,7 +2619,11 @@ class ApisController extends AppController
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -2487,12 +2636,17 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
+
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+/*
 						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 						if(isset($RironStockProducts[0])){
 							$riron_check = 1;
 						}
-
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -2517,6 +2671,7 @@ class ApisController extends AppController
 						}
 
 						//組立品呼び出し
+						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
 						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
@@ -2795,15 +2950,26 @@ class ApisController extends AppController
 				'OR' => [['product_code like' => 'P0%']]])->toArray();
 
 				$arrProductsmoto = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
+					}
+
+/*
 					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
 					if(isset($RironStockProducts[0])){
 						$riron_check = 1;
 					}
-
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -2824,7 +2990,11 @@ class ApisController extends AppController
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -2836,12 +3006,17 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
+
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+/*
 						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 						if(isset($RironStockProducts[0])){
 							$riron_check = 1;
 						}
-
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -2866,6 +3041,7 @@ class ApisController extends AppController
 						}
 
 						//組立品呼び出し
+						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
 						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
@@ -3147,15 +3323,26 @@ class ApisController extends AppController
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])->toArray();
 
 				$arrProductsmoto = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
+					}
+
+/*
 					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
 					if(isset($RironStockProducts[0])){
 						$riron_check = 1;
 					}
-
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -3176,7 +3363,11 @@ class ApisController extends AppController
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -3188,12 +3379,17 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
+
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+/*
 						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 						if(isset($RironStockProducts[0])){
 							$riron_check = 1;
 						}
-
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -3218,6 +3414,7 @@ class ApisController extends AppController
 						}
 
 						//組立品呼び出し
+						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
 						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
@@ -3499,15 +3696,26 @@ class ApisController extends AppController
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])->toArray();
 
 				$arrProductsmoto = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
+					}
+
+/*
 					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
 					if(isset($RironStockProducts[0])){
 						$riron_check = 1;
 					}
-
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -3528,7 +3736,11 @@ class ApisController extends AppController
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -3540,12 +3752,17 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
+
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+/*
 						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 						if(isset($RironStockProducts[0])){
 							$riron_check = 1;
 						}
-
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -3570,6 +3787,7 @@ class ApisController extends AppController
 						}
 
 						//組立品呼び出し
+						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
 						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
@@ -3851,15 +4069,26 @@ class ApisController extends AppController
 				])->toArray();
 
 				$arrProductsmoto = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
+					}
+
+/*
 					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
 					if(isset($RironStockProducts[0])){
 						$riron_check = 1;
 					}
-
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -3880,7 +4109,11 @@ class ApisController extends AppController
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -3892,12 +4125,17 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
+
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+/*
 						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 						if(isset($RironStockProducts[0])){
 							$riron_check = 1;
 						}
-
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -3922,6 +4160,7 @@ class ApisController extends AppController
 						}
 
 						//組立品呼び出し
+						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
 						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
@@ -4200,15 +4439,26 @@ class ApisController extends AppController
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])->toArray();
 
 				$arrProductsmoto = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($arrProducts); $k++){
 
 					$riron_check = 0;
-					$date16 = $day."-16";//選択した月の初日
+
+					$key = array_search($arrProducts[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+					if(strlen($key) > 0){
+						$riron_check = 1;//登録されていれば「１」//210615削除
+					}
+
+/*
 					$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
 					if(isset($RironStockProducts[0])){
 						$riron_check = 1;
 					}
-
+*/
 					$arrProductsmoto[] = [
 						'date_order' => "",
 						'num_order' => "",
@@ -4229,7 +4479,11 @@ class ApisController extends AppController
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrOrderEdis = array();//注文呼び出し
-				$arrAssembleProducts = array();
+
+				$date16 = $day."-16";//選択した月の初日//210615追加
+				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')//210615追加
+				->where(['date_culc' => $date16])->toArray();//210615追加
+
 				for($k=0; $k<count($OrderEdis); $k++){
 
 					//			$Product = $this->Products->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'status' => 0, 'primary_p' => 0])->toArray();//productsの絞込みsinsei
@@ -4241,12 +4495,17 @@ class ApisController extends AppController
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						$date16 = $day."-16";//選択した月の初日
+
+						$key = array_search($OrderEdis[$k]["product_code"], array_column($RironStockProducts, 'product_code'));//配列の検索
+						if(strlen($key) > 0){
+							$riron_check = 1;//登録されていれば「１」//210615削除
+			      }
+/*
 						$RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
 						if(isset($RironStockProducts[0])){
 							$riron_check = 1;
 						}
-
+*/
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -4271,6 +4530,7 @@ class ApisController extends AppController
 						}
 
 						//組立品呼び出し
+						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
 						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();

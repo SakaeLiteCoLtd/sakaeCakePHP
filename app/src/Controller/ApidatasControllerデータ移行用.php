@@ -190,7 +190,6 @@ class ApidatasController extends AppController
 
 	 public function testupdate()//http://localhost:5000/Apidatas/testupdate/api/test.xml
 	{
-
 		$http = new Client();
 
 		$response = $http->put('http://192.168.4.246/Apidatas/test/api/test.json');//参考https://codelab.website/cakephp3-api/

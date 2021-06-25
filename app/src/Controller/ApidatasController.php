@@ -365,5 +365,27 @@ class ApidatasController extends AppController
 
 		}
 
+		public function test()//http://localhost:5000/Apidatas/test/api/test.xml
+ 	 {
+
+		 $tourokutestproduct = [
+			 'product_code' => date('Y-m-d H:i:s').'acbd',
+			 'product_name' => 'APIテスト192',
+			 'weight' => '9999',
+			 'primary_p' => '0',
+			 'status' => '0',
+			 'delete_flag' => '0',
+			 'created_at' => date('Y-m-d H:i:s'),
+			 'created_staff' => '9999',
+		 ];
+
+	//	 mb_convert_variables('UTF-8','SJIS-win',$tourokutestproduct);//文字コードを変換
+
+		 $this->set([
+			 'tourokutestproduct' => $tourokutestproduct,
+			 '_serialize' => ['tourokutestproduct']
+		 ]);
+
+	 }
 
 	}

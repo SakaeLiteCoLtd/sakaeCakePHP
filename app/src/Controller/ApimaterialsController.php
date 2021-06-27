@@ -28,6 +28,8 @@ class ApimaterialsController extends AppController
 		//http://localhost:5000/Apimaterials/materails/aip.json
     public function materails()
 		{
+			header("Access-Control-Allow-Origin: *");//https://helog.jp/php/ajax-php-cors/ ブラウザ側に安全を保証してますよって伝えてる
+	//		echo $json;
 
 			$Materials = $this->Materials->find()->where(['delete_flag' => 0])->toArray();
 
@@ -77,7 +79,8 @@ class ApimaterialsController extends AppController
 		public function test2()//http://localhost:5000/Apimaterials/test2/aip.json
 		{
 
-			$url="http://192.168.4.246/Apimaterials/test1/aip.json";
+	//		$url="http://192.168.4.246/Apimaterials/test1/aip.json";
+			$url="http://192.168.4.246/Apimaterials/materails/aip.json";
       $json=file_get_contents($url);
       $arr=json_decode($json,true);
 

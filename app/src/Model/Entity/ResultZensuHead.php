@@ -36,6 +36,7 @@ class ResultZensuHead extends Entity
     protected $_accessible = [
         'product_code' => true,
         'lot_num' => true,
+        'count_inspection' => true,
         'staff_id' => true,
         'datetime_start' => true,
         'datetime_finish' => true,

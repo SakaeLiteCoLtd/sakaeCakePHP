@@ -79,6 +79,11 @@ class ResultZensuHeadsTable extends Table
             ->requirePresence('lot_num', 'create')
             ->notEmpty('lot_num');
 
+            $validator
+                ->integer('count_inspection')
+                ->requirePresence('count_inspection', 'create')
+                ->notEmpty('count_inspection');
+
         $validator
             ->dateTime('datetime_start')
             ->requirePresence('datetime_start', 'create')
@@ -123,7 +128,8 @@ class ResultZensuHeadsTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->existsIn(['staff_id'], 'Staffs'));
+  //      $rules->add($rules->existsIn(['staff_id'], 'Staffs'));
+        $rules->add($rules->isUnique(['product_code','lot_num','count_inspection']));
 
         return $rules;
     }

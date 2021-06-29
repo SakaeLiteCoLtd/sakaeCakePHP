@@ -75,6 +75,7 @@ class AppController extends Controller
     public function initialize()
     {
         parent::initialize();
+				header("Access-Control-Allow-Origin: *");//https://helog.jp/php/ajax-php-cors/ ブラウザ側に安全を保証してますよって伝えてる
 
 /*        $this->loadComponent('RequestHandler', [
             'enableBeforeRedirect' => false,

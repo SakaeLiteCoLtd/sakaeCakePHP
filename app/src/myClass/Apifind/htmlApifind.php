@@ -35,7 +35,7 @@ class htmlApifind extends AppController
        $datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
 
        $ResultZensuHeads = $this->ResultZensuHeads->find()
-       ->where(['product_code' => $product_code, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+       ->where(['product_code' => $product_code, 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
        ->order(["datetime_finish"=>"DESC"])->toArray();
 
        if(isset($ResultZensuHeads[0])){//検査している場合
@@ -55,7 +55,7 @@ class htmlApifind extends AppController
                $irisu = $Konpou[0]->irisu;//製品の入数を取得
 
                $ResultZensuHeadsday = $this->ResultZensuHeads->find()//同じ日付に検査した製品の個数を求める
-               ->where(['product_code' => $product_code, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+               ->where(['product_code' => $product_code, 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
                ->order(["datetime_finish"=>"DESC"])->toArray();
 
                if(isset($ResultZensuHeadsday[0])){//同じ日付に検査した製品が存在する場合
@@ -190,7 +190,7 @@ class htmlApifind extends AppController
       $datestart = $_SESSION['classarrdatestart'];
 
       $ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-      ->where(['datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
+      ->where(['datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
       ->order(["datetime_finish"=>"DESC"])->toArray();
 
       $arrResultZensuHeadsmoto = array();

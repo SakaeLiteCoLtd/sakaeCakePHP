@@ -71,8 +71,8 @@
 
   <?php for($i=0; $i<1; $i++): ?>
   <tr style="border-bottom: solid;border-width: 1px">
-    <td bgcolor="#FFFFCC"><?= $this->Form->input('cont'.$i, ["type"=>"select", "empty"=>"選択してください", "options"=>$arrContRejection, 'label'=>false]); ?></td>
-    <td bgcolor="#FFFFCC"><?= $this->Form->input('amount'.$i, ["type"=>"text", 'label'=>false]); ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input('cont'.$i, ["type"=>"select", "empty"=>"選択してください", 'required'=>true, "options"=>$arrContRejection, 'label'=>false]); ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input('amount'.$i, ["type"=>"text", 'label'=>false, 'required'=>true]); ?></td>
     <td bgcolor="#FFFFCC"><?= $this->Form->input('bik'.$i, ["type"=>"text", 'label'=>false]); ?></td>
   </tr>
   <?= $this->Form->control('num', array('type'=>'hidden', 'value'=>$i, 'label'=>false)) ?>

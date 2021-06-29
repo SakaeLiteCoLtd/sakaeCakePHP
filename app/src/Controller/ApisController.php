@@ -31,6 +31,7 @@ class ApisController extends AppController
 		 $this->RironStockProducts = TableRegistry::get('rironStockProducts');
 		 $this->LabelSetikkatsues = TableRegistry::get('labelSetikkatsues');
 		 $this->StockInoutWorklogs = TableRegistry::get('stockInoutWorklogs');
+		 $this->NonKadouSeikeis = TableRegistry::get('nonKadouSeikeis');
 		}
 
 		public function xmlday()
@@ -375,7 +376,7 @@ class ApisController extends AppController
 
 				$arrAssembleProducts = array();//ここから組立品
 				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
 				->order(["datetime_finish"=>"DESC"])->toArray();
 
 				$arrResultZensuHeadsmoto = array();
@@ -647,7 +648,7 @@ class ApisController extends AppController
 
 						$Product = $this->Products->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
 
-						if(isset($Product[0])){//'primary_p' => 1（主要）の場合
+						if(isset($Product[0])){
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
@@ -702,7 +703,7 @@ class ApisController extends AppController
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -710,7 +711,9 @@ class ApisController extends AppController
 
 						$Product = $this->Products->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -847,7 +850,7 @@ echo "</pre>";
 						//組立品呼び出し
 						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -867,7 +870,7 @@ echo "</pre>";
 										$irisu = $Konpou[0]->irisu;
 
 										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+										->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
 										->order(["datetime_finish"=>"DESC"])->toArray();
 
 										if(isset($ResultZensuHeadsday[0])){
@@ -1097,7 +1100,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1])
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
 
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
@@ -1105,7 +1108,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code like' => '2%'])->toArray();//productsの絞込みprimary_dnp
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -1239,7 +1244,7 @@ echo "</pre>";
 						//組立品呼び出し
 						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -1259,7 +1264,7 @@ echo "</pre>";
 										$irisu = $Konpou[0]->irisu;
 
 										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+										->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
 										->order(["datetime_finish"=>"DESC"])->toArray();
 
 										if(isset($ResultZensuHeadsday[0])){
@@ -1492,7 +1497,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -1501,7 +1506,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_w
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -1635,7 +1642,7 @@ echo "</pre>";
 						//組立品呼び出し
 						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -1655,7 +1662,7 @@ echo "</pre>";
 										$irisu = $Konpou[0]->irisu;
 
 										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+										->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
 										->order(["datetime_finish"=>"DESC"])->toArray();
 
 										if(isset($ResultZensuHeadsday[0])){
@@ -1885,7 +1892,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -1894,7 +1901,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_h
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -2026,7 +2035,7 @@ echo "</pre>";
 						//組立品呼び出し
 						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -2046,7 +2055,7 @@ echo "</pre>";
 										$irisu = $Konpou[0]->irisu;
 
 										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+										->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
 										->order(["datetime_finish"=>"DESC"])->toArray();
 
 										if(isset($ResultZensuHeadsday[0])){
@@ -2273,7 +2282,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1])
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
 
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
@@ -2281,7 +2290,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10005'])->toArray();//productsの絞込みreizouko
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -2413,7 +2424,7 @@ echo "</pre>";
 						//組立品呼び出し
 						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -2433,7 +2444,7 @@ echo "</pre>";
 										$irisu = $Konpou[0]->irisu;
 
 										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+										->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
 										->order(["datetime_finish"=>"DESC"])->toArray();
 
 										if(isset($ResultZensuHeadsday[0])){
@@ -2660,7 +2671,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1])
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
 
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
@@ -2668,7 +2679,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10003'])->toArray();//productsの絞込みuwawaku
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -2808,7 +2821,7 @@ echo "</pre>";
 						//組立品呼び出し
 						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -2828,7 +2841,7 @@ echo "</pre>";
 										$irisu = $Konpou[0]->irisu;
 
 										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+										->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
 										->order(["datetime_finish"=>"DESC"])->toArray();
 
 										if(isset($ResultZensuHeadsday[0])){
@@ -3057,7 +3070,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1])
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
 
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
@@ -3066,7 +3079,9 @@ echo "</pre>";
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
 						->toArray();//productsの絞込みother
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -3201,7 +3216,7 @@ echo "</pre>";
 						//組立品呼び出し
 						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -3221,7 +3236,7 @@ echo "</pre>";
 										$irisu = $Konpou[0]->irisu;
 
 										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+										->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
 										->order(["datetime_finish"=>"DESC"])->toArray();
 
 										if(isset($ResultZensuHeadsday[0])){
@@ -3453,7 +3468,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -3462,7 +3477,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -3597,7 +3614,7 @@ echo "</pre>";
 						//組立品呼び出し
 						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -3617,7 +3634,7 @@ echo "</pre>";
 										$irisu = $Konpou[0]->irisu;
 
 										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+										->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
 										->order(["datetime_finish"=>"DESC"])->toArray();
 
 										if(isset($ResultZensuHeadsday[0])){
@@ -3849,7 +3866,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -3858,7 +3875,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp1
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -3993,7 +4012,7 @@ echo "</pre>";
 						//組立品呼び出し
 						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -4013,7 +4032,7 @@ echo "</pre>";
 										$irisu = $Konpou[0]->irisu;
 
 										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+										->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
 										->order(["datetime_finish"=>"DESC"])->toArray();
 
 										if(isset($ResultZensuHeadsday[0])){
@@ -4245,7 +4264,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -4254,7 +4273,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -4389,7 +4410,7 @@ echo "</pre>";
 						//組立品呼び出し
 						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -4409,7 +4430,7 @@ echo "</pre>";
 										$irisu = $Konpou[0]->irisu;
 
 										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+										->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
 										->order(["datetime_finish"=>"DESC"])->toArray();
 
 										if(isset($ResultZensuHeadsday[0])){
@@ -4638,7 +4659,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1])
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
 
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
@@ -4646,7 +4667,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -4781,7 +4804,7 @@ echo "</pre>";
 						//組立品呼び出し
 						$arrAssembleProducts = array();
 						$ResultZensuHeads = $this->ResultZensuHeads->find()
-						->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
+						->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00"])
 						->order(["datetime_finish"=>"DESC"])->toArray();
 
 						if(isset($ResultZensuHeads[0])){//210107データ確認ok
@@ -4801,7 +4824,7 @@ echo "</pre>";
 										$irisu = $Konpou[0]->irisu;
 
 										$ResultZensuHeadsday = $this->ResultZensuHeads->find()
-										->where(['product_code' => $OrderEdis[$k]["product_code"], 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
+										->where(['product_code' => $OrderEdis[$k]["product_code"], 'count_inspection' => 1, 'delete_flag' => 0, 'datetime_finish >=' => $datetime_finish." 00:00:00", 'datetime_finish <=' => $datetime_finish." 23:59:59"])
 										->order(["datetime_finish"=>"DESC"])->toArray();
 
 										if(isset($ResultZensuHeadsday[0])){
@@ -4977,7 +5000,7 @@ echo "</pre>";
 						//				$Product = $this->Products->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'status' => 0, 'primary_p' => 0])->toArray();//productsの絞込みsinsei
 										$Product = $this->Products->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込みsinsei
 
-						if(isset($Product[0])){
+										if(isset($Product[0])){
 
 							$Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 
@@ -5032,7 +5055,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1,
+					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -5040,7 +5063,9 @@ echo "</pre>";
 
 						$Product = $this->Products->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込みsinsei
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),

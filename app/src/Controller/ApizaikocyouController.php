@@ -35,6 +35,7 @@ class ApizaikocyouController extends AppController
 		 $this->RironStockProducts = TableRegistry::get('rironStockProducts');
 		 $this->LabelSetikkatsues = TableRegistry::get('labelSetikkatsues');
 		 $this->StockInoutWorklogs = TableRegistry::get('stockInoutWorklogs');
+		 $this->NonKadouSeikeis = TableRegistry::get('nonKadouSeikeis');
 		}
 
 		public function zaikocyou()
@@ -442,7 +443,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext,
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
 					->order(["date_work"=>"ASC"])->toArray();
 /*
@@ -454,7 +455,9 @@ echo "</pre>";
 
 						$Product = $this->Products->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -812,7 +815,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext])
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
 
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
@@ -820,7 +823,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code like' => '2%'])->toArray();//productsの絞込みprimary_dnp
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -1171,7 +1176,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext,
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -1179,7 +1184,9 @@ echo "</pre>";
 
 						$Product = $this->Products->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -1529,7 +1536,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext,
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22,
 					'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -1538,7 +1545,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_h
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -1885,7 +1894,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext])
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
 
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
@@ -1893,7 +1902,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10005'])->toArray();//productsの絞込みreizouko
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -2240,7 +2251,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext])
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
 
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
@@ -2248,7 +2259,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10003'])->toArray();//productsの絞込みuwawaku
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -2597,7 +2610,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext])
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
 
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
@@ -2606,7 +2619,9 @@ echo "</pre>";
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
 						->toArray();//productsの絞込みother
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -2956,7 +2971,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext,
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22,
 					'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -2965,7 +2980,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -3315,7 +3332,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext,
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -3324,7 +3341,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp1
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -3674,7 +3693,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext,
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -3683,7 +3702,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -4031,7 +4052,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext])
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
 
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
@@ -4039,7 +4060,9 @@ echo "</pre>";
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),
@@ -4387,7 +4410,7 @@ echo "</pre>";
 					}
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext,
+					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 					->order(["date_work"=>"ASC"])->toArray();
 
@@ -4395,7 +4418,9 @@ echo "</pre>";
 
 						$Product = $this->Products->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込みsinsei
 
-						if(isset($Product[0])){
+						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
+
+						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){
 
 							$arrSeisans[] = [
 								'dateseikei' => $StockInoutWorklogs[$k]["date_work"]->format('Y/m/d'),

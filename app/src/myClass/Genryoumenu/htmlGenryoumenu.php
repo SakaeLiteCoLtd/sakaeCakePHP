@@ -33,8 +33,13 @@ class htmlGenryoumenu extends AppController
                   "<img src='/img/Labelimg/report_stock_mate.gif' width=115 height=40>\n".
                   "</a>\n".
 */
+"<td style='padding: 0.1rem 0.1rem;'><a href='/Hazaimaterials/menu'>\n".//210629追加
+"<img src='/img/Labelimg/hazaimenu.gif' width=115 height=40>\n".//210629追加
+"</a>\n".//210629追加
+
 "<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/nyuukomenu'>\n".
 "<img src='/img/Labelimg/gen_nyuuko.gif' width=115 height=40>\n".
+
 /*
 "</a>\n".
 "<td style='padding: 0.1rem 0.1rem;'><a href='/Genryous/csvtest'>\n".

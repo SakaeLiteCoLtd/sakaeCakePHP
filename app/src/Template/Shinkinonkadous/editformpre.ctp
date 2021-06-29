@@ -34,22 +34,20 @@ $this->layout = 'defaultshinki';
 </table>
 <hr size="5" style="margin: 0.5rem">
 <br>
-<legend align="center"><font color="black"><?= __("データを更新する検査外注製品の品番を入力してください。") ?></legend>
+<legend align="center"><font color="black"><?= __("データを更新する検査外注製品の品番と仕入先を入力してください。") ?></legend>
 <br>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
     <tr style="border-bottom: 0px;border-width: 0px">
-      <td width="300" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 13pt; color:blue">品番</strong></div></td>
+      <td width="300"><div align="center"><strong style="font-size: 13pt; color:blue">品番</strong></div></td>
+      <td width="300"><div align="center"><strong style="font-size: 13pt; color:blue">仕入先</strong></div></td>
     </tr>
 
-<?php
-echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-?>
-<td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false, 'autofocus'=>true)) ?></td>
-<?php
-echo "</tr>\n";
-?>
+    <tr style="border-bottom: 0px;border-width: 0px">
+      <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false, 'autofocus'=>true, 'required'=>true)) ?></td>
+      <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("outsource_handy_id", ["type"=>"select", "empty"=>"選択してください", "options"=>$arrOutsourceHandy, 'label'=>false, 'required'=>true]) ?></td>
+    </tr>
 </table>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

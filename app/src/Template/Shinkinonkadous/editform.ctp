@@ -67,6 +67,7 @@ $this->layout = 'defaultshinki';
         </tr>
       </table>
 
+      <?= $this->Form->control('NonKadouSeikeisId', array('type'=>'hidden', 'value'=>$NonKadouSeikeisId, 'label'=>false)) ?>
       <?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
       <?= $this->Form->control('product_name', array('type'=>'hidden', 'value'=>$product_name, 'label'=>false)) ?>
       <br>

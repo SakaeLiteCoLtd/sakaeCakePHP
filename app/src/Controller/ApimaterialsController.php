@@ -145,7 +145,7 @@ class ApimaterialsController extends AppController
 
     }
 
-		public function test2()//http://localhost:5000/Apimaterials/test2/api.json
+		public function test2()//http://192.168.4.246/Apimaterials/test2/api.json http://localhost:5000/Apimaterials/test2/api.json
 		{
 
 	//		$url = "http://192.168.4.246/Apimaterials/test1/api.json";

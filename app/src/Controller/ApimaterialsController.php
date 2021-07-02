@@ -20,16 +20,22 @@ class ApimaterialsController extends AppController
 		{
 		 parent::initialize();
 		 $this->loadComponent('RequestHandler');
+
+		 $this->response->header("Access-Control-Allow-Origin: *");//https://shota-natuta.hatenablog.com/entry/2017/02/08/230211 ブラウザ側に安全を保証してますよって伝えてる
+		 $this->response->header("Access-Control-Allow-Headers: Content-Type");
+		 $this->response->header("Access-Control-Allow-Credentials: true");
+		 $this->response->header("Access-Control-Allow-Methods: POST, PUT, DELETE, PATCH");
+
 		 $this->Materials = TableRegistry::get('materials');
 		 $this->StockEndMaterials = TableRegistry::get('stockEndMaterials');
 		 $this->Users = TableRegistry::get('users');
 		}
 /*
 ルール参考　https://qiita.com/TakahiRoyte/items/949f4e88caecb02119aa
-①登録 POST    https://192.168.4.246/Apimaterials/apimaterails/api.json
-②取得 GET     https://192.168.4.246/Apimaterials/apimaterails/grade_color_lotnum.json
-③更新 PUT     https://192.168.4.246/Apimaterials/apimaterails/grade_color_lotnum.json
-④削除 DELETE  https://192.168.4.246/Apimaterials/apimaterails/grade_color_lotnum.json
+①登録 POST    https://192.168.4.246/Apimaterials/hazaitouroku/api.json
+②取得 GET     https://192.168.4.246/Apimaterials/hazaitouroku/grade_color_lotnum.json
+③更新 PUT     https://192.168.4.246/Apimaterials/hazaitouroku/grade_color_lotnum.json
+④削除 DELETE  https://192.168.4.246/Apimaterials/hazaitouroku/grade_color_lotnum.json
 */
 		//json出力
     //参考　https://qiita.com/tatamix/items/1758ed25442cc6940411
@@ -60,21 +66,114 @@ class ApimaterialsController extends AppController
 
     }
 
-		public function apimaterails($id)//http://localhost:5000/Apimaterials/apimaterails/3.json
+//https://192.168.4.246/Apimaterials/apimaterails/api.json
+		public function hazaitouroku($id)//http://localhost:5000/Apimaterials/apimaterails/3.json
 		{
 
-			if($this->request->is(['post'])) {
-				$mess = "method = post ; id = ".$id;
-			}elseif($this->request->is(['put'])){
-				$mess = "method = put ; id = ".$id;
-			}elseif($this->request->is(['get'])){
-				$mess = "method = get ; id = ".$id;
-			}
+			if($this->request->is(['post'])) {//登録postの時
 
-			$this->set([
-				'mess' => "api_test_hirokawa... ".$mess,
-        '_serialize' => ['mess']
-      ]);
+			//	$mess = "method = post ; id = ".$id;
+				$arr = $this->request->getData();
+
+				$arrTourokuStockEndMaterials = array();//空の配列を作る
+				for($k=0; $k<count($arr); $k++){//jsonを配列に変換
+
+					$Materials = $this->Materials->find()
+					->where(['grade' => $arr[$k]["grade"], 'color' => $arr[$k]["color"]])->toArray();
+/*
+					$Users = $this->Users->find()
+					->where(['username' => $arr[$k]["username"]])->toArray();
+*/
+					$arrTourokuStockEndMaterials[] = [
+						'material_id' => $Materials[0]["id"],
+						'status_material' => $arr[$k]["status_material"],
+						'amount' => $arr[$k]["amount"],
+						'state' => 0,
+						'status_import_tab' => 0,
+						'delete_flag' => 0,
+		        'created_at' => date('Y-m-d H:i:s'),
+		        'created_staff' => $arr[$k]["staff_id"],
+					];
+
+				}
+
+				foreach ((array) $arrTourokuStockEndMaterials as $key => $value) {//並び替え
+					$sort[$key] = $value['material_id'];
+				}
+				array_multisort($sort, SORT_ASC, $arrTourokuStockEndMaterials);
+
+				$material_idArray = array_column($arrTourokuStockEndMaterials, 'material_id');
+				$arrCountmaterials = array_count_values($material_idArray);//カウントする
+
+				$lotdate = date('y').date('m').date('d');
+
+				for($k=0; $k<count($arrTourokuStockEndMaterials); $k++){//ロットナンバーを追加
+
+					if($k == 0){//最初または前のidと違うときはロットナンバーを最初にする
+
+						$countStockEndMaterials = $this->StockEndMaterials->find()
+						->where(['material_id' => $arrTourokuStockEndMaterials[$k]["material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
+						$countLot = count($countStockEndMaterials) + 1;
+
+					}elseif($arrTourokuStockEndMaterials[$k]["material_id"] !== $arrTourokuStockEndMaterials[$k-1]["material_id"]){//新しい原料に変わったとき
+
+						$countStockEndMaterials = $this->StockEndMaterials->find()
+						->where(['material_id' => $arrTourokuStockEndMaterials[$k]["material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
+						$countLot = count($countStockEndMaterials) + 1;
+
+					}else{//idが前のidと同じとき
+
+						$countLot = $countLot + 1;
+
+					}
+					$lot_num = $lotdate."-".sprintf('%03d', $countLot);
+
+					$arrTourokuStockEndMaterials[$k] = array_merge($arrTourokuStockEndMaterials[$k],array('lot_num' => $lot_num));
+
+				}
+
+				$StockEndMaterials = $this->StockEndMaterials->patchEntities($this->StockEndMaterials->newEntity(), $arrTourokuStockEndMaterials);
+	      if ($this->StockEndMaterials->saveMany($StockEndMaterials)) {
+	          $message = 'Saved';
+	      } else {
+	          $message = 'Error';
+	      }
+
+	      $this->viewBuilder()->className('Json');
+	      $this->set([
+	          'message' => $message,
+	          'StockEndMaterials' => $StockEndMaterials,
+	          '_serialize' => ['message', 'StockEndMaterials']
+	      ]);
+
+			}elseif($this->request->is(['put'])){//更新・削除putの時
+
+				$mess = "method = put ; id = ".$id;
+				$this->set([
+					'mess' => "api_test_hirokawa... ".$mess,
+	        '_serialize' => ['mess']
+	      ]);
+
+			}elseif($this->request->is(['get'])){//取得・一覧getの時
+
+				$mess = "method = get ; id = ".$id;
+				$arr = $this->request->getData();
+
+				$this->set([
+					'mess' => "api_test_hirokawa... ".$mess,
+					'arr' => $arr,
+	        '_serialize' => ['mess', 'arr']
+	      ]);
+
+			}else{
+
+				$mess = "エラー（post,put,getではありません。）";
+				$this->set([
+					'mess' => "api_test_hirokawa... ".$mess,
+					'_serialize' => ['mess']
+				]);
+
+			}
 
 		}
 
@@ -236,5 +335,43 @@ class ApimaterialsController extends AppController
 
     }
 
+		public function apimaterails($id)//http://localhost:5000/Apimaterials/hyoujitest/api.json
+		{
+
+			if($this->request->is(['post'])) {//登録postの時
+
+				$mess = "method = post ; id = ".$id;
+				$this->set([
+					'mess' => "api_test_hirokawa... ".$mess,
+					'_serialize' => ['mess']
+				]);
+
+			}elseif($this->request->is(['put'])){//取得・一覧getの時
+
+				$mess = "method = put ; id = ".$id;
+				$this->set([
+					'mess' => "api_test_hirokawa... ".$mess,
+					'_serialize' => ['mess']
+				]);
+
+			}elseif($this->request->is(['get'])){//取得・一覧getの時
+
+				$mess = "method = get ; id = ".$id;
+				$this->set([
+					'mess' => "api_test_hirokawa... ".$mess,
+					'_serialize' => ['mess']
+				]);
+
+			}else{
+
+				$mess = "エラー（post,put,getではありません。）";
+				$this->set([
+					'mess' => "api_test_hirokawa... ".$mess,
+					'_serialize' => ['mess']
+				]);
+
+			}
+
+		}
 
 	}

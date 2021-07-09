@@ -43,7 +43,7 @@ class ApimaterialsController extends AppController
 		//http://localhost:5000/Apimaterials/materails/api.json
     public function materails()
 		{
-	//		header("Access-Control-Allow-Origin: *");//https://helog.jp/php/ajax-php-cors/ ブラウザ側に安全を保証してますよって伝えてるappコントローラーに追加
+			header("Access-Control-Allow-Origin: *");//https://helog.jp/php/ajax-php-cors/ ブラウザ側に安全を保証してますよって伝えてるappコントローラーに追加
 
 			$Materials = $this->Materials->find()->where(['delete_flag' => 0])->toArray();
 
@@ -72,30 +72,30 @@ class ApimaterialsController extends AppController
 
 			if($this->request->is(['post'])) {//登録postの時
 
-			//	$mess = "method = post ; id = ".$id;
+				$mess = "method = post";
+
 				$arr = $this->request->getData();
 
 				$arrTourokuStockEndMaterials = array();//空の配列を作る
-				for($k=0; $k<count($arr); $k++){//jsonを配列に変換
 
-					$Materials = $this->Materials->find()
-					->where(['grade' => $arr[$k]["grade"], 'color' => $arr[$k]["color"]])->toArray();
-/*
-					$Users = $this->Users->find()
-					->where(['username' => $arr[$k]["username"]])->toArray();
-*/
-					$arrTourokuStockEndMaterials[] = [
-						'material_id' => $Materials[0]["id"],
-						'status_material' => $arr[$k]["status_material"],
-						'amount' => $arr[$k]["amount"],
-						'state' => 0,
-						'status_import_tab' => 0,
-						'delete_flag' => 0,
-		        'created_at' => date('Y-m-d H:i:s'),
-		        'created_staff' => $arr[$k]["staff_id"],
-					];
+				$Materials = $this->Materials->find()
+				->where(['grade' => $arr["grade"], 'color' => $arr["color"]])->toArray();
 
+				if(isset($Materials[0])){
+					$id = $Materials[0]["id"];
+				}else{
+					$id = 999999;
 				}
+				$arrTourokuStockEndMaterials[] = [
+					'material_id' => $id,
+					'status_material' => $arr["status_material"],
+					'amount' => $arr["amount"],
+					'state' => 0,
+					'status_import_tab' => 0,
+					'delete_flag' => 0,
+					'created_at' => date('Y-m-d H:i:s'),
+					'created_staff' => $arr["staff_id"],
+				];
 
 				foreach ((array) $arrTourokuStockEndMaterials as $key => $value) {//並び替え
 					$sort[$key] = $value['material_id'];
@@ -145,6 +145,16 @@ class ApimaterialsController extends AppController
 	          'StockEndMaterials' => $StockEndMaterials,
 	          '_serialize' => ['message', 'StockEndMaterials']
 	      ]);
+
+/*
+				$arr = $this->request->getData();
+
+				$this->set([
+					'arr' => $arr,
+					'mess' => "api_test_hirokawa... ".$mess,
+	        '_serialize' => ['arr','mess']
+	      ]);
+*/
 
 			}elseif($this->request->is(['put'])){//更新・削除putの時
 

@@ -29,15 +29,13 @@
  $htmlKadoumenus = $htmlKadoumenu->Kadoumenus();
  ?>
  <hr size="5" style="margin: 0.5rem">
- <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+ <table style="margin-bottom:0px" width="1300" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
  <?php
     echo $htmlKadoumenus;
  ?>
  </table>
  <hr size="5" style="margin: 0.5rem">
 <?=$this->Form->create($kadouSeikeis, ['url' => ['action' => 'kensakusyousai']]) ?>
-
-
 
 <?php if($check_product != 1): ?>
 
@@ -197,7 +195,7 @@
             <?php
             echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
             echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $i."_".$KadouSeikeis[$i]["id"]."_".strval($KadouSeikeis[$i]["accomp_rate_program"] * 1000).
-            "_".strval($KadouSeikeis[$i]["kobetu_loss_time"] * 1000)."_".strval($KadouSeikeis[$i]["katagae_time"] * 1000)]) ;
+            "_".strval($KadouSeikeis[$i]["kobetu_loss_time"] * 1000)."_".strval($KadouSeikeis[$i]["katagae_time"] * 1000)."_".$distinction_sesson]) ;
             echo "</div></td>";
             ?>
           </tr>
@@ -219,7 +217,7 @@
             <td colspan="20" nowrap="nowrap"><font color="red"><font color="blue"><?= h("-") ?></font></td>
 
             <?php
-            
+
             $numcell = 1;
 
                 echo "<td colspan='20' nowrap='nowrap' rowspan=$numcell><div align='center'><font color='red'>";
@@ -234,7 +232,7 @@
 
             <?php
             echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
-            echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $i."_".$arrNon_data_KadouSeikeis[$i]["id"]."_-_-_-"]) ;
+            echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $i."_".$arrNon_data_KadouSeikeis[$i]["id"]."_-_-_-"."_".$distinction_sesson]) ;
             echo "</div></td>";
             ?>
           </tr>
@@ -280,7 +278,7 @@
               <td colspan="20" nowrap="nowrap"><font color="blue"><?= h($KadouSeikeis[$i]["last_lot_num"]) ?></font></td>
               <?php
               echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
-              echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $i."_".$KadouSeikeis[$i]["id"]."_-_-_-"]) ;
+              echo $this->Form->submit("詳細" , ['action'=>'kensakusyousai', 'name' => $i."_".$KadouSeikeis[$i]["id"]."_-_-_-"."_".$distinction_sesson]) ;
               echo "</div></td>";
               ?>
             </tr>

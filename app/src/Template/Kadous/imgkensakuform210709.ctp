@@ -54,8 +54,6 @@
 
 <br>
 
-<?= $this->Form->control('distinction_sesson', array('type'=>'hidden', 'value'=>$distinction_sesson, 'label'=>false)) ?>
-
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr>
     <td style="border-style: none;"><div align="left"><?= $this->Form->submit('前へ', array('name' => 'neg')); ?></div></td>

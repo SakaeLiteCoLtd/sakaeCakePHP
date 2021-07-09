@@ -246,11 +246,78 @@ class KadousController extends AppController
       $KariKadouSeikeis = $this->KariKadouSeikeis->newEntity();
 			$this->set('KariKadouSeikeis',$KariKadouSeikeis);
       $Data = $this->request->query('s');
-/*
-      echo "<pre>";
-      print_r($Data);
-      echo "</pre>";
-*/
+
+      $time_check = 0;
+      $mess = "";
+      $this->set('time_check',$time_check);
+      $this->set('mess',$mess);
+
+      for($j=1; $j<=9; $j++){//8:00で開始、終了されていない場合
+
+        ${"n".$j} = $Data["data"]["n".$j];
+        $this->set('n'.$j,${"n".$j});
+
+        for($i=1; $i<=${"n".$j}; $i++){
+
+          if(strtotime($Data["data"]["finishing_tm".$j.$i]) <= strtotime($Data["data"]["starting_tm".$j.$i])){
+
+            $time_check = 1;
+            $mess = $j."号機の時間の前後関係に誤りがあります。確認してください。";
+            $this->set('time_check',$time_check);
+            $this->set('mess',$mess);
+
+          }
+
+          if($i > 1){
+
+            $i1 = $i-1;
+            if(strtotime($Data["data"]["starting_tm".$j.$i]) < strtotime($Data["data"]["finishing_tm".$j.$i1])){
+
+              $time_check = 1;
+              $mess = $j."号機の時間の前後関係に誤りがあります。確認してください。";
+              $this->set('time_check',$time_check);
+              $this->set('mess',$mess);
+
+            }
+
+          }
+
+          if($i == 1){
+
+            ${"starting_tm".$j.$i} = $Data["data"]["starting_tm".$j.$i];
+            ${"starting_tm_check".$j} = substr(${"starting_tm".$j.$i}, -5, 5);
+
+            if(${"starting_tm_check".$j} != "08:00"){
+
+              $time_check = 1;
+              $mess = $j."号機の開始時間が8:00になっていません。確認してください。";
+              $this->set('time_check',$time_check);
+              $this->set('mess',$mess);
+
+            }
+
+          }
+
+          if($i == ${"n".$j}){
+
+            ${"finishing_tm".$j.$i} = $Data["data"]["finishing_tm".$j.$i];
+            ${"finishing_tm_check".$j} = substr(${"finishing_tm".$j.$i}, -5, 5);
+
+            if(${"finishing_tm_check".$j} != "08:00"){
+
+              $time_check = 1;
+              $mess = $j."号機の終了時間が8:00になっていません。確認してください。";
+              $this->set('time_check',$time_check);
+              $this->set('mess',$mess);
+
+            }
+
+          }
+
+        }
+
+      }
+
       for($j=1; $j<=9; $j++){
 
       ${"n".$j} = $Data["data"]["n".$j];
@@ -490,6 +557,80 @@ class KadousController extends AppController
      $_SESSION['kadouseikei'] = array();
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);//
+
+     $data = $this->request->getData();
+
+     $time_check = 0;
+     $mess = "";
+     $this->set('time_check',$time_check);
+     $this->set('mess',$mess);
+
+     for($j=1; $j<=9; $j++){//8:00で開始、終了されていない場合
+
+       ${"n".$j} = $data["n".$j];
+       $this->set('n'.$j,${"n".$j});
+
+       for($i=1; $i<=${"n".$j}; $i++){
+
+         if(strtotime($data["finishing_tm".$j.$i]) <= strtotime($data["starting_tm".$j.$i])){
+
+           $time_check = 1;
+           $mess = $j."号機の時間の前後関係に誤りがあります。確認してください。";
+           $this->set('time_check',$time_check);
+           $this->set('mess',$mess);
+
+         }
+
+         if($i > 1){
+
+           $i1 = $i-1;
+           if(strtotime($data["starting_tm".$j.$i]) < strtotime($data["finishing_tm".$j.$i1])){
+
+             $time_check = 1;
+             $mess = $j."号機の時間の前後関係に誤りがあります。確認してください。";
+             $this->set('time_check',$time_check);
+             $this->set('mess',$mess);
+
+           }
+
+         }
+
+         if($i == 1){
+
+           ${"starting_tm".$j.$i} = $data["starting_tm".$j.$i];
+           ${"starting_tm_check".$j} = substr(${"starting_tm".$j.$i}, -5, 5);
+
+           if(${"starting_tm_check".$j} != "08:00"){
+
+             $time_check = 1;
+             $mess = $j."号機の開始時間が8:00になっていません。確認してください。";
+             $this->set('time_check',$time_check);
+             $this->set('mess',$mess);
+
+           }
+
+         }
+
+         if($i == ${"n".$j}){
+
+           ${"finishing_tm".$j.$i} = $data["finishing_tm".$j.$i];
+           ${"finishing_tm_check".$j} = substr(${"finishing_tm".$j.$i}, -5, 5);
+
+           if(${"finishing_tm_check".$j} != "08:00"){
+
+             $time_check = 1;
+             $mess = $j."号機の終了時間が8:00になっていません。確認してください。";
+             $this->set('time_check',$time_check);
+             $this->set('mess',$mess);
+
+           }
+
+         }
+
+       }
+
+     }
+
    }
 
 		public function preadd()
@@ -994,6 +1135,25 @@ class KadousController extends AppController
 
     }
 
+    $flag_start = 0;
+    $connection = ConnectionManager::get('big_DB');//旧DBを参照
+    $table = TableRegistry::get('shotdata_sensors');
+    $table->setConnection($connection);
+
+    $sql = "SELECT datetime,seikeiki,product_code,shot_cycle,flag_start_finish
+    FROM shotdata_sensors".
+    " where datetime >= '".$starting_tm_search."' and datetime < '".$finishing_tm_search."'
+     and flag_start_finish > '".$flag_start."' order by datetime asc";
+    $connection = ConnectionManager::get('big_DB');
+    $arrFlag_check = $connection->execute($sql)->fetchAll('assoc');
+
+    $connection = ConnectionManager::get('default');
+    $table->setConnection($connection);
+
+    if(count($arrFlag_check) < 1){
+      $check_product = 1;
+    }
+
     $this->set('check_product',$check_product);
 /*
     echo "<pre>";
@@ -1027,11 +1187,17 @@ class KadousController extends AppController
           $connection = ConnectionManager::get('big_DB');
           $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
 
+          $connection = ConnectionManager::get('default');
+          $table->setConnection($connection);
+
+/*
+          echo "<pre>";
+          print_r($k);
+          print_r($log_confirm_kadou_seikeikis);
+          echo "</pre>";
+*/
           if(isset($log_confirm_kadou_seikeikis[0])){
             $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
-
-            $connection = ConnectionManager::get('default');
-            $table->setConnection($connection);
 
             $arramount_programming = array('amount_programming'=>$amount_programming);
             $KadouSeikeis[$k] = array_merge($KadouSeikeis[$k]->toArray(), $arramount_programming);
@@ -1063,7 +1229,7 @@ class KadousController extends AppController
 //      $this->set('countkadouSeikei',count($KadouSeikeis));
 /*
       echo "<pre>";
-      print_r($arrNon_data_KadouSeikeis);
+      print_r($KadouSeikeis);
       echo "</pre>";
 */
 
@@ -1119,6 +1285,9 @@ class KadousController extends AppController
         }
 /*
         echo "<pre>";
+        print_r($countbig);
+        echo "</pre>";
+        echo "<pre>";
         print_r($arrFlag_start);
         echo "</pre>";
         echo "<pre>";
@@ -1141,17 +1310,8 @@ class KadousController extends AppController
           }
 
         }
-/*
-        echo "<pre>";
-        print_r($n." ".$KadouSeikeis[$n]["product_code"]);
-        echo "</pre>";
-        echo "<pre>";
-        print_r($arrFlag_start);
-        echo "</pre>";
-        echo "<pre>";
-        print_r($arrFlag_finish);
-        echo "</pre>";
-*/
+
+
         for($m=0; $m<count($arrFlag_start); $m++){
           $arrStartTime[] = $arrFlag_start[$m];
         }
@@ -1170,7 +1330,17 @@ class KadousController extends AppController
       $countFinishTime = count($arrFinishTime);
 /*
       echo "<pre>";
-      print_r($count." ".$countFinishTime);
+      print_r($n." ".$KadouSeikeis[$n]["product_code"]);
+      echo "</pre>";
+      echo "<pre>";
+      print_r($arrStartTime);
+      echo "</pre>";
+      echo "<pre>";
+      print_r($arrFinishTime);
+      echo "</pre>";
+
+      echo "<pre>";
+      print_r($count);
       echo "</pre>";
 */
       for($l=0; $l<$count; $l++){
@@ -1181,11 +1351,13 @@ class KadousController extends AppController
           $FinishTime = $arrFinishTime[$l]['datetime'];
         }
 
-        $arrStartTimestuika = array('program_starting_tm'=>$arrStartTime[$l]['datetime']);
-        $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $arrStartTimestuika);
+        if(isset($arrStartTime[$l]) && isset($KadouSeikeis[$l])){
+          $arrStartTimestuika = array('program_starting_tm'=>$arrStartTime[$l]['datetime']);
+          $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $arrStartTimestuika);
 
-        $arrFinishTimestuika = array('program_finishing_tm'=>$FinishTime);
-        $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $arrFinishTimestuika);
+          $arrFinishTimestuika = array('program_finishing_tm'=>$FinishTime);
+          $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $arrFinishTimestuika);
+        }
 
       }
 /*
@@ -1532,25 +1704,27 @@ class KadousController extends AppController
 
               }else{//前の行と同じ仲間ではない場合
 
-                $connection = ConnectionManager::get('big_DB');//旧DBを参照
-                $table = TableRegistry::get('log_confirm_kadou_seikeikis');
-                $table->setConnection($connection);
+                if(isset($KadouSeikeis[$n1])){
+                  $connection = ConnectionManager::get('big_DB');//旧DBを参照
+                  $table = TableRegistry::get('log_confirm_kadou_seikeikis');
+                  $table->setConnection($connection);
 
-                $sql = "SELECT lot_code,starting_tm_nippou,starting_tm_program,finishing_tm_nippou,
-                finishing_tm_program,shot_cycle_nippou,shot_cycle_mode,amount_nippou,amount_programming,status_shot_cycle,non_production_time
-                FROM log_confirm_kadou_seikeikis".
-                " where starting_tm_nippou = '".$KadouSeikeis[$n1]["starting_tm"]."' and product_code = '".$KadouSeikeis[$n1]["product_code"]."' and seikeiki = '".$KadouSeikeis[$n1]["seikeiki"]."'";
-                $connection = ConnectionManager::get('big_DB');
-                $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
+                  $sql = "SELECT lot_code,starting_tm_nippou,starting_tm_program,finishing_tm_nippou,
+                  finishing_tm_program,shot_cycle_nippou,shot_cycle_mode,amount_nippou,amount_programming,status_shot_cycle,non_production_time
+                  FROM log_confirm_kadou_seikeikis".
+                  " where starting_tm_nippou = '".$KadouSeikeis[$n1]["starting_tm"]."' and product_code = '".$KadouSeikeis[$n1]["product_code"]."' and seikeiki = '".$KadouSeikeis[$n1]["seikeiki"]."'";
+                  $connection = ConnectionManager::get('big_DB');
+                  $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
 
-                $sql = "SELECT datetime,seikeiki,product_code,shot_cycle
-                FROM shotdata_sensors".
-                " where datetime >= '".$groupday."' and datetime <= '".$groupdayto."' and product_code = '".$KadouSeikeis[$n1]["product_code"]."' and seikeiki = '".$KadouSeikeis[$n1]["seikeiki"]."'";
-                $connection = ConnectionManager::get('big_DB');
-                $shotdata_sensors = $connection->execute($sql)->fetchAll('assoc');
+                  $sql = "SELECT datetime,seikeiki,product_code,shot_cycle
+                  FROM shotdata_sensors".
+                  " where datetime >= '".$groupday."' and datetime <= '".$groupdayto."' and product_code = '".$KadouSeikeis[$n1]["product_code"]."' and seikeiki = '".$KadouSeikeis[$n1]["seikeiki"]."'";
+                  $connection = ConnectionManager::get('big_DB');
+                  $shotdata_sensors = $connection->execute($sql)->fetchAll('assoc');
 
-                $connection = ConnectionManager::get('default');
-                $table->setConnection($connection);
+                  $connection = ConnectionManager::get('default');
+                  $table->setConnection($connection);
+                }
 
                 if(count($log_confirm_kadou_seikeikis) > 0){//log_confirm_kadou_seikeikisテーブルに存在する時
 
@@ -1661,16 +1835,18 @@ class KadousController extends AppController
 
                 }else{//log_confirm_kadou_seikeikisテーブルにデータが存在しない時
 
-                  $arrshot_cycle = array('shot_cycle'=>"データベースに存在しません");
-                  $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrshot_cycle);
-                  $arraccomp_rate_program = array('accomp_rate_program'=>0);
-                  $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arraccomp_rate_program);
-                  $arrkobetu_loss_time = array('kobetu_loss_time'=>0);
-                  $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrkobetu_loss_time);
-                  $arrnumkadouritu = array('numkadouritu'=>$numkadouritu);
-                  $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrnumkadouritu);
-                  $arrriron_loss_time = array('riron_loss_time'=>0);
-                  $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrriron_loss_time);
+                  if(isset($KadouSeikeis[$n1])){
+                    $arrshot_cycle = array('shot_cycle'=>"データベースに存在しません");
+                    $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrshot_cycle);
+                    $arraccomp_rate_program = array('accomp_rate_program'=>0);
+                    $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arraccomp_rate_program);
+                    $arrkobetu_loss_time = array('kobetu_loss_time'=>0);
+                    $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrkobetu_loss_time);
+                    $arrnumkadouritu = array('numkadouritu'=>$numkadouritu);
+                    $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrnumkadouritu);
+                    $arrriron_loss_time = array('riron_loss_time'=>0);
+                    $KadouSeikeis[$n1] = array_merge($KadouSeikeis[$n1], $arrriron_loss_time);
+                  }
 
                 }
 
@@ -1688,10 +1864,16 @@ class KadousController extends AppController
 
 $katagae_time = 0;
 $seisan_time = 0;
+$total_loss_time = 0;
+
 for($n=0; $n<count($KadouSeikeis); $n++){
 
     if(($n > 0) && ($KadouSeikeis[$n]["numkadouritu"] == $KadouSeikeis[$n-1]["numkadouritu"])){
-
+/*
+      echo "<pre>";
+      print_r("if".$n);
+      echo "</pre>";
+*/
 //      $starting_tm_kadou = strtotime($KadouSeikeis[$n]["starting_tm"]);
 //      $finishing_tm_kadou = strtotime($KadouSeikeis[$n-1]["finishing_tm"]);
 
@@ -1731,15 +1913,24 @@ for($n=0; $n<count($KadouSeikeis); $n++){
 
       }
 
-      $total_loss_time = round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
-
+  //    $total_loss_time = round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
+      $total_loss_time = $total_loss_time + round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
+/*
+      echo "<pre>";
+      print_r($total_loss_time);
+      echo "</pre>";
+*/
       $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
       $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrtotal_loss_time);
 
       $kadouritsu = round(1 - (($total_loss_time * 60) / 86400), 3);
       $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
       $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkadouritsu);
-
+/*
+      echo "<pre>";
+      print_r($kadouritsu);
+      echo "</pre>";
+*/
       $katagae_time_touroku = $katagae_time * 60 ;
 /*
       echo "<pre>";
@@ -1802,6 +1993,11 @@ for($n=0; $n<count($KadouSeikeis); $n++){
     }
 
 }
+/*
+echo "<pre>";
+print_r($KadouSeikeis);
+echo "</pre>";
+*/
 
       session_start();
       for($n=0; $n<count($KadouSeikeis); $n++){
@@ -1815,6 +2011,7 @@ for($n=0; $n<count($KadouSeikeis); $n++){
         );
       }
 
+      $arrGroup = array();
       for($n=0; $n<count($KadouSeikeis); $n++){
 
         $arrGroup[] = $KadouSeikeis[$n]["numkadouritu"];
@@ -1861,15 +2058,15 @@ for($n=0; $n<count($KadouSeikeis); $n++){
         $KadouritsuSeikeikidata = $this->KadouritsuSeikeikis->find()
         ->where(['seikeiki' => $KadouSeikeis[$countfin-1]['seikeiki'], 'date' => substr($KadouSeikeis[$countfin-1]['starting_tm'], 0, 10)])->toArray();
 
-        if(isset($KadouritsuSeikeikidata[0])){//既にデータが存在する場合
+//210428        if(isset($KadouritsuSeikeikidata[0])){//既にデータが存在する場合
 
-          $kadouritsu = $KadouritsuSeikeikidata[0]["kadouritus"];
+//210428          $kadouritsu = $KadouritsuSeikeikidata[0]["kadouritus"];
 
-        }else{
+//210428        }else{
 
           $kadouritsu = round(1 - (($KadouSeikeis[$countfin-1]['total_loss_time'] * 60) / 86400), 3);
 
-        }
+//210428        }
 
         $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
         $KadouSeikeis[$countfin-1] = array_merge($KadouSeikeis[$countfin-1], $arrkadouritsu);
@@ -1901,14 +2098,16 @@ for($n=0; $n<count($KadouSeikeis); $n++){
 
         if(${"check".$m} == 0){
 
-          $arrTouroku[] = [
-            'seikeiki' => $m,
-            'date' => substr($KadouSeikeis[0]['starting_tm'], 0, 10),
-            'kadouritus' => 0,
-            'delete_flag' => 0,
-            'created_at' => date('Y-m-d H:i:s'),
-            'created_staff' => $KadouSeikeis[0]["created_staff"]
-          ];
+          if(isset($KadouSeikeis[0])){
+            $arrTouroku[] = [
+              'seikeiki' => $m,
+              'date' => substr($KadouSeikeis[0]['starting_tm'], 0, 10),
+              'kadouritus' => 0,
+              'delete_flag' => 0,
+              'created_at' => date('Y-m-d H:i:s'),
+              'created_staff' => $KadouSeikeis[0]["created_staff"]
+            ];
+          }
 
         }
 

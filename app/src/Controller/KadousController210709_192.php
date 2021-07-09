@@ -1135,6 +1135,25 @@ class KadousController extends AppController
 
     }
 
+    $flag_start = 0;
+    $connection = ConnectionManager::get('big_DB');//旧DBを参照
+    $table = TableRegistry::get('shotdata_sensors');
+    $table->setConnection($connection);
+
+    $sql = "SELECT datetime,seikeiki,product_code,shot_cycle,flag_start_finish
+    FROM shotdata_sensors".
+    " where datetime >= '".$starting_tm_search."' and datetime < '".$finishing_tm_search."'
+     and flag_start_finish > '".$flag_start."' order by datetime asc";
+    $connection = ConnectionManager::get('big_DB');
+    $arrFlag_check = $connection->execute($sql)->fetchAll('assoc');
+
+    $connection = ConnectionManager::get('default');
+    $table->setConnection($connection);
+
+    if(count($arrFlag_check) < 1){
+      $check_product = 1;
+    }
+
     $this->set('check_product',$check_product);
 /*
     echo "<pre>";
@@ -1167,6 +1186,10 @@ class KadousController extends AppController
           " where starting_tm_nippou = '".$KadouSeikeis[$k]["starting_tm"]."' and product_code = '".$KadouSeikeis[$k]["product_code"]."' and seikeiki = '".$KadouSeikeis[$k]["seikeiki"]."' order by product_code asc";
           $connection = ConnectionManager::get('big_DB');
           $log_confirm_kadou_seikeikis = $connection->execute($sql)->fetchAll('assoc');
+
+          $connection = ConnectionManager::get('default');
+          $table->setConnection($connection);
+
 /*
           echo "<pre>";
           print_r($k);
@@ -1175,9 +1198,6 @@ class KadousController extends AppController
 */
           if(isset($log_confirm_kadou_seikeikis[0])){
             $amount_programming = $log_confirm_kadou_seikeikis[0]["amount_programming"];
-
-            $connection = ConnectionManager::get('default');
-            $table->setConnection($connection);
 
             $arramount_programming = array('amount_programming'=>$amount_programming);
             $KadouSeikeis[$k] = array_merge($KadouSeikeis[$k]->toArray(), $arramount_programming);
@@ -1844,10 +1864,16 @@ class KadousController extends AppController
 
 $katagae_time = 0;
 $seisan_time = 0;
+$total_loss_time = 0;
+
 for($n=0; $n<count($KadouSeikeis); $n++){
 
     if(($n > 0) && ($KadouSeikeis[$n]["numkadouritu"] == $KadouSeikeis[$n-1]["numkadouritu"])){
-
+/*
+      echo "<pre>";
+      print_r("if".$n);
+      echo "</pre>";
+*/
 //      $starting_tm_kadou = strtotime($KadouSeikeis[$n]["starting_tm"]);
 //      $finishing_tm_kadou = strtotime($KadouSeikeis[$n-1]["finishing_tm"]);
 
@@ -1887,15 +1913,24 @@ for($n=0; $n<count($KadouSeikeis); $n++){
 
       }
 
-      $total_loss_time = round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
-
+  //    $total_loss_time = round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
+      $total_loss_time = $total_loss_time + round($katagae_time + ($KadouSeikeis[$n]["riron_loss_time"] / 60) , 1);
+/*
+      echo "<pre>";
+      print_r($total_loss_time);
+      echo "</pre>";
+*/
       $arrtotal_loss_time = array('total_loss_time'=>$total_loss_time);
       $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrtotal_loss_time);
 
       $kadouritsu = round(1 - (($total_loss_time * 60) / 86400), 3);
       $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
       $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkadouritsu);
-
+/*
+      echo "<pre>";
+      print_r($kadouritsu);
+      echo "</pre>";
+*/
       $katagae_time_touroku = $katagae_time * 60 ;
 /*
       echo "<pre>";
@@ -1958,6 +1993,11 @@ for($n=0; $n<count($KadouSeikeis); $n++){
     }
 
 }
+/*
+echo "<pre>";
+print_r($KadouSeikeis);
+echo "</pre>";
+*/
 
       session_start();
       for($n=0; $n<count($KadouSeikeis); $n++){
@@ -2018,15 +2058,15 @@ for($n=0; $n<count($KadouSeikeis); $n++){
         $KadouritsuSeikeikidata = $this->KadouritsuSeikeikis->find()
         ->where(['seikeiki' => $KadouSeikeis[$countfin-1]['seikeiki'], 'date' => substr($KadouSeikeis[$countfin-1]['starting_tm'], 0, 10)])->toArray();
 
-        if(isset($KadouritsuSeikeikidata[0])){//既にデータが存在する場合
+//210428        if(isset($KadouritsuSeikeikidata[0])){//既にデータが存在する場合
 
-          $kadouritsu = $KadouritsuSeikeikidata[0]["kadouritus"];
+//210428          $kadouritsu = $KadouritsuSeikeikidata[0]["kadouritus"];
 
-        }else{
+//210428        }else{
 
           $kadouritsu = round(1 - (($KadouSeikeis[$countfin-1]['total_loss_time'] * 60) / 86400), 3);
 
-        }
+//210428        }
 
         $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
         $KadouSeikeis[$countfin-1] = array_merge($KadouSeikeis[$countfin-1], $arrkadouritsu);
@@ -2712,10 +2752,32 @@ for($n=0; $n<count($KadouSeikeis); $n++){
      $arrAll = glob("img/shotgraphs/$product_code/$date_y/$date_m/$date_d/前回比較/*");//webrootフォルダにファイルが存在するか確認
      $countfile = count($arrAll);
 
+  //   $arrAllmoto = glob("img/kadouimgcopy/$product_code/$date_y/$date_m/$date_d/前回比較/*");//tuika210708//local
+     $arrAllmoto = glob("/data/share/mkNewDir/$product_code/$date_y/$date_m/$date_d/前回比較/*");//tuika210708//192
+     $countfilemoto = count($arrAllmoto);//tuika210708
+
+     $arrAllwebcheck = array();
+     for($k=0; $k<$countfile; $k++){
+       ${"file".$k} = explode("/",$arrAll[$k]);
+       $file_name = ${"file".$k}[7];//webroot内のファイル
+       $arrAllwebcheck[] = $file_name;
+     }
+
+     $arrAllmotocheck = array();
+     for($k=0; $k<$countfilemoto; $k++){
+       ${"file".$k} = explode("/",$arrAllmoto[$k]);
+//       $file_name = ${"file".$k}[7];//ローカル
+       $file_name = ${"file".$k}[9];//192
+       $arrAllmotocheck[] = $file_name;
+     }
+
+     $arrdiffcheck = array_diff($arrAllmotocheck, $arrAllwebcheck);
+
      $mes = "";
      $this->set('mes',$mes);
 
-     if($countfile > 0){//webrootフォルダにファイルが存在しているときはそのまま表示する
+     //if($countfile > 0){//webrootフォルダにファイルが存在しているときはそのまま表示する
+     if(count($arrdiffcheck) == 0){//210709追加//元の画像ファイルとwebrootのデータに差がある場合
 
        $graphcheck = 1;
        $this->set('graphcheck',$graphcheck);

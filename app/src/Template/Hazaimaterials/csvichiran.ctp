@@ -94,6 +94,6 @@ if(!isset($_SESSION)){
 <td style="border-style: none;"><div align="center"><?= $this->Form->submit('csv発行データ確認', array('name' => 'kakuninn')); ?></div></td>
 </tr>
 </table>
-<br><br><br>
+<br><br><br><br><br><br><br>
 <?=$this->Form->end() ?>
 </form>

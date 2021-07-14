@@ -66,8 +66,8 @@ class ApimaterialsController extends AppController
 
     }
 
-//https://192.168.4.246/Apimaterials/apimaterails/api.json
-		public function hazaitouroku($id)//http://localhost:5000/Apimaterials/apimaterails/3.json
+//https://192.168.4.246/Apimaterials/hazaitouroku/api.json
+		public function hazaitouroku($id)//http://localhost:5000/Apimaterials/hazaitouroku/3.json
 		{
 
 			if($this->request->is(['post'])) {//登録postの時
@@ -250,8 +250,6 @@ class ApimaterialsController extends AppController
         '_serialize' => ['arrStockEndMaterials']
       ]);
 
-//			echo json_encode($arrStockEndMaterials,JSON_PRETTY_PRINT);//これではcakeは受け取れない
-
     }
 
 		public function test2()//http://192.168.4.246/Apimaterials/test2/api.json http://localhost:5000/Apimaterials/test2/api.json
@@ -263,11 +261,7 @@ class ApimaterialsController extends AppController
 			$url = "http://192.168.4.246/Apimaterials/test1/api.json";
       $json = file_get_contents($url);
       $arr = json_decode($json,true);
-/*
-      echo "<pre>";
-      print_r($arr);
-      echo "</pre>";
-*/
+
 			$arrTourokuStockEndMaterials = array();//空の配列を作る
 			for($k=0; $k<count($arr["arrStockEndMaterials"]); $k++){//jsonを配列に変換
 
@@ -324,11 +318,7 @@ class ApimaterialsController extends AppController
 				$arrTourokuStockEndMaterials[$k] = array_merge($arrTourokuStockEndMaterials[$k],array('lot_num' => $lot_num));
 
 			}
-/*
-			echo "<pre>";
-      print_r($arrTourokuStockEndMaterials);
-      echo "</pre>";
-*/
+
 			$StockEndMaterials = $this->StockEndMaterials->patchEntities($this->StockEndMaterials->newEntity(), $arrTourokuStockEndMaterials);
       if ($this->StockEndMaterials->saveMany($StockEndMaterials)) {
           $message = 'Saved';
@@ -344,9 +334,10 @@ class ApimaterialsController extends AppController
       ]);
 
     }
-
-		public function apimaterails($id)//http://localhost:5000/Apimaterials/hyoujitest/api.json
+																		//http://192.168.4.246/Apimaterials/hyoujitest/api.json
+		public function hyoujitest($id)//http://localhost:5000/Apimaterials/hyoujitest/api.json
 		{
+			$post_data = $this->request->getData();
 
 			if($this->request->is(['post'])) {//登録postの時
 
@@ -381,6 +372,72 @@ class ApimaterialsController extends AppController
 				]);
 
 			}
+
+			$arrTourokuStockEndMaterials[] = [
+				'material_id' => 1,
+				'status_material' => 1,
+				'amount' => 1,
+				'lot_num' => $post_data['title']['grade'],
+				'state' => 0,
+				'status_import_tab' => 0,
+				'delete_flag' => 0,
+				'created_at' => date('Y-m-d H:i:s'),
+				'created_staff' => 1,
+			];
+/*
+			$arrTourokuStockEndMaterials[] = [
+				'material_id' => 1,
+				'status_material' => 1,
+				'amount' => 1,
+				'lot_num' => $mess,
+				'state' => 0,
+				'status_import_tab' => 0,
+				'delete_flag' => 0,
+				'created_at' => date('Y-m-d H:i:s'),
+				'created_staff' => 111,
+			];
+*/
+			$StockEndMaterials = $this->StockEndMaterials->patchEntities($this->StockEndMaterials->newEntity(), $arrTourokuStockEndMaterials);
+      if ($this->StockEndMaterials->saveMany($StockEndMaterials)) {
+          $message = 'Saved';
+      } else {
+          $message = 'Error';
+      }
+
+      $this->viewBuilder()->className('Json');
+      $this->set([
+          'message' => $message,
+          'StockEndMaterials' => $StockEndMaterials,
+          '_serialize' => ['message', 'StockEndMaterials']
+      ]);
+
+		}
+																  	//http://192.168.4.246/Apimaterials/ukewatasitest
+		public function ukewatasitest()//http://localhost:5000/Apimaterials/ukewatasitest
+		{
+			$http = new Client();
+			/*
+			$response = $http->get('http://192.168.4.246/Apimaterials/hyoujitest/api.json', [//post,put,get
+			  'title' => 'testing',
+			  'body' => 'content in the put'
+			]);
+*/
+
+			$data = array();//空の配列を作る
+			$data = [
+				'grade' => '1010N2',
+				'color' => 'N',
+				'status_material' => 0,
+				'amount' => 30,
+				'state' => 0,
+				'username' => "test",
+			];
+
+			$response = $http->post('http://192.168.4.246/Apimaterials/hyoujitest/api.json', [//post,put,get
+//			$response = $http->post('http://localhost:5000/Apimaterials/hyoujitest/api.json', [//localhostには送れない
+				'title' => $data,
+				['type' => 'json']
+			]);
 
 		}
 

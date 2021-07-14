@@ -25,6 +25,19 @@ class HazaimaterialsController extends AppController {
    {
    }
 
+   public function materialform()
+   {
+     $Material_list = $this->Materials->find()
+     ->where(['delete_flag' => 0])->toArray();
+     $arrMaterial_list = array();
+     for($j=0; $j<count($Material_list); $j++){
+       array_push($arrMaterial_list,$Material_list[$j]["grade"]."_".$Material_list[$j]["color"]);
+     }
+     $arrMaterial_list = array_unique($arrMaterial_list);
+     $arrMaterial_list = array_values($arrMaterial_list);
+     $this->set('arrMaterial_list', $arrMaterial_list);
+   }
+
    public function csvlogin()
    {
      $stockEndMaterials = $this->StockEndMaterials->newEntity();

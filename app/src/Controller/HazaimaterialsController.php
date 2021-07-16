@@ -659,9 +659,9 @@ $arrTourokuStockEndMaterials = [
       $data = $this->request->getData();
 
       $username = $data["username"];
-      echo "<pre>";
-      print_r($username);
-      echo "</pre>";
+      $Users = $this->Users->find()
+      ->where(['username' => $username])->toArray();
+      $staff_id = $Users[0]["staff_id"];
 
       $source_file = $_FILES['file']['tmp_name'];
 
@@ -676,13 +676,74 @@ $arrTourokuStockEndMaterials = [
          $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
          $sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
          $arrFp[] = $sample;//配列に追加する
-         $arrLot[] = ['product_code' => $arrFp[$k-1][6]];
+
+         if(isset($arrFp[$k-1][4]) && isset($arrFp[$k-1][6])){
+           $arrLot[] = ['lot_num' => $arrFp[$k-1][4], 'grade' => $arrFp[$k-1][6]];
+         }
 
        }
 
+       for ($k=0; $k<count($arrLot); $k++) {
+
+         $Materials = $this->Materials->find()
+         ->where(['grade' => $arrLot[$k]["grade"], 'delete_flag' => 0])->toArray();
+
+         for($i=0; $i<count($Materials); $i++){
+
+           $StockEndMaterials = $this->StockEndMaterials->find()
+           ->where(["material_id" => $Materials[$i]["id"], 'lot_num' => $arrLot[$k]["lot_num"], 'status_import_tab' => 1, 'delete_flag' => 0])->toArray();
+
+           if(isset($StockEndMaterials[0])){
+
+             $arr_StockEndMaterials_id = array('StockEndMaterialsId' => $StockEndMaterials[0]["id"]);
+             $arrLot[$k] = array_merge($arr_StockEndMaterials_id, $arrLot[$k]);
+
+           }
+
+         }
+
+       }
+/*
        echo "<pre>";
-       print_r($arrFp);
+       print_r($arrLot);
        echo "</pre>";
+*/
+       $StockEndMaterials = $this->StockEndMaterials->patchEntity($this->StockEndMaterials->newEntity(), $arrLot);
+       $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+        $connection->begin();//トランザクション3
+        try {//トランザクション4
+
+          for($k=0; $k<count($arrLot); $k++){
+
+            if ($this->StockEndMaterials->updateAll(
+              ['import_tab_staff' => $staff_id, 'import_tab_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $staff_id],
+              ['id'  => $arrLot[$k]["StockEndMaterialsId"]]
+            )){
+
+              if($k == count($arrLot) - 1){
+
+                $mes = "※登録されました";
+                $this->set('mes',$mes);
+                $connection->commit();// コミット5
+
+              }
+
+            } else {
+
+              $mes = "※登録されませんでした";
+              $this->set('mes',$mes);
+              $this->Flash->error(__('The product could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+            }
+
+          }
+
+        } catch (Exception $e) {//トランザクション7
+        //ロールバック8
+          $connection->rollback();//トランザクション9
+        }//トランザクション10
 
      }
 

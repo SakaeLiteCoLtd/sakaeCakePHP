@@ -22,3 +22,6 @@
 <hr size="5" style="margin: 0.5rem">
 <br>
 <?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'menu']]) ?>
+<br>
+<legend align="center"><font color="red" size="3"><?= __($mes) ?></font></legend>
+<br><br>

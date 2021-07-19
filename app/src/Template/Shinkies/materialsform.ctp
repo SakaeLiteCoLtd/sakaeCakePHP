@@ -35,8 +35,8 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
     <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色番号</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('grade', array('type'=>'text', 'label'=>false, 'autofocus'=>true)) ?></td>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('color', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('grade', array('type'=>'text', 'label'=>false, 'autofocus'=>true, 'required'=>true)) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('color', array('type'=>'text', 'label'=>false, 'required'=>true)) ?></td>
 	</tr>
 </table>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
@@ -45,8 +45,8 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
     <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">ロット上限</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('lot_low', array('type'=>'text', 'label'=>false)) ?></td>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('lot_upper', array('type'=>'text', 'label'=>false)) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('lot_low', array('type'=>'text', 'pattern'=>'^[0-9.-]+$', 'title'=>'半角数字で入力して下さい。', 'label'=>false, 'required'=>true)) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('lot_upper', array('type'=>'text', 'pattern'=>'^[0-9.-]+$', 'title'=>'半角数字で入力して下さい。', 'label'=>false, 'required'=>true)) ?></td>
 	</tr>
 </table>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
@@ -55,9 +55,17 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
     <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">原料サプライヤー</strong></td>
 	</tr>
   <tr>
-    <td width="220" bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><?= $this->Form->control('price', array('type'=>'text', 'label'=>false)) ?></td>
+    <td width="220" bgcolor="#FFFFCC" style="border-right-style: none;padding: 0.2rem"><?= $this->Form->control('price', array('type'=>'text', 'pattern'=>'^[0-9.-]+$', 'title'=>'半角数字で入力して下さい。', 'label'=>false, 'required'=>true)) ?></td>
     <td width="62" bgcolor="#FFFFCC" style="border-left-style: none;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">円/kg</strong></td>
-    <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("sup_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrSupplier, 'label'=>false]) ?></td>
+    <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("sup_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrSupplier, 'label'=>false, 'required'=>true]) ?></td>
+	</tr>
+</table>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">種類</strong></td>
+	</tr>
+  <tr>
+    <td width="280"  bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->input("status_buying", ["type"=>"select", "options"=>$arrstatus_buying, 'label'=>false, 'required'=>true]) ?></td>
 	</tr>
 </table>
 

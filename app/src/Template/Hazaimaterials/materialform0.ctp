@@ -10,7 +10,6 @@
 
 <?php
 $arrMaterial_list = json_encode($arrMaterial_list);//jsに配列を受け渡すために変換
-$arrProduct_list = json_encode($arrProduct_list);//jsに配列を受け渡すために変換
 ?>
 
 <script>
@@ -23,15 +22,6 @@ $(function() {
         source: wordlist
       });
   });
-
-  $(function() {
-        // 入力補完候補の単語リスト
-        let wordlist = <?php echo $arrProduct_list; ?>
-        // 入力補完を実施する要素に単語リストを設定
-        $("#product_list").autocomplete({
-          source: wordlist
-        });
-    });
 
 </script>
 
@@ -51,31 +41,8 @@ $(function() {
 <?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'materialformsyousai']]) ?>
 <br>
 <div align="center"><font color="red" size="3"><?= __($mess) ?></font></div>
-<legend align="center"><font color="black"><?= __("「製品名」または「原料グレード_色」を入力してください。") ?></font></legend>
 <br>
 
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-  <tr>
-    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">登録社員</strong></td>
-	</tr>
-  <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem">
-      <?= h($staff_name) ?>
-    </td>
-	</tr>
-</table>
-<br>
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-  <tr>
-    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">製品名</strong></td>
-	</tr>
-  <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem">
-      <?= $this->Form->control('product_name', array('type'=>'text', 'label'=>false, 'id'=>"product_list", 'autofocus'=>true)) ?>
-    </td>
-	</tr>
-</table>
-<br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">原料グレード_色</strong></td>
@@ -83,28 +50,6 @@ $(function() {
   <tr>
     <td bgcolor="#FFFFCC" style="padding: 0.2rem">
       <?= $this->Form->control('materialgrade_color', array('type'=>'text', 'label'=>false, 'id'=>"material_list", 'autofocus'=>true)) ?>
-    </td>
-	</tr>
-</table>
-<br>
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-  <tr>
-    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">端材ステイタス</strong></td>
-	</tr>
-  <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem">
-      <?= $this->Form->input("status_material", ["type"=>"select", "options"=>$arrStatusMaterial, 'label'=>false, 'required'=>true]) ?>
-    </td>
-	</tr>
-</table>
-<br>
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-  <tr>
-    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">数量（kg）</strong></td>
-	</tr>
-  <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem">
-      <?= $this->Form->control('amount', array('type'=>'text', 'label'=>false, 'pattern'=>'^[0-9.]+$', 'title'=>'半角数字で入力して下さい。', 'required'=>true)) ?>
     </td>
 	</tr>
 </table>

@@ -34,10 +34,10 @@
             </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-          <?php for($i=0; $i<count($arrLot); $i++): ?>
+          <?php for($i=0; $i<count($arrLottouroku); $i++): ?>
             <tr style="border-bottom: solid;border-width: 1px">
-              <td colspan="20" nowrap="nowrap"><?= h($arrLot[$i]["hazai"]) ?></td>
-              <td colspan="20" nowrap="nowrap"><?= h($arrLot[$i]["lot_num"]) ?></td>
+              <td colspan="20" nowrap="nowrap"><?= h($arrLottouroku[$i]["hazai"]) ?></td>
+              <td colspan="20" nowrap="nowrap"><?= h($arrLottouroku[$i]["lot_num"]) ?></td>
             </tr>
            <?php endfor;?>
         </tbody>

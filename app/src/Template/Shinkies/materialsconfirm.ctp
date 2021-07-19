@@ -60,6 +60,14 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
     <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($Suppliername) ?></td>
 	</tr>
 </table>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="280" bgcolor="#FFFFCC" style="font-size: 12pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">種類</strong></td>
+	</tr>
+  <tr>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($hyouji_status_buying) ?></td>
+	</tr>
+</table>
 
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -74,6 +82,8 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
   <?= $this->Form->control('lot_upper', array('type'=>'hidden', 'value'=>$this->request->getData('lot_upper'), 'label'=>false)) ?>
   <?= $this->Form->control('price', array('type'=>'hidden', 'value'=>$this->request->getData('price'), 'label'=>false)) ?>
   <?= $this->Form->control('sup_id', array('type'=>'hidden', 'value'=>$this->request->getData('sup_id'), 'label'=>false)) ?>
+  <?= $this->Form->control('status_buying', array('type'=>'hidden', 'value'=>$this->request->getData('status_buying'), 'label'=>false)) ?>
   <?= $this->Form->control('Suppliername', array('type'=>'hidden', 'value'=>$Suppliername, 'label'=>false)) ?>
+  <?= $this->Form->control('hyouji_status_buying', array('type'=>'hidden', 'value'=>$hyouji_status_buying, 'label'=>false)) ?>
 
 <br>

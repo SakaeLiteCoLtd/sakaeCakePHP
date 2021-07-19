@@ -39,10 +39,9 @@ class ShinkiesController extends AppController {
 
   public function index()
   {
-//   $this->request->session()->destroy(); // セッションの破棄
+ //  $this->request->session()->destroy(); // セッションの破棄
    $user = $this->Users->newEntity();
    $this->set('user',$user);
-
   }
 
    public function login()
@@ -99,11 +98,6 @@ class ShinkiesController extends AppController {
 
     $session = $this->request->getSession();
     $data = $session->read();
-/*
-    echo "<pre>";
-    print_r($data);
-    echo "</pre>";
-*/
    }
 
    public function materialsform()//原料
@@ -129,6 +123,13 @@ class ShinkiesController extends AppController {
        $arrSupplier[] = array($value->id=>$value->name);
      }
      $this->set('arrSupplier',$arrSupplier);
+
+     $arrstatus_buying = [
+       '0' => 'ナチュラル・練りこみ',
+       '1' => 'MB・ドライカラー自社混合'
+     ];
+     $this->set('arrstatus_buying',$arrstatus_buying);
+
    }
 
    public function materialsconfirm()
@@ -152,6 +153,14 @@ class ShinkiesController extends AppController {
      $Suppliers = $this->Suppliers->find()->where(['id' => $data['sup_id']])->toArray();
      $Suppliername = $Suppliers[0]->name;
      $this->set('Suppliername',$Suppliername);
+
+     if($data['status_buying'] == 0){
+       $hyouji_status_buying = "ナチュラル・練りこみ";
+     }else{
+       $hyouji_status_buying = "MB・ドライカラー自社混合";
+     }
+     $this->set('hyouji_status_buying',$hyouji_status_buying);
+
    }
 
    public function materialsdo()
@@ -172,6 +181,7 @@ class ShinkiesController extends AppController {
      $arrtouroku[] = array(
        'grade' => $data['grade'],
        'color' => $data['color'],
+       'status_buying' => $data['status_buying'],
        'lot_low' => $data['lot_low'],
        'lot_upper' => $data['lot_upper'],
        'tourokubi' => date('Y-m-d'),
@@ -192,7 +202,7 @@ class ShinkiesController extends AppController {
      $connection->begin();//トランザクション3
      try {//トランザクション4
 
-//既に登録されている場合はdeleteする
+       //既に登録されている場合はdeleteする
        $deletePriceMaterials = $this->PriceMaterials->find('all')
        ->where(['grade' => $arrtouroku[0]["grade"], 'color' => $arrtouroku[0]["color"], 'delete_flag' => 0])->toArray();
        if(isset($deletePriceMaterials[0])){
@@ -207,7 +217,7 @@ class ShinkiesController extends AppController {
        if ($this->PriceMaterials->save($PriceMaterials)) {
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('price_material');
          $table->setConnection($connection);
 
@@ -351,7 +361,7 @@ class ShinkiesController extends AppController {
        if ($this->Suppliers->save($Suppliers)) {
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('supplier');
          $table->setConnection($connection);
 
@@ -540,7 +550,7 @@ class ShinkiesController extends AppController {
           if ($this->AssembleProducts->saveMany($assembleProducts)) {//saveManyで一括登録
 
             //insert 旧DB
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('assemble_products');
             $table->setConnection($connection);
 
@@ -687,7 +697,7 @@ class ShinkiesController extends AppController {
          $this->ProductSuppliers->save($ProductSuppliers);
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('outsource_handy');
          $table->setConnection($connection);
 
@@ -698,7 +708,7 @@ class ShinkiesController extends AppController {
 
          $sql = "SELECT id FROM outsource_handy".
                " where name ='".$data["handy_name"]."'";
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $outsource_handy_id = $connection->execute($sql)->fetchAll('assoc');
          $handy_id_old = $outsource_handy_id[0]['id'];
 
@@ -846,7 +856,7 @@ class ShinkiesController extends AppController {
        if ($this->AccountUrikakePriceMaterials->save($AccountUrikakePriceMaterials)) {
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('account_urikake_price_material');
          $table->setConnection($connection);
 
@@ -1029,13 +1039,13 @@ class ShinkiesController extends AppController {
          );
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('product_gaityu');
          $table->setConnection($connection);
 
          $sql = "SELECT id FROM product_supplier".
                " where name ='".$product_supplier_name."'";
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $product_supplier_id = $connection->execute($sql)->fetchAll('assoc');
          $id_supplier_old = $product_supplier_id[0]['id'];
 
@@ -1152,7 +1162,7 @@ class ShinkiesController extends AppController {
        if ($this->SyoumouSuppliers->save($SyoumouSuppliers)) {
 
          //旧DBに製品登録
-         $connection = ConnectionManager::get('DB_ikou_test');
+         $connection = ConnectionManager::get('sakaeMotoDB');
          $table = TableRegistry::get('syoumou_suppliers');
          $table->setConnection($connection);
 
@@ -1567,7 +1577,7 @@ class ShinkiesController extends AppController {
          $this->CustomersHandys->save($CustomersHandys);
 
          //旧DBに登録
-        $connection = ConnectionManager::get('DB_ikou_test');
+        $connection = ConnectionManager::get('sakaeMotoDB');
         $table = TableRegistry::get('placedeliver');
         $table->setConnection($connection);
 
@@ -1763,7 +1773,7 @@ class ShinkiesController extends AppController {
           );
 
           //旧DBに単価登録
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('placedeliver');
           $table->setConnection($connection);
 
@@ -1930,6 +1940,5 @@ class ShinkiesController extends AppController {
     }//トランザクション10
 
    }
-
 
 }

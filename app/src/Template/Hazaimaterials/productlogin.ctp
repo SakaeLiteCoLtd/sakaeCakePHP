@@ -21,7 +21,7 @@
 </table>
 <hr size="5" style="margin: 0.5rem">
 <br>
-<?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'materialform']]) ?>
+<?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'productform']]) ?>
 
 <br>
 <div align="center"><font color="red" size="3"><?= __($mess) ?></font></div>

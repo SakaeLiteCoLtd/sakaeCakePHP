@@ -25,19 +25,19 @@
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
         <thead>
             <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
-              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">グレード</strong></div></td>
-              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">色番</strong></div></td>
+              <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">端材</strong></div></td>
+              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">ロットNo.</strong></div></td>
               <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">端材ステイタス</strong></div></td>
-              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">数量</strong></div></td>
-              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">登録日</strong></div></td>
-              <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">登録者</strong></div></td>
+              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">数量</strong></div></td>
+              <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">登録日</strong></div></td>
+              <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">登録者</strong></div></td>
             </tr>
         </thead>
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
           <?php for($i=0; $i<count($csvStockEndMaterials); $i++): ?>
             <tr style="border-bottom: solid;border-width: 1px">
-              <td colspan="20" nowrap="nowrap"><?= h($csvStockEndMaterials[$i]["grade"]) ?></td>
-              <td colspan="20" nowrap="nowrap"><?= h($csvStockEndMaterials[$i]["color"]) ?></td>
+              <td colspan="20" nowrap="nowrap"><?= h($csvStockEndMaterials[$i]["hazai"]) ?></td>
+              <td colspan="20" nowrap="nowrap"><?= h($csvStockEndMaterials[$i]["lot_num"]) ?></td>
               <td colspan="20" nowrap="nowrap"><?= h($csvStockEndMaterials[$i]["status_material"]) ?></td>
               <td colspan="20" nowrap="nowrap"><?= h($csvStockEndMaterials[$i]["amount"]) ?></td>
               <td colspan="20" nowrap="nowrap"><?= h($csvStockEndMaterials[$i]["created_at"]) ?></td>

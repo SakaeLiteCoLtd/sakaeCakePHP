@@ -25,3 +25,27 @@
 <br>
 <legend align="center"><font color="red" size="3"><?= __($mes) ?></font></legend>
 <br><br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+  <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+        <thead>
+            <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+              <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">端材</strong></div></td>
+              <td width="200" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">ロットNo.</strong></div></td>
+            </tr>
+        </thead>
+        <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+          <?php for($i=0; $i<count($arrLot); $i++): ?>
+            <tr style="border-bottom: solid;border-width: 1px">
+              <td colspan="20" nowrap="nowrap"><?= h($arrLot[$i]["hazai"]) ?></td>
+              <td colspan="20" nowrap="nowrap"><?= h($arrLot[$i]["lot_num"]) ?></td>
+            </tr>
+           <?php endfor;?>
+        </tbody>
+    </table>
+<br><br><br><br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+  <tr>
+    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('TOP', array('name' => 'top')); ?></div></td>
+  </tr>
+</table>
+<br><br><br><br><br><br><br>

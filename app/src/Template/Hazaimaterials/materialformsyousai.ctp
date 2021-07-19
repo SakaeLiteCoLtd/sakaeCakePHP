@@ -21,7 +21,7 @@
 <hr size="5" style="margin: 0.5rem">
 <table style="margin-bottom:0px" width="1000" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
  <tr style="background-color: #E6FFFF">
-     <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaigenryou.gif',array('width'=>'105','url'=>array('action'=>'materiallogin')));?></td>
+     <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaigenryou.gif',array('width'=>'105','url'=>array('action'=>'materialmenu')));?></td>
  </tr>
 </table>
 <hr size="5" style="margin: 0.5rem">
@@ -94,4 +94,4 @@
 <?= $this->Form->control('staff_name', array('type'=>'hidden', 'value'=>$staff_name, 'label'=>false)) ?>
 <?= $this->Form->control('grade', array('type'=>'hidden', 'value'=>$grade, 'label'=>false)) ?>
 <?= $this->Form->control('color', array('type'=>'hidden', 'value'=>$color, 'label'=>false)) ?>
-<?= $this->Form->control('material_id', array('type'=>'hidden', 'value'=>$material_id, 'label'=>false)) ?>
+<?= $this->Form->control('price_material_id', array('type'=>'hidden', 'value'=>$price_material_id, 'label'=>false)) ?>

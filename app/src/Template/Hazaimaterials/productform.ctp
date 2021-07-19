@@ -9,16 +9,16 @@
 <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <?php
-$arrMaterial_list = json_encode($arrMaterial_list);//jsに配列を受け渡すために変換
+$arrProduct_list = json_encode($arrProduct_list);//jsに配列を受け渡すために変換
 ?>
 
 <script>
 
 $(function() {
       // 入力補完候補の単語リスト
-      let wordlist = <?php echo $arrMaterial_list; ?>
+      let wordlist = <?php echo $arrProduct_list; ?>
       // 入力補完を実施する要素に単語リストを設定
-      $("#material_list").autocomplete({
+      $("#product_list").autocomplete({
         source: wordlist
       });
   });
@@ -38,18 +38,18 @@ $(function() {
  </tr>
 </table>
 <hr size="5" style="margin: 0.5rem">
-<?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'materialformsyousai']]) ?>
+<?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'productformsyousai']]) ?>
 <br>
 <div align="center"><font color="red" size="3"><?= __($mess) ?></font></div>
 <br>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">原料グレード_色</strong></td>
+    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">製品名</strong></td>
 	</tr>
   <tr>
     <td bgcolor="#FFFFCC" style="padding: 0.2rem">
-      <?= $this->Form->control('materialgrade_color', array('type'=>'text', 'label'=>false, 'id'=>"material_list", 'autofocus'=>true)) ?>
+      <?= $this->Form->control('product_name', array('type'=>'text', 'label'=>false, 'id'=>"product_list", 'autofocus'=>true)) ?>
     </td>
 	</tr>
 </table>

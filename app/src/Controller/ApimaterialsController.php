@@ -26,7 +26,8 @@ class ApimaterialsController extends AppController
 		 $this->response->header("Access-Control-Allow-Credentials: true");
 		 $this->response->header("Access-Control-Allow-Methods: POST, PUT, DELETE, PATCH");
 
-		 $this->Materials = TableRegistry::get('materials');
+	//	 $this->Materials = TableRegistry::get('materials');
+		 $this->PriceMaterials = TableRegistry::get('priceMaterials');
 		 $this->StockEndMaterials = TableRegistry::get('stockEndMaterials');
 		 $this->Users = TableRegistry::get('users');
 		}
@@ -45,14 +46,14 @@ class ApimaterialsController extends AppController
 		{
 			header("Access-Control-Allow-Origin: *");//https://helog.jp/php/ajax-php-cors/ ブラウザ側に安全を保証してますよって伝えてるappコントローラーに追加
 
-			$Materials = $this->Materials->find()->where(['delete_flag' => 0])->toArray();
+			$PriceMaterials = $this->PriceMaterials->find()->where(['delete_flag' => 0])->toArray();
 
 			$arrMaterials = array();//空の配列を作る
-			for($k=0; $k<count($Materials); $k++){
+			for($k=0; $k<count($PriceMaterials); $k++){
 
 				$arrMaterials[] = [
-					'id' => $Materials[$k]["id"],//配列に追加する
-					'grade_color' => $Materials[$k]["grade"]."_".$Materials[$k]["color"]//配列に追加する
+					'id' => $PriceMaterials[$k]["id"],//配列に追加する
+					'grade_color' => $PriceMaterials[$k]["grade"]."_".$PriceMaterials[$k]["color"]//配列に追加する
 				];
 
 			}
@@ -78,16 +79,16 @@ class ApimaterialsController extends AppController
 
 				$arrTourokuStockEndMaterials = array();//空の配列を作る
 
-				$Materials = $this->Materials->find()
+				$PriceMaterials = $this->PriceMaterials->find()
 				->where(['grade' => $arr["grade"], 'color' => $arr["color"]])->toArray();
 
-				if(isset($Materials[0])){
-					$id = $Materials[0]["id"];
+				if(isset($PriceMaterials[0])){
+					$id = $PriceMaterials[0]["id"];
 				}else{
 					$id = 999999;
 				}
 				$arrTourokuStockEndMaterials[] = [
-					'material_id' => $id,
+					'price_material_id' => $id,
 					'status_material' => $arr["status_material"],
 					'amount' => $arr["amount"],
 					'state' => 0,
@@ -98,12 +99,12 @@ class ApimaterialsController extends AppController
 				];
 
 				foreach ((array) $arrTourokuStockEndMaterials as $key => $value) {//並び替え
-					$sort[$key] = $value['material_id'];
+					$sort[$key] = $value['price_material_id'];
 				}
 				array_multisort($sort, SORT_ASC, $arrTourokuStockEndMaterials);
 
-				$material_idArray = array_column($arrTourokuStockEndMaterials, 'material_id');
-				$arrCountmaterials = array_count_values($material_idArray);//カウントする
+				$price_material_idArray = array_column($arrTourokuStockEndMaterials, 'price_material_id');
+				$arrCountmaterials = array_count_values($price_material_idArray);//カウントする
 
 				$lotdate = date('y').date('m').date('d');
 
@@ -112,13 +113,13 @@ class ApimaterialsController extends AppController
 					if($k == 0){//最初または前のidと違うときはロットナンバーを最初にする
 
 						$countStockEndMaterials = $this->StockEndMaterials->find()
-						->where(['material_id' => $arrTourokuStockEndMaterials[$k]["material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
+						->where(['price_material_id' => $arrTourokuStockEndMaterials[$k]["price_material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
 						$countLot = count($countStockEndMaterials) + 1;
 
-					}elseif($arrTourokuStockEndMaterials[$k]["material_id"] !== $arrTourokuStockEndMaterials[$k-1]["material_id"]){//新しい原料に変わったとき
+					}elseif($arrTourokuStockEndMaterials[$k]["price_material_id"] !== $arrTourokuStockEndMaterials[$k-1]["price_material_id"]){//新しい原料に変わったとき
 
 						$countStockEndMaterials = $this->StockEndMaterials->find()
-						->where(['material_id' => $arrTourokuStockEndMaterials[$k]["material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
+						->where(['price_material_id' => $arrTourokuStockEndMaterials[$k]["price_material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
 						$countLot = count($countStockEndMaterials) + 1;
 
 					}else{//idが前のidと同じとき
@@ -265,14 +266,14 @@ class ApimaterialsController extends AppController
 			$arrTourokuStockEndMaterials = array();//空の配列を作る
 			for($k=0; $k<count($arr["arrStockEndMaterials"]); $k++){//jsonを配列に変換
 
-				$Materials = $this->Materials->find()
+				$PriceMaterials = $this->PriceMaterials->find()
 				->where(['grade' => $arr["arrStockEndMaterials"][$k]["grade"], 'color' => $arr["arrStockEndMaterials"][$k]["color"]])->toArray();
 
 				$Users = $this->Users->find()
 				->where(['username' => $arr["arrStockEndMaterials"][$k]["username"]])->toArray();
 
 				$arrTourokuStockEndMaterials[] = [
-					'material_id' => $Materials[0]["id"],
+					'price_material_id' => $Materials[0]["id"],
 					'status_material' => $arr["arrStockEndMaterials"][$k]["status_material"],
 					'amount' => $arr["arrStockEndMaterials"][$k]["amount"],
 					'state' => $arr["arrStockEndMaterials"][$k]["state"],
@@ -285,12 +286,12 @@ class ApimaterialsController extends AppController
 			}
 
 			foreach ((array) $arrTourokuStockEndMaterials as $key => $value) {//並び替え
-				$sort[$key] = $value['material_id'];
+				$sort[$key] = $value['price_material_id'];
 			}
 			array_multisort($sort, SORT_ASC, $arrTourokuStockEndMaterials);
 
-			$material_idArray = array_column($arrTourokuStockEndMaterials, 'material_id');
-			$arrCountmaterials = array_count_values($material_idArray);//カウントする
+			$price_material_idArray = array_column($arrTourokuStockEndMaterials, 'price_material_id');
+			$arrCountmaterials = array_count_values($price_material_idArray);//カウントする
 
 			$lotdate = date('y').date('m').date('d');
 
@@ -299,13 +300,13 @@ class ApimaterialsController extends AppController
 				if($k == 0){//最初または前のidと違うときはロットナンバーを最初にする
 
 					$countStockEndMaterials = $this->StockEndMaterials->find()
-					->where(['material_id' => $arrTourokuStockEndMaterials[$k]["material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
+					->where(['price_material_id' => $arrTourokuStockEndMaterials[$k]["price_material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
 					$countLot = count($countStockEndMaterials) + 1;
 
-				}elseif($arrTourokuStockEndMaterials[$k]["material_id"] !== $arrTourokuStockEndMaterials[$k-1]["material_id"]){//新しい原料に変わったとき
+				}elseif($arrTourokuStockEndMaterials[$k]["price_material_id"] !== $arrTourokuStockEndMaterials[$k-1]["price_material_id"]){//新しい原料に変わったとき
 
 					$countStockEndMaterials = $this->StockEndMaterials->find()
-					->where(['material_id' => $arrTourokuStockEndMaterials[$k]["material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
+					->where(['price_material_id' => $arrTourokuStockEndMaterials[$k]["price_material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
 					$countLot = count($countStockEndMaterials) + 1;
 
 				}else{//idが前のidと同じとき
@@ -374,7 +375,7 @@ class ApimaterialsController extends AppController
 			}
 
 			$arrTourokuStockEndMaterials[] = [
-				'material_id' => 1,
+				'price_material_id' => 1,
 				'status_material' => 1,
 				'amount' => 1,
 				'lot_num' => $post_data['title']['grade'],
@@ -386,7 +387,7 @@ class ApimaterialsController extends AppController
 			];
 /*
 			$arrTourokuStockEndMaterials[] = [
-				'material_id' => 1,
+				'price_material_id' => 1,
 				'status_material' => 1,
 				'amount' => 1,
 				'lot_num' => $mess,

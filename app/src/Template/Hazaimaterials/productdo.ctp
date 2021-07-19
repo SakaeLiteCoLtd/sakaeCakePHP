@@ -18,7 +18,7 @@
 </table>
 <hr size="5" style="margin: 0.5rem">
 <br><br>
-<?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'materialdo']]) ?>
+<?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'menu']]) ?>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
@@ -33,22 +33,11 @@
 <br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">グレード</strong></td>
+    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">製品名</strong></td>
 	</tr>
   <tr>
     <td bgcolor="#FFFFCC" style="padding: 0.2rem">
-      <?= h($grade) ?>
-    </td>
-	</tr>
-</table>
-<br>
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-  <tr>
-    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">色</strong></td>
-	</tr>
-  <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem">
-      <?= h($color) ?>
+      <?= h($product_name) ?>
     </td>
 	</tr>
 </table>
@@ -78,16 +67,7 @@
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr>
-    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
-    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('登録', array('name' => 'hakkou')); ?></div></td>
+    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('TOP', array('name' => 'top')); ?></div></td>
   </tr>
 </table>
 <br><br><br><br><br><br><br>
-<?= $this->Form->control('username', array('type'=>'hidden', 'value'=>$username, 'label'=>false)) ?>
-<?= $this->Form->control('staff_name', array('type'=>'hidden', 'value'=>$staff_name, 'label'=>false)) ?>
-<?= $this->Form->control('grade', array('type'=>'hidden', 'value'=>$grade, 'label'=>false)) ?>
-<?= $this->Form->control('color', array('type'=>'hidden', 'value'=>$color, 'label'=>false)) ?>
-<?= $this->Form->control('price_material_id', array('type'=>'hidden', 'value'=>$price_material_id, 'label'=>false)) ?>
-<?= $this->Form->control('hyouji_status_material', array('type'=>'hidden', 'value'=>$hyouji_status_material, 'label'=>false)) ?>
-<?= $this->Form->control('status_material', array('type'=>'hidden', 'value'=>$status_material, 'label'=>false)) ?>
-<?= $this->Form->control('amount', array('type'=>'hidden', 'value'=>$amount, 'label'=>false)) ?>

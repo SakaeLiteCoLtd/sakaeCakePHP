@@ -31,7 +31,8 @@ if(!isset($_SESSION)){
 <?php if ($chesk_flag == 1): ?>
 <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr>
-<td style="border-style: none;"><div align="center"><?= $this->Form->submit('全てのチェックを外す', array('name' => 'alldel')); ?></div></td>
+  <td style="border-style: none;"><div align="center"><?= $this->Form->submit('全てのチェックを外す', array('name' => 'alldel')); ?></div></td>
+  <td style="border-style: none;"><div align="center">　　　</div></td>
 </tr>
 </table>
 <br><br><br>
@@ -48,8 +49,8 @@ if(!isset($_SESSION)){
               <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">ロットNo.</strong></div></td>
               <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">端材ステイタス</strong></div></td>
               <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">数量</strong></div></td>
-              <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">登録日</strong></div></td>
-              <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">登録者</strong></div></td>
+              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">登録日</strong></div></td>
+              <td width="100" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">登録者</strong></div></td>
               <td width="30" height="30" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue"></strong></div></td>
             </tr>
         </thead>
@@ -92,6 +93,7 @@ if(!isset($_SESSION)){
 <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr>
 <td style="border-style: none;"><div align="center"><?= $this->Form->submit('csv発行データ確認', array('name' => 'kakuninn')); ?></div></td>
+<td style="border-style: none;"><div align="center">　　　</div></td>
 </tr>
 </table>
 <br><br><br><br><br><br><br>

@@ -48,7 +48,7 @@ $(function() {
  </tr>
 </table>
 <hr size="5" style="margin: 0.5rem">
-<?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'materialformsyousai']]) ?>
+<?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'materialconfirm']]) ?>
 <br>
 <div align="center"><font color="red" size="3"><?= __($mess) ?></font></div>
 <legend align="center"><font color="black"><?= __("「製品名」または「原料グレード_色」を入力してください。") ?></font></legend>
@@ -117,3 +117,4 @@ $(function() {
 </table>
 <br><br><br><br><br><br><br>
 <?= $this->Form->control('username', array('type'=>'hidden', 'value'=>$username, 'label'=>false)) ?>
+<?= $this->Form->control('staff_name', array('type'=>'hidden', 'value'=>$staff_name, 'label'=>false)) ?>

@@ -8,8 +8,6 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 use Cake\Auth\DefaultPasswordHasher;//
 
-use App\myClass\hazaiploglam\htmlhazaicheck;
-
 use Cake\Routing\Router;//urlの取得
 use Cake\Http\Client;//httpの読取に必要
 
@@ -24,6 +22,7 @@ class HazaimaterialsController extends AppController {
    $this->Staffs = TableRegistry::get('staffs');
    $this->Users = TableRegistry::get('users');
    $this->Products = TableRegistry::get('products');
+//   $this->Materials = TableRegistry::get('materials');
    $this->PriceMaterials = TableRegistry::get('priceMaterials');
    $this->StockEndMaterials = TableRegistry::get('stockEndMaterials');
   }
@@ -291,60 +290,82 @@ class HazaimaterialsController extends AppController {
      $check_product = 1;
      $this->set('check_product', $check_product);
 
-     if(strlen($product_name) > 0 && strlen($materialgrade_color) > 0){//製品名と原料の両方入力されているとき
+     if(strlen($product_name) > 0 && strlen($materialgrade_color) > 0){
 
-       //$product_nameを送って配列を返してもらう
-      $htmlhazaicheck = new htmlhazaicheck();//クラスを使用
-      $arrhazaicheckproduct = $htmlhazaicheck->productcheck($product_name);
+       $Products = $this->Products->find()
+       ->where(['product_name' => $product_name, 'delete_flag' => 0])->toArray();
 
-      if($arrhazaicheckproduct["productcheck"] == 0){
+       if(isset($Products[0])){
 
-        $this->set('price_material_id', $arrhazaicheckproduct["price_material_id"]);
-        $this->set('materialgrade_color', $arrhazaicheckproduct["materialgrade_color"]);
+         $materialgrade_color = $Products[0]["m_grade"]."_".$Products[0]["col_num"];
+         $this->set('materialgrade_color', $materialgrade_color);
 
-      }else{
+         $PriceMaterials = $this->PriceMaterials->find()
+         ->where(['grade' => $Products[0]["m_grade"], 'color' => $Products[0]["col_num"], 'delete_flag' => 0])->toArray();
 
-        return $this->redirect(['action' => 'materialform',
-        's' => ['username' => $username, 'mess' => "製品名：「".$product_name."」の製品は製品登録されていません。"]]);
+         if(isset($PriceMaterials[0])){
 
-      }
+           $price_material_id = $PriceMaterials[0]["id"];
+           $this->set('price_material_id', $price_material_id);
 
-      //$grade_colorを送って配列を返してもらう
-      $grade_color = explode('_', $data["materialgrade_color"]);
+         }
 
-      $htmlhazaicheck = new htmlhazaicheck();//クラスを使用
-      $arrhazaicheckmaterial = $htmlhazaicheck->materialcheck($grade_color);
+       }else{
 
-      if($arrhazaicheckmaterial["materialcheck"] == 0){//okのとき
+         return $this->redirect(['action' => 'materialform',
+         's' => ['username' => $username, 'mess' => "製品名：「".$product_name."」の製品は製品登録されていません。"]]);
 
-        $this->set('price_material_id', $arrhazaicheckmaterial["price_material_id"]);
-        $this->set('materialgrade_color', $data["materialgrade_color"]);
+       }
 
-      }elseif($arrhazaicheckmaterial["materialcheck"] == 1){//PriceMaterialsになかった時
+       $grade_color = explode('_', $data["materialgrade_color"]);
+       $grade = $grade_color[0];
+       if(isset($grade_color[1])){
+         $color = $grade_color[1];
 
-        return $this->redirect(['action' => 'materialform',
-        's' => ['username' => $username, 'mess' => "「原料グレード_色」:「".$data["materialgrade_color"]."」の原料は原料登録されていません。"]]);
+         $PriceMaterials = $this->PriceMaterials->find()
+         ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
 
-      }else{//入力されてないとき
+         if(isset($PriceMaterials[0])){
 
-        return $this->redirect(['action' => 'materialform',
-        's' => ['username' => $username, 'mess' => "グレードと色を「_」（アンダーバー）でつないで入力してください。"]]);
+           $price_material_id = $PriceMaterials[0]["id"];
+           $this->set('price_material_id', $price_material_id);
 
-      }
+         }else{
+
+           return $this->redirect(['action' => 'materialform',
+           's' => ['username' => $username, 'mess' => "グレード：「".$grade."」、色：「".$color."」の原料は原料登録されていません。"]]);
+
+         }
+
+       }else{
+
+         return $this->redirect(['action' => 'materialform',
+         's' => ['username' => $username, 'mess' => "グレードと色を「_」（アンダーバー）でつないで入力してください。"]]);
+
+       }
 
        $mess = "※「製品名」と「原料グレード_色」が両方入力されました。製品に対応する「原料グレード_色」を自動で呼び出しています。";
        $this->set('mess', $mess);
 
-     }elseif(strlen($product_name) > 0){//製品名だけ入力されているとき
+     }elseif(strlen($product_name) > 0){
 
-       //$product_nameを送って配列を返してもらう
-       $htmlhazaicheck = new htmlhazaicheck();//クラスを使用
-       $arrhazaicheckproduct = $htmlhazaicheck->productcheck($product_name);
+       $Products = $this->Products->find()
+       ->where(['product_name' => $product_name, 'delete_flag' => 0])->toArray();
 
-       if($arrhazaicheckproduct["productcheck"] == 0){
+       if(isset($Products[0])){
 
-         $this->set('price_material_id', $arrhazaicheckproduct["price_material_id"]);
-         $this->set('materialgrade_color', $arrhazaicheckproduct["materialgrade_color"]);
+         $materialgrade_color = $Products[0]["m_grade"]."_".$Products[0]["col_num"];
+         $this->set('materialgrade_color', $materialgrade_color);
+
+         $PriceMaterials = $this->PriceMaterials->find()
+         ->where(['grade' => $Products[0]["m_grade"], 'color' => $Products[0]["col_num"], 'delete_flag' => 0])->toArray();
+
+         if(isset($PriceMaterials[0])){
+
+           $price_material_id = $PriceMaterials[0]["id"];
+           $this->set('price_material_id', $price_material_id);
+
+         }
 
        }else{
 
@@ -356,35 +377,39 @@ class HazaimaterialsController extends AppController {
        $mess = "※製品に対応する「原料グレード_色」を自動で呼び出しています。";
        $this->set('mess', $mess);
 
-     }elseif(strlen($materialgrade_color) > 0){//原料だけ入力されているとき
+     }elseif(strlen($materialgrade_color) > 0){
 
        $check_product = 0;
        $this->set('check_product', $check_product);
 
-       //$grade_colorを送って配列を返してもらう
        $grade_color = explode('_', $data["materialgrade_color"]);
+       $grade = $grade_color[0];
+       if(isset($grade_color[1])){
+         $color = $grade_color[1];
 
-       $htmlhazaicheck = new htmlhazaicheck();//クラスを使用
-       $arrhazaicheckmaterial = $htmlhazaicheck->materialcheck($grade_color);
+         $PriceMaterials = $this->PriceMaterials->find()
+         ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
 
-       if($arrhazaicheckmaterial["materialcheck"] == 0){//okのとき
+         if(isset($PriceMaterials[0])){
 
-         $this->set('price_material_id', $arrhazaicheckmaterial["price_material_id"]);
-         $this->set('materialgrade_color', $data["materialgrade_color"]);
+           $price_material_id = $PriceMaterials[0]["id"];
+           $this->set('price_material_id', $price_material_id);
 
-       }elseif($arrhazaicheckmaterial["materialcheck"] == 1){//PriceMaterialsになかった時
+         }else{
 
-         return $this->redirect(['action' => 'materialform',
-         's' => ['username' => $username, 'mess' => "「原料グレード_色」:「".$data["materialgrade_color"]."」の原料は原料登録されていません。"]]);
+           return $this->redirect(['action' => 'materialform',
+           's' => ['username' => $username, 'mess' => "グレード：「".$grade."」、色：「".$color."」の原料は原料登録されていません。"]]);
 
-       }else{//入力されてないとき
+         }
+
+       }else{
 
          return $this->redirect(['action' => 'materialform',
          's' => ['username' => $username, 'mess' => "グレードと色を「_」（アンダーバー）でつないで入力してください。"]]);
 
        }
 
-     }else{//両方入力されていないとき
+     }else{
 
        return $this->redirect(['action' => 'materialform',
        's' => ['username' => $username, 'mess' => "「製品名」と「原料グレード_色」がどちらも入力されていません。"]]);
@@ -395,8 +420,19 @@ class HazaimaterialsController extends AppController {
      $this->set('status_material', $status_material);
      $amount = $data["amount"];
 
-     $htmlhazaicheck = new htmlhazaicheck();//クラスを使用
-     $amount = $htmlhazaicheck->amountcheck($amount);
+     $countdot = mb_substr_count($amount, ".");
+     if($countdot > 1){
+       $amount = str_replace('.', '', $amount);
+     }
+
+     $dotini = substr($amount, 0, 1);
+     $dotend = substr($amount, -1, 1);
+
+     if($dotini == "."){
+       $amount = "0".$amount;
+     }elseif($dotend == "."){
+       $amount = $amount."0";
+     }
      $this->set('amount', $amount);
 
      if($status_material == 0){
@@ -876,7 +912,7 @@ class HazaimaterialsController extends AppController {
 
                 if($k == count($csvStockEndMaterials) - 1){//最後のデータが登録されたときにCSVを出力
   //                $fp = fopen('hazai/hazai.csv', 'w');//local
-                  $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');//192
+                  $fp = fopen('/home/centosuser/hazai_csv/hazai.csv', 'w');//192
 
                   foreach ($arrCsvs as $line) {
                     $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -911,7 +947,7 @@ class HazaimaterialsController extends AppController {
 
                 if($k == count($csvStockEndMaterials) - 1){//最後のデータが登録されたときにCSVを出力
   //                $fp = fopen('hazai/hazai.csv', 'w');//local
-                  $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');//192
+                  $fp = fopen('/home/centosuser/hazai_csv/hazai.csv', 'w');//192
 
                   foreach ($arrCsvs as $line) {
                     $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -1104,143 +1140,6 @@ class HazaimaterialsController extends AppController {
         //ロールバック8
           $connection->rollback();//トランザクション9
         }//トランザクション10
-
-     }
-
-     public function kensakuform()//ロット検索
-     {
-       $stockEndMaterials = $this->StockEndMaterials->newEntity();
-       $this->set('stockEndMaterials',$stockEndMaterials);
-
-       $Material_list = $this->PriceMaterials->find()
-       ->where(['delete_flag' => 0])->toArray();
-       $arrMaterial_list = array();
-       for($j=0; $j<count($Material_list); $j++){
-         array_push($arrMaterial_list,$Material_list[$j]["grade"]."_".$Material_list[$j]["color"]);
-       }
-       $arrMaterial_list = array_unique($arrMaterial_list);
-       $arrMaterial_list = array_values($arrMaterial_list);
-       $this->set('arrMaterial_list', $arrMaterial_list);
-     }
-
-     public function kensakuview()//ロット検索
-     {
-       $stockEndMaterials = $this->StockEndMaterials->newEntity();
-       $this->set('stockEndMaterials',$stockEndMaterials);
-
-       $data = $this->request->getData();
-
-       $grade_color = explode('_', $data["materialgrade_color"]);
-
-       $htmlhazaicheck = new htmlhazaicheck();//クラスを使用
-       $arrhazaicheckmaterial = $htmlhazaicheck->materialcheck($grade_color);
-
-       if($arrhazaicheckmaterial["materialcheck"] == 0){//okのとき
-
-         $price_material_id = $arrhazaicheckmaterial["price_material_id"];
-
-       }else{//PriceMaterialsになかった時
-
-         $price_material_id = "";
-
-       }
-
-       $lot_num = $data['lot_num'];
-       $date_sta = $data['date_sta'];
-       $date_fin = $data['date_fin'];
-
-       $date_sta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
-       $date_fin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
-
-       $date_fin = strtotime($date_fin);
-       $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
-
-       if($price_material_id > 0){
-
-         $StockEndMaterials = $this->StockEndMaterials->find()
-           ->where(['delete_flag' => '0','import_tab_at >=' => $date_sta, 'import_tab_at <=' => $date_fin,
-            'lot_num like' => '%'.$lot_num.'%', 'price_material_id' => $price_material_id])->toArray();
-
-       }else{
-
-         $StockEndMaterials = $this->StockEndMaterials->find()
-           ->where(['delete_flag' => '0','import_tab_at >=' => $date_sta, 'import_tab_at <=' => $date_fin,
-            'lot_num like' => '%'.$lot_num.'%'])->toArray();
-
-       }
-
-         //並べかえ
-         foreach($StockEndMaterials as $key => $row ) {
-           $tmp_hazai_array[$key] = $row["hazai"];
-           $tmp_lot_num_array[$key] = $row["lot_num"];
-         }
-
-         if(count($StockEndMaterials) > 0){
-           array_multisort($tmp_hazai_array, $tmp_lot_num_array, SORT_ASC, SORT_NUMERIC, $StockEndMaterials);
-         }
-
-        $arrStockEndMaterials = array();//空の配列を作る
-        for($k=0; $k<count($StockEndMaterials); $k++){
-
-          if($StockEndMaterials[$k]["price_material_id"] > 0){
-
-            $PriceMaterials = $this->PriceMaterials->find()
-            ->where(['id' => $StockEndMaterials[$k]["price_material_id"]])->toArray();
-            $grade = $PriceMaterials[0]["grade"];
-            $color = $PriceMaterials[0]["color"];
-
-            if($StockEndMaterials[$k]["status_material"] == 0){
-              $status_material = "バージン";
-            }elseif($StockEndMaterials[$k]["status_material"] == 1){
-              $status_material = "粉砕";
-            }else{
-              $status_material = "バージン＋粉砕";
-            }
-
-            $Staffs = $this->Staffs->find()
-            ->where(['id' => $StockEndMaterials[$k]["created_staff"]])->toArray();
-            $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
-
-            $arrStockEndMaterials[] = [
-              'hazai' => $grade."_".$color,
-              'lot_num' => $StockEndMaterials[$k]["lot_num"],
-              'status_material' => $status_material,
-              'amount' => $StockEndMaterials[$k]["amount"],
-              'created_at' => $StockEndMaterials[$k]["created_at"]->format('Y-n-j'),
-              'staff_name' => $staff_name,
-            ];
-
-          }elseif(strlen($StockEndMaterials[$k]["product_code"]) > 0){
-
-            $Products = $this->Products->find()
-            ->where(['product_code' => $StockEndMaterials[$k]["product_code"]])->toArray();
-            $product_name = $Products[0]["product_name"];
-
-            if($StockEndMaterials[$k]["status_material"] == 0){
-              $status_material = "バージン";
-            }elseif($StockEndMaterials[$k]["status_material"] == 1){
-              $status_material = "粉砕";
-            }else{
-              $status_material = "バージン＋粉砕";
-            }
-
-            $Staffs = $this->Staffs->find()
-            ->where(['id' => $StockEndMaterials[$k]["created_staff"]])->toArray();
-            $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
-
-            $arrStockEndMaterials[] = [
-              'hazai' => $product_name,
-              'lot_num' => $StockEndMaterials[$k]["lot_num"],
-              'status_material' => $status_material,
-              'amount' => $StockEndMaterials[$k]["amount"],
-              'created_at' => $StockEndMaterials[$k]["created_at"]->format('Y-n-j'),
-              'staff_name' => $staff_name,
-            ];
-
-          }
-
-        }
-        $this->set('arrStockEndMaterials',$arrStockEndMaterials);
 
      }
 

@@ -739,6 +739,39 @@ class LabelsController extends AppController
        }//トランザクション10
      }
    }
+
+   public function ikkatsupreadd()//210323
+  {
+    $KadouSeikeis = $this->KadouSeikeis->newEntity();
+    $this->set('KadouSeikeis',$KadouSeikeis);
+  }
+
+  public function ikkatsulogin()//210323
+  {
+    if ($this->request->is('post')) {
+      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+      $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+      $ary = explode(',', $str);//$strを配列に変換
+
+      $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+      //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+      $this->set('username', $username);
+      $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+        if(empty($Userdata)){
+          $delete_flag = "";
+        }else{
+          $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+          $this->set('delete_flag',$delete_flag);//登録者の表示のため
+        }
+          $user = $this->Auth->identify();
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'ikkatsupreform']);
+        }
+      }
+  }
+
    public function ikkatsupreform()//一括ラベル発行
    {
      //$this->request->session()->destroy(); // セッションの破棄
@@ -761,7 +794,6 @@ class LabelsController extends AppController
 	fclose($f);
 */
    }
-   
    public function ikkatsuform()//一括ラベル発行
    {
      if(!isset($_SESSION)){//sessionsyuuseituika
@@ -946,7 +978,7 @@ class LabelsController extends AppController
              $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
               'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
               'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
           }elseif(isset($LabelSetikkatsu1[0]) || isset($LabelSetikkatsu2[0])){//〇タイプCでなくセット取りの場合
       //      echo "<pre>";
@@ -965,7 +997,7 @@ class LabelsController extends AppController
              $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
               'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
               'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
               if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
         //        echo "<pre>";
@@ -999,7 +1031,7 @@ class LabelsController extends AppController
                 $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                  'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                  'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                 'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                 'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
                }
 
                 if(isset($LabelSetikkatsu1[0])){//セット取りのもう片方が$LabelSetikkatsu1[0]にあった場合
@@ -1028,7 +1060,7 @@ class LabelsController extends AppController
                      $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                       'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                       'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-                      'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                      'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
                       if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
                   //      echo "<pre>";
@@ -1060,7 +1092,7 @@ class LabelsController extends AppController
                         $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                          'product1' => $product_id2, 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                          'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                         'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                         'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
                        }
 
                 }else{//セット取りのもう片方が$LabelSetikkatsu2[0]にあった場合//OK
@@ -1086,7 +1118,7 @@ class LabelsController extends AppController
                      $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                       'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                       'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-                      'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                      'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
                       if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
                         $lotnumIN = "IN.".$lotnum;//inの時はirisuを外（irisu）÷内（num_inside）にする（konpouテーブルとinsideoutテーブル）
@@ -1117,7 +1149,7 @@ class LabelsController extends AppController
                         $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                          'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                          'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                         'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                         'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
                        }
               }
 
@@ -1133,7 +1165,7 @@ class LabelsController extends AppController
              $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
               'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
               'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+              'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
               if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
 
@@ -1163,7 +1195,7 @@ class LabelsController extends AppController
                 $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                  'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                  'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                 'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                 'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
                }
           }
 
@@ -1507,6 +1539,39 @@ class LabelsController extends AppController
     }
   }
 
+  public function kobetuformpreadd()//210323
+ {
+   $KadouSeikeis = $this->KadouSeikeis->newEntity();
+   $this->set('KadouSeikeis',$KadouSeikeis);
+ }
+
+ public function kobetuformlogin()//210323
+ {
+   if ($this->request->is('post')) {
+     $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+     $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+     $ary = explode(',', $str);//$strを配列に変換
+
+     $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+     //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+     $this->set('username', $username);
+     $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+       if(empty($Userdata)){
+         $delete_flag = "";
+       }else{
+         $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+         $this->set('delete_flag',$delete_flag);//登録者の表示のため
+       }
+         $user = $this->Auth->identify();
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'kobetuform']);
+       }
+     }
+ }
+
+
   public function kobetuform()//個別成形（時間なし）
   {
     session_start();
@@ -1619,7 +1684,7 @@ class LabelsController extends AppController
             $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
              'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
              'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-             'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+             'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
          }elseif(isset($LabelSetikkatsu1[0]) || isset($LabelSetikkatsu2[0])){//〇タイプCでなくセット取りの場合
            //まずセット取りの片方の行を登録
@@ -1634,7 +1699,7 @@ class LabelsController extends AppController
               $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-               'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+               'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
                if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
          //        echo "<pre>";
@@ -1667,7 +1732,7 @@ class LabelsController extends AppController
                  $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                   'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                   'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                  'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                  'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
                 }
 
                  if(isset($LabelSetikkatsu1[0])){//セット取りのもう片方が$LabelSetikkatsu1[0]にあった場合
@@ -1695,7 +1760,7 @@ class LabelsController extends AppController
                       $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                        'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                        'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-                       'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                       'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
                        if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
            //              echo "<pre>";
@@ -1726,7 +1791,7 @@ class LabelsController extends AppController
                          $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                           'product1' => $product_id2, 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                           'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                          'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                          'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
                         }
 
                  }else{//セット取りのもう片方が$LabelSetikkatsu2[0]にあった場合//OK
@@ -1751,7 +1816,7 @@ class LabelsController extends AppController
                       $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                        'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                        'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-                       'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                       'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
                        if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
        //                  echo "<pre>";
@@ -1782,7 +1847,7 @@ class LabelsController extends AppController
                          $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                           'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                           'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                          'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                          'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
                         }
                }
 
@@ -1798,7 +1863,7 @@ class LabelsController extends AppController
             $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
              'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
              'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-             'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+             'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
              if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
 
@@ -1828,7 +1893,7 @@ class LabelsController extends AppController
                $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                 'product1' => $_SESSION['labeljunbi']['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                 'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi']['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
               }
          }//修正
 
@@ -1934,6 +1999,40 @@ class LabelsController extends AppController
        $scheduleKouteis = $this->ScheduleKouteis->newEntity();
        $this->set('scheduleKouteis',$scheduleKouteis);
      }
+
+
+          public function kobetujikanformpreadd()//210323
+      		{
+           $KadouSeikeis = $this->KadouSeikeis->newEntity();
+           $this->set('KadouSeikeis',$KadouSeikeis);
+      		}
+
+         public function kobetujikanformlogin()//210323
+         {
+     			if ($this->request->is('post')) {
+     				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+     				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+     				$ary = explode(',', $str);//$strを配列に変換
+
+     				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+     				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+     				$this->set('username', $username);
+     				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+     					if(empty($Userdata)){
+     						$delete_flag = "";
+     					}else{
+     						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+     						$this->set('delete_flag',$delete_flag);//登録者の表示のため
+     					}
+     						$user = $this->Auth->identify();
+     					if ($user) {
+     						$this->Auth->setUser($user);
+     						return $this->redirect(['action' => 'kobetujikanform']);
+     					}
+     				}
+     		}
+
 
      public function kobetujikanform()//個別成形時間
      {
@@ -2114,7 +2213,7 @@ class LabelsController extends AppController
                $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                 'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                 'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
             }elseif(isset($LabelSetikkatsu1[0]) || isset($LabelSetikkatsu2[0])){//〇タイプCでなくセット取りの場合
         //      echo "<pre>";
@@ -2133,7 +2232,7 @@ class LabelsController extends AppController
                $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                 'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                 'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
                 if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0]))  && $InsideFuyou == 0){//INラベルが必要な場合
           //        echo "<pre>";
@@ -2167,7 +2266,7 @@ class LabelsController extends AppController
                   $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                    'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                    'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                   'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                   'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
                  }
 
                   if(isset($LabelSetikkatsu1[0])){//セット取りのもう片方が$LabelSetikkatsu1[0]にあった場合
@@ -2197,7 +2296,7 @@ class LabelsController extends AppController
                        $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                         'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                         'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-                        'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                        'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
                         if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])) && $InsideFuyou == 0){//INラベルが必要な場合
             //              echo "<pre>";
@@ -2229,7 +2328,7 @@ class LabelsController extends AppController
                           $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                            'product1' => $product_id2, 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                            'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                           'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                           'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
                          }
 
                   }else{//セット取りのもう片方が$LabelSetikkatsu2[0]にあった場合//OK
@@ -2256,7 +2355,7 @@ class LabelsController extends AppController
                        $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                         'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                         'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-                        'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                        'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
                         if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])) && $InsideFuyou == 0){//mb_substrだと文字化けしない//修正変更
         //                  echo "<pre>";
@@ -2288,7 +2387,7 @@ class LabelsController extends AppController
                           $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                            'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                            'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                           'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                           'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
                          }
                 }
 
@@ -2304,7 +2403,7 @@ class LabelsController extends AppController
                $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                 'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                 'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu), 'irisu2' => trim($irisu2), 'unit1' => trim($unit), 'unit2' => "",
-                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
 
                 if((mb_substr($costomerName, 0, 6) == "(株)ＤＮＰ" || isset($LabelInsideout1[0])) && $InsideFuyou == 0){//mb_substrだと文字化けしない//修正変更
 
@@ -2334,7 +2433,7 @@ class LabelsController extends AppController
                   $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
                    'product1' => $_SESSION['labeljunbi'][$i]['product_code'], 'product2' => $product_code2, 'name_pro1' => trim($product_name),
                    'name_pro2' => trim($product_name2), 'irisu1' => trim($irisu12), 'irisu2' => trim($irisu22), 'unit1' => trim($unit), 'unit2' => "",
-                   'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0];//unit2,line_code1...不要
+                   'line_code' => "", 'date' => $date, 'start_lot' => $_SESSION['labeljunbi'][$i]['hakoNo'], 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
                  }
             }
 
@@ -3076,6 +3175,38 @@ class LabelsController extends AppController
 
      }
 
+          public function hasupreadd()//210323
+         {
+           $KadouSeikeis = $this->KadouSeikeis->newEntity();
+           $this->set('KadouSeikeis',$KadouSeikeis);
+         }
+
+         public function hasulogin()//210323
+         {
+           if ($this->request->is('post')) {
+             $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+             $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+             $ary = explode(',', $str);//$strを配列に変換
+
+             $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+             //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+             $this->set('username', $username);
+             $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+               if(empty($Userdata)){
+                 $delete_flag = "";
+               }else{
+                 $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+                 $this->set('delete_flag',$delete_flag);//登録者の表示のため
+               }
+                 $user = $this->Auth->identify();
+               if ($user) {
+                 $this->Auth->setUser($user);
+                 return $this->redirect(['action' => 'hasuform']);
+               }
+             }
+         }
+
      public function hasuform()//ラベル発行の端数登録（日程絞り込み画面）
      {
        //$this->request->session()->destroy(); // セッションの破棄
@@ -3271,7 +3402,7 @@ class LabelsController extends AppController
          $arrCsvtouroku[] = ['number_sheet' => 0, 'hanbetsu' => $Layout, 'place1' => trim($place1), 'place2' => trim($place2),//trim…文字の前後の空白削除
           'product1' => $data['labelhasu'][$i]['product_code'], 'product2' => "", 'name_pro1' => trim($product_name),
           'name_pro2' => "", 'irisu1' => $data['labelhasu'][$i]['hasu'], 'irisu2' => "", 'unit1' => "", 'unit2' => "",
-          'line_code' => "", 'date' => $date, 'start_lot' => 1, 'delete_flag' => 0];//unit2,line_code1...不要
+          'line_code' => "", 'date' => $date, 'start_lot' => 1, 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
       }
 
   //    $fp = fopen('labels/label_hasu_200507.csv', 'w');

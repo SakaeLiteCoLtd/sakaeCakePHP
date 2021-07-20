@@ -45,7 +45,8 @@ class LabelsController extends AppController
        $this->MotoLots = TableRegistry::get('motoLots');
        $this->PlaceDelivers = TableRegistry::get('placeDelivers');
        $this->CheckLotsDoubles = TableRegistry::get('checkLotsDoubles');
-  //     $this->ScheduleKoutei = TableRegistry::get('scheduleKoutei');//DB_ikou_test必要なし
+       $this->PriceMaterials = TableRegistry::get('priceMaterials');
+       $this->StockEndMaterials = TableRegistry::get('stockEndMaterials');
  }
      public function indexMenu()
      {
@@ -53,9 +54,7 @@ class LabelsController extends AppController
        if(!isset($_SESSION)){//sessionsyuuseituika
        session_start();
        }
-
      }
-
      public function indexShinki()
      {
        //$this->request->session()->destroy(); // セッションの破棄
@@ -84,6 +83,7 @@ class LabelsController extends AppController
 
    public function layoutform()//レイアウト入力
    {
+
      $data = $this->request->getData();
      /*
      echo "<pre>";
@@ -121,12 +121,10 @@ class LabelsController extends AppController
      $labelTypeProducts = $this->LabelTypeProducts->newEntity();
      $this->set('labelTypeProducts',$labelTypeProducts);
 
-     //$this->request->session()->destroy(); // セッションの破棄
      if(!isset($_SESSION)){//sessionsyuuseituika
      session_start();
      }
      $_SESSION['labellayouts'] = array();
-
    }
 
    public function layoutpreadd()//レイアウトログイン
@@ -186,7 +184,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labellayouts']をinsert into label_type_productする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_type_product');
            $table->setConnection($connection);
 
@@ -210,7 +208,7 @@ class LabelsController extends AppController
 
    public function placeform()//納品場所入力
    {
-//     $this->request->session()->destroy(); // セッションの破棄
+     //$this->request->session()->destroy(); // セッションの破棄
      $labelElementPlaces = $this->LabelElementPlaces->newEntity();
      $this->set('labelElementPlaces',$labelElementPlaces);
    }
@@ -231,7 +229,6 @@ class LabelsController extends AppController
      session_start();
      }
      $_SESSION['labelplaces'] = array();
-
    }
 
    public function placepreadd()//納品場所ログイン
@@ -292,7 +289,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelplaces']をinsert into label_element_placeする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_element_place');
            $table->setConnection($connection);
 
@@ -315,7 +312,7 @@ class LabelsController extends AppController
 
    public function nashiform()//ラベル無し入力
    {
-    // $this->request->session()->destroy(); // セッションの破棄
+     //$this->request->session()->destroy(); // セッションの破棄
      $labelNashies = $this->LabelNashies->newEntity();
      $this->set('labelNashies',$labelNashies);
    }
@@ -400,7 +397,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_nashiする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_nashi');
            $table->setConnection($connection);
 
@@ -422,7 +419,7 @@ class LabelsController extends AppController
 
    public function setikkatsuform()//セット取り入力
    {
-    // $this->request->session()->destroy(); // セッションの破棄
+     //$this->request->session()->destroy(); // セッションの破棄
      $labelSetikkatsues = $this->LabelSetikkatsues->newEntity();
      $this->set('labelSetikkatsues',$labelSetikkatsues);
    }
@@ -519,7 +516,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_setikkatsuする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_setikkatsu');
            $table->setConnection($connection);
 
@@ -542,7 +539,7 @@ class LabelsController extends AppController
 
    public function insideoutform()//外箱中身入力
    {
-  //   $this->request->session()->destroy(); // セッションの破棄
+     //$this->request->session()->destroy(); // セッションの破棄
      $labelInsideouts = $this->LabelInsideouts->newEntity();
      $this->set('labelInsideouts',$labelInsideouts);
    }
@@ -630,7 +627,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_setikkatsuする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_insideout');
            $table->setConnection($connection);
 
@@ -652,7 +649,7 @@ class LabelsController extends AppController
 
    public function unitform()//数量単位入力
    {
-  //   $this->request->session()->destroy(); // セッションの破棄
+     //$this->request->session()->destroy(); // セッションの破棄
      $labelElementUnits = $this->LabelElementUnits->newEntity();
      $this->set('labelElementUnits',$labelElementUnits);
    }
@@ -724,7 +721,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_element_unitする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_element_unit');
            $table->setConnection($connection);
 
@@ -778,11 +775,11 @@ class LabelsController extends AppController
 
    public function ikkatsupreform()//一括ラベル発行
    {
-  //   $this->request->session()->destroy(); // セッションの破棄
-  if(!isset($_SESSION)){//sessionsyuuseituika
-  session_start();
-  }
-  $_SESSION['labeljunbi'] = array();
+     //$this->request->session()->destroy(); // セッションの破棄
+     if(!isset($_SESSION)){//sessionsyuuseituika
+     session_start();
+     }
+     $_SESSION['labeljunbi'] = array();
 
      $scheduleKouteis = $this->ScheduleKouteis->newEntity();
      $this->set('scheduleKouteis',$scheduleKouteis);
@@ -798,14 +795,12 @@ class LabelsController extends AppController
 	fclose($f);
 */
    }
-
-
    public function ikkatsuform()//一括ラベル発行
    {
      if(!isset($_SESSION)){//sessionsyuuseituika
      session_start();
      }
-     //     $_SESSION['labeljunbi'] = array();
+//     $_SESSION['labeljunbi'] = array();
 
      $KadouSeikeis = $this->KadouSeikeis->newEntity();
      $this->set('KadouSeikeis',$KadouSeikeis);
@@ -1235,7 +1230,7 @@ class LabelsController extends AppController
                    $connection->commit();// コミット5
 
                    //insert into label_csvする
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('label_csv');
                    $table->setConnection($connection);
 
@@ -1323,7 +1318,7 @@ class LabelsController extends AppController
      }
 
      $i = 1;
-     if($i == 1){//DB_ikou_testを使う
+     if($i == 1){//sakaeMotoDBを使う
        /*
        $connection = ConnectionManager::get('DB_ikou_test');
        $table = TableRegistry::get('scheduleKoutei');
@@ -1339,14 +1334,13 @@ class LabelsController extends AppController
 /*
           $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM schedule_koutei".
                 " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
 
           echo "<pre>";
           print_r($scheduleKoutei);
           echo "</pre>";
 */
-
           $scheduleKoutei = $this->ScheduleKouteis->find()->where(['datetime >=' => $dateYMDs, 'datetime <=' => $dateYMDf, 'seikeiki' => $j, 'delete_flag' => 0])->toArray();
 
           ${"arrP".$j} = array();
@@ -1396,7 +1390,6 @@ class LabelsController extends AppController
                   $this->set('arrP'.$j.$m1,${"arrP".$j.$m1});//セット
                 }
             }
-
           }
         }
 
@@ -1494,7 +1487,7 @@ class LabelsController extends AppController
 
     public function logout()
 		{
-	//		$this->request->session()->destroy(); // セッションの破棄
+      //$this->request->session()->destroy(); // セッションの破棄
 			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
 		}
 
@@ -1932,7 +1925,7 @@ class LabelsController extends AppController
                   $connection->commit();// コミット5
 
                   //insert into label_csvする
-                  $connection = ConnectionManager::get('DB_ikou_test');
+                  $connection = ConnectionManager::get('sakaeMotoDB');
                   $table = TableRegistry::get('label_csv');
                   $table->setConnection($connection);
 
@@ -2003,42 +1996,44 @@ class LabelsController extends AppController
 
      public function kobetupreform()//個別成形時間
      {
-    //   $this->request->session()->destroy(); // セッションの破棄
+       //$this->request->session()->destroy(); // セッションの破棄
        $scheduleKouteis = $this->ScheduleKouteis->newEntity();
        $this->set('scheduleKouteis',$scheduleKouteis);
      }
 
-     public function kobetujikanformpreadd()//210323
- 		{
-      $KadouSeikeis = $this->KadouSeikeis->newEntity();
-      $this->set('KadouSeikeis',$KadouSeikeis);
- 		}
 
-    public function kobetujikanformlogin()//210323
-    {
-			if ($this->request->is('post')) {
-				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-				$ary = explode(',', $str);//$strを配列に変換
+          public function kobetujikanformpreadd()//210323
+      		{
+           $KadouSeikeis = $this->KadouSeikeis->newEntity();
+           $this->set('KadouSeikeis',$KadouSeikeis);
+      		}
 
-				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-				$this->set('username', $username);
-				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+         public function kobetujikanformlogin()//210323
+         {
+     			if ($this->request->is('post')) {
+     				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+     				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+     				$ary = explode(',', $str);//$strを配列に変換
 
-					if(empty($Userdata)){
-						$delete_flag = "";
-					}else{
-						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-						$this->set('delete_flag',$delete_flag);//登録者の表示のため
-					}
-						$user = $this->Auth->identify();
-					if ($user) {
-						$this->Auth->setUser($user);
-						return $this->redirect(['action' => 'kobetujikanform']);
-					}
-				}
-		}
+     				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+     				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+     				$this->set('username', $username);
+     				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+
+     					if(empty($Userdata)){
+     						$delete_flag = "";
+     					}else{
+     						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+     						$this->set('delete_flag',$delete_flag);//登録者の表示のため
+     					}
+     						$user = $this->Auth->identify();
+     					if ($user) {
+     						$this->Auth->setUser($user);
+     						return $this->redirect(['action' => 'kobetujikanform']);
+     					}
+     				}
+     		}
+
 
      public function kobetujikanform()//個別成形時間
      {
@@ -2048,7 +2043,7 @@ class LabelsController extends AppController
        $data = $this->request->getData();//postデータを$dataに
 /*
        echo "<pre>";
-       print_r($_SESSION["Auth"]["User"]["staff_id"]);
+       print_r($data);
        echo "</pre>";
 */
         if(isset($data['touroku'])){//csv確認おしたとき
@@ -2452,11 +2447,7 @@ class LabelsController extends AppController
           	fputcsv($fp, $line);
           }
             fclose($fp);
-/*
-            echo "<pre>";
-            print_r($arrCsvtouroku);
-            echo "</pre>";
-*/
+
             $labelCsvs = $this->LabelCsvs->newEntity();
             $this->set('labelCsvs',$labelCsvs);
              if ($this->request->is('post')) {
@@ -2471,7 +2462,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5
 
                      //insert into label_csvする
-                     $connection = ConnectionManager::get('DB_ikou_test');
+                     $connection = ConnectionManager::get('sakaeMotoDB');
                      $table = TableRegistry::get('label_csv');
                      $table->setConnection($connection);
 
@@ -2609,6 +2600,8 @@ class LabelsController extends AppController
        $session = $this->request->getSession();
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
+       $mes = "";
+       $this->set('mes',$mes);
 
        if ($this->request->is('post')) {
          $source_file = $_FILES['file']['tmp_name'];
@@ -2618,6 +2611,7 @@ class LabelsController extends AppController
           for($count = 0; fgets( $fpcount ); $count++ );
           $arrFp = array();//空の配列を作る
           $arrLot = array();//空の配列を作る
+          $arrLotHazai = array();//空の配列を作る
           $created_staff = $this->Auth->user('staff_id');
           for ($k=1; $k<=$count; $k++) {//最後の行まで
             $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
@@ -2636,7 +2630,13 @@ class LabelsController extends AppController
                 }else{
                   $flag_used = 0;
                 }
-                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+
+                if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                }else{
+                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
+                }
+
               }
               for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
                 $renban = $arrFp[$k-1][5] + $m;
@@ -2647,7 +2647,13 @@ class LabelsController extends AppController
                 }else{
                   $flag_used = 0;
                 }
-                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+
+                if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                }else{
+                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
+                }
+
               }
             }else{//product_codeが１つの時
               $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
@@ -2660,64 +2666,62 @@ class LabelsController extends AppController
                 }else{
                   $flag_used = 0;
                 }
-                $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+
+                if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                }else{
+                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
+                }
+
               }
+
             }
-        }
-/*
-//ファイル名の変更実験
-        $file_test = $_FILES['file']['name'];
-        $toFile = "copy_".$file_test;
-//        echo "<pre>";
-//        print_r($_FILES['file']);
-//        echo "</pre>";
-        echo "<pre>";
-        print_r("元々：".$file_test."  登録用：".$toFile);
-        echo "</pre>";
 
-    //    if (copy($_FILES['file']['tmp_name'], "copy_".$_FILES['file']['name'])) {//copyはいける//webrootにファイルのコピーが作成される
-    //    if (copy($_FILES['file']['tmp_name'], 'test20200213/'."copy_200213.txt")) {//webrootのフォルダにcopyが作成される
-        if (copy($_FILES['file']['tmp_name'], '/home/centosuser/test20200213/'.$toFile)) {
-          echo 'コピーしました！';
-        }else{
-          echo 'コピーできない！';
         }
-*/
-/*
-      //if (rename('labels/furiwake111.txt', 'EDI/furiwake111.txt')) {//1回できたが、「Device or resource busy」のエラーが発生
-      //if (rename('/home/centosuser/EDI/'.$file_test, '/home/centosuser/EDI/'.$toFile)) {
-      if (copy('test20200213/'.$file_test, 'test20200213/'.$toFile)) {//copyはいける
-        echo 'コピーしました。';
-        if (unlink('test20200213/'.$file_test)) {//unlinkは「Device or resource busy」のエラーが発生（たまにできる時もある）
-          echo '削除しました。';
-        } else {
-          echo '削除できない！';
-        }
-      }else{
-        echo 'コピーできない！';
-      }
 
-      if (rename('test20200213/'.$file_test, 'test19080501/'.$toFile)) {//renameは「Device or resource busy」のエラーが発生（たまにできる時もある）
-        echo '移動しました。';
-      } else {
-        echo '移動できない！';
-      }
-*/
-/*
-      echo "<pre>";
-      print_r(count($arrLot));
-      echo "</pre>";
-*/
+        $arrLotHazaitouroku = array();//空の配列を作る
+        for ($k=0; $k<count($arrLotHazai); $k++){
+
+          $arrhazai = explode('_', $arrLotHazai[$k]['hazai']);
+
+          if(isset($arrhazai[1])){//grade_colorの場合
+
+            $grade = $arrhazai[0];
+            $color = $arrhazai[1];
+
+            $PriceMaterials = $this->PriceMaterials->find()
+            ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+
+            $StockEndMaterials = $this->StockEndMaterials->find()
+            ->where(["price_material_id" => $PriceMaterials[0]["id"], 'lot_num' => $arrLotHazai[$k]["lot_num"], 'status_import_tab' => 1, 'delete_flag' => 0])->toArray();
+
+            if(isset($StockEndMaterials[0])){
+
+              $arr_StockEndMaterials_id = array('StockEndMaterialsId' => $StockEndMaterials[0]["id"]);
+              $arrLotHazai[$k] = array_merge($arr_StockEndMaterials_id, $arrLotHazai[$k]);
+              $arrLotHazaitouroku[] = $arrLotHazai[$k];
+
+            }
+
+          }
+
+        }
+
       $count = count($arrLot);
       for($i = 0 ; $i < $count ; $i++){
           $tmp_arr[$arrLot[$i]['datetime_hakkou'].'_'.$arrLot[$i]['product_code'].'_'.$arrLot[$i]['lot_num']]
            = $tmp_arr[$arrLot[$i]['datetime_hakkou'].'_'.$arrLot[$i]['product_code'].'_'.$arrLot[$i]['lot_num']]??$i;
       }
-      foreach($tmp_arr as $v){
-          $arrLotunique[$v] = $arrLot[$v];
-      }
 
-      $arrLot = $arrLotunique;
+      if(count($arrLot) > 0){
+
+        foreach($tmp_arr as $v){
+            $arrLotunique[$v] = $arrLot[$v];
+        }
+
+        $arrLot = $arrLotunique;
+
+      }
 
       $count = 0;
       for($k=0; $k<count($arrLot); $k++){
@@ -2754,14 +2758,7 @@ class LabelsController extends AppController
             'second_created_time' => date('Y-m-d H:i:s'),'second_created_staff' => $arrLot[$k]["created_staff"],'delete_flag' => 0];
 
           }else{
-            /*
-            ${"CheckLottourokuzumiproduct_code".$k} = "";
-            $this->set('CheckLottourokuzumiproduct_code'.$k,${"CheckLottourokuzumiproduct_code".$k});
-            ${"CheckLottourokuzumilot_num".$k} = "";
-            $this->set('CheckLottourokuzumilot_num'.$k,${"CheckLottourokuzumilot_num".$k});
-            $counttourokuzumi = $counttourokuzumi + 1;
-            $this->set('counttourokuzumi',$counttourokuzumi);
-            */
+
             $arrLotmitouroku[] = $arrLot[$k];
             $mes = "※以下のロットは既に登録されています。他のロットは登録されました。";
             $this->set('mes',$mes);
@@ -2771,21 +2768,20 @@ class LabelsController extends AppController
           $arrLot = $arrLotmitouroku;
         }
       }
-
 /*
       echo "<pre>";
-      print_r("登録されるデータの個数　＝　".count($arrLot));
+      print_r($arrLotHazai);
       echo "</pre>";
-
       echo "<pre>";
-      print_r($arrLotdouble);
+      print_r($arrLotHazaitouroku);
       echo "</pre>";
 */
-
           if(isset($arrLotdouble[0])){
             $CheckLotsDoubles = $this->CheckLotsDoubles->patchEntities($this->CheckLotsDoubles->newEntity(), $arrLotdouble);
             $this->CheckLotsDoubles->saveMany($CheckLotsDoubles);
           }
+
+          if(count($arrLot) > 0){
 
            $checkLots = $this->CheckLots->newEntity();
            $this->set('checkLots',$checkLots);
@@ -2801,7 +2797,7 @@ class LabelsController extends AppController
                $this->set('mes',$mes);
 
                //$arrLotをinsert into check_lotsする
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('check_lots');
                $table->setConnection($connection);
 
@@ -2831,8 +2827,48 @@ class LabelsController extends AppController
              $connection->rollback();//トランザクション9
            }//トランザクション10
 
-        }
+         }
 
+        if(count($arrLotHazaitouroku) > 0){
+
+          $StockEndMaterials = $this->StockEndMaterials->patchEntity($this->StockEndMaterials->newEntity(), $arrLotHazaitouroku);
+          $connection = ConnectionManager::get('default');//トランザクション1
+           // トランザクション開始2
+           $connection->begin();//トランザクション3
+           try {//トランザクション4
+
+             for($k=0; $k<count($arrLotHazaitouroku); $k++){
+
+               if ($this->StockEndMaterials->updateAll(
+                 ['import_tab_staff' => $created_staff, 'import_tab_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $created_staff],
+                 ['id'  => $arrLotHazaitouroku[$k]["StockEndMaterialsId"]]
+               )){
+
+                 if($k == count($arrLotHazaitouroku) - 1){
+
+                   $mes = $mes."※端材ロットが登録されました。";
+                   $this->set('mes',$mes);
+                   $connection->commit();// コミット5
+
+                 }
+
+               } else {
+
+                 $this->Flash->error(__('The product could not be saved. Please, try again.'));
+                 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+               }
+
+             }
+
+           } catch (Exception $e) {//トランザクション7
+           //ロールバック8
+             $connection->rollback();//トランザクション9
+           }//トランザクション10
+
+         }
+
+       }
 
      }
 
@@ -2869,14 +2905,14 @@ class LabelsController extends AppController
 
     public function fushiyouMenu()
 		{
-  //    $this->request->session()->destroy(); // セッションの破棄
+      //$this->request->session()->destroy(); // セッションの破棄
       $checkLots = $this->CheckLots->newEntity();
       $this->set('checkLots',$checkLots);
 		}
 
     public function fushiyoupreadd()
 		{
-  //    $this->request->session()->destroy(); // セッションの破棄
+      //$this->request->session()->destroy(); // セッションの破棄
       $checkLots = $this->CheckLots->newEntity();
       $this->set('checkLots',$checkLots);
 		}
@@ -2963,6 +2999,7 @@ class LabelsController extends AppController
        $data = $this->request->getData();
        $maisuu = $data["maisuu"];
 
+
        $CheckLots = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
          ->where(['product_code' => $data["product_code"], 'lot_num' => $data["lot_num_0"]])->toArray();
        if(isset($CheckLots[0])){//新DBにデータがある場合ダブル更新
@@ -2987,7 +3024,7 @@ class LabelsController extends AppController
              $mes = "不使用ロットが登録されました";
              $this->set('mes',$mes);
 
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('check_lots');
              $table->setConnection($connection);
 
@@ -3004,13 +3041,13 @@ class LabelsController extends AppController
        }else{//新DBにデータがない場合旧DBのみ更新
 
          for($i=0; $i<$maisuu; $i++){
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('check_lots');
            $table->setConnection($connection);
 
            $sql = "SELECT datetime_hakkou,lot_num,product_id,amount,flag_used,flag_deliver FROM check_lots".
                  " where product_id ='".$data["product_code"]."' and lot_num = '".$data["lot_num_".$i]."'";
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $checkLot = $connection->execute($sql)->fetchAll('assoc');
 /*
            echo "<pre>";
@@ -3077,7 +3114,7 @@ class LabelsController extends AppController
 
      public function kensakuform()//ロット検索
      {
-  //     $this->request->session()->destroy(); // セッションの破棄
+       //$this->request->session()->destroy(); // セッションの破棄
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
      }
@@ -3097,11 +3134,11 @@ class LabelsController extends AppController
 
        $date_fin = strtotime($date_fin);
        $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
-
+/*
        $connection = ConnectionManager::get('DB_ikou_test');
        $table = TableRegistry::get('check_lots');
        $table->setConnection($connection);
-/*
+
        $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM check_lots".
              " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
        $connection = ConnectionManager::get('DB_ikou_test');
@@ -3184,41 +3221,41 @@ class LabelsController extends AppController
 
      }
 
-     public function hasupreadd()//210323
-    {
-      $KadouSeikeis = $this->KadouSeikeis->newEntity();
-      $this->set('KadouSeikeis',$KadouSeikeis);
-    }
+          public function hasupreadd()//210323
+         {
+           $KadouSeikeis = $this->KadouSeikeis->newEntity();
+           $this->set('KadouSeikeis',$KadouSeikeis);
+         }
 
-    public function hasulogin()//210323
-    {
-      if ($this->request->is('post')) {
-        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-        $ary = explode(',', $str);//$strを配列に変換
+         public function hasulogin()//210323
+         {
+           if ($this->request->is('post')) {
+             $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+             $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+             $ary = explode(',', $str);//$strを配列に変換
 
-        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-        $this->set('username', $username);
-        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+             $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+             //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+             $this->set('username', $username);
+             $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
 
-          if(empty($Userdata)){
-            $delete_flag = "";
-          }else{
-            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-            $this->set('delete_flag',$delete_flag);//登録者の表示のため
-          }
-            $user = $this->Auth->identify();
-          if ($user) {
-            $this->Auth->setUser($user);
-            return $this->redirect(['action' => 'hasuform']);
-          }
-        }
-    }
+               if(empty($Userdata)){
+                 $delete_flag = "";
+               }else{
+                 $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+                 $this->set('delete_flag',$delete_flag);//登録者の表示のため
+               }
+                 $user = $this->Auth->identify();
+               if ($user) {
+                 $this->Auth->setUser($user);
+                 return $this->redirect(['action' => 'hasuform']);
+               }
+             }
+         }
 
      public function hasuform()//ラベル発行の端数登録（日程絞り込み画面）
      {
-  //     $this->request->session()->destroy();// セッションの破棄
+       //$this->request->session()->destroy(); // セッションの破棄
        $orderEdis = $this->OrderEdis->newEntity();
        $this->set('orderEdis',$orderEdis);
      }
@@ -3436,7 +3473,7 @@ class LabelsController extends AppController
                  $connection->commit();// コミット5
 
                  //insert into label_csvする
-                 $connection = ConnectionManager::get('DB_ikou_test');
+                 $connection = ConnectionManager::get('sakaeMotoDB');
                  $table = TableRegistry::get('label_csv');
                  $table->setConnection($connection);
 /*
@@ -3480,7 +3517,7 @@ class LabelsController extends AppController
 
      public function hasulotstafftouroku()
     {
-  //    $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy(); // セッションの破棄
       $MotoLots = $this->MotoLots->newEntity();
       $this->set('MotoLots',$MotoLots);
 
@@ -3555,8 +3592,10 @@ class LabelsController extends AppController
         $this->set('amount',$amount);
         $lot_num = $ary[4];
         $this->set('lot_num',$lot_num);
-        $staff_id = $data["staff_id"];
+        $staff_id = $ary[7];
         $this->set('staff_id',$staff_id);
+
+
         $staffData = $this->Staffs->find()->where(['id' => $staff_id])->toArray();
         $Staff = $staffData[0]->staff_code." : ".$staffData[0]->f_name." ".$staffData[0]->l_name;
         $this->set('Staff',$Staff);
@@ -3665,7 +3704,6 @@ class LabelsController extends AppController
              $amount_sum = $amount_sum + ${"amount_moto".$i};
              $this->set('amount_sum',$amount_sum);
 
-//AWW1097A1ZH0,,176,HHS.210125-001,210125
              ${"CheckLot".$i} = $this->CheckLots->find()->where(['lot_num' => ${"lot_moto".$i},  'product_code' => ${"product_moto".$i}])->toArray();
 
              if(isset(${"CheckLot".$i}[0])){
@@ -3863,7 +3901,7 @@ class LabelsController extends AppController
             $connection->commit();// コミット5
 
             //insert into order_ediする
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('moto_lots');
             $table->setConnection($connection);
 
@@ -3898,7 +3936,7 @@ class LabelsController extends AppController
 
     public function hasukensakuform()
    {
-//     $this->request->session()->destroy();// セッションの破棄
+     //$this->request->session()->destroy(); // セッションの破棄
      $MotoLots = $this->MotoLots->newEntity();
      $this->set('MotoLots',$MotoLots);
    }
@@ -3946,12 +3984,12 @@ class LabelsController extends AppController
 
       public function genzaijoukyoumenu()
      {
-    //   $this->request->session()->destroy();// セッションの破棄
+       //$this->request->session()->destroy(); // セッションの破棄
      }
 
      public function genzaijoukyouform()
     {
-  //    $this->request->session()->destroy();// セッションの破棄
+      //$this->request->session()->destroy(); // セッションの破棄
       $checkLots = $this->CheckLots->newEntity();
       $this->set('checkLots',$checkLots);
     }
@@ -4033,7 +4071,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5ここに持ってくる//これを旧DBの登録の後に持ってきたら新DBに登録されない（トランザクションが途中で途切れる？）
 
                      //insert 旧update
-                     $connection = ConnectionManager::get('DB_ikou_test');
+                     $connection = ConnectionManager::get('sakaeMotoDB');
                      $table = TableRegistry::get('order_edi');
                      $table->setConnection($connection);
 
@@ -4131,7 +4169,7 @@ class LabelsController extends AppController
 
         public function syukkajoukyouform()
        {
-    //     $this->request->session()->destroy();// セッションの破棄
+         //$this->request->session()->destroy(); // セッションの破棄
          $orderEdis = $this->OrderEdis->newEntity();
          $this->set('orderEdis',$orderEdis);
        }
@@ -4350,7 +4388,7 @@ class LabelsController extends AppController
 
     public function doubletourokuform()
    {
-  //   $this->request->session()->destroy();// セッションの破棄
+     //$this->request->session()->destroy(); // セッションの破棄
      $CheckLotsDoubles = $this->CheckLotsDoubles->newEntity();
      $this->set('CheckLotsDoubles',$CheckLotsDoubles);
 
@@ -4366,7 +4404,7 @@ class LabelsController extends AppController
 
    public function doubletourokuichiran()
   {
-//    $this->request->session()->destroy();// セッションの破棄
+    //$this->request->session()->destroy(); // セッションの破棄
     $CheckLotsDoubles = $this->CheckLotsDoubles->newEntity();
     $this->set('CheckLotsDoubles',$CheckLotsDoubles);
 

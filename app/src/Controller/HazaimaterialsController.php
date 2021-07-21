@@ -33,137 +33,110 @@ class HazaimaterialsController extends AppController {
      $stockEndMaterials = $this->StockEndMaterials->newEntity();
      $this->set('stockEndMaterials',$stockEndMaterials);
 
-     $StockEndMaterials = $this->StockEndMaterials->find()
+     $StockEndMaterials = $this->StockEndMaterials->find()//CSV未出力データ
      ->where(['status_import_tab' => 0, 'delete_flag' => 0])->toArray();
 
      $arrStockEndMaterials = array();//空の配列を作る
      for($k=0; $k<count($StockEndMaterials); $k++){
 
-       if($StockEndMaterials[$k]["price_material_id"] > 0){
+       $PriceMaterials = $this->PriceMaterials->find()
+       ->where(['id' => $StockEndMaterials[$k]["price_material_id"]])->toArray();
+       $grade = $PriceMaterials[0]["grade"];
+       $color = $PriceMaterials[0]["color"];
 
-         $PriceMaterials = $this->PriceMaterials->find()
-         ->where(['id' => $StockEndMaterials[$k]["price_material_id"]])->toArray();
-         $grade = $PriceMaterials[0]["grade"];
-         $color = $PriceMaterials[0]["color"];
-
-         if($StockEndMaterials[$k]["status_material"] == 0){
-           $status_material = "バージン";
-         }elseif($StockEndMaterials[$k]["status_material"] == 1){
-           $status_material = "粉砕";
-         }else{
-           $status_material = "バージン＋粉砕";
-         }
-
-         $Staffs = $this->Staffs->find()
-         ->where(['id' => $StockEndMaterials[$k]["created_staff"]])->toArray();
-         $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
-
-         $arrStockEndMaterials[] = [
-           'hazai' => $grade."_".$color,
-           'lot_num' => $StockEndMaterials[$k]["lot_num"],
-           'status_material' => $status_material,
-           'amount' => $StockEndMaterials[$k]["amount"],
-           'created_at' => $StockEndMaterials[$k]["created_at"]->format('Y-n-j'),
-           'staff_name' => $staff_name,
-         ];
-
-       }elseif(strlen($StockEndMaterials[$k]["product_code"]) > 0){
-
-         $Products = $this->Products->find()
-         ->where(['product_code' => $StockEndMaterials[$k]["product_code"]])->toArray();
-         $product_name = $Products[0]["product_name"];
-
-         if($StockEndMaterials[$k]["status_material"] == 0){
-           $status_material = "バージン";
-         }elseif($StockEndMaterials[$k]["status_material"] == 1){
-           $status_material = "粉砕";
-         }else{
-           $status_material = "バージン＋粉砕";
-         }
-
-         $Staffs = $this->Staffs->find()
-         ->where(['id' => $StockEndMaterials[$k]["created_staff"]])->toArray();
-         $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
-
-         $arrStockEndMaterials[] = [
-           'hazai' => $product_name,
-           'lot_num' => $StockEndMaterials[$k]["lot_num"],
-           'status_material' => $status_material,
-           'amount' => $StockEndMaterials[$k]["amount"],
-           'created_at' => $StockEndMaterials[$k]["created_at"]->format('Y-n-j'),
-           'staff_name' => $staff_name,
-         ];
-
+       if($StockEndMaterials[$k]["status_material"] == 0){
+         $status_material = "バージン";
+       }elseif($StockEndMaterials[$k]["status_material"] == 1){
+         $status_material = "粉砕";
+       }else{
+         $status_material = "バージン＋粉砕";
        }
+
+       $Staffs = $this->Staffs->find()
+       ->where(['id' => $StockEndMaterials[$k]["created_staff"]])->toArray();
+       $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
+
+       $arrStockEndMaterials[] = [
+         'hazai' => $grade."_".$color,
+         'lot_num' => $StockEndMaterials[$k]["lot_num"],
+         'status_material' => $status_material,
+         'amount' => $StockEndMaterials[$k]["amount"],
+         'created_at' => $StockEndMaterials[$k]["created_at"]->format('Y-n-j'),
+         'staff_name' => $staff_name,
+       ];
 
      }
      $this->set('arrStockEndMaterials',$arrStockEndMaterials);
 
-     $tabStockEndMaterials = $this->StockEndMaterials->find()
+     $tabStockEndMaterials = $this->StockEndMaterials->find()//TABファイル未取込データ
      ->where(['status_import_tab' => 1, 'import_tab_staff IS' => NULL, 'delete_flag' => 0])->toArray();
 
      $arrtabStockEndMaterials = array();//空の配列を作る
      for($k=0; $k<count($tabStockEndMaterials); $k++){
 
-       if($tabStockEndMaterials[$k]["price_material_id"] > 0){
+       $PriceMaterials = $this->PriceMaterials->find()
+       ->where(['id' => $tabStockEndMaterials[$k]["price_material_id"]])->toArray();
+       $grade = $PriceMaterials[0]["grade"];
+       $color = $PriceMaterials[0]["color"];
 
-         $PriceMaterials = $this->PriceMaterials->find()
-         ->where(['id' => $tabStockEndMaterials[$k]["price_material_id"]])->toArray();
-         $grade = $PriceMaterials[0]["grade"];
-         $color = $PriceMaterials[0]["color"];
-
-         if($tabStockEndMaterials[$k]["status_material"] == 0){
-           $status_material = "バージン";
-         }elseif($tabStockEndMaterials[$k]["status_material"] == 1){
-           $status_material = "粉砕";
-         }else{
-           $status_material = "バージン＋粉砕";
-         }
-
-         $Staffs = $this->Staffs->find()
-         ->where(['id' => $tabStockEndMaterials[$k]["created_staff"]])->toArray();
-         $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
-
-         $arrtabStockEndMaterials[] = [
-           'hazai' => $grade."_".$color,
-           'lot_num' => $tabStockEndMaterials[$k]["lot_num"],
-           'status_material' => $status_material,
-           'amount' => $tabStockEndMaterials[$k]["amount"],
-           'created_at' => $tabStockEndMaterials[$k]["created_at"]->format('Y-n-j'),
-           'staff_name' => $staff_name,
-         ];
-
-       }elseif(strlen($tabStockEndMaterials[$k]["product_code"]) > 0){
-
-         $Products = $this->Products->find()
-         ->where(['product_code' => $tabStockEndMaterials[$k]["product_code"]])->toArray();
-         $product_name = $Products[0]["product_name"];
-
-         if($tabStockEndMaterials[$k]["status_material"] == 0){
-           $status_material = "バージン";
-         }elseif($tabStockEndMaterials[$k]["status_material"] == 1){
-           $status_material = "粉砕";
-         }else{
-           $status_material = "バージン＋粉砕";
-         }
-
-         $Staffs = $this->Staffs->find()
-         ->where(['id' => $tabStockEndMaterials[$k]["created_staff"]])->toArray();
-         $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
-
-         $arrtabStockEndMaterials[] = [
-           'hazai' => $product_name,
-           'lot_num' => $tabStockEndMaterials[$k]["lot_num"],
-           'status_material' => $status_material,
-           'amount' => $tabStockEndMaterials[$k]["amount"],
-           'created_at' => $tabStockEndMaterials[$k]["created_at"]->format('Y-n-j'),
-           'staff_name' => $staff_name,
-         ];
-
+       if($tabStockEndMaterials[$k]["status_material"] == 0){
+         $status_material = "バージン";
+       }elseif($tabStockEndMaterials[$k]["status_material"] == 1){
+         $status_material = "粉砕";
+       }else{
+         $status_material = "バージン＋粉砕";
        }
+
+       $Staffs = $this->Staffs->find()
+       ->where(['id' => $tabStockEndMaterials[$k]["created_staff"]])->toArray();
+       $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
+
+       $arrtabStockEndMaterials[] = [
+         'hazai' => $grade."_".$color,
+         'lot_num' => $tabStockEndMaterials[$k]["lot_num"],
+         'status_material' => $status_material,
+         'amount' => $tabStockEndMaterials[$k]["amount"],
+         'created_at' => $tabStockEndMaterials[$k]["created_at"]->format('Y-n-j'),
+         'staff_name' => $staff_name,
+       ];
 
      }
      $this->set('arrtabStockEndMaterials',$arrtabStockEndMaterials);
+
+     $shippedStockEndMaterials = $this->StockEndMaterials->find()//出荷待ちデータ
+     ->where(['status_import_tab' => 1, 'import_tab_staff >=' => 0, 'shiped_staff IS' => NULL, 'delete_flag' => 0])->toArray();
+
+     $arrshippedStockEndMaterials = array();//空の配列を作る
+     for($k=0; $k<count($shippedStockEndMaterials); $k++){
+
+       $PriceMaterials = $this->PriceMaterials->find()
+       ->where(['id' => $shippedStockEndMaterials[$k]["price_material_id"]])->toArray();
+       $grade = $PriceMaterials[0]["grade"];
+       $color = $PriceMaterials[0]["color"];
+
+       if($shippedStockEndMaterials[$k]["status_material"] == 0){
+         $status_material = "バージン";
+       }elseif($shippedStockEndMaterials[$k]["status_material"] == 1){
+         $status_material = "粉砕";
+       }else{
+         $status_material = "バージン＋粉砕";
+       }
+
+       $Staffs = $this->Staffs->find()
+       ->where(['id' => $shippedStockEndMaterials[$k]["created_staff"]])->toArray();
+       $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
+
+       $arrshippedStockEndMaterials[] = [
+         'hazai' => $grade."_".$color,
+         'lot_num' => $shippedStockEndMaterials[$k]["lot_num"],
+         'status_material' => $status_material,
+         'amount' => $shippedStockEndMaterials[$k]["amount"],
+         'created_at' => $shippedStockEndMaterials[$k]["created_at"]->format('Y-n-j'),
+         'staff_name' => $staff_name,
+       ];
+
+     }
+     $this->set('arrshippedStockEndMaterials',$arrshippedStockEndMaterials);
 
    }
 
@@ -234,7 +207,7 @@ class HazaimaterialsController extends AppController {
      ->where(['delete_flag' => 0])->toArray();
      $arrProduct_list = array();
      for($j=0; $j<count($Product_list); $j++){
-       array_push($arrProduct_list,$Product_list[$j]["product_name"]);
+       array_push($arrProduct_list,$Product_list[$j]["product_code"]);
      }
      $arrProduct_list = array_unique($arrProduct_list);
      $arrProduct_list = array_values($arrProduct_list);
@@ -277,8 +250,8 @@ class HazaimaterialsController extends AppController {
      $this->set('username', $username);
      $staff_name = $data["staff_name"];
      $this->set('staff_name', $staff_name);
-     $product_name = $data["product_name"];
-     $this->set('product_name', $product_name);
+     $product_code = $data["product_code"];
+     $this->set('product_code', $product_code);
      $materialgrade_color = $data["materialgrade_color"];
      $this->set('materialgrade_color', $materialgrade_color);
 
@@ -291,11 +264,11 @@ class HazaimaterialsController extends AppController {
      $check_product = 1;
      $this->set('check_product', $check_product);
 
-     if(strlen($product_name) > 0 && strlen($materialgrade_color) > 0){//製品名と原料の両方入力されているとき
+     if(strlen($product_code) > 0 && strlen($materialgrade_color) > 0){//品番と原料の両方入力されているとき
 
-       //$product_nameを送って配列を返してもらう
+       //$product_codeを送って配列を返してもらう
       $htmlhazaicheck = new htmlhazaicheck();//クラスを使用
-      $arrhazaicheckproduct = $htmlhazaicheck->productcheck($product_name);
+      $arrhazaicheckproduct = $htmlhazaicheck->productcheck($product_code);
 
       if($arrhazaicheckproduct["productcheck"] == 0){
 
@@ -305,7 +278,7 @@ class HazaimaterialsController extends AppController {
       }else{
 
         return $this->redirect(['action' => 'materialform',
-        's' => ['username' => $username, 'mess' => "製品名：「".$product_name."」の製品は製品登録されていません。"]]);
+        's' => ['username' => $username, 'mess' => "品番：「".$product_code."」の製品は製品登録されていません。"]]);
 
       }
 
@@ -332,14 +305,14 @@ class HazaimaterialsController extends AppController {
 
       }
 
-       $mess = "※「製品名」と「原料グレード_色」が両方入力されました。製品に対応する「原料グレード_色」を自動で呼び出しています。";
+       $mess = "※「品番」と「原料グレード_色」が両方入力されました。製品に対応する「原料グレード_色」を自動で呼び出しています。";
        $this->set('mess', $mess);
 
-     }elseif(strlen($product_name) > 0){//製品名だけ入力されているとき
+     }elseif(strlen($product_code) > 0){//品番だけ入力されているとき
 
-       //$product_nameを送って配列を返してもらう
+       //$product_codeを送って配列を返してもらう
        $htmlhazaicheck = new htmlhazaicheck();//クラスを使用
-       $arrhazaicheckproduct = $htmlhazaicheck->productcheck($product_name);
+       $arrhazaicheckproduct = $htmlhazaicheck->productcheck($product_code);
 
        if($arrhazaicheckproduct["productcheck"] == 0){
 
@@ -349,7 +322,7 @@ class HazaimaterialsController extends AppController {
        }else{
 
          return $this->redirect(['action' => 'materialform',
-         's' => ['username' => $username, 'mess' => "製品名：「".$product_name."」の製品は製品登録されていません。"]]);
+         's' => ['username' => $username, 'mess' => "品番：「".$product_code."」の製品は製品登録されていません。"]]);
 
        }
 
@@ -387,7 +360,7 @@ class HazaimaterialsController extends AppController {
      }else{//両方入力されていないとき
 
        return $this->redirect(['action' => 'materialform',
-       's' => ['username' => $username, 'mess' => "「製品名」と「原料グレード_色」がどちらも入力されていません。"]]);
+       's' => ['username' => $username, 'mess' => "「品番」と「原料グレード_色」がどちらも入力されていません。"]]);
 
      }
 
@@ -429,8 +402,8 @@ class HazaimaterialsController extends AppController {
      $this->set('staff_name', $staff_name);
      $materialgrade_color = $data["materialgrade_color"];
      $this->set('materialgrade_color', $materialgrade_color);
-     $product_name = $data["product_name"];
-     $this->set('product_name', $product_name);
+     $product_code = $data["product_code"];
+     $this->set('product_code', $product_code);
      $price_material_id = $data["price_material_id"];
      $this->set('price_material_id', $price_material_id);
      $status_material = $data["status_material"];
@@ -450,11 +423,6 @@ class HazaimaterialsController extends AppController {
      $postdata = array();//空の配列を作る
 
      if($check_product == 1){//product_codeの入力がある時
-
-       $Products = $this->Products->find()
-       ->where(['product_name' => $product_name, 'delete_flag' => 0])->toArray();
-       $product_code = $Products[0]["product_code"];
-       $this->set('product_code', $product_code);
 
        $postdata = [
          'product_code' => $product_code,
@@ -672,9 +640,7 @@ class HazaimaterialsController extends AppController {
 
        }elseif(strlen($StockEndMaterials[$k]["product_code"]) > 0){
 
-         $Products = $this->Products->find()
-         ->where(['product_code' => $StockEndMaterials[$k]["product_code"]])->toArray();
-         $hazai = $Products[0]["product_name"];
+         $hazai = $StockEndMaterials[$k]["product_code"];
 
        }
 
@@ -733,20 +699,16 @@ class HazaimaterialsController extends AppController {
      for($k=0; $k<=$data["nummax"]; $k++){
        if(isset($data["check".$k])){//checkがついているもの
 
-         if($StockEndMaterials[$k]["price_material_id"] > 0){
+         $PriceMaterials = $this->PriceMaterials->find()
+         ->where(['id' => $StockEndMaterials[$k]["price_material_id"]])->toArray();
+         $grade = $PriceMaterials[0]["grade"];
+         $color = $PriceMaterials[0]["color"];
+         $hazai = $grade."_".$color;
 
-           $PriceMaterials = $this->PriceMaterials->find()
-           ->where(['id' => $StockEndMaterials[$k]["price_material_id"]])->toArray();
-           $grade = $PriceMaterials[0]["grade"];
-           $color = $PriceMaterials[0]["color"];
-           $hazai = $grade."_".$color;
-
-         }elseif(strlen($StockEndMaterials[$k]["product_code"]) > 0){
-
-           $Products = $this->Products->find()
-           ->where(['product_code' => $StockEndMaterials[$k]["product_code"]])->toArray();
-           $hazai = $Products[0]["product_name"];
-
+         if(strlen($StockEndMaterials[$k]["product_code"]) > 0){
+           $product_code = $StockEndMaterials[$k]["product_code"];
+         }else{
+           $product_code = "";
          }
 
          if($StockEndMaterials[$k]["status_material"] == 0){
@@ -762,6 +724,7 @@ class HazaimaterialsController extends AppController {
          $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
 
          $csvStockEndMaterials[] = [
+           'product_code' => $product_code,
            'hazai' => $hazai,
            'status_material' => $status_material,
            'lot_num' => $StockEndMaterials[$k]["lot_num"],
@@ -825,8 +788,7 @@ class HazaimaterialsController extends AppController {
        $lot_num = mb_substr($csvStockEndMaterials[$k]['lot_num'], 0, 6);
        $lot_renban = (int)mb_substr($csvStockEndMaterials[$k]['lot_num'], 8, 3);
 
-       $arrhazai = explode('_', $csvStockEndMaterials[$k]['hazai']);
-       if(isset($arrhazai[1])){//grade_colorの場合
+       if(strlen($csvStockEndMaterials[$k]["product_code"]) < 1){//grade_colorの場合
          $hazai = $csvStockEndMaterials[$k]['hazai'];
 
          $arrCsvs[] = ['maisu' => 1, 'layout' => "B", 'lotnum' => $lot_num,
@@ -836,15 +798,11 @@ class HazaimaterialsController extends AppController {
 
        }else{//製品の場合
 
-         $Products = $this->Products->find()
-         ->where(['product_name' => $csvStockEndMaterials[$k]["hazai"]])->toArray();
-         $hazai = $Products[0]["product_code"];
-         $grade = $Products[0]["m_grade"];
-         $color = $Products[0]["col_num"];
+         $hazai = $csvStockEndMaterials[$k]['hazai'];
 
          $arrCsvs[] = ['maisu' => 1, 'layout' => "B", 'lotnum' => $lot_num,
-          'renban' => $lot_renban, 'place1' => $hazai, 'place2' => "",
-          'product_code' => $grade."_".$color, 'product_code2' => "", 'product_name' => $status_material,
+          'renban' => $lot_renban, 'place1' => $csvStockEndMaterials[$k]["product_code"], 'place2' => "",
+          'product_code' => $hazai, 'product_code2' => "", 'product_name' => $status_material,
           'product_name2' => "", 'irisu' => $csvStockEndMaterials[$k]['amount'], 'irisu2' => "", 'unit' => "", 'unit2' => "", 'line_code1' => ""];
 
        }
@@ -901,7 +859,7 @@ class HazaimaterialsController extends AppController {
             }else{//製品の場合
 
               $Products = $this->Products->find()
-              ->where(['product_name' => $csvStockEndMaterials[$k]["hazai"], 'delete_flag' => 0])->toArray();
+              ->where(['product_code' => $csvStockEndMaterials[$k]["hazai"], 'delete_flag' => 0])->toArray();
               $product_code = $Products[0]["product_code"];
 
               if ($this->StockEndMaterials->updateAll(//検査終了時間の更新
@@ -944,7 +902,7 @@ class HazaimaterialsController extends AppController {
 
    }
 
-   public function torikomilogin()
+   public function torikomilogin()//210720不使用ラベルメニューの取込を使用
    {
      $stockEndMaterials = $this->StockEndMaterials->newEntity();
      $this->set('stockEndMaterials',$stockEndMaterials);
@@ -959,7 +917,7 @@ class HazaimaterialsController extends AppController {
      }
    }
 
-   public function torikomiselect()
+   public function torikomiselect()//210720不使用ラベルメニューの取込を使用
    {
      $stockEndMaterials = $this->StockEndMaterials->newEntity();
      $this->set('stockEndMaterials',$stockEndMaterials);
@@ -986,7 +944,7 @@ class HazaimaterialsController extends AppController {
 
     }
 
-    public function torikomiselectdo()
+    public function torikomiselectdo()//210720不使用ラベルメニューの取込を使用
     {
       $stockEndMaterials = $this->StockEndMaterials->newEntity();
       $this->set('stockEndMaterials',$stockEndMaterials);
@@ -1121,6 +1079,14 @@ class HazaimaterialsController extends AppController {
        $arrMaterial_list = array_unique($arrMaterial_list);
        $arrMaterial_list = array_values($arrMaterial_list);
        $this->set('arrMaterial_list', $arrMaterial_list);
+
+       $arrShipped = [
+         '0' => '',
+         '1' => '出荷済み',
+         '2' => '出荷待ち'
+               ];
+       $this->set('arrShipped',$arrShipped);
+
      }
 
      public function kensakuview()//ロット検索
@@ -1154,18 +1120,54 @@ class HazaimaterialsController extends AppController {
 
        $date_fin = strtotime($date_fin);
        $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
-
+/*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+*/
        if($price_material_id > 0){
 
-         $StockEndMaterials = $this->StockEndMaterials->find()
-           ->where(['delete_flag' => '0','import_tab_at >=' => $date_sta, 'import_tab_at <=' => $date_fin,
-            'lot_num like' => '%'.$lot_num.'%', 'price_material_id' => $price_material_id])->toArray();
+         if($data["shippedflag"] == 1){//出荷済み
+
+           $StockEndMaterials = $this->StockEndMaterials->find()
+             ->where(['delete_flag' => '0','import_tab_at >=' => $date_sta, 'import_tab_at <=' => $date_fin, 'shiped_staff >=' => 0,
+              'lot_num like' => '%'.$lot_num.'%', 'price_material_id' => $price_material_id])->toArray();
+
+         }elseif($data["shippedflag"] == 2){//出荷待ち
+
+           $StockEndMaterials = $this->StockEndMaterials->find()
+             ->where(['delete_flag' => '0','import_tab_at >=' => $date_sta, 'import_tab_at <=' => $date_fin, 'shiped_staff IS' => NULL,
+              'lot_num like' => '%'.$lot_num.'%', 'price_material_id' => $price_material_id])->toArray();
+
+         }else{//選択なし
+
+           $StockEndMaterials = $this->StockEndMaterials->find()
+             ->where(['delete_flag' => '0','import_tab_at >=' => $date_sta, 'import_tab_at <=' => $date_fin,
+              'lot_num like' => '%'.$lot_num.'%', 'price_material_id' => $price_material_id])->toArray();
+
+         }
 
        }else{
 
-         $StockEndMaterials = $this->StockEndMaterials->find()
-           ->where(['delete_flag' => '0','import_tab_at >=' => $date_sta, 'import_tab_at <=' => $date_fin,
-            'lot_num like' => '%'.$lot_num.'%'])->toArray();
+         if($data["shippedflag"] == 1){//出荷済み
+
+           $StockEndMaterials = $this->StockEndMaterials->find()
+             ->where(['delete_flag' => '0','import_tab_at >=' => $date_sta, 'import_tab_at <=' => $date_fin, 'shiped_staff >=' => 0,
+              'lot_num like' => '%'.$lot_num.'%'])->toArray();
+
+         }elseif($data["shippedflag"] == 2){//出荷待ち
+
+           $StockEndMaterials = $this->StockEndMaterials->find()
+             ->where(['delete_flag' => '0','import_tab_at >=' => $date_sta, 'import_tab_at <=' => $date_fin, 'shiped_staff IS' => NULL,
+              'lot_num like' => '%'.$lot_num.'%'])->toArray();
+
+         }else{//選択なし
+
+           $StockEndMaterials = $this->StockEndMaterials->find()
+             ->where(['delete_flag' => '0','import_tab_at >=' => $date_sta, 'import_tab_at <=' => $date_fin,
+              'lot_num like' => '%'.$lot_num.'%'])->toArray();
+
+         }
 
        }
 
@@ -1182,65 +1184,237 @@ class HazaimaterialsController extends AppController {
         $arrStockEndMaterials = array();//空の配列を作る
         for($k=0; $k<count($StockEndMaterials); $k++){
 
-          if($StockEndMaterials[$k]["price_material_id"] > 0){
+          $PriceMaterials = $this->PriceMaterials->find()
+          ->where(['id' => $StockEndMaterials[$k]["price_material_id"]])->toArray();
+          $grade = $PriceMaterials[0]["grade"];
+          $color = $PriceMaterials[0]["color"];
 
-            $PriceMaterials = $this->PriceMaterials->find()
-            ->where(['id' => $StockEndMaterials[$k]["price_material_id"]])->toArray();
-            $grade = $PriceMaterials[0]["grade"];
-            $color = $PriceMaterials[0]["color"];
-
-            if($StockEndMaterials[$k]["status_material"] == 0){
-              $status_material = "バージン";
-            }elseif($StockEndMaterials[$k]["status_material"] == 1){
-              $status_material = "粉砕";
-            }else{
-              $status_material = "バージン＋粉砕";
-            }
-
-            $Staffs = $this->Staffs->find()
-            ->where(['id' => $StockEndMaterials[$k]["created_staff"]])->toArray();
-            $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
-
-            $arrStockEndMaterials[] = [
-              'hazai' => $grade."_".$color,
-              'lot_num' => $StockEndMaterials[$k]["lot_num"],
-              'status_material' => $status_material,
-              'amount' => $StockEndMaterials[$k]["amount"],
-              'created_at' => $StockEndMaterials[$k]["created_at"]->format('Y-n-j'),
-              'staff_name' => $staff_name,
-            ];
-
-          }elseif(strlen($StockEndMaterials[$k]["product_code"]) > 0){
-
-            $Products = $this->Products->find()
-            ->where(['product_code' => $StockEndMaterials[$k]["product_code"]])->toArray();
-            $product_name = $Products[0]["product_name"];
-
-            if($StockEndMaterials[$k]["status_material"] == 0){
-              $status_material = "バージン";
-            }elseif($StockEndMaterials[$k]["status_material"] == 1){
-              $status_material = "粉砕";
-            }else{
-              $status_material = "バージン＋粉砕";
-            }
-
-            $Staffs = $this->Staffs->find()
-            ->where(['id' => $StockEndMaterials[$k]["created_staff"]])->toArray();
-            $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
-
-            $arrStockEndMaterials[] = [
-              'hazai' => $product_name,
-              'lot_num' => $StockEndMaterials[$k]["lot_num"],
-              'status_material' => $status_material,
-              'amount' => $StockEndMaterials[$k]["amount"],
-              'created_at' => $StockEndMaterials[$k]["created_at"]->format('Y-n-j'),
-              'staff_name' => $staff_name,
-            ];
-
+          if($StockEndMaterials[$k]["status_material"] == 0){
+            $status_material = "バージン";
+          }elseif($StockEndMaterials[$k]["status_material"] == 1){
+            $status_material = "粉砕";
+          }else{
+            $status_material = "バージン＋粉砕";
           }
+
+          $Staffs = $this->Staffs->find()
+          ->where(['id' => $StockEndMaterials[$k]["created_staff"]])->toArray();
+          $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
+
+          $arrStockEndMaterials[] = [
+            'hazai' => $grade."_".$color,
+            'lot_num' => $StockEndMaterials[$k]["lot_num"],
+            'status_material' => $status_material,
+            'shiped_staff' => $StockEndMaterials[$k]["shiped_staff"],
+            'amount' => $StockEndMaterials[$k]["amount"],
+            'created_at' => $StockEndMaterials[$k]["created_at"]->format('Y-n-j'),
+            'staff_name' => $staff_name,
+          ];
 
         }
         $this->set('arrStockEndMaterials',$arrStockEndMaterials);
+
+     }
+
+     public function shippedlogin()
+     {
+       $stockEndMaterials = $this->StockEndMaterials->newEntity();
+       $this->set('stockEndMaterials',$stockEndMaterials);
+
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }else{
+         $mess = "";
+         $this->set('mess',$mess);
+       }
+     }
+
+     public function shippedform()
+     {
+       $stockEndMaterials = $this->StockEndMaterials->newEntity();
+       $this->set('stockEndMaterials',$stockEndMaterials);
+
+       $data = $this->request->getData();
+
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $username = $Data["username"];
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }else{
+         $data = $this->request->getData();
+         $mess = "";
+         $this->set('mess',$mess);
+       }
+
+       if(isset($data["username"])){//登録者の確認
+
+         $ary = explode(',', $data["username"]);
+         $username = $ary[0];
+
+         $Users = $this->Users->find()
+         ->where(['username' => $username])->toArray();
+
+         if(!isset($Users[0])){
+
+           return $this->redirect(['action' => 'shippedlogin',
+           's' => ['mess' => "社員コードが間違っています。もう一度やり直してください。"]]);
+
+         }
+
+       }
+       $this->set('username', $username);
+
+       $Users = $this->Users->find()
+       ->where(['username' => $username])->toArray();
+       $Staffs = $this->Staffs->find()
+       ->where(['id' => $Users[0]["staff_id"]])->toArray();
+       $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
+       $this->set('staff_name', $staff_name);
+
+       if(!isset($_SESSION)){
+         session_start();
+         header('Expires:-1');
+         header('Cache-Control:');
+         header('Pragma:');
+       }
+
+     }
+
+     public function shippedconfirm()
+     {
+       $stockEndMaterials = $this->StockEndMaterials->newEntity();
+       $this->set('stockEndMaterials',$stockEndMaterials);
+
+       $data = $this->request->getData();
+       $username = $data["username"];
+       $this->set('username',$username);
+       $staff_name = $data["staff_name"];
+       $this->set('staff_name',$staff_name);
+/*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+*/
+       $arrshippeddata = explode(',', $data['shippeddata']);
+       $materialgrade_color = $arrshippeddata[0];
+
+       if(isset($arrshippeddata[4])){
+
+         $lot_num = $arrshippeddata[4];
+
+       }else{
+
+         return $this->redirect(['action' => 'shippedform',
+         's' => ['username' => $username, 'mess' => "端材が読み込まれません。正しいラベルか確認してください。"]]);
+
+       }
+
+       $this->set('materialgrade_color',$materialgrade_color);
+       $this->set('lot_num',$lot_num);
+
+       $arrhazai = explode('_', $materialgrade_color);
+
+       $grade = $arrhazai[0];
+
+       if(isset($arrhazai[1])){
+         $color = $arrhazai[1];
+       }else{
+
+         return $this->redirect(['action' => 'shippedform',
+         's' => ['username' => $username, 'mess' => "端材が読み込まれません。正しいラベルか確認してください。"]]);
+
+       }
+
+       $check_stock_end = 0;
+
+       $PriceMaterials = $this->PriceMaterials->find()
+       ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+
+       if(isset($PriceMaterials[0])){
+
+         $StockEndMaterials = $this->StockEndMaterials->find()
+         ->where(["price_material_id" => $PriceMaterials[0]['id'], 'lot_num' => $lot_num,
+          'import_tab_staff >=' => 0, 'delete_flag' => 0])->toArray();
+
+          if(isset($StockEndMaterials[0])){
+
+            $check_stock_end = 1;
+            $this->set('StockEndMaterialsId',$StockEndMaterials[0]["id"]);
+
+          }
+
+       }
+
+       if($check_stock_end == 0){
+
+         return $this->redirect(['action' => 'shippedform',
+         's' => ['username' => $username, 'mess' => "読み込まれたデータはTAB取込されていません。"]]);
+
+       }
+
+       if(!isset($_SESSION)){
+         session_start();
+         header('Expires:-1');
+         header('Cache-Control:');
+         header('Pragma:');
+       }
+
+     }
+
+     public function shippeddo()
+     {
+       $stockEndMaterials = $this->StockEndMaterials->newEntity();
+       $this->set('stockEndMaterials',$stockEndMaterials);
+
+       $data = $this->request->getData();
+       $username = $data["username"];
+       $this->set('username',$username);
+       $staff_name = $data["staff_name"];
+       $this->set('staff_name',$staff_name);
+       $materialgrade_color = $data["materialgrade_color"];
+       $this->set('materialgrade_color',$materialgrade_color);
+       $lot_num = $data["lot_num"];
+       $this->set('lot_num',$lot_num);
+
+       $Users = $this->Users->find()
+       ->where(['username' => $username])->toArray();
+       $staff_id = $Users[0]["staff_id"];
+/*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+*/
+       $StockEndMaterials = $this->StockEndMaterials->patchEntity($this->StockEndMaterials->newEntity(), $data);
+       $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+        $connection->begin();//トランザクション3
+        try {//トランザクション4
+          if ($this->StockEndMaterials->updateAll(//検査終了時間の更新
+            ['shiped_staff' => $staff_id, 'shiped_at' => date('Y-m-d H:i:s'),
+             'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $staff_id],
+            ['id'  => $data["StockEndMaterialsId"]]
+          )){
+
+          $mes = "※登録されました";
+          $this->set('mes',$mes);
+          $connection->commit();// コミット5
+
+        } else {
+
+          $mes = "※登録されませんでした";
+          $this->set('mes',$mes);
+          $this->Flash->error(__('The product could not be saved. Please, try again.'));
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+        }
+
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
 
      }
 

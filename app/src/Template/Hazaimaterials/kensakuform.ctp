@@ -44,9 +44,10 @@
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
     <tr style="border-bottom: 0px;border-width: 0px">
-      <td width="200" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">端材（原料グレード_色）</strong></div></td>
-      <td width="200" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">ロットＮｏ．</strong></div></td>
-      <td width="350" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">ロット発行日</strong></div></td>
+      <td width="100" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">出荷</strong></div></td>
+      <td width="150" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">端材（原料グレード_色）</strong></div></td>
+      <td width="150" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">ロットＮｏ．</strong></div></td>
+      <td width="250" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">ロット発行日</strong></div></td>
     </tr>
 
 <?php
@@ -55,12 +56,14 @@
       $dayye = date('Y-m-d', strtotime('-1 day', $dateYMD1));
 
       echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-
 ?>
 
-      <td rowspan='2'  height='6' colspan='20'>
-        <?= $this->Form->control('materialgrade_color', array('type'=>'text', 'label'=>false, 'id'=>"material_list", 'autofocus'=>true)) ?>
-      </td>
+<td rowspan='2'  height='6' colspan='20'>
+  <?= $this->Form->input("shippedflag", ["type"=>"select", "options"=>$arrShipped, 'label'=>false]) ?>
+</td>
+<td rowspan='2'  height='6' colspan='20'>
+  <?= $this->Form->control('materialgrade_color', array('type'=>'text', 'label'=>false, 'id'=>"material_list", 'autofocus'=>true)) ?>
+</td>
 
 <?php
 
@@ -75,7 +78,7 @@
       echo "</strong></div></td>\n";
 
     ?>
-    <td width="250" colspan="20" style="border-bottom: 0px;border-width: 1px"><div align="center"><?= $this->Form->input("date_sta", array('type' => 'date', 'value' => $dayye, 'monthNames' => false, 'label'=>false)); ?></div></td>
+    <td style="border-bottom: 0px;border-width: 1px"><div align="center"><?= $this->Form->input("date_sta", array('type' => 'date', 'value' => $dayye, 'monthNames' => false, 'label'=>false)); ?></div></td>
     <?php
 
       echo "</tr>\n";
@@ -85,18 +88,20 @@
       echo "</strong></div></td>\n";
 
     ?>
-    <td width="250" colspan="20" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date_fin", array('type' => 'date', 'value' => $dateYMD, 'monthNames' => false, 'label'=>false)); ?></div></td>
+    <td style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date_fin", array('type' => 'date', 'value' => $dateYMD, 'monthNames' => false, 'label'=>false)); ?></div></td>
     <?php
 
       echo "</tr>\n";
  ?>
 <br>
+</table>
+<br>
+<table align="center">
   <tr bgcolor="#E6FFFF" >
-    <td width="100" colspan="30" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
-    <td width="100" colspan="30" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
-    <td align="right" rowspan="2"  colspan="20" width="250" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('検索'), array('name' => 'kensaku')); ?></div></td>
+    <td bgcolor="#E6FFFF" style="border: none"><?= $this->Form->submit(__('検索'), array('name' => 'kensaku')); ?></td>
   </tr>
 </table>
 </fieldset>
+<br><br>
 
 <?=$this->Form->end() ?>

@@ -13,7 +13,7 @@
 <hr size="5" style="margin: 0.5rem">
 <table style="margin-bottom:0px" width="1000" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
  <tr style="background-color: #E6FFFF">
-     <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaigenryou.gif',array('width'=>'105','url'=>array('action'=>'materialmenu')));?></td>
+     <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaigenryou.gif',array('width'=>'105','url'=>array('action'=>'materiallogin')));?></td>
  </tr>
 </table>
 <hr size="5" style="margin: 0.5rem">
@@ -42,11 +42,11 @@
 <br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">製品名</strong></td>
+    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">品番</strong></td>
 	</tr>
   <tr>
     <td bgcolor="#FFFFCC" style="padding: 0.2rem">
-      <?= h($product_name) ?>
+      <?= h($product_code) ?>
     </td>
 	</tr>
 </table>
@@ -99,7 +99,7 @@
 <?= $this->Form->control('username', array('type'=>'hidden', 'value'=>$username, 'label'=>false)) ?>
 <?= $this->Form->control('staff_name', array('type'=>'hidden', 'value'=>$staff_name, 'label'=>false)) ?>
 <?= $this->Form->control('materialgrade_color', array('type'=>'hidden', 'value'=>$materialgrade_color, 'label'=>false)) ?>
-<?= $this->Form->control('product_name', array('type'=>'hidden', 'value'=>$product_name, 'label'=>false)) ?>
+<?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
 <?= $this->Form->control('price_material_id', array('type'=>'hidden', 'value'=>$price_material_id, 'label'=>false)) ?>
 <?= $this->Form->control('hyouji_status_material', array('type'=>'hidden', 'value'=>$hyouji_status_material, 'label'=>false)) ?>
 <?= $this->Form->control('status_material', array('type'=>'hidden', 'value'=>$status_material, 'label'=>false)) ?>

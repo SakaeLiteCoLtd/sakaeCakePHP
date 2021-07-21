@@ -16,10 +16,10 @@ class htmlhazaicheck extends AppController
         $this->PriceMaterials = TableRegistry::get('priceMaterials');
     }
 
-    public function productcheck($product_name)
+    public function productcheck($product_code)
    {
      $Products = $this->Products->find()
-     ->where(['product_name' => $product_name, 'delete_flag' => 0])->toArray();
+     ->where(['product_code' => $product_code, 'delete_flag' => 0])->toArray();
 
      $materialgrade_color = "";
      $price_material_id = "";

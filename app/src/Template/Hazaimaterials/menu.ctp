@@ -21,6 +21,7 @@
     ?>
     <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaisiyou.gif',array('width'=>'105','url'=>array('action'=>'shippedlogin')));?></td>
     <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazairotkensaku.gif',array('width'=>'105','url'=>array('action'=>'kensakuform')));?></td>
+    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaisyuusei.gif',array('width'=>'105','url'=>array('action'=>'editlogin')));?></td>
 
 <?php
 /*
@@ -32,7 +33,7 @@
 </table>
 <hr size="5" style="margin: 0.5rem">
  <br>
- <legend align="left"><font color="black"><?= __("　　CSV未出力データ一覧") ?></font></legend>
+ <legend align="left"><font color="black"><?= __("　　CSV未出力端材原料一覧") ?></font></legend>
  <br>
  <table align="center" width="1000" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
    <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
@@ -61,7 +62,7 @@
      </table>
 
          <br><br>
-         <legend align="left"><font color="black"><?= __("　　TABファイル未取込データ一覧") ?></font></legend>
+         <legend align="left"><font color="black"><?= __("　　TABファイル未取込端材原料一覧") ?></font></legend>
          <br>
          <table align="center" width="1000" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
            <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
@@ -90,7 +91,7 @@
              </table>
 
              <br><br>
-             <legend align="left"><font color="black"><?= __("　　出荷待ちデータ一覧") ?></font></legend>
+             <legend align="left"><font color="black"><?= __("　　未使用端材原料一覧") ?></font></legend>
              <br>
              <table align="center" width="1000" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
                <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">

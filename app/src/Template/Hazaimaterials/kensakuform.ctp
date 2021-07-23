@@ -44,7 +44,7 @@
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
     <tr style="border-bottom: 0px;border-width: 0px">
-      <td width="100" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">出荷</strong></div></td>
+      <td width="100" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">使用</strong></div></td>
       <td width="150" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">端材（原料グレード_色）</strong></div></td>
       <td width="150" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">ロットＮｏ．</strong></div></td>
       <td width="250" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 11pt; color:blue">ロット発行日</strong></div></td>

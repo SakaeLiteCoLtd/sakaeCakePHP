@@ -92,7 +92,7 @@ if(!isset($_SESSION)){
 <br>
 <table align="right" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr>
-<td style="border-style: none;"><div align="center"><?= $this->Form->submit('csv発行データ確認', array('name' => 'kakuninn')); ?></div></td>
+<td style="border-style: none;"><div align="center"><?= $this->Form->submit('csv発行確認', array('name' => 'kakuninn')); ?></div></td>
 <td style="border-style: none;"><div align="center">　　　</div></td>
 </tr>
 </table>

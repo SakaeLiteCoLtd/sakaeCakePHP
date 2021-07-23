@@ -26,6 +26,7 @@ class HazaimaterialsController extends AppController {
    $this->Products = TableRegistry::get('products');
    $this->PriceMaterials = TableRegistry::get('priceMaterials');
    $this->StockEndMaterials = TableRegistry::get('stockEndMaterials');
+   $this->StatusRoles = TableRegistry::get('statusRoles');
   }
 
    public function menu()
@@ -1022,7 +1023,7 @@ class HazaimaterialsController extends AppController {
 */
        $this->set('arrLottouroku',$arrLottouroku);
        if(count($arrLottouroku) < 1){
-         $mes = "※登録されるデータがありません。正しいファイルが選択されているか確認してください。";
+         $mes = "※登録される端材原料がありません。正しいファイルが選択されているか確認してください。";
          $this->set('mes',$mes);
        }
 
@@ -1041,7 +1042,7 @@ class HazaimaterialsController extends AppController {
 
               if($k == count($arrLottouroku) - 1){
 
-                $mes = "※以下のデータが登録されました";
+                $mes = "※以下の端材原料が登録されました";
                 $this->set('mes',$mes);
                 $connection->commit();// コミット5
 
@@ -1082,8 +1083,8 @@ class HazaimaterialsController extends AppController {
 
        $arrShipped = [
          '0' => '',
-         '1' => '出荷済み',
-         '2' => '出荷待ち'
+         '1' => '使用済',
+         '2' => '未使用'
                ];
        $this->set('arrShipped',$arrShipped);
 
@@ -1283,7 +1284,7 @@ class HazaimaterialsController extends AppController {
 
      }
 
-     public function shippedconfirm()
+     public function shippedconfirm()//210722不要いきなり登録へ
      {
        $stockEndMaterials = $this->StockEndMaterials->newEntity();
        $this->set('stockEndMaterials',$stockEndMaterials);
@@ -1351,7 +1352,7 @@ class HazaimaterialsController extends AppController {
        if($check_stock_end == 0){
 
          return $this->redirect(['action' => 'shippedform',
-         's' => ['username' => $username, 'mess' => "読み込まれたデータはTAB取込されていません。"]]);
+         's' => ['username' => $username, 'mess' => "読み込まれた端材原料はTAB取込されていません。"]]);
 
        }
 
@@ -1374,10 +1375,63 @@ class HazaimaterialsController extends AppController {
        $this->set('username',$username);
        $staff_name = $data["staff_name"];
        $this->set('staff_name',$staff_name);
-       $materialgrade_color = $data["materialgrade_color"];
+
+       $arrshippeddata = explode(',', $data['shippeddata']);
+       $materialgrade_color = $arrshippeddata[0];
+
+       if(isset($arrshippeddata[4])){
+
+         $lot_num = $arrshippeddata[4];
+
+       }else{
+
+         return $this->redirect(['action' => 'shippedform',
+         's' => ['username' => $username, 'mess' => "端材が読み込まれません。正しいラベルか確認してください。"]]);
+
+       }
+
        $this->set('materialgrade_color',$materialgrade_color);
-       $lot_num = $data["lot_num"];
        $this->set('lot_num',$lot_num);
+
+       $arrhazai = explode('_', $materialgrade_color);
+
+       $grade = $arrhazai[0];
+
+       if(isset($arrhazai[1])){
+         $color = $arrhazai[1];
+       }else{
+
+         return $this->redirect(['action' => 'shippedform',
+         's' => ['username' => $username, 'mess' => "端材が読み込まれません。正しいラベルか確認してください。"]]);
+
+       }
+
+       $check_stock_end = 0;
+
+       $PriceMaterials = $this->PriceMaterials->find()
+       ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+
+       if(isset($PriceMaterials[0])){
+
+         $StockEndMaterials = $this->StockEndMaterials->find()
+         ->where(["price_material_id" => $PriceMaterials[0]['id'], 'lot_num' => $lot_num,
+          'import_tab_staff >=' => 0, 'delete_flag' => 0])->toArray();
+
+          if(isset($StockEndMaterials[0])){
+
+            $check_stock_end = 1;
+            $StockEndMaterialsId = $StockEndMaterials[0]["id"];
+
+          }
+
+       }
+
+       if($check_stock_end == 0){
+
+         return $this->redirect(['action' => 'shippedform',
+         's' => ['username' => $username, 'mess' => "読み込まれた端材原料はTAB取込されていません。"]]);
+
+       }
 
        $Users = $this->Users->find()
        ->where(['username' => $username])->toArray();
@@ -1395,7 +1449,7 @@ class HazaimaterialsController extends AppController {
           if ($this->StockEndMaterials->updateAll(//検査終了時間の更新
             ['shiped_staff' => $staff_id, 'shiped_at' => date('Y-m-d H:i:s'),
              'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $staff_id],
-            ['id'  => $data["StockEndMaterialsId"]]
+            ['id'  => $StockEndMaterialsId]
           )){
 
           $mes = "※登録されました";
@@ -1410,6 +1464,416 @@ class HazaimaterialsController extends AppController {
           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
 
         }
+
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+     }
+
+     public function editlogin()
+     {
+       $stockEndMaterials = $this->StockEndMaterials->newEntity();
+       $this->set('stockEndMaterials',$stockEndMaterials);
+
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }else{
+         $mess = "";
+         $this->set('mess',$mess);
+       }
+     }
+
+     public function editform()
+     {
+       $stockEndMaterials = $this->StockEndMaterials->newEntity();
+       $this->set('stockEndMaterials',$stockEndMaterials);
+
+       $data = $this->request->getData();
+
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $username = $Data["username"];
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }else{
+         $data = $this->request->getData();
+         $mess = "";
+         $this->set('mess',$mess);
+       }
+
+       if(isset($data["username"])){//登録者の確認
+
+         $ary = explode(',', $data["username"]);
+         $username = $ary[0];
+
+         $Users = $this->Users->find()
+         ->where(['username' => $username])->toArray();
+
+         if(!isset($Users[0])){
+
+           return $this->redirect(['action' => 'editlogin',
+           's' => ['mess' => "社員コードが間違っています。もう一度やり直してください。"]]);
+
+         }else{//管理者チェック
+
+           $StatusRolesData = $this->StatusRoles->find()->where(['staff_id' => $Users[0]["staff_id"], 'role_id <=' => 3, 'delete_flag' => 0])->toArray();
+
+           if(!isset($StatusRolesData[0])){
+
+             return $this->redirect(['action' => 'editlogin',
+             's' => ['mess' => "端材原料情報を修正する権限がありません。"]]);
+
+           }
+
+         }
+
+       }
+       $this->set('username', $username);
+
+       $Users = $this->Users->find()
+       ->where(['username' => $username])->toArray();
+       $Staffs = $this->Staffs->find()
+       ->where(['id' => $Users[0]["staff_id"]])->toArray();
+       $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
+       $this->set('staff_name', $staff_name);
+
+       $Material_list = $this->PriceMaterials->find()
+       ->where(['delete_flag' => 0])->toArray();
+       $arrMaterial_list = array();
+       for($j=0; $j<count($Material_list); $j++){
+         array_push($arrMaterial_list,$Material_list[$j]["grade"]."_".$Material_list[$j]["color"]);
+       }
+       $arrMaterial_list = array_unique($arrMaterial_list);
+       $arrMaterial_list = array_values($arrMaterial_list);
+       $this->set('arrMaterial_list', $arrMaterial_list);
+
+       if(!isset($_SESSION)){
+         session_start();
+         header('Expires:-1');
+         header('Cache-Control:');
+         header('Pragma:');
+       }
+
+     }
+
+     public function editformsyousai()
+     {
+       $stockEndMaterials = $this->StockEndMaterials->newEntity();
+       $this->set('stockEndMaterials',$stockEndMaterials);
+
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $username = $Data["username"];
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }else{
+         $data = $this->request->getData();
+         $mess = "";
+         $this->set('mess',$mess);
+       }
+
+       $data = $this->request->getData();
+/*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+*/
+       $username = $data["username"];
+       $this->set('username',$username);
+       $staff_name = $data["staff_name"];
+       $this->set('staff_name',$staff_name);
+
+       $materialgrade_color = $data["materialgrade_color"];
+       $this->set('materialgrade_color',$materialgrade_color);
+       $lot_num = $data["lot_num"];
+       $this->set('lot_num',$lot_num);
+
+       $arrhazai = explode('_', $materialgrade_color);
+
+       $grade = $arrhazai[0];
+
+       if(isset($arrhazai[1])){
+         $color = $arrhazai[1];
+       }else{
+
+         return $this->redirect(['action' => 'editform',
+         's' => ['username' => $username, 'mess' => "グレードと色を「_」（アンダーバー）でつないで入力してください。"]]);
+
+       }
+
+       $check_stock_end = 0;
+
+       $PriceMaterials = $this->PriceMaterials->find()
+       ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+
+       if(isset($PriceMaterials[0])){
+
+         $StockEndMaterials = $this->StockEndMaterials->find()
+         ->where(["price_material_id" => $PriceMaterials[0]['id'], 'lot_num' => $lot_num,
+          'delete_flag' => 0])->toArray();
+
+          if(isset($StockEndMaterials[0])){
+
+            $check_stock_end = 1;
+            $StockEndMaterialsId = $StockEndMaterials[0]["id"];
+            $this->set('StockEndMaterialsId',$StockEndMaterialsId);
+            $this->set('StockEndMaterialData',$StockEndMaterials[0]);
+
+          }
+
+       }
+
+       if($check_stock_end == 0){
+
+         return $this->redirect(['action' => 'editform',
+         's' => ['username' => $username, 'mess' => "入力された端材原料は登録されていません。"]]);
+
+       }
+
+       if(strlen($StockEndMaterials[0]["shiped_staff"]) > 0){
+         $shippedflag = 1;
+       }else{
+         $shippedflag = 0;
+       }
+       $this->set('shippedflag',$shippedflag);
+/*
+       echo "<pre>";
+       print_r($shippedflag);
+       echo "</pre>";
+*/
+       if(!isset($_SESSION)){
+         session_start();
+         header('Expires:-1');
+         header('Cache-Control:');
+         header('Pragma:');
+       }
+
+     }
+
+     public function editconfirm()
+     {
+       $stockEndMaterials = $this->StockEndMaterials->newEntity();
+       $this->set('stockEndMaterials',$stockEndMaterials);
+
+       $data = $this->request->getData();
+/*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+*/
+       $username = $data["username"];
+       $this->set('username',$username);
+       $staff_name = $data["staff_name"];
+       $this->set('staff_name',$staff_name);
+
+       $product_code = $data["product_code"];
+       $this->set('product_code',$product_code);
+       $materialgrade_color = $data["materialgrade_color"];
+       $this->set('materialgrade_color',$materialgrade_color);
+       $lot_num = $data["lot_num"];
+       $this->set('lot_num',$lot_num);
+       $StockEndMaterialsId = $data["StockEndMaterialsId"];
+       $this->set('StockEndMaterialsId',$StockEndMaterialsId);
+
+       $amount = $data["amount"];
+       $htmlhazaicheck = new htmlhazaicheck();//クラスを使用
+       $amount = $htmlhazaicheck->amountcheck($amount);
+       $this->set('amount', $amount);
+
+       $shippedflag = $data["shippedflag"];
+       $this->set('shippedflag',$shippedflag);
+       if($data["shippedflag"] > 0){
+         $shipped = "使用済";
+       }else{
+         $shipped = "未使用";
+       }
+       $this->set('shipped',$shipped);
+
+       if($data["check"] > 0){
+         $mess = "以下のデータを削除します。よろしければ「決定」ボタンを押してください。";
+         $delete_flag = 1;
+       }else{
+         $mess = "以下のように更新します。よろしければ「決定」ボタンを押してください。";
+         $delete_flag = 0;
+       }
+       $this->set('mess', $mess);
+       $this->set('delete_flag', $delete_flag);
+
+       if(!isset($_SESSION)){
+         session_start();
+         header('Expires:-1');
+         header('Cache-Control:');
+         header('Pragma:');
+       }
+
+     }
+
+     public function editdo()
+     {
+       $stockEndMaterials = $this->StockEndMaterials->newEntity();
+       $this->set('stockEndMaterials',$stockEndMaterials);
+
+       $data = $this->request->getData();
+/*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+*/
+       $username = $data["username"];
+       $this->set('username',$username);
+       $staff_name = $data["staff_name"];
+       $this->set('staff_name',$staff_name);
+
+       $Users = $this->Users->find()
+       ->where(['username' => $username])->toArray();
+       $staff_id = $Users[0]["staff_id"];
+
+       $product_code = $data["product_code"];
+       $this->set('product_code',$product_code);
+       $materialgrade_color = $data["materialgrade_color"];
+       $this->set('materialgrade_color',$materialgrade_color);
+       $lot_num = $data["lot_num"];
+       $this->set('lot_num',$lot_num);
+       $StockEndMaterialsId = $data["StockEndMaterialsId"];
+       $this->set('StockEndMaterialsId',$StockEndMaterialsId);
+       $amount = $data["amount"];
+       $this->set('amount', $amount);
+
+       $shippedflag = $data["shippedflag"];
+       $this->set('shippedflag',$shippedflag);
+       if($data["shippedflag"] > 0){
+         $shipped = "使用済";
+       }else{
+         $shipped = "未使用";
+       }
+       $this->set('shipped',$shipped);
+
+       $StockEndMaterials = $this->StockEndMaterials->find()
+       ->where(['id' => $StockEndMaterialsId])->toArray();
+
+       if(strlen($StockEndMaterials[0]["shiped_staff"]) > 0){//もともと使用済み
+
+         if($shippedflag > 0){//変更なし
+
+           $shippedflaghennkou = 0;
+
+         }else{//不使用に変更
+
+           $shippedflaghennkou = 1;
+
+         }
+
+       }else{//もともと不使用
+
+         if($shippedflag > 0){//使用に変更
+
+           $shippedflaghennkou = 2;
+
+         }else{//変更なし
+
+           $shippedflaghennkou = 0;
+
+         }
+
+       }
+
+       $StockEndMaterials = $this->StockEndMaterials->patchEntity($this->StockEndMaterials->newEntity(), $data);
+       $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+        $connection->begin();//トランザクション3
+        try {//トランザクション4
+
+          if($data["delete_flag"] == 0){//削除ではないとき
+
+            if($shippedflaghennkou == 2){//不使用を使用に変更する場合
+
+              if ($this->StockEndMaterials->updateAll(//検査終了時間の更新
+                ['amount' => $amount, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $staff_id,
+                'shiped_staff' => $staff_id, 'shiped_at' => date('Y-m-d H:i:s')],
+                ['id'  => $StockEndMaterialsId]
+              )){
+
+                $mes = "※更新されました";
+                $this->set('mes',$mes);
+                $connection->commit();// コミット5
+
+              } else {
+
+                $mes = "※更新されませんでした";
+                $this->set('mes',$mes);
+                $this->Flash->error(__('The product could not be saved. Please, try again.'));
+                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+              }
+
+            }elseif($shippedflaghennkou == 1){//使用を不使用に変更する場合
+
+              if ($this->StockEndMaterials->updateAll(//検査終了時間の更新
+                ['amount' => $amount, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $staff_id,
+                'shiped_staff' => NULL, 'shiped_at' => NULL],
+                ['id'  => $StockEndMaterialsId]
+              )){
+
+                $mes = "※更新されました";
+                $this->set('mes',$mes);
+                $connection->commit();// コミット5
+
+              } else {
+
+                $mes = "※更新されませんでした";
+                $this->set('mes',$mes);
+                $this->Flash->error(__('The product could not be saved. Please, try again.'));
+                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+              }
+
+            }else{//使用は変更なしの場合
+
+              if ($this->StockEndMaterials->updateAll(//検査終了時間の更新
+                ['amount' => $amount, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $staff_id],
+                ['id'  => $StockEndMaterialsId]
+              )){
+
+                $mes = "※更新されました";
+                $this->set('mes',$mes);
+                $connection->commit();// コミット5
+
+              } else {
+
+                $mes = "※更新されませんでした";
+                $this->set('mes',$mes);
+                $this->Flash->error(__('The product could not be saved. Please, try again.'));
+                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+              }
+
+            }
+
+          }else{//削除のとき
+
+            if ($this->StockEndMaterials->updateAll(//検査終了時間の更新
+              ['delete_flag' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $staff_id],
+              ['id'  => $StockEndMaterialsId]
+            )){
+
+              $mes = "※削除されました";
+              $this->set('mes',$mes);
+              $connection->commit();// コミット5
+
+            } else {
+
+              $mes = "※削除されませんでした";
+              $this->set('mes',$mes);
+              $this->Flash->error(__('The product could not be saved. Please, try again.'));
+              throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+            }
+
+          }
 
       } catch (Exception $e) {//トランザクション7
       //ロールバック8

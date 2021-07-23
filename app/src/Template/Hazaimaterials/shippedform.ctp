@@ -17,7 +17,7 @@
  </tr>
 </table>
 <hr size="5" style="margin: 0.5rem">
-<?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'shippedconfirm']]) ?>
+<?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'shippeddo']]) ?>
 <br>
 <div align="center"><font color="red" size="3"><?= __($mess) ?></font></div>
 <legend align="center"><font color="black"><?= __("QRコードを読み込んでください。") ?></font></legend>
@@ -49,7 +49,7 @@
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr>
-    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('次へ', array('name' => 'next')); ?></div></td>
+    <td style="border-style: none;"><div align="center"><?= $this->Form->submit('登録', array('name' => 'next')); ?></div></td>
   </tr>
 </table>
 <br><br><br><br><br><br><br>

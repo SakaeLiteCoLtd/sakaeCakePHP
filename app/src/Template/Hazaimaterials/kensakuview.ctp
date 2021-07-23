@@ -18,7 +18,7 @@
 <hr size="5" style="margin: 0.5rem">
 <br>
 
- <legend align="left"><font color="black"><?= __("　　TAB取込済みデータ一覧") ?></font></legend>
+ <legend align="left"><font color="black"><?= __("　　TAB取込済み端材原料一覧") ?></font></legend>
  <br>
  <table align="center" width="1000" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
    <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
@@ -30,7 +30,7 @@
                <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">数量</strong></div></td>
                <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">登録日</strong></div></td>
                <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">登録者</strong></div></td>
-               <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">出荷状況</strong></div></td>
+               <td width="80" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">使用状況</strong></div></td>
              </tr>
          </thead>
          <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
@@ -45,9 +45,9 @@
 
                <?php
                if(strlen($arrStockEndMaterials[$i]["shiped_staff"]) > 0){
-                 $shiped = "出荷済み";
+                 $shiped = "使用済";
                }else{
-                 $shiped = "出荷待ち";
+                 $shiped = "未使用";
                }
                ?>
 

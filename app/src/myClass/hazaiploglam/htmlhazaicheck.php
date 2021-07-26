@@ -37,7 +37,7 @@ class htmlhazaicheck extends AppController
 
        }else{
 
-         $productcheck = 1;
+         $productcheck = 2;
 
        }
 

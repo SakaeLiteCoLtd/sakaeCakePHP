@@ -276,10 +276,18 @@ class HazaimaterialsController extends AppController {
         $this->set('price_material_id', $arrhazaicheckproduct["price_material_id"]);
         $this->set('materialgrade_color', $arrhazaicheckproduct["materialgrade_color"]);
 
-      }else{
+      }elseif($arrhazaicheckproduct["productcheck"] == 1){
 
         return $this->redirect(['action' => 'materialform',
         's' => ['username' => $username, 'mess' => "品番：「".$product_code."」の製品は製品登録されていません。"]]);
+
+      }else{
+
+        $Products = $this->Products->find()
+        ->where(['product_code' => $product_code, 'delete_flag' => 0])->toArray();
+
+        return $this->redirect(['action' => 'materialform',
+        's' => ['username' => $username, 'mess' => "品番：「".$product_code."」の原料：「".$Products[0]["m_grade"]."」、色：「".$Products[0]["col_num"]."」は原料登録されていません。"]]);
 
       }
 
@@ -320,10 +328,18 @@ class HazaimaterialsController extends AppController {
          $this->set('price_material_id', $arrhazaicheckproduct["price_material_id"]);
          $this->set('materialgrade_color', $arrhazaicheckproduct["materialgrade_color"]);
 
-       }else{
+       }elseif($arrhazaicheckproduct["productcheck"] == 1){
 
          return $this->redirect(['action' => 'materialform',
          's' => ['username' => $username, 'mess' => "品番：「".$product_code."」の製品は製品登録されていません。"]]);
+
+       }else{
+
+         $Products = $this->Products->find()
+         ->where(['product_code' => $product_code, 'delete_flag' => 0])->toArray();
+
+         return $this->redirect(['action' => 'materialform',
+         's' => ['username' => $username, 'mess' => "品番：「".$product_code."」の原料：「".$Products[0]["m_grade"]."」、色：「".$Products[0]["col_num"]."」は原料登録されていません。"]]);
 
        }
 

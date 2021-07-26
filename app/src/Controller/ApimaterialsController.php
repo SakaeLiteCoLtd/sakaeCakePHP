@@ -42,8 +42,8 @@ class ApimaterialsController extends AppController
     //参考　https://qiita.com/tatamix/items/1758ed25442cc6940411
 		//http://192.168.4.246/Apimaterials/materails/api.json
 		//http://localhost:5000/Apimaterials/materails/api.json
-		
-    public function materails()//ここは使用中
+
+    public function materials()//ここは使用中
 		{
 			header("Access-Control-Allow-Origin: *");//https://helog.jp/php/ajax-php-cors/ ブラウザ側に安全を保証してますよって伝えてるappコントローラーに追加
 
@@ -68,10 +68,9 @@ class ApimaterialsController extends AppController
 
     }
 
-//https://192.168.4.246/Apimaterials/hazaitouroku/api.json
+																			//http://192.168.4.246/Apimaterials/hazaitouroku/api.json
 		public function hazaitouroku($id)//http://localhost:5000/Apimaterials/hazaitouroku/3.json
 		{
-
 			if($this->request->is(['post'])) {//登録postの時
 
 				$mess = "method = post";

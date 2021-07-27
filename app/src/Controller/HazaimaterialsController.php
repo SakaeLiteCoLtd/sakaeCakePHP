@@ -29,6 +29,60 @@ class HazaimaterialsController extends AppController {
    $this->StatusRoles = TableRegistry::get('statusRoles');
   }
 
+  public function materialformtest()
+  {
+    $stockEndMaterials = $this->StockEndMaterials->newEntity();
+    $this->set('stockEndMaterials',$stockEndMaterials);
+
+    $mess = "";
+    $this->set('mess',$mess);
+    $username = "test";
+    $this->set('username',$username);
+
+    $Users = $this->Users->find()
+    ->where(['username' => $username])->toArray();
+
+    $Staffs = $this->Staffs->find()
+    ->where(['id' => $Users[0]["staff_id"]])->toArray();
+    $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
+    $this->set('staff_name', $staff_name);
+
+    $Product_list = $this->Products->find()
+    ->where(['delete_flag' => 0])->toArray();
+    $arrProduct_list = array();
+    for($j=0; $j<count($Product_list); $j++){
+      array_push($arrProduct_list,$Product_list[$j]["product_code"]);
+    }
+    $arrProduct_list = array_unique($arrProduct_list);
+    $arrProduct_list = array_values($arrProduct_list);
+    $this->set('arrProduct_list', $arrProduct_list);
+
+    $Material_list = $this->PriceMaterials->find()
+    ->where(['delete_flag' => 0])->toArray();
+    $arrMaterial_list = array();
+    for($j=0; $j<count($Material_list); $j++){
+      array_push($arrMaterial_list,$Material_list[$j]["grade"]."_".$Material_list[$j]["color"]);
+    }
+    $arrMaterial_list = array_unique($arrMaterial_list);
+    $arrMaterial_list = array_values($arrMaterial_list);
+    $this->set('arrMaterial_list', $arrMaterial_list);
+
+    $arrStatusMaterial = [
+      '0' => 'バージン',
+      '1' => '粉砕',
+      '2' => 'バージン＋粉砕'
+    ];
+    $this->set('arrStatusMaterial',$arrStatusMaterial);
+
+    if(!isset($_SESSION)){
+      session_start();
+      header('Expires:-1');
+      header('Cache-Control:');
+      header('Pragma:');
+    }
+
+  }
+
    public function menu()
    {
      $stockEndMaterials = $this->StockEndMaterials->newEntity();

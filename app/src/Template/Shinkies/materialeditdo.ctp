@@ -26,7 +26,7 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
     <fieldset>
 
       <br>
-      <div align="center"><font color="black" size="3"><?= __($mess) ?></font></div>
+      <div align="center"><font color="black" size="3"><?= __($mes) ?></font></div>
       <br>
 
       <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">

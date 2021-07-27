@@ -2134,11 +2134,11 @@ class ShinkiesController extends AppController {
      $this->set('priceMaterials',$priceMaterials);
 
      $data = $this->request->getData();
-
+/*
      echo "<pre>";
      print_r($data);
      echo "</pre>";
-
+*/
      $PriceMaterialId = $data['PriceMaterialId'];
      $this->set('PriceMaterialId',$PriceMaterialId);
      $grade = $data['grade'];
@@ -2158,10 +2158,6 @@ class ShinkiesController extends AppController {
        header('Cache-Control:');
        header('Pragma:');
      }
-
-     $tourokunewpricematerials = [
-
-     ];
 
      $PriceMaterials = $this->PriceMaterials->patchEntity($this->PriceMaterials->newEntity(), $data);
      $connection = ConnectionManager::get('default');//トランザクション1
@@ -2191,6 +2187,25 @@ class ShinkiesController extends AppController {
 
         }else{
 
+          $PriceMaterialsMoto = $this->PriceMaterials->find('all', ['conditions' => ['id' => $PriceMaterialId]])->toArray();
+
+          $tourokunewpricematerials = [
+            'grade' => $PriceMaterialsMoto[0]['grade'],
+            'color' => $PriceMaterialsMoto[0]['color'],
+            'tourokubi' => $PriceMaterialsMoto[0]['tourokubi']->format('Y-m-d'),
+            'price' => $price,
+            'material_type_id' =>$PriceMaterialsMoto[0]['material_type_id'],
+            'status_buying' =>$PriceMaterialsMoto[0]['status_buying'],
+            'tani' =>$PriceMaterialsMoto[0]['tani'],
+            'lot_low' => $PriceMaterialsMoto[0]['lot_low'],
+            'lot_upper' => $PriceMaterialsMoto[0]['lot_upper'],
+            'sup_id' => $sup_id,
+            'emp_id' => $PriceMaterialsMoto[0]['emp_id'],
+            'delete_flag' => 0,
+            'created_staff' => $PriceMaterialsMoto[0]['created_staff'],
+            'created_at' => $PriceMaterialsMoto[0]['created_at']->format('Y-m-d H:i:s'),
+          ];
+
           if ($this->PriceMaterials->updateAll(
             ['delete_flag' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
             ['id'  => $PriceMaterialId]
@@ -2218,7 +2233,6 @@ class ShinkiesController extends AppController {
       //ロールバック8
         $connection->rollback();//トランザクション9
       }//トランザクション10
-
 
    }
 

@@ -1941,6 +1941,7 @@ class ShinkiesController extends AppController {
 
    }
 
+//ここから追加
    public function materialeditkensaku()
   {
     $session = $this->request->getSession();

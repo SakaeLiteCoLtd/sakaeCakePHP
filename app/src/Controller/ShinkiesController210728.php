@@ -124,11 +124,11 @@ class ShinkiesController extends AppController {
      }
      $this->set('arrSupplier',$arrSupplier);
 
-     $arrDenpyou = [
-       '0' => '無',
-       '1' => '有'
-             ];
-      $this->set('arrDenpyou',$arrDenpyou);
+     $arrstatus_buying = [
+       '0' => 'ナチュラル・練りこみ',
+       '1' => 'MB・ドライカラー自社混合'
+     ];
+     $this->set('arrstatus_buying',$arrstatus_buying);
 
    }
 
@@ -153,6 +153,14 @@ class ShinkiesController extends AppController {
      $Suppliers = $this->Suppliers->find()->where(['id' => $data['sup_id']])->toArray();
      $Suppliername = $Suppliers[0]->name;
      $this->set('Suppliername',$Suppliername);
+
+     if($data['status_buying'] == 0){
+       $hyouji_status_buying = "ナチュラル・練りこみ";
+     }else{
+       $hyouji_status_buying = "MB・ドライカラー自社混合";
+     }
+     $this->set('hyouji_status_buying',$hyouji_status_buying);
+
    }
 
    public function materialsdo()
@@ -173,6 +181,7 @@ class ShinkiesController extends AppController {
      $arrtouroku[] = array(
        'grade' => $data['grade'],
        'color' => $data['color'],
+       'status_buying' => $data['status_buying'],
        'lot_low' => $data['lot_low'],
        'lot_upper' => $data['lot_upper'],
        'tourokubi' => date('Y-m-d'),

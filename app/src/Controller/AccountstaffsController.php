@@ -486,4 +486,50 @@ class AccountstaffsController extends AppController
 
 		}
 
+    public function useraddform()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $data = $this->request->getData();
+       $mess = "";
+       $this->set('mess',$mess);
+     }
+
+     $arrStaffs = $this->Staffs->find('all', ['conditions' => ['delete_flag' => '0']])->order(['staff_code' => 'ASC']);//Staffsテーブルの'delete_flag' => '0'となるものを見つけ、staff_code順に並べる
+     $arrStaff = array();//配列の初期化
+     foreach ($arrStaffs as $value) {//2行上のStaffsテーブルのデータそれぞれに対して
+       $arrStaff[] = array($value->id=>$value->staff_code.':'.$value->f_name.$value->l_name);//配列に3行上のStaffsテーブルのデータそれぞれのstaff_code:f_name:l_name
+     }
+     $this->set('arrStaff',$arrStaff);//4行上$arrStaffをctpで使えるようにセット
+		}
+
+    public function useraddconfirm()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $data = $this->request->getData();
+
+     $Users = $this->Users->find()
+     ->where(['staff_id' => $data['staff_id'], 'delete_flag' => 1])->toArray();
+
+     if(isset($Users[0])){
+
+       return $this->redirect(['action' => 'useraddform',
+       's' => ['mess' => "選択された社員のユーザー情報は既に登録されています。"]]);
+
+     }
+
+     echo "<pre>";
+		 print_r($Users);
+		 echo "</pre>";
+
+		}
+
 }

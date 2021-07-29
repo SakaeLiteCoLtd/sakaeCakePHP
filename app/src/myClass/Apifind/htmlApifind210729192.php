@@ -110,26 +110,20 @@ class htmlApifind extends AppController
     $OrderEdis = $_SESSION['classOrderEdis'];
     $arrOrderEdis = $_SESSION['classarrOrderEdis'];
 
-    $countmax = count($arrOrderEdis);//210729in
-
     //同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
     for($l=0; $l<count($arrOrderEdis); $l++){
 
-      for($m=$l+1; $m<$countmax; $m++){//210729in
+      for($m=$l+1; $m<count($arrOrderEdis); $m++){
 
-        if(isset($arrOrderEdis[$m]["product_code"])){
+        if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
 
-          if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+          $amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+          $denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
 
-            $amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-            $denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
+          $arrOrderEdis[$l]["amount"] = $amount;
+          $arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
 
-            $arrOrderEdis[$l]["amount"] = $amount;
-            $arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-
-            unset($arrOrderEdis[$m]);
-
-          }
+          unset($arrOrderEdis[$m]);
 
         }
 
@@ -221,25 +215,18 @@ class htmlApifind extends AppController
          array_multisort($product_code, array_map("strtotime", $datetime_finish), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
        }
 
-       $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);//210729in
-
       //同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
       for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
 
-  //			for($m=$l+1; $m<count($arrResultZensuHeadsmoto); $m++){
-        for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
+        for($m=$l+1; $m<count($arrResultZensuHeadsmoto); $m++){
 
-          if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
+          if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
 
-            if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
+            $count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
 
-              $count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
+            $arrResultZensuHeadsmoto[$l]["count"] = $count;
 
-              $arrResultZensuHeadsmoto[$l]["count"] = $count;
-
-              unset($arrResultZensuHeadsmoto[$m]);
-
-            }
+            unset($arrResultZensuHeadsmoto[$m]);
 
           }
 

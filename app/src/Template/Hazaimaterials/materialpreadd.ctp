@@ -5,7 +5,7 @@
 ?>
 
 <?= $this->Flash->render() ?>
-<?= $this->Form->create($orderEdis, ['url' => ['action' => 'hattyucsvlogin']]) ?>
+<?= $this->Form->create($stockEndMaterials, ['url' => ['action' => 'materiallogin']]) ?>
 
 <br><br>
 <legend align="center"><font color="red" size="3"><?= __($mess) ?></font></legend>

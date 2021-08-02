@@ -19,6 +19,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 <?php
     $session = $this->request->getSession();
     $data = $session->read();
+
     if(isset($data['login']['staffname'])){
       $user = $data['login']['staffname'].'さん、こんにちは。';
     }else{
@@ -62,7 +63,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
                 } else {
                     // ログインしていないとき
                     // ログインへのリンクをだす
-                    echo $this->Html->link('　ログアウト', array('controller'=>'accounts','action'=>'index','alink'=>'#E6FFFF'));
+                    echo $this->Html->link('　ログアウト', array('action'=>'index','alink'=>'#E6FFFF'));
                 }
               ?>
               </div>

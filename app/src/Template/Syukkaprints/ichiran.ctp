@@ -48,18 +48,18 @@ echo $this->Form->hidden('field' ,['value'=>$field]);
   <td style="border-style: none;"><div align="center"><?= $this->Form->submit('全てチェックをはずす', array('name' => 'nocheck')); ?></div></td>
 </tr>
 </table>
-
+<br><br><br><br>
 <?php if($allcheck_flag != 1): ?>
 
-  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+  <table align="center" width="1000" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
           <thead>
               <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
                 <td width="30" height="30" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue"></strong></div></td>
                 <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品番</strong></div></td>
                 <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品名</strong></div></td>
-                <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品数</strong></div></td>
-                <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品ID</strong></div></td>
+                <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品数</strong></div></td>
+                <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品ID</strong></div></td>
                 <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">製造年月日:ロット番号</strong></td>
               </tr>
           </thead>
@@ -127,15 +127,15 @@ echo $this->Form->hidden('field' ,['value'=>$field]);
 
 <?php else: ?>
 
-    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+    <table align="center" width="1000" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
       <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
             <thead>
                 <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
                   <td width="30" height="30" colspan="10" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue"></strong></div></td>
                   <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品番</strong></div></td>
                   <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">品名</strong></div></td>
-                  <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品数</strong></div></td>
-                  <td width="50" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品ID</strong></div></td>
+                  <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品数</strong></div></td>
+                  <td width="150" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納品ID</strong></div></td>
                   <td width="250" height="30" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">製造年月日:ロット番号</strong></td>
                 </tr>
             </thead>

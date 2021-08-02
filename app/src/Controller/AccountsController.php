@@ -52,6 +52,7 @@ class AccountsController extends AppController
       $session = $this->request->getSession();
       $data = $session->read();
       $data['login'] = array();
+      $session->delete("login");//ログインしたデータを削除
 
      }
 

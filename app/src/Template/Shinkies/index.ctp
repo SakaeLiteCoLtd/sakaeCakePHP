@@ -2,7 +2,6 @@
 $this->layout = 'defaultaccount';
 ?>
 
-
 <?= $this->Form->create($user, ['url' => ['action' => 'login']]) ?>
 <fieldset>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">

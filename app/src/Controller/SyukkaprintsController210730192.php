@@ -84,31 +84,25 @@ class SyukkaprintsController extends AppController {
 
       }
 
-      $countorderedi = count($OrderEdis);
-
       for($l=0; $l<count($OrderEdis); $l++){
 
-        for($m=$l+1; $m<$countorderedi; $m++){
+        for($m=$l+1; $m<count($OrderEdis); $m++){
 
-          if(isset($OrderEdis[$m]["product_code"])){
+          if($OrderEdis[$l]["product_code"] != 'W002' && $OrderEdis[$l]["product_code"] == $OrderEdis[$m]["product_code"]){
 
-            if($OrderEdis[$l]["product_code"] != 'W002' && $OrderEdis[$l]["product_code"] == $OrderEdis[$m]["product_code"]){
+            $amount = $OrderEdis[$l]["amount"] + $OrderEdis[$m]["amount"];
 
-              $amount = $OrderEdis[$l]["amount"] + $OrderEdis[$m]["amount"];
+            $OrderEdis[$l]["amount"] = $amount;
 
-              $OrderEdis[$l]["amount"] = $amount;
+            unset($OrderEdis[$m]);
 
-              unset($OrderEdis[$m]);
+          }elseif($OrderEdis[$l]["product_code"] == 'W002' && $OrderEdis[$m]["product_code"] == 'W002' && $OrderEdis[$l]["place_line"] == $OrderEdis[$m]["place_line"]){
 
-            }elseif($OrderEdis[$l]["product_code"] == 'W002' && $OrderEdis[$m]["product_code"] == 'W002' && $OrderEdis[$l]["place_line"] == $OrderEdis[$m]["place_line"]){
+            $amount = $OrderEdis[$l]["amount"] + $OrderEdis[$m]["amount"];
 
-              $amount = $OrderEdis[$l]["amount"] + $OrderEdis[$m]["amount"];
+            $OrderEdis[$l]["amount"] = $amount;
 
-              $OrderEdis[$l]["amount"] = $amount;
-
-              unset($OrderEdis[$m]);
-
-            }
+            unset($OrderEdis[$m]);
 
           }
 

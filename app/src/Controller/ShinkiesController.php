@@ -42,6 +42,11 @@ class ShinkiesController extends AppController {
  //  $this->request->session()->destroy(); // セッションの破棄
    $user = $this->Users->newEntity();
    $this->set('user',$user);
+
+   $session = $this->request->getSession();
+   $data = $session->read();
+   $session->delete("login");//ログインしたデータを削除
+
   }
 
    public function login()

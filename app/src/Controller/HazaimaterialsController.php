@@ -9,6 +9,7 @@ use Cake\Core\Configure;//トランザクション
 use Cake\Auth\DefaultPasswordHasher;//
 
 use App\myClass\hazaiploglam\htmlhazaicheck;
+use App\myClass\Logins\htmlLogin;
 
 use Cake\Routing\Router;//urlの取得
 use Cake\Http\Client;//httpの読取に必要
@@ -201,7 +202,7 @@ class HazaimaterialsController extends AppController {
      $this->set('stockEndMaterials',$stockEndMaterials);
    }
 
-   public function materiallogin()
+   public function materialpreadd()
    {
      $stockEndMaterials = $this->StockEndMaterials->newEntity();
      $this->set('stockEndMaterials',$stockEndMaterials);
@@ -214,6 +215,44 @@ class HazaimaterialsController extends AppController {
        $mess = "";
        $this->set('mess',$mess);
      }
+
+   }
+
+   public function materiallogin()
+   {
+     if ($this->request->is('post')) {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+       $userdata = $data['username'];
+
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'materialpreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
+         }
+
+       }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'materialform']);
+       }
+     }
+
    }
 
    public function materialform()
@@ -232,22 +271,10 @@ class HazaimaterialsController extends AppController {
        $this->set('mess',$mess);
      }
 
-     if(isset($data["username"])){//登録者の確認
+     $session = $this->request->getSession();
+     $data = $session->read();
 
-       $ary = explode(',', $data["username"]);
-       $username = $ary[0];
-
-       $Users = $this->Users->find()
-       ->where(['username' => $username])->toArray();
-
-       if(!isset($Users[0])){
-
-         return $this->redirect(['action' => 'materiallogin',
-         's' => ['mess' => "社員コードが間違っています。もう一度やり直してください。"]]);
-
-       }
-
-     }
+     $username = $data["Auth"]["User"]["username"];
      $this->set('username', $username);
 
      $Users = $this->Users->find()
@@ -632,7 +659,7 @@ class HazaimaterialsController extends AppController {
 
    }
 
-   public function csvlogin()
+   public function csvpreadd()
    {
      $stockEndMaterials = $this->StockEndMaterials->newEntity();
      $this->set('stockEndMaterials',$stockEndMaterials);
@@ -647,30 +674,54 @@ class HazaimaterialsController extends AppController {
      }
    }
 
+   public function csvlogin()
+   {
+     if ($this->request->is('post')) {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+       $userdata = $data['username'];
+
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'csvpreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
+         }
+
+       }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'csvichiran']);
+       }
+     }
+   }
+
    public function csvichiran()
    {
      $stockEndMaterials = $this->StockEndMaterials->newEntity();
      $this->set('stockEndMaterials',$stockEndMaterials);
 
+     $session = $this->request->getSession();
+     $Userdata = $session->read();
+
+     $username = $Userdata["Auth"]["User"]["username"];
+     $this->set('username', $username);
+
      $data = $this->request->getData();
-
-     if(isset($data["username"])){//登録者の確認
-
-       $ary = explode(',', $data["username"]);
-       $username = $ary[0];
-
-       $Users = $this->Users->find()
-       ->where(['username' => $username])->toArray();
-
-       if(!isset($Users[0])){
-
-         return $this->redirect(['action' => 'csvlogin',
-         's' => ['mess' => "社員コードが間違っています。もう一度やり直してください。"]]);
-
-       }
-
-     }
-     $this->set('username',$username);
 
      if(isset($data["alldel"])){
        $chesk_flag = 0;
@@ -972,7 +1023,7 @@ class HazaimaterialsController extends AppController {
         }//トランザクション10
 
    }
-
+/*
    public function torikomilogin()//210720不使用ラベルメニューの取込を使用
    {
      $stockEndMaterials = $this->StockEndMaterials->newEntity();
@@ -1086,11 +1137,7 @@ class HazaimaterialsController extends AppController {
          }
 
        }
-/*
-       echo "<pre>";
-       print_r($arrLottouroku);
-       echo "</pre>";
-*/
+
        $this->set('arrLottouroku',$arrLottouroku);
        if(count($arrLottouroku) < 1){
          $mes = "※登録される端材原料がありません。正しいファイルが選択されているか確認してください。";
@@ -1135,7 +1182,7 @@ class HazaimaterialsController extends AppController {
         }//トランザクション10
 
      }
-
+*/
      public function kensakuform()//ロット検索
      {
        $stockEndMaterials = $this->StockEndMaterials->newEntity();
@@ -1287,7 +1334,7 @@ class HazaimaterialsController extends AppController {
 
      }
 
-     public function shippedlogin()
+     public function shippedpreadd()
      {
        $stockEndMaterials = $this->StockEndMaterials->newEntity();
        $this->set('stockEndMaterials',$stockEndMaterials);
@@ -1302,12 +1349,52 @@ class HazaimaterialsController extends AppController {
        }
      }
 
-     public function shippedform()
+     public function shippedlogin()
+     {
+       if ($this->request->is('post')) {
+         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+         $userdata = $data['username'];
+
+         if(isset($data['prelogin'])){
+
+           $htmllogin = new htmlLogin();
+           $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+           if($qrcheck > 0){
+             return $this->redirect(['action' => 'shippedpreadd',
+             's' => ['mess' => "QRコードを読み込んでください。"]]);
+           }
+
+         }
+
+         $htmllogin = new htmlLogin();
+         $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+         $username = $arraylogindate[0];
+         $delete_flag = $arraylogindate[1];
+         $this->set('username',$username);
+         $this->set('delete_flag',$delete_flag);
+
+         $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'shippedform']);
+         }
+       }
+     }
+
+     public function shippedform()//QR＝HT60_RH27,,,,210720-001,
      {
        $stockEndMaterials = $this->StockEndMaterials->newEntity();
        $this->set('stockEndMaterials',$stockEndMaterials);
 
-       $data = $this->request->getData();
+       $session = $this->request->getSession();
+       $Userdata = $session->read();
+
+       $username = $Userdata["Auth"]["User"]["username"];
+       $this->set('username', $username);
 
        $Data=$this->request->query('s');
        if(isset($Data["mess"])){
@@ -1320,23 +1407,7 @@ class HazaimaterialsController extends AppController {
          $this->set('mess',$mess);
        }
 
-       if(isset($data["username"])){//登録者の確認
-
-         $ary = explode(',', $data["username"]);
-         $username = $ary[0];
-
-         $Users = $this->Users->find()
-         ->where(['username' => $username])->toArray();
-
-         if(!isset($Users[0])){
-
-           return $this->redirect(['action' => 'shippedlogin',
-           's' => ['mess' => "社員コードが間違っています。もう一度やり直してください。"]]);
-
-         }
-
-       }
-       $this->set('username', $username);
+       $data = $this->request->getData();
 
        $Users = $this->Users->find()
        ->where(['username' => $username])->toArray();
@@ -1353,7 +1424,7 @@ class HazaimaterialsController extends AppController {
        }
 
      }
-
+/*
      public function shippedconfirm()//210722不要いきなり登録へ
      {
        $stockEndMaterials = $this->StockEndMaterials->newEntity();
@@ -1364,11 +1435,11 @@ class HazaimaterialsController extends AppController {
        $this->set('username',$username);
        $staff_name = $data["staff_name"];
        $this->set('staff_name',$staff_name);
-/*
+
        echo "<pre>";
        print_r($data);
        echo "</pre>";
-*/
+
        $arrshippeddata = explode(',', $data['shippeddata']);
        $materialgrade_color = $arrshippeddata[0];
 
@@ -1404,6 +1475,10 @@ class HazaimaterialsController extends AppController {
        $PriceMaterials = $this->PriceMaterials->find()
        ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
 
+       echo "<pre>";
+       print_r($PriceMaterials[0]." ".$lot_num);
+       echo "</pre>";
+
        if(isset($PriceMaterials[0])){
 
          $StockEndMaterials = $this->StockEndMaterials->find()
@@ -1434,7 +1509,7 @@ class HazaimaterialsController extends AppController {
        }
 
      }
-
+*/
      public function shippeddo()
      {
        $stockEndMaterials = $this->StockEndMaterials->newEntity();
@@ -1542,7 +1617,7 @@ class HazaimaterialsController extends AppController {
 
      }
 
-     public function editlogin()
+     public function editpreadd()
      {
        $stockEndMaterials = $this->StockEndMaterials->newEntity();
        $this->set('stockEndMaterials',$stockEndMaterials);
@@ -1557,10 +1632,66 @@ class HazaimaterialsController extends AppController {
        }
      }
 
+     public function editlogin()
+     {
+       if ($this->request->is('post')) {
+         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+         $userdata = $data['username'];
+
+         if(isset($data['prelogin'])){
+
+           $htmllogin = new htmlLogin();
+           $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+           if($qrcheck > 0){
+             return $this->redirect(['action' => 'editpreadd',
+             's' => ['mess' => "QRコードを読み込んでください。"]]);
+           }
+
+         }
+
+         $htmllogin = new htmlLogin();
+         $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+         $username = $arraylogindate[0];
+         $delete_flag = $arraylogindate[1];
+         $this->set('username',$username);
+         $this->set('delete_flag',$delete_flag);
+
+         $Users = $this->Users->find()
+         ->where(['username' => $username])->toArray();
+         if(isset($Users[0])){
+           $StatusRolesData = $this->StatusRoles->find()->where(['staff_id' => $Users[0]["staff_id"], 'role_id <=' => 3, 'delete_flag' => 0])->toArray();
+
+           if(!isset($StatusRolesData[0])){
+
+             return $this->redirect(['action' => 'editpreadd',
+             's' => ['mess' => "端材原料情報を修正する権限がありません。"]]);
+
+           }
+
+         }
+
+         $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'editform']);
+         }
+       }
+     }
+
      public function editform()
      {
        $stockEndMaterials = $this->StockEndMaterials->newEntity();
        $this->set('stockEndMaterials',$stockEndMaterials);
+
+       $session = $this->request->getSession();
+       $Userdata = $session->read();
+
+       $username = $Userdata["Auth"]["User"]["username"];
+       $this->set('username', $username);
 
        $data = $this->request->getData();
 
@@ -1574,35 +1705,6 @@ class HazaimaterialsController extends AppController {
          $mess = "";
          $this->set('mess',$mess);
        }
-
-       if(isset($data["username"])){//登録者の確認
-
-         $ary = explode(',', $data["username"]);
-         $username = $ary[0];
-
-         $Users = $this->Users->find()
-         ->where(['username' => $username])->toArray();
-
-         if(!isset($Users[0])){
-
-           return $this->redirect(['action' => 'editlogin',
-           's' => ['mess' => "社員コードが間違っています。もう一度やり直してください。"]]);
-
-         }else{//管理者チェック
-
-           $StatusRolesData = $this->StatusRoles->find()->where(['staff_id' => $Users[0]["staff_id"], 'role_id <=' => 3, 'delete_flag' => 0])->toArray();
-
-           if(!isset($StatusRolesData[0])){
-
-             return $this->redirect(['action' => 'editlogin',
-             's' => ['mess' => "端材原料情報を修正する権限がありません。"]]);
-
-           }
-
-         }
-
-       }
-       $this->set('username', $username);
 
        $Users = $this->Users->find()
        ->where(['username' => $username])->toArray();

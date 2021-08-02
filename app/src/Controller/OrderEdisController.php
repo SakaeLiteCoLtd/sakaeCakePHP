@@ -343,31 +343,52 @@ class OrderEdisController extends AppController
       session_start();//セッションの開始
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
  		}
 
  		public function hattyucsvlogin()
  		{
- 			if ($this->request->is('post')) {
+      if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-        $this->set('data',$data);//セット
-        $userdata = $data['username'];
-        $this->set('userdata',$userdata);//セット
 
-        $htmllogin = new htmlLogin();//クラスを使用
-        $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
+        $userdata = $data['username'];
+
+        if(isset($data['prelogin'])){
+
+          $htmllogin = new htmlLogin();
+          $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+          if($qrcheck > 0){
+            return $this->redirect(['action' => 'hattyucsvpreadd',
+            's' => ['mess' => "QRコードを読み込んでください。"]]);
+          }
+
+        }
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
 
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);
         $this->set('delete_flag',$delete_flag);
 
-        $user = $this->Auth->identify();
+        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
 
- 					if ($user) {
- 						$this->Auth->setUser($user);
-            return $this->redirect(['action' => 'hattyucsv']);//hattyucsvへ移動
- 					}
- 				}
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'hattyucsv']);
+        }
+      }
  		}
 
     public function dnpcsvpreadd()
@@ -376,32 +397,52 @@ class OrderEdisController extends AppController
       session_start();//セッションの開始
      $orderEdis = $this->OrderEdis->newEntity();
      $this->set('orderEdis',$orderEdis);
-     $data = $this->request->getData();
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
+
     }
 
     public function dnpcsvlogin()
     {
-       if ($this->request->is('post')) {
-         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-         $this->set('data',$data);//セット
-         $userdata = $data['username'];
-         $this->set('userdata',$userdata);//セット
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
-         $htmllogin = new htmlLogin();
-         $arraylogindate = $htmllogin->htmllogin($userdata);
+        $userdata = $data['username'];
 
-         $username = $arraylogindate[0];
-         $delete_flag = $arraylogindate[1];
-         $this->set('username',$username);
-         $this->set('delete_flag',$delete_flag);
+        if(isset($data['prelogin'])){
 
-         $user = $this->Auth->identify();
+          $htmllogin = new htmlLogin();
+          $qrcheck = $htmllogin->qrcheckprogram($userdata);
 
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'dnpcsv']);
-         }
-       }
+          if($qrcheck > 0){
+            return $this->redirect(['action' => 'dnpcsvpreadd',
+            's' => ['mess' => "QRコードを読み込んでください。"]]);
+          }
+
+        }
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'dnpcsv']);
+        }
+      }
     }
 
     public function dnpcsv()
@@ -559,7 +600,7 @@ echo "</pre>";
       print_r("arrEDI");
       print_r($arrEDI);
       echo "</pre>";
-*/
+  */
   //    $_SESSION['order_edi_kumitate'] = array();//空の配列を作る
 
       $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrEDI);//patchEntitiesで一括登録
@@ -1058,7 +1099,6 @@ echo "</pre>";
           file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
           $this->Flash->error(__('This orderEdis could not be saved. Please, try again.'));
           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-          
         }
       } catch (Exception $e) {//トランザクション7
       //ロールバック8
@@ -3444,7 +3484,7 @@ echo "</pre>";
       $this->set("product_name",$product_name);
 
       $PlaceDelivers = $this->PlaceDelivers->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
-        ->where(['cs_code like' => '%'."20".'%'])->toArray();
+        ->where(['cs_code like' => '%'."200".'%'])->toArray();
         $arrPlaceDeliver = array();//配列の初期化
       	foreach ($PlaceDelivers as $value) {//2行上のCustomersテーブルのデータそれぞれに対して
       		$arrPlaceDeliver[] = array($value->id=>$value->name);//配列に3行上のCustomersテーブルのデータそれぞれのcustomer_code:name
@@ -3886,28 +3926,13 @@ echo "</pre>";
 */
       if(empty($product_code)){//product_codeの入力がないとき
         $product_code = "no";
-
-        $OrderToSuppliers = $this->OrderToSuppliers->find()
-          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin])->toArray();
-          /*
-        $OrderYobiToSuppliers = $this->OrderYobistockSuppliers->find()
-          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin])->toArray();
-
-        $OrderToSuppliers = array_merge($OrderToSuppliers, $OrderYobiToSuppliers);
-*/
-        $this->set('OrderToSuppliers',$OrderToSuppliers);
-
+        $this->set('OrderToSuppliers',$this->OrderToSuppliers->find()
+          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin]
+          ));//対象の製品を絞り込む
       }else{//product_codeの入力があるとき
-          $OrderToSuppliers = $this->OrderToSuppliers->find()
-          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code])->toArray();//対象の製品を絞り込む
-/*
-          $OrderYobiToSuppliers = $this->OrderYobistockSuppliers->find()
-            ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code])->toArray();
-
-            $OrderToSuppliers = array_merge($OrderToSuppliers, $OrderYobiToSuppliers);
-*/
-            $this->set('OrderToSuppliers',$OrderToSuppliers);
-
+        $this->set('OrderToSuppliers',$this->OrderToSuppliers->find()
+          ->where(['delete_flag' => '0', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin, 'product_code' => $product_code]
+          ));//対象の製品を絞り込む
       }
 
     }
@@ -4066,8 +4091,6 @@ echo "</pre>";
          $connection->begin();//トランザクション3
          try {//トランザクション4
            for($k=0; $k<count($data['orderToSuppliers']); $k++){
-
-
 
                if ($this->OrderToSuppliers->updateAll(//検査終了時間の更新
                  ['amount' => $data['orderToSuppliers'][$k]['amount'], 'date_deliver' => $data['orderToSuppliers'][$k]['date_deliver'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $staff_id],

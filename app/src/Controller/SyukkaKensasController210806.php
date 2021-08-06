@@ -599,7 +599,7 @@ class SyukkaKensasController extends AppController {
 
     public function typeimtaiouform()//IMtaiou
     {
-      $this->request->session()->destroy();// セッションの破棄
+    //  $this->request->session()->destroy();// セッションの破棄
 
       $data = $this->request->query();
 
@@ -651,6 +651,11 @@ class SyukkaKensasController extends AppController {
 
     public function imtaiouconfirm()//IMtaiou
     {
+      if(!isset($_SESSION)){//sessionsyuuseituika
+      session_start();
+      }
+      $_SESSION['kikakudata'] = array();
+
      $data = $this->request->getData();
      $product_code = $data["product_code"];
 
@@ -979,7 +984,7 @@ class SyukkaKensasController extends AppController {
 
     public function indexhome()//取り込み画面
     {
-      $this->request->session()->destroy(); // セッションの破棄
+    //  $this->request->session()->destroy(); // セッションの破棄
 
       $imKikakus = $this->ImKikakus->newEntity();
       $this->set('imKikakus', $imKikakus);
@@ -1258,7 +1263,7 @@ class SyukkaKensasController extends AppController {
 
           }else{//検査していない場合
 
-          ${"KadouSeikeifinishing_tm".$i} = $KadouSeikeiDatac[$i-1]->finishing_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
+          ${"KadouSeikeifinishing_tm".$i} = $KadouSeikeiDatac[$i-1]->starting_tm->format('Y-m-d H:i:s');//配列の$i番目のfinishing_tm
           ${"KadouSeikeifinishing_date".$i} = substr(${"KadouSeikeifinishing_tm".$i},0,4)."-".substr(${"KadouSeikeifinishing_tm".$i},5,2)."-".substr(${"KadouSeikeifinishing_tm".$i},8,2);//finishing_tmの年月日を取得
 
             if(substr(${"KadouSeikeifinishing_date".$i},0,10) === substr($today,0,10)){//今日のデータの場合は表示しない
@@ -2683,7 +2688,7 @@ class SyukkaKensasController extends AppController {
 
   public function logout()
   {
-    $this->request->session()->destroy(); // セッションの破棄
+  //  $this->request->session()->destroy(); // セッションの破棄
   }
 
       public function do()//「出荷検査表登録」登録画面
@@ -2978,7 +2983,7 @@ class SyukkaKensasController extends AppController {
 
      public function imtaiouedit($id = null)
      {
-       $this->request->session()->destroy(); // セッションの破棄
+  //     $this->request->session()->destroy(); // セッションの破棄
 
        $ImKikakuTaious = $this->ImKikakuTaious->get($id);
        $this->set('ImKikakuTaious', $ImKikakuTaious);//$kensahyouHeadをctpで使えるようにセット
@@ -3023,6 +3028,11 @@ class SyukkaKensasController extends AppController {
 
      public function imtaioueditconfirm()
      {
+       if(!isset($_SESSION)){//sessionsyuuseituika
+       session_start();
+       }
+       $_SESSION['kikakudata'] = array();
+
       $data = $this->request->getData();
       $product_code = $data["product_code"];
 

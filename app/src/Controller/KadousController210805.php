@@ -1002,8 +1002,13 @@ class KadousController extends AppController
   public function kensakuform()//ロット検索
   {
   //  $this->request->session()->destroy(); // セッションの破棄
-      $_SESSION['imgdata'] = array();
-      $_SESSION['imgnum'] = array();
+  //    $_SESSION['imgdata'] = array();//210709削除
+  //    $_SESSION['imgnum'] = array();//210709削除
+
+    if(!isset($_SESSION['distinction'])){//210709追加
+      session_start();//210709追加
+      $_SESSION['distinction'] = array();//210709追加
+    }//210709追加
 
     $KadouSeikeis = $this->KadouSeikeis->newEntity();
     $this->set('KadouSeikeis',$KadouSeikeis);
@@ -1048,9 +1053,12 @@ class KadousController extends AppController
 
     $date_sta = $data['date_sta_year']."-".$data['date_sta_month']."-".$data['date_sta_date'];
     $date_fin = $data['date_fin_year']."-".$data['date_fin_month']."-".$data['date_fin_date'];
+
+    $distinction_sesson = $date_sta."-".$date_fin;//210709追加
+    $this->set('distinction_sesson',$distinction_sesson);//210709追加
 /*
     echo "<pre>";
-    print_r($date_sta." - ".$date_fin);
+    print_r($distinction_sesson);
     echo "</pre>";
 */
     $product_code = $data['product_code'];
@@ -2000,8 +2008,10 @@ echo "</pre>";
 */
 
       session_start();
+      $_SESSION['imgdata'.$distinction_sesson] = array();//210709追加
+      $_SESSION['imgnum'.$distinction_sesson] = array();//210709追加
       for($n=0; $n<count($KadouSeikeis); $n++){
-        $_SESSION['imgdata'][$n] = array(
+        $_SESSION['imgdata'.$distinction_sesson][$n] = array(//210709追加
           'id' => $KadouSeikeis[$n]['id'],
           'pro_num' => $KadouSeikeis[$n]['product_code'],
           'starting_tm_nippou' => substr($KadouSeikeis[$n]['starting_tm'], 0, 19),
@@ -2169,8 +2179,10 @@ echo "</pre>";
       $this->set('countarrNon_data_KadouSeikeis',$countarrNon_data_KadouSeikeis);
 
       session_start();
+      $_SESSION['imgdata'.$distinction_sesson] = array();//210709追加
+      $_SESSION['imgnum'.$distinction_sesson] = array();//210709追加
       for($n=0; $n<count($KadouSeikeis); $n++){
-        $_SESSION['imgdata'][$n] = array(
+        $_SESSION['imgdata'.$distinction_sesson][$n] = array(//210709追加
           'id' => $KadouSeikeis[$n]['id'],
           'pro_num' => $KadouSeikeis[$n]['product_code'],
           'starting_tm_nippou' => substr($KadouSeikeis[$n]['starting_tm'], 0, 19),
@@ -2189,33 +2201,33 @@ echo "</pre>";
     $session = $this->request->getSession();
     $datasession = $session->read();
 
-    if(!isset($datasession["imgdata"])){
+    if(!isset($datasession["distinction"])){
       return $this->redirect(['action' => 'kariindex',
       's' => ['mess' => "セッションが切れました。日報呼出ボタンからやり直してください。"]]);
     }
 
-    $arrdatasession = $datasession["imgdata"];
-
     $KadouSeikeis = $this->KadouSeikeis->newEntity();
     $this->set('KadouSeikeis',$KadouSeikeis);
 
-    $Data=$this->request->query('s');
+    $Data = $this->request->query('s');
+
     if(isset($Data["returndata"])){
 
       $imgdatas = explode("_",$Data["returndata"]);//切り離し
+      $distinction_sesson = $imgdatas[6];
 
     }else{
 
       $data = $this->request->getData();
       $data = array_keys($data, '詳細');
       $imgdatas = explode("_",$data[0]);//切り離し
+      $distinction_sesson = $imgdatas[5];
 
     }
-/*
-    echo "<pre>";
-    print_r($imgdatas);
-    echo "</pre>";
-*/
+
+    $this->set('distinction_sesson',$distinction_sesson);
+
+    $arrdatasession = $datasession["imgdata".$distinction_sesson];
 
       if(isset($imgdatas[2])){
 
@@ -2256,10 +2268,14 @@ echo "</pre>";
 
       }
 
-      $_SESSION['imgnum'] = array(
+      $_SESSION['imgnum'.$distinction_sesson] = array(
         'num' => $imgdatas[0]
       );
-
+/*
+      echo "<pre>";
+      print_r($_SESSION);
+      echo "</pre>";
+*/
       $KadouSeikeis = $this->KadouSeikeis->find()->where(['id' => $imgdatas[1]])->toArray();
 
       $date_sta = $KadouSeikeis[0]["starting_tm"]->format('Y-m-d H:i:s');
@@ -2277,11 +2293,7 @@ echo "</pre>";
       $this->set('first_lot_num',$first_lot_num);
       $last_lot_num = $KadouSeikeis[0]["last_lot_num"];
       $this->set('last_lot_num',$last_lot_num);
-/*
-      echo "<pre>";
-      print_r($product_name);
-      echo "</pre>";
-*/
+
       $connection = ConnectionManager::get('big_DB');//旧DBを参照
       $table = TableRegistry::get('log_confirm_kadou_seikeikis');
       $table->setConnection($connection);
@@ -2295,11 +2307,6 @@ echo "</pre>";
 
       $connection = ConnectionManager::get('default');
       $table->setConnection($connection);
-/*
-      echo "<pre>";
-      print_r($log_confirm_kadou_seikeikis[0]);
-      echo "</pre>";
-*/
 
       if(isset($log_confirm_kadou_seikeikis[0])){
 
@@ -2361,7 +2368,6 @@ echo "</pre>";
 
     public function syuuseiform()//ロット検索
     {
-  //    $this->request->session()->destroy(); // セッションの破棄
       $KadouSeikeis = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikeis',$KadouSeikeis);
 
@@ -2397,7 +2403,6 @@ echo "</pre>";
 
     public function syuuseiconfirm()//ロット検索
     {
-  //    $this->request->session()->destroy(); // セッションの破棄
       session_start();
       $_SESSION['kadouseikeisyuusei'] = array();
       $_SESSION['kadouseikeiid'] = array();
@@ -2469,7 +2474,6 @@ echo "</pre>";
       }
 
       $this->set('sum_predict_lot_num',$sum_predict_lot_num);
-
 
       $_SESSION['kadouseikeisyuusei'] = array(
         'product_code' => $product_code,
@@ -2606,22 +2610,31 @@ echo "</pre>";
      $session = $this->request->getSession();
      $datasession = $session->read();
 
-     if(!isset($datasession["imgnum"])){
+     $data = $this->request->getData();
+     $distinction_sesson = $data["distinction_sesson"];
+     $this->set('distinction_sesson',$distinction_sesson);
+/*
+     echo "<pre>";
+     print_r($data);
+     echo "</pre>";
+     echo "<pre>";
+     print_r($datasession);
+     echo "</pre>";
+*/
+     if(!isset($datasession["imgnum".$distinction_sesson])){
        return $this->redirect(['action' => 'kariindex',
        's' => ['mess' => "セッションが切れました。日報呼出ボタンからやり直してください。"]]);
      }
 
-     $imgdatanum = $datasession["imgnum"]["num"];
-     $imgdatanummax = count($datasession["imgdata"]) - 1;
+     $imgdatanum = $datasession["imgnum".$distinction_sesson]["num"];
+     $imgdatanummax = count($datasession["imgdata".$distinction_sesson]) - 1;
 
-     $date_sta = $datasession["imgdata"][$imgdatanum]["starting_tm"];
+     $date_sta = $datasession["imgdata".$distinction_sesson][$imgdatanum]["starting_tm"];
      $this->set('date_sta',$date_sta);
 
-     $starting_tm_nippou = $datasession["imgdata"][$imgdatanum]["starting_tm_nippou"];
-     $pro_num = $datasession["imgdata"][$imgdatanum]["pro_num"];
-     $seikeiki = $datasession["imgdata"][$imgdatanum]["seikeiki"];
-
-     $data = $this->request->getData();
+     $starting_tm_nippou = $datasession["imgdata".$distinction_sesson][$imgdatanum]["starting_tm_nippou"];
+     $pro_num = $datasession["imgdata".$distinction_sesson][$imgdatanum]["pro_num"];
+     $seikeiki = $datasession["imgdata".$distinction_sesson][$imgdatanum]["seikeiki"];
 
      if(isset($data["bikou"])){
 
@@ -2654,8 +2667,8 @@ echo "</pre>";
        $kobetu_loss_time = $data["kobetu_loss_time"]*1000;
        $katagae_time = $data["katagae_time"]*1000;
 
-       $returndata = $imgdatanum."_".$datasession["imgdata"][$imgdatanum]["id"]."_".
-       $accomp_rate_program."_".$kobetu_loss_time."_".$katagae_time."_".$data["shot_cycle_heikin"];
+       $returndata = $imgdatanum."_".$datasession["imgdata".$distinction_sesson][$imgdatanum]["id"]."_".
+       $accomp_rate_program."_".$kobetu_loss_time."_".$katagae_time."_".$data["shot_cycle_heikin"]."_".$distinction_sesson;
 
        return $this->redirect(['action' => 'kensakusyousai',
        's' => ['returndata' => $returndata]]);
@@ -2671,15 +2684,15 @@ echo "</pre>";
          $imgdatanum = $imgdatanum % $imgdatanummax;
        }
 
-       $_SESSION['imgnum'] = array(
+       $_SESSION['imgnum'.$distinction_sesson] = array(
          'num' => $imgdatanum
        );
 
-       $product_code = $datasession["imgdata"][$imgdatanum]["pro_num"];
+       $product_code = $datasession["imgdata".$distinction_sesson][$imgdatanum]["pro_num"];
        $this->set('product_code',$product_code);
-       $seikeiki = $datasession["imgdata"][$imgdatanum]["seikeiki"];
+       $seikeiki = $datasession["imgdata".$distinction_sesson][$imgdatanum]["seikeiki"];
        $this->set('seikeiki',$seikeiki);
-       $date_sta = $datasession["imgdata"][$imgdatanum]["starting_tm"];
+       $date_sta = $datasession["imgdata".$distinction_sesson][$imgdatanum]["starting_tm"];
        $this->set('date_sta',$date_sta);
 
      }elseif(isset($data["poj"])){
@@ -2689,15 +2702,15 @@ echo "</pre>";
          $imgdatanum = 0;
        }
 
-       $_SESSION['imgnum'] = array(
+       $_SESSION['imgnum'.$distinction_sesson] = array(
          'num' => $imgdatanum
        );
 
-       $product_code = $datasession["imgdata"][$imgdatanum]["pro_num"];
+       $product_code = $datasession["imgdata".$distinction_sesson][$imgdatanum]["pro_num"];
        $this->set('product_code',$product_code);
-       $seikeiki = $datasession["imgdata"][$imgdatanum]["seikeiki"];
+       $seikeiki = $datasession["imgdata".$distinction_sesson][$imgdatanum]["seikeiki"];
        $this->set('seikeiki',$seikeiki);
-       $date_sta = $datasession["imgdata"][$imgdatanum]["starting_tm"];
+       $date_sta = $datasession["imgdata".$distinction_sesson][$imgdatanum]["starting_tm"];
        $this->set('date_sta',$date_sta);
 
      }elseif(isset($data["yobidasi"])){//グラフ呼び出しボタンを押したとき
@@ -2728,9 +2741,9 @@ echo "</pre>";
      $arrImgpriority = ['1' => '主要グラフ','2' => 'その他'];
      $this->set('arrImgpriority',$arrImgpriority);
 
-     $pro_num = $datasession["imgdata"][$imgdatanum]["pro_num"];
-     $seikeiki = $datasession["imgdata"][$imgdatanum]["seikeiki"];
-     $starting_tm_nippou = $datasession["imgdata"][$imgdatanum]["starting_tm_nippou"];
+     $pro_num = $datasession["imgdata".$distinction_sesson][$imgdatanum]["pro_num"];
+     $seikeiki = $datasession["imgdata".$distinction_sesson][$imgdatanum]["seikeiki"];
+     $starting_tm_nippou = $datasession["imgdata".$distinction_sesson][$imgdatanum]["starting_tm_nippou"];
 
      $connection = ConnectionManager::get('big_DB');//旧DBを参照
      $table = TableRegistry::get('log_confirm_kadou_seikeikis');
@@ -2984,24 +2997,31 @@ echo "</pre>";
       $session = $this->request->getSession();
       $datasession = $session->read();
 
-      if(!isset($datasession["imgnum"])){
+      $Data = $this->request->query('s');
+      $data = $Data['data'];//postデータ取得し、$dataと名前を付ける
+      /*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+      */
+      $distinction_sesson = $data["distinction_sesson"];
+      $this->set('distinction_sesson',$distinction_sesson);
+
+      if(!isset($datasession["imgnum".$distinction_sesson])){
         return $this->redirect(['action' => 'kariindex',
         's' => ['mess' => "セッションが切れました。日報呼出ボタンからやり直してください。"]]);
       }
 
-      $imgdatanum = $datasession["imgnum"]["num"];
-      $product_code = $datasession["imgdata"][$imgdatanum]["pro_num"];
+      $imgdatanum = $datasession["imgnum".$distinction_sesson]["num"];
+      $product_code = $datasession["imgdata".$distinction_sesson][$imgdatanum]["pro_num"];
       $this->set('product_code',$product_code);
-      $seikeiki = $datasession["imgdata"][$imgdatanum]["seikeiki"];
+      $seikeiki = $datasession["imgdata".$distinction_sesson][$imgdatanum]["seikeiki"];
       $this->set('seikeiki',$seikeiki);
-      $date_sta = $datasession["imgdata"][$imgdatanum]["starting_tm"];
+      $date_sta = $datasession["imgdata".$distinction_sesson][$imgdatanum]["starting_tm"];
       $this->set('date_sta',$date_sta);
       $date_y = substr($date_sta, 0, 4);
       $date_m = substr($date_sta, 5, 2);
       $date_d = substr($date_sta, 8, 2);
-
-      $Data = $this->request->query('s');
-      $data = $Data['data'];//postデータ取得し、$dataと名前を付ける
 
      $priority = $data['priority'];
      $type = $data['type'];

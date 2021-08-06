@@ -16,9 +16,45 @@ class ZzzcsvtorikomisController extends AppController
 			parent::initialize();
       $this->Products = TableRegistry::get('products');
       $this->PriceMaterials = TableRegistry::get('priceMaterials');
+      $this->Materials = TableRegistry::get('materials');
      }
 
      public function torikomi()//http://localhost:5000/Zzzcsvtorikomis/torikomi
+     {
+
+       $PriceMaterials = $this->PriceMaterials->find()
+       ->where(['delete_flag' => 0])->toArray();
+
+       for($j=0; $j<count($PriceMaterials); $j++){
+
+         $Materials = $this->Materials->find()
+         ->where(['grade' => $PriceMaterials[$j]['grade'], 'color' => $PriceMaterials[$j]['color'], 'delete_flag' => 0])->toArray();
+
+         if(!isset($Materials[0])){
+
+           $arrMaterialsok[] = [
+             'grade' => $PriceMaterials[$j]['grade'],
+             'color' => $PriceMaterials[$j]['color'],
+             'status' => 0,
+             'delete_flag' => 0,
+             'created_staff' => 0,
+             'created_at' => "2021-08-06 17:00:00",
+           ];
+
+         }
+
+       }
+
+       echo "<pre>";
+			 print_r($arrMaterialsok);
+			 echo "</pre>";
+
+  //     $Materials = $this->Materials->patchEntities($this->Materials->newEntity(), $arrMaterialsok);
+  //     $this->Materials->saveMany($Materials);
+
+     }
+
+     public function torikomi2()//http://localhost:5000/Zzzcsvtorikomis/torikomi
      {
 
 			 $fp = fopen("hazai/price_materials_grade_color210727.csv", "r");//csvファイルはwebrootに入れる

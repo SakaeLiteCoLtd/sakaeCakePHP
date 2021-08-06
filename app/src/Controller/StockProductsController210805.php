@@ -394,52 +394,32 @@ class StockProductsController extends AppController
 	 {
 		 $StockProducts = $this->StockProducts->newEntity();
 		 $this->set('StockProducts',$StockProducts);
-
-		 $Data=$this->request->query('s');
-		 if(isset($Data["mess"])){
-			 $mess = $Data["mess"];
-			 $this->set('mess',$mess);
-		 }else{
-			 $mess = "";
-			 $this->set('mess',$mess);
-		 }
-
 	 }
 
 	 public function login()
 	 {
 		 if ($this->request->is('post')) {
-			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+  			$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+  			$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+  			$ary = explode(',', $str);//$strを配列に変換
 
-			 $userdata = $data['username'];
+  			$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+  			//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+  			$this->set('username', $username);
+  			$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
 
-			 if(isset($data['prelogin'])){
-
-				 $htmllogin = new htmlLogin();
-				 $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-				 if($qrcheck > 0){
-					 return $this->redirect(['action' => 'preadd',
-					 's' => ['mess' => "QRコードを読み込んでください。"]]);
-				 }
-
-			 }
-
-			 $htmllogin = new htmlLogin();
-			 $arraylogindate = $htmllogin->htmlloginprogram($userdata);
-
-			 $username = $arraylogindate[0];
-			 $delete_flag = $arraylogindate[1];
-			 $this->set('username',$username);
-			 $this->set('delete_flag',$delete_flag);
-
-			 $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
-
-			 if ($user) {
-				 $this->Auth->setUser($user);
-				 return $this->redirect(['action' => 'do']);
-			 }
-		 }
+  				if(empty($Userdata)){
+  					$delete_flag = "";
+  				}else{
+  					$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+  					$this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+  				}
+  					$user = $this->Auth->identify();
+  				if ($user) {
+  					$this->Auth->setUser($user);
+  					return $this->redirect(['action' => 'do']);
+  				}
+  			}
 			}
 
 			public function do()
@@ -493,13 +473,58 @@ class StockProductsController extends AppController
 							'updated_at' => $_SESSION['tourokustockupdate'][$k]["updated_at"]],
 						 ['id' => $_SESSION['tourokustockupdate'][$k]["id"]]
 						 );
+/*
+						 //旧DBに登録
+						$connection = ConnectionManager::get('sakaeMotoDB');
+						$table = TableRegistry::get('stock_product');
+						$table->setConnection($connection);
 
+						 $sql = "SELECT product_id,date_stock FROM stock_product".
+						 " where product_id = '".$_SESSION['tourokustockupdate'][$k]["product_code"]."' and date_stock = '".$_SESSION['tourokustockupdate'][$k]["date_stock"]."'";
+						 $connection = ConnectionManager::get('sakaeMotoDB');
+						 $date_stock_moto = $connection->execute($sql)->fetchAll('assoc');
+
+						 if(isset($date_stock_moto[0])){
+							 $updater = "UPDATE stock_product set amount = '".$_SESSION['tourokustockupdate'][$k]["amount"]."'
+							 where product_id ='".$_SESSION['tourokustockupdate'][$k]["product_code"]."' and date_stock ='".$_SESSION['tourokustockupdate'][$k]["date_stock"]."'";
+							 $connection->execute($updater);
+						 }else{
+
+							 $connection->insert('stock_product', [
+									 'product_id' => $_SESSION['tourokustockupdate'][$k]["product_code"],
+									 'date_stock' => $_SESSION['tourokustockupdate'][$k]["date_stock"],
+									 'amount' => $_SESSION['tourokustockupdate'][$k]["amount"]
+							 ]);
+
+						 }
+
+						 $connection = ConnectionManager::get('default');//新DBに戻る
+						 $table->setConnection($connection);
+*/
 					 }
 
 					 if(count($_SESSION['tourokustock']) > 0) {
 
 						 if ($this->StockProducts->saveMany($StockProduct)) {
+/*
+							 //旧DBに登録
+							$connection = ConnectionManager::get('sakaeMotoDB');
+							$table = TableRegistry::get('stock_product');
+							$table->setConnection($connection);
 
+							 for ($k=0; $k<count($_SESSION['tourokustock']); $k++) {
+
+									$connection->insert('stock_product', [
+											'product_id' => $_SESSION['tourokustock'][$k]["product_code"],
+											'date_stock' => $_SESSION['tourokustock'][$k]["date_stock"],
+											'amount' => $_SESSION['tourokustock'][$k]["amount"]
+									]);
+
+							 }
+
+							 $connection = ConnectionManager::get('default');//新DBに戻る
+							 $table->setConnection($connection);
+*/
 							 $mes = "※以下のように登録されました";
 							 $this->set('mes',$mes);
 							 $connection->commit();// コミット5
@@ -523,7 +548,25 @@ class StockProductsController extends AppController
 				 }else{
 
 					 if ($this->StockProducts->saveMany($StockProduct)) {
+/*
+						 //旧DBに登録
+						$connection = ConnectionManager::get('sakaeMotoDB');
+						$table = TableRegistry::get('stock_product');
+						$table->setConnection($connection);
 
+						 for ($k=0; $k<count($_SESSION['tourokustock']); $k++) {
+
+								$connection->insert('stock_product', [
+										'product_id' => $_SESSION['tourokustock'][$k]["product_code"],
+										'date_stock' => $_SESSION['tourokustock'][$k]["date_stock"],
+										'amount' => $_SESSION['tourokustock'][$k]["amount"]
+								]);
+
+						 }
+
+						 $connection = ConnectionManager::get('default');//新DBに戻る
+						 $table->setConnection($connection);
+*/
 						 $mes = "※以下のように登録されました";
 						 $this->set('mes',$mes);
 						 $connection->commit();// コミット5

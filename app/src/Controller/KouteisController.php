@@ -10,6 +10,7 @@ use Cake\Core\Configure;//トランザクション
 use Cake\Filesystem\Folder;
 use Cake\Filesystem\File;
 use App\myClass\KensahyouSokuteidata\htmlKensahyouSokuteidata;//myClassフォルダに配置したクラスを使用
+use App\myClass\Logins\htmlLogin;
 
 class KouteisController extends AppController {
 
@@ -1227,74 +1228,110 @@ class KouteisController extends AppController {
     {
       $this->set('entity',$this->KouteiImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
 
-      $session = $this->request->getSession();
-      $data = $session->read();//postデータ取得し、$dataと名前を付ける
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
     }
 
     public function typeimtaioupreadd()
     {
       $this->set('KouteiKensahyouHeads',$this->KouteiKensahyouHeads->newEntity());
 
-     $session = $this->request->getSession();
-     $data = $session->read();//postデータ取得し、$dataと名前を付ける
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
 
-     $_SESSION['imdatanew'][0] = array(
-       'id' => $_POST['id'],
-       'version' => $_POST['version'],
-       'type_im' => $_POST['type_im']
-     );
+        $session = $this->request->getSession();
+        $data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+        $_SESSION['imdatanew'][0] = array(
+          'id' => $_POST['id'],
+          'version' => $_POST['version'],
+          'type_im' => $_POST['type_im']
+        );
+      }
+
     }
 
    public function imlogin()
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
 
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+       $userdata = $data['username'];
 
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'impreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
          }
-           $user = $this->Auth->identify();
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'imtaioudo']);
-         }
+
        }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'imtaioudo']);
+       }
+     }
    }
 
    public function typeimlogin()
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
 
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+       $userdata = $data['username'];
 
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'typeimtaioupreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
          }
-           $user = $this->Auth->identify();
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'typeimtaioudo']);
-         }
+
        }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'typeimtaioudo']);
+       }
+     }
    }
 
     public function imtaioudo()
@@ -1354,7 +1391,7 @@ class KouteisController extends AppController {
             if ($this->KouteiImKikakuTaious->saveMany($KouteiImKikakuTaiou)) {//saveManyで一括登録
 
             //旧DB更新
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('koutei_im_kikaku_taiou');
             $table->setConnection($connection);
 
@@ -1462,7 +1499,7 @@ class KouteisController extends AppController {
               $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['id' => $data["imdatanew"][0]['id']])->toArray();
 
               //旧DBに登録
-  						$connection = ConnectionManager::get('DB_ikou_test');
+  						$connection = ConnectionManager::get('sakaeMotoDB');
   						$table = TableRegistry::get('koutei_kensahyou_head');
   						$table->setConnection($connection);
 
@@ -1633,7 +1670,7 @@ class KouteisController extends AppController {
                                     try {//トランザクション4
                                       if ($this->KouteiImSokuteidataHeads->saveMany($KouteiImSokuteidataHead)) {
 
-                                        $connection = ConnectionManager::get('DB_ikou_test');
+                                        $connection = ConnectionManager::get('sakaeMotoDB');
                                         $table = TableRegistry::get('koutei_im_sokuteidata_head');
                                         $table->setConnection($connection);
 
@@ -1684,7 +1721,7 @@ class KouteisController extends AppController {
                                           $KouteiImKikakus = $this->KouteiImKikakus->patchEntities($KouteiImKikakus, $arrIm_kikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                              if ($this->KouteiImKikakus->saveMany($KouteiImKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $table = TableRegistry::get('koutei_im_kikaku');
                                                $table->setConnection($connection);
 
@@ -1692,7 +1729,7 @@ class KouteisController extends AppController {
                                                " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                 and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                  order by id desc limit 1";
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                for($k=0; $k<count($arrIm_kikaku); $k++){
@@ -1743,7 +1780,7 @@ class KouteisController extends AppController {
                                                   $KouteiImSokuteidataResults = $this->KouteiImSokuteidataResults->patchEntities($KouteiImSokuteidataResults, $arrIm_Result);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                                   if ($this->KouteiImSokuteidataResults->saveMany($KouteiImSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
 
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $table = TableRegistry::get('koutei_im_sokuteidata_result');
                                                     $table->setConnection($connection);
 
@@ -1751,7 +1788,7 @@ class KouteisController extends AppController {
                                                     " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                      and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                       order by id desc limit 1";
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                     for($k=0; $k<count($arrIm_Result); $k++){
@@ -1760,7 +1797,7 @@ class KouteisController extends AppController {
                                                       " where id = '".$im_sokuteidata_head_id[0]["id"]."' and inspec_datetime = '".$arrIm_Result[$k]["inspec_datetime"]."'
                                                        and serial = '".$arrIm_Result[$k]["serial"]."' and size_num = '".$arrIm_Result[$k]["size_num"]."'
                                                         order by id desc limit 1";
-                                                      $connection = ConnectionManager::get('DB_ikou_test');
+                                                      $connection = ConnectionManager::get('sakaeMotoDB');
                                                       $koutei_im_sokuteidata_result = $connection->execute($sql)->fetchAll('assoc');
 
                                                       if(!isset($koutei_im_sokuteidata_result[0])){
@@ -2069,7 +2106,7 @@ class KouteisController extends AppController {
                                     try {//トランザクション4
                                       if ($this->KouteiImSokuteidataHeads->saveMany($KouteiImSokuteidataHead)) {
 
-                                        $connection = ConnectionManager::get('DB_ikou_test');
+                                        $connection = ConnectionManager::get('sakaeMotoDB');
                                         $table = TableRegistry::get('koutei_im_sokuteidata_head');
                                         $table->setConnection($connection);
 
@@ -2120,7 +2157,7 @@ class KouteisController extends AppController {
                                           $KouteiImKikakus = $this->KouteiImKikakus->patchEntities($KouteiImKikakus, $arrIm_kikaku);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                              if ($this->KouteiImKikakus->saveMany($KouteiImKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $table = TableRegistry::get('koutei_im_kikaku');
                                                $table->setConnection($connection);
 
@@ -2128,7 +2165,7 @@ class KouteisController extends AppController {
                                                " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                 and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                  order by id desc limit 1";
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                for($k=0; $k<count($arrIm_kikaku); $k++){
@@ -2180,7 +2217,7 @@ class KouteisController extends AppController {
                                                   $KouteiImSokuteidataResults = $this->KouteiImSokuteidataResults->patchEntities($KouteiImSokuteidataResults, $arrIm_Result);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
                                                   if ($this->KouteiImSokuteidataResults->saveMany($KouteiImSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
 
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $table = TableRegistry::get('koutei_im_sokuteidata_result');
                                                     $table->setConnection($connection);
 
@@ -2188,7 +2225,7 @@ class KouteisController extends AppController {
                                                     " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                      and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                       order by id desc limit 1";
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                     for($k=0; $k<count($arrIm_Result); $k++){
@@ -2197,7 +2234,7 @@ class KouteisController extends AppController {
                                                       " where id = '".$im_sokuteidata_head_id[0]["id"]."' and inspec_datetime = '".$arrIm_Result[$k]["inspec_datetime"]."'
                                                        and serial = '".$arrIm_Result[$k]["serial"]."' and size_num = '".$arrIm_Result[$k]["size_num"]."'
                                                         order by id desc limit 1";
-                                                      $connection = ConnectionManager::get('DB_ikou_test');
+                                                      $connection = ConnectionManager::get('sakaeMotoDB');
                                                       $koutei_im_sokuteidata_result = $connection->execute($sql)->fetchAll('assoc');
 
                                                       if(!isset($koutei_im_sokuteidata_result[0])){
@@ -2493,35 +2530,52 @@ class KouteisController extends AppController {
    public function preadd()
    {
      $this->set('KouteiKensahyouHeads',$this->KouteiKensahyouHeads->newEntity());
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
+
    }
 
   public function login()
   {
     if ($this->request->is('post')) {
       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-      $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-      $ary = explode(',', $str);//$strを配列に変換
 
-      $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-      //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-      $this->set('username', $username);
-      $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+      $userdata = $data['username'];
 
-      $staff_id = $this->Auth->user('staff_id');//created_staffの登録用
-    	$this->set('staff_id',$staff_id);//セット
+      if(isset($data['prelogin'])){
 
-        if(empty($Userdata)){
-          $delete_flag = "";
-        }else{
-          $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-          $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+        $htmllogin = new htmlLogin();
+        $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+        if($qrcheck > 0){
+          return $this->redirect(['action' => 'preadd',
+          's' => ['mess' => "QRコードを読み込んでください。"]]);
         }
-          $user = $this->Auth->identify();
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'do']);
-        }
+
       }
+
+      $htmllogin = new htmlLogin();
+      $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+      $username = $arraylogindate[0];
+      $delete_flag = $arraylogindate[1];
+      $this->set('username',$username);
+      $this->set('delete_flag',$delete_flag);
+
+      $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+      if ($user) {
+        $this->Auth->setUser($user);
+        return $this->redirect(['action' => 'do']);
+      }
+    }
   }
 
   public function logout()
@@ -2589,7 +2643,7 @@ class KouteisController extends AppController {
            if ($this->KouteiKensahyouHeads->save($KouteiKensahyouHeads)) {//saveできた時
 
              //旧DBに登録
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('koutei_kensahyou_head');
              $table->setConnection($connection);
 
@@ -2796,69 +2850,101 @@ class KouteisController extends AppController {
  	{
      $kensahyouHead = $this->KensahyouHeads->newEntity();//newEntity・テーブルに空の行を作る
      $this->set('kensahyouHead',$kensahyouHead);//セット
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
  	}
 
-      public function imtaioueditpreadd()
-      {
-        $this->set('entity',$this->KouteiImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
+  public function imtaioueditpreadd()
+  {
+    $this->set('entity',$this->KouteiImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
 
-        $session = $this->request->getSession();
-        $data = $session->read();//postデータ取得し、$dataと名前を付ける
-      }
+    $Data=$this->request->query('s');
+    if(isset($Data["mess"])){
+      $mess = $Data["mess"];
+      $this->set('mess',$mess);
+    }else{
+      $mess = "";
+      $this->set('mess',$mess);
+    }
+  }
 
  		public function editlogin()
  	 {
-      if ($this->request->is('post')) {
-        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-        $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-        $ary = explode(',', $str);//$strを配列に変換
+     if ($this->request->is('post')) {
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
-        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-        //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-        $this->set('username', $username);
-        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+       $userdata = $data['username'];
 
-        $staff_id = $this->Auth->user('staff_id');//created_staffの登録用
-      	$this->set('staff_id',$staff_id);//セット
+       if(isset($data['prelogin'])){
 
-          if(empty($Userdata)){
-            $delete_flag = "";
-          }else{
-            $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-            $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
-          }
-            $user = $this->Auth->identify();
-          if ($user) {
-            $this->Auth->setUser($user);
-            return $this->redirect(['action' => 'editdo']);
-          }
-        }
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'editpreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
+         }
+
+       }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'editdo']);
+       }
+     }
  	 }
 
    public function imtaioueditlogin()
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
 
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+       $userdata = $data['username'];
 
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'imtaioueditpreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
          }
-           $user = $this->Auth->identify();
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'imtaioueditdo']);
-         }
+
        }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'imtaioueditdo']);
+       }
+     }
    }
 
 
@@ -2959,7 +3045,7 @@ class KouteisController extends AppController {
          )){
 
            //旧DBに登録
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('koutei_kensahyou_head');
            $table->setConnection($connection);
 
@@ -3074,7 +3160,7 @@ class KouteisController extends AppController {
            $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['id' => $data['id']])->toArray();
 
            //旧DBに登録
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('koutei_kensahyou_head');
            $table->setConnection($connection);
 
@@ -3251,7 +3337,7 @@ class KouteisController extends AppController {
               $this->KouteiImKikakuTaious->saveMany($KouteiImKikakuTaious);
 
               //旧DB更新
-              $connection = ConnectionManager::get('DB_ikou_test');
+              $connection = ConnectionManager::get('sakaeMotoDB');
               $table = TableRegistry::get('koutei_im_kikaku_taiou');
               $table->setConnection($connection);
 

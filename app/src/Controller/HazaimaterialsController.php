@@ -122,6 +122,18 @@ class HazaimaterialsController extends AppController {
        ];
 
      }
+
+     $hazai_array = array();
+     $lot_num_array = array();
+     foreach($arrStockEndMaterials as $key => $row) {
+       $hazai_array[$key] = $row["hazai"];
+       $lot_num_array[$key] = $row["lot_num"];
+     }
+
+     if(count($hazai_array) > 0){
+       array_multisort($hazai_array, $lot_num_array, SORT_ASC, SORT_NUMERIC, $arrStockEndMaterials);
+     }
+
      $this->set('arrStockEndMaterials',$arrStockEndMaterials);
 
      $tabStockEndMaterials = $this->StockEndMaterials->find()//TABファイル未取込データ
@@ -157,6 +169,18 @@ class HazaimaterialsController extends AppController {
        ];
 
      }
+
+     $tabhazai_array = array();
+     $tablot_num_array = array();
+     foreach($arrtabStockEndMaterials as $key => $row) {
+       $tabhazai_array[$key] = $row["hazai"];
+       $tablot_num_array[$key] = $row["lot_num"];
+     }
+
+     if(count($tabhazai_array) > 0){
+       array_multisort($tabhazai_array, $tablot_num_array, SORT_ASC, SORT_NUMERIC, $arrtabStockEndMaterials);
+     }
+
      $this->set('arrtabStockEndMaterials',$arrtabStockEndMaterials);
 
      $shippedStockEndMaterials = $this->StockEndMaterials->find()//出荷待ちデータ
@@ -192,6 +216,18 @@ class HazaimaterialsController extends AppController {
        ];
 
      }
+
+     $shippedhazai_array = array();
+     $shippedlot_num_array = array();
+     foreach($arrshippedStockEndMaterials as $key => $row) {
+       $shippedhazai_array[$key] = $row["hazai"];
+       $shippedlot_num_array[$key] = $row["lot_num"];
+     }
+
+     if(count($shippedhazai_array) > 0){
+       array_multisort($shippedhazai_array, $shippedlot_num_array, SORT_ASC, SORT_NUMERIC, $arrshippedStockEndMaterials);
+     }
+
      $this->set('arrshippedStockEndMaterials',$arrshippedStockEndMaterials);
 
    }

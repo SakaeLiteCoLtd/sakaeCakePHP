@@ -25,7 +25,6 @@ class KouteisController extends AppController {
      $this->KouteiImKikakuTaious = TableRegistry::get('kouteiImKikakuTaious');
      $this->KouteiKensahyouHeads = TableRegistry::get('kouteiKensahyouHeads');
      $this->KouteiFileCopyChecks = TableRegistry::get('kouteiFileCopyChecks');
-     $this->KouteiKensahyouHeads = TableRegistry::get('kouteiKensahyouHeads');
      $this->KensahyouHeads = TableRegistry::get('kensahyouHeads');//kensahyouHeadsテーブルを使う
      $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//kensahyouSokuteidatasテーブルを使う
     }
@@ -45,24 +44,84 @@ class KouteisController extends AppController {
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
       $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+
+        echo "<pre>";
+        print_r($mess);
+        echo "</pre>";
+
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function typeyobidashicustomer()//「出荷検査用呼出」ページトップ
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
       $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+
+        echo "<pre>";
+        print_r($mess);
+        echo "</pre>";
+
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function headyobidashicustomer()//「出荷検査用呼出」ページトップ
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
       $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+
+        echo "<pre>";
+        print_r($mess);
+        echo "</pre>";
+
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function tourokuyobidashicustomer()//「出荷検査用呼出」ページトップ
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
       $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+
+        echo "<pre>";
+        print_r($mess);
+        echo "</pre>";
+
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function yobidashipana()
@@ -855,7 +914,15 @@ class KouteisController extends AppController {
     	$this->set('KensaProduct',$KensaProduct);//セット
 
     	$Productn = $this->Products->find()->where(['product_code' => $product_code])->toArray();//
-    	$Productname = $Productn[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+      if(isset($Productn[0])){
+        $Productname = $Productn[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+      }else{
+        $Productname = "";//$Productのproduct_nameに$Productnameと名前を付ける
+
+        return $this->redirect(['action' => 'tourokuyobidashicustomer',
+        's' => ['mess' => "品番：".$product_code." が登録されていません"]]);
+
+      }
     	$this->set('Productname',$Productname);//セット
 
     	$this->set('KouteiKensahyouHeads',$this->KouteiKensahyouHeads->find()//KensahyouHeadsテーブルから
@@ -911,7 +978,15 @@ class KouteisController extends AppController {
      $ImKikakuex = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => 0])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
      $this->set('ImKikakuex',$ImKikakuex);//セット
 
-     $Productname = $Product[0]->product_name;
+     if(isset($Product[0])){
+       $Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+     }else{
+       $Productname = "";//$Productのproduct_nameに$Productnameと名前を付ける
+
+       return $this->redirect(['action' => 'tourokuyobidashicustomer',
+       's' => ['mess' => "品番：".$product_code." が登録されていません"]]);
+
+     }
      $this->set('Productname',$Productname);//セット
 
      $ImSokuteidataHeads = $this->KouteiImSokuteidataHeads->find()
@@ -957,7 +1032,6 @@ class KouteisController extends AppController {
        }
      }
 
-
      if(isset($KouteiKensahyouHead[0])){
        $KensahyouHeadbik = $KouteiKensahyouHead[0]->bik;
        $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
@@ -965,8 +1039,6 @@ class KouteisController extends AppController {
        $KensahyouHeadbik = "";
        $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
      }
-
-
 
    }
 
@@ -989,7 +1061,15 @@ class KouteisController extends AppController {
       $ImKikakuex = $this->KouteiImKikakuTaious->find()->where(['product_code' => $product_code])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
       $this->set('ImKikakuex',$ImKikakuex);//セット
 
-      $Productname = $Product[0]->product_name;
+      if(isset($Product[0])){
+        $Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+      }else{
+        $Productname = "";//$Productのproduct_nameに$Productnameと名前を付ける
+
+        return $this->redirect(['action' => 'yobidashicustomer',
+        's' => ['mess' => "品番：".$product_code." が登録されていません"]]);
+
+      }
       $this->set('Productname',$Productname);//セット
 
       $ImSokuteidataHeads = $this->KouteiImSokuteidataHeads->find()
@@ -1056,6 +1136,7 @@ class KouteisController extends AppController {
     public function typeimtaiouform()//IMtaiou
     {
   //    $this->request->session()->destroy();// セッションの破棄
+
       if(!isset($_SESSION)){
       session_start();
       }
@@ -1074,7 +1155,15 @@ class KouteisController extends AppController {
     	$this->set('KouteiKensahyouHeads',$this->KouteiKensahyouHeads->newEntity());
 
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
-      $Productname = $Product[0]->product_name;
+      if(isset($Product[0])){
+        $Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+      }else{
+        $Productname = "";//$Productのproduct_nameに$Productnameと名前を付ける
+
+        return $this->redirect(['action' => 'tourokuyobidashicustomer',
+        's' => ['mess' => "品番：".$product_code." が登録されていません"]]);
+
+      }
       $this->set('Productname',$Productname);
 
       $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->find()->where(['product_code' => $product_code, 'delete_flag' => 0])->order(["version"=>"desc"])->toArray();//versionが大きいものから順に呼出
@@ -1443,20 +1532,21 @@ class KouteisController extends AppController {
 
     public function indexhome()//取り込み画面
     {
-      //      $this->request->session()->destroy(); // セッションの破棄
+//      $this->request->session()->destroy(); // セッションの破棄
 
-            if(!isset($_SESSION)){
-            session_start();
-            }
-            $_SESSION['kikakudata'] = array();
-            $_SESSION['sokuteidata'] = array();
-            $_SESSION['kousinn_flag'] = array();
-            $_SESSION['imdatanew'] = array();
+      if(!isset($_SESSION)){
+      session_start();
+      }
+      $_SESSION['kikakudata'] = array();
+      $_SESSION['sokuteidata'] = array();
+      $_SESSION['kousinn_flag'] = array();
+      $_SESSION['imdatanew'] = array();
 
       $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->newEntity();
       $this->set('KouteiKensahyouHeads', $KouteiKensahyouHeads);
     }
 
+/*
      public function torikomi()//取り込み（画面なし自動で次のページへ）
     {
 
@@ -2335,6 +2425,7 @@ class KouteisController extends AppController {
       return $this->redirect(['action' => 'indexhome']);
 
     }
+*/
 
     public function preform()//「出荷検査表登録」ページで検査結果を入力
     {
@@ -2467,7 +2558,6 @@ class KouteisController extends AppController {
          if(strlen($data["upper_".$j]) < 1){
            $data["upper_".$j] = null;
          }
-
          if(strlen($data["lower_".$j]) < 1){
            $data["lower_".$j] = null;
          }
@@ -2586,12 +2676,12 @@ class KouteisController extends AppController {
 
      public function imtaiouedit($id = null)
      {
-       //   $this->request->session()->destroy(); // セッションの破棄
+    //   $this->request->session()->destroy(); // セッションの破棄
 
-          if(!isset($_SESSION)){
-          session_start();
-          }
-          $_SESSION['kikakudata'] = array();
+       if(!isset($_SESSION)){
+       session_start();
+       }
+       $_SESSION['kikakudata'] = array();
 
        $KouteiImKikakuTaious = $this->KouteiImKikakuTaious->get($id);
        $this->set('KouteiImKikakuTaious', $KouteiImKikakuTaious);//$kensahyouHeadをctpで使えるようにセット
@@ -3200,5 +3290,56 @@ class KouteisController extends AppController {
 
      }
 
+     public function hyoujicustomer()
+     {
+       $KensahyouHeads = $this->KensahyouHeads->newEntity();
+       $this->set('KensahyouHeads',$KensahyouHeads);
+     }
+
+     public function hyouji()
+     {
+       $KensahyouHeads = $this->KensahyouHeads->newEntity();
+       $this->set('KensahyouHeads',$KensahyouHeads);
+
+       $data = $this->request->getData();
+       $product_code = $data["product_code"];
+       $this->set('product_code',$product_code);//セット
+
+       $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+       $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderkouteidata($product_code);//
+       $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+
+       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+       $Productname = $Product[0]->product_name;
+       $this->set('Productname',$Productname);
+
+       for($i=1; $i<=9; $i++){
+
+         $KouteiImKikakuTaious = $this->KouteiImKikakuTaious->find()
+         ->where(['product_code' => $product_code, 'kensahyou_size' => $i, 'status' => 0])->toArray();
+
+         if(isset($KouteiImKikakuTaious[0])){
+           ${"shape_detection_".$i} = $KouteiImKikakuTaious[0]->shape_detection;
+           if(${"shape_detection_".$i} == 1){
+             ${"shape_detection_".$i} = "IM形状";
+           }else{
+             ${"shape_detection_".$i} = "寸法";
+           }
+           $this->set('shape_detection_'.$i,${"shape_detection_".$i});
+           ${"kind_kensa".$i} =  $KouteiImKikakuTaious[0]->kind_kensa;
+           $this->set('kind_kensa'.$i,${"kind_kensa".$i});
+           ${"size_num_".$i} =  $KouteiImKikakuTaious[0]->im_size_num;
+           $this->set('size_num_'.$i,${"size_num_".$i});
+         }else{
+           ${"shape_detection_".$i} = "";
+           $this->set('shape_detection_'.$i,${"shape_detection_".$i});
+           ${"kind_kensa".$i} = "";
+           $this->set('kind_kensa'.$i,${"kind_kensa".$i});
+           ${"size_num_".$i} = "";
+           $this->set('size_num_'.$i,${"size_num_".$i});
+         }
+       }
+
+     }
 
 }

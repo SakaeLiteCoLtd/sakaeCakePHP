@@ -8,7 +8,7 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 
  use App\myClass\Productcheck\htmlProductcheck;
-
+ use App\myClass\Logins\htmlLogin;
 
 /**
  * Roles Controller
@@ -365,39 +365,51 @@ class KadousController extends AppController
       $KariKadouSeikei = $this->KariKadouSeikeis->newEntity();
       $this->set('KariKadouSeikei',$KariKadouSeikei);
 
-      $session = $this->request->getSession();
-      $data = $session->read();
-/*
-      echo "<pre>";
-      print_r($data["karikadouseikei"]);
-      echo "</pre>";
-*/
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
 		}
 
 		public function karilogin()
 		{
-			if ($this->request->is('post')) {
-				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-				$ary = explode(',', $str);//$strを配列に変換
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
-				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-				$this->set('username', $username);
-				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+        $userdata = $data['username'];
 
-					if(empty($Userdata)){
-						$delete_flag = "";
-					}else{
-						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-						$this->set('delete_flag',$delete_flag);//登録者の表示のため
-					}
-						$user = $this->Auth->identify();
-					if ($user) {
-						$this->Auth->setUser($user);
-						return $this->redirect(['action' => 'karido']);
-					}
-				}
+        if(isset($data['prelogin'])){
+
+          $htmllogin = new htmlLogin();
+          $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+          if($qrcheck > 0){
+            return $this->redirect(['action' => 'karipreadd',
+            's' => ['mess' => "QRコードを読み込んでください。"]]);
+          }
+
+        }
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'karido']);
+        }
+      }
 		}
 
     public function karido()
@@ -637,45 +649,55 @@ class KadousController extends AppController
 		{
       $KadouSeikei = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikei',$KadouSeikei);
-/*
-      $session = $this->request->getSession();
-      $data = $session->read();
-      echo "<pre>";
-      print_r($_SESSION['kadouseikei']);
-      echo "</pre>";
-*/
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
 		}
 
 		public function login()
 		{
-			if ($this->request->is('post')) {
-				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-				$ary = explode(',', $str);//$strを配列に変換
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
-				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-				$this->set('username', $username);
-				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+        $userdata = $data['username'];
 
-					if(empty($Userdata)){
-						$delete_flag = "";
-					}else{
-						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-						$this->set('delete_flag',$delete_flag);//登録者の表示のため
-					}
-						$user = $this->Auth->identify();
-					if ($user) {
-						$this->Auth->setUser($user);
-            return $this->redirect(['action' => 'do']);
-        //    return $this->redirect(['action' => 'docsvtest']);
-					}
-				}
+        if(isset($data['prelogin'])){
+
+          $htmllogin = new htmlLogin();
+          $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+          if($qrcheck > 0){
+            return $this->redirect(['action' => 'preadd',
+            's' => ['mess' => "QRコードを読み込んでください。"]]);
+          }
+
+        }
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'do']);
+        }
+      }
 		}
 
 		public function logout()
 		{
-//			$this->request->session()->destroy(); // セッションの破棄
 			return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);//ログアウト後に移るページ
 		}
 
@@ -695,12 +717,6 @@ class KadousController extends AppController
         break;
       }
     }
-
-/*
-    echo "<pre>";
-    print_r($_SESSION['kadouseikei']);
-    echo "</pre>";
-*/
 
     if ($this->request->is('get')) {
       $KadouSeikeis = $this->KadouSeikeis->patchEntities($KadouSeikeis, $_SESSION['kadouseikei']);//$roleデータ（空の行）を$this->request->getData()に更新する
@@ -2503,32 +2519,52 @@ echo "</pre>";
 		{
       $KadouSeikei = $this->KadouSeikeis->newEntity();
       $this->set('KadouSeikei',$KadouSeikei);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
 		}
 
 		public function syuuseilogin()
 		{
-			if ($this->request->is('post')) {
-				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-				$ary = explode(',', $str);//$strを配列に変換
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
-				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-				$this->set('username', $username);
-				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+        $userdata = $data['username'];
 
-					if(empty($Userdata)){
-						$delete_flag = "";
-					}else{
-						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-						$this->set('delete_flag',$delete_flag);//登録者の表示のため
-					}
-						$user = $this->Auth->identify();
-					if ($user) {
-						$this->Auth->setUser($user);
-						return $this->redirect(['action' => 'syuuseido']);
-					}
-				}
+        if(isset($data['prelogin'])){
+
+          $htmllogin = new htmlLogin();
+          $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+          if($qrcheck > 0){
+            return $this->redirect(['action' => 'syuuseipreadd',
+            's' => ['mess' => "QRコードを読み込んでください。"]]);
+          }
+
+        }
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'syuuseido']);
+        }
+      }
 		}
 
     public function syuuseido()
@@ -2582,7 +2618,6 @@ echo "</pre>";
 
            $connection = ConnectionManager::get('default');
            $table->setConnection($connection);
-
 
            $mes = "※登録されました";
            $this->set('mes',$mes);

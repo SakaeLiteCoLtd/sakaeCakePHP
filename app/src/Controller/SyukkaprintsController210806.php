@@ -11,8 +11,6 @@ use Cake\Filesystem\Folder;
 use Cake\Filesystem\File;
 use App\myClass\KensahyouSokuteidata\htmlKensahyouSokuteidata;//myClassフォルダに配置したクラスを使用
 
-use App\myClass\Logins\htmlLogin;
-
 class SyukkaprintsController extends AppController {
 
       public function initialize()
@@ -184,52 +182,32 @@ class SyukkaprintsController extends AppController {
 		{
       $product = $this->Products->newEntity();
 			$this->set('product',$product);
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
-
 		}
 
 		public function login()
 		{
-      if ($this->request->is('post')) {
-        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+			if ($this->request->is('post')) {
+				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+				$ary = explode(',', $str);//$strを配列に変換
 
-        $userdata = $data['username'];
+				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+				$this->set('username', $username);
+				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
 
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'preadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
-
-        $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
-
-        $username = $arraylogindate[0];
-        $delete_flag = $arraylogindate[1];
-        $this->set('username',$username);
-        $this->set('delete_flag',$delete_flag);
-
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
-
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'do']);
-        }
-      }
+					if(empty($Userdata)){
+						$delete_flag = "";
+					}else{
+						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+						$this->set('delete_flag',$delete_flag);//登録者の表示のため
+					}
+						$user = $this->Auth->identify();
+					if ($user) {
+						$this->Auth->setUser($user);
+						return $this->redirect(['action' => 'do']);
+					}
+				}
 		}
 
     public function do()

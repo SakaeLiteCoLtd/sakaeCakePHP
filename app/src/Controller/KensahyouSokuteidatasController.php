@@ -193,7 +193,6 @@ class KensahyouSokuteidatasController  extends AppController
     	$this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
 
       if (isset($data['start'])) {//データがpostで送られたとき（日付を選んだ場合）
-      //  if ($this->request->is('post') && isset($data['start'])) {//データがpostで送られたとき（日付を選んだ場合）
 
     		$data = $this->request->data;//postで送られたデータの呼び出し
 
@@ -759,11 +758,11 @@ class KensahyouSokuteidatasController  extends AppController
     public function form()//「出荷検査表登録」ページで検査結果を入力
     {
     	$data = $this->request->getData();//postデータを$dataに
-
+/*
       echo "<pre>";
       print_r("start  ".date('Y-m-d H:i:s'));
       echo "</pre>";
-
+*/
       $kadouseikeiId = $data["kadouseikeiId"];
       $this->set('kadouseikeiId',$kadouseikeiId);
 /*
@@ -1007,11 +1006,11 @@ class KensahyouSokuteidatasController  extends AppController
 
               $KensahyouHeadbik = $KensahyouHead[0]->bik;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
               $this->set('KensahyouHeadbik',$KensahyouHeadbik);//セット
-
+/*
               echo "<pre>";
               print_r("finish ".date('Y-m-d H:i:s'));
               echo "</pre>";
-
+*/
     }
 
      public function confirm()//「出荷検査表登録」確認画面

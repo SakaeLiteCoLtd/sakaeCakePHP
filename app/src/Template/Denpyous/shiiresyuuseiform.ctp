@@ -47,10 +47,10 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
       <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
         <tr style="border-bottom: solid;border-width: 1px">
           <td width='220'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">品番、または品名、発注名</strong></td>
-          <td width='80'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">仕入項目</strong></td>
+          <td width='200'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">仕入項目</strong></td>
           <td width='60'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">価格（円）</strong></td>
           <td width='60'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">数量</strong></td>
-          <td width='200'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">納入日</strong></td>
+          <td width='300'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">納入日</strong></td>
           <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">削除</strong></td>
         </tr>
 

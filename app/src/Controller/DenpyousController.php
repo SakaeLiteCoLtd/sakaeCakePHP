@@ -40,43 +40,63 @@ class DenpyousController extends AppController
 			 }
 
 	//		 $this->request->session()->destroy();// セッションの破棄
-					if(!isset($_SESSION)){
-					session_start();
-					}
-					$_SESSION['tourokusyoumouheader'] = array();
-					$_SESSION['tourokusyoumoufooder'] = array();
+			 if(!isset($_SESSION)){
+			 session_start();
+			 }
+			 $_SESSION['tourokusyoumouheader'] = array();
+			 $_SESSION['tourokusyoumoufooder'] = array();
 		 }
 
 		 public function syoumoupreadd()
 		{
 			$Users = $this->Users->newEntity();
 	    $this->set('Users',$Users);
+
+			$Data=$this->request->query('s');
+			if(isset($Data["mess"])){
+				$mess = $Data["mess"];
+				$this->set('mess',$mess);
+			}else{
+				$mess = "";
+				$this->set('mess',$mess);
+			}
+
 		}
 
 		public function syoumoulogin()
 	 {
 		 if ($this->request->is('post')) {
-			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-			 $this->set('data',$data);//セット
-			 $userdata = $data['username'];
-			 $this->set('userdata',$userdata);//セット
+       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
-			 $htmllogin = new htmlLogin();//クラスを使用
-			 $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
+       $userdata = $data['username'];
 
-			 $username = $arraylogindate[0];
-			 $delete_flag = $arraylogindate[1];
-			 $this->set('username',$username);
-			 $this->set('delete_flag',$delete_flag);
+       if(isset($data['prelogin'])){
 
-			 $user = $this->Auth->identify();
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
 
-				if ($user) {
-					$this->Auth->setUser($user);
-					return $this->redirect(['action' => 'syoumouform',//以下のデータを持ってsyoumouformに移動
-					's' => ['username' => $username]]);
-				}
-			}
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'syoumoupreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
+         }
+
+       }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'syoumouform']);
+       }
+     }
 	 }
 
 	 public function syoumouform()
@@ -84,9 +104,12 @@ class DenpyousController extends AppController
 		$Users = $this->Users->newEntity();
 		$this->set('Users',$Users);
 
-		$Data=$this->request->query('s');
+//		$Data=$this->request->query('s');
 
-		$username = $Data['username'];
+		$session = $this->request->getSession();
+		$data = $session->read();
+
+		$username = $data["Auth"]["User"]["username"];
 		$UserData = $this->Users->find()->where(['username' => $username])->toArray();
 		$staffData = $this->Staffs->find()->where(['id' => $UserData[0]['staff_id']])->toArray();
 		$Staff = $staffData[0]->staff_code." : ".$staffData[0]->f_name." ".$staffData[0]->l_name;
@@ -118,20 +141,6 @@ class DenpyousController extends AppController
 
 		$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 		$this->set('data',$data);
-/*
-		echo "<pre>";
-		print_r($username);
-		echo "</pre>";
-		echo "<pre>";
-		print_r($Staff);
-		echo "</pre>";
-		echo "<pre>";
-		print_r($Staffcode);
-		echo "</pre>";
-		echo "<pre>";
-		print_r($Staffid);
-		echo "</pre>";
-*/
 	}
 
 	public function syoumouformtuika()
@@ -411,7 +420,7 @@ class DenpyousController extends AppController
 					if ($this->OrderSyoumouShiireHeaders->save($OrderSyoumouShiireHeaders)) {
 
 						//旧DBに登録
-						$connection = ConnectionManager::get('DB_ikou_test');
+						$connection = ConnectionManager::get('sakaeMotoDB');
 						$table = TableRegistry::get('order_syoumou_shiire_header');
 						$table->setConnection($connection);
 
@@ -451,14 +460,14 @@ class DenpyousController extends AppController
 								$this->OrderSyoumouShiireFooders->save($OrderSyoumouShiireFooders);
 
 								//旧DBに登録
-								$connection = ConnectionManager::get('DB_ikou_test');
+								$connection = ConnectionManager::get('sakaeMotoDB');
 								$table = TableRegistry::get('order_syoumou_shiire_header');
 								$table->setConnection($connection);
 
 								$sql = "SELECT id FROM order_syoumou_shiire_header".
 				              " where date_order ='".$sessiondata["tourokusyoumouheader"]["date_order"]."' and num_order = '".$sessiondata["tourokusyoumouheader"]["num_order"].
 											"' and kannou = '".$sessiondata["tourokusyoumouheader"]["kannou"]."' order by id desc";
-				        $connection = ConnectionManager::get('DB_ikou_test');
+				        $connection = ConnectionManager::get('sakaeMotoDB');
 				        $order_syoumou_shiire_header = $connection->execute($sql)->fetchAll('assoc');
 								$order_syoumou_shiire_header_id = $order_syoumou_shiire_header[0]['id'];
 
@@ -695,45 +704,64 @@ class DenpyousController extends AppController
 
 		public function syoumousyuuseipreadd()
 		{
-	//		$this->request->session()->destroy();// セッションの破棄
-
-			$data = $this->request->getData();
-
-			session_start();
-			$_SESSION['order_syoumou_shiire_header_id'] = array();
-
-			$_SESSION['order_syoumou_shiire_header_id'] = array(
-				'id' => $data["order_syoumou_shiire_header_id"]
-			);
-
 			$Users = $this->Users->newEntity();
 	    $this->set('Users',$Users);
+
+			$Data=$this->request->query('s');
+			if(isset($Data["mess"])){
+				$mess = $Data["mess"];
+				$this->set('mess',$mess);
+			}else{
+				$mess = "";
+				$this->set('mess',$mess);
+
+				$data = $this->request->getData();
+
+				session_start();
+				$_SESSION['order_syoumou_shiire_header_id'] = array();
+
+				$_SESSION['order_syoumou_shiire_header_id'] = array(
+					'id' => $data["order_syoumou_shiire_header_id"]
+				);
+
+			}
+
 	 	}
 
 		public function syoumousyuuseilogin()
 		{
 			if ($this->request->is('post')) {
- 			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
- 			 $this->set('data',$data);//セット
- 			 $userdata = $data['username'];
- 			 $this->set('userdata',$userdata);//セット
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
- 			 $htmllogin = new htmlLogin();//クラスを使用
- 			 $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
+        $userdata = $data['username'];
 
- 			 $username = $arraylogindate[0];
- 			 $delete_flag = $arraylogindate[1];
- 			 $this->set('username',$username);
- 			 $this->set('delete_flag',$delete_flag);
+        if(isset($data['prelogin'])){
 
- 			 $user = $this->Auth->identify();
+          $htmllogin = new htmlLogin();
+          $qrcheck = $htmllogin->qrcheckprogram($userdata);
 
- 				if ($user) {
- 					$this->Auth->setUser($user);
- 					return $this->redirect(['action' => 'syoumousyuuseiform',
- 					's' => ['username' => $username]]);
- 				}
- 			}
+          if($qrcheck > 0){
+            return $this->redirect(['action' => 'syoumousyuuseipreadd',
+            's' => ['mess' => "QRコードを読み込んでください。"]]);
+          }
+
+        }
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'syoumousyuuseiform']);
+        }
+      }
 	 	}
 
 		public function syoumousyuuseiform()
@@ -746,7 +774,8 @@ class DenpyousController extends AppController
 
 			$Data=$this->request->query('s');
 
-			$username = $Data['username'];
+			$username = $sessiondata["Auth"]["User"]["username"];
+
 			$UserData = $this->Users->find()->where(['username' => $username])->toArray();
 			$staffData = $this->Staffs->find()->where(['id' => $UserData[0]['staff_id']])->toArray();
 			$Staff = $staffData[0]->staff_code." : ".$staffData[0]->f_name." ".$staffData[0]->l_name;
@@ -1080,7 +1109,7 @@ class DenpyousController extends AppController
 					 )){
 
 						 //旧DBに単価登録
-						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $connection = ConnectionManager::get('sakaeMotoDB');
 						 $table = TableRegistry::get('order_syoumou_shiire_header');
 						 $table->setConnection($connection);
 
@@ -1132,7 +1161,7 @@ class DenpyousController extends AppController
                );
 
 							 //旧DBに登録
-							 $connection = ConnectionManager::get('DB_ikou_test');
+							 $connection = ConnectionManager::get('sakaeMotoDB');
 							 $table = TableRegistry::get('order_syoumou_shiire_fooder');
 							 $table->setConnection($connection);
 
@@ -1199,32 +1228,52 @@ class DenpyousController extends AppController
 		{
 			$Users = $this->Users->newEntity();
 			$this->set('Users',$Users);
+
+			$Data=$this->request->query('s');
+			if(isset($Data["mess"])){
+				$mess = $Data["mess"];
+				$this->set('mess',$mess);
+			}else{
+				$mess = "";
+				$this->set('mess',$mess);
+			}
+
 	 	}
 
 		public function shiirelogin()
 		{
 			if ($this->request->is('post')) {
- 			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
- 			 $this->set('data',$data);//セット
- 			 $userdata = $data['username'];
- 			 $this->set('userdata',$userdata);//セット
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
- 			 $htmllogin = new htmlLogin();//クラスを使用
- 			 $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
+        $userdata = $data['username'];
 
- 			 $username = $arraylogindate[0];
- 			 $delete_flag = $arraylogindate[1];
- 			 $this->set('username',$username);
- 			 $this->set('delete_flag',$delete_flag);
+        if(isset($data['prelogin'])){
 
- 			 $user = $this->Auth->identify();
+          $htmllogin = new htmlLogin();
+          $qrcheck = $htmllogin->qrcheckprogram($userdata);
 
- 				if ($user) {
- 					$this->Auth->setUser($user);
- 					return $this->redirect(['action' => 'shiireform',//以下のデータを持ってshiireformに移動
- 					's' => ['username' => $username]]);
- 				}
- 			}
+          if($qrcheck > 0){
+            return $this->redirect(['action' => 'shiirepreadd',
+            's' => ['mess' => "QRコードを読み込んでください。"]]);
+          }
+
+        }
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'shiireform']);
+        }
+      }
 	 	}
 
 		public function shiireform()
@@ -1243,9 +1292,13 @@ class DenpyousController extends AppController
 			$Users = $this->Users->newEntity();
 			$this->set('Users',$Users);
 
+			$session = $this->request->getSession();
+			$sessiondata = $session->read();
+
 			$Data=$this->request->query('s');
 
-			$username = $Data['username'];
+			$username = $sessiondata["Auth"]["User"]["username"];
+
 			$UserData = $this->Users->find()->where(['username' => $username])->toArray();
 			$staffData = $this->Staffs->find()->where(['id' => $UserData[0]['staff_id']])->toArray();
 			$Staff = $staffData[0]->staff_code." : ".$staffData[0]->f_name." ".$staffData[0]->l_name;
@@ -1375,7 +1428,7 @@ class DenpyousController extends AppController
 					if ($this->OrderSpecialShiires->save($OrderSpecialShiires)) {
 
             //旧DBに製品登録
-						$connection = ConnectionManager::get('DB_ikou_test');
+						$connection = ConnectionManager::get('sakaeMotoDB');
 						$table = TableRegistry::get('order_special_shiire');
 						$table->setConnection($connection);
 
@@ -1477,49 +1530,67 @@ class DenpyousController extends AppController
 
 		public function shiiresyuuseipreadd()
 		{
-//			$this->request->session()->destroy();// セッションの破棄
-
-			$data = $this->request->getData();
-			$data = array_keys($data, '編集');
-			$OrderSpecialShiireid = $data[0];
-
-			session_start();
-			$_SESSION['OrderSpecialShiireid'] = array();
-			$_SESSION['tourokushiiresyuusei'] = array();
-			$_SESSION['tourokushiiresyuusei'] = array();
-
-			$_SESSION['OrderSpecialShiireid'] = array(
-				'id' => $OrderSpecialShiireid
-			);
-
 			$Users = $this->Users->newEntity();
 	    $this->set('Users',$Users);
+
+			$Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+
+				$data = $this->request->getData();
+				$data = array_keys($data, '編集');
+				$OrderSpecialShiireid = $data[0];
+
+				session_start();
+				$_SESSION['OrderSpecialShiireid'] = array();
+				$_SESSION['tourokushiiresyuusei'] = array();
+				$_SESSION['tourokushiiresyuusei'] = array();
+
+				$_SESSION['OrderSpecialShiireid'] = array(
+					'id' => $OrderSpecialShiireid
+				);
+      }
+
 	 	}
 
 		public function shiiresyuuseilogin()
 		{
 			if ($this->request->is('post')) {
- 			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
- 			 $this->set('data',$data);//セット
- 			 $userdata = $data['username'];
- 			 $this->set('userdata',$userdata);//セット
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
- 			 $htmllogin = new htmlLogin();//クラスを使用
- 			 $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
+        $userdata = $data['username'];
 
- 			 $username = $arraylogindate[0];
- 			 $delete_flag = $arraylogindate[1];
- 			 $this->set('username',$username);
- 			 $this->set('delete_flag',$delete_flag);
+        if(isset($data['prelogin'])){
 
- 			 $user = $this->Auth->identify();
+          $htmllogin = new htmlLogin();
+          $qrcheck = $htmllogin->qrcheckprogram($userdata);
 
- 				if ($user) {
- 					$this->Auth->setUser($user);
- 					return $this->redirect(['action' => 'shiiresyuuseiform',//以下のデータを持ってshiireformに移動
- 					's' => ['username' => $username]]);
- 				}
- 			}
+          if($qrcheck > 0){
+            return $this->redirect(['action' => 'shiiresyuuseipreadd',
+            's' => ['mess' => "QRコードを読み込んでください。"]]);
+          }
+
+        }
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'shiiresyuuseiform']);
+        }
+      }
 	 	}
 
 		public function shiiresyuuseiform()
@@ -1705,14 +1776,14 @@ class DenpyousController extends AppController
 					 )){
 
 						 //旧DBに単価登録
-						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $connection = ConnectionManager::get('sakaeMotoDB');
 						 $table = TableRegistry::get('order_special_shiire');
 						 $table->setConnection($connection);
 
 						 $sql = "SELECT id,order_name,date_order,num_order,ps_id
 						 FROM order_special_shiire".
 						 " where order_name = '".$moto_order_name."' and date_order = '".$moto_date_order."' and num_order = '".$moto_num_order."' and ps_id = '".$moto_product_supplier_id."'";
-						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $connection = ConnectionManager::get('sakaeMotoDB');
 						 $order_special_shiire_id = $connection->execute($sql)->fetchAll('assoc');
 						 $moto_id = $order_special_shiire_id[0]["id"];
 

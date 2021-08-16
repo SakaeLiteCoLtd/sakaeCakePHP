@@ -131,51 +131,30 @@ class LabelsController extends AppController
    {
      $labelTypeProducts = $this->LabelTypeProducts->newEntity();
      $this->set('labelTypeProducts',$labelTypeProducts);
-
-     $Data=$this->request->query('s');
-     if(isset($Data["mess"])){
-       $mess = $Data["mess"];
-       $this->set('mess',$mess);
-     }else{
-       $mess = "";
-       $this->set('mess',$mess);
-     }
    }
 
    public function layoutlogin()//レイアウトログイン
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
-       $userdata = $data['username'];
-
-       if(isset($data['prelogin'])){
-
-         $htmllogin = new htmlLogin();
-         $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-         if($qrcheck > 0){
-           return $this->redirect(['action' => 'layoutpreadd',
-           's' => ['mess' => "QRコードを読み込んでください。"]]);
+       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+       $ary = explode(',', $str);//$strを配列に変換
+       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+       $this->set('username', $username);
+       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+         if(empty($Userdata)){
+           $delete_flag = "";
+         }else{
+           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+           $this->set('delete_flag',$delete_flag);//登録者の表示のため
          }
-
+           $user = $this->Auth->identify();
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'layoutdo']);
+         }
        }
-
-       $htmllogin = new htmlLogin();
-       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
-
-       $username = $arraylogindate[0];
-       $delete_flag = $arraylogindate[1];
-       $this->set('username',$username);
-       $this->set('delete_flag',$delete_flag);
-
-       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
-
-       if ($user) {
-         $this->Auth->setUser($user);
-         return $this->redirect(['action' => 'layoutdo']);
-       }
-     }
    }
 
    public function layoutdo()//レイアウト登録
@@ -205,7 +184,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labellayouts']をinsert into label_type_productする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_type_product');
            $table->setConnection($connection);
 
@@ -256,51 +235,32 @@ class LabelsController extends AppController
    {
      $labelElementPlaces = $this->LabelElementPlaces->newEntity();
      $this->set('labelElementPlaces',$labelElementPlaces);
-
-     $Data=$this->request->query('s');
-     if(isset($Data["mess"])){
-       $mess = $Data["mess"];
-       $this->set('mess',$mess);
-     }else{
-       $mess = "";
-       $this->set('mess',$mess);
-     }
+     $session = $this->request->getSession();
+     $data = $session->read();
    }
 
    public function placelogin()//納品場所ログイン
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
-       $userdata = $data['username'];
-
-       if(isset($data['prelogin'])){
-
-         $htmllogin = new htmlLogin();
-         $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-         if($qrcheck > 0){
-           return $this->redirect(['action' => 'placepreadd',
-           's' => ['mess' => "QRコードを読み込んでください。"]]);
+       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+       $ary = explode(',', $str);//$strを配列に変換
+       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+       $this->set('username', $username);
+       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+         if(empty($Userdata)){
+           $delete_flag = "";
+         }else{
+           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+           $this->set('delete_flag',$delete_flag);//登録者の表示のため
          }
-
+           $user = $this->Auth->identify();
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'placedo']);
+         }
        }
-
-       $htmllogin = new htmlLogin();
-       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
-
-       $username = $arraylogindate[0];
-       $delete_flag = $arraylogindate[1];
-       $this->set('username',$username);
-       $this->set('delete_flag',$delete_flag);
-
-       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
-
-       if ($user) {
-         $this->Auth->setUser($user);
-         return $this->redirect(['action' => 'placedo']);
-       }
-     }
    }
 
    public function placedo()//納品場所登録
@@ -329,7 +289,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelplaces']をinsert into label_element_placeする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_element_place');
            $table->setConnection($connection);
 
@@ -437,7 +397,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_nashiする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_nashi');
            $table->setConnection($connection);
 
@@ -556,7 +516,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_setikkatsuする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_setikkatsu');
            $table->setConnection($connection);
 
@@ -667,7 +627,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_setikkatsuする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_insideout');
            $table->setConnection($connection);
 
@@ -761,7 +721,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_element_unitする
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('label_element_unit');
            $table->setConnection($connection);
 
@@ -785,52 +745,32 @@ class LabelsController extends AppController
   {
     $KadouSeikeis = $this->KadouSeikeis->newEntity();
     $this->set('KadouSeikeis',$KadouSeikeis);
-
-    $Data=$this->request->query('s');
-    if(isset($Data["mess"])){
-      $mess = $Data["mess"];
-      $this->set('mess',$mess);
-    }else{
-      $mess = "";
-      $this->set('mess',$mess);
-    }
-
   }
 
   public function ikkatsulogin()//210323
   {
     if ($this->request->is('post')) {
       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+      $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+      $ary = explode(',', $str);//$strを配列に変換
 
-      $userdata = $data['username'];
+      $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+      //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+      $this->set('username', $username);
+      $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
 
-      if(isset($data['prelogin'])){
-
-        $htmllogin = new htmlLogin();
-        $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-        if($qrcheck > 0){
-          return $this->redirect(['action' => 'ikkatsupreadd',
-          's' => ['mess' => "QRコードを読み込んでください。"]]);
+        if(empty($Userdata)){
+          $delete_flag = "";
+        }else{
+          $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+          $this->set('delete_flag',$delete_flag);//登録者の表示のため
         }
-
+          $user = $this->Auth->identify();
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'ikkatsupreform']);
+        }
       }
-
-      $htmllogin = new htmlLogin();
-      $arraylogindate = $htmllogin->htmlloginprogram($userdata);
-
-      $username = $arraylogindate[0];
-      $delete_flag = $arraylogindate[1];
-      $this->set('username',$username);
-      $this->set('delete_flag',$delete_flag);
-
-      $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
-
-      if ($user) {
-        $this->Auth->setUser($user);
-        return $this->redirect(['action' => 'ikkatsupreform']);
-      }
-    }
   }
 
    public function ikkatsupreform()//一括ラベル発行
@@ -1290,7 +1230,7 @@ class LabelsController extends AppController
                    $connection->commit();// コミット5
 
                    //insert into label_csvする
-                   $connection = ConnectionManager::get('DB_ikou_test');
+                   $connection = ConnectionManager::get('sakaeMotoDB');
                    $table = TableRegistry::get('label_csv');
                    $table->setConnection($connection);
 
@@ -1378,7 +1318,7 @@ class LabelsController extends AppController
      }
 
      $i = 1;
-     if($i == 1){//DB_ikou_testを使う
+     if($i == 1){//sakaeMotoDBを使う
        /*
        $connection = ConnectionManager::get('DB_ikou_test');
        $table = TableRegistry::get('scheduleKoutei');
@@ -1394,7 +1334,7 @@ class LabelsController extends AppController
 /*
           $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM schedule_koutei".
                 " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
-          $connection = ConnectionManager::get('DB_ikou_test');
+          $connection = ConnectionManager::get('sakaeMotoDB');
           $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
 
           echo "<pre>";
@@ -1985,7 +1925,7 @@ class LabelsController extends AppController
                   $connection->commit();// コミット5
 
                   //insert into label_csvする
-                  $connection = ConnectionManager::get('DB_ikou_test');
+                  $connection = ConnectionManager::get('sakaeMotoDB');
                   $table = TableRegistry::get('label_csv');
                   $table->setConnection($connection);
 
@@ -2522,7 +2462,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5
 
                      //insert into label_csvする
-                     $connection = ConnectionManager::get('DB_ikou_test');
+                     $connection = ConnectionManager::get('sakaeMotoDB');
                      $table = TableRegistry::get('label_csv');
                      $table->setConnection($connection);
 
@@ -2857,7 +2797,7 @@ class LabelsController extends AppController
                $this->set('mes',$mes);
 
                //$arrLotをinsert into check_lotsする
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('check_lots');
                $table->setConnection($connection);
 
@@ -3084,7 +3024,7 @@ class LabelsController extends AppController
              $mes = "不使用ロットが登録されました";
              $this->set('mes',$mes);
 
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('check_lots');
              $table->setConnection($connection);
 
@@ -3101,13 +3041,13 @@ class LabelsController extends AppController
        }else{//新DBにデータがない場合旧DBのみ更新
 
          for($i=0; $i<$maisuu; $i++){
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $table = TableRegistry::get('check_lots');
            $table->setConnection($connection);
 
            $sql = "SELECT datetime_hakkou,lot_num,product_id,amount,flag_used,flag_deliver FROM check_lots".
                  " where product_id ='".$data["product_code"]."' and lot_num = '".$data["lot_num_".$i]."'";
-           $connection = ConnectionManager::get('DB_ikou_test');
+           $connection = ConnectionManager::get('sakaeMotoDB');
            $checkLot = $connection->execute($sql)->fetchAll('assoc');
 /*
            echo "<pre>";
@@ -3533,7 +3473,7 @@ class LabelsController extends AppController
                  $connection->commit();// コミット5
 
                  //insert into label_csvする
-                 $connection = ConnectionManager::get('DB_ikou_test');
+                 $connection = ConnectionManager::get('sakaeMotoDB');
                  $table = TableRegistry::get('label_csv');
                  $table->setConnection($connection);
 /*
@@ -3961,7 +3901,7 @@ class LabelsController extends AppController
             $connection->commit();// コミット5
 
             //insert into order_ediする
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('moto_lots');
             $table->setConnection($connection);
 
@@ -4131,7 +4071,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5ここに持ってくる//これを旧DBの登録の後に持ってきたら新DBに登録されない（トランザクションが途中で途切れる？）
 
                      //insert 旧update
-                     $connection = ConnectionManager::get('DB_ikou_test');
+                     $connection = ConnectionManager::get('sakaeMotoDB');
                      $table = TableRegistry::get('order_edi');
                      $table->setConnection($connection);
 

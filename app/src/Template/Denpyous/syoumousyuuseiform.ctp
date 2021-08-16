@@ -77,13 +77,13 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 
 <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tr style="border-bottom: solid;border-width: 1px">
-    <td width='10'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue"></strong></td>
-    <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">仕入項目</strong></td>
-    <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">品番、機械番号etc</strong></td>
-    <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">品名、または発注名</strong></td>
-    <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">単価（円）</strong></td>
-    <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">数量</strong></td>
-    <td width='80'  bgcolor="#FFFFCC"><strong style="font-size: 10pt; color:blue">納入日</strong></td>
+    <td width='30'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue"></strong></td>
+    <td width='200'  bgcolor="#FFFFCC"><strong style="font-size: 9pt; color:blue">仕入項目</strong></td>
+    <td width='120'  bgcolor="#FFFFCC"><strong style="font-size: 9pt; color:blue">品番、機械番号etc</strong></td>
+    <td width='120'  bgcolor="#FFFFCC"><strong style="font-size: 9pt; color:blue">品名、または発注名</strong></td>
+    <td width='100'  bgcolor="#FFFFCC"><strong style="font-size: 9pt; color:blue">単価（円）</strong></td>
+    <td width='100'  bgcolor="#FFFFCC"><strong style="font-size: 9pt; color:blue">数量</strong></td>
+    <td width='300'  bgcolor="#FFFFCC"><strong style="font-size: 9pt; color:blue">納入日</strong></td>
   </tr>
 
   <?php for($i=0; $i<=$tuika; $i++): ?>
@@ -101,7 +101,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
   <?php endfor;?>
 
 </table>
-<br>
+<br><br><br><br><br><br><br><br><br><br>
 <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr bgcolor="#E6FFFF" >
   <td width="30" colspan="50" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>

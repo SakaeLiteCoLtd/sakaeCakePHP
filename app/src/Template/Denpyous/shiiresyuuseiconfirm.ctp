@@ -64,7 +64,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
         </tr>
       </table>
       <br><br><br><br><br><br>
-      <legend align="left"><strong style="font-size: 11pt; color:black"><?= __("※検収後登録なら完納済にチェックです。") ?></strong></legend>
+      <legend align="left"><strong style="font-size: 11pt; color:black"><?= __("※検収後登録なら完納済にチェック") ?></strong></legend>
       <br><br>
       <table align="left" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
       <tr bgcolor="#E6FFFF" >

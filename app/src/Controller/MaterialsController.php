@@ -54,25 +54,7 @@ class MaterialsController extends AppController
 			}
 			$materials = $this->paginate($this->Materials);//
     }
-/*
-    public function login()
-    {
-	if ($this->request->is('post')) {
-		$user = $this->Auth->identify();
-		if ($user) {
-			$this->Auth->setUser($user);
-			return $this->redirect($this->Auth->redirectUrl());
-		}
-		$this->Flash->error(__('Invalid username or password, try again'));
-		}
-    }
 
-    public function logout()
-    {
-	$this->request->session()->destroy(); // セッションの破棄
-	return $this->redirect($this->Auth->logout()); // ログアウト処理
-    }
-*/
     public function form()
     {
 			$material = $this->Materials->newEntity();//newentityに$materialという名前を付ける

@@ -22,6 +22,7 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
   <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/subYobidashiMaterial.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'materialsyobidashi')));?></td>
     <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/subTourokuShiire.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'supplierform')));?></td>
       <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/genryouedit.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'materialeditkensaku')));?></td>
+        <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/genryoudaitai.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'daitais', 'action'=>'index')));?></td>
 </tr>
 </table>
 

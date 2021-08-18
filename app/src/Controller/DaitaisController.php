@@ -29,95 +29,77 @@ class DaitaisController extends AppController
 				return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
 			}
 
+      $arrMaterials = array();
       $Materials = $this->Materials->find()//CSV未出力データ
-      ->where(['delete_flag' => 0])->toArray();
+      ->where(['delete_flag' => 0])->order(["grade"=>"ASC"])->toArray();
+
+      for($j=0; $j<count($Materials); $j++){
+
+        if(strlen($Materials[$j]["grade"]) + strlen($Materials[$j]["color"]) + 1 > 20){
+
+          if(strlen($Materials[$j]["name_substitute"]) > 0){
+            $name_substitute = $Materials[$j]["name_substitute"];
+          }else{
+            $name_substitute = "登録されていません";
+          }
+
+          $arrMaterials[] = [
+            "grade" => $Materials[$j]["grade"],
+            "color" => $Materials[$j]["color"],
+            "name_substitute" => $name_substitute
+          ];
+        }
+
+      }
+
+      $this->set('arrMaterials',$arrMaterials);
+
+    }
+
+    public function editkensaku()
+    {
+      $session = $this->request->getSession();
+      $sessionData = $session->read();
+
+      if(!isset($sessionData['login'])){
+        return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
+      }
+
+			$Materials = $this->Materials->newEntity();
       $this->set('Materials',$Materials);
 
-    }
-
-    public function addform()
-    {
-			$session = $this->request->getSession();
-      $sessionData = $session->read();
-
-      if(!isset($sessionData['login'])){
-        return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $data = $this->request->getData();
+        $mess = "";
+        $this->set('mess',$mess);
       }
 
-			$materialTypes = $this->MaterialTypes->newEntity();
-      $this->set('materialTypes',$materialTypes);
+      $Material_list = $this->Materials->find()
+      ->where(['delete_flag' => 0])->toArray();
+      $arrMaterial_list = array();
+      for($j=0; $j<count($Material_list); $j++){
 
-			if(!isset($_SESSION)){
-				session_start();
-			}
-				header('Expires:-1');
-				header('Cache-Control:');
-				header('Pragma:');
+        if(strlen($Material_list[$j]["grade"]) + strlen($Material_list[$j]["color"]) + 1 > 20){
 
-    }
+          array_push($arrMaterial_list,$Material_list[$j]["grade"]."_".$Material_list[$j]["color"]);
 
-     public function addconfirm()
-    {
-			$session = $this->request->getSession();
-      $sessionData = $session->read();
+        }
 
-      if(!isset($sessionData['login'])){
-        return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
       }
+      $arrMaterial_list = array_unique($arrMaterial_list);
+      $arrMaterial_list = array_values($arrMaterial_list);
+      $this->set('arrMaterial_list', $arrMaterial_list);
 
-			$materialTypes = $this->MaterialTypes->newEntity();
-      $this->set('materialTypes',$materialTypes);
-
-			$data = $this->request->getData();
-			$this->set('name',$data["name"]);
-    }
-
-     public function adddo()
-    {
-			$session = $this->request->getSession();
-      $sessionData = $session->read();
-
-      if(!isset($sessionData['login'])){
-        return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
+      if(!isset($_SESSION)){
+        session_start();
+        header('Expires:-1');
+        header('Cache-Control:');
+        header('Pragma:');
       }
-
-			$materialTypes = $this->MaterialTypes->newEntity();
-      $this->set('materialTypes',$materialTypes);
-
-			$data = $this->request->getData();
-			$this->set('name',$data["name"]);
-
-			$tourokumaterialTypes = [
-				'name' => $data["name"],
-				'delete_flag' => 0,
-				'created_at' => date('Y-m-d H:i:s'),
-				'created_staff' => $sessionData['login']['staff_id'],
-			];
-
-			$MaterialTypes = $this->MaterialTypes->patchEntity($this->MaterialTypes->newEntity(), $tourokumaterialTypes);
-			$connection = ConnectionManager::get('default');//トランザクション1
-			 // トランザクション開始2
-			 $connection->begin();//トランザクション3
-			 try {//トランザクション4
-				 if ($this->MaterialTypes->save($MaterialTypes)) {
-
-					 $mes = "※以下のデータが登録されました";
-					 $this->set('mes',$mes);
-					 $connection->commit();// コミット5
-
-					 } else {
-
-						 $mes = "※登録されませんでした";
-						 $this->set('mes',$mes);
-						 $this->Flash->error(__('The product could not be saved. Please, try again.'));
-						 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-
-					 }
-
-			 } catch (Exception $e) {//トランザクション7
-			 //ロールバック8
-				 $connection->rollback();//トランザクション9
-			 }//トランザクション10
 
     }
 
@@ -130,9 +112,6 @@ class DaitaisController extends AppController
         return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
       }
 
-			$materialTypes = $this->MaterialTypes->newEntity();
-      $this->set('materialTypes',$materialTypes);
-
       $Data=$this->request->query('s');
       if(isset($Data["mess"])){
         $mess = $Data["mess"];
@@ -143,59 +122,35 @@ class DaitaisController extends AppController
         $this->set('mess',$mess);
       }
 
-      $MaterialTypes_list = $this->MaterialTypes->find()
-      ->where(['delete_flag' => 0])->toArray();
-      $arrMaterialTypes_list = array();
-      for($j=0; $j<count($MaterialTypes_list); $j++){
-        array_push($arrMaterialTypes_list,$MaterialTypes_list[$j]["name"]);
-      }
-      $arrMaterialTypes_list = array_unique($arrMaterialTypes_list);
-      $arrMaterialTypes_list = array_values($arrMaterialTypes_list);
-      $this->set('arrMaterialTypes_list', $arrMaterialTypes_list);
+      $materialgrade_color = $data["materialgrade_color"];
+      $this->set('materialgrade_color',$materialgrade_color);
 
-      if(!isset($_SESSION)){
-        session_start();
-        header('Expires:-1');
-        header('Cache-Control:');
-        header('Pragma:');
-      }
+      $arrhazai = explode('_', $materialgrade_color);
 
-    }
+      $grade = $arrhazai[0];
 
-    public function editformsyousai()
-    {
-      $session = $this->request->getSession();
-      $sessionData = $session->read();
-
-      if(!isset($sessionData['login'])){
-        return $this->redirect(['controller' => 'Shinkies', 'action' => 'index']);
-      }
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $name = $Data["name"];
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
+      if(isset($arrhazai[1])){
+        $color = $arrhazai[1];
       }else{
-        $data = $this->request->getData();
-        $name = $data["name"];
-        $mess = "";
-        $this->set('mess',$mess);
-      }
 
-      $MaterialTypes = $this->MaterialTypes->find()
-      ->where(['name' => $name, 'delete_flag' => 0])->toArray();
-
-      if(!isset($MaterialTypes[0])){
-
-        return $this->redirect(['action' => 'editform',
-        's' => ['mess' => "入力された原料種類は登録されていません。"]]);
+        return $this->redirect(['action' => 'editkensaku',
+        's' => ['mess' => "グレードと色を「_」（アンダーバー）でつないで入力してください。"]]);
 
       }
-      $this->set('MaterialTypeId',$MaterialTypes[0]["id"]);
 
-			$materialTypes = $this->MaterialTypes->newEntity();
-      $this->set('materialTypes',$materialTypes);
+      $Materials = $this->Materials->find()
+      ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+
+      if(!isset($Materials[0])){
+
+        return $this->redirect(['action' => 'editkensaku',
+        's' => ['mess' => "入力された「グレード_色」は登録されていません。"]]);
+
+      }
+      $this->set('MaterialId',$Materials[0]["id"]);
+
+			$Materials = $this->Materials->newEntity();
+      $this->set('Materials',$Materials);
 
       if(!isset($_SESSION)){
         session_start();
@@ -216,44 +171,15 @@ class DaitaisController extends AppController
       }
 
       $data = $this->request->getData();
+      $MaterialId = $data["MaterialId"];
+      $this->set('MaterialId',$MaterialId);
+      $materialgrade_color = $data["materialgrade_color"];
+      $this->set('materialgrade_color',$materialgrade_color);
+      $name_substitute = $data["name_substitute"];
+      $this->set('name_substitute',$name_substitute);
 
-      $this->set('MaterialTypeId',$data["MaterialTypeId"]);
-      $this->set('name',$data["name"]);
-
-/*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
-
-			$materialTypes = $this->MaterialTypes->newEntity();
-      $this->set('materialTypes',$materialTypes);
-
-      if($data["check"] > 0){
-        $mess = "以下のデータを削除します。よろしければ「決定」ボタンを押してください。";
-        $delete_flag = 1;
-
-        $MaterialTypes = $this->MaterialTypes->find()
-        ->where(['id' => $data["MaterialTypeId"]])->toArray();
-        $this->set('name',$MaterialTypes[0]["name"]);
-
-      }else{
-
-        $MaterialTypes = $this->MaterialTypes->find()
-        ->where(['name' => $data["name"], 'delete_flag' => 0])->toArray();
-
-        if(isset($MaterialTypes[0])){
-
-          return $this->redirect(['action' => 'editformsyousai',
-          's' => ['name' => $data["name"], 'mess' => "入力された原料種類は既に存在します。"]]);
-
-        }
-
-        $mess = "以下のように更新します。よろしければ「決定」ボタンを押してください。";
-        $delete_flag = 0;
-      }
-      $this->set('mess', $mess);
-      $this->set('delete_flag', $delete_flag);
+      $Materials = $this->Materials->newEntity();
+      $this->set('Materials',$Materials);
 
       if(!isset($_SESSION)){
         session_start();
@@ -274,60 +200,38 @@ class DaitaisController extends AppController
       }
 
       $data = $this->request->getData();
-      $this->set('name',$data["name"]);
-/*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
-			$materialTypes = $this->MaterialTypes->newEntity();
-      $this->set('materialTypes',$materialTypes);
 
-      $MaterialTypes = $this->MaterialTypes->patchEntity($this->MaterialTypes->newEntity(), $data);
+      $Materials = $this->Materials->newEntity();
+      $this->set('Materials',$Materials);
+
+      $MaterialId = $data["MaterialId"];
+      $this->set('MaterialId',$MaterialId);
+      $materialgrade_color = $data["materialgrade_color"];
+      $this->set('materialgrade_color',$materialgrade_color);
+      $name_substitute = $data["name_substitute"];
+      $this->set('name_substitute',$name_substitute);
+
+      $Materials = $this->Materials->patchEntity($this->Materials->newEntity(), $data);
       $connection = ConnectionManager::get('default');//トランザクション1
        // トランザクション開始2
        $connection->begin();//トランザクション3
        try {//トランザクション4
 
-         if($data["delete_flag"] > 0){
+         if ($this->Materials->updateAll(
+           ['name_substitute' => $data["name_substitute"], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
+           ['id'  => $data["MaterialId"]]
+         )){
 
-           if ($this->MaterialTypes->updateAll(
-             ['delete_flag' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
-             ['id'  => $data["MaterialTypeId"]]
-           )){
+           $mes = "※更新されました";
+           $this->set('mes',$mes);
+           $connection->commit();// コミット5
 
-             $mes = "※削除されました";
-             $this->set('mes',$mes);
-             $connection->commit();// コミット5
+         } else {
 
-           } else {
-
-             $mes = "※削除されませんでした";
-             $this->set('mes',$mes);
-             $this->Flash->error(__('The product could not be saved. Please, try again.'));
-             throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-
-           }
-
-         }else{
-
-           if ($this->MaterialTypes->updateAll(
-             ['name' => $data["name"], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
-             ['id'  => $data["MaterialTypeId"]]
-           )){
-
-             $mes = "※更新されました";
-             $this->set('mes',$mes);
-             $connection->commit();// コミット5
-
-           } else {
-
-             $mes = "※更新されませんでした";
-             $this->set('mes',$mes);
-             $this->Flash->error(__('The product could not be saved. Please, try again.'));
-             throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
-
-           }
+           $mes = "※更新されませんでした";
+           $this->set('mes',$mes);
+           $this->Flash->error(__('The product could not be saved. Please, try again.'));
+           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
 
          }
 

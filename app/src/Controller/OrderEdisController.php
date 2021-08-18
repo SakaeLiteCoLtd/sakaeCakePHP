@@ -3294,10 +3294,17 @@ echo "</pre>";
       $this->set('amount',$amount);
       $date_deliver = $data["date_deliver"]["year"]."-".$data["date_deliver"]["month"]."-".$data["date_deliver"]["day"];
       $this->set('date_deliver',$date_deliver);
+
+//210818更新
+/*
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
       $customer_id = $Product[0]->customer_id;
       $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
       $customer_code = $Customer[0]->customer_code;
+*/
+      $PlaceDeliver = $this->PlaceDelivers->find()->where(['id' => $place_deliver])->toArray();
+      $customer_code = $PlaceDeliver[0]->cs_code;
+
       $this->set("customer_code",$customer_code);
 
 //単価の表示をするかチェック

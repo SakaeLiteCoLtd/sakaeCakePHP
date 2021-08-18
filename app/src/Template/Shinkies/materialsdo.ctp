@@ -72,6 +72,21 @@ $htmlShinkis = $htmlShinkimenu->Shinkimenus();
 	</tr>
 </table>
 
+<?php if ($check_substitute > 0): ?>
+  <br>
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+    <tr>
+      <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">代替名</strong></td>
+  	</tr>
+    <tr>
+      <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($this->request->getData('name_substitute')) ?></td>
+  	</tr>
+  </table>
+
+<?php else : ?>
+
+<?php endif; ?>
+
     </fieldset>
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

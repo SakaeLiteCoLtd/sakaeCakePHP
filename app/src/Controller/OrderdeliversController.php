@@ -65,7 +65,7 @@ class OrderdeliversController extends AppController
       $num_order = $data['num_order'];
 
       $orderEdis = $this->OrderEdis->find()
-      ->where(['date_deliver >=' => $date_sta, 'date_deliver <' => $date_fin])->order(["product_code"=>"ASC"])->toArray();
+      ->where(['num_order like' => '%'.$data['num_order'].'%', 'product_code like' => '%'.$data['product_code'].'%', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin])->order(["product_code"=>"ASC"])->toArray();
       $this->set('orderEdis',$orderEdis);
 /*
       echo "<pre>";

@@ -51,11 +51,6 @@ class htmlLogin extends AppController
     public function htmllogin($userdata)
    {
        $data = $userdata;//postデータ取得し、$dataと名前を付ける
-       /*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-    */
        $ary = explode(',', $userdata);//$strを配列に変換
        $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
        $Userdata = $this->Users->find()->where(['username' => $username])->toArray();

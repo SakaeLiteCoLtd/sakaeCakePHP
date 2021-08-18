@@ -33,7 +33,9 @@
       $i = 0 ;
        ?>
 
-      <br>
+       <br>
+       <div align="center"><font color="black" size="3"><?= __("行先変更するデータにチェックを入れてください。") ?></font></div>
+       <br>
 
       <table width="1000" align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">

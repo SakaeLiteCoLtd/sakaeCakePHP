@@ -26,6 +26,7 @@ class HazaimaterialsController extends AppController {
    $this->Users = TableRegistry::get('users');
    $this->Products = TableRegistry::get('products');
    $this->PriceMaterials = TableRegistry::get('priceMaterials');
+   $this->Materials = TableRegistry::get('materials');
    $this->StockEndMaterials = TableRegistry::get('stockEndMaterials');
    $this->StatusRoles = TableRegistry::get('statusRoles');
   }
@@ -112,8 +113,16 @@ class HazaimaterialsController extends AppController {
        ->where(['id' => $StockEndMaterials[$k]["created_staff"]])->toArray();
        $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
 
+       $Materials = $this->Materials->find()
+       ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+       if(strlen($Materials[0]["name_substitute"])){
+         $hazai = $Materials[0]["name_substitute"];
+       }else{
+         $hazai = $grade."_".$color;
+       }
+
        $arrStockEndMaterials[] = [
-         'hazai' => $grade."_".$color,
+         'hazai' => $hazai,
          'lot_num' => $StockEndMaterials[$k]["lot_num"],
          'status_material' => $status_material,
          'amount' => $StockEndMaterials[$k]["amount"],
@@ -159,8 +168,16 @@ class HazaimaterialsController extends AppController {
        ->where(['id' => $tabStockEndMaterials[$k]["created_staff"]])->toArray();
        $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
 
+       $Materials = $this->Materials->find()
+       ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+       if(strlen($Materials[0]["name_substitute"])){
+         $hazai = $Materials[0]["name_substitute"];
+       }else{
+         $hazai = $grade."_".$color;
+       }
+
        $arrtabStockEndMaterials[] = [
-         'hazai' => $grade."_".$color,
+         'hazai' => $hazai,
          'lot_num' => $tabStockEndMaterials[$k]["lot_num"],
          'status_material' => $status_material,
          'amount' => $tabStockEndMaterials[$k]["amount"],
@@ -206,8 +223,16 @@ class HazaimaterialsController extends AppController {
        ->where(['id' => $shippedStockEndMaterials[$k]["created_staff"]])->toArray();
        $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
 
+       $Materials = $this->Materials->find()
+       ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+       if(strlen($Materials[0]["name_substitute"])){
+         $hazai = $Materials[0]["name_substitute"];
+       }else{
+         $hazai = $grade."_".$color;
+       }
+
        $arrshippedStockEndMaterials[] = [
-         'hazai' => $grade."_".$color,
+         'hazai' => $hazai,
          'lot_num' => $shippedStockEndMaterials[$k]["lot_num"],
          'status_material' => $status_material,
          'amount' => $shippedStockEndMaterials[$k]["amount"],
@@ -588,7 +613,7 @@ class HazaimaterialsController extends AppController {
 */
    }
 
-                                   //https://192.168.4.246/Hazaimaterials/hazaitourokuapi/api.json
+                                       //https://192.168.4.246/Hazaimaterials/hazaitourokuapi/api.json
    public function hazaitourokuapi($id)//http://localhost:5000/Hazaimaterials/hazaitourokuapi/3.json
    {
      if($this->request->is(['post'])) {//登録postの時
@@ -786,6 +811,7 @@ class HazaimaterialsController extends AppController {
      ->where(['status_import_tab' => 0, 'delete_flag' => 0])->toArray();
 
      $arrStockEndMaterials = array();//空の配列を作る
+     $checkstrlen = 0;
      for($k=0; $k<count($StockEndMaterials); $k++){
 
        if($StockEndMaterials[$k]["price_material_id"] > 0){
@@ -796,9 +822,25 @@ class HazaimaterialsController extends AppController {
          $color = $PriceMaterials[0]["color"];
          $hazai = $grade."_".$color;
 
+         $Materials = $this->Materials->find()
+         ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+         if(strlen($Materials[0]["name_substitute"])){
+           $hazai = $Materials[0]["name_substitute"];
+         }else{
+           $hazai = $grade."_".$color;
+         }
+
        }elseif(strlen($StockEndMaterials[$k]["product_code"]) > 0){
 
          $hazai = $StockEndMaterials[$k]["product_code"];
+
+         $Materials = $this->Materials->find()
+         ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+         if(strlen($Materials[0]["name_substitute"])){
+           $hazai = $Materials[0]["name_substitute"];
+         }else{
+           $hazai = $grade."_".$color;
+         }
 
        }
 
@@ -814,7 +856,15 @@ class HazaimaterialsController extends AppController {
        ->where(['id' => $StockEndMaterials[$k]["created_staff"]])->toArray();
        $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
 
+       if(strlen($hazai) > 20){
+         $hazainamecheck = 1;
+         $checkstrlen = $checkstrlen + 1;
+       }else{
+         $hazainamecheck = 0;
+       }
+
        $arrStockEndMaterials[] = [
+         'hazainamecheck' => $hazainamecheck,
          'hazai' => $hazai,
          'status_material' => $status_material,
          'lot_num' => $StockEndMaterials[$k]["lot_num"],
@@ -824,8 +874,13 @@ class HazaimaterialsController extends AppController {
        ];
 
      }
+     $this->set('checkstrlen',$checkstrlen);
      $this->set('arrStockEndMaterials',$arrStockEndMaterials);
-
+/*
+     echo "<pre>";
+     print_r($checkstrlen);
+     echo "</pre>";
+*/
    }
 
    public function csvconfirm()
@@ -880,6 +935,14 @@ class HazaimaterialsController extends AppController {
          $Staffs = $this->Staffs->find()
          ->where(['id' => $StockEndMaterials[$k]["created_staff"]])->toArray();
          $staff_name = $Staffs[0]["f_name"]." ".$Staffs[0]["l_name"];
+
+         $Materials = $this->Materials->find()
+         ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+         if(strlen($Materials[0]["name_substitute"])){
+           $hazai = $Materials[0]["name_substitute"];
+         }else{
+           $hazai = $grade."_".$color;
+         }
 
          $csvStockEndMaterials[] = [
            'product_code' => $product_code,
@@ -976,7 +1039,46 @@ class HazaimaterialsController extends AppController {
           for($k=0; $k<count($csvStockEndMaterials); $k++){
 
             $arrhazai = explode('_', $csvStockEndMaterials[$k]['hazai']);
-            if(isset($arrhazai[1])){//grade_colorの場合
+
+            $Materials = $this->Materials->find()
+            ->where(['name_substitute' => $arrhazai[0], 'delete_flag' => 0])->toArray();
+
+            if(isset($Materials[0])){
+
+              $PriceMaterials = $this->PriceMaterials->find()
+              ->where(['grade' => $Materials[0]["grade"], 'color' => $Materials[0]["color"], 'delete_flag' => 0])->toArray();
+              $price_material_id = $PriceMaterials[0]["id"];
+
+              if ($this->StockEndMaterials->updateAll(//検査終了時間の更新
+                ['status_import_tab' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $staff_id],
+                ['price_material_id'  => $price_material_id, 'lot_num' => $csvStockEndMaterials[$k]['lot_num']]
+              )){
+
+                if($k == count($csvStockEndMaterials) - 1){//最後のデータが登録されたときにCSVを出力
+    //              $fp = fopen('hazai/hazai.csv', 'w');//local
+                  $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');//192
+
+                  foreach ($arrCsvs as $line) {
+                    $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+                   fputcsv($fp, $line);
+                  }
+                  fclose($fp);
+
+                  $mes = "192.168.4.246\home\centosuser\hazai_csv にＣＳＶファイルが出力されました。";
+                  $this->set('mes',$mes);
+                  $connection->commit();// コミット5
+                }
+
+              } else {
+
+                $mes = "※登録されませんでした";
+                $this->set('mes',$mes);
+                $this->Flash->error(__('The product could not be saved. Please, try again.'));
+                throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+              }
+
+            }elseif(isset($arrhazai[1])){//grade_colorの場合
 
               $grade = $arrhazai[0];
               $color = $arrhazai[1];
@@ -991,7 +1093,7 @@ class HazaimaterialsController extends AppController {
               )){
 
                 if($k == count($csvStockEndMaterials) - 1){//最後のデータが登録されたときにCSVを出力
-  //                $fp = fopen('hazai/hazai.csv', 'w');//local
+    //              $fp = fopen('hazai/hazai.csv', 'w');//local
                   $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');//192
 
                   foreach ($arrCsvs as $line) {

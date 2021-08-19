@@ -41,6 +41,16 @@ if(!isset($_SESSION)){
 
 <?= $this->Form->control('username', array('type'=>'hidden', 'value'=>$username, 'label'=>false)) ?>
 
+<?php if ($checkstrlen > 0): ?>
+
+<br>
+<legend align="center"><font color="red"><?= __("※端材名が21字以上のものはCSV出力できません。代替名を登録してください。") ?></font></legend>
+<br>
+
+<?php else : ?>
+
+<?php endif; ?>
+
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
         <thead>
@@ -64,18 +74,30 @@ if(!isset($_SESSION)){
               <td colspan="20" nowrap="nowrap"><?= h($arrStockEndMaterials[$i]["created_at"]) ?></td>
               <td colspan="20" nowrap="nowrap"><?= h($arrStockEndMaterials[$i]["staff_name"]) ?></td>
 
-              <?php if ($chesk_flag == 1): ?>
-                <?php
-                echo "<td colspan='10' nowrap='nowrap'>\n";
-                echo "<input type='checkbox' name=check".$i." checked='checked' size='6'/>\n";
-                echo "</td>\n";
-                ?>
+              <?php if ($arrStockEndMaterials[$i]["hazainamecheck"] == 0): ?>
+
+                <?php if ($chesk_flag == 1): ?>
+                  <?php
+                  echo "<td colspan='10' nowrap='nowrap'>\n";
+                  echo "<input type='checkbox' name=check".$i." checked='checked' size='6'/>\n";
+                  echo "</td>\n";
+                  ?>
+                <?php else : ?>
+                  <?php
+                  echo "<td colspan='10' nowrap='nowrap'>\n";
+                  echo "<input type='checkbox' name=check".$i." size='6'/>\n";
+                  echo "</td>\n";
+                  ?>
+                <?php endif; ?>
+
               <?php else : ?>
+
                 <?php
                 echo "<td colspan='10' nowrap='nowrap'>\n";
-                echo "<input type='checkbox' name=check".$i." size='6'/>\n";
+                echo "\n";
                 echo "</td>\n";
                 ?>
+
               <?php endif; ?>
 
             </tr>

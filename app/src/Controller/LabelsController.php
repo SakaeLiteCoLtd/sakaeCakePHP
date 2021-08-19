@@ -47,6 +47,7 @@ class LabelsController extends AppController
        $this->CheckLotsDoubles = TableRegistry::get('checkLotsDoubles');
        $this->PriceMaterials = TableRegistry::get('priceMaterials');
        $this->StockEndMaterials = TableRegistry::get('stockEndMaterials');
+       $this->Materials = TableRegistry::get('materials');
  }
      public function indexMenu()
      {
@@ -2708,10 +2709,22 @@ class LabelsController extends AppController
                   $flag_used = 0;
                 }
 
-                if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                $Materials = $this->Materials->find()
+                ->where(['name_substitute' => $arrFp[$k-1][6]])->toArray();
+
+                if(isset($Materials[0])){
+
+                  $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
+                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
+
+                }elseif(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+
                   $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+
                 }else{
+
                   $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
+
                 }
 
               }
@@ -2727,10 +2740,22 @@ class LabelsController extends AppController
                   $flag_used = 0;
                 }
 
-                if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                $Materials = $this->Materials->find()
+                ->where(['name_substitute' => $arrFp[$k-1][6]])->toArray();
+
+                if(isset($Materials[0])){
+
+                  $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
+                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
+
+                }elseif(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+
                   $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+
                 }else{
+
                   $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
+                  
                 }
 
               }

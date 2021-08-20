@@ -22,6 +22,9 @@ class DaitaisController extends AppController
 
     public function index()
     {
+      $Materials = $this->Materials->newEntity();
+      $this->set('Materials',$Materials);
+
 			$session = $this->request->getSession();
 			$sessionData = $session->read();
 
@@ -44,6 +47,7 @@ class DaitaisController extends AppController
           }
 
           $arrMaterials[] = [
+            "id" => $Materials[$j]["id"],
             "grade" => $Materials[$j]["grade"],
             "color" => $Materials[$j]["color"],
             "name_substitute" => $name_substitute
@@ -114,50 +118,31 @@ class DaitaisController extends AppController
 
       $Data=$this->request->query('s');
       if(isset($Data["mess"])){
+        $Id = $Data["Id"];
         $mess = $Data["mess"];
         $this->set('mess',$mess);
       }else{
         $data = $this->request->getData();
         $mess = "";
         $this->set('mess',$mess);
+        $data = array_keys($data, '編集');
+        $Id = $data[0];
       }
 
-      $materialgrade_color = $data["materialgrade_color"];
+
+      $Materials = $this->Materials->find()//CSV未出力データ
+      ->where(['id' => $Id])->toArray();
+
+      $materialgrade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
       $this->set('materialgrade_color',$materialgrade_color);
-
-      $arrhazai = explode('_', $materialgrade_color);
-
-      $grade = $arrhazai[0];
-
-      if(isset($arrhazai[1])){
-        $color = $arrhazai[1];
-      }else{
-
-        return $this->redirect(['action' => 'editkensaku',
-        's' => ['mess' => "グレードと色を「_」（アンダーバー）でつないで入力してください。"]]);
-
-      }
-
-      $Materials = $this->Materials->find()
-      ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
-
-      if(!isset($Materials[0])){
-
-        return $this->redirect(['action' => 'editkensaku',
-        's' => ['mess' => "入力された「グレード_色」は登録されていません。"]]);
-
-      }
-      $this->set('MaterialId',$Materials[0]["id"]);
+      $this->set('MaterialId',$Id);
 
 			$Materials = $this->Materials->newEntity();
       $this->set('Materials',$Materials);
 
-      if(!isset($_SESSION)){
-        session_start();
-        header('Expires:-1');
-        header('Cache-Control:');
-        header('Pragma:');
-      }
+      header('Expires:-1');
+      header('Cache-Control:');
+      header('Pragma:');
 
     }
 
@@ -178,15 +163,17 @@ class DaitaisController extends AppController
       $name_substitute = $data["name_substitute"];
       $this->set('name_substitute',$name_substitute);
 
+      if(strlen($name_substitute) > 20){
+        return $this->redirect(['action' => 'editform',
+        's' => ['Id' => $MaterialId, 'mess' => "代替名は20字以下にしてください。"]]);
+      }
+
       $Materials = $this->Materials->newEntity();
       $this->set('Materials',$Materials);
 
-      if(!isset($_SESSION)){
-        session_start();
-        header('Expires:-1');
-        header('Cache-Control:');
-        header('Pragma:');
-      }
+      header('Expires:-1');
+      header('Cache-Control:');
+      header('Pragma:');
 
     }
 

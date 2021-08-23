@@ -1041,7 +1041,7 @@ class HazaimaterialsController extends AppController {
             $arrhazai = explode('_', $csvStockEndMaterials[$k]['hazai']);
 
             $Materials = $this->Materials->find()
-            ->where(['name_substitute' => $arrhazai[0], 'delete_flag' => 0])->toArray();
+            ->where(['name_substitute' => $csvStockEndMaterials[$k]['hazai'], 'delete_flag' => 0])->toArray();
 
             if(isset($Materials[0])){
 
@@ -1055,7 +1055,7 @@ class HazaimaterialsController extends AppController {
               )){
 
                 if($k == count($csvStockEndMaterials) - 1){//最後のデータが登録されたときにCSVを出力
-    //              $fp = fopen('hazai/hazai.csv', 'w');//local
+      //            $fp = fopen('hazai/hazai.csv', 'w');//local
                   $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');//192
 
                   foreach ($arrCsvs as $line) {
@@ -1093,7 +1093,7 @@ class HazaimaterialsController extends AppController {
               )){
 
                 if($k == count($csvStockEndMaterials) - 1){//最後のデータが登録されたときにCSVを出力
-    //              $fp = fopen('hazai/hazai.csv', 'w');//local
+      //            $fp = fopen('hazai/hazai.csv', 'w');//local
                   $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');//192
 
                   foreach ($arrCsvs as $line) {

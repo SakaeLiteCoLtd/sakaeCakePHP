@@ -29,7 +29,6 @@ class ApimaterialsController extends AppController
 	//	 $this->Materials = TableRegistry::get('materials');
 		 $this->PriceMaterials = TableRegistry::get('priceMaterials');
 		 $this->StockEndMaterials = TableRegistry::get('stockEndMaterials');
-		 $this->StockEndMaterialTests = TableRegistry::get('stockEndMaterialTests');
 		 $this->Users = TableRegistry::get('users');
 		}
 /*
@@ -113,13 +112,13 @@ class ApimaterialsController extends AppController
 
 					if($k == 0){//最初または前のidと違うときはロットナンバーを最初にする
 
-						$countStockEndMaterials = $this->StockEndMaterialTests->find()
+						$countStockEndMaterials = $this->StockEndMaterials->find()
 						->where(['price_material_id' => $arrTourokuStockEndMaterials[$k]["price_material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
 						$countLot = count($countStockEndMaterials) + 1;
 
 					}elseif($arrTourokuStockEndMaterials[$k]["price_material_id"] !== $arrTourokuStockEndMaterials[$k-1]["price_material_id"]){//新しい原料に変わったとき
 
-						$countStockEndMaterials = $this->StockEndMaterialTests->find()
+						$countStockEndMaterials = $this->StockEndMaterials->find()
 						->where(['price_material_id' => $arrTourokuStockEndMaterials[$k]["price_material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
 						$countLot = count($countStockEndMaterials) + 1;
 
@@ -134,8 +133,8 @@ class ApimaterialsController extends AppController
 
 				}
 
-				$StockEndMaterialTests = $this->StockEndMaterialTests->patchEntities($this->StockEndMaterialTests->newEntity(), $arrTourokuStockEndMaterials);
-	      if ($this->StockEndMaterialTests->saveMany($StockEndMaterialTests)) {
+				$StockEndMaterials = $this->StockEndMaterials->patchEntities($this->StockEndMaterials->newEntity(), $arrTourokuStockEndMaterials);
+	      if ($this->StockEndMaterials->saveMany($StockEndMaterials)) {
 	          $message = 'Saved';
 	      } else {
 	          $message = 'Error';
@@ -144,8 +143,8 @@ class ApimaterialsController extends AppController
 	      $this->viewBuilder()->className('Json');
 	      $this->set([
 	          'message' => $message,
-	          'StockEndMaterialTests' => $StockEndMaterialTests,
-	          '_serialize' => ['message', 'StockEndMaterialTests']
+	          'StockEndMaterials' => $StockEndMaterials,
+	          '_serialize' => ['message', 'StockEndMaterials']
 	      ]);
 
 /*

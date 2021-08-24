@@ -11,24 +11,28 @@
  </table>
  <hr size="5" style="margin: 0.5rem">
  <?= $this->Flash->render() ?>
- <?= $this->Form->create($OrderSpecials, ['url' => ['action' => 'adddo']]) ?>
+ <?= $this->Form->create($OrderSpecials, ['url' => ['action' => 'editpreadd']]) ?>
  <fieldset>
    <table style="margin-bottom:0px" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
      <tr style="background-color: #E6FFFF">
-       <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/subTouroku.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'addpreadd')));?></td>
+       <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/subYobidashi.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'kensakuform')));?></td>
      </tr>
    </table>
-<br><br>
+   <br>
+   <div align="center"><font color="red" size="3"><?= __($mes) ?></font></div>
+   <br>
 <table width="1000" align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="270" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">注文日付</strong></td>
-    <td width="270" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">注文NO(無ければ任意の英数字)</strong></td>
+    <td width="250" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">注文日付</strong></td>
+    <td width="230" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">注文NO(無ければ任意の英数字)</strong></td>
     <td bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">発注元顧客</strong></td>
+    <td width="60" bgcolor="#FFFFCC" style="font-size: 12pt;"><strong style="font-size: 11pt; color:blue">状況</strong></td>
 	</tr>
   <tr>
     <td bgcolor="#FFFFCC"><?= h($date_order) ?></td>
     <td bgcolor="#FFFFCC"><?= h($num_order) ?></td>
     <td bgcolor="#FFFFCC"><?= h($cs_name) ?></td>
+    <td bgcolor="#FFFFCC"><?= h($kannou_name) ?></td>
 	</tr>
 </table>
 <br><br>
@@ -48,16 +52,8 @@
     <td bgcolor="#FFFFCC"><?= h($date_deliver) ?></td>
 	</tr>
 </table>
-<br>
-<table align="center">
-<tbody>
-  <tr>
-    <td><?= $this->Form->control('kannou', array('type'=>'checkbox', 'label'=>false)) ?></td>
-    <td><div><strong style="font-size: 11pt; color:blue">完納済の場合はチェックを入れてください。</strong></div></td>
-  </tr>
-</tbody>
-</table>
 
+<?= $this->Form->control('Id', array('type'=>'hidden', 'value'=>$Id, 'label'=>false)) ?>
 <?= $this->Form->control('date_order', array('type'=>'hidden', 'value'=>$date_order, 'label'=>false)) ?>
 <?= $this->Form->control('num_order', array('type'=>'hidden', 'value'=>$num_order, 'label'=>false)) ?>
 <?= $this->Form->control('cs_id', array('type'=>'hidden', 'value'=>$cs_id, 'label'=>false)) ?>

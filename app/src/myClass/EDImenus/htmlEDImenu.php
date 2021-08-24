@@ -55,7 +55,7 @@ class htmlEDImenu extends AppController
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/chokusetsuformpro'>\n".
                  "<img src='/img/Labelimg/touroku_tyokusetsu.gif' width=85 height=36>\n".
                  "</a></td>\n".
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/hasuform'>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Orderothers/menu'>\n".
                  "<img src='/img/Labelimg/another_ryousan.gif' width=85 height=36>\n".
                  "</a>\n";
 

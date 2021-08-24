@@ -264,13 +264,9 @@ class ApigenryousController extends AppController
 							$_SESSION['specialvba'][] = $specialvba;
 
 						}
-/*
+
 						$daburicheckOrderMaterials = $this->OrderMaterials->find('all')
 						->where(['id_order' => $id_order_moto, 'grade' => $grade, 'color' => $color])
-						->order(["id_order"=>"DESC"])->toArray();
-	*/
-						$daburicheckOrderMaterials = $this->OrderMaterials->find('all')
-						->where(['id_order like' => '%'.$id_order_moto_arr[0].'%', 'grade' => $grade, 'color' => $color])
 						->order(["id_order"=>"DESC"])->toArray();
 
 						if(isset($daburicheckOrderMaterials[0])){

@@ -216,6 +216,77 @@ class AccountstaffsController extends AppController
 
 		}
 
+    public function staffkensakusyousai()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $data = $this->request->getData();
+     $arrname = explode('_', $data["name"]);
+
+     $f_name = $arrname[0];
+     if(isset($arrname[1])){
+       $l_name = $arrname[1];
+
+       $Staffs = $this->Staffs->find()
+       ->where(['f_name' => $f_name, 'l_name' => $l_name, 'delete_flag' => 0])->toArray();
+
+       if(!isset($Staffs[0])){
+
+         return $this->redirect(['action' => 'staffeditkensaku',
+         's' => ['mess' => "入力された社員名は登録されていません。"]]);
+
+       }
+       $this->set('StaffId',$Staffs[0]["id"]);
+
+     }else{
+
+       return $this->redirect(['action' => 'staffeditkensaku',
+       's' => ['mess' => "姓と名を「_」（アンダーバー）でつないで入力してください。"]]);
+
+     }
+
+     $name = $data['name'];
+     $this->set('name',$name);
+     $f_name = $Staffs[0]['f_name'];
+     $this->set('f_name',$f_name);
+     $l_name = $Staffs[0]['l_name'];
+     $this->set('l_name',$l_name);
+     $staff_code = $Staffs[0]['staff_code'];
+     $this->set('staff_code',$staff_code);
+     $tel = $Staffs[0]['tel'];
+     $this->set('tel',$tel);
+     $address = $Staffs[0]['address'];
+     $this->set('address',$address);
+
+     if($Staffs[0]['sex'] == 0){
+       $sex = "男";
+     }elseif($Staffs[0]['sex'] == 1){
+       $sex = "女";
+     }else{
+       $sex = "";
+     }
+     $this->set('sex',$sex);
+
+     if(strlen($Staffs[0]['birth']) > 0){
+       $birth = $Staffs[0]['birth']->format('Y-m-d');
+     }else{
+       $birth = "";
+     }
+     $this->set('birth',$birth);
+
+     if(strlen($Staffs[0]['date_start']) > 0){
+       $date_start = $Staffs[0]['date_start']->format('Y-m-d');
+     }else{
+       $date_start = "";
+     }
+     $this->set('date_start',$date_start);
+
+     header('Expires:-1');
+     header('Cache-Control:');
+     header('Pragma:');
+		}
+
     public function staffeditform()
 		{
 		 $user = $this->Users->newEntity();
@@ -526,10 +597,104 @@ class AccountstaffsController extends AppController
 
      }
 
-     echo "<pre>";
-		 print_r($Users);
-		 echo "</pre>";
+     $staff_id = $data['staff_id'];
+     $this->set('staff_id',$staff_id);
+     $username = $data['username'];
+     $this->set('username',$username);
+     $password = $data['password'];
+     $this->set('password',$password);
+     $arrStaffs = $this->Staffs->find('all', ['conditions' => ['id' => $staff_id]])->toArray();
+     $staff_name = $arrStaffs[0]['staff_code'].":".$arrStaffs[0]['f_name'].$arrStaffs[0]['l_name'];
+     $this->set('staff_name',$staff_name);
 
 		}
+
+    public function useradddo()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     $data = $this->request->getData();
+
+     $staff_id = $data['staff_id'];
+     $this->set('staff_id',$staff_id);
+     $username = $data['username'];
+     $this->set('username',$username);
+     $password = $data['password'];
+     $this->set('password',$password);
+     $staff_name = $data['staff_name'];
+     $this->set('staff_name',$staff_name);
+
+     $tourokuUsers = [
+       'username' => $username,
+       'password' => $password,
+       'role_id' => 4,
+       'staff_id' => $staff_id,
+       'delete_flag' => 1,
+       'created_at' => date('Y-m-d H:i:s'),
+       'created_staff' => $sessionData['login']['staff_id'],
+     ];
+/*
+     echo "<pre>";
+     print_r($tourokuUsers);
+     echo "</pre>";
+*/
+    $Users = $this->Users->patchEntity($this->Users->newEntity(), $tourokuUsers);
+    $connection = ConnectionManager::get('default');//トランザクション1
+     // トランザクション開始2
+     $connection->begin();//トランザクション3
+     try {//トランザクション4
+       if ($this->Users->save($Users)) {
+
+         $mes = "※以下のデータが登録されました";
+         $this->set('mes',$mes);
+         $connection->commit();// コミット5
+
+       } else {
+
+         $mes = "※登録されませんでした";
+         $this->set('mes',$mes);
+         $this->Flash->error(__('The data could not be saved. Please, try again.'));
+         throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+       }
+
+     } catch (Exception $e) {//トランザクション7
+     //ロールバック8
+       $connection->rollback();//トランザクション9
+     }//トランザクション10
+
+		}
+
+    public function userichiran()
+    {
+      $user = $this->Users->newEntity();
+      $this->set('user',$user);
+
+      $arrUsers = array();
+      $Users = $this->Users->find()
+      ->where(['delete_flag' => 1])->toArray();
+
+      for($j=0; $j<count($Users); $j++){
+
+        $Staffs = $this->Staffs->find('all', ['conditions' => ['id' => $Users[$j]["staff_id"]]])->toArray();
+        $staff_code = $Staffs[0]['staff_code'];
+        $staff_name = $Staffs[0]['f_name'].$Staffs[0]['l_name'];
+
+          $arrUsers[] = [
+            "id" => $Users[$j]["id"],
+            "username" => $Users[$j]["username"],
+            "staff_code" => $staff_code,
+            "staff_name" => $staff_name
+          ];
+
+      }
+      $this->set('arrUsers',$arrUsers);
+
+    }
+
 
 }

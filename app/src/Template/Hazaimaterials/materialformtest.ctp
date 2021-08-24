@@ -2,6 +2,9 @@
  use App\myClass\Genryoumenu\htmlGenryoumenu;//myClassフォルダに配置したクラスを使用
  $htmlGenryoumenu = new htmlGenryoumenu();
  $htmlGenryou = $htmlGenryoumenu->Genryoumenus();
+
+ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
+ $this->Products = TableRegistry::get('products');
  ?>
 
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
@@ -14,6 +17,68 @@ $arrProduct_list = json_encode($arrProduct_list);//jsに配列を受け渡すた
 ?>
 
 <script>
+
+function orgFloor(value, base) {
+        return Math.floor(value * base) / base;
+}
+
+$(document).ready(function() {
+    $("#product_list").focusout(function() {
+      var inputNumber = $("#product_list").val();
+      var multiplicationResult = inputNumber * 10;
+      var dataForLast = $("#material_list").val(multiplicationResult);
+    })
+});
+
+/*
+function orgFloor(value, base) {
+        return Math.floor(value * base) / base;
+}
+
+$(document).ready(function() {
+    $("#product_list").focusout(function() {
+      var inputNumber = $("#product_list").val();
+
+      const data = inputNumber; // 渡したいデータ
+
+      $.ajax({
+          type: "POST", //　GETでも可
+          url: "http://localhost:5000/hazaimaterials/materialformtest", //　送り先
+          data: {'データ': data }, //　渡したいデータをオブジェクトで渡す
+          dataType : "json", //　データ形式を指定
+          scriptCharset: 'utf-8' //　文字コードを指定
+      })
+      .then(
+          function(param){　 //　paramに処理後のデータが入って戻ってくる
+              console.log(param); //　帰ってきたら実行する処理
+          },
+          function(XMLHttpRequest, textStatus, errorThrown){ //　エラーが起きた時はこちらが実行される
+              console.log(XMLHttpRequest); //　エラー内容表示
+      });
+*/
+<?php
+/*
+header('Content-type: application/json; charset=utf-8'); // ヘッダ（データ形式、文字コードなど指定）
+$data = filter_input(INPUT_POST, 'データ'); // 送ったデータを受け取る（GETで送った場合は、INPUT_GET）
+
+$product_code = $data;	//　やりたい処理
+
+$Products = $this->Products->find()
+->where(['product_code' => $product_code, 'delete_flag' => 0])->toArray();
+if(isset($Products[0])){
+  $auto_grade_color = $Products[0]["grade"]."_".$Products[0]["color"];
+}else{
+  $auto_grade_color = "";
+}
+
+$auto_grade_color = json_encode($auto_grade_color);//jsに配列を受け渡すために変換
+*/
+?>
+/*
+      var dataForLast = $("#material_list").val(<?php echo $auto_grade_color; ?>);
+    })
+});
+*/
 
 $(function() {
       // 入力補完候補の単語リスト
@@ -82,29 +147,7 @@ $(function() {
 	</tr>
   <tr>
     <td bgcolor="#FFFFCC" style="padding: 0.2rem">
-      <?= $this->Form->control('materialgrade_color', array('type'=>'text', 'label'=>false, 'id'=>"material_list", 'autofocus'=>true)) ?>
-    </td>
-	</tr>
-</table>
-<br>
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-  <tr>
-    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">端材ステイタス</strong></td>
-	</tr>
-  <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem">
-      <?= $this->Form->input("status_material", ["type"=>"select", "options"=>$arrStatusMaterial, 'label'=>false, 'required'=>true]) ?>
-    </td>
-	</tr>
-</table>
-<br>
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-  <tr>
-    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">数量（kg）</strong></td>
-	</tr>
-  <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem">
-      <?= $this->Form->control('amount', array('type'=>'text', 'label'=>false, 'pattern'=>'^[0-9.]+$', 'title'=>'半角数字で入力して下さい。', 'required'=>true)) ?>
+      <?= $this->Form->control('materialgrade_color', array('type'=>'text', 'label'=>false, 'id'=>"material_list")) ?>
     </td>
 	</tr>
 </table>

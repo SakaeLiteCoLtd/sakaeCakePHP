@@ -129,8 +129,7 @@ class DaitaisController extends AppController
         $Id = $data[0];
       }
 
-
-      $Materials = $this->Materials->find()//CSV未出力データ
+      $Materials = $this->Materials->find()
       ->where(['id' => $Id])->toArray();
 
       $materialgrade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];

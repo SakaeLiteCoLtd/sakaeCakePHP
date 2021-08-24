@@ -2,6 +2,9 @@
  use App\myClass\EDImenus\htmlEDImenu;//myClassフォルダに配置したクラスを使用
  $htmlEDImenu = new htmlEDImenu();
  $htmlEDIs = $htmlEDImenu->EDImenus();
+
+ use Cake\ORM\TableRegistry;//独立したテーブルを扱う
+ $this->Customers = TableRegistry::get('customers');
  ?>
  <hr size="5" style="margin: 0.5rem">
  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
@@ -11,57 +14,56 @@
  </table>
  <hr size="5" style="margin: 0.5rem">
  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-  <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/subYobidashi.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'addpreadd')));?></td>
+   <td style="padding: 0.1rem 0.1rem; text-align: center"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/subYobidashi.gif',array('width'=>'85','height'=>'36','url'=>array('action'=>'kensakuform')));?></td>
  </table>
  <hr size="5" style="margin: 0.5rem">
 
-        <?= $this->Form->create($OrderSpecials, ['url' => ['action' => 'denpyouhenkouichiran']]) ?>
+ <?= $this->Form->create($OrderSpecials, ['url' => ['action' => 'editform']]) ?>
 
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-  <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
-    <tr style="border-bottom: 0px;border-width: 0px">
-      <td width="250" height="35" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">会社名</strong></div></td>
-      <td width="500" colspan="40" nowrap="nowrap"><div align="center"><strong style="font-size: 15pt; color:blue">納期絞り込み</strong></div></td>
-    </tr>
+ <br>
+ <legend align="center"><font color="black"><?= __("量産品以外一覧") ?></font></legend>
+ <br>
+ <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
+     <thead>
+         <tr border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+           <td width="150" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">会社名</strong></div></td>
+           <td width="200" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">注文名</strong></div></td>
+           <td width="80" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">納入日</strong></div></td>
+           <td width="70" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">単価</strong></div></td>
+           <td width="70" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">数量</strong></div></td>
+           <td width="70" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue">状況</strong></div></td>
+           <td width="50" colspan="20" nowrap="nowrap"><div align="center"><strong style="font-size: 12pt; color:blue"></strong></div></td>
+         </tr>
+     </thead>
+     <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">
+       <?php for($i=0; $i<count($arrOrderSpecials); $i++): ?>
+         <tr style="border-bottom: solid;border-width: 1px">
 
-<?php
-      $dateYMD = date('Y-m-d');
-      $dateYMD1 = strtotime($dateYMD);
-      $dayye = date('Y-m-d', strtotime('-1 day', $dateYMD1));
+           <?php
+           $Customers = $this->Customers->find()->where(['customer_code' => $arrOrderSpecials[$i]["cs_id"]])->toArray();
+           $cs_name = $Customers[0]->name;
 
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-  ?>
-      <td rowspan='2'  height='6' colspan='20'>
-        <?= $this->Form->input('cs_id', ["type"=>"select", "empty"=>"", "options"=>$arrCustomers, 'label'=>false, 'empty'=>true]); ?>
-      </td>
-<?php
-      echo "<td width='50' colspan='3' style='border-bottom: 0px'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "開始";
-      echo "</strong></div></td>\n";
+           if($arrOrderSpecials[$i]["kannou"] > 0){
+             $kannou = "完納";
+           }else{
+             $kannou = "未納";
+           }
+           ?>
 
-  ?>
-  <td width="350" colspan="37" style="border-bottom: 0px;border-width: 1px"><div align="center"><?= $this->Form->input("date_sta", array('type' => 'date', 'value' => $dayye, 'monthNames' => false, 'label'=>false)); ?></div></td>
-  <?php
-
-      echo "</tr>\n";
-      echo "<tr style='border-bottom: 0px;border-width: 0px'>\n";
-      echo "<td colspan='3'><div align='center'><strong style='font-size: 15pt; color:blue'>\n";
-      echo "終了";
-      echo "</strong></div></td>\n";
-
-?>
-<td colspan="37" style="border-bottom: solid;border-width: 1px"><div align="center"><?= $this->Form->input("date_fin", array('type' => 'date', 'value' => $dateYMD, 'monthNames' => false, 'label'=>false)); ?></div></td>
-<?php
-
-      echo "</tr>\n";
-
- ?>
-<br>
-  <tr bgcolor="#E6FFFF" >
-    <td width="100" colspan="30" nowrap="nowrap" bgcolor="#E6FFFF" style="border: none"><div align="center"><strong style="font-size: 15pt; color:blue"></strong></div></td>
-    <td align="right" rowspan="2"  colspan="20" width="250" bgcolor="#E6FFFF" style="border: none"><div align="right"><?= $this->Form->submit(__('呼出'), array('name' => 'kensaku')); ?></div></td>
-  </tr>
-</table>
-</fieldset>
-
-<?=$this->Form->end() ?>
+           <td colspan="20" nowrap="nowrap"><?= h($cs_name) ?></td>
+           <td colspan="20" nowrap="nowrap"><?= h($arrOrderSpecials[$i]["order_name"]) ?></td>
+           <td colspan="20" nowrap="nowrap"><?= h($arrOrderSpecials[$i]["date_deliver"]->format('Y-m-d')) ?></td>
+           <td colspan="20" nowrap="nowrap"><?= h($arrOrderSpecials[$i]["price"]) ?></td>
+           <td colspan="20" nowrap="nowrap"><?= h($arrOrderSpecials[$i]["amount"]) ?></td>
+           <td colspan="20" nowrap="nowrap"><?= h($kannou) ?></td>
+           <?php
+           echo "<td colspan='20' nowrap='nowrap'><div align='center'>";
+           echo $this->Form->submit("編集" , ['action'=>'hensyu', 'name' => $arrOrderSpecials[$i]["id"]]) ;
+           echo "</div></td>";
+           ?>
+         </tr>
+        <?php endfor;?>
+     </tbody>
+   </table>
+ <br><br><br>

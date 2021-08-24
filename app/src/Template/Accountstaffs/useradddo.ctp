@@ -30,48 +30,44 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 </table>
 <hr size="5" style="margin: 0.5rem">
 
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<?= $this->Form->create($user, ['url' => ['action' => 'menu']]) ?>
+<fieldset>
 
-<?php
-$arrStaffs_list = json_encode($arrStaffs_list);//jsに配列を受け渡すために変換
-?>
+  <br>
+  <div align="center"><font color="black" size="3"><?= __($mes) ?></font></div>
+  <br>
 
-<script>
-
-$(function() {
-      // 入力補完候補の単語リスト
-      let wordlist = <?php echo $arrStaffs_list; ?>
-      // 入力補完を実施する要素に単語リストを設定
-      $("#staffs_list").autocomplete({
-        source: wordlist
-      });
-  });
-
-</script>
-
-    <?= $this->Form->create($user, ['url' => ['action' => 'staffkensakusyousai']]) ?>
-    <fieldset>
-
-      <br>
-      <div align="center"><font color="red" size="3"><?= __($mess) ?></font></div>
-      <div align="center"><font color="black" size="3"><?= __("データを呼び出す社員名を「姓_名」の形で入力してください。") ?></font></div>
-      <br>
-
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+    <tr>
+      <td width="280" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">社員</strong></td>
+    </tr>
+    <tr>
+      <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($staff_name) ?></td>
+    </tr>
+  </table>
+<br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
-    <td width="200" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">姓_名</strong></td>
+    <td width="280" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">ユーザー名</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('name', array('type'=>'text', 'label'=>false,'id'=>"staffs_list",  'autofocus'=>true, 'required'=>true)) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($username) ?></td>
+	</tr>
+</table>
+<br>
+<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+  <tr>
+    <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">パスワード</strong></td>
+	</tr>
+  <tr>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h("----") ?></td>
 	</tr>
 </table>
 
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('次へ'), array('name' => 'kakunin')); ?></div></td>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('TOP'), array('name' => 'kakunin')); ?></div></td>
     </tr>
   </table>
 <br>

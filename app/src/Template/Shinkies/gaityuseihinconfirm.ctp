@@ -78,7 +78,7 @@ $this->layout = 'defaultshinki';
 
   <?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$product_code, 'label'=>false)) ?>
   <?= $this->Form->control('unit', array('type'=>'hidden', 'value'=>($this->request->getData('unit')), 'label'=>false)) ?>
-  <?= $this->Form->control('price', array('type'=>'hidden', 'value'=>($this->request->getData('unit')), 'label'=>false)) ?>
+  <?= $this->Form->control('price', array('type'=>'hidden', 'value'=>($this->request->getData('price')), 'label'=>false)) ?>
   <?= $this->Form->control('product_supplier_id', array('type'=>'hidden', 'value'=>($this->request->getData('product_supplier_id')), 'label'=>false)) ?>
 
 <br>

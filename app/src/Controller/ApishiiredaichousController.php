@@ -32,8 +32,8 @@ class ApishiiredaichousController extends AppController
 		 $this->Products = TableRegistry::get('products');
 		}
 
-													     //http://192.168.4.246/Apishiiredaichous/yobidashi/api/2021-6-9_2021-6-20.xml
-		public function yobidashi()//http://localhost:5000/Apishiiredaichous/yobidashi/api/2021-6-9_2021-6-20.xml
+													     //http://192.168.4.246/Apishiiredaichous/yobidashi/api/2021-7-1_2021-7-31.xml
+		public function yobidashi()//http://localhost:5000/Apishiiredaichous/yobidashi/api/2021-7-1_2021-7-31.xml
 		{
 			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
 			$data = urldecode($data);
@@ -50,7 +50,11 @@ class ApishiiredaichousController extends AppController
 			$arrLoadAccountElementsKaikakeZengetsuKurikoshi = array();
 			$arrLoadAccountElementsKaikake = array();
 			$arrLoadYusyouzaiUkeire = array();
-
+/*
+			echo "<pre>";
+	   	print_r("start".date("Y-m-d H:i:s"));
+	   	echo "</pre>";
+*/
 			//ここから$arrLoadShiire
 			$StockInoutWorklogs = $this->StockInoutWorklogs->find()
 			->where(['type' => 1, 'date_work >=' => $daysta, 'date_work <=' => $dayfin, 'is_canceled' => 0, 'delete_flag' => 0])
@@ -69,32 +73,51 @@ class ApishiiredaichousController extends AppController
 
 		 }
 
+		 $arrProductSuppliers_name = array();
+		 $ProductSuppliers = $this->ProductSuppliers->find()->where(['delete_flag' => 0])->toArray();
+		 for($k=0; $k<count($ProductSuppliers); $k++){
+			 $arrProductSuppliers_name[] = [
+				 "sup_id" => $ProductSuppliers[$k]["id"],
+				 "name" => $ProductSuppliers[$k]["name"],
+				 "handy_id" => $ProductSuppliers[$k]["handy_id"],
+			 ];
+		 }
+
+			$arrProductGaityus_price_shiire = array();
+			$ProductGaityus = $this->ProductGaityus->find()->where(['status' => 0])->toArray();
+			for($k=0; $k<count($ProductGaityus); $k++){
+				$arrProductGaityus_price_shiire[] = [
+					"product_code" => $ProductGaityus[$k]["product_code"],
+					"price_shiire" => $ProductGaityus[$k]["price_shiire"]
+				];
+			}
+
 		 $arrStockInoutWorklogs = array();
 		 for($k=0; $k<count($StockInoutWorklogs); $k++){
 
-			 $ProductSuppliers = $this->ProductSuppliers->find()
-			 ->where(['handy_id' => $StockInoutWorklogs[$k]["outsource_code"]])->toArray();
+			$keyIndex = array_search($StockInoutWorklogs[$k]["outsource_code"], array_column($arrProductSuppliers_name, 'handy_id'));//配列の検索
+			$name = $arrProductSuppliers_name[$keyIndex]["name"];
+			$sup_id = $arrProductSuppliers_name[$keyIndex]["sup_id"];
 
-			$ProductGaityus = $this->ProductGaityus->find()
-			->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0])->toArray();
-
-			if(isset($ProductGaityus[0])){
-				$price = $ProductGaityus[0]["price_shiire"];
+			$keyIndex = array_search($StockInoutWorklogs[$k]["product_code"], array_column($arrProductGaityus_price_shiire, 'product_code'));//配列の検索
+			$price = $arrProductGaityus_price_shiire[$keyIndex]["price_shiire"];
+			if(strlen($price)){
+				$price = $price;
 			}else{
 				$price = 0;
 			}
 
-			if($ProductSuppliers[0]["id"] != 22){
+			if($sup_id != 22){
 
 				$arrStockInoutWorklogs[] = [
- 				 'id' => $StockInoutWorklogs[$k]["id"],
- 				 'name' => $ProductSuppliers[0]["name"],
- 				 'sup_id' => $ProductSuppliers[0]["id"],
- 				 'product_code' => $StockInoutWorklogs[$k]["product_code"],
- 				 'date_work' => $StockInoutWorklogs[$k]->date_work->format('Y-m-d'),
- 				 'amount' => $StockInoutWorklogs[$k]["amount"],
- 				 'lot_num' => $StockInoutWorklogs[$k]["lot_num"],
- 				 'price' => $price,
+					'name' => $name,
+					'date_work' => $StockInoutWorklogs[$k]->date_work->format('Y-m-d'),
+					'id' => $StockInoutWorklogs[$k]["id"],
+					'product_code' => $StockInoutWorklogs[$k]["product_code"],
+					'amount' => $StockInoutWorklogs[$k]["amount"],
+					'sup_id' => $sup_id,
+					'price' => $price,
+					'lot_num' => $StockInoutWorklogs[$k]["lot_num"],
  			 ];
 
 			}
@@ -249,13 +272,17 @@ class ApishiiredaichousController extends AppController
 		 'product_code' => $AccountYusyouzaiUkeires[$k]["product_code"],
 		 'amount' => $AccountYusyouzaiUkeires[$k]["amount"],
 		 'tanka' => $AccountYusyouzaiUkeires[$k]["tanka"],
-		 'customer_code' => $AccountYusyouzaiUkeires[$k]["customer_code"],
+		 'customer_code' => $AccountYusyouzaiMasters[0]["customer_code"],
 	 ];
 
 	}
 
 	$arrLoadYusyouzaiUkeire = $arrAccountYusyouzaiUkeires;//$arrLoadYusyouzaiUkeire完成
-
+/*
+	echo "<pre>";
+	print_r("end ".date("Y-m-d H:i:s"));
+	echo "</pre>";
+*/
 /*
 		 echo "<pre>";
 		 print_r($arrLoadAccountElementsKaikake);

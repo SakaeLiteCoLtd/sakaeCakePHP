@@ -2891,6 +2891,11 @@ class LabelsController extends AppController
 
       }
 
+      echo "<pre>";
+      print_r($arrLot);
+      echo "</pre>";
+
+/*
       $count = 0;
       for($k=0; $k<count($arrLot); $k++){
         $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[$k]["datetime_hakkou"], 'product_code' => $arrLot[$k]["product_code"], 'lot_num' => $arrLot[$k]["lot_num"], 'amount' => $arrLot[$k]["amount"]])->toArray();
@@ -2936,14 +2941,7 @@ class LabelsController extends AppController
           $arrLot = $arrLotmitouroku;
         }
       }
-/*
-      echo "<pre>";
-      print_r($arrLotHazai);
-      echo "</pre>";
-      echo "<pre>";
-      print_r($arrLotHazaitouroku);
-      echo "</pre>";
-*/
+
           if(isset($arrLotdouble[0])){
             $CheckLotsDoubles = $this->CheckLotsDoubles->patchEntities($this->CheckLotsDoubles->newEntity(), $arrLotdouble);
             $this->CheckLotsDoubles->saveMany($CheckLotsDoubles);
@@ -3035,7 +3033,7 @@ class LabelsController extends AppController
            }//トランザクション10
 
          }
-
+*/
        }
 
      }

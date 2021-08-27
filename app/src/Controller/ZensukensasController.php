@@ -1194,7 +1194,7 @@ class ZensukensasController extends AppController
       //    $fp = fopen('zensu_csv/zenken_test.csv', 'w');
           $fp = fopen('/home/centosuser/zensu_csv/zenken_test.csv', 'w');
             foreach ($arrichiran_csv as $line) {
-        //      $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+              $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
               fputcsv($fp, $line);
             }
             fclose($fp);

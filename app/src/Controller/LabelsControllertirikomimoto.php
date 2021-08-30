@@ -2750,35 +2750,6 @@ class LabelsController extends AppController
        if ($this->request->is('post')) {
          $source_file = $_FILES['file']['tmp_name'];
 
-         $charArys = array('UTF-8', 'eucJP-win', 'SJIS-win', 'ASCII', 'EUC-JP', 'SJIS', 'JIS');
-         foreach ($charArys as $charset){
-           if ( $source_file == mb_convert_encoding($source_file, $charset, $charset) ){
-             return $charset;
-           }
-         }
-         return $charset;
-
-         echo "<pre>";
-         print_r($charset);
-         echo "</pre>";
-
-         if($fpcount > 0){
-
-           echo "<pre>";
-           print_r("1");
-           echo "</pre>";
-
-         }else{
-
-           echo "<pre>";
-           print_r("2");
-           echo "</pre>";
-
-         }
-
-         // 文字コードを変換しながら読み込めるようにPHPフィルタを定義（utf-16をutf-8に変換）
-         $source_file = 'php://filter/read=convert.iconv.utf-16%2Futf-8/resource='.$source_file;
-
          $fp = fopen($source_file, "r");
          $fpcount = fopen($source_file, 'r' );
           for($count = 0; fgets( $fpcount ); $count++ );
@@ -2790,14 +2761,14 @@ class LabelsController extends AppController
             $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
             $sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
             $arrFp[] = $sample;//配列に追加する
-            if(isset($arrFp[$k-1][11]) && ($arrFp[$k-1][11] != "")){//product_codeが２つある時
+            if(isset($arrFp[$k-1][10]) && ($arrFp[$k-1][10] != "")){//product_codeが２つある時
               $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
               for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
-                $renban = $arrFp[$k-1][6] + $m;
-                $lot_num = $arrFp[$k-1][5]."-".sprintf('%03d', $renban);
+                $renban = $arrFp[$k-1][5] + $m;
+                $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
                 //product_code=$arrFp[$k-1][6],status=0がzensu_productsに存在するときflag_used=9
                 //else...flag_used=0
-                $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][7], 'status' => 0])->toArray();
+                $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][6], 'status' => 0])->toArray();
                 if(isset($ZensuProduct[0])){
                   $flag_used = 9;
                 }else{
@@ -2805,46 +2776,15 @@ class LabelsController extends AppController
                 }
 
                 if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
-                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
                 }else{
-                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][7]];
+                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
                 }
 
               }
               for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
-                $renban = $arrFp[$k-1][6] + $m;
-                $lot_num = $arrFp[$k-1][5]."-".sprintf('%03d', $renban);
-                $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][8], 'status' => 0])->toArray();
-                if(isset($ZensuProduct[0])){
-                  $flag_used = 9;
-                }else{
-                  $flag_used = 0;
-                }
-
-                $Materials = $this->Materials->find()
-                ->where(['name_substitute' => $arrFp[$k-1][7]])->toArray();
-
-                if(isset($Materials[0])){
-
-                  $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
-                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
-
-                }elseif(strpos($arrFp[$k-1][7],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
-
-                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][8], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
-
-                }else{
-
-                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][7]];
-
-                }
-
-              }
-            }else{//product_codeが１つの時
-              $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
-              for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
-                $renban = $arrFp[$k-1][6] + $m;
-                $lot_num = $arrFp[$k-1][5]."-".sprintf('%03d', $renban);
+                $renban = $arrFp[$k-1][5] + $m;
+                $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
                 $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][7], 'status' => 0])->toArray();
                 if(isset($ZensuProduct[0])){
                   $flag_used = 9;
@@ -2853,7 +2793,7 @@ class LabelsController extends AppController
                 }
 
                 $Materials = $this->Materials->find()
-                ->where(['name_substitute' => $arrFp[$k-1][7]])->toArray();
+                ->where(['name_substitute' => $arrFp[$k-1][6]])->toArray();
 
                 if(isset($Materials[0])){
 
@@ -2862,11 +2802,42 @@ class LabelsController extends AppController
 
                 }elseif(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
 
-                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
 
                 }else{
 
-                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][7]];
+                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
+
+                }
+
+              }
+            }else{//product_codeが１つの時
+              $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+              for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+                $renban = $arrFp[$k-1][5] + $m;
+                $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
+                $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][6], 'status' => 0])->toArray();
+                if(isset($ZensuProduct[0])){
+                  $flag_used = 9;
+                }else{
+                  $flag_used = 0;
+                }
+
+                $Materials = $this->Materials->find()
+                ->where(['name_substitute' => $arrFp[$k-1][6]])->toArray();
+
+                if(isset($Materials[0])){
+
+                  $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
+                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
+
+                }elseif(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+
+                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+
+                }else{
+
+                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
 
                 }
 
@@ -2875,8 +2846,6 @@ class LabelsController extends AppController
             }
 
         }
-
-
 
         $arrLotHazaitouroku = array();//空の配列を作る
         for ($k=0; $k<count($arrLotHazai); $k++){
@@ -2921,10 +2890,6 @@ class LabelsController extends AppController
         $arrLot = $arrLotunique;
 
       }
-
-      echo "<pre>";
-      print_r($arrLot);
-      echo "</pre>";
 
       $count = 0;
       for($k=0; $k<count($arrLot); $k++){
@@ -2972,6 +2937,13 @@ class LabelsController extends AppController
         }
       }
 /*
+      echo "<pre>";
+      print_r($arrLotHazai);
+      echo "</pre>";
+      echo "<pre>";
+      print_r($arrLotHazaitouroku);
+      echo "</pre>";
+*/
           if(isset($arrLotdouble[0])){
             $CheckLotsDoubles = $this->CheckLotsDoubles->patchEntities($this->CheckLotsDoubles->newEntity(), $arrLotdouble);
             $this->CheckLotsDoubles->saveMany($CheckLotsDoubles);
@@ -3063,7 +3035,7 @@ class LabelsController extends AppController
            }//トランザクション10
 
          }
-*/
+
        }
 
      }

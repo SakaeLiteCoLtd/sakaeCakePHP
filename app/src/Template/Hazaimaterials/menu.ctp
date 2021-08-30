@@ -12,23 +12,12 @@
  <hr size="5" style="margin: 0.5rem">
  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
   <tr style="background-color: #E6FFFF">
-    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaigenryou.gif',array('width'=>'105','url'=>array('action'=>'materialpreadd')));?></td>
-    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaicsv.gif',array('width'=>'105','url'=>array('action'=>'csvpreadd')));?></td>
-      <?php
-      /*
-    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaitab.gif',array('width'=>'105','url'=>array('action'=>'torikomilogin')));?></td>
-    */
-    ?>
-    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaisiyou.gif',array('width'=>'105','url'=>array('action'=>'shippedpreadd')));?></td>
-    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazairotkensaku.gif',array('width'=>'105','url'=>array('action'=>'kensakuform')));?></td>
-    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaisyuusei.gif',array('width'=>'105','url'=>array('action'=>'editpreadd')));?></td>
-
-<?php
-/*
-    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaizaiko.gif',array('width'=>'105','url'=>array('action'=>'menu')));?></td>
-*/
-?>
-
+    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaigenryou.gif',array('width'=>'85','url'=>array('action'=>'materialpreadd')));?></td>
+    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaicsv.gif',array('width'=>'85','url'=>array('action'=>'csvpreadd')));?></td>
+    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaisiyou.gif',array('width'=>'85','url'=>array('action'=>'shippedpreadd')));?></td>
+    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazairotkensaku.gif',array('width'=>'85','url'=>array('action'=>'kensakuform')));?></td>
+    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaisyuusei.gif',array('width'=>'85','url'=>array('action'=>'editpreadd')));?></td>
+    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/hazaisiyousuuryou.gif',array('width'=>'85','url'=>array('controller'=>'Hazaishiyous', 'action'=>'menu')));?></td>
   </tr>
 </table>
 <hr size="5" style="margin: 0.5rem">

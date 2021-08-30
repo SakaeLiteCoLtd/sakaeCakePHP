@@ -4416,7 +4416,7 @@ echo "</pre>";
       $product_name = $Product[0]->product_name;
       $this->set('product_name',$product_name);
 
-      $ProductGaityus = $this->ProductGaityus->find()->where(['product_code' => $product_code])->toArray();
+      $ProductGaityus = $this->ProductGaityus->find()->where(['product_code' => $product_code, 'flag_denpyou' => 1,  'status' => 0])->toArray();
       if(isset($ProductGaityus[0])){
         $id_supplier = $ProductGaityus[0]->id_supplier;
         $ProductSuppliers = $this->ProductSuppliers->find()->where(['id' => $id_supplier])->toArray();

@@ -3115,10 +3115,17 @@ echo "</pre>";
       $this->set('amount',$amount);
       $date_deliver = $data["date_deliver"]["year"]."-".$data["date_deliver"]["month"]."-".$data["date_deliver"]["day"];
       $this->set('date_deliver',$date_deliver);
+
+      //210818更新
+      /*
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
       $customer_id = $Product[0]->customer_id;
       $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
       $customer_code = $Customer[0]->customer_code;
+*/
+      $PlaceDeliver = $this->PlaceDelivers->find()->where(['id' => $place_deliver])->toArray();
+      $customer_code = $PlaceDeliver[0]->cs_code;
+
       $this->set("customer_code",$customer_code);
 
 //単価の表示をするかチェック
@@ -4158,7 +4165,7 @@ echo "</pre>";
       $product_name = $Product[0]->product_name;
       $this->set('product_name',$product_name);
 
-      $ProductGaityus = $this->ProductGaityus->find()->where(['product_code' => $product_code])->toArray();
+      $ProductGaityus = $this->ProductGaityus->find()->where(['product_code' => $product_code, 'flag_denpyou' => 1,  'status' => 0])->toArray();
       if(isset($ProductGaityus[0])){
         $id_supplier = $ProductGaityus[0]->id_supplier;
         $ProductSuppliers = $this->ProductSuppliers->find()->where(['id' => $id_supplier])->toArray();

@@ -71,17 +71,7 @@
                   echo "</div></td>";
                 }
 
-                if($i > 0 && $datecheck < 1){
-                  echo "<td colspan='20' nowrap='nowrap' rowspan=1><div align='center'>";
-                  echo $arrShiyouhazai[$i]["seikeiki"]." 号機";
-                  echo "</div></td>";
-                  echo "<td colspan='20' nowrap='nowrap' rowspan=1><div align='center'>";
-                  echo $arrShiyouhazai[$i]["product_code"];
-                  echo "</div></td>";
-                  echo "<td colspan='20' nowrap='nowrap' rowspan=1><div align='center'>";
-                  echo $arrShiyouhazai[$i]["product_name"];
-                  echo "</div></td>";
-                }elseif($i > 0 && $arrShiyouhazai[$i-1]["product_code"] != $arrShiyouhazai[$i]["product_code"]){
+                if($i > 0 && $arrShiyouhazai[$i-1]["product_code"] != $arrShiyouhazai[$i]["product_code"]){
                   echo "<td colspan='20' nowrap='nowrap' rowspan=$num><div align='center'>";
                   echo $arrShiyouhazai[$i]["seikeiki"]." 号機";
                   echo "</div></td>";

@@ -124,6 +124,12 @@ class HazaishiyousController extends AppController {
          $StockEndMaterialused = $this->StockEndMaterials->find()//使用の場合
          ->where(['price_material_id' => $PriceMaterials[0]["id"], 'shiped_at >=' => $dateYMDs, 'shiped_at <=' => $dateYMDf, 'delete_flag' => 0])->toArray();
 
+         $StockEndMaterialnuused = $this->StockEndMaterials->find()//未使用の場合
+         ->where(['price_material_id' => $PriceMaterials[0]["id"], 'import_tab_at <=' => $dateYMDs, 'delete_flag' => 0,
+         'OR' => [['shiped_at >' => $dateYMDf], ['shiped_at IS' => NULL]]])->toArray();
+
+         $numall = count($StockEndMaterialused) + count($StockEndMaterialnuused);
+
          $countcheck = 0;
 
          for($j=0; $j<count($StockEndMaterialused); $j++){
@@ -144,6 +150,7 @@ class HazaishiyousController extends AppController {
              $arrShiyouhazai[$numarr]['status_material'] = $status_material;
              $arrShiyouhazai[$numarr]['amount'] = $StockEndMaterialused[$j]["amount"];
              $arrShiyouhazai[$numarr]['usedcheck'] = "使用";
+             $arrShiyouhazai[$numarr]['num'] = $numall;
 
            }else{
 
@@ -156,7 +163,7 @@ class HazaishiyousController extends AppController {
                'lot_num' => $StockEndMaterialused[$j]["lot_num"],
                'status_material' => $status_material,
                'amount' => $StockEndMaterialused[$j]["amount"],
-               'num' => 1,
+               'num' => $numall,
                'usedcheck' => "使用",
              ];
 
@@ -184,6 +191,7 @@ class HazaishiyousController extends AppController {
              $arrShiyouhazai[$numarr]['status_material'] = $status_material;
              $arrShiyouhazai[$numarr]['amount'] = $StockEndMaterialnuused[$j]["amount"];
              $arrShiyouhazai[$numarr]['usedcheck'] = "未使用";
+             $arrShiyouhazai[$numarr]['num'] = $numall;
 
            }else{
 
@@ -196,7 +204,7 @@ class HazaishiyousController extends AppController {
                'lot_num' => $StockEndMaterialnuused[$j]["lot_num"],
                'status_material' => $status_material,
                'amount' => $StockEndMaterialnuused[$j]["amount"],
-               'num' => 1,
+               'num' => $numall,
                'usedcheck' => "未使用",
              ];
 
@@ -361,16 +369,22 @@ class HazaishiyousController extends AppController {
     $this->set('stockEndMaterials',$stockEndMaterials);
 
     $data = $this->request->getData();
-    echo "<pre>";
-    print_r($data);
-    echo "</pre>";
 
-    $datesta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day']."T00:00:00";
+    if(isset($data['csv'])){//csv出力
+      $datesta = $data['datesta'];
+      $datefin = $data['datefin'];
+    }else{
+      $datesta = $data['date_sta']['year']."-".$data['date_sta']['month']."-".$data['date_sta']['day'];
+      $datefin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
+    }
+
     $this->set('datesta',$datesta);
-    $datefin = $data['date_fin']['year']."-".$data['date_fin']['month']."-".$data['date_fin']['day'];
     $this->set('datefin',$datefin);
+    $datesta = $datesta."T00:00:00";
     $datefin = strtotime($datefin);
     $datefin = date('Y-m-d', strtotime('+1 day', $datefin))."T00:00:00";
+
+    $this->set('materialgrade_color',$data["materialgrade_color"]);
 
     $grade_color = explode('_', $data["materialgrade_color"]);
     $grade = $grade_color[0];
@@ -379,17 +393,74 @@ class HazaishiyousController extends AppController {
     $PriceMaterials = $this->PriceMaterials->find()
     ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
 
+    $arrShiyouhazais = array();
+
     if(isset($PriceMaterials[0])){
 
       $StockEndMaterials = $this->StockEndMaterials->find()
       ->where(['price_material_id' => $PriceMaterials[0]["id"], 'shiped_at >=' => $datesta, 'shiped_at <=' => $datefin, 'delete_flag' => 0])->toArray();
 
-      echo "<pre>";
-      print_r($StockEndMaterials);
-      echo "</pre>";
+      for($k=0; $k<count($StockEndMaterials); $k++){
+
+        if($StockEndMaterials[$k]["status_material"] == 0){
+          $status_material = "バージン";
+        }elseif($StockEndMaterials[$k]["status_material"] == 1){
+          $status_material = "粉砕";
+        }else{
+          $status_material = "バージン＋粉砕";
+        }
+
+        $staffData = $this->Staffs->find()->where(['id' => $StockEndMaterials[$k]["shiped_staff"]])->toArray();
+        $Staff = $staffData[0]->f_name." ".$staffData[0]->l_name;
+
+        $arrShiyouhazais[] = [
+          'grade_color' => $data["materialgrade_color"],
+          'lot_num' => $StockEndMaterials[$k]["lot_num"],
+          'status_material' => $status_material,
+          'amount' => $StockEndMaterials[$k]["amount"],
+          'import_tab_at' => $StockEndMaterials[$k]["import_tab_at"]->format('Y-m-d H:i:s'),
+          'shiped_at' => $StockEndMaterials[$k]["shiped_at"]->format('Y-m-d H:i:s'),
+          'shiped_staff' => $Staff,
+        ];
+
+      }
 
     }
+    $this->set('arrShiyouhazais',$arrShiyouhazais);
 
+    $arrShiyouhazaicsvs = array();
+    $arrShiyouhazaicsvs[] = [
+      'grade_color' => "端材",
+      'lot_num' => "ロットNo.",
+      'status_material' => "端材ステータス",
+      'amount' => "数量(kg)",
+      'import_tab_at' => "TAB取込日時",
+      'shiped_at' => "使用日時",
+      'shiped_staff' => "使用スタッフ",
+    ];
+
+    $arrShiyouhazaicsvs = array_merge($arrShiyouhazaicsvs, $arrShiyouhazais);;
+
+    if(isset($data['csv'])){//csv出力
+    //    $fp = fopen('hazaishiyou/hazaishiyou.csv', 'w');
+        $fp = fopen('/home/centosuser/hazaishiyou/hazaishiyou.csv', 'w');
+
+          foreach ($arrShiyouhazaicsvs as $line) {
+            $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+            fputcsv($fp, $line);
+          }
+          fclose($fp);
+          $mes = "\\192.168.4.246\centosuser\hazaishiyou にＣＳＶファイルが出力されました";
+          $this->set('mes',$mes);
+    }else{
+      $mes = "";
+      $this->set('mes',$mes);
+    }
+/*
+    echo "<pre>";
+    print_r($arrShiyouhazais);
+    echo "</pre>";
+*/
   }
 
 }

@@ -281,7 +281,8 @@ class HazaishiyousController extends AppController {
         if(isset($PriceMaterials[0])){
 
           $StockEndMaterials = $this->StockEndMaterials->find()
-          ->where(['price_material_id' => $PriceMaterials[0]["id"], 'shiped_staff IS' => NULL, 'delete_flag' => 0])->toArray();
+          ->where(['price_material_id' => $PriceMaterials[0]["id"], 'shiped_staff IS' => NULL, 'delete_flag' => 0,
+          'NOT' => ['import_tab_staff IS' => NULL]])->toArray();
 
           if(!isset($StockEndMaterials[0])){
             $arrShiyouhazai[$numarr]['grade_color'] = "未使用ロットなし";
@@ -461,6 +462,232 @@ class HazaishiyousController extends AppController {
     print_r($arrShiyouhazais);
     echo "</pre>";
 */
+  }
+
+  public function mishiyoukensakuform()
+  {
+    $stockEndMaterials = $this->StockEndMaterials->newEntity();
+    $this->set('stockEndMaterials',$stockEndMaterials);
+
+    $Material_list = $this->PriceMaterials->find()
+    ->where(['delete_flag' => 0])->toArray();
+    $arrMaterial_list = array();
+    for($j=0; $j<count($Material_list); $j++){
+      array_push($arrMaterial_list,$Material_list[$j]["grade"]."_".$Material_list[$j]["color"]);
+    }
+    $arrMaterial_list = array_unique($arrMaterial_list);
+    $arrMaterial_list = array_values($arrMaterial_list);
+    $this->set('arrMaterial_list', $arrMaterial_list);
+  }
+
+  public function mishiyouichiran()
+  {
+    $stockEndMaterials = $this->StockEndMaterials->newEntity();
+    $this->set('stockEndMaterials',$stockEndMaterials);
+
+    $data = $this->request->getData();
+
+    if(strlen($data["materialgrade_color"]) > 0){//入力がある時
+      $this->set('materialgrade_color',$data["materialgrade_color"]);
+
+      $grade_color = explode('_', $data["materialgrade_color"]);
+      $grade = $grade_color[0];
+      $color = $grade_color[1];
+
+      $PriceMaterials = $this->PriceMaterials->find()
+      ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+
+      $arrShiyouhazais = array();
+
+      if(isset($PriceMaterials[0])){
+
+        $StockEndMaterials = $this->StockEndMaterials->find()
+        ->where(['price_material_id' => $PriceMaterials[0]["id"], 'shiped_staff IS' => NULL, 'delete_flag' => 0,
+        'NOT' => ['import_tab_staff IS' => NULL]])->toArray();
+
+        $totalamount = 0;
+
+        for($k=0; $k<count($StockEndMaterials); $k++){
+
+          if($StockEndMaterials[$k]["status_material"] == 0){
+            $status_material = "バージン";
+          }elseif($StockEndMaterials[$k]["status_material"] == 1){
+            $status_material = "粉砕";
+          }else{
+            $status_material = "バージン＋粉砕";
+          }
+
+          $totalamount = $totalamount + $StockEndMaterials[$k]["amount"];
+
+          if($k > 0){
+            $arrShiyouhazais[$k - 1]['totalamount'] = $totalamount;
+          }
+
+          $arrShiyouhazais[] = [
+            'grade_color' => $data["materialgrade_color"],
+            'lot_num' => $StockEndMaterials[$k]["lot_num"],
+            'status_material' => $status_material,
+            'amount' => $StockEndMaterials[$k]["amount"],
+            'import_tab_at' => $StockEndMaterials[$k]["import_tab_at"]->format('Y-m-d H:i:s'),
+            'totalamount' => $totalamount,
+            'num' => count($StockEndMaterials),
+          ];
+
+        }
+
+      }
+      $this->set('arrShiyouhazais',$arrShiyouhazais);
+
+    }else{//入力がない時
+
+      $this->set('materialgrade_color',"全表示");
+
+      $arrShiyouhazais = array();
+
+      $StockEndMaterials = $this->StockEndMaterials->find()
+      ->where(['shiped_staff IS' => NULL, 'delete_flag' => 0,
+      'NOT' => ['import_tab_staff IS' => NULL]])->toArray();
+
+      for($k=0; $k<count($StockEndMaterials); $k++){
+
+        if($StockEndMaterials[$k]["status_material"] == 0){
+          $status_material = "バージン";
+        }elseif($StockEndMaterials[$k]["status_material"] == 1){
+          $status_material = "粉砕";
+        }else{
+          $status_material = "バージン＋粉砕";
+        }
+
+        $PriceMaterials = $this->PriceMaterials->find()
+        ->where(['id' => $StockEndMaterials[$k]["price_material_id"]])->toArray();
+        $grade = $PriceMaterials[0]["grade"];
+        $color = $PriceMaterials[0]["color"];
+        $materialgrade_color = $grade."_".$color;
+
+        $arrShiyouhazais[] = [
+          'grade_color' => $materialgrade_color,
+          'lot_num' => $StockEndMaterials[$k]["lot_num"],
+          'status_material' => $status_material,
+          'amount' => $StockEndMaterials[$k]["amount"],
+          'import_tab_at' => $StockEndMaterials[$k]["import_tab_at"]->format('Y-m-d H:i:s'),
+          'totalamount' => $StockEndMaterials[$k]["amount"],
+          'num' => 1,
+        ];
+
+      }
+
+      $grade_color_array = array();
+      $lot_num_array = array();
+      foreach($arrShiyouhazais as $key => $row) {
+        $grade_color_array[$key] = $row["grade_color"];
+        $lot_num_array[$key] = $row["lot_num"];
+      }
+
+      if(count($grade_color_array) > 0){
+        array_multisort($grade_color_array, $lot_num_array, SORT_ASC, SORT_NUMERIC, $arrShiyouhazais);
+      }
+
+      //同じ端材の合計数量をまとめる
+      $count = 1;
+      $totalamount = 0;
+      for($k=0; $k<count($arrShiyouhazais); $k++){
+
+        if(0 < $k && $k < count($arrShiyouhazais) - 1 && $arrShiyouhazais[$k-1]["grade_color"] == $arrShiyouhazais[$k]["grade_color"]){
+          //配列の最後以外で前のと同じとき…カウント、合計数量を増やす
+          $count = $count + 1;
+
+          if($k == 1){
+            $totalamount = $arrShiyouhazais[$k-1]["amount"] + $arrShiyouhazais[$k]["amount"];
+          }else{
+            $totalamount = $totalamount + $arrShiyouhazais[$k]["amount"];
+          }
+
+        }elseif(0 < $k && $k == count($arrShiyouhazais) - 1){//配列の最後
+
+          if($arrShiyouhazais[$k-1]["grade_color"] == $arrShiyouhazais[$k]["grade_color"]){//前のと同じとき
+
+            $count = $count + 1;
+            $totalamount = $totalamount + $arrShiyouhazais[$k]["amount"];
+
+            for($j=0; $j<count($arrShiyouhazais); $j++){
+
+              if($arrShiyouhazais[$j]["grade_color"] == $arrShiyouhazais[$k-1]["grade_color"]){
+
+                $arrShiyouhazais[$j]['num'] = $count;
+                $arrShiyouhazais[$j]['totalamount'] = $totalamount;
+
+              }
+
+            }
+
+          }else{//前のと違うとき
+
+            for($j=0; $j<count($arrShiyouhazais); $j++){
+
+              if($arrShiyouhazais[$j]["grade_color"] == $arrShiyouhazais[$k-1]["grade_color"]){
+
+                $arrShiyouhazais[$j]['num'] = $count;
+                $arrShiyouhazais[$j]['totalamount'] = $totalamount;
+
+              }
+
+            }
+
+            $count = 1;
+            $totalamount = $arrShiyouhazais[$k-1]["amount"];
+
+          }
+
+          $count = 1;
+          $totalamount = $arrShiyouhazais[$k]["amount"];
+
+        }elseif($k == 1 && $arrShiyouhazais[$k-1]["grade_color"] != $arrShiyouhazais[$k]["grade_color"]){//配列の最初と2番目が違う場合
+
+          $count = 1;
+          $totalamount = $arrShiyouhazais[$k-1]["amount"];
+
+          for($j=0; $j<count($arrShiyouhazais); $j++){
+
+            if($arrShiyouhazais[$j]["grade_color"] == $arrShiyouhazais[$k-1]["grade_color"]){
+
+              $arrShiyouhazais[$j]['num'] = $count;
+              $arrShiyouhazais[$j]['totalamount'] = $totalamount;
+
+            }
+
+          }
+
+          $totalamount = $arrShiyouhazais[$k]["amount"];
+
+        }elseif(0 < $k && $k < count($arrShiyouhazais) - 1){//前のと変わったとき
+
+          for($j=0; $j<count($arrShiyouhazais); $j++){
+
+            if($arrShiyouhazais[$j]["grade_color"] == $arrShiyouhazais[$k-1]["grade_color"]){
+
+              $arrShiyouhazais[$j]['num'] = $count;
+              $arrShiyouhazais[$j]['totalamount'] = $totalamount;
+
+            }
+
+          }
+
+          $count = 1;
+          $totalamount = $arrShiyouhazais[$k]["amount"];
+
+        }
+
+      }
+/*
+      echo "<pre>";
+      print_r($arrShiyouhazais);
+      echo "</pre>";
+*/
+      $this->set('arrShiyouhazais',$arrShiyouhazais);
+
+    }
+
+
   }
 
 }

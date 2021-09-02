@@ -47,6 +47,7 @@ class LabelsController extends AppController
        $this->CheckLotsDoubles = TableRegistry::get('checkLotsDoubles');
        $this->PriceMaterials = TableRegistry::get('priceMaterials');
        $this->StockEndMaterials = TableRegistry::get('stockEndMaterials');
+       $this->Materials = TableRegistry::get('materials');
  }
      public function indexMenu()
      {
@@ -131,30 +132,51 @@ class LabelsController extends AppController
    {
      $labelTypeProducts = $this->LabelTypeProducts->newEntity();
      $this->set('labelTypeProducts',$labelTypeProducts);
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
    }
 
    public function layoutlogin()//レイアウトログイン
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+
+       $userdata = $data['username'];
+
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'layoutpreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
          }
-           $user = $this->Auth->identify();
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'layoutdo']);
-         }
+
        }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'layoutdo']);
+       }
+     }
    }
 
    public function layoutdo()//レイアウト登録
@@ -235,32 +257,51 @@ class LabelsController extends AppController
    {
      $labelElementPlaces = $this->LabelElementPlaces->newEntity();
      $this->set('labelElementPlaces',$labelElementPlaces);
-     $session = $this->request->getSession();
-     $data = $session->read();
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
    }
 
    public function placelogin()//納品場所ログイン
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+
+       $userdata = $data['username'];
+
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'placepreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
          }
-           $user = $this->Auth->identify();
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'placedo']);
-         }
+
        }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'placedo']);
+       }
+     }
    }
 
    public function placedo()//納品場所登録
@@ -345,30 +386,51 @@ class LabelsController extends AppController
    {
      $labelNashies = $this->LabelNashies->newEntity();
      $this->set('labelNashies',$labelNashies);
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
    }
 
    public function nashilogin()//ラベル無しログイン
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+
+       $userdata = $data['username'];
+
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'nashipreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
          }
-           $user = $this->Auth->identify();
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'nashido']);
-         }
+
        }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'nashido']);
+       }
+     }
    }
 
    public function nashido()//ラベル無し登録
@@ -464,30 +526,51 @@ class LabelsController extends AppController
    {
      $labelSetikkatsues = $this->LabelSetikkatsues->newEntity();
      $this->set('labelSetikkatsues',$labelSetikkatsues);
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
    }
 
    public function setikkatsulogin()//セット取りログイン
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+
+       $userdata = $data['username'];
+
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'setikkatsupreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
          }
-           $user = $this->Auth->identify();
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'setikkatsudo']);
-         }
+
        }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'setikkatsudo']);
+       }
+     }
    }
 
    public function setikkatsudo()//セット取り登録
@@ -575,30 +658,51 @@ class LabelsController extends AppController
    {
      $labelInsideouts = $this->LabelInsideouts->newEntity();
      $this->set('labelInsideouts',$labelInsideouts);
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
    }
 
    public function insideoutlogin()//外箱中身ログイン
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+
+       $userdata = $data['username'];
+
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'insideoutpreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
          }
-           $user = $this->Auth->identify();
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'insideoutdo']);
-         }
+
        }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'insideoutdo']);
+       }
+     }
    }
 
    public function insideoutdo()//外箱中身登録
@@ -669,30 +773,51 @@ class LabelsController extends AppController
    {
      $labelElementUnits = $this->LabelElementUnits->newEntity();
      $this->set('labelElementUnits',$labelElementUnits);
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
    }
 
    public function unitlogin()//数量単位ログイン
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため
+
+       $userdata = $data['username'];
+
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'unitpreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
          }
-           $user = $this->Auth->identify();
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'unitdo']);
-         }
+
        }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'unitdo']);
+       }
+     }
    }
 
    public function unitdo()//数量単位登録
@@ -745,32 +870,52 @@ class LabelsController extends AppController
   {
     $KadouSeikeis = $this->KadouSeikeis->newEntity();
     $this->set('KadouSeikeis',$KadouSeikeis);
+
+    $Data=$this->request->query('s');
+    if(isset($Data["mess"])){
+      $mess = $Data["mess"];
+      $this->set('mess',$mess);
+    }else{
+      $mess = "";
+      $this->set('mess',$mess);
+    }
+
   }
 
   public function ikkatsulogin()//210323
   {
     if ($this->request->is('post')) {
       $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-      $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-      $ary = explode(',', $str);//$strを配列に変換
 
-      $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-      //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-      $this->set('username', $username);
-      $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+      $userdata = $data['username'];
 
-        if(empty($Userdata)){
-          $delete_flag = "";
-        }else{
-          $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-          $this->set('delete_flag',$delete_flag);//登録者の表示のため
+      if(isset($data['prelogin'])){
+
+        $htmllogin = new htmlLogin();
+        $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+        if($qrcheck > 0){
+          return $this->redirect(['action' => 'ikkatsupreadd',
+          's' => ['mess' => "QRコードを読み込んでください。"]]);
         }
-          $user = $this->Auth->identify();
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'ikkatsupreform']);
-        }
+
       }
+
+      $htmllogin = new htmlLogin();
+      $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+      $username = $arraylogindate[0];
+      $delete_flag = $arraylogindate[1];
+      $this->set('username',$username);
+      $this->set('delete_flag',$delete_flag);
+
+      $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+      if ($user) {
+        $this->Auth->setUser($user);
+        return $this->redirect(['action' => 'ikkatsupreform']);
+      }
+    }
   }
 
    public function ikkatsupreform()//一括ラベル発行
@@ -1320,10 +1465,10 @@ class LabelsController extends AppController
      $i = 1;
      if($i == 1){//sakaeMotoDBを使う
        /*
-       $connection = ConnectionManager::get('DB_ikou_test');
+       $connection = ConnectionManager::get('sakaeMotoDB');
        $table = TableRegistry::get('scheduleKoutei');
        $table->setConnection($connection);
-       $connection = ConnectionManager::get('DB_ikou_test');
+       $connection = ConnectionManager::get('sakaeMotoDB');
 */
 //       $ScheduleKoutei = $this->ScheduleKoutei->find()->where(['datetime >=' => $dateYMDs, 'datetime <=' => $dateYMDf, 'present_kensahyou' => 0])->toArray();
 //※findに対応していないため、SQL文で持ってくる
@@ -2001,7 +2146,6 @@ class LabelsController extends AppController
        $this->set('scheduleKouteis',$scheduleKouteis);
      }
 
-
           public function kobetujikanformpreadd()//210323
       		{
            $KadouSeikeis = $this->KadouSeikeis->newEntity();
@@ -2606,78 +2750,222 @@ class LabelsController extends AppController
        if ($this->request->is('post')) {
          $source_file = $_FILES['file']['tmp_name'];
 
-         $fp = fopen($source_file, "r");
-         $fpcount = fopen($source_file, 'r' );
-          for($count = 0; fgets( $fpcount ); $count++ );
-          $arrFp = array();//空の配列を作る
-          $arrLot = array();//空の配列を作る
-          $arrLotHazai = array();//空の配列を作る
-          $created_staff = $this->Auth->user('staff_id');
-          for ($k=1; $k<=$count; $k++) {//最後の行まで
-            $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
-            $sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
-            $arrFp[] = $sample;//配列に追加する
-            if(isset($arrFp[$k-1][10]) && ($arrFp[$k-1][10] != "")){//product_codeが２つある時
-              $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
-              for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
-                $renban = $arrFp[$k-1][5] + $m;
-                $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-                //product_code=$arrFp[$k-1][6],status=0がzensu_productsに存在するときflag_used=9
-                //else...flag_used=0
-                $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][6], 'status' => 0])->toArray();
-                if(isset($ZensuProduct[0])){
-                  $flag_used = 9;
-                }else{
-                  $flag_used = 0;
-                }
+         $fpcheck = fopen($source_file, "r");
+         $fpcountcheck = fopen($source_file, 'r' );
 
-                if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
-                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
-                }else{
-                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
+         $linecheck = fgets($fpcheck);//ファイル$fpの上の１行を取る（２行目から）
+         $samplecheck = explode("\t",$linecheck);//$lineを"（スペース）"毎に配列に入れる
+
+         if(strlen($samplecheck[0]) == 10){//utf-8の場合
+/*
+           echo "<pre>";
+           print_r("1");
+           echo "</pre>";
+*/
+           $fp = fopen($source_file, "r");
+           $fpcount = fopen($source_file, 'r' );
+            for($count = 0; fgets( $fpcount ); $count++ );
+            $arrFp = array();//空の配列を作る
+            $arrLot = array();//空の配列を作る
+            $arrLotHazai = array();//空の配列を作る
+            $created_staff = $this->Auth->user('staff_id');
+            for ($k=1; $k<=$count; $k++) {//最後の行まで
+              $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+              $sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
+              $arrFp[] = $sample;//配列に追加する
+              if(isset($arrFp[$k-1][10]) && ($arrFp[$k-1][10] != "")){//product_codeが２つある時
+                $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+                for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+                  $renban = $arrFp[$k-1][5] + $m;
+                  $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
+                  //product_code=$arrFp[$k-1][6],status=0がzensu_productsに存在するときflag_used=9
+                  //else...flag_used=0
+                  $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][6], 'status' => 0])->toArray();
+                  if(isset($ZensuProduct[0])){
+                    $flag_used = 9;
+                  }else{
+                    $flag_used = 0;
+                  }
+
+                  if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                    $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                  }else{
+                    $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
+                  }
+
+                }
+                for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+                  $renban = $arrFp[$k-1][5] + $m;
+                  $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
+                  $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][7], 'status' => 0])->toArray();
+                  if(isset($ZensuProduct[0])){
+                    $flag_used = 9;
+                  }else{
+                    $flag_used = 0;
+                  }
+
+                  $Materials = $this->Materials->find()
+                  ->where(['name_substitute' => $arrFp[$k-1][6]])->toArray();
+
+                  if(isset($Materials[0])){
+
+                    $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
+                    $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
+
+                  }elseif(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+
+                    $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+
+                  }else{
+
+                    $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
+
+                  }
+
+                }
+              }else{//product_codeが１つの時
+                $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+                for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+                  $renban = $arrFp[$k-1][5] + $m;
+                  $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
+                  $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][6], 'status' => 0])->toArray();
+                  if(isset($ZensuProduct[0])){
+                    $flag_used = 9;
+                  }else{
+                    $flag_used = 0;
+                  }
+
+                  $Materials = $this->Materials->find()
+                  ->where(['name_substitute' => $arrFp[$k-1][6]])->toArray();
+
+                  if(isset($Materials[0])){
+
+                    $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
+                    $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
+
+                  }elseif(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+
+                    $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+
+                  }else{
+
+                    $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
+
+                  }
+
                 }
 
               }
-              for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
-                $renban = $arrFp[$k-1][5] + $m;
-                $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-                $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][7], 'status' => 0])->toArray();
-                if(isset($ZensuProduct[0])){
-                  $flag_used = 9;
-                }else{
-                  $flag_used = 0;
-                }
 
-                if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
-                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
-                }else{
-                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
+          }
+
+         }else{//utf-16の場合
+/*
+           echo "<pre>";
+           print_r("2");
+           echo "</pre>";
+*/
+           // 文字コードを変換しながら読み込めるようにPHPフィルタを定義（utf-16をutf-8に変換）
+           $source_file = 'php://filter/read=convert.iconv.utf-16%2Futf-8/resource='.$source_file;
+
+           $fp = fopen($source_file, "r");
+           $fpcount = fopen($source_file, 'r' );
+            for($count = 0; fgets( $fpcount ); $count++ );
+            $arrFp = array();//空の配列を作る
+            $arrLot = array();//空の配列を作る
+            $arrLotHazai = array();//空の配列を作る
+            $created_staff = $this->Auth->user('staff_id');
+            for ($k=1; $k<=$count; $k++) {//最後の行まで
+              $line = fgets($fp);//ファイル$fpの上の１行を取る（２行目から）
+              $sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
+              $arrFp[] = $sample;//配列に追加する
+              if(isset($arrFp[$k-1][11]) && ($arrFp[$k-1][11] != "")){//product_codeが２つある時
+                $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+                for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+                  $renban = $arrFp[$k-1][6] + $m;
+                  $lot_num = $arrFp[$k-1][5]."-".sprintf('%03d', $renban);
+                  //product_code=$arrFp[$k-1][6],status=0がzensu_productsに存在するときflag_used=9
+                  //else...flag_used=0
+                  $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][7], 'status' => 0])->toArray();
+                  if(isset($ZensuProduct[0])){
+                    $flag_used = 9;
+                  }else{
+                    $flag_used = 0;
+                  }
+
+                  if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                    $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                  }else{
+                    $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][7]];
+                  }
+
+                }
+                for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+                  $renban = $arrFp[$k-1][6] + $m;
+                  $lot_num = $arrFp[$k-1][5]."-".sprintf('%03d', $renban);
+                  $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][8], 'status' => 0])->toArray();
+                  if(isset($ZensuProduct[0])){
+                    $flag_used = 9;
+                  }else{
+                    $flag_used = 0;
+                  }
+
+                  $Materials = $this->Materials->find()
+                  ->where(['name_substitute' => $arrFp[$k-1][7]])->toArray();
+
+                  if(isset($Materials[0])){
+
+                    $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
+                    $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
+
+                  }elseif(strpos($arrFp[$k-1][7],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+
+                    $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][8], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+
+                  }else{
+
+                    $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][7]];
+
+                  }
+
+                }
+              }else{//product_codeが１つの時
+                $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+                for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
+                  $renban = $arrFp[$k-1][6] + $m;
+                  $lot_num = $arrFp[$k-1][5]."-".sprintf('%03d', $renban);
+                  $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][7], 'status' => 0])->toArray();
+                  if(isset($ZensuProduct[0])){
+                    $flag_used = 9;
+                  }else{
+                    $flag_used = 0;
+                  }
+
+                  $Materials = $this->Materials->find()
+                  ->where(['name_substitute' => $arrFp[$k-1][7]])->toArray();
+
+                  if(isset($Materials[0])){
+
+                    $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
+                    $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
+
+                  }elseif(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+
+                    $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+
+                  }else{
+
+                    $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][7]];
+
+                  }
+
                 }
 
               }
-            }else{//product_codeが１つの時
-              $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
-              for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
-                $renban = $arrFp[$k-1][5] + $m;
-                $lot_num = $arrFp[$k-1][4]."-".sprintf('%03d', $renban);
-                $ZensuProduct = $this->ZensuProducts->find()->where(['product_code' => $arrFp[$k-1][6], 'status' => 0])->toArray();
-                if(isset($ZensuProduct[0])){
-                  $flag_used = 9;
-                }else{
-                  $flag_used = 0;
-                }
 
-                if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
-                  $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][8]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
-                }else{
-                  $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][6]];
-                }
+          }
 
-              }
-
-            }
-
-        }
+         }
 
         $arrLotHazaitouroku = array();//空の配列を作る
         for ($k=0; $k<count($arrLotHazai); $k++){
@@ -2722,7 +3010,11 @@ class LabelsController extends AppController
         $arrLot = $arrLotunique;
 
       }
-
+/*
+      echo "<pre>";
+      print_r($arrLot);
+      echo "</pre>";
+*/
       $count = 0;
       for($k=0; $k<count($arrLot); $k++){
         $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[$k]["datetime_hakkou"], 'product_code' => $arrLot[$k]["product_code"], 'lot_num' => $arrLot[$k]["lot_num"], 'amount' => $arrLot[$k]["amount"]])->toArray();
@@ -2768,14 +3060,7 @@ class LabelsController extends AppController
           $arrLot = $arrLotmitouroku;
         }
       }
-/*
-      echo "<pre>";
-      print_r($arrLotHazai);
-      echo "</pre>";
-      echo "<pre>";
-      print_r($arrLotHazaitouroku);
-      echo "</pre>";
-*/
+
           if(isset($arrLotdouble[0])){
             $CheckLotsDoubles = $this->CheckLotsDoubles->patchEntities($this->CheckLotsDoubles->newEntity(), $arrLotdouble);
             $this->CheckLotsDoubles->saveMany($CheckLotsDoubles);
@@ -3135,13 +3420,13 @@ class LabelsController extends AppController
        $date_fin = strtotime($date_fin);
        $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
 /*
-       $connection = ConnectionManager::get('DB_ikou_test');
+       $connection = ConnectionManager::get('sakaeMotoDB');
        $table = TableRegistry::get('check_lots');
        $table->setConnection($connection);
 
        $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM check_lots".
              " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
-       $connection = ConnectionManager::get('DB_ikou_test');
+       $connection = ConnectionManager::get('sakaeMotoDB');
        $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
 */
 

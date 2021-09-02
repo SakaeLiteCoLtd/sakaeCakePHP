@@ -2746,7 +2746,6 @@ class LabelsController extends AppController
        $this->set('checkLots',$checkLots);
        $mes = "";
        $this->set('mes',$mes);
-
        if ($this->request->is('post')) {
          $source_file = $_FILES['file']['tmp_name'];
 
@@ -2880,7 +2879,10 @@ class LabelsController extends AppController
               $sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
               $arrFp[] = $sample;//配列に追加する
               if(isset($arrFp[$k-1][11]) && ($arrFp[$k-1][11] != "")){//product_codeが２つある時
+
                 $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+                $datetime_hakkou = date('Y-m-d H:i',  strtotime($datetime_hakkou));
+
                 for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
                   $renban = $arrFp[$k-1][6] + $m;
                   $lot_num = $arrFp[$k-1][5]."-".sprintf('%03d', $renban);
@@ -2893,7 +2895,7 @@ class LabelsController extends AppController
                     $flag_used = 0;
                   }
 
-                  if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                  if(strpos($arrFp[$k-1][7],'_') === false){//$arrFp[$k-1][7]に「_」が含まれていない場合
                     $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
                   }else{
                     $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][7]];
@@ -2918,7 +2920,7 @@ class LabelsController extends AppController
                     $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
                     $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
 
-                  }elseif(strpos($arrFp[$k-1][7],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                  }elseif(strpos($arrFp[$k-1][7],'_') === false){//$arrFp[$k-1][7]に「_」が含まれていない場合
 
                     $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][8], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
 
@@ -2930,7 +2932,10 @@ class LabelsController extends AppController
 
                 }
               }else{//product_codeが１つの時
+
                 $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+                $datetime_hakkou = date('Y-m-d H:i',  strtotime($datetime_hakkou));
+
                 for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
                   $renban = $arrFp[$k-1][6] + $m;
                   $lot_num = $arrFp[$k-1][5]."-".sprintf('%03d', $renban);
@@ -2949,7 +2954,7 @@ class LabelsController extends AppController
                     $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
                     $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
 
-                  }elseif(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                  }elseif(strpos($arrFp[$k-1][7],'_') === false){//$arrFp[$k-1][7]に「_」が含まれていない場合
 
                     $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
 
@@ -3020,8 +3025,6 @@ class LabelsController extends AppController
         $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[$k]["datetime_hakkou"], 'product_code' => $arrLot[$k]["product_code"], 'lot_num' => $arrLot[$k]["lot_num"], 'amount' => $arrLot[$k]["amount"]])->toArray();
         $count = $count + count($CheckLottourokuzumi);
       }
-
-      $mes = "";
 
       if($count != 0){
         $mes = "※以下のロットは既に登録されています。";
@@ -3100,6 +3103,10 @@ class LabelsController extends AppController
                $connection->commit();// コミット5
 
              } else {
+
+               echo "<pre>";
+               print_r("ng");
+               echo "</pre>";
 
                $mes = "登録できませんでした。".$mes;
                $this->set('mes',$mes);

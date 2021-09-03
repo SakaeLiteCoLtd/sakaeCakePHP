@@ -247,6 +247,7 @@ class HazaishiyousController extends AppController {
       for($k=0; $k<count($scheduleKoutei); $k++){
 
         $numarr = count($arrShiyouhazai);
+        $tantou = str_replace('　', '', $scheduleKoutei[$k]["tantou"]);
 
         $arrShiyouhazai[] = [
           'seikeiki' => $scheduleKoutei[$k]["seikeiki"],
@@ -258,6 +259,7 @@ class HazaishiyousController extends AppController {
           'status_material' => "",
           'amount' => "",
           'num' => 1,
+          'tantou' => $tantou,
         ];
 
         $Products = $this->Products->find()
@@ -307,6 +309,7 @@ class HazaishiyousController extends AppController {
 
             }else{
 
+              $tantou = str_replace('　', '', $scheduleKoutei[$k]["tantou"]);
               $arrShiyouhazai[] = [
                 'seikeiki' => $scheduleKoutei[$k]["seikeiki"],
                 'datetime' => $scheduleKoutei[$k]["datetime"]->format('Y-m-d H:i:s'),
@@ -317,6 +320,7 @@ class HazaishiyousController extends AppController {
                 'status_material' => $status_material,
                 'amount' => $StockEndMaterials[$j]["amount"],
                 'num' => count($StockEndMaterials),
+                'tantou' => $tantou,
               ];
 
             }
@@ -332,13 +336,13 @@ class HazaishiyousController extends AppController {
       }
 
     }
-/*
+
+    $this->set('arrShiyouhazai',$arrShiyouhazai);
+    /*
     echo "<pre>";
     print_r($arrShiyouhazai);
     echo "</pre>";
-    */
-    $this->set('arrShiyouhazai',$arrShiyouhazai);
-
+*/
     if(!isset($_SESSION)){
       session_start();
       header('Expires:-1');

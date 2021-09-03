@@ -81,6 +81,16 @@
                   echo "<td colspan='20' nowrap='nowrap' rowspan=$num><div align='center'>";
                   echo $arrShiyouhazai[$i]["product_name"];
                   echo "</div></td>";
+                }elseif($i > 0 && $arrShiyouhazai[$i-1]["product_code"] == $arrShiyouhazai[$i]["product_code"] && $arrShiyouhazai[$i-1]["tantou"] != $arrShiyouhazai[$i]["tantou"]){
+                  echo "<td colspan='20' nowrap='nowrap' rowspan=$num><div align='center'>";
+                  echo $arrShiyouhazai[$i]["seikeiki"]." 号機";
+                  echo "</div></td>";
+                  echo "<td colspan='20' nowrap='nowrap' rowspan=$num><div align='center'>";
+                  echo $arrShiyouhazai[$i]["product_code"];
+                  echo "</div></td>";
+                  echo "<td colspan='20' nowrap='nowrap' rowspan=$num><div align='center'>";
+                  echo $arrShiyouhazai[$i]["product_name"]." ".$arrShiyouhazai[$i]["tantou"];
+                  echo "</div></td>";
                 }
 
             ?>

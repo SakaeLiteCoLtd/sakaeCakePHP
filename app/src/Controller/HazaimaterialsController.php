@@ -667,7 +667,7 @@ class HazaimaterialsController extends AppController {
 
          $lotdate = date('y').date('m').date('d');
          $countStockEndMaterials = $this->StockEndMaterials->find()
-         ->where(['product_code' => $arrTourokuStockEndMaterials["product_code"], 'lot_num like' => $lotdate.'%'])->toArray();
+         ->where(['price_material_id' => $arrTourokuStockEndMaterials["price_material_id"], 'lot_num like' => $lotdate.'%'])->toArray();
          $countLot = count($countStockEndMaterials) + 1;
          $lot_num = $lotdate."-".sprintf('%03d', $countLot);
 

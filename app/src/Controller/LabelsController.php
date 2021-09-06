@@ -2896,7 +2896,7 @@ class LabelsController extends AppController
                   }
 
                   if(strpos($arrFp[$k-1][7],'_') === false){//$arrFp[$k-1][7]に「_」が含まれていない場合
-                    $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                    $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
                   }else{
                     $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][7]];
                   }
@@ -3103,10 +3103,6 @@ class LabelsController extends AppController
                $connection->commit();// コミット5
 
              } else {
-
-               echo "<pre>";
-               print_r("ng");
-               echo "</pre>";
 
                $mes = "登録できませんでした。".$mes;
                $this->set('mes',$mes);

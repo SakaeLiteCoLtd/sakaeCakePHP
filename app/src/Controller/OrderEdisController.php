@@ -343,52 +343,31 @@ class OrderEdisController extends AppController
       session_start();//セッションの開始
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
-
  		}
 
  		public function hattyucsvlogin()
  		{
-      if ($this->request->is('post')) {
+ 			if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+        $this->set('data',$data);//セット
         $userdata = $data['username'];
+        $this->set('userdata',$userdata);//セット
 
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'hattyucsvpreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
-
-        $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+        $htmllogin = new htmlLogin();//クラスを使用
+        $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
 
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);
         $this->set('delete_flag',$delete_flag);
 
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+        $user = $this->Auth->identify();
 
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'hattyucsv']);
-        }
-      }
+ 					if ($user) {
+ 						$this->Auth->setUser($user);
+            return $this->redirect(['action' => 'hattyucsv']);//hattyucsvへ移動
+ 					}
+ 				}
  		}
 
     public function dnpcsvpreadd()
@@ -397,52 +376,32 @@ class OrderEdisController extends AppController
       session_start();//セッションの開始
      $orderEdis = $this->OrderEdis->newEntity();
      $this->set('orderEdis',$orderEdis);
-
-     $Data=$this->request->query('s');
-     if(isset($Data["mess"])){
-       $mess = $Data["mess"];
-       $this->set('mess',$mess);
-     }else{
-       $mess = "";
-       $this->set('mess',$mess);
-     }
-
+     $data = $this->request->getData();
     }
 
     public function dnpcsvlogin()
     {
-      if ($this->request->is('post')) {
-        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+       if ($this->request->is('post')) {
+         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+         $this->set('data',$data);//セット
+         $userdata = $data['username'];
+         $this->set('userdata',$userdata);//セット
 
-        $userdata = $data['username'];
+         $htmllogin = new htmlLogin();
+         $arraylogindate = $htmllogin->htmllogin($userdata);
 
-        if(isset($data['prelogin'])){
+         $username = $arraylogindate[0];
+         $delete_flag = $arraylogindate[1];
+         $this->set('username',$username);
+         $this->set('delete_flag',$delete_flag);
 
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
+         $user = $this->Auth->identify();
 
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'dnpcsvpreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
-
-        $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
-
-        $username = $arraylogindate[0];
-        $delete_flag = $arraylogindate[1];
-        $this->set('username',$username);
-        $this->set('delete_flag',$delete_flag);
-
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
-
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'dnpcsv']);
-        }
-      }
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'dnpcsv']);
+         }
+       }
     }
 
     public function dnpcsv()
@@ -1279,52 +1238,31 @@ echo "</pre>";
       session_start();//セッションの開始
      $orderEdis = $this->OrderEdis->newEntity();
      $this->set('orderEdis',$orderEdis);
-
-     $Data=$this->request->query('s');
-     if(isset($Data["mess"])){
-       $mess = $Data["mess"];
-       $this->set('mess',$mess);
-     }else{
-       $mess = "";
-       $this->set('mess',$mess);
-     }
-
     }
 
     public function keikakucsvlogin()
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+        $this->set('data',$data);//セット
         $userdata = $data['username'];
-
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'keikakucsvpreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
+        $this->set('userdata',$userdata);//セット
 
         $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+        $arraylogindate = $htmllogin->htmllogin($userdata);
 
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);
         $this->set('delete_flag',$delete_flag);
 
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+        $user = $this->Auth->identify();
 
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'keikakucsv']);
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'keikakucsv']);
+          }
         }
-      }
     }
 
     public function henkoutop()//登録呼出変更のトップ
@@ -1568,52 +1506,31 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
-
     }
 
     public function henkoupanalogin()
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+        $this->set('data',$data);//セット
         $userdata = $data['username'];
-
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'henkoupanapreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
+        $this->set('userdata',$userdata);//セット
 
         $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+        $arraylogindate = $htmllogin->htmllogin($userdata);
 
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);
         $this->set('delete_flag',$delete_flag);
 
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+        $user = $this->Auth->identify();
 
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'henkoupanado']);
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkoupanado']);
+          }
         }
-      }
     }
 
     public function henkoupanado()//日付更新
@@ -1673,51 +1590,33 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
+      $session = $this->request->getSession();
+      $data = $session->read();
     }
 
     public function henkoupanabunnnoulogin()
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+        $this->set('data',$data);//セット
         $userdata = $data['username'];
-
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'henkoupanabunnnoupreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
+        $this->set('userdata',$userdata);//セット
 
         $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+        $arraylogindate = $htmllogin->htmllogin($userdata);
 
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);
         $this->set('delete_flag',$delete_flag);
 
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+        $user = $this->Auth->identify();
 
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'henkoupanabunnnoudo']);
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkoupanabunnnoudo']);
+          }
         }
-      }
     }
 
     public function henkoupanabunnnoudo()//パナ分納
@@ -2089,52 +1988,31 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
-
     }
 
     public function henkoudnplogin()
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+        $this->set('data',$data);//セット
         $userdata = $data['username'];
-
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'henkoudnppreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
+        $this->set('userdata',$userdata);//セット
 
         $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+        $arraylogindate = $htmllogin->htmllogin($userdata);
 
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);
         $this->set('delete_flag',$delete_flag);
 
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+        $user = $this->Auth->identify();
 
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'henkoudnpdo']);
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkoudnpdo']);
+          }
         }
-      }
     }
 
     public function henkoudnpdo()
@@ -2202,51 +2080,31 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
     }
 
     public function henkoudnpbunnnoulogin()
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+        $this->set('data',$data);//セット
         $userdata = $data['username'];
-
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'henkoudnpbunnnoupreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
+        $this->set('userdata',$userdata);//セット
 
         $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+        $arraylogindate = $htmllogin->htmllogin($userdata);
 
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);
         $this->set('delete_flag',$delete_flag);
 
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+        $user = $this->Auth->identify();
 
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'henkoudnpbunnnoudo']);
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkoudnpbunnnoudo']);
+          }
         }
-      }
     }
 
     public function henkoudnpbunnnoudo()//DNP分納
@@ -2868,51 +2726,31 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
     }
 
     public function henkouotherlogin()
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+        $this->set('data',$data);//セット
         $userdata = $data['username'];
-
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'henkouotherpreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
+        $this->set('userdata',$userdata);//セット
 
         $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+        $arraylogindate = $htmllogin->htmllogin($userdata);
 
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);
         $this->set('delete_flag',$delete_flag);
 
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+        $user = $this->Auth->identify();
 
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'henkouotherdo']);
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkouotherdo']);
+          }
         }
-      }
     }
 
     public function henkouotherdo()
@@ -2975,50 +2813,33 @@ echo "</pre>";
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
 
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
+      $session = $this->request->getSession();
+      $data = $session->read();
     }
 
     public function henkouotherbunnnoulogin()
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+        $this->set('data',$data);//セット
         $userdata = $data['username'];
-
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'henkouotherbunnnoupreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
+        $this->set('userdata',$userdata);//セット
 
         $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+        $arraylogindate = $htmllogin->htmllogin($userdata);
 
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);
         $this->set('delete_flag',$delete_flag);
 
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+        $user = $this->Auth->identify();
 
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'henkouotherbunnnoudo']);
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'henkouotherbunnnoudo']);
+          }
         }
-      }
     }
 
     public function henkouotherbunnnoudo()
@@ -3295,8 +3116,8 @@ echo "</pre>";
       $date_deliver = $data["date_deliver"]["year"]."-".$data["date_deliver"]["month"]."-".$data["date_deliver"]["day"];
       $this->set('date_deliver',$date_deliver);
 
-//210818更新
-/*
+      //210818更新
+      /*
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
       $customer_id = $Product[0]->customer_id;
       $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
@@ -3340,18 +3161,14 @@ echo "</pre>";
       if(!isset($_SESSION)){//sessionsyuuseituika
       session_start();
       }
+      $_SESSION['order_edi'] = array();
 
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
 
-      if(isset($_SESSION['order_edi_pana']['place_deliver_code'])){
-        $data = $_SESSION['order_edi_pana'];
-      }else{
-        $_SESSION['order_edi_pana'] = array();
-        $data = $this->request->getData();
-      }
+      $data = $this->request->getData();
 
-      $_SESSION['order_edi_pana'] = array(
+      $_SESSION['order_edi'] = array(
         'place_deliver_code' => $data["place_deliver_code"],
         'date_order' => $data["date_order"],
         'price' => $data["price"],
@@ -3384,51 +3201,31 @@ echo "</pre>";
         'date_deliver' => $kari_datenouki
       );
 
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
-
     }
 
     public function chokusetsupanalogin()
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+        $this->set('data',$data);//セット
         $userdata = $data['username'];
-
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'chokusetsupanapreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
+        $this->set('userdata',$userdata);//セット
 
         $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+        $arraylogindate = $htmllogin->htmllogin($userdata);
 
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);
         $this->set('delete_flag',$delete_flag);
 
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+        $user = $this->Auth->identify();
 
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'chokusetsupanado']);
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'chokusetsupanado']);
+          }
         }
-      }
     }
 
     public function chokusetsupanado()
@@ -3443,23 +3240,22 @@ echo "</pre>";
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
-      $_SESSION['order_edi_pana'] = array_merge($_SESSION['order_edi_pana'],$created_staff);
+      $_SESSION['order_edi'] = array_merge($_SESSION['order_edi'],$created_staff);
 
       $session = $this->request->getSession();
       $data = $session->read();
 
       //外注の対応
-      $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $data['order_edi_pana']['product_code'],
-       'flag_denpyou' => 1,  'status' => 0])->toArray();
+      $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $data['order_edi']['product_code'], 'flag_denpyou' => 1,  'status' => 0])->toArray();
       if(count($ProductGaityu) > 0){
 
       $id_supplier = $ProductGaityu[0]->id_supplier;
         $_SESSION['ProductGaityu'] = array(
-          'id_order' => $data['order_edi_pana']["num_order"],
-          'product_code' => $data['order_edi_pana']['product_code'],
-          'price' => $data['order_edi_pana']["price"],
+          'id_order' => $data['order_edi']["num_order"],
+          'product_code' => $data['order_edi']['product_code'],
+          'price' => $data['order_edi']["price"],
           'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
-          'amount' => $data['order_edi_pana']["amount"],
+          'amount' => $data['order_edi']["amount"],
           'id_supplier' => $id_supplier,
           'tourokubi' => date("Y-m-d"),
           'flag_attach' => 0,
@@ -3470,23 +3266,23 @@ echo "</pre>";
 
         }
 
-      $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $data['order_edi_pana']['product_code'], 'flag' => 0])->toArray();
+      $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $data['order_edi']['product_code'], 'flag' => 0])->toArray();
       if(count($AssembleProduct) > 0){
         for($n=0; $n<count($AssembleProduct); $n++){
           $child_pid = $AssembleProduct[$n]->child_pid;
 
           $_SESSION['order_edi_kumitate'][$n] = array(
             'place_deliver_code' => "00000",
-            'date_order' => $data['order_edi_pana']["date_order"],
+            'date_order' => $data['order_edi']["date_order"],
             'price' => 0,
-            'amount' => $data['order_edi_pana']["amount"],
+            'amount' => $data['order_edi']["amount"],
             'product_code' => $child_pid,
-            'line_code' => $data['order_edi_pana']["line_code"],
-            'date_deliver' => $data['order_edi_pana']["date_deliver"],
-            'num_order' => $data['order_edi_pana']["num_order"],
-            'first_date_deliver' => $data['order_edi_pana']["first_date_deliver"],
-            'customer_code' => $data['order_edi_pana']["customer_code"],
-            'place_line' => $data['order_edi_pana']["place_line"],
+            'line_code' => $data['order_edi']["line_code"],
+            'date_deliver' => $data['order_edi']["date_deliver"],
+            'num_order' => $data['order_edi']["num_order"],
+            'first_date_deliver' => $data['order_edi']["first_date_deliver"],
+            'customer_code' => $data['order_edi']["customer_code"],
+            'place_line' => $data['order_edi']["place_line"],
             'check_denpyou' => 0,
             'bunnou' => 0,
             'kannou' => 0,
@@ -3503,7 +3299,7 @@ echo "</pre>";
                 'product_code' => $child_pid,
                 'price' => 0,
                 'date_deliver' => $_SESSION['supplier_date_deliver']["date_deliver"],
-                'amount' => $data['order_edi_pana']["amount"],
+                'amount' => $data['order_edi']["amount"],
                 'id_supplier' => $id_supplier,
                 'tourokubi' => date("Y-m-d"),
                 'flag_attach' => 0,
@@ -3518,9 +3314,9 @@ echo "</pre>";
 
       }
 
-      $_SESSION['hyoujitourokudata'] = $data['order_edi_pana'];
+      $_SESSION['hyoujitourokudata'] = $data['order_edi'];
 
-      $orderEdis = $this->OrderEdis->patchEntity($orderEdis, $data['order_edi_pana']);//$productデータ（空の行）を$this->request->getData()に更新する
+      $orderEdis = $this->OrderEdis->patchEntity($orderEdis, $data['order_edi']);//$productデータ（空の行）を$this->request->getData()に更新する
       $connection = ConnectionManager::get('default');//トランザクション1
       // トランザクション開始2
       $connection->begin();//トランザクション3
@@ -3538,20 +3334,20 @@ echo "</pre>";
           $table->setConnection($connection);
 
             $connection->insert('order_edi', [
-                'date_order' => $data['order_edi_pana']["date_order"],
-                'num_order' => $data['order_edi_pana']["num_order"],
-                'product_id' => $data['order_edi_pana']["product_code"],
-                'price' => $data['order_edi_pana']["price"],
-                'date_deliver' => $data['order_edi_pana']["date_deliver"],
-                'amount' => $data['order_edi_pana']["amount"],
-                'cs_id' => $data['order_edi_pana']["customer_code"],
-                'place_deliver_id' => $data['order_edi_pana']["place_deliver_code"],
-                'place_line' => $data['order_edi_pana']["place_line"],
-                'line_code' => $data['order_edi_pana']["line_code"],
-                'check_denpyou' => $data['order_edi_pana']["check_denpyou"],
-                'bunnou' => $data['order_edi_pana']["bunnou"],
-                'kannou' => $data['order_edi_pana']["kannou"],
-                'delete_flg' => $data['order_edi_pana']["delete_flag"],
+                'date_order' => $data['order_edi']["date_order"],
+                'num_order' => $data['order_edi']["num_order"],
+                'product_id' => $data['order_edi']["product_code"],
+                'price' => $data['order_edi']["price"],
+                'date_deliver' => $data['order_edi']["date_deliver"],
+                'amount' => $data['order_edi']["amount"],
+                'cs_id' => $data['order_edi']["customer_code"],
+                'place_deliver_id' => $data['order_edi']["place_deliver_code"],
+                'place_line' => $data['order_edi']["place_line"],
+                'line_code' => $data['order_edi']["line_code"],
+                'check_denpyou' => $data['order_edi']["check_denpyou"],
+                'bunnou' => $data['order_edi']["bunnou"],
+                'kannou' => $data['order_edi']["kannou"],
+                'delete_flg' => $data['order_edi']["delete_flag"],
                 'created_at' => date("Y-m-d H:i:s")
             ]);
           $connection = ConnectionManager::get('default');
@@ -3560,7 +3356,7 @@ echo "</pre>";
           if(isset($_SESSION['ProductGaityu'])){//外注がある場合はKariOrderToSuppliersに登録
 
               $arrFp = array();//空の配列を作る
-              $arrFp[] = $data['order_edi_pana'];
+              $arrFp[] = $data['order_edi'];
 
               //外注仮登録クラス
               $htmlgaityukaritouroku = new htmlEDItouroku();
@@ -3637,8 +3433,6 @@ echo "</pre>";
       //ロールバック8
         $connection->rollback();//トランザクション9
       }//トランザクション10
-
-      $_SESSION['order_edi_pana'] = array();
 
     }
 
@@ -3747,20 +3541,9 @@ echo "</pre>";
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
 
-      if(isset($_SESSION['order_edi_dnp']['place_deliver_code'])){
-        $data = $_SESSION['order_edi_dnp'] + $_SESSION['denpyouDnpMinoukannous'] + $_SESSION['dnpTotalAmounts'];
-        echo "<pre>";
-        print_r($data);
-        echo "</pre>";
-      }else{
-        $_SESSION['order_edi_dnp'] = array();
-        $data = $this->request->getData();
-        echo "<pre>";
-        print_r("B");
-        echo "</pre>";
-      }
+      $data = $this->request->getData();
 
-      $_SESSION['order_edi_dnp'] = array(
+      $_SESSION['order_edi'] = array(
         'place_deliver_code' => $data["place_deliver_code"],
         'date_order' => $data["date_order"],
         'price' => $data["price"],
@@ -3798,51 +3581,35 @@ echo "</pre>";
         'num_order' => $data["num_order"],
         'delete_flag' => 0
       );
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
     }
 
     public function chokusetsudnplogin()
     {
       if ($this->request->is('post')) {
         $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-
+        $this->set('data',$data);//セット
         $userdata = $data['username'];
-
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'chokusetsudnppreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
+        $this->set('userdata',$userdata);//セット
 
         $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
-
+        $arraylogindate = $htmllogin->htmllogin($userdata);
+/*
+        echo "<pre>";
+        print_r($arraylogindate);
+        echo "</pre>";
+*/
         $username = $arraylogindate[0];
         $delete_flag = $arraylogindate[1];
         $this->set('username',$username);
         $this->set('delete_flag',$delete_flag);
 
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+        $user = $this->Auth->identify();
 
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'chokusetsudnpdo']);
+          if ($user) {
+            $this->Auth->setUser($user);
+            return $this->redirect(['action' => 'chokusetsudnpdo']);
+          }
         }
-      }
     }
 
     public function chokusetsudnpdo()
@@ -3855,68 +3622,73 @@ echo "</pre>";
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
       $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
-      $_SESSION['order_edi_dnp'] = array_merge($_SESSION['order_edi_dnp'],$created_staff);
+      $_SESSION['order_edi'] = array_merge($_SESSION['order_edi'],$created_staff);
       $_SESSION['denpyouDnpMinoukannous'] = array_merge($_SESSION['denpyouDnpMinoukannous'],$created_staff);
       $_SESSION['dnpTotalAmounts'] = array_merge($_SESSION['dnpTotalAmounts'],$created_staff);
 
       $session = $this->request->getSession();
       $data = $session->read();
 
-      $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $data['order_edi_dnp']['product_code']])->toArray();
+      $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $data['order_edi']['product_code']])->toArray();
       if(count($AssembleProduct) > 0){
         for($n=0; $n<count($AssembleProduct); $n++){
           $child_pid = $AssembleProduct[$n]->child_pid;
 
           $_SESSION['order_edi_kumitate'][$n] = array(
             'place_deliver_code' => "00000",
-            'date_order' => $data['order_edi_dnp']["date_order"],
+            'date_order' => $data['order_edi']["date_order"],
             'price' => 0,
-            'amount' => $data['order_edi_dnp']["amount"],
+            'amount' => $data['order_edi']["amount"],
             'product_code' => $child_pid,
-            'line_code' => $data['order_edi_dnp']["line_code"],
-            'date_deliver' => $data['order_edi_dnp']["date_deliver"],
-            'num_order' => $data['order_edi_dnp']["num_order"],
-            'first_date_deliver' => $data['order_edi_dnp']["first_date_deliver"],
-            'customer_code' => $data['order_edi_dnp']["customer_code"],
-            'place_line' => $data['order_edi_dnp']["place_line"],
+            'line_code' => $data['order_edi']["line_code"],
+            'date_deliver' => $data['order_edi']["date_deliver"],
+            'num_order' => $data['order_edi']["num_order"],
+            'first_date_deliver' => $data['order_edi']["first_date_deliver"],
+            'customer_code' => $data['order_edi']["customer_code"],
+            'place_line' => $data['order_edi']["place_line"],
             'check_denpyou' => 0,
             'bunnou' => 0,
-            'kannou' => $data['order_edi_dnp']["kannou"],
+            'kannou' => $data['order_edi']["kannou"],
             'delete_flag' => 0,
             'created_staff' => $this->Auth->user('staff_id')
           );
         }
       }
 
-      $_SESSION['hyoujitourokudata'] = $data['order_edi_dnp'];
+      $_SESSION['hyoujitourokudata'] = $data['order_edi'];
 
-      $orderEdis = $this->OrderEdis->patchEntity($orderEdis, $data['order_edi_dnp']);//$productデータ（空の行）を$this->request->getData()に更新する
+      $orderEdis = $this->OrderEdis->patchEntity($orderEdis, $data['order_edi']);//$productデータ（空の行）を$this->request->getData()に更新する
       $connection = ConnectionManager::get('default');//トランザクション1
       // トランザクション開始2
       $connection->begin();//トランザクション3
       try {//トランザクション4
         if ($this->OrderEdis->save($orderEdis)) {
-
+/*
+          echo "<pre>";
+          print_r('旧DB登録');
+          print_r($data['order_edi']);
+          echo "</pre>";
+  */
           //旧DB登録
           $connection = ConnectionManager::get('sakaeMotoDB');
           $table = TableRegistry::get('order_edi');
           $table->setConnection($connection);
 
             $connection->insert('order_edi', [
-                'date_order' => $data['order_edi_dnp']["date_order"],
-                'num_order' => $data['order_edi_dnp']["num_order"],
-                'product_id' => $data['order_edi_dnp']["product_code"],
-                'price' => $data['order_edi_dnp']["price"],
-                'date_deliver' => $data['order_edi_dnp']["date_deliver"],
-                'amount' => $data['order_edi_dnp']["amount"],
-                'cs_id' => $data['order_edi_dnp']["customer_code"],
-                'place_deliver_id' => $data['order_edi_dnp']["place_deliver_code"],
-                'place_line' => $data['order_edi_dnp']["place_line"],
-                'line_code' => $data['order_edi_dnp']["line_code"],
-                'check_denpyou' => $data['order_edi_dnp']["check_denpyou"],
-                'bunnou' => $data['order_edi_dnp']["bunnou"],
-                'kannou' => $data['order_edi_dnp']["kannou"],
-                'delete_flg' => $data['order_edi_dnp']["delete_flag"],
+                'date_order' => $data['order_edi']["date_order"],
+                'num_order' => $data['order_edi']["num_order"],
+                'product_id' => $data['order_edi']["product_code"],
+                'price' => $data['order_edi']["price"],
+                'date_deliver' => $data['order_edi']["date_deliver"],
+                'amount' => $data['order_edi']["amount"],
+                'cs_id' => $data['order_edi']["customer_code"],
+                'place_deliver_id' => $data['order_edi']["place_deliver_code"],
+                'place_line' => $data['order_edi']["place_line"],
+                'line_code' => $data['order_edi']["line_code"],
+                'check_denpyou' => $data['order_edi']["check_denpyou"],
+                'bunnou' => $data['order_edi']["bunnou"],
+                'kannou' => $data['order_edi']["kannou"],
+                'delete_flg' => $data['order_edi']["delete_flag"],
                 'created_at' => date("Y-m-d H:i:s")
             ]);
 
@@ -3925,13 +3697,13 @@ echo "</pre>";
             $table->setConnection($connection);
 
               $connection->insert('order_dnp_kannous', [
-                  'date_order' => $data['order_edi_dnp']["date_order"],
-                  'num_order' => $data['order_edi_dnp']["num_order"],
-                  'product_id' => $data['order_edi_dnp']["product_code"],
-                  'code' => $data['order_edi_dnp']["line_code"],
-                  'date_deliver' => $data['order_edi_dnp']["date_deliver"],
-                  'amount' => $data['order_edi_dnp']["amount"],
-                  'minoukannou' => $data['order_edi_dnp']["kannou"],
+                  'date_order' => $data['order_edi']["date_order"],
+                  'num_order' => $data['order_edi']["num_order"],
+                  'product_id' => $data['order_edi']["product_code"],
+                  'code' => $data['order_edi']["line_code"],
+                  'date_deliver' => $data['order_edi']["date_deliver"],
+                  'amount' => $data['order_edi']["amount"],
+                  'minoukannou' => $data['order_edi']["kannou"],
                   'delete_flg' => 0,
                   'created_at' => date("Y-m-d H:i:s")
               ]);
@@ -3940,17 +3712,22 @@ echo "</pre>";
               $table = TableRegistry::get('denpyou_dnp');
               $table->setConnection($connection);
 
-              $PlaceDeliver = $this->PlaceDelivers->find()->where(['id_from_order' => $data['order_edi_dnp']["place_deliver_code"]])->toArray();
+              $PlaceDeliver = $this->PlaceDelivers->find()->where(['id_from_order' => $data['order_edi']["place_deliver_code"]])->toArray();
               $place_deliver = $PlaceDeliver[0]->name;
-
+              /*
+              echo "<pre>";
+              print_r($data['order_edi']["place_deliver_code"]);
+              print_r($place_deliver);
+              echo "</pre>";
+*/
                 $connection->insert('denpyou_dnp', [
-                    'num_order' => $data['order_edi_dnp']["num_order"],
-                    'product_id' => $data['order_edi_dnp']["product_code"],
+                    'num_order' => $data['order_edi']["num_order"],
+                    'product_id' => $data['order_edi']["product_code"],
                     'name_order' => $_SESSION['denpyouDnpMinoukannous']["name_order"],
                     'place_deliver' => $place_deliver,
-                    'code' => $data['order_edi_dnp']["line_code"],
+                    'code' => $data['order_edi']["line_code"],
                     'conf_print' => 0,
-                    'tourokubi' => $data['order_edi_dnp']["date_order"],
+                    'tourokubi' => $data['order_edi']["date_order"],
                     'created_at' => date("Y-m-d H:i:s")
                 ]);
 
@@ -3958,8 +3735,12 @@ echo "</pre>";
               //旧DBここまで
 
           $arrFp = array();//空の配列を作る
-          $arrFp[] = $data['order_edi_dnp'];
-
+          $arrFp[] = $data['order_edi'];
+/*
+          echo "<pre>";
+          print_r($arrFp);
+          echo "</pre>";
+*/
           //外注仮登録クラス
           $htmlgaityukaritouroku = new htmlEDItouroku();
           $data = $htmlgaityukaritouroku->htmlgaityukaritouroku($arrFp);
@@ -3968,10 +3749,7 @@ echo "</pre>";
           $htmlgaityutouroku = new htmlEDItouroku();
           $data = $htmlgaityutouroku->htmlgaityutouroku();
 
-          $OrderEdi = $this->OrderEdis->find()->where(['num_order' => $_SESSION['order_edi_dnp']['num_order'],
-           'product_code' => $_SESSION['order_edi_dnp']['product_code'],
-           'date_order' => $_SESSION['order_edi_dnp']['date_order'],
-           'date_deliver' => $_SESSION['order_edi_dnp']['date_deliver']])->toArray();
+          $OrderEdi = $this->OrderEdis->find()->where(['num_order' => $_SESSION['order_edi']['num_order'], 'product_code' => $_SESSION['order_edi']['product_code'], 'date_order' => $_SESSION['order_edi']['date_order'], 'date_deliver' => $_SESSION['order_edi']['date_deliver']])->toArray();
           $OrderEdi_id = $OrderEdi[0]->id;
 
           $arrid = array('order_edi_id'=>$OrderEdi_id);
@@ -3980,8 +3758,25 @@ echo "</pre>";
           $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntity($this->DenpyouDnpMinoukannous->newEntity(), $_SESSION['denpyouDnpMinoukannous']);
           $this->DenpyouDnpMinoukannous->save($denpyouDnpMinoukannous);
 
+
+    /*      if ($this->DenpyouDnpMinoukannous->save($denpyouDnpMinoukannous)) {
+            echo "<pre>";
+            print_r("ok");
+            echo "</pre>";
+          }else{
+            echo "<pre>";
+            print_r("no");
+            echo "</pre>";
+          }
+*/
+/*
+echo "<pre>";
+print_r($_SESSION['dnpTotalAmounts']);
+echo "</pre>";
+*/
           $dnpTotalAmounts = $this->DnpTotalAmounts->patchEntity($this->DnpTotalAmounts->newEntity(), $_SESSION['dnpTotalAmounts']);
           $this->DnpTotalAmounts->save($dnpTotalAmounts);
+
 
           $mes = "※登録されました";
           $this->set('mes',$mes);
@@ -4036,12 +3831,10 @@ echo "</pre>";
 
                 $mes = "※登録されました（組み立て品も登録されました）";
                 $this->set('mes',$mes);
-                $_SESSION['order_edi_dnp'] = array();
                 $connection->commit();// コミット5
               }else{
                 $mes = "※登録されました（組み立て品は登録できませんでした）";
                 $this->set('mes',$mes);
-                $_SESSION['order_edi_dnp'] = array();
                 throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
               }
             }
@@ -4050,16 +3843,12 @@ echo "</pre>";
         } else {
           $mes = "※登録されませんでした";
           $this->set('mes',$mes);
-          $_SESSION['order_edi_dnp'] = array();
           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
         }
       } catch (Exception $e) {//トランザクション7
       //ロールバック8
         $connection->rollback();//トランザクション9
       }//トランザクション10
-
-      $_SESSION['order_edi_dnp'] = array();
-
     }
 
     public function denpyouindex()
@@ -4219,52 +4008,32 @@ echo "</pre>";
     {
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
-
     }
 
     public function denpyouhenkoulogin()
     {
       if ($this->request->is('post')) {
-        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+ 			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+ 			 $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+ 			 $ary = explode(',', $str);//$strを配列に変換
 
-        $userdata = $data['username'];
+ 			 $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+ 			 //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+ 			 $this->set('username', $username);
+ 			 $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
 
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'denpyouhenkoupreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
-
-        $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
-
-        $username = $arraylogindate[0];
-        $delete_flag = $arraylogindate[1];
-        $this->set('username',$username);
-        $this->set('delete_flag',$delete_flag);
-
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
-
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'denpyouhenkoudo']);
-        }
-      }
+ 				 if(empty($Userdata)){
+ 					 $delete_flag = "";
+ 				 }else{
+ 					 $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+ 					 $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+ 				 }
+ 					 $user = $this->Auth->identify();
+ 				 if ($user) {
+ 					 $this->Auth->setUser($user);
+ 					 return $this->redirect(['action' => 'denpyouhenkoudo']);
+ 				 }
+ 			 }
     }
 
     public function denpyouhenkoudo()
@@ -4341,52 +4110,32 @@ echo "</pre>";
       //$this->request->session()->destroy(); // セッションの破棄
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
-
     }
 
     public function yobizaikologin()
     {
       if ($this->request->is('post')) {
-        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+ 			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+ 			 $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+ 			 $ary = explode(',', $str);//$strを配列に変換
 
-        $userdata = $data['username'];
+ 			 $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+ 			 //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+ 			 $this->set('username', $username);
+ 			 $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
 
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'yobizaikopreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
-
-        $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
-
-        $username = $arraylogindate[0];
-        $delete_flag = $arraylogindate[1];
-        $this->set('username',$username);
-        $this->set('delete_flag',$delete_flag);
-
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
-
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'yobizaikoproduct']);
-        }
-      }
+ 				 if(empty($Userdata)){
+ 					 $delete_flag = "";
+ 				 }else{
+ 					 $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+ 					 $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+ 				 }
+ 					 $user = $this->Auth->identify();
+ 				 if ($user) {
+ 					 $this->Auth->setUser($user);
+ 					 return $this->redirect(['action' => 'yobizaikoproduct']);
+ 				 }
+ 			 }
     }
 
     public function yobizaikoproduct()
@@ -4504,13 +4253,13 @@ echo "</pre>";
         $date_deliver = $data["date_deliver{$k}"]['year']."-".$data["date_deliver{$k}"]['month']."-".$data["date_deliver{$k}"]['day'];
         $amount = $data["amount{$k}"];
 
-        $ProductGaityus = $this->ProductGaityus->find()->where(['product_code' => $product_code])->toArray();
+        $ProductGaityus = $this->ProductGaityus->find()->where(['product_code' => $product_code, 'flag_denpyou' => 1,  'status' => 0])->toArray();
         $id_supplier = $ProductGaityus[0]->id_supplier;
 
         $ProductSuppliers = $this->ProductSuppliers->find()->where(['id' => $id_supplier])->toArray();
         $Supplier = $ProductSuppliers[0]->name;
 
-        $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $product_code])->toArray();
+        $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $product_code, 'flag_denpyou' => 1,  'status' => 0])->toArray();
         $price = $ProductGaityu[0]->price_shiire;
 
         $k1 = $k+1;
@@ -4727,52 +4476,32 @@ echo "</pre>";
     {
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
-
-      $Data=$this->request->query('s');
-      if(isset($Data["mess"])){
-        $mess = $Data["mess"];
-        $this->set('mess',$mess);
-      }else{
-        $mess = "";
-        $this->set('mess',$mess);
-      }
-
     }
 
     public function yobidenpyouhenkoulogin()
     {
       if ($this->request->is('post')) {
-        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+ 			 $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+ 			 $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
+ 			 $ary = explode(',', $str);//$strを配列に変換
 
-        $userdata = $data['username'];
+ 			 $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
+ 			 //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
+ 			 $this->set('username', $username);
+ 			 $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
 
-        if(isset($data['prelogin'])){
-
-          $htmllogin = new htmlLogin();
-          $qrcheck = $htmllogin->qrcheckprogram($userdata);
-
-          if($qrcheck > 0){
-            return $this->redirect(['action' => 'yobidenpyouhenkoupreadd',
-            's' => ['mess' => "QRコードを読み込んでください。"]]);
-          }
-
-        }
-
-        $htmllogin = new htmlLogin();
-        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
-
-        $username = $arraylogindate[0];
-        $delete_flag = $arraylogindate[1];
-        $this->set('username',$username);
-        $this->set('delete_flag',$delete_flag);
-
-        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
-
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'yobidenpyouhenkoudo']);
-        }
-      }
+ 				 if(empty($Userdata)){
+ 					 $delete_flag = "";
+ 				 }else{
+ 					 $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
+ 					 $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+ 				 }
+ 					 $user = $this->Auth->identify();
+ 				 if ($user) {
+ 					 $this->Auth->setUser($user);
+ 					 return $this->redirect(['action' => 'yobidenpyouhenkoudo']);
+ 				 }
+ 			 }
     }
 
     public function yobidenpyouhenkoudo()

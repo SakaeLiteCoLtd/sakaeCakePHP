@@ -9,6 +9,8 @@ use Cake\Core\Configure;//トランザクション
 
 use App\myClass\Logins\htmlLogin;
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 /**
  * Staffs Controller
  *
@@ -32,6 +34,16 @@ class KensahyouHeadsController  extends AppController
      {
        $KensahyouHeads = $this->KensahyouHeads->newEntity();
        $this->set('KensahyouHeads',$KensahyouHeads);
+
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }else{
+         $mess = "";
+         $this->set('mess',$mess);
+       }
+
      }
 
      public function yobidashipana()
@@ -349,6 +361,14 @@ class KensahyouHeadsController  extends AppController
       $session = $this->request->getSession();
       $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
 
+      $session_names = "sokuteidata,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'yobidashicustomer',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
       $_SESSION['sokuteidata'] = array_merge($created_staff,$_SESSION['sokuteidata']);
 
@@ -577,6 +597,14 @@ class KensahyouHeadsController  extends AppController
 
        $session = $this->request->getSession();
        $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
+
+       $session_names = "sokuteidata,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+       $htmlSessioncheck = new htmlSessioncheck();
+       $arr_session_flag = $htmlSessioncheck->check($session_names);
+       if($arr_session_flag["num"] > 1){//セッション切れの場合
+         return $this->redirect(['action' => 'yobidashicustomer',
+         's' => ['mess' => $arr_session_flag["mess"]]]);
+       }
 
        $created_staff = array('updated_staff'=>$this->Auth->user('staff_id'));
        $_SESSION['sokuteidata'] = array_merge($created_staff,$_SESSION['sokuteidata']);

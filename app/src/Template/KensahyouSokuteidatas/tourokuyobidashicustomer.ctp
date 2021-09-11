@@ -29,6 +29,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
  <hr size="5" style="margin: 0.5rem">
 
  <br>
+  <div align="center"><font color="red" size="2"><?= __($mess) ?></font></div>
+  <br>
 
  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
    <tr>

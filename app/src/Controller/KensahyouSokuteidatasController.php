@@ -8,6 +8,8 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 use App\myClass\KensahyouSokuteidata\htmlKensahyouSokuteidata;//myClassフォルダに配置したクラスを使用
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 /**
  * Staffs Controller
  *
@@ -421,6 +423,16 @@ class KensahyouSokuteidatasController  extends AppController
    ->select(['product_code','delete_flag' => '0'])
    ->group('product_code')
    );
+
+   $Data=$this->request->query('s');
+   if(isset($Data["mess"])){
+     $mess = $Data["mess"];
+     $this->set('mess',$mess);
+   }else{
+     $mess = "";
+     $this->set('mess',$mess);
+   }
+
   }
 
   public function tourokuyobidashipana()
@@ -1297,6 +1309,14 @@ class KensahyouSokuteidatasController  extends AppController
     {
       $session = $this->request->getSession();
       $sessiondata = $session->read();
+
+      $session_names = "Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'tourokuyobidashicustomer',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       for($n=1; $n<=8; $n++){
         $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));

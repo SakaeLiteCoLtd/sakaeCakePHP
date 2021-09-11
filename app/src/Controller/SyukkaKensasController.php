@@ -13,6 +13,8 @@ use App\myClass\KensahyouSokuteidata\htmlKensahyouSokuteidata;//myClassフォル
 
 use App\myClass\Logins\htmlLogin;
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 class SyukkaKensasController extends AppController {
 
       public function initialize()
@@ -43,6 +45,16 @@ class SyukkaKensasController extends AppController {
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
       $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function yobidashicustomer()//「出荷検査用呼出」ページトップ
@@ -795,6 +807,15 @@ class SyukkaKensasController extends AppController {
     {
       $session = $this->request->getSession();
       $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
+
+      $session_names = "kikakudata,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'yobidashimenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $data = $sessiondata['kikakudata'];
 
       $Product = $this->Products->find()->where(['product_code' => $sessiondata['kikakudata'][1]['product_code']])->toArray();
@@ -888,6 +909,14 @@ class SyukkaKensasController extends AppController {
     {
       $session = $this->request->getSession();
       $data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+      $session_names = "imdatanew,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'yobidashimenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $updated_staff = array('updated_staff'=>$data['Auth']['User']['staff_id']);
       $data["imdatanew"][0] = array_merge($data["imdatanew"][0],$updated_staff);
@@ -3148,6 +3177,14 @@ class SyukkaKensasController extends AppController {
     {
       $session = $this->request->getSession();
       $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
+
+      $session_names = "kikakudata,kousinn_flag,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'yobidashimenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $data = $sessiondata['kikakudata'];
       $kousinn_flag = $_SESSION['kousinn_flag']['kousinn_flag'];

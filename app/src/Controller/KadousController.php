@@ -10,6 +10,8 @@ use Cake\Core\Configure;//トランザクション
  use App\myClass\Productcheck\htmlProductcheck;
  use App\myClass\Logins\htmlLogin;
 
+ use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 /**
  * Roles Controller
  *
@@ -421,6 +423,14 @@ class KadousController extends AppController
      $data = $session->read();
      $this->set('data',$data);
 
+     $session_names = "karikadouseikei";//データ登録に必要なセッションの名前をカンマでつなぐ
+     $htmlSessioncheck = new htmlSessioncheck();
+     $arr_session_flag = $htmlSessioncheck->check($session_names);
+     if($arr_session_flag["num"] > 1){//セッション切れの場合
+       return $this->redirect(['action' => 'kariindex',
+       's' => ['mess' => $arr_session_flag["mess"]]]);
+     }
+
      $num = count($data["karikadouseikei"]) + 1;
 
      for($n=1; $n<=$num; $n++){
@@ -708,6 +718,14 @@ class KadousController extends AppController
 
     $session = $this->request->getSession();
     $data = $session->read();
+
+    $session_names = "kadouseikei";//データ登録に必要なセッションの名前をカンマでつなぐ
+    $htmlSessioncheck = new htmlSessioncheck();
+    $arr_session_flag = $htmlSessioncheck->check($session_names);
+    if($arr_session_flag["num"] > 1){//セッション切れの場合
+      return $this->redirect(['action' => 'kariindex',
+      's' => ['mess' => $arr_session_flag["mess"]]]);
+    }
 
     for($n=1; $n<=100; $n++){
       if(isset($_SESSION['kadouseikei'][$n])){
@@ -2574,6 +2592,14 @@ echo "</pre>";
 
      $session = $this->request->getSession();
      $data = $session->read();
+
+     $session_names = "kadouseikeisyuusei,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+     $htmlSessioncheck = new htmlSessioncheck();
+     $arr_session_flag = $htmlSessioncheck->check($session_names);
+     if($arr_session_flag["num"] > 1){//セッション切れの場合
+       return $this->redirect(['action' => 'kariindex',
+       's' => ['mess' => $arr_session_flag["mess"]]]);
+     }
 
      if ($this->request->is('get')) {
 

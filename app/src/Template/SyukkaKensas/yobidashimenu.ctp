@@ -25,7 +25,6 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
     echo $htmlSyukkakensamenus;
  ?>
  </table>
-
  <hr size="5" style="margin: 0.5rem">
  <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
    <tr style="background-color: #E6FFFF">
@@ -33,5 +32,6 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
      <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/imtype.gif',array('width'=>'115','height'=>'40','url'=>array('action'=>'typeyobidashicustomer')));?></td>
    </tr>
  </table>
-
  <br>
+  <div align="center"><font color="red" size="2"><?= __($mess) ?></font></div>
+  <br>

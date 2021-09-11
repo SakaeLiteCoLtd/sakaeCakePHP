@@ -19,6 +19,9 @@ $date = date('Y-m-d');
 $dateto = strtotime($date);
 $dateto = date('Y-m-d', strtotime('+1 day', $dateto));
 ?>
+<br>
+ <div align="center"><font color="red" size="2"><?= __($mess) ?></font></div>
+ <br>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>

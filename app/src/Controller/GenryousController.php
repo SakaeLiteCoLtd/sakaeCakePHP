@@ -10,6 +10,8 @@ use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラス�
 
 use Cake\Routing\Router;//urlの取得
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 class GenryousController extends AppController
 	{
 
@@ -315,9 +317,12 @@ class GenryousController extends AppController
 			$session = $this->request->getSession();
 			$datasession = $session->read();
 
-			if(!isset($datasession['Auth'])){
+			$session_names = "nyuukotyoukaupdate,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
         return $this->redirect(['action' => 'menu',
-        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+        's' => ['mess' => $arr_session_flag["mess"]]]);
       }
 
 		//	$data = $this->request->getData();
@@ -344,13 +349,13 @@ class GenryousController extends AppController
 						 )){
 
 							 //旧DB
-							 $connection = ConnectionManager::get('DB_ikou_test');
+							 $connection = ConnectionManager::get('sakaeMotoDB');
 							 $table = TableRegistry::get('order_material');
 							 $table->setConnection($connection);
 
 							 $sql = "SELECT id FROM order_material".
 				 						" where id ='".$moto_id_order."'";
-										$connection = ConnectionManager::get('DB_ikou_test');
+										$connection = ConnectionManager::get('sakaeMotoDB');
 							 			$order_material_moto = $connection->execute($sql)->fetchAll('assoc');
 
 							 if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
@@ -407,13 +412,13 @@ class GenryousController extends AppController
 					 )){
 
 						 //旧DB
-						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $connection = ConnectionManager::get('sakaeMotoDB');
 						 $table = TableRegistry::get('order_material');
 						 $table->setConnection($connection);
 
 						 $sql = "SELECT id FROM order_material".
 									" where id ='".$moto_id_order."'";
-									$connection = ConnectionManager::get('DB_ikou_test');
+									$connection = ConnectionManager::get('sakaeMotoDB');
 									$order_material_moto = $connection->execute($sql)->fetchAll('assoc');
 
 						 if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
@@ -469,13 +474,13 @@ class GenryousController extends AppController
 							 )){
 
 								 //旧DB
-								 $connection = ConnectionManager::get('DB_ikou_test');
+								 $connection = ConnectionManager::get('sakaeMotoDB');
 								 $table = TableRegistry::get('order_material');
 								 $table->setConnection($connection);
 
 								 $sql = "SELECT id FROM order_material".
 					 						" where id ='".$moto_id_order."'";
-											$connection = ConnectionManager::get('DB_ikou_test');
+											$connection = ConnectionManager::get('sakaeMotoDB');
 								 			$order_material_moto = $connection->execute($sql)->fetchAll('assoc');
 
 					 			if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
@@ -651,9 +656,12 @@ class GenryousController extends AppController
 			$session = $this->request->getSession();
 			$datasession = $session->read();
 
-			if(!isset($datasession['Auth'])){
+			$session_names = "nyuukominyuukaupdate,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
         return $this->redirect(['action' => 'menu',
-        's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+        's' => ['mess' => $arr_session_flag["mess"]]]);
       }
 
 			$data = $_SESSION['nyuukominyuukaupdate'];
@@ -679,13 +687,13 @@ class GenryousController extends AppController
 						 )){
 
 							 //旧DB
-							 $connection = ConnectionManager::get('DB_ikou_test');
+							 $connection = ConnectionManager::get('sakaeMotoDB');
 							 $table = TableRegistry::get('order_material');
 							 $table->setConnection($connection);
 
 							 $sql = "SELECT id FROM order_material".
 				 						" where id ='".$moto_id_order."'";
-										$connection = ConnectionManager::get('DB_ikou_test');
+										$connection = ConnectionManager::get('sakaeMotoDB');
 							 			$order_material_moto = $connection->execute($sql)->fetchAll('assoc');
 
 							 if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
@@ -742,13 +750,13 @@ class GenryousController extends AppController
 					 )){
 
 						 //旧DB
-						 $connection = ConnectionManager::get('DB_ikou_test');
+						 $connection = ConnectionManager::get('sakaeMotoDB');
 						 $table = TableRegistry::get('order_material');
 						 $table->setConnection($connection);
 
 						 $sql = "SELECT id FROM order_material".
 									" where id ='".$moto_id_order."'";
-									$connection = ConnectionManager::get('DB_ikou_test');
+									$connection = ConnectionManager::get('sakaeMotoDB');
 									$order_material_moto = $connection->execute($sql)->fetchAll('assoc');
 
 						 if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
@@ -804,13 +812,13 @@ class GenryousController extends AppController
 							 )){
 
 								 //旧DB
-								 $connection = ConnectionManager::get('DB_ikou_test');
+								 $connection = ConnectionManager::get('sakaeMotoDB');
 								 $table = TableRegistry::get('order_material');
 								 $table->setConnection($connection);
 
 								 $sql = "SELECT id FROM order_material".
 					 						" where id ='".$moto_id_order."'";
-											$connection = ConnectionManager::get('DB_ikou_test');
+											$connection = ConnectionManager::get('sakaeMotoDB');
 								 			$order_material_moto = $connection->execute($sql)->fetchAll('assoc');
 
 					 			if(isset($order_material_moto[0])){//旧DBにデータがあれば更新
@@ -1020,10 +1028,13 @@ class GenryousController extends AppController
 			$session = $this->request->getSession();
 			$datasession = $session->read();
 
-			if(!isset($datasession['Auth'])){
-				return $this->redirect(['action' => 'menu',
-				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
-			}
+			$session_names = "nyuukonouki,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'menu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
 			$data = $_SESSION['nyuukonouki'];
 
@@ -1043,7 +1054,7 @@ class GenryousController extends AppController
 				 )){
 
 					 //旧DBに単価登録
-					 $connection = ConnectionManager::get('DB_ikou_test');
+					 $connection = ConnectionManager::get('sakaeMotoDB');
 					 $table = TableRegistry::get('order_material');
 					 $table->setConnection($connection);
 

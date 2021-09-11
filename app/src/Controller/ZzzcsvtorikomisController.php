@@ -22,6 +22,11 @@ class ZzzcsvtorikomisController extends AppController
      public function torikomi()//http://localhost:5000/Zzzcsvtorikomis/torikomi
      {
 
+       $this->request->session()->destroy();//セッションの破棄
+       echo "<pre>";
+			 print_r("セッション削除");
+			 echo "</pre>";
+/*
        $PriceMaterials = $this->PriceMaterials->find()
        ->where(['delete_flag' => 0])->toArray();
 
@@ -48,7 +53,7 @@ class ZzzcsvtorikomisController extends AppController
        echo "<pre>";
 			 print_r($arrMaterialsok);
 			 echo "</pre>";
-
+*/
   //     $Materials = $this->Materials->patchEntities($this->Materials->newEntity(), $arrMaterialsok);
   //     $this->Materials->saveMany($Materials);
 

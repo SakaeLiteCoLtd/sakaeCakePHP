@@ -16,6 +16,8 @@ use Cake\Http\Client;//httpの読取に必要
 
 use App\myClass\Rolecheck\htmlRolecheck;
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 class HazaimaterialsController extends AppController {
 
   public function initialize()
@@ -89,6 +91,15 @@ class HazaimaterialsController extends AppController {
    {
      $stockEndMaterials = $this->StockEndMaterials->newEntity();
      $this->set('stockEndMaterials',$stockEndMaterials);
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
 
      $StockEndMaterials = $this->StockEndMaterials->find()//CSV未出力データ
      ->where(['status_import_tab' => 0, 'delete_flag' => 0])->toArray();
@@ -985,6 +996,14 @@ class HazaimaterialsController extends AppController {
 
      $session = $this->request->getSession();
      $_SESSION = $session->read();
+
+     $session_names = "hazaicsvdatasdo";//データ登録に必要なセッションの名前をカンマでつなぐ
+     $htmlSessioncheck = new htmlSessioncheck();
+     $arr_session_flag = $htmlSessioncheck->check($session_names);
+     if($arr_session_flag["num"] > 1){//セッション切れの場合
+       return $this->redirect(['action' => 'menu',
+       's' => ['mess' => $arr_session_flag["mess"]]]);
+     }
 
      $csvStockEndMaterials = $_SESSION['hazaicsvdatasdo'];
      $staff_id = $_SESSION['hazaicsvstaffdo'];

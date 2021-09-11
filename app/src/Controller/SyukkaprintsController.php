@@ -11,6 +11,8 @@ use Cake\Filesystem\Folder;
 use Cake\Filesystem\File;
 use App\myClass\KensahyouSokuteidata\htmlKensahyouSokuteidata;//myClassフォルダに配置したクラスを使用
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 use App\myClass\Logins\htmlLogin;
 
 class SyukkaprintsController extends AppController {
@@ -38,6 +40,16 @@ class SyukkaprintsController extends AppController {
   		$field[] = array("10001"=>"PDF草津食洗");
   		$field[] = array("99999"=>"印刷その他顧客");
 			$this->set('field',$field);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function ichiran()
@@ -239,6 +251,14 @@ class SyukkaprintsController extends AppController {
 
       $session = $this->request->getSession();
       $data = $session->read();
+
+      $session_names = "insatsu,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'form',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $this->set('orderEdis',$data["insatsu"]);
 

@@ -9,6 +9,9 @@ use Cake\Core\Configure;//トランザクション
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 use App\myClass\EDItouroku\htmlEDItouroku;//myClassフォルダに配置したクラスを使用
 use App\myClass\Productcheck\htmlProductcheck;
+
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 /*
 $htmllogin = new htmlLogin();
 $htmllogin = $htmllogin->htmllogin();
@@ -51,6 +54,16 @@ class OrderEdisController extends AppController
      public function indexmenu()
      {
        //$this->request->session()->destroy();// セッションの破棄
+
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }else{
+         $mess = "";
+         $this->set('mess',$mess);
+       }
+
      }
 
      public function hattyucsv()//発注CSV
@@ -59,6 +72,14 @@ class OrderEdisController extends AppController
        session_start();
        }
        $_SESSION['order_edi_kumitate'] = array();
+
+       $session_names = "Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+       $htmlSessioncheck = new htmlSessioncheck();
+       $arr_session_flag = $htmlSessioncheck->check($session_names);
+       if($arr_session_flag["num"] > 1){//セッション切れの場合
+         return $this->redirect(['action' => 'indexmenu',
+         's' => ['mess' => $arr_session_flag["mess"]]]);
+       }
 
        $orderEdis = $this->OrderEdis->newEntity();
        $this->set('orderEdis',$orderEdis);
@@ -343,6 +364,16 @@ class OrderEdisController extends AppController
       session_start();//セッションの開始
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
  		}
 
  		public function hattyucsvlogin()
@@ -377,6 +408,16 @@ class OrderEdisController extends AppController
      $orderEdis = $this->OrderEdis->newEntity();
      $this->set('orderEdis',$orderEdis);
      $data = $this->request->getData();
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
+
     }
 
     public function dnpcsvlogin()
@@ -408,6 +449,14 @@ class OrderEdisController extends AppController
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexmenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       if ($this->request->is('post')) {
       $orderEdis = $this->OrderEdis->newEntity();
@@ -682,7 +731,6 @@ echo "</pre>";
                 }
 
               }
-
 
 //ここからDenpyouDnpMinoukannousへ登録用
 
@@ -1075,6 +1123,14 @@ echo "</pre>";
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
 
+      $session_names = "Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexmenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $syoyouKeikakus = $this->SyoyouKeikakus->newEntity();
       $this->set('syoyouKeikakus',$syoyouKeikakus);
 /*
@@ -1236,8 +1292,17 @@ echo "</pre>";
     {
       //$this->request->session()->destroy();// セッションの破棄
       session_start();//セッションの開始
-     $orderEdis = $this->OrderEdis->newEntity();
-     $this->set('orderEdis',$orderEdis);
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
     }
 
     public function keikakucsvlogin()
@@ -1267,7 +1332,14 @@ echo "</pre>";
 
     public function henkoutop()//登録呼出変更のトップ
     {
-      //$this->request->session()->destroy();// セッションの破棄
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
     }
 
     public function henkousentakucustomer()//登録呼出変更のpana,dnp,others選択画面
@@ -1506,6 +1578,16 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkoupanalogin()
@@ -1537,6 +1619,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data['orderEdis']);//配列（更新するカラム）の個数
@@ -1592,6 +1683,16 @@ echo "</pre>";
       $this->set('orderEdis',$orderEdis);
       $session = $this->request->getSession();
       $data = $session->read();
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkoupanabunnnoulogin()
@@ -1623,6 +1724,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data);//配列（更新するカラム）の個数
@@ -1988,6 +2098,16 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkoudnplogin()
@@ -2019,6 +2139,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data['orderEdis']);//配列（更新するカラム）の個数
@@ -2080,6 +2209,16 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkoudnpbunnnoulogin()
@@ -2111,6 +2250,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data);//配列（更新するカラム）の個数
@@ -2726,6 +2874,16 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkouotherlogin()
@@ -2757,6 +2915,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data['orderEdis']);//配列（更新するカラム）の個数
@@ -2815,6 +2982,16 @@ echo "</pre>";
 
       $session = $this->request->getSession();
       $data = $session->read();
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkouotherbunnnoulogin()
@@ -2846,6 +3023,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data);//配列（更新するカラム）の個数
@@ -3201,6 +3387,15 @@ echo "</pre>";
         'date_deliver' => $kari_datenouki
       );
 
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function chokusetsupanalogin()
@@ -3236,6 +3431,14 @@ echo "</pre>";
       $_SESSION['ProductGaityu'] = array();
       $_SESSION['order_edi_kumitate'] = array();
       $_SESSION['ProductGaityu_kumitate'] = array();
+
+      $session_names = "order_edi,supplier_date_deliver,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexmenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
@@ -3581,6 +3784,16 @@ echo "</pre>";
         'num_order' => $data["num_order"],
         'delete_flag' => 0
       );
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function chokusetsudnplogin()
@@ -3618,6 +3831,14 @@ echo "</pre>";
       session_start();
       }
       $_SESSION['order_edi_kumitate'] = array();
+
+      $session_names = "order_edi,denpyouDnpMinoukannous,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexmenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
@@ -3863,6 +4084,16 @@ echo "</pre>";
       //$this->request->session()->destroy(); // セッションの破棄
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function denpyouhenkoukensaku()
@@ -4008,6 +4239,16 @@ echo "</pre>";
     {
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function denpyouhenkoulogin()
@@ -4043,6 +4284,14 @@ echo "</pre>";
 
 			$session = $this->request->getSession();
 			$data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+      $session_names = "orderToSuppliers,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'denpyouhattyu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
 			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 /*
@@ -4110,6 +4359,16 @@ echo "</pre>";
       //$this->request->session()->destroy(); // セッションの破棄
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function yobizaikologin()
@@ -4287,6 +4546,14 @@ echo "</pre>";
     {
       $OrderYobistockSuppliers = $this->OrderYobistockSuppliers->newEntity();
       $this->set('OrderYobistockSuppliers',$OrderYobistockSuppliers);
+
+      $session_names = "orderyobistock,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'denpyouhattyu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $session = $this->request->getSession();
 			$data = $session->read();//postデータ取得し、$dataと名前を付ける
@@ -4476,6 +4743,15 @@ echo "</pre>";
     {
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
     }
 
     public function yobidenpyouhenkoulogin()
@@ -4511,6 +4787,14 @@ echo "</pre>";
 
 			$session = $this->request->getSession();
 			$data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+      $session_names = "OrderYobistockSuppliers,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'denpyouhattyu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
 			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 /*

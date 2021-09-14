@@ -10,6 +10,8 @@ use Cake\Core\Configure;//トランザクション
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 use App\myClass\Productcheck\htmlProductcheck;
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 class DenpyousController extends AppController
 	{
 
@@ -311,10 +313,18 @@ class DenpyousController extends AppController
 
 			$session = $this->request->getSession();
 			$sessiondata = $session->read();
-
+/*
 			if(!isset($sessiondata['tourokusyoumouheader'])){
 				return $this->redirect(['action' => 'syoumoumenu',
         's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
+      }
+	*/
+			$session_names = "tourokusyoumouheader";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'syoumoumenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
       }
 
 			$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
@@ -991,11 +1001,19 @@ class DenpyousController extends AppController
 
 			$session = $this->request->getSession();
 			$sessiondata = $session->read();
-
+/*
 			if(!isset($sessiondata['tourokusyoumouheadersyuusei'])){
 				return $this->redirect(['action' => 'syoumoumenu',
 				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
 			}
+			*/
+			$session_names = "tourokusyoumouheadersyuusei";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'syoumoumenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
 			$data = $this->request->getData();
 
@@ -1363,11 +1381,19 @@ class DenpyousController extends AppController
 
 			$session = $this->request->getSession();
 			$sessiondata = $session->read();
-
+/*
 			if(!isset($sessiondata['Auth'])){
 				return $this->redirect(['action' => 'shiiremenu',
 				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
 			}
+*/
+			$session_names = "Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'shiiremenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
 			$date_order = $data['date_order'];
 			$this->set('date_order',$date_order);
@@ -1698,11 +1724,19 @@ class DenpyousController extends AppController
 
 			$session = $this->request->getSession();
 			$sessiondata = $session->read();
-
+/*
 			if(!isset($sessiondata['Auth'])){
 				return $this->redirect(['action' => 'shiiremenu',
 				's' => ['mess' => "セッションが切れました。この画面からやり直してください。"]]);
 			}
+*/
+			$session_names = "OrderSpecialShiireid,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'shiiremenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
 			$Users = $this->Users->newEntity();
 			$this->set('Users',$Users);

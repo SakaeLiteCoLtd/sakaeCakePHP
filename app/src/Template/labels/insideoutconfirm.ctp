@@ -27,8 +27,6 @@
          </table>
          <hr size="5" style="margin: 0.5rem">
 <br>
-<legend align="center"><strong style="font-size: 15pt; color:blue"><?= __('ラベル納品場所登録') ?></strong></legend>
-<br><br>
 
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC">

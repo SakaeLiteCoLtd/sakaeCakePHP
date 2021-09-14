@@ -9,6 +9,8 @@ use Cake\Core\Configure;//トランザクション
 
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 class OrderothersController extends AppController
 {
 
@@ -26,6 +28,16 @@ class OrderothersController extends AppController
     {
       $OrderSpecials = $this->OrderSpecials->newEntity();
       $this->set('OrderSpecials',$OrderSpecials);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function addpreadd()
@@ -164,6 +176,14 @@ class OrderothersController extends AppController
     {
       $OrderSpecials = $this->OrderSpecials->newEntity();
       $this->set('OrderSpecials',$OrderSpecials);
+
+      $session_names = "Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'menu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       if(!isset($_SESSION)){
       session_start();
@@ -514,6 +534,15 @@ class OrderothersController extends AppController
 
       $session = $this->request->getSession();
       $data = $session->read();
+
+      $session_names = "orderothersedit,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'menu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
 /*
       echo "<pre>";
       print_r($data);

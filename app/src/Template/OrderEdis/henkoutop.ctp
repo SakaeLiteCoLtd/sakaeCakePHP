@@ -25,4 +25,6 @@
                  <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/orderdeliver.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'Orderdelivers','action'=>'kensakuform')));?></td>
              </tr>
  </table>
- <br><br><br><br>
+ <br>
+  <div align="center"><font color="red" size="2"><?= __($mess) ?></font></div>
+  <br>

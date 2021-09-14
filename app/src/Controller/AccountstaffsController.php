@@ -19,6 +19,7 @@ class AccountstaffsController extends AppController
 			$this->Users = TableRegistry::get('users');
       $this->Staffs = TableRegistry::get('staffs');
       $this->StatusRoles = TableRegistry::get('statusRoles');
+      $this->Roles = TableRegistry::get('roles');
 
       $session = $this->request->getSession();
       $data = $session->read();
@@ -47,12 +48,6 @@ class AccountstaffsController extends AppController
 		}
 
     public function usermenu()
-		{
-		 $user = $this->Users->newEntity();
-		 $this->set('user',$user);
-		}
-
-    public function rolemenu()
 		{
 		 $user = $this->Users->newEntity();
 		 $this->set('user',$user);
@@ -681,20 +676,355 @@ class AccountstaffsController extends AppController
       for($j=0; $j<count($Users); $j++){
 
         $Staffs = $this->Staffs->find('all', ['conditions' => ['id' => $Users[$j]["staff_id"]]])->toArray();
-        $staff_code = $Staffs[0]['staff_code'];
-        $staff_name = $Staffs[0]['f_name'].$Staffs[0]['l_name'];
 
-          $arrUsers[] = [
-            "id" => $Users[$j]["id"],
-            "username" => $Users[$j]["username"],
-            "staff_code" => $staff_code,
-            "staff_name" => $staff_name
-          ];
+        if(isset($Staffs[0])){
+          $staff_code = $Staffs[0]['staff_code'];
+          $staff_name = $Staffs[0]['f_name'].$Staffs[0]['l_name'];
+
+            $arrUsers[] = [
+              "id" => $Users[$j]["id"],
+              "username" => $Users[$j]["username"],
+              "staff_code" => $staff_code,
+              "staff_name" => $staff_name
+            ];
+        }
 
       }
       $this->set('arrUsers',$arrUsers);
 
     }
 
+    public function usereditform()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $Id = $Data["Id"];
+       $this->set('Id',$Id);
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $data = $this->request->getData();
+       $data = array_keys($data, '編集');
+       $Id = $data[0];
+       $this->set('Id',$Id);
+       $mess = "";
+       $this->set('mess',$mess);
+     }
+
+     $Users = $this->Users->find()
+     ->where(['id' => $Id])->toArray();
+     $this->set('username',$Users[0]["username"]);
+
+     $Staffs = $this->Staffs->find('all', ['conditions' => ['id' => $Users[0]["staff_id"]]])->toArray();
+     $staff_name = $Staffs[0]['f_name'].$Staffs[0]['l_name'];
+     $this->set('staff_name',$staff_name);
+
+     header('Expires:-1');
+     header('Cache-Control:');
+     header('Pragma:');
+
+/*
+     echo "<pre>";
+     print_r($Staffs);
+     echo "</pre>";
+*/
+		}
+
+    public function usereditconfirm()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $data = $this->request->getData();
+     $this->set('Id',$data['Id']);
+     $this->set('staff_name',$data['staff_name']);
+
+     $Users = $this->Users->find()
+     ->where(['id' => $data['Id'], 'username IS NOT' => $data['username'], 'delete_flag' => 1])->toArray();
+
+     if(isset($Users[0])){
+
+       return $this->redirect(['action' => 'usereditform',
+       's' => ['mess' => "ユーザー名「".$data['username']."」は既に登録されています。", 'Id' => $data['Id']]]);
+
+     }
+
+     $username = $data['username'];
+     $this->set('username',$username);
+     $password = $data['password'];
+     $this->set('password',$password);
+
+     if($data["check"] > 0){
+
+       $mess = "以下のデータを削除します。よろしければ「決定」ボタンを押してください。";
+       $delete_flag = 1;
+
+     }else{
+
+       $mess = "以下のように更新します。よろしければ「決定」ボタンを押してください。";
+       $delete_flag = 0;
+
+     }
+     $this->set('mess', $mess);
+     $this->set('delete_flag', $delete_flag);
+
+		}
+
+    public function usereditdo()
+		{
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $data = $this->request->getData();
+     $this->set('staff_name',$data['staff_name']);
+
+     $username = $data['username'];
+     $this->set('username',$username);
+     $password = $data['password'];
+     $this->set('password',$password);
+
+     $Users = $this->Users->patchEntity($this->Users->newEntity(), $data);
+     $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+
+        if($data["delete_flag"] > 0){
+
+          if ($this->Users->updateAll(
+            ['delete_flag' => 0, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
+            ['id'  => $data["Id"]]
+          )){
+
+            $mes = "※削除されました";
+            $this->set('mes',$mes);
+            $connection->commit();// コミット5
+
+          } else {
+
+            $mes = "※削除されませんでした";
+            $this->set('mes',$mes);
+            $this->Flash->error(__('The product could not be saved. Please, try again.'));
+            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+          }
+
+        }else{
+
+          if ($this->Users->updateAll(
+            [
+              'username' => $data["username"],
+              'password' => $data["password"],
+              'updated_at' => date('Y-m-d H:i:s'),
+              'updated_staff' => $sessionData['login']['staff_id']],
+              ['id'  => $data["Id"]]
+          )){
+
+            $mes = "※更新されました";
+            $this->set('mes',$mes);
+            $connection->commit();// コミット5
+
+          } else {
+
+            $mes = "※更新されませんでした";
+            $this->set('mes',$mes);
+            $this->Flash->error(__('The product could not be saved. Please, try again.'));
+            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+          }
+
+        }
+
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+		}
+
+    public function rolemenu()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $arrUsers = array();
+     $Users = $this->Users->find()
+     ->where(['delete_flag' => 1])->order(['username' => 'ASC'])->toArray();
+
+     for($j=0; $j<count($Users); $j++){
+
+       $Staffs = $this->Staffs->find('all', ['conditions' => ['id' => $Users[$j]["staff_id"]]])->toArray();
+
+       if(isset($Staffs[0])){
+         $staff_code = $Staffs[0]['staff_code'];
+         $staff_name = $Staffs[0]['f_name'].$Staffs[0]['l_name'];
+
+         $Roles = $this->Roles->find('all', ['conditions' => ['id' => $Staffs[0]["role_id"]]])->toArray();
+
+           $arrUsers[] = [
+             "id" => $Users[$j]["id"],
+             "username" => $Users[$j]["username"],
+             "role_name" => $Roles[0]["name"],
+             "staff_name" => $staff_name
+           ];
+       }
+
+     }
+     $this->set('arrUsers',$arrUsers);
+
+		}
+
+    public function roleeditform()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $data = $this->request->getData();
+     $data = array_keys($data, '編集');
+     $Id = $data[0];
+     $this->set('Id',$Id);
+
+     $Users = $this->Users->find()
+     ->where(['id' => $Id])->toArray();
+     $this->set('username',$Users[0]["username"]);
+
+     $Staffs = $this->Staffs->find('all', ['conditions' => ['id' => $Users[0]["staff_id"]]])->toArray();
+     $staff_name = $Staffs[0]['f_name'].$Staffs[0]['l_name'];
+     $this->set('staff_name',$staff_name);
+
+     $arrRoles = $this->Roles->find('all', ['conditions' => ['delete_flag' => '0', 'id >' => 1]])->order(['id' => 'ASC']);
+     $arrRole = array();
+     foreach ($arrRoles as $value) {
+       $arrRole[] = array($value->id=>$value->name);
+     }
+     $this->set('arrRole',$arrRole);
+
+     header('Expires:-1');
+     header('Cache-Control:');
+     header('Pragma:');
+		}
+
+    public function roleeditconfirm()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $data = $this->request->getData();
+     $this->set('Id',$data['Id']);
+     $this->set('staff_name',$data['staff_name']);
+     $this->set('role_id',$data['role_id']);
+
+     $Roles = $this->Roles->find('all', ['conditions' => ['id' => $data["role_id"]]])->toArray();
+     $this->set('role_name',$Roles[0]['name']);
+
+     header('Expires:-1');
+     header('Cache-Control:');
+     header('Pragma:');
+		}
+
+    public function roleeditdo()
+		{
+		 $user = $this->Users->newEntity();
+		 $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $sessionData = $session->read();
+
+     $data = $this->request->getData();
+     $this->set('Id',$data['Id']);
+     $this->set('staff_name',$data['staff_name']);
+     $this->set('role_id',$data['role_id']);
+
+     $Roles = $this->Roles->find('all', ['conditions' => ['id' => $data["role_id"]]])->toArray();
+     $this->set('role_name',$Roles[0]['name']);
+
+     $Rolestouroku = $this->Roles->find('all', ['conditions' => ['id >=' => $data["role_id"], 'id <' => 4]])->toArray();
+
+     $userId = $data['Id'];
+     $Users = $this->Users->find()
+     ->where(['id' => $userId])->toArray();
+
+     $staffId = $Users[0]["staff_id"];
+
+     $tourokuStatusRoles = array();
+     for ($k=0; $k<count($Rolestouroku); $k++){
+       $tourokuStatusRoles[] = [
+         "staff_id" => $staffId,
+         "role_id" => $Rolestouroku[$k]["id"],
+         "staff_name" => $data['staff_name'],
+         'status' => 0,
+         'delete_flag' => 0,
+         'created_at' => date('Y-m-d H:i:s'),
+         'created_staff' => $sessionData['login']['staff_id'],
+       ];
+     }
+/*
+     echo "<pre>";
+     print_r($tourokuStatusRoles);
+     echo "</pre>";
+*/
+     $Staffs = $this->Staffs->patchEntity($this->Staffs->newEntity(), $data);
+     $connection = ConnectionManager::get('default');//トランザクション1
+      // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+
+        if ($this->Staffs->updateAll(
+          ['role_id' => $data['role_id'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
+          ['id'  => $staffId]
+        )){
+
+          if ($this->Users->updateAll(
+            ['role_id' => $data['role_id'], 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
+            ['id'  => $userId]
+          )){
+
+            $this->StatusRoles->updateAll(
+              ['delete_flag' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessionData['login']['staff_id']],
+              ['staff_id'  => $staffId]
+            );
+
+            if(count($tourokuStatusRoles) > 0){
+              $StatusRoles = $this->StatusRoles->patchEntities($this->StatusRoles->newEntity(), $tourokuStatusRoles);
+              $this->StatusRoles->saveMany($StatusRoles);
+            }
+
+            $mes = "※更新されました";
+            $this->set('mes',$mes);
+            $connection->commit();// コミット5
+
+          } else {
+
+            $mes = "※更新されませんでした";
+            $this->set('mes',$mes);
+            $this->Flash->error(__('The product could not be saved. Please, try again.'));
+            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+          }
+
+        } else {
+
+          $mes = "※更新されませんでした";
+          $this->set('mes',$mes);
+          $this->Flash->error(__('The product could not be saved. Please, try again.'));
+          throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+
+        }
+
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+     header('Expires:-1');
+     header('Cache-Control:');
+     header('Pragma:');
+		}
 
 }

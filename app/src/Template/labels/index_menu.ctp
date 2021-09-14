@@ -10,3 +10,6 @@
  ?>
  </table>
  <hr size="5" style="margin: 0.5rem">
+ <br>
+  <div align="center"><font color="red" size="2"><?= __($mess) ?></font></div>
+  <br>

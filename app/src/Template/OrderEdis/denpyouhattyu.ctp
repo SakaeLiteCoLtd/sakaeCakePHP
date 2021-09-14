@@ -25,3 +25,6 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
             <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/yobizaiko.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'orderEdis','action'=>'yobizaikopreadd')));?></td>
               <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/yobizaikohenkou.gif',array('width'=>'85','height'=>'36','url'=>array('controller'=>'orderEdis','action'=>'yobidenpyouhenkoukensaku')));?></td>
         </table>
+        <br>
+         <div align="center"><font color="red" size="2"><?= __($mess) ?></font></div>
+         <br>

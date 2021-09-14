@@ -30,7 +30,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 </table>
 <hr size="5" style="margin: 0.5rem">
 
-    <?= $this->Form->create($user, ['url' => ['action' => 'useraddconfirm']]) ?>
+    <?= $this->Form->create($user, ['url' => ['action' => 'usereditconfirm']]) ?>
     <fieldset>
 
       <br>
@@ -39,10 +39,10 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 
       <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
         <tr>
-          <td width="280" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">社員</strong></td>
+          <td width="280" bgcolor="#FFFFCC" style="padding: 0.2rem"><strong style="font-size: 11pt; color:blue">社員</strong></td>
       	</tr>
         <tr>
-          <td width="280" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><?= $this->Form->input("staff_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrStaff, 'label'=>false, 'required'=>true]); ?></td>
+          <td width="280" bgcolor="#FFFFCC" style="font-size: 11pt;padding: 0.2rem"><?= h($staff_name) ?></td>
       	</tr>
       </table>
 <br>
@@ -51,7 +51,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
     <td width="280" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">ユーザー名</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('username', array('type'=>'text', 'label'=>false, 'autofocus'=>true, 'required'=>true)) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('username', array('type'=>'text', 'label'=>false, 'value'=>$username, 'required'=>true)) ?></td>
 	</tr>
 </table>
 <br>
@@ -64,6 +64,14 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 	</tr>
 </table>
 <br>
+<table align="center">
+<tbody>
+  <tr>
+    <td><?= $this->Form->control('check', array('type'=>'checkbox', 'label'=>false)) ?></td>
+    <td><div><strong style="font-size: 11pt; color:blue">データを削除する場合はチェックを入れてください。</strong></div></td>
+  </tr>
+</tbody>
+</table>
 
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
@@ -72,3 +80,5 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
     </tr>
   </table>
 <br>
+<?= $this->Form->control('staff_name', array('type'=>'hidden', 'value'=>$staff_name, 'label'=>false)) ?>
+<?= $this->Form->control('Id', array('type'=>'hidden', 'value'=>$Id, 'label'=>false)) ?>

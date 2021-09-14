@@ -25,7 +25,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 <table style="margin-bottom:0px" width="500" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
   <tr style="background-color: #E6FFFF">
     <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/chokusoushinki.gif',array('width'=>'105','url'=>array('action'=>'staffaddform')));?></td>
-    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/chokusouhensyuu.gif',array('width'=>'105','url'=>array('action'=>'staffeditkensaku')));?></td>
+    <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/yobidashiyellow.gif',array('width'=>'105','url'=>array('action'=>'staffeditkensaku')));?></td>
   </tr>
 </table>
 <hr size="5" style="margin: 0.5rem">
@@ -94,7 +94,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
       <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('登録', array('name' => 'kettei')); ?></div></td>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('決定', array('name' => 'kettei')); ?></div></td>
     </tr>
   </table>
 <br>

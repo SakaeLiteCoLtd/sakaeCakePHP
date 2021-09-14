@@ -56,11 +56,11 @@ class htmlEDItouroku extends AppController
         $arrProcode[] = $product_code;
 
       }
-
+/*
       echo "<pre>";
       print_r($_SESSION['KariOrderToSuppliers']);
       echo "</pre>";
-
+*/
       $arrProcode = array_unique($arrProcode);//品番の重複を削除
       $arrProcode = array_values($arrProcode);//添え字の振り直し
 /*
@@ -349,12 +349,12 @@ class htmlEDItouroku extends AppController
                      'id_order' => $arrAttachnum[$m],
                      'kari_order_to_supplier_id' => $arrKariIds[$m]
                    ];
-
+/*
                    echo "<pre>";
                    print_r("1Attach".$m." ".count($arrKariIds));
                    print_r($arrAttach);
                    echo "</pre>";
-
+*/
                  $AttachOrderToSuppliers = $this->AttachOrderToSuppliers->patchEntity($this->AttachOrderToSuppliers->newEntity(), $arrAttach[0]);
                    $this->AttachOrderToSuppliers->save($AttachOrderToSuppliers);
 
@@ -387,12 +387,12 @@ class htmlEDItouroku extends AppController
                      'id_order' => $arrAttachnum[0]."-".$m,
                      'kari_order_to_supplier_id' => $arrKariIds[$m]
                    ];
-
+/*
                    echo "<pre>";
                    print_r("2Attach".$m." ".count($arrKariIds));
                    print_r($arrAttach);
                    echo "</pre>";
-
+*/
                    $AttachOrderToSuppliers = $this->AttachOrderToSuppliers->patchEntity($this->AttachOrderToSuppliers->newEntity(), $arrAttach[0]);
                    $this->AttachOrderToSuppliers->save($AttachOrderToSuppliers);
 

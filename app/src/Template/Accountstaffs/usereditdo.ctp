@@ -30,28 +30,28 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
 </table>
 <hr size="5" style="margin: 0.5rem">
 
-    <?= $this->Form->create($user, ['url' => ['action' => 'useraddconfirm']]) ?>
-    <fieldset>
+<?= $this->Form->create($user, ['url' => ['action' => 'usermenu']]) ?>
+<fieldset>
 
-      <br>
-      <div align="center"><font color="red" size="3"><?= __($mess) ?></font></div>
-      <br>
+  <br>
+  <div align="center"><font color="black" size="3"><?= __($mes) ?></font></div>
+  <br>
 
-      <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
-        <tr>
-          <td width="280" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">社員</strong></td>
-      	</tr>
-        <tr>
-          <td width="280" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><?= $this->Form->input("staff_id", ["type"=>"select","empty"=>"選択してください", "options"=>$arrStaff, 'label'=>false, 'required'=>true]); ?></td>
-      	</tr>
-      </table>
+  <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
+    <tr>
+      <td width="280" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">社員</strong></td>
+    </tr>
+    <tr>
+      <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($staff_name) ?></td>
+    </tr>
+  </table>
 <br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0" style="border-bottom: solid;border-width: 1px">
   <tr>
     <td width="280" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">ユーザー名</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('username', array('type'=>'text', 'label'=>false, 'autofocus'=>true, 'required'=>true)) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h($username) ?></td>
 	</tr>
 </table>
 <br>
@@ -60,7 +60,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
     <td width="282" bgcolor="#FFFFCC" style="font-size: 8pt;padding: 0.2rem"><strong style="font-size: 11pt; color:blue">パスワード</strong></td>
 	</tr>
   <tr>
-    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= $this->Form->control('password', array('type'=>'password', 'label'=>false, 'required'=>true)) ?></td>
+    <td bgcolor="#FFFFCC" style="padding: 0.2rem"><?= h("----") ?></td>
 	</tr>
 </table>
 <br>
@@ -68,7 +68,7 @@ use App\myClass\Shinkimenus\htmlShinkimenu;//myClassフォルダに配置した�
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('次へ'), array('name' => 'kakunin')); ?></div></td>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('TOP'), array('name' => 'kakunin')); ?></div></td>
     </tr>
   </table>
 <br>

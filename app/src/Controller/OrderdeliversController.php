@@ -9,6 +9,8 @@ use Cake\Core\Configure;//トランザクション
 
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 class OrderdeliversController extends AppController
 {
 
@@ -49,6 +51,15 @@ class OrderdeliversController extends AppController
           $arrDays[$k] =$k;
         }
       $this->set('arrDays',$arrDays);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
 
     }
 
@@ -267,6 +278,14 @@ class OrderdeliversController extends AppController
     {
       $session = $this->request->getSession();
       $sessiondata = $session->read();
+
+      $session_names = "place_deliver_data,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'kensakuform',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
 			$OrderEdis = $this->OrderEdis->newEntity();
       $this->set('OrderEdis',$OrderEdis);

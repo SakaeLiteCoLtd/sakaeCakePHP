@@ -24,7 +24,7 @@ class ZzzcsvtorikomisController extends AppController
 
        $this->request->session()->destroy();//セッションの破棄
        echo "<pre>";
-			 print_r("セッション削除");
+			 print_r("セッション削除 ".date('Y-m-d H:i:s'));
 			 echo "</pre>";
 /*
        $PriceMaterials = $this->PriceMaterials->find()

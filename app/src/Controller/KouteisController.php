@@ -12,6 +12,8 @@ use Cake\Filesystem\File;
 use App\myClass\KensahyouSokuteidata\htmlKensahyouSokuteidata;//myClassフォルダに配置したクラスを使用
 use App\myClass\Logins\htmlLogin;
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 class KouteisController extends AppController {
 
       public function initialize()
@@ -33,6 +35,7 @@ class KouteisController extends AppController {
     public function index()
     {
       //メニュー画面
+
     }
 
     public function yobidashimenu()//「出荷検査用呼出」ページトップ
@@ -1339,6 +1342,14 @@ class KouteisController extends AppController {
       $session = $this->request->getSession();
       $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
 
+      $session_names = "kikakudata,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexhome',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $data = $sessiondata['kikakudata'];
 
       $Product = $this->Products->find()->where(['product_code' => $sessiondata['kikakudata'][1]['product_code']])->toArray();
@@ -1432,6 +1443,14 @@ class KouteisController extends AppController {
     {
       $session = $this->request->getSession();
       $data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+      $session_names = "imdatanew,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexhome',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $updated_staff = array('updated_staff'=>$data['Auth']['User']['staff_id']);
       $data["imdatanew"][0] = array_merge($data["imdatanew"][0],$updated_staff);
@@ -1581,6 +1600,16 @@ class KouteisController extends AppController {
 
       $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->newEntity();
       $this->set('KouteiKensahyouHeads', $KouteiKensahyouHeads);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
 /*
@@ -2590,6 +2619,14 @@ class KouteisController extends AppController {
        $session = $this->request->getSession();
        $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
 
+       $session_names = "sokuteidata,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+       $htmlSessioncheck = new htmlSessioncheck();
+       $arr_session_flag = $htmlSessioncheck->check($session_names);
+       if($arr_session_flag["num"] > 1){//セッション切れの場合
+         return $this->redirect(['action' => 'indexhome',
+         's' => ['mess' => $arr_session_flag["mess"]]]);
+       }
+
        $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
        $_SESSION['sokuteidata'] = array_merge($created_staff,$_SESSION['sokuteidata']);
 
@@ -2956,6 +2993,14 @@ class KouteisController extends AppController {
     $session = $this->request->getSession();
     $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
 
+    $session_names = "sokuteidata,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+    $htmlSessioncheck = new htmlSessioncheck();
+    $arr_session_flag = $htmlSessioncheck->check($session_names);
+    if($arr_session_flag["num"] > 1){//セッション切れの場合
+      return $this->redirect(['action' => 'indexhome',
+      's' => ['mess' => $arr_session_flag["mess"]]]);
+    }
+
     $created_staff = array('updated_staff'=>$this->Auth->user('staff_id'));
     $_SESSION['sokuteidata'] = array_merge($created_staff,$_SESSION['sokuteidata']);
 
@@ -3231,6 +3276,14 @@ class KouteisController extends AppController {
      {
        $session = $this->request->getSession();
        $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
+
+       $session_names = "kikakudata,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+       $htmlSessioncheck = new htmlSessioncheck();
+       $arr_session_flag = $htmlSessioncheck->check($session_names);
+       if($arr_session_flag["num"] > 1){//セッション切れの場合
+         return $this->redirect(['action' => 'indexhome',
+         's' => ['mess' => $arr_session_flag["mess"]]]);
+       }
 
        $data = $sessiondata['kikakudata'];
 

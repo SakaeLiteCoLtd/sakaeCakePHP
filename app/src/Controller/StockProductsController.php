@@ -10,6 +10,8 @@ use Cake\Core\Configure;//トランザクション
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 use App\myClass\Productcheck\htmlProductcheck;
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 class StockProductsController extends AppController
 	{
 
@@ -27,6 +29,16 @@ class StockProductsController extends AppController
 		{
 			$StockProducts = $this->StockProducts->newEntity();
 			$this->set('StockProducts',$StockProducts);
+
+			$Data=$this->request->query('s');
+			if(isset($Data["mess"])){
+				$mess = $Data["mess"];
+				$this->set('mess',$mess);
+			}else{
+				$mess = "";
+				$this->set('mess',$mess);
+			}
+
 		}
 
 		public function yobidashipana()
@@ -447,10 +459,21 @@ class StockProductsController extends AppController
 			 $StockProducts = $this->StockProducts->newEntity();
 			 $this->set('StockProducts',$StockProducts);
 
-			 session_start();
+			 $session_names = "tourokustock,tourokustockupdate,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+       $htmlSessioncheck = new htmlSessioncheck();
+       $arr_session_flag = $htmlSessioncheck->check($session_names);
+       if($arr_session_flag["num"] > 1){//セッション切れの場合
+         return $this->redirect(['action' => 'yobidashicustomer',
+         's' => ['mess' => $arr_session_flag["mess"]]]);
+       }
+
 			 $session = $this->request->getSession();
 			 $_SESSION = $session->read();//postデータ取得し、$dataと名前を付ける
-
+/*
+			 echo "<pre>";
+	     print_r($_SESSION);
+	     echo "</pre>";
+*/
 			 for ($k=0; $k<count($_SESSION['tourokustock']); $k++) {
 
  				$_SESSION['tourokustock'][$k]['created_staff'] = $_SESSION['Auth']['User']['staff_id'];//created_staffを$staff_idにする

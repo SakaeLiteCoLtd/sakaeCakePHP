@@ -12,3 +12,6 @@
  <hr size="5" style="margin: 0.5rem">
 
 <?= $this->Form->create($KouteiKensahyouHeads, ['url' => ['action' => 'torikomi']]) ?>
+<br>
+ <div align="center"><font color="red" size="2"><?= __($mess) ?></font></div>
+ <br>

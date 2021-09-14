@@ -37,3 +37,5 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             </tr>
 </table>
 <br>
+ <div align="center"><font color="red" size="2"><?= __($mess) ?></font></div>
+ <br>

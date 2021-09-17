@@ -136,15 +136,15 @@ class OrderEdisController extends AppController
     //       }
         }
 
+        $mes = "";
         for($n=0; $n<count($arrFp); $n++){
           if(isset($arrFp[$n])){//$arrFp[$n]が存在する時、対応するcustomer_code等を配列に追加する
             $Product = $this->Products->find()->where(['product_code' => $arrFp[$n]['product_code']])->toArray();
             if(isset($Product[0])){
+              $mes = $mes."";
               $customer_id = $Product[0]->customer_id;
             }else{
-              echo "<pre>";
-              print_r($arrFp[$n]['product_code']."が登録されていません");
-              echo "</pre>";
+              $mes = $mes."製品「".$arrFp[$n]['product_code']."」が登録されていません。新規登録メニューから製品登録してもう一度csvを取込んでください。";
             }
 
             $ProductChokusous = $this->ProductChokusous->find()->where(['product_code' => $arrFp[$n]['product_code'], 'status'=>0])->toArray();
@@ -153,10 +153,15 @@ class OrderEdisController extends AppController
               $arrFp[$n] = array_merge($arrFp[$n],array('place_deliver_code'=>$tyokusou_line_code));
             }
 
-    				$customer_id = $Product[0]->customer_id;
-            $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
-    				$customer_code = $Customer[0]->customer_code;
+            if(isset($Product[0])){
+              $customer_id = $Product[0]->customer_id;
+              $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+              $customer_code = $Customer[0]->customer_code;
+            }else{
+              $customer_code = "";
+            }
             $arrFp[$n] = array_merge($arrFp[$n],array('customer_code'=>$customer_code));
+
 /*
             list($youso1,$place_line,$youso3)=explode("/", $arrFp[$n]['place_line']);
             if(!empty($place_line)){
@@ -186,24 +191,19 @@ class OrderEdisController extends AppController
 
           if(isset($OrderEdi[0])){
             unset($arrFp[$k]);
+          }elseif(strlen($arrFp[$k]['customer_code']) < 1){
+            unset($arrFp[$k]);
           }
 
         }
 
         if(count($arrFp) == 0){
-          echo "<pre>";
-          print_r("同じcsvを読み込んでいないか確認してください");
-          echo "</pre>";
+          $mes = $mes."新規データがありません。同じcsvを読み込んでいないか確認してください";
         }
 
         $arrFp = array_values($arrFp);//添え字の振り直し
         $arrFpold = $arrFp;//添え字の振り直し
-/*
-        echo "<pre>";
-        print_r("登録内容表示");
-        print_r($arrFp);
-        echo "</pre>";
-*/
+
            $orderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrFp);//patchEntitiesで一括登録
            $connection = ConnectionManager::get('default');//トランザクション1
            // トランザクション開始2
@@ -267,7 +267,7 @@ class OrderEdisController extends AppController
                    $arrFp = $_SESSION['order_edi_kumitate'];
 
                    //insert into order_ediする（旧DB）
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $table = TableRegistry::get('order_edi');
                    $table->setConnection($connection);
 
@@ -309,12 +309,16 @@ class OrderEdisController extends AppController
 
                }
 
+               if(strlen($mes) > 0){
+                 $mes = $mes."　※その他のデータは登録されました";
+               }else{
                  $mes = "※登録されました";
+               }
                  $this->set('mes',$mes);
                  $connection->commit();// コミット5
 
                  //insert into order_ediする（旧DB）
-                 $connection = ConnectionManager::get('sakaeMotoDB');
+                 $connection = ConnectionManager::get('DB_ikou_test');
                  $table = TableRegistry::get('order_edi');
                  $table->setConnection($connection);
 
@@ -342,9 +346,13 @@ class OrderEdisController extends AppController
                    ]);
                  }
 
-
                } else {
-                 $mes = "※登録されませんでした";
+
+                 if(strlen($mes) > 0){
+                   $mes = $mes."　※データが登録されませんでした";
+                 }else{
+                   $mes = "※登録されませんでした";
+                 }
                  $this->set('mes',$mes);
                  $this->Flash->error(__('The data could not be saved. Please, try again.'));
                  throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
@@ -458,6 +466,8 @@ class OrderEdisController extends AppController
         's' => ['mess' => $arr_session_flag["mess"]]]);
       }
 
+      $mes = "";
+
       if ($this->request->is('post')) {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
@@ -506,23 +516,39 @@ class OrderEdisController extends AppController
 
         for($n=0; $n<=10000; $n++){
           if(isset($arrEDImotodenpyoudnp[$n])){//$arrEDImotodenpyoudnp[$n]が存在する時、対応するcustomer_code等を配列に追加する
+
             $Product = $this->Products->find()->where(['product_code' => $arrEDImotodenpyoudnp[$n]['product_code']])->toArray();
-    				$customer_id = $Product[0]->customer_id;
-            $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
-    				$customer_code = $Customer[0]->customer_code;
+            if(isset($Product[0])){
+              $mes = $mes."";
+              $customer_id = $Product[0]->customer_id;
+            }else{
+              $mes = $mes."製品「".$arrEDImotodenpyoudnp[$n]['product_code']."」が登録されていません。新規登録メニューから製品登録してもう一度csvを取込んでください。";
+            }
+            if(isset($Product[0])){
+              $customer_id = $Product[0]->customer_id;
+              $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+              $customer_code = $Customer[0]->customer_code;
+            }else{
+              $customer_code = "";
+            }
 
             $arrEDImotodenpyoudnp[$n] = array_merge($arrEDImotodenpyoudnp[$n],array('customer_code'=>$customer_code));
           }else{
             break;
           }
         }
+        $arrEDImotodenpyoudnpnum = count($arrEDImotodenpyoudnp);
+        for($k=0; $k<$arrEDImotodenpyoudnpnum; $k++){//組み立て品登録
+
+          if(strlen($arrEDImotodenpyoudnp[$k]['customer_code']) < 1){
+            unset($arrEDImotodenpyoudnp[$k]);
+          }
+
+        }
+        $arrEDImotodenpyoudnp = array_values($arrEDImotodenpyoudnp);//添え字の振り直し
+
 //ここまでmotoDBへ登録用
-/*
-echo "<pre>";
-print_r("arrEDImotodenpyoudnp");
-print_r($arrEDImotodenpyoudnp);
-echo "</pre>";
-*/
+
   //    for($count = 0; fgets( $fpcount ); $count++ );//motoDBへ登録用を消したら必要
       $arrEDI = array();//空の配列を作る
       $arrDenpyouDnpMinoukannous = array();//空の配列を作る
@@ -557,10 +583,21 @@ echo "</pre>";
 
         for($n=0; $n<=10000; $n++){
           if(isset($arrEDI[$n])){//$arrEDI[$n]が存在する時、対応するcustomer_code等を配列に追加する
+
             $Product = $this->Products->find()->where(['product_code' => $arrEDI[$n]['product_code']])->toArray();
-    				$customer_id = $Product[0]->customer_id;
-            $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
-    				$customer_code = $Customer[0]->customer_code;
+            if(isset($Product[0])){
+              $mes = $mes."";
+              $customer_id = $Product[0]->customer_id;
+            }else{
+              $mes = $mes."製品「".$arrEDI[$n]['product_code']."」が登録されていません。新規登録メニューから製品登録してもう一度csvを取込んでください。";
+            }
+            if(isset($Product[0])){
+              $customer_id = $Product[0]->customer_id;
+              $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+              $customer_code = $Customer[0]->customer_code;
+            }else{
+              $customer_code = "";
+            }
 
             if(mb_substr($arrEDI[$n]["place_deliver"], 0, 1) === "弊"){
               $place_deliver = str_replace("弊社","",$arrEDI[$n]["place_deliver"]);
@@ -592,14 +629,14 @@ echo "</pre>";
 
           if(isset($OrderEdi[0])){
             unset($arrEDI[$k]);
+          }elseif(strlen($arrEDI[$k]['customer_code']) < 1){
+            unset($arrEDI[$k]);
           }
 
         }
 
         if(count($arrEDI) == 0){
-          echo "<pre>";
-          print_r("同じcsvを読み込んでいないか確認してください");
-          echo "</pre>";
+          $mes = $mes."新規データがありません。同じcsvを読み込んでいないか確認してください";
         }
 
         $arrEDI = array_values($arrEDI);//添え字の振り直し
@@ -608,7 +645,7 @@ echo "</pre>";
       print_r("arrEDI");
       print_r($arrEDI);
       echo "</pre>";
-  */
+*/
   //    $_SESSION['order_edi_kumitate'] = array();//空の配列を作る
 
       $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrEDI);//patchEntitiesで一括登録
@@ -681,7 +718,7 @@ echo "</pre>";
                   $arrFp = $_SESSION['order_edi_kumitate'];
 
                   //insert into order_ediする（旧DB）
-                  $connection = ConnectionManager::get('sakaeMotoDB');
+                  $connection = ConnectionManager::get('DB_ikou_test');
                   $table = TableRegistry::get('order_edi');
                   $table->setConnection($connection);
 
@@ -690,7 +727,7 @@ echo "</pre>";
                     $sql = "SELECT bunnou FROM order_edi".//
                           " where date_order ='".$arrFp[$m]["date_order"]."' and num_order = '".$arrFp[$m]["num_order"]."'
                            and product_id = '".$arrFp[$m]["product_code"]."' order by bunnou desc limit 1";//
-                    $connection = ConnectionManager::get('sakaeMotoDB');//
+                    $connection = ConnectionManager::get('DB_ikou_test');//
                     $bunnoumoto = $connection->execute($sql)->fetchAll('assoc');//
       //
                     if(isset($bunnoumoto[0]["bunnou"])){//
@@ -735,7 +772,7 @@ echo "</pre>";
 //ここからDenpyouDnpMinoukannousへ登録用
 
             //insert into order_ediする（旧DB）
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('order_edi');
             $table->setConnection($connection);
 
@@ -744,7 +781,7 @@ echo "</pre>";
               $sql = "SELECT bunnou FROM order_edi".//
                     " where date_order ='".$arrEDI[$k]["date_order"]."' and num_order = '".$arrEDI[$k]["num_order"]."'
                      and product_id = '".$arrEDI[$k]["product_code"]."' order by bunnou desc limit 1";//
-              $connection = ConnectionManager::get('sakaeMotoDB');//
+              $connection = ConnectionManager::get('DB_ikou_test');//
               $bunnoumoto = $connection->execute($sql)->fetchAll('assoc');//
 //
               if(isset($bunnoumoto[0]["bunnou"])){//
@@ -772,7 +809,7 @@ echo "</pre>";
               ]);
             }
 
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('denpyou_dnp');
             $table->setConnection($connection);
 
@@ -783,11 +820,10 @@ echo "</pre>";
                 $place_deliver = $arrEDImotodenpyoudnp[$k]["place_deliver"];
               }
 
-
               $sql = "SELECT num_order FROM denpyou_dnp".//
                     " where num_order ='".$arrEDImotodenpyoudnp[$k]["num_order"]."' and product_id = '".$arrEDImotodenpyoudnp[$k]["product_code"]."'
                      and tourokubi = '".$arrEDImotodenpyoudnp[$k]["date_order"]."'";//
-              $connection = ConnectionManager::get('sakaeMotoDB');//
+              $connection = ConnectionManager::get('DB_ikou_test');//
               $denpyou_dnpcheck = $connection->execute($sql)->fetchAll('assoc');//
 
               if(isset($denpyou_dnpcheck[0]["num_order"])){//
@@ -833,34 +869,62 @@ echo "</pre>";
 
             for($n=0; $n<=10000; $n++){
               if(isset($arrDenpyouDnpMinoukannous[$n])){
-                $OrderEdi = $this->OrderEdis->find()->where(['num_order' => $arrDenpyouDnpMinoukannous[$n]['num_order'], 'line_code' => $arrDenpyouDnpMinoukannous[$n]['code'],
-                 'product_code' => $arrDenpyouDnpMinoukannous[$n]['product_code'], 'date_order' => $arrDenpyouDnpMinoukannous[$n]['tourokubi'], 'date_deliver' => $arrDenpyouDnpMinoukannous[$n]['date_deliver']])->toArray();
-        				$OrderEdi_id = $OrderEdi[0]->id;
 
-                unset($arrDenpyouDnpMinoukannous[$n]['num_order']);
-                unset($arrDenpyouDnpMinoukannous[$n]['code']);
-                unset($arrDenpyouDnpMinoukannous[$n]['date_deliver']);
-                unset($arrDenpyouDnpMinoukannous[$n]['product_code']);
-                unset($arrDenpyouDnpMinoukannous[$n]['tourokubi']);
+                $Product = $this->Products->find()->where(['product_code' => $arrDenpyouDnpMinoukannous[$n]['product_code']])->toArray();
+                if(isset($Product[0])){
+                  $OrderEdi = $this->OrderEdis->find()->where(['num_order' => $arrDenpyouDnpMinoukannous[$n]['num_order'], 'line_code' => $arrDenpyouDnpMinoukannous[$n]['code'],
+                   'product_code' => $arrDenpyouDnpMinoukannous[$n]['product_code'], 'date_order' => $arrDenpyouDnpMinoukannous[$n]['tourokubi'], 'date_deliver' => $arrDenpyouDnpMinoukannous[$n]['date_deliver']])->toArray();
+                   if(isset($OrderEdi[0])){
+                     $OrderEdi_id = $OrderEdi[0]->id;
 
-                $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('order_edi_id'=>$OrderEdi_id));
-                $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('conf_print'=>0));
-                $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('minoukannou'=>1));
-                $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('delete_flag'=>0));
-                $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('created_staff'=>$created_staff));
+                     unset($arrDenpyouDnpMinoukannous[$n]['num_order']);
+                     unset($arrDenpyouDnpMinoukannous[$n]['code']);
+                     unset($arrDenpyouDnpMinoukannous[$n]['date_deliver']);
+                     unset($arrDenpyouDnpMinoukannous[$n]['product_code']);
+                     unset($arrDenpyouDnpMinoukannous[$n]['tourokubi']);
+
+                     $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('order_edi_id'=>$OrderEdi_id));
+                     $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('conf_print'=>0));
+                     $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('minoukannou'=>1));
+                     $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('delete_flag'=>0));
+                     $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('created_staff'=>$created_staff));
+                   }
+                }else{
+                  unset($arrDenpyouDnpMinoukannous[$n]);
+                }
+
               }else{
                 break;
               }
             }
+            $arrDenpyouDnpMinoukannous = array_values($arrDenpyouDnpMinoukannous);//添え字の振り直し
 /*
             echo "<pre>";
-            print_r("arrDenpyouDnpMinoukannous");
+            print_r("DenpyouDnpMinoukannous1");
+            print_r($arrDenpyouDnpMinoukannous);
+            echo "</pre>";
+*/
+            $arrDenpyouDnpMinoukannousnum = count($arrDenpyouDnpMinoukannous);
+            for($k=0; $k<$arrDenpyouDnpMinoukannousnum; $k++){
+
+              $DenpyouDnpMinoukannouscheck = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDenpyouDnpMinoukannous[$k]['order_edi_id'],
+              'name_order' => $arrDenpyouDnpMinoukannous[$k]['name_order'], 'delete_flag' => $arrDenpyouDnpMinoukannous[$k]['delete_flag']])->toArray();
+
+              if(isset($DenpyouDnpMinoukannouscheck[0])){
+                unset($arrDenpyouDnpMinoukannous[$k]);
+              }
+
+            }
+
+            $arrDenpyouDnpMinoukannous = array_values($arrDenpyouDnpMinoukannous);//添え字の振り直し
+/*
+            echo "<pre>";
+            print_r("DenpyouDnpMinoukannous2");
             print_r($arrDenpyouDnpMinoukannous);
             echo "</pre>";
 */
             $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($denpyouDnpMinoukannous, $arrDenpyouDnpMinoukannous);//patchEntitiesで一括登録
             if ($this->DenpyouDnpMinoukannous->saveMany($denpyouDnpMinoukannous)) {//saveManyで一括登録//ここからDnpTotalAmountsへ登録用
-
 //旧DB
               for($k=0; $k<count($arrDenpyouDnpMinoukannous); $k++){
               $connection = ConnectionManager::get('default');
@@ -876,7 +940,7 @@ echo "</pre>";
               $mikanbunnou = $OrderEdi[0]['bunnou'];//
               $mikanminoukannou = 0;
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_dnp_kannous');
               $table->setConnection($connection);
 
@@ -915,44 +979,51 @@ echo "</pre>";
 
                  if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき
                    $OrderEdi = $this->OrderEdis->find()->where(['line_code' => $sample['line_code'], 'num_order' => $sample['num_order'], 'product_code' => $sample['product_code'], 'date_order' => $sample['date_order']])->toArray();//同一の注文
-                   $total_amount = $OrderEdi[0]['amount'];
-                   $date_deliver = $OrderEdi[0]['date_deliver'];
-                   ${"arrDnpdouitutyuumon".($k-2)} = array();//空の配列を作る
 
-                     for($n=0; $n<=10000; $n++){
-                       if(isset($OrderEdi[$n])){//同一注文について（一つの場合と複数の場合がある）
-                         if(isset($OrderEdi[$n+1])){//同じ注番のものが既に分納され、複数存在する時・・・amountを合計し、DenpyouDnpMinoukannousのminoukannouを更新する（date_deliverが小さい方を０に）
-                           $total_amount = $total_amount + $OrderEdi[$n+1]['amount'];//amountを合計
-                           $orderedi_id = $OrderEdi[$n]['id'];
-                           $date_deliver = $OrderEdi[$n]['date_deliver'];
-                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['id'] = $orderedi_id;//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
-                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['date_deliver'] = $date_deliver->format('Y-m-d');//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
-                         }else{//同一注文が単一の時
-                           $orderedi_id = $OrderEdi[$n]['id'];
-                           $date_deliver = $OrderEdi[$n]['date_deliver'];
-                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['id'] = $orderedi_id;//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
-                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['date_deliver'] = $date_deliver->format('Y-m-d');//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
+                   if(isset($OrderEdi[0])){
+
+                     $total_amount = $OrderEdi[0]['amount'];
+                     $date_deliver = $OrderEdi[0]['date_deliver'];
+                     ${"arrDnpdouitutyuumon".($k-2)} = array();//空の配列を作る
+
+                       for($n=0; $n<=10000; $n++){
+                         if(isset($OrderEdi[$n])){//同一注文について（一つの場合と複数の場合がある）
+                           if(isset($OrderEdi[$n+1])){//同じ注番のものが既に分納され、複数存在する時・・・amountを合計し、DenpyouDnpMinoukannousのminoukannouを更新する（date_deliverが小さい方を０に）
+                             $total_amount = $total_amount + $OrderEdi[$n+1]['amount'];//amountを合計
+                             $orderedi_id = $OrderEdi[$n]['id'];
+                             $date_deliver = $OrderEdi[$n]['date_deliver'];
+                             ${"arrDnpdouitutyuumon".($k-2)}[$n]['id'] = $orderedi_id;//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
+                             ${"arrDnpdouitutyuumon".($k-2)}[$n]['date_deliver'] = $date_deliver->format('Y-m-d');//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
+                           }else{//同一注文が単一の時
+                             $orderedi_id = $OrderEdi[$n]['id'];
+                             $date_deliver = $OrderEdi[$n]['date_deliver'];
+                             ${"arrDnpdouitutyuumon".($k-2)}[$n]['id'] = $orderedi_id;//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
+                             ${"arrDnpdouitutyuumon".($k-2)}[$n]['date_deliver'] = $date_deliver->format('Y-m-d');//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
+                           }
+                         }else{
+                           break;
                          }
-                       }else{
-                         break;
                        }
-                     }
 
-                      foreach (${"arrDnpdouitutyuumon".($k-2)} as $key => $value) {//同一注文をdate_deliver順に並べ直す
-                          $sort[$key] = $value['date_deliver'];
-                      }
-                      array_multisort( array_map( "strtotime", array_column( ${"arrDnpdouitutyuumon".($k-2)}, "date_deliver" ) ), SORT_ASC, ${"arrDnpdouitutyuumon".($k-2)} ) ;//並び替え
+                        foreach (${"arrDnpdouitutyuumon".($k-2)} as $key => $value) {//同一注文をdate_deliver順に並べ直す
+                            $sort[$key] = $value['date_deliver'];
+                        }
+                        array_multisort( array_map( "strtotime", array_column( ${"arrDnpdouitutyuumon".($k-2)}, "date_deliver" ) ), SORT_ASC, ${"arrDnpdouitutyuumon".($k-2)} ) ;//並び替え
 
-                     $arrDnpdouitutyuumon[] = ${"arrDnpdouitutyuumon".($k-2)};
-                     //以下、DnpTotalAmounts登録用
-                     $arrDnpTotalAmounts[$k-2]['num_order'] = $sample['num_order'];//配列に追加する
-                     $arrDnpTotalAmounts[$k-2]['name_order'] = $sample['name_order'];
-                     $arrDnpTotalAmounts[$k-2]['line_code'] = $sample['line_code'];
-                     $arrDnpTotalAmounts[$k-2]['product_code'] = $sample['product_code'];
-                     $arrDnpTotalAmounts[$k-2]['date_order'] = $sample['date_order'];
-                     $arrDnpTotalAmounts[$k-2]['amount'] = $total_amount;
-                     $arrDnpTotalAmounts[$k-2]['date_deliver'] = $date_deliver->format('Y-m-d');
+                       $arrDnpdouitutyuumon[] = ${"arrDnpdouitutyuumon".($k-2)};
+                       //以下、DnpTotalAmounts登録用
+                       $arrDnpTotalAmounts[$k-2]['num_order'] = $sample['num_order'];//配列に追加する
+                       $arrDnpTotalAmounts[$k-2]['name_order'] = $sample['name_order'];
+                       $arrDnpTotalAmounts[$k-2]['line_code'] = $sample['line_code'];
+                       $arrDnpTotalAmounts[$k-2]['product_code'] = $sample['product_code'];
+                       $arrDnpTotalAmounts[$k-2]['date_order'] = $sample['date_order'];
+                       $arrDnpTotalAmounts[$k-2]['amount'] = $total_amount;
+                       $arrDnpTotalAmounts[$k-2]['date_deliver'] = $date_deliver->format('Y-m-d');
+
+                   }
+
                  }
+
               }
 
               $uniquearrDnpdouitutyuumon = array_unique($arrDnpdouitutyuumon, SORT_REGULAR);//重複削除
@@ -986,7 +1057,7 @@ echo "</pre>";
                       $mikanamount = $OrderEdi[0]['amount'];
                       $mikanminoukannou = 0;
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_dnp_kannous');
                       $table->setConnection($connection);
 
@@ -1011,7 +1082,7 @@ echo "</pre>";
                       $mikandate_deliver = $OrderEdi[0]['date_deliver'];
                       $mikanamount = $OrderEdi[0]['amount'];
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_edi');
                       $table->setConnection($connection);
 
@@ -1036,14 +1107,14 @@ echo "</pre>";
                       $mikanamount = $OrderEdi[0]['amount'];
                       $m1 = $m + 1;
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_edi');
                       $table->setConnection($connection);
 
                       $updater = "UPDATE order_edi set bunnou = '".$m1."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$mikandate_deliver."'";//もとのDBも更新
                       $connection->execute($updater);
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_dnp_kannous');
                       $table->setConnection($connection);
 
@@ -1063,6 +1134,7 @@ echo "</pre>";
               }
 
               //以下、DnpTotalAmountsにもどる
+              $arrDnpTotalAmounts = array_values($arrDnpTotalAmounts);
               for($n=0; $n<=10000; $n++){
                 if(isset($arrDnpTotalAmounts[$n])){
                   $arrDnpTotalAmounts[$n] = array_merge($arrDnpTotalAmounts[$n],array('delete_flag'=>0));
@@ -1072,21 +1144,61 @@ echo "</pre>";
                 }
               }
               $uniquearrDnpTotalAmounts = array_unique($arrDnpTotalAmounts, SORT_REGULAR);//重複削除
+/*
+              echo "<pre>";
+              print_r("dnpTotalAmounts0");
+              print_r($uniquearrDnpTotalAmounts);
+              echo "</pre>";
+*/
+              $uniquearrDnpTotalAmountsnum = count($uniquearrDnpTotalAmounts);
+              for($k=0; $k<$uniquearrDnpTotalAmountsnum; $k++){
 
+                $DnpTotalAmountscheck = $this->DnpTotalAmounts->find()->where([
+                'product_code' => $uniquearrDnpTotalAmounts[$k]['product_code'],
+                'num_order' => $uniquearrDnpTotalAmounts[$k]['num_order'],
+                'name_order' => $uniquearrDnpTotalAmounts[$k]['name_order'],
+                'delete_flag' => $uniquearrDnpTotalAmounts[$k]['delete_flag']])->toArray();
+
+                if(isset($DnpTotalAmountscheck[0])){
+                  unset($uniquearrDnpTotalAmounts[$k]);
+                }
+
+              }
+
+              $uniquearrDnpTotalAmounts = array_values($uniquearrDnpTotalAmounts);//添え字の振り直し
+/*
+              echo "<pre>";
+              print_r("dnpTotalAmounts0");
+              print_r($uniquearrDnpTotalAmounts);
+              echo "</pre>";
+*/
                $dnpTotalAmounts = $this->DnpTotalAmounts->patchEntities($dnpTotalAmounts, $uniquearrDnpTotalAmounts);//patchEntitiesで一括登録
                    if ($this->DnpTotalAmounts->saveMany($dnpTotalAmounts)) {//saveManyで一括登録
-                     $mes = "※登録されました";
+
+                     if(strlen($mes) > 0){
+                       $mes = $mes."　※登録されました";
+                     }else{
+                       $mes = "※登録されました";
+                     }
                      $this->set('mes',$mes);
 
                    } else {
-                     $mes = "※登録されませんでした";
+                     if(strlen($mes) > 0){
+                       $mes = $mes."　※データが登録されませんでした";
+                     }else{
+                       $mes = "※登録されませんでした";
+                     }
                      $this->set('mes',$mes);
                      file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
                      $this->Flash->error(__('The dnpTotalAmounts could not be saved. Please, try again.'));
                      throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
                    }
               } else {
-                $mes = "※登録されませんでした";
+                if(strlen($mes) > 0){
+                  $mes = $mes."　※データが登録されませんでした";
+                }else{
+                  $mes = "※登録されませんでした";
+                }
                 $this->set('mes',$mes);
                 file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
                 $this->Flash->error(__('This denpyouDnpMinoukannous could not be saved. Please, try again.'));
@@ -1097,9 +1209,17 @@ echo "</pre>";
         } else {
 
           if(count($arrEDI) == 0){
-            $mes = "※登録される新規データはありません。登録済みのcsvを読み込んでいないか確認してください";
+            if(strlen($mes) > 0){
+              $mes = $mes."※登録される新規データはありません。登録済みのcsvを読み込んでいないか確認してください";
+            }else{
+              $mes = "※登録される新規データはありません。登録済みのcsvを読み込んでいないか確認してください";
+            }
           }else{
-            $mes = "※登録されませんでした。ファイル内の製品名や金額等のデータにカンマが含まれていないか確認してください。";
+            if(strlen($mes) > 0){
+              $mes = $mes."※登録されませんでした。ファイル内の製品名や金額等のデータにカンマが含まれていないか確認してください。";
+            }else{
+              $mes = "※登録されませんでした。ファイル内の製品名や金額等のデータにカンマが含まれていないか確認してください。";
+            }
           }
           $this->set('mes',$mes);
 
@@ -1241,7 +1361,7 @@ echo "</pre>";
              ['product_code' => $arrSyoyouKeikaku[$k]['product_code']]
              );
 
-             $connection = ConnectionManager::get('sakaeMotoDB');
+             $connection = ConnectionManager::get('DB_ikou_test');
              $table = TableRegistry::get('syoyou_keikaku');
              $table->setConnection($connection);
 
@@ -1260,7 +1380,7 @@ echo "</pre>";
                $connection->commit();// コミット5
 
                //insert into label_csvする（旧DB）
-               $connection = ConnectionManager::get('sakaeMotoDB');
+               $connection = ConnectionManager::get('DB_ikou_test');
                $table = TableRegistry::get('syoyou_keikaku');
                $table->setConnection($connection);
 
@@ -1649,7 +1769,7 @@ echo "</pre>";
           $mikanline_code = $OrderEdi[0]['line_code'];
           //$mikandate_deliver = $OrderEdi[0]['date_deliver'];
 
-          $connection = ConnectionManager::get('sakaeMotoDB');
+          $connection = ConnectionManager::get('DB_ikou_test');
           $table = TableRegistry::get('order_edi');
           $table->setConnection($connection);
 
@@ -1779,7 +1899,7 @@ echo "</pre>";
               $mikanproduct_code = $OrderEdi[0]['product_code'];
               $mikanline_code = $OrderEdi[0]['line_code'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -1811,7 +1931,7 @@ echo "</pre>";
               $mikanproduct_code = $OrderEdi[0]['product_code'];
               $mikanline_code = $OrderEdi[0]['line_code'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -1846,7 +1966,7 @@ echo "</pre>";
               $arrFp = $arrOrderEdisnew;
 
               //旧DB更新
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -2169,7 +2289,7 @@ echo "</pre>";
             $mikanline_code = $OrderEdi[0]['line_code'];
             //$mikandate_deliver = $OrderEdi[0]['date_deliver'];
 
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('order_edi');
             $table->setConnection($connection);
 
@@ -2308,7 +2428,7 @@ echo "</pre>";
               $mikanline_code = $OrderEdi[0]['line_code'];
               $mikandate_deliver = $OrderEdi[0]['date_deliver'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -2349,7 +2469,7 @@ echo "</pre>";
               $mikandate_deliver = $OrderEdi[0]['date_deliver'];
               $mikanamount = $OrderEdi[0]['amount'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -2375,7 +2495,7 @@ echo "</pre>";
               $mikanamount = $OrderEdi[0]['amount'];
               $mikanminoukannou = 0;
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_dnp_kannous');
               $table->setConnection($connection);
 
@@ -2411,7 +2531,7 @@ echo "</pre>";
               $arrFp = $arrOrderEdisnew;
 
               //旧DB更新
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -2466,7 +2586,7 @@ echo "</pre>";
                   $mikanamount = $OrderEdi[0]['amount'];
                   $mikanminoukannou = 0;
 
-                  $connection = ConnectionManager::get('sakaeMotoDB');
+                  $connection = ConnectionManager::get('DB_ikou_test');
                   $table = TableRegistry::get('order_dnp_kannous');
                   $table->setConnection($connection);
 
@@ -2530,7 +2650,7 @@ echo "</pre>";
                       $mikanamount = $OrderEdi[0]['amount'];
                       $mikanminoukannou = 0;
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_dnp_kannous');
                       $table->setConnection($connection);
 
@@ -2558,7 +2678,7 @@ echo "</pre>";
                       $mikanamount = $OrderEdi[0]['amount'];
                       $mikanminoukannou = 0;
 
-                      $connection = ConnectionManager::get('sakaeMotoDB');
+                      $connection = ConnectionManager::get('DB_ikou_test');
                       $table = TableRegistry::get('order_dnp_kannous');
                       $table->setConnection($connection);
 
@@ -2635,7 +2755,7 @@ echo "</pre>";
                 $mikanamount = $OrderEdi[0]['amount'];
                 $mikanminoukannou = 0;
 
-                $connection = ConnectionManager::get('sakaeMotoDB');
+                $connection = ConnectionManager::get('DB_ikou_test');
                 $table = TableRegistry::get('order_dnp_kannous');
                 $table->setConnection($connection);
 
@@ -2662,7 +2782,7 @@ echo "</pre>";
                 $mikanamount = $OrderEdi[0]['amount'];
                 $mikanminoukannou = 0;
 
-                $connection = ConnectionManager::get('sakaeMotoDB');
+                $connection = ConnectionManager::get('DB_ikou_test');
                 $table = TableRegistry::get('order_dnp_kannous');
                 $table->setConnection($connection);
 
@@ -2946,7 +3066,7 @@ echo "</pre>";
             $mikanline_code = $OrderEdi[0]['line_code'];
             //$mikandate_deliver = $OrderEdi[0]['date_deliver'];
 
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('order_edi');
             $table->setConnection($connection);
 
@@ -3075,7 +3195,7 @@ echo "</pre>";
               $mikanproduct_code = $OrderEdi[0]['product_code'];
               $mikanline_code = $OrderEdi[0]['line_code'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -3108,7 +3228,7 @@ echo "</pre>";
               $mikanproduct_code = $OrderEdi[0]['product_code'];
               $mikanline_code = $OrderEdi[0]['line_code'];
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -3143,7 +3263,7 @@ echo "</pre>";
               $arrFp = $arrOrderEdisnew;
 
               //旧DB更新
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
@@ -3532,7 +3652,7 @@ echo "</pre>";
           echo "</pre>";
 */
           //旧DB登録
-          $connection = ConnectionManager::get('sakaeMotoDB');
+          $connection = ConnectionManager::get('DB_ikou_test');
           $table = TableRegistry::get('order_edi');
           $table->setConnection($connection);
 
@@ -3580,7 +3700,7 @@ echo "</pre>";
                 for($n=0; $n<count($_SESSION['order_edi_kumitate']); $n++){
 
                 //旧DB登録
-                $connection = ConnectionManager::get('sakaeMotoDB');
+                $connection = ConnectionManager::get('DB_ikou_test');
                 $table = TableRegistry::get('order_edi');
                 $table->setConnection($connection);
 
@@ -3891,7 +4011,7 @@ echo "</pre>";
           echo "</pre>";
   */
           //旧DB登録
-          $connection = ConnectionManager::get('sakaeMotoDB');
+          $connection = ConnectionManager::get('DB_ikou_test');
           $table = TableRegistry::get('order_edi');
           $table->setConnection($connection);
 
@@ -3913,7 +4033,7 @@ echo "</pre>";
                 'created_at' => date("Y-m-d H:i:s")
             ]);
 
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('order_dnp_kannous');
             $table->setConnection($connection);
 
@@ -3929,7 +4049,7 @@ echo "</pre>";
                   'created_at' => date("Y-m-d H:i:s")
               ]);
 
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('denpyou_dnp');
               $table->setConnection($connection);
 
@@ -4009,7 +4129,7 @@ echo "</pre>";
                 for($n=0; $n<count($_SESSION['order_edi_kumitate']); $n++){
 
                 //旧DB登録
-                $connection = ConnectionManager::get('sakaeMotoDB');
+                $connection = ConnectionManager::get('DB_ikou_test');
                 $table = TableRegistry::get('order_edi');
                 $table->setConnection($connection);
 
@@ -4317,7 +4437,7 @@ echo "</pre>";
                  $product_code = $OrderToSuppliers[0]->product_code;
 
                  //旧DBに単価登録
-                 $connection = ConnectionManager::get('sakaeMotoDB');
+                 $connection = ConnectionManager::get('DB_ikou_test');
                  $table = TableRegistry::get('order_to_supplier');
                  $table->setConnection($connection);
 
@@ -4566,7 +4686,7 @@ echo "</pre>";
             if ($this->OrderYobistockSuppliers->saveMany($OrderYobistockSuppliers)) {//saveManyで一括登録
 
               //旧DBに単価登録
-              $connection = ConnectionManager::get('sakaeMotoDB');
+              $connection = ConnectionManager::get('DB_ikou_test');
               $table = TableRegistry::get('order_yobistock_suppliers');
               $table->setConnection($connection);
 
@@ -4820,7 +4940,7 @@ echo "</pre>";
                  $product_code = $OrderToSuppliers[0]->product_code;
 
                  //旧DBに単価登録
-                 $connection = ConnectionManager::get('sakaeMotoDB');
+                 $connection = ConnectionManager::get('DB_ikou_test');
                  $table = TableRegistry::get('order_yobistock_suppliers');
                  $table->setConnection($connection);
 

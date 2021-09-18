@@ -28,11 +28,18 @@ class htmlEDImenu extends AppController
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/henkoutop'>\n".
                   "<img src='/img/Labelimg/edi_sub_henkou.gif' width=115 height=40>\n".
                   "</a>\n".
+                  "<td style='padding: 0.1rem 0.1rem;'>\n".
+
+                  "<a href='http://192.168.4.1/edi/top_prim.php'><img src='/img/Labelimg/edi_sub_syuyou.gif' width='115' height='40' alt='menu_kensaku' border='0' />\n".
+                  "</a><td style='padding: 0.1rem 0.1rem;'>\n".
+                  "<a href='http://192.168.4.1/edi/top_productions.php'><img src='/img/Labelimg/edi_sub_productions.gif' width='115' height='40' alt='menu_kensaku' border='0' />\n".
+                  /*
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/index'>\n".
                   "<img src='/img/Labelimg/edi_sub_syuyou.gif' width=115 height=40>\n".
                   "</a>\n".
                   "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/index0'>\n".
                   "<img src='/img/Labelimg/edi_sub_productions.gif' width=115 height=40>\n".
+*/
                   "</a>\n";
 
     		return $html;
@@ -55,8 +62,14 @@ class htmlEDImenu extends AppController
                  "<td style='padding: 0.1rem 0.1rem;'><a href='/OrderEdis/chokusetsuformpro'>\n".
                  "<img src='/img/Labelimg/touroku_tyokusetsu.gif' width=85 height=36>\n".
                  "</a></td>\n".
-                 "<td style='padding: 0.1rem 0.1rem;'><a href='/Orderothers/menu'>\n".
-                 "<img src='/img/Labelimg/another_ryousan.gif' width=85 height=36>\n".
+                 "<td style='padding: 0.1rem 0.1rem;'>\n".
+
+                 "<a href='http://192.168.4.1/edi/form_order_another_ryousan.php'><img src='/img/Labelimg/another_ryousan.gif' width='85' height='36' alt='menu_kensaku' border='0' />\n".
+
+//量産品以外（新）
+//                 "</a><td style='padding: 0.1rem 0.1rem;'><a href='/Orderothers/menu'>\n".
+//                 "<img src='/img/Labelimg/another_ryousan.gif' width=85 height=36>\n".
+
                  "</a>\n";
 
        return $html;

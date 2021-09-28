@@ -228,7 +228,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labellayouts']をinsert into label_type_productする
-           $connection = ConnectionManager::get('sakaeMotoDB');
+           $connection = ConnectionManager::get('DB_ikou_test');
            $table = TableRegistry::get('label_type_product');
            $table->setConnection($connection);
 
@@ -361,7 +361,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelplaces']をinsert into label_element_placeする
-           $connection = ConnectionManager::get('sakaeMotoDB');
+           $connection = ConnectionManager::get('DB_ikou_test');
            $table = TableRegistry::get('label_element_place');
            $table->setConnection($connection);
 
@@ -499,7 +499,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_nashiする
-           $connection = ConnectionManager::get('sakaeMotoDB');
+           $connection = ConnectionManager::get('DB_ikou_test');
            $table = TableRegistry::get('label_nashi');
            $table->setConnection($connection);
 
@@ -648,7 +648,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_setikkatsuする
-           $connection = ConnectionManager::get('sakaeMotoDB');
+           $connection = ConnectionManager::get('DB_ikou_test');
            $table = TableRegistry::get('label_setikkatsu');
            $table->setConnection($connection);
 
@@ -789,7 +789,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_setikkatsuする
-           $connection = ConnectionManager::get('sakaeMotoDB');
+           $connection = ConnectionManager::get('DB_ikou_test');
            $table = TableRegistry::get('label_insideout');
            $table->setConnection($connection);
 
@@ -913,7 +913,7 @@ class LabelsController extends AppController
            $connection->commit();// コミット5
 
            //$_SESSION['labelnashis']をinsert into label_element_unitする
-           $connection = ConnectionManager::get('sakaeMotoDB');
+           $connection = ConnectionManager::get('DB_ikou_test');
            $table = TableRegistry::get('label_element_unit');
            $table->setConnection($connection);
 
@@ -1451,7 +1451,7 @@ class LabelsController extends AppController
                    $connection->commit();// コミット5
 
                    //insert into label_csvする
-                   $connection = ConnectionManager::get('sakaeMotoDB');
+                   $connection = ConnectionManager::get('DB_ikou_test');
                    $table = TableRegistry::get('label_csv');
                    $table->setConnection($connection);
 
@@ -1539,12 +1539,12 @@ class LabelsController extends AppController
      }
 
      $i = 1;
-     if($i == 1){//sakaeMotoDBを使う
+     if($i == 1){//DB_ikou_testを使う
        /*
-       $connection = ConnectionManager::get('sakaeMotoDB');
+       $connection = ConnectionManager::get('DB_ikou_test');
        $table = TableRegistry::get('scheduleKoutei');
        $table->setConnection($connection);
-       $connection = ConnectionManager::get('sakaeMotoDB');
+       $connection = ConnectionManager::get('DB_ikou_test');
 */
 //       $ScheduleKoutei = $this->ScheduleKoutei->find()->where(['datetime >=' => $dateYMDs, 'datetime <=' => $dateYMDf, 'present_kensahyou' => 0])->toArray();
 //※findに対応していないため、SQL文で持ってくる
@@ -1555,7 +1555,7 @@ class LabelsController extends AppController
 /*
           $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM schedule_koutei".
                 " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
-          $connection = ConnectionManager::get('sakaeMotoDB');
+          $connection = ConnectionManager::get('DB_ikou_test');
           $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
 
           echo "<pre>";
@@ -2174,7 +2174,7 @@ class LabelsController extends AppController
                   $connection->commit();// コミット5
 
                   //insert into label_csvする
-                  $connection = ConnectionManager::get('sakaeMotoDB');
+                  $connection = ConnectionManager::get('DB_ikou_test');
                   $table = TableRegistry::get('label_csv');
                   $table->setConnection($connection);
 
@@ -2739,7 +2739,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5
 
                      //insert into label_csvする
-                     $connection = ConnectionManager::get('sakaeMotoDB');
+                     $connection = ConnectionManager::get('DB_ikou_test');
                      $table = TableRegistry::get('label_csv');
                      $table->setConnection($connection);
 
@@ -3227,7 +3227,7 @@ class LabelsController extends AppController
                $this->set('mes',$mes);
 
                //$arrLotをinsert into check_lotsする
-               $connection = ConnectionManager::get('sakaeMotoDB');
+               $connection = ConnectionManager::get('DB_ikou_test');
                $table = TableRegistry::get('check_lots');
                $table->setConnection($connection);
 
@@ -3506,7 +3506,7 @@ class LabelsController extends AppController
              $mes = "不使用ロットが登録されました";
              $this->set('mes',$mes);
 
-             $connection = ConnectionManager::get('sakaeMotoDB');
+             $connection = ConnectionManager::get('DB_ikou_test');
              $table = TableRegistry::get('check_lots');
              $table->setConnection($connection);
 
@@ -3523,13 +3523,13 @@ class LabelsController extends AppController
        }else{//新DBにデータがない場合旧DBのみ更新
 
          for($i=0; $i<$maisuu; $i++){
-           $connection = ConnectionManager::get('sakaeMotoDB');
+           $connection = ConnectionManager::get('DB_ikou_test');
            $table = TableRegistry::get('check_lots');
            $table->setConnection($connection);
 
            $sql = "SELECT datetime_hakkou,lot_num,product_id,amount,flag_used,flag_deliver FROM check_lots".
                  " where product_id ='".$data["product_code"]."' and lot_num = '".$data["lot_num_".$i]."'";
-           $connection = ConnectionManager::get('sakaeMotoDB');
+           $connection = ConnectionManager::get('DB_ikou_test');
            $checkLot = $connection->execute($sql)->fetchAll('assoc');
 /*
            echo "<pre>";
@@ -3617,13 +3617,13 @@ class LabelsController extends AppController
        $date_fin = strtotime($date_fin);
        $date_fin = date('Y-m-d', strtotime('+1 day', $date_fin));
 /*
-       $connection = ConnectionManager::get('sakaeMotoDB');
+       $connection = ConnectionManager::get('DB_ikou_test');
        $table = TableRegistry::get('check_lots');
        $table->setConnection($connection);
 
        $sql = "SELECT datetime,seikeiki,product_id,present_kensahyou,product_name FROM check_lots".
              " where datetime >= '".$dateYMDs."' and datetime <= '".$dateYMDf."' and seikeiki = ".$j." order by datetime asc";
-       $connection = ConnectionManager::get('sakaeMotoDB');
+       $connection = ConnectionManager::get('DB_ikou_test');
        $scheduleKoutei = $connection->execute($sql)->fetchAll('assoc');
 */
 
@@ -3984,7 +3984,7 @@ class LabelsController extends AppController
                  $connection->commit();// コミット5
 
                  //insert into label_csvする
-                 $connection = ConnectionManager::get('sakaeMotoDB');
+                 $connection = ConnectionManager::get('DB_ikou_test');
                  $table = TableRegistry::get('label_csv');
                  $table->setConnection($connection);
 /*
@@ -4431,7 +4431,7 @@ class LabelsController extends AppController
             $connection->commit();// コミット5
 
             //insert into order_ediする
-            $connection = ConnectionManager::get('sakaeMotoDB');
+            $connection = ConnectionManager::get('DB_ikou_test');
             $table = TableRegistry::get('moto_lots');
             $table->setConnection($connection);
 
@@ -4577,7 +4577,7 @@ class LabelsController extends AppController
              }
            }
 
-           ${"arrOrderdouitu".$m} = $this->OrderEdis->find()->where(['date_deliver' => ${"date".$i}, 'product_code' => ${"arrPro_c".$i}[$m], 'delete_flag' => '0'])->toArray();
+           ${"arrOrderdouitu".$m} = $this->OrderEdis->find()->where(['date_deliver' => ${"date".$i}, 'product_code' => ${"arrPro_c".$i}[$m], 'delete_flag' => '0', 'place_deliver_code IS NOT' => '00000'])->toArray();
 
            if(isset(${"arrOrderdouitu".$m}[0])){
              for($n=0; $n<count(${"arrOrderdouitu".$m}); $n++){
@@ -4601,7 +4601,7 @@ class LabelsController extends AppController
                      $connection->commit();// コミット5ここに持ってくる//これを旧DBの登録の後に持ってきたら新DBに登録されない（トランザクションが途中で途切れる？）
 
                      //insert 旧update
-                     $connection = ConnectionManager::get('sakaeMotoDB');
+                     $connection = ConnectionManager::get('DB_ikou_test');
                      $table = TableRegistry::get('order_edi');
                      $table->setConnection($connection);
 
@@ -4635,7 +4635,11 @@ class LabelsController extends AppController
            }else{
 
              for($p=0; $p<count(${"arrOrderdouitu".$m}); $p++){
-
+/*
+               echo "<pre>";
+               print_r(${"arrPro_c".$i}[$m]." check_lots=".$amount_c." order_edi=".$amount_o." ".${"arrOrderdouitu".$m}[$p]->place_deliver_code);
+               echo "</pre>";
+*/
                 if(${"arrOrderdouitu".$m}[$p]->place_deliver_code !== "00000"){
 
                   $arrPlaceDelivers = $this->PlaceDelivers->find()->where(['id_from_order' => ${"arrOrderdouitu".$m}[$p]->place_deliver_code])->toArray();

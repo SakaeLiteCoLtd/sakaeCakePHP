@@ -430,7 +430,7 @@ class DenpyousController extends AppController
 					if ($this->OrderSyoumouShiireHeaders->save($OrderSyoumouShiireHeaders)) {
 
 						//旧DBに登録
-						$connection = ConnectionManager::get('sakaeMotoDB');
+						$connection = ConnectionManager::get('DB_ikou_test');
 						$table = TableRegistry::get('order_syoumou_shiire_header');
 						$table->setConnection($connection);
 
@@ -470,14 +470,14 @@ class DenpyousController extends AppController
 								$this->OrderSyoumouShiireFooders->save($OrderSyoumouShiireFooders);
 
 								//旧DBに登録
-								$connection = ConnectionManager::get('sakaeMotoDB');
+								$connection = ConnectionManager::get('DB_ikou_test');
 								$table = TableRegistry::get('order_syoumou_shiire_header');
 								$table->setConnection($connection);
 
 								$sql = "SELECT id FROM order_syoumou_shiire_header".
 				              " where date_order ='".$sessiondata["tourokusyoumouheader"]["date_order"]."' and num_order = '".$sessiondata["tourokusyoumouheader"]["num_order"].
 											"' and kannou = '".$sessiondata["tourokusyoumouheader"]["kannou"]."' order by id desc";
-				        $connection = ConnectionManager::get('sakaeMotoDB');
+				        $connection = ConnectionManager::get('DB_ikou_test');
 				        $order_syoumou_shiire_header = $connection->execute($sql)->fetchAll('assoc');
 								$order_syoumou_shiire_header_id = $order_syoumou_shiire_header[0]['id'];
 
@@ -1127,7 +1127,7 @@ class DenpyousController extends AppController
 					 )){
 
 						 //旧DBに単価登録
-						 $connection = ConnectionManager::get('sakaeMotoDB');
+						 $connection = ConnectionManager::get('DB_ikou_test');
 						 $table = TableRegistry::get('order_syoumou_shiire_header');
 						 $table->setConnection($connection);
 
@@ -1179,7 +1179,7 @@ class DenpyousController extends AppController
                );
 
 							 //旧DBに登録
-							 $connection = ConnectionManager::get('sakaeMotoDB');
+							 $connection = ConnectionManager::get('DB_ikou_test');
 							 $table = TableRegistry::get('order_syoumou_shiire_fooder');
 							 $table->setConnection($connection);
 
@@ -1454,7 +1454,7 @@ class DenpyousController extends AppController
 					if ($this->OrderSpecialShiires->save($OrderSpecialShiires)) {
 
             //旧DBに製品登録
-						$connection = ConnectionManager::get('sakaeMotoDB');
+						$connection = ConnectionManager::get('DB_ikou_test');
 						$table = TableRegistry::get('order_special_shiire');
 						$table->setConnection($connection);
 
@@ -1760,7 +1760,11 @@ class DenpyousController extends AppController
 			}
 
 			$data = $this->request->getData();
-
+			/*
+			echo "<pre>";
+			print_r($data);
+			echo "</pre>";
+*/
 			$date_order = $sessiondata["tourokushiiresyuusei"]['date_order'];
 			$this->set('date_order',$date_order);
 
@@ -1781,8 +1785,12 @@ class DenpyousController extends AppController
 			$this->set('date_deliver',$date_deliver);
 			$delete_flag = $sessiondata["tourokushiiresyuusei"]['delete_flag'];
 			$this->set('delete_flag',$delete_flag);
-			$kannou = $sessiondata["tourokushiiresyuusei"]['kannou'];
-			if($kannou == 1){
+			if(isset($data["check"])){
+				$kannou_flag = $data["check"];
+			}else{
+				$kannou_flag = $sessiondata["tourokushiiresyuusei"]['kannou'];
+			}
+			if($kannou_flag == 1){
 				$kannou = "完納";
 			}else{
 				$kannou = "未納";
@@ -1803,28 +1811,28 @@ class DenpyousController extends AppController
 						 ['date_order' => $sessiondata['tourokushiiresyuusei']['date_order'], 'num_order' => $sessiondata['tourokushiiresyuusei']['num_order'],
 							'order_name' => $sessiondata['tourokushiiresyuusei']['order_name'], 'price' => $sessiondata['tourokushiiresyuusei']['price'],
 							'amount' => $sessiondata['tourokushiiresyuusei']['amount'], 'date_deliver' => $sessiondata['tourokushiiresyuusei']['date_deliver'],
-							'product_supplier_id' => $sessiondata['tourokushiiresyuusei']['product_supplier_id'], 'kannou' => $sessiondata['tourokushiiresyuusei']['kannou'],
+							'product_supplier_id' => $sessiondata['tourokushiiresyuusei']['product_supplier_id'], 'kannou' => $kannou_flag,
 							'delete_flag' => $sessiondata['tourokushiiresyuusei']['delete_flag'],
 							'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $sessiondata['tourokushiiresyuusei']['created_staff']],
 						 ['id'  => $sessiondata['OrderSpecialShiireid']['id']]
 					 )){
 
 						 //旧DBに単価登録
-						 $connection = ConnectionManager::get('sakaeMotoDB');
+						 $connection = ConnectionManager::get('DB_ikou_test');
 						 $table = TableRegistry::get('order_special_shiire');
 						 $table->setConnection($connection);
 
 						 $sql = "SELECT id,order_name,date_order,num_order,ps_id
 						 FROM order_special_shiire".
 						 " where order_name = '".$moto_order_name."' and date_order = '".$moto_date_order."' and num_order = '".$moto_num_order."' and ps_id = '".$moto_product_supplier_id."'";
-						 $connection = ConnectionManager::get('sakaeMotoDB');
+						 $connection = ConnectionManager::get('DB_ikou_test');
 						 $order_special_shiire_id = $connection->execute($sql)->fetchAll('assoc');
 						 $moto_id = $order_special_shiire_id[0]["id"];
 
 						 $updater = "UPDATE order_special_shiire set date_order ='".$sessiondata['tourokushiiresyuusei']['date_order']."' , num_order ='".$sessiondata['tourokushiiresyuusei']['num_order']."' ,
 						 order_name ='".$sessiondata['tourokushiiresyuusei']['order_name']."', price ='".$sessiondata['tourokushiiresyuusei']['price']."',
 						 amount ='".$sessiondata['tourokushiiresyuusei']['amount']."', date_deliver ='".$sessiondata['tourokushiiresyuusei']['date_deliver']."',
-						 ps_id ='".$sessiondata['tourokushiiresyuusei']['product_supplier_id']."', kannou ='".$sessiondata['tourokushiiresyuusei']['kannou']."',
+						 ps_id ='".$sessiondata['tourokushiiresyuusei']['product_supplier_id']."', kannou ='".$kannou_flag."',
 						 delete_flag ='".$sessiondata['tourokushiiresyuusei']['delete_flag']."', update_emp_id ='".$sessiondata['tourokushiiresyuusei']['created_staff']."' ,updated_at ='".date('Y-m-d H:i:s')."'
 						 where id ='".$moto_id."'";
 						 $connection->execute($updater);

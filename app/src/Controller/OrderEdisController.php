@@ -1292,54 +1292,36 @@ class OrderEdisController extends AppController
          unset($sample['35'],$sample['36'],$sample['37'],$sample['38'],$sample['39'],$sample['40'],$sample['41']);//最後の改行も削除
 
          if($k>=2 && !empty($sample['product_code'])){
+
              $arrSyoyouKeikaku[] = $sample;//配列に追加する
-  //           $this->SyoyouKeikakus->deleteAll(['product_code' => $sample['product_code']]);//格納した品番の所要計画データは一旦削除
 /*
-             if(substr($sample['product_code'],0,1) == "P"){
-               $countP = $countP + 1;
-             }elseif(substr($sample['product_code'],0,1) == "w"){
-               $countW = $countW + 1;
-             }elseif(substr($sample['product_code'],0,1) == "R"){
-               $countR = $countR + 1;
-             }else{
-               $countP = $countP;
-               $countW = $countW;
-               $countR = $countR;
+//ここから211006追加
+             $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $sample['product_code'], 'flag' => 0])->toArray();
+
+             if(count($AssembleProduct) > 0){
+
+               for($n=0; $n<count($AssembleProduct); $n++){
+
+                 $child_pid = $AssembleProduct[$n]->child_pid;
+
+                 $arrSyoyouKeikaku[] = [
+                   'date_keikaku' => $sample["date_keikaku"],
+                   'product_code' => $child_pid,
+                   'date_deliver' => $sample["date_deliver"],
+                   'amount' => $sample["amount"] * $AssembleProduct[$n]->inzu,
+                   'num_keikaku' => $sample["num_keikaku"]."_Assemble",
+                   'created_staff' => $sample["created_staff"],
+                   'created_at' => $sample["created_at"],
+                 ];
+
+               }
+
              }
+//ここまで
 */
           }
-      }
-/*
-      if($countP >= 10){//この場合、customer_id=1（customer_code=10001）パナソニック(株)HA社キッチンアプライアンス（事）草津工場の製品をSyoyouKeikakusテーブルから削除
-        $Products_P = $this->Products->find()->where(['customer_id' => '1']);
-        foreach ($Products_P as $value) {
-          $product_code= $value->product_code;
-          $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
-        }
-      }
 
-      if($countW >= 5){//customer_id=2（customer_code=10002）パナソニック(株)HA社ランドリークリーナー（事）静岡工場の製品をSyoyouKeikakusテーブルから削除
-        $Products_W = $this->Products->find()->where(['customer_id' => '2']);
-        foreach ($Products_W as $value) {
-          $product_code= $value->product_code;
-          $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
-        }
       }
-
-      if($countR >= 5){//customer_id=3（customer_code=10003）パナソニック(株)HA社キッチンアプライアンス（事）加東工場の製品をSyoyouKeikakusテーブルから削除
-        $Products_R = $this->Products->find()->where(['customer_id' => '3']);
-        foreach ($Products_R as $value) {
-          $product_code= $value->product_code;
-          $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
-        }
-      }
-*/
-
-//      echo "<pre>";
-//      print_r($arrSyoyouKeikaku);
-//      echo "</pre>";
-
-//         rename($source_file,$source_file."test");
 
          $syoyouKeikakus = $this->SyoyouKeikakus->patchEntities($syoyouKeikakus, $arrSyoyouKeikaku);//patchEntitiesで一括登録
          $connection = ConnectionManager::get('default');//トランザクション1
@@ -1351,10 +1333,6 @@ class OrderEdisController extends AppController
            for($k=0; $k<count($arrSyoyouKeikaku); $k++){
 
              $SyoyouKeikaku= $this->SyoyouKeikakus->find()->where(['product_code' => $arrSyoyouKeikaku[$k]['product_code']])->toArray();
-
-        //     if(isset($SyoyouKeikaku[0])){
-        //       $this->SyoyouKeikakus->deleteAll(['product_code' => $arrSyoyouKeikaku[$k]['product_code']]);
-        //     }
 
              $this->SyoyouKeikakus->updateAll(
              ['delete_flag' => 1, 'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],
@@ -1406,6 +1384,7 @@ class OrderEdisController extends AppController
          }//トランザクション10
 //       }
      }
+     
     }
 
     public function keikakucsvpreadd()

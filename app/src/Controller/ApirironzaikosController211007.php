@@ -602,23 +602,30 @@ echo "</pre>";
 			 array_multisort($product_code, array_map("strtotime", $datetime_finish), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
 		 }
 */
-		//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-		for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
+		$countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);//210729in
 
-			for($m=$l+1; $m<count($arrResultZensuHeadsmoto); $m++){
+	 //同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
+	 for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
 
-				if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
+//			for($m=$l+1; $m<count($arrResultZensuHeadsmoto); $m++){
+		 for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
 
-					$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
+			 if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
 
-					$arrResultZensuHeadsmoto[$l]["count"] = $count;
+				 if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
 
-					unset($arrResultZensuHeadsmoto[$m]);
+					 $count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
 
-				}
+					 $arrResultZensuHeadsmoto[$l]["count"] = $count;
 
-			}
-			$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
+					 unset($arrResultZensuHeadsmoto[$m]);
+
+				 }
+
+			 }
+
+		 }
+		 $arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
 
 		}
 
@@ -770,19 +777,26 @@ echo "</pre>";
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
 
-				for($l=0; $l<count($arrOrderEdis); $l++){
+				$countmax = count($arrOrderEdis);//210729in
 
-		      for($m=$l+1; $m<count($arrOrderEdis); $m++){
+		    //同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+		    for($l=0; $l<count($arrOrderEdis); $l++){
 
-		        if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
+		      for($m=$l+1; $m<$countmax; $m++){//210729in
 
-		          $amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-		          $denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
+		        if(isset($arrOrderEdis[$m]["product_code"])){
 
-		          $arrOrderEdis[$l]["amount"] = $amount;
-		          $arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+		          if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
 
-		          unset($arrOrderEdis[$m]);
+		            $amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
+		            $denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
+
+		            $arrOrderEdis[$l]["amount"] = $amount;
+		            $arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
+
+		            unset($arrOrderEdis[$m]);
+
+		          }
 
 		        }
 

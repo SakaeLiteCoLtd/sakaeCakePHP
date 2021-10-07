@@ -1527,7 +1527,7 @@ class HazaimaterialsController extends AppController {
        }
      }
 
-     public function shippedform()//QR＝HT60_RH27,,,,210720-001,
+     public function shippedform()//QRの形　・・・　HT60_RH27,,,,210720-001,
      {
        $stockEndMaterials = $this->StockEndMaterials->newEntity();
        $this->set('stockEndMaterials',$stockEndMaterials);
@@ -1710,6 +1710,41 @@ class HazaimaterialsController extends AppController {
             $StockEndMaterialsId = $StockEndMaterials[0]["id"];
 
           }
+
+       }else{
+
+         $Materials = $this->Materials->find()
+         ->where(['name_substitute' => $materialgrade_color, 'delete_flag' => 0])->toArray();
+
+         if(isset($Materials[0])){
+
+           $grade = $Materials[0]["grade"];
+           $color = $Materials[0]["color"];
+
+           $PriceMaterials = $this->PriceMaterials->find()
+           ->where(['grade' => $grade, 'color' => $color, 'delete_flag' => 0])->toArray();
+
+           if(isset($PriceMaterials[0])){
+
+             $StockEndMaterials = $this->StockEndMaterials->find()
+             ->where(["price_material_id" => $PriceMaterials[0]['id'], 'lot_num' => $lot_num,
+              'import_tab_staff >=' => 0, 'delete_flag' => 0])->toArray();
+
+              if(isset($StockEndMaterials[0])){
+
+                $check_stock_end = 1;
+                $StockEndMaterialsId = $StockEndMaterials[0]["id"];
+
+              }
+
+           }else{
+
+             return $this->redirect(['action' => 'shippedform',
+             's' => ['username' => $username, 'mess' => "読み込まれた端材原料は代替名登録がされていません。"]]);
+
+           }
+
+         }
 
        }
 

@@ -457,6 +457,12 @@ class ApisController extends AppController
 					}
 
 				}
+
+				echo "<pre>";
+				print_r("arrAssembleProducts");
+				print_r($arrAssembleProducts);
+				echo "</pre>";
+
 //arrAssembleProductsここまで
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
@@ -750,6 +756,12 @@ class ApisController extends AppController
 					if(count($arrSeisans) > 0){
 						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
 					}
+
+					echo "<pre>";
+					print_r("arrSeisans");
+					print_r($arrSeisans);
+					echo "</pre>";
+
 //arrSeisansここまで
 /*
 echo "<pre>";

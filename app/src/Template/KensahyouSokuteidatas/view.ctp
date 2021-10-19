@@ -39,8 +39,8 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
           <td colspan="9" nowrap="nowrap"><?= h($Productname) ?></td>
         </tr>
         <tr style="background-color: #FFFFFF;border-bottom: solid;border-width: 1px">
-          <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
-          <td colspan="9"><?= h($KensahyouHeadver) ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>バージョン</strong></div></td>
+          <td colspan="9"><?= h($KensahyouHeadver-1) ?></td>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
           <td colspan="9"><?= h($lot_num) ?></td>
         </tr>

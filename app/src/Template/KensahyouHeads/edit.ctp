@@ -84,14 +84,17 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         $upperArray = Array();
         for($i=1; $i<=8; $i++){
         echo '<td colspan="2"><div align="center">';
-        echo '<input name=" upper_' . $i . '" type="text"  value="" size="6"/>';
+        if(strlen(${"upper_".$i}) > 0){
+          echo "<input type='text' value=${"upper_".$i} name=upper_".$i." size='6'/>";
+        }else{
+          echo "<input type='text' name=upper_".$i." size='6'/>";
+        }
         echo '</div></td>';
         }
         echo "<td colspan='2'>\n";
         echo "</td>\n";
         echo "<td colspan='2'>\n";
         echo "</td>\n";
-
     ?>
 
       <td colspan="2"><div align="center"></div></td>
@@ -104,7 +107,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         $lowerArray = Array();
         for($i=1; $i<=8; $i++){
         echo '<td colspan="2"><div align="center">';
-        echo '<input name=" lower_' . $i . '" type="text"  value="" size="6"/>';
+        if(strlen(${"lower_".$i}) > 0){
+          echo "<input type='text' value=${"lower_".$i} name=lower_".$i." size='6'/>";
+        }else{
+          echo "<input type='text' name=lower_".$i." size='6'/>";
+        }
         echo '</div></td>';
         }
         echo "<td colspan='2'>\n";
@@ -123,7 +130,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         $sizeArray = Array();
         for($i=1; $i<=9; $i++){
         echo '<td colspan="2"><div align="center">';
-        echo '<input name=" size_' . $i . '" type="text"  value="" size="6"/>';
+        if(strlen(${"size_".$i}) > 0){
+          echo "<input type='text' value=${"size_".$i} name=size_".$i." size='6'/>";
+        }else{
+          echo "<input type='text' name=size_".$i." size='6'/>";
+        }
         echo '</div></td>';
         }
         /*
@@ -142,7 +153,11 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
     <td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
       <strong style="text-align: left">備考：</strong><br>
-          <textarea name="bik"  cols="120" rows="10"></textarea>
+          <textarea name="bik" cols="120" rows="10">
+<?php
+echo "$bik\n";;
+?>
+          </textarea>
       </td>
     </tr>
    <tr>

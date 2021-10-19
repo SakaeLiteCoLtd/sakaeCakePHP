@@ -42,7 +42,133 @@ class htmlKensahyouSokuteidata extends AppController
                   "<td valign='middle' width='50' rowspan='3' nowrap='nowrap' colspan='2' style='valign: middle'><div align='center'><strong>規格</strong></div></td>\n".
                   "<td width='50' nowrap='nowrap' colspan='2'><div align='center'><strong>上限</strong></div></td>\n";
 
-            $KensahyouHeads = $this->KensahyouHeads->find('all', ['conditions' => ['product_code' => $product_code, 'delete_flag' => 0]])->order(['id' => 'ASC']);//
+            $KensahyouHeads = $this->KensahyouHeads->find('all', ['conditions' => ['product_code' => $product_code, 'delete_flag' => 0]])->order(['version' => 'desc']);
+      			foreach ($KensahyouHeads as $value) {
+      			}
+
+            for($l=1; $l<=8; $l++){
+              if(isset($value)){
+                $upper= $value->{"upper_{$l}"};
+              }else{
+                $upper= "";
+              }
+      //  		$upper= $value->{"upper_{$l}"};
+            $html = $html.
+                    "<td colspan='2'><div align='center'>\n";
+            $html = $html.$upper;
+            $html = $html."</div></td>\n";
+            }
+
+        $html = $html.
+        "<td colspan='2'><div align='center'></div></td>\n".
+        "<td colspan='2'><div align='center'></div></td>\n".
+        "<td colspan='2'><div align='center'></div></td>\n".
+        "<td rowspan='3' colspan='2'>&nbsp;</td>\n".
+          "</tr>\n".
+          "<tr>\n".
+          "<td nowrap='nowrap' colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'><strong>下限</strong></div></td>\n";
+
+            for($l=1; $l<=8; $l++){
+              if(isset($value)){
+                $lower= $value->{"lower_{$l}"};
+              }else{
+                $lower= "";
+              }
+    //    		$lower= $value->{"lower_{$l}"};
+                $html = $html.
+                        "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'><font size='-1'>\n";
+                $html = $html.$lower;
+                $html = $html."</font></div></td>\n";
+            }
+
+        $html = $html.
+          "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'></div></td>\n".
+          "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'></div></td>\n".
+          "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'></div></td>\n".
+          "</tr>\n".
+          "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
+          "<td nowrap='nowrap' colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'><strong>寸法</strong></div></td>\n";
+
+            for($l=1; $l<=9; $l++){
+              if(isset($value)){
+                $size= $value->{"size_{$l}"};
+                $text_10 = $value->text_10;
+                $text_11 = $value->text_11;
+              }else{
+                $size= "";
+                $text_10= "";
+                $text_11= "";
+              }
+      //  		$size= $value->{"size_{$l}"};
+                $html = $html.
+                        "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'>\n";
+                $html = $html.$size;
+                $html = $html."</div></td>\n";
+            }
+            $html = $html.
+  //          "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'></div></td>\n".
+  //          "<td colspan='2'><div align='center'></div></td>\n";
+            "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'>\n";
+            $html = $html.$text_10;
+            $html = $html."</div></td>\n";
+            $html = $html.
+            "<td colspan='2' style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><div align='center'>\n";
+            $html = $html.$text_11;
+            $html = $html."</div></td>\n";
+
+/*
+        $html = $html.
+        "</tr>\n".
+        "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
+          "<td width='24' colspan='4'><div align='center'><strong>検査種類</strong></div></td>\n".
+          "<td width='24' colspan='2'><div align='center'><strong>ノギス</strong></div></td>\n".
+          "<td width='38' colspan='2'><div align='center'><strong>ノギス</strong></div></td>\n".
+          "<td width='38' colspan='2'><div align='center'><strong>ノギス</strong></div></td>\n".
+          "<td width='38' colspan='2'><div align='center'><strong>ノギス</strong></div></td>\n".
+          "<td width='38' colspan='2'><div align='center'><strong>ノギス</strong></div></td>\n".
+          "<td width='38' colspan='2'><div align='center'><strong>ノギス</strong></div></td>\n".
+          "<td width='38' colspan='2'><div align='center'><strong>ノギス</strong></div></td>\n".
+          "<td width='38' colspan='2'><div align='center'><strong>ノギス</strong></div></td>\n".
+          "<td colspan='2'>&nbsp;</td>\n".
+          "<td colspan='2'>&nbsp;</td>\n".
+        "</tr>\n";
+*/
+		return $html;
+		$this->html = $html;
+		$this->data = $KensahyouHeads;
+	}
+
+  public function htmlHeaderKensahyouSokuteidatayobidashi($product_created)
+	{
+
+    $arrproduct_created = explode("_",$product_created);
+    $product_code = $arrproduct_created[0];
+    $created_at = $arrproduct_created[1];
+
+        $html =
+                  "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
+                  "<td width='100' colspan='4'>&nbsp;</td>\n".
+                  "<td width='50' colspan='2'><div align='center'><strong>A</strong></div></td>\n".
+                  "<td width='50' colspan='2'><div align='center'><strong>B</strong></div></td>\n".
+                  "<td width='50' colspan='2'><div align='center'><strong>C</strong></div></td>\n".
+                  "<td width='50' colspan='2'><div align='center'><strong>D</strong></div></td>\n".
+                  "<td width='50' colspan='2'><div align='center'><strong>E</strong></div></td>\n".
+                  "<td width='50' colspan='2'><div align='center'><strong>F</strong></div></td>\n".
+                  "<td width='50' colspan='2'><div align='center'><strong>G</strong></div></td>\n".
+                  "<td width='50' colspan='2'><div align='center'><strong>H</strong></div></td>\n".
+                  "<td width='80' nowrap='nowrap' colspan='2'><div align='center'><font size='-3'><strong>ソリ・フレ</strong></font></div></td>\n".
+                  "<td width='80' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観１</strong></font></div></td>\n".
+                  "<td width='80' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観２</strong></font></div></td>\n".
+                  "<td width='100' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>単重</strong></font></div></td>\n".
+                  "</tr>\n".
+                  "<tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'>\n".
+                  "<td valign='middle' width='50' rowspan='3' nowrap='nowrap' colspan='2' style='valign: middle'><div align='center'><strong>規格</strong></div></td>\n".
+                  "<td width='50' nowrap='nowrap' colspan='2'><div align='center'><strong>上限</strong></div></td>\n";
+
+            $KensahyouHeads = $this->KensahyouHeads
+            ->find('all', ['conditions' => ['product_code' => $product_code, 'created_at <' => $created_at]])
+            ->order(['created_at' => 'desc'])->limit('1');
+
       			foreach ($KensahyouHeads as $value) {
       			}
 

@@ -256,7 +256,7 @@ class KensahyouHeadsController  extends AppController
     	$kensahyouHead = $this->KensahyouHeads->newEntity();//newEntity・・・テーブルに空の行を作る
     	$this->set('kensahyouHead',$kensahyouHead);//セット
 
-    	$KensaProduct = $this->KensahyouHeads->find()->where(['product_code' => $product_code, 'delete_flag' => '0'])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
+    	$KensaProduct = $this->KensahyouHeads->find()->where(['product_code' => $product_code ,'delete_flag' => '0'])->order(["version"=>"desc"])->toArray();//'product_id' => $product_idを満たすデータを$KensaProductにセット
     	$this->set('KensaProduct',$KensaProduct);//セット
 
     	$Productn = $this->Products->find()->where(['product_code' => $product_code])->toArray();//
@@ -497,8 +497,29 @@ class KensahyouHeadsController  extends AppController
       $newversion = $KensaProductV + 1;
       $this->set('newversion',$newversion);
 
+      $bik = $KensaProduct[0]->bik;
+      $this->set('bik',$bik);
+
       $arrType = ['0' => 'IM6120(1号機)', '1' => 'IM7000(2号機)'];
       $this->set('arrType',$arrType);
+
+      for($i=1; $i<=9; $i++){
+        ${"size_".$i} = $KensaProduct[0]["size_".$i];
+        $this->set('size_'.$i,${"size_".$i});
+     }
+
+     for($i=1; $i<=8; $i++){
+       ${"upper_".$i} = $KensaProduct[0]["upper_".$i];
+       $this->set('upper_'.$i,${"upper_".$i});
+       ${"lower_".$i} = $KensaProduct[0]["lower_".$i];
+       $this->set('lower_'.$i,${"lower_".$i});
+     }
+
+      for($i=10; $i<=11; $i++){
+        ${"text_".$i} = $KensaProduct[0]["text_".$i];
+        $this->set('text_'.$i,${"text_".$i});
+     }
+
     }
 
     public function editconfirm()
@@ -514,7 +535,7 @@ class KensahyouHeadsController  extends AppController
      $kensahyouHead = $this->KensahyouHeads->newEntity();//newEntity・テーブルに空の行を作る
      $this->set('kensahyouHead',$kensahyouHead);//セット
 
-     $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_idを満たすものを$Product
+     $Product = $this->Products->find()->where(['product_code' => $product_code ,'delete_flag' => '0'])->toArray();//'id' => $product_idを満たすものを$Product
      $Productcode = $Product[0]->product_code;//$Productのproduct_codeに$Productcodeと名前を付ける
      $this->set('Productcode',$Productcode);//セット
 
@@ -620,22 +641,22 @@ class KensahyouHeadsController  extends AppController
        $this->set('type_im',$type_im);
 
        for($i=1; $i<=9; $i++){
-         if(empty($data["size_".$i])){
+         if(strlen($data["size_".$i]) < 1){
            $data["size_".$i] = null;
          }
      	}
 
      	for($j=1; $j<=8; $j++){
-         if(empty($data["upper_".$j])){
+         if(strlen($data["upper_".$j]) < 1){
            $data["upper_".$j] = null;
          }
-         if(empty($data["lower_".$j])){
+         if(strlen($data["lower_".$j]) < 1){
            $data["lower_".$j] = null;
          }
      	}
 
        for($i=10; $i<=11; $i++){
-         if(empty($data["text_".$i])){
+         if(strlen($data["text_".$i]) < 1){
            $data["text_".$i] = null;
          }
      	}
@@ -696,7 +717,7 @@ class KensahyouHeadsController  extends AppController
                $versionmoto = $data['version'] - 1;
 
                for($i=1; $i<=9; $i++){
-                 if(!empty($data["size_".$i])){
+                 if(strlen($data["size_".$i]) < 1){
                    $updater = "UPDATE kensahyou_head set size_$i ='".$data["size_".$i]."'
                    where product_id ='".$Productcode."'";
                    $connection->execute($updater);
@@ -704,7 +725,7 @@ class KensahyouHeadsController  extends AppController
               }
 
               for($i=1; $i<=9; $i++){
-                if(!empty($data["upper_".$i])){
+                if(strlen($data["upper_".$j]) < 1){
                   $updater = "UPDATE kensahyou_head set upper_$i ='".$data["upper_".$i]."'
                   where product_id ='".$Productcode."'";
                   $connection->execute($updater);
@@ -712,7 +733,7 @@ class KensahyouHeadsController  extends AppController
              }
 
              for($i=1; $i<=9; $i++){
-               if(!empty($data["lower_".$i])){
+               if(strlen($data["lower_".$j]) < 1){
                  $updater = "UPDATE kensahyou_head set lower_$i ='".$data["lower_".$i]."'
                  where product_id ='".$Productcode."'";
                  $connection->execute($updater);
@@ -720,7 +741,7 @@ class KensahyouHeadsController  extends AppController
             }
 
             for($i=10; $i<=11; $i++){
-              if(empty($data["text_".$i])){
+              if(strlen($data["text_".$i]) < 1){
                 $updater = "UPDATE kensahyou_head set text_$i ='".$data["text_".$i]."'
                 where product_id ='".$Productcode."'";
                 $connection->execute($updater);

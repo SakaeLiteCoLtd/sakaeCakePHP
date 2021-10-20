@@ -37,21 +37,11 @@ class ApidatasController extends AppController
 
 		}
 
-		public function preadd0()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apidatas/preadd0
+		public function preadd0()//http://localhost:5000 http://192.168.4.246/Apidatas/preadd  http://localhost:5000/Apidatas/preadd
 		{
 
 			session_start();
 			$session = $this->request->getSession();
-
-			$arr[] = [
-				'check1' => 11,
-				'check2' => 12,
-			];
-
-
-			$kouteivba['datetime'] = "abc";
-			$kouteivba['seikeiki'] = $arr;
-
 			echo "<pre>";
 			print_r($_SESSION);
 			echo "</pre>";
@@ -120,7 +110,6 @@ class ApidatasController extends AppController
 
 	public function staffcodeupdate()
 	{
-
 		$OrderSyoumouShiireHeaders = $this->OrderSyoumouShiireHeaders->find('all')->where(['created_staff >' => 1000])->toArray();
 
 		for($k=0; $k<count($OrderSyoumouShiireHeaders); $k++){
@@ -150,20 +139,7 @@ class ApidatasController extends AppController
 			{
 				session_start();
 				$session = $this->request->getSession();
-				session_regenerate_id();//セッションIDを更新
-		//		$session = $this->request->getSession()->renew();
-
-				$arr[] = [
-					'check1' => 11,
-					'check2' => 12,
-				];
-
-				$_SESSION['kouteivba1'] = $arr;
-				$_SESSION['kouteivba2'] = "bbb";
-
-				echo "<pre>";
-				print_r(session_id());
-				echo "</pre>";
+//				$_SESSION['kouteivba'] = array();
 				echo "<pre>";
 				print_r($_SESSION);
 				echo "</pre>";
@@ -179,6 +155,7 @@ class ApidatasController extends AppController
 			//http://192.168.4.246/Apidatas/vbakoutei/api/2020-10-28_08:00:00_2_CAS-NDS-20002_粉砕量注意！.xml
 			//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_2020-11-4_hirokawa.xml
 			//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_08:00:00_2_CAS-NDS-20002_粉砕量注意！_hirokawa.xml
+			//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_08:00:00_2_CAS-NDS-20002__hirokawa.xml
 			//http://localhost:5000/Apidatas/vbakoutei/api/2020-10-28_2020-11-4_end_hirokawa.xml
 		public function vbakoutei()
 		{
@@ -199,7 +176,6 @@ class ApidatasController extends AppController
 				if(isset($dataarr[4])){//ScheduleKouteis登録用の配列に追加
 
 					session_start();
-					session_regenerate_id();//セッションIDを更新
 					$session = $this->request->getSession();
 
 					if($dataarr[5] == $_SESSION['sessionstartstaff']){
@@ -365,27 +341,5 @@ class ApidatasController extends AppController
 
 		}
 
-		public function test()//http://localhost:5000/Apidatas/test/api/test.xml
- 	 {
-
-		 $tourokutestproduct = [
-			 'product_code' => date('Y-m-d H:i:s').'acbd',
-			 'product_name' => 'APIテスト192',
-			 'weight' => '9999',
-			 'primary_p' => '0',
-			 'status' => '0',
-			 'delete_flag' => '0',
-			 'created_at' => date('Y-m-d H:i:s'),
-			 'created_staff' => '9999',
-		 ];
-
-	//	 mb_convert_variables('UTF-8','SJIS-win',$tourokutestproduct);//文字コードを変換
-
-		 $this->set([
-			 'tourokutestproduct' => $tourokutestproduct,
-			 '_serialize' => ['tourokutestproduct']
-		 ]);
-
-	 }
 
 	}

@@ -76,12 +76,14 @@ class ApisController extends AppController
 				$product_name = $Product[0]->product_name;
 	 //			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
 
+				$tantou = str_replace(array(" ", "　"), "", $ScheduleKouteis[$k]["tantou"]);
+
 				$arrScheduleKoutei_csv[] = [
 					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $product_name,
-					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
+					'tantou' => $tantou
 			 ];
 
 			}
@@ -146,13 +148,15 @@ class ApisController extends AppController
 					$product_name = "";
 				}
 
+				$tantou = str_replace(array(" ", "　"), "", $ScheduleKouteis[$k]["tantou"]);
+
 				$arrScheduleKoutei_csv[] = [
 					'day' => $ScheduleKouteis[$k]->datetime->format('j'),//0なしの日付
 					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $product_name,
-					'tantou' => $ScheduleKouteis[$k]["tantou"]."　"
+					'tantou' => $tantou
 			 ];
 
 			}
@@ -209,12 +213,14 @@ class ApisController extends AppController
 					$product_name = "　";
 				}
 
+				$tantou = str_replace(array(" ", "　"), "", $ScheduleKouteis[$k]["tantou"]);
+
 				$arrScheduleKoutei_csv[] = [
 					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $product_name,
-					'tantou' => $ScheduleKouteis[$k]["tantou"]."　",
+					'tantou' => $tantou,
 					'date' => $ScheduleKouteis[$k]->datetime->format('Y-m-d')
 			 ];
 
@@ -280,13 +286,15 @@ class ApisController extends AppController
 					$product_name = "　";
 				}
 
+				$tantou = str_replace(array(" ", "　"), "", $ScheduleKouteis[$k]["tantou"]);
+
 				$arrScheduleKoutei_csv[] = [
 					'day' => $ScheduleKouteis[$k]->datetime->format('j'),//0なしの日付
 					'seikeiki' => $ScheduleKouteis[$k]["seikeiki"]."号機",
 					'time' => $ScheduleKouteis[$k]->datetime->format('H:i'),
 					'product_code' => $ScheduleKouteis[$k]["product_code"],
 					'product_name' => $product_name,
-					'tantou' => $ScheduleKouteis[$k]["tantou"]."　",
+					'tantou' => $tantou,
 					'date' => $ScheduleKouteis[$k]->datetime->format('Y-m-d')
 			 ];
 
@@ -401,6 +409,7 @@ class ApisController extends AppController
 					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
 				 }
 
+
 				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);//210729in
 
 				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
@@ -457,12 +466,6 @@ class ApisController extends AppController
 					}
 
 				}
-
-				echo "<pre>";
-				print_r("arrAssembleProducts");
-				print_r($arrAssembleProducts);
-				echo "</pre>";
-
 //arrAssembleProductsここまで
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
@@ -756,12 +759,6 @@ class ApisController extends AppController
 					if(count($arrSeisans) > 0){
 						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
 					}
-
-					echo "<pre>";
-					print_r("arrSeisans");
-					print_r($arrSeisans);
-					echo "</pre>";
-
 //arrSeisansここまで
 /*
 echo "<pre>";
@@ -5294,6 +5291,8 @@ echo "</pre>";
 		$tantou = $tantouarr[0];//tantouの取得
 
 		$tantou = mb_convert_encoding($tantou,"sjis","utf-8");
+
+		$tantou = str_replace(array(" ", "　"), "", $tantou);
 
 		$kouteivba['datetime'] = $datetime;
 		$kouteivba['seikeiki'] = $seikeiki;

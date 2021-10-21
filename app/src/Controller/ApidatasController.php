@@ -192,6 +192,7 @@ class ApidatasController extends AppController
 
 						$tantouarr = explode(".",$dataarr[4]);//切り離し
 						$tantou = $tantouarr[0];//tantouの取得
+						$tantou = str_replace(array(" ", "　"), "", $tantou);
 
 						$present_kensahyou = 0;
 

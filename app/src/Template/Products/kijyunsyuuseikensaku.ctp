@@ -36,6 +36,7 @@ $this->layout = 'defaultshinki';
  <hr size="5" style="margin: 0.5rem">
  <br>
  <legend align="center"><strong style="font-size: 13pt; color:blue"><?= __("外観検査基準時間修正") ?></strong></legend>
+ <legend align="center"><font color="red" size="3"><?= __($mess) ?></font></legend>
 <br>
 
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">

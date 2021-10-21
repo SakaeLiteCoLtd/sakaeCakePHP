@@ -461,6 +461,16 @@ class ShinkiesController extends AppController {
 
      $assembleProducts = $this->AssembleProducts->newEntity();
      $this->set('assembleProducts',$assembleProducts);
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
+
    }
 
    public function kumitateform()
@@ -481,6 +491,12 @@ class ShinkiesController extends AppController {
      $this->set('assembleProducts',$assembleProducts);
 
      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+     $Products = $this->Products->find()->where(['product_code' => $data["product_code"], 'delete_flag' => 0])->toArray();
+     if(!isset($Products[0])){
+       return $this->redirect(['action' => 'kumitateproductform',
+       's' => ['mess' => "入力された品番は存在しません。"]]);
+     }
 
      $product_code = $data['product_code'];
      $this->set('product_code',$product_code);
@@ -820,6 +836,24 @@ class ShinkiesController extends AppController {
      $data = $session->read();
    }
 
+   public function menugaityuproducts()
+   {
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $session = $this->request->getSession();
+     $data = $session->read();
+   }
+
+   public function gaityuseihinichiran()
+   {
+     $user = $this->Users->newEntity();
+     $this->set('user',$user);
+
+     $ProductGaityus = $this->ProductGaityus->find('all', ['conditions' => ['status' => 0]])->order(["product_code"=>"ASC"]);
+     $this->set('ProductGaityus',$ProductGaityus);
+   }
+
    public function gaityuurikakeform()
    {
      $session = $this->request->getSession();
@@ -956,6 +990,16 @@ class ShinkiesController extends AppController {
 
      $accountUrikakePriceMaterials = $this->AccountUrikakePriceMaterials->newEntity();
      $this->set('accountUrikakePriceMaterials',$accountUrikakePriceMaterials);
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
+
    }
 
    public function gaityuseihinform()
@@ -976,6 +1020,13 @@ class ShinkiesController extends AppController {
      $this->set('accountUrikakePriceMaterials',$accountUrikakePriceMaterials);
 
      $data = $this->request->getData();
+
+     $Products = $this->Products->find()->where(['product_code' => $data["product_code"], 'delete_flag' => 0])->toArray();
+     if(!isset($Products[0])){
+       return $this->redirect(['action' => 'gaityuseihinproduct',
+       's' => ['mess' => "入力された品番は存在しません。"]]);
+     }
+
      $product_code = $data['product_code'];
      $this->set('product_code',$product_code);
      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
@@ -1307,6 +1358,15 @@ class ShinkiesController extends AppController {
        return $this->redirect(['action' => 'index']);
      }
 
+     $Data=$this->request->query('s');
+		 if(isset($Data["mess"])){
+			 $mess = $Data["mess"];
+			 $this->set('mess',$mess);
+		 }else{
+			 $mess = "";
+			 $this->set('mess',$mess);
+		 }
+
    }
 
    public function chokusoubuhinconfirm()
@@ -1325,6 +1385,12 @@ class ShinkiesController extends AppController {
 
      $product_code = $data["product_code"];
      $this->set('product_code',$product_code);
+
+     $Products = $this->Products->find()->where(['product_code' => $data["product_code"], 'delete_flag' => 0])->toArray();
+     if(!isset($Products[0])){
+       return $this->redirect(['action' => 'chokusoubuhinform',
+       's' => ['mess' => "入力された品番は存在しません。"]]);
+     }
 
      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
      if(isset($Product[0])){
@@ -1866,6 +1932,15 @@ class ShinkiesController extends AppController {
      $user = $this->Users->newEntity();
      $this->set('user',$user);
 
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
+
      $session = $this->request->getSession();
      $sessionData = $session->read();
 
@@ -1899,6 +1974,13 @@ class ShinkiesController extends AppController {
      }
 
      $data = $this->request->getData();
+
+     $Products = $this->Products->find()->where(['product_code' => $data["product_code"], 'delete_flag' => 0])->toArray();
+     if(!isset($Products[0])){
+       return $this->redirect(['action' => 'zensuproductform',
+       's' => ['mess' => "入力された品番は存在しません。"]]);
+     }
+
      $ZensuProducts = $this->ZensuProducts->find()->where(['product_code' => $data["product_code"], 'delete_flag' => 0])->toArray();
      if(isset($ZensuProducts[0])){//存在するなら「２」そうでなければ「１」
        $tourokucheck = 2;
@@ -1916,7 +1998,9 @@ class ShinkiesController extends AppController {
        }
 
      }else{
+
        $tourokucheck = 1;
+
      }
      $this->set('tourokucheck',$tourokucheck);
 

@@ -39,6 +39,8 @@ $this->layout = 'defaultshinki';
   <br><br>
 <?php else : ?>
 
+  <legend align="center"><font color="red" size="3"><?= __($mess) ?></font></legend>
+
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">
     <tr style="border-bottom: 0px;border-width: 0px">

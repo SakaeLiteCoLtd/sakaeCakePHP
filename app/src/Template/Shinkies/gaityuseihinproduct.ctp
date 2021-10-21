@@ -33,6 +33,8 @@ $this->layout = 'defaultshinki';
  </tr>
  </table>
  <hr size="5" style="margin: 0.5rem">
+
+ <legend align="center"><font color="red" size="3"><?= __($mess) ?></font></legend>
 <br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
   <tbody border="2" bordercolor="#E6FFFF" bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px">

@@ -154,6 +154,14 @@ class ShinkiesController extends AppController {
      $Suppliername = $Suppliers[0]->name;
      $this->set('Suppliername',$Suppliername);
 
+//210818追加
+     if(strlen($data["grade"]) + strlen($data["color"]) + 1 > 20){
+       $check_substitute = 1;
+     }else{
+       $check_substitute = 0;
+     }
+     $this->set('check_substitute',$check_substitute);
+
      if($data['status_buying'] == 0){
        $hyouji_status_buying = "ナチュラル・練りこみ";
      }else{
@@ -177,6 +185,40 @@ class ShinkiesController extends AppController {
 
      $data = $this->request->getData();
 
+     if(isset($data['name_substitute'])){
+       $check_substitute = 1;
+
+       $arrtourokuMaterials = array();
+       $arrtourokuMaterials[] = array(
+         'grade' => $data['grade'],
+         'color' => $data['color'],
+         'name_substitute' => $data['name_substitute'],
+         'status' => 0,
+         'delete_flag' => 0,
+         'created_staff' => $sessionData['login']['staff_id'],
+         'created_at' => date('Y-m-d H:i:s')
+       );
+
+     }else{
+       $check_substitute = 0;
+
+       $arrtourokuMaterials = array();
+       $arrtourokuMaterials[] = array(
+         'grade' => $data['grade'],
+         'color' => $data['color'],
+         'status' => 0,
+         'delete_flag' => 0,
+         'created_staff' => $sessionData['login']['staff_id'],
+         'created_at' => date('Y-m-d H:i:s')
+       );
+
+     }
+     $this->set('check_substitute',$check_substitute);
+/*
+     echo "<pre>";
+     print_r($arrtourokuMaterials);
+     echo "</pre>";
+*/
      $arrtouroku = array();
      $arrtouroku[] = array(
        'grade' => $data['grade'],
@@ -191,11 +233,7 @@ class ShinkiesController extends AppController {
        'created_staff' => $sessionData['login']['staff_id'],
        'created_at' => date('Y-m-d H:i:s')
      );
-/*
-     echo "<pre>";
-     print_r($arrtouroku[0]);
-     echo "</pre>";
-*/
+
      $PriceMaterials = $this->PriceMaterials->patchEntity($this->PriceMaterials->newEntity(), $arrtouroku[0]);
      $connection = ConnectionManager::get('default');//トランザクション1
      // トランザクション開始2
@@ -215,6 +253,19 @@ class ShinkiesController extends AppController {
        }
 
        if ($this->PriceMaterials->save($PriceMaterials)) {
+
+         $checkMaterials = $this->Materials->find('all')
+         ->where(['grade' => $arrtouroku[0]["grade"], 'color' => $arrtouroku[0]["color"], 'delete_flag' => 0])->toArray();
+         if(isset($checkMaterials[0])){//Materialsテーブルに存在すればupdate
+
+           $this->Materials->updateAll(
+             ['delete_flag' => 1, 'updated_staff' => $arrtouroku[0]["created_staff"], 'updated_at' => date('Y-m-d H:i:s')],
+             ['id' => $checkMaterials[0]["id"]]
+           );
+
+         }
+         $Materials = $this->Materials->patchEntity($this->Materials->newEntity(), $arrtourokuMaterials[0]);
+         $this->Materials->save($Materials);
 
          //旧DBに製品登録
          $connection = ConnectionManager::get('sakaeMotoDB');

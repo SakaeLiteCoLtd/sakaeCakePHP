@@ -83,11 +83,27 @@ class htmlShinkimenu extends AppController
   public function gaityumenus()
 	{
         $html =
-        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/gaityuseihinproduct'>\n".
+  //      "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/gaityuseihinproduct'>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/menugaityuproducts'>\n".
         "<img src='/img/Labelimg/sub_index_gaityuproduct.gif' width=85 height=36>\n".
         "</a>\n".
         "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/gaityuurikakeform'>\n".
         "<img src='/img/Labelimg/subUrikakeGaityu.gif' width=85 height=36>\n".
+        "</a>\n";
+
+		return $html;
+		$this->html = $html;
+		$this->data = $shinkimenus;
+	}
+
+  public function gaityuproductsmenus()
+	{
+        $html =
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/gaityuseihinproduct'>\n".
+        "<img src='/img/Labelimg/subTouroku.gif' width=85 height=36>\n".
+        "</a>\n".
+        "<td style='padding: 0.1rem 0.1rem;'><a href='/shinkies/gaityuseihinichiran'>\n".
+        "<img src='/img/Labelimg/subYobidashi.gif' width=85 height=36>\n".
         "</a>\n";
 
 		return $html;

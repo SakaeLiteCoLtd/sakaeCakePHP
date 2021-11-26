@@ -351,6 +351,7 @@ class ZensukensasController extends AppController
          ${"product_name".$n} = $Product[0]->product_name;
          $this->set('product_name'.$n,${"product_name".$n});
        }
+       
      }
 
      public function zensufinishpre()

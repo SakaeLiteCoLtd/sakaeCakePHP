@@ -99,6 +99,7 @@ class HazaishiyousController extends AppController {
          'amount' => "",
          'num' => 1,
          'usedcheck' => "",
+         'tantou' => "",
        ];
 
        $Products = $this->Products->find()
@@ -165,6 +166,7 @@ class HazaishiyousController extends AppController {
                'amount' => $StockEndMaterialused[$j]["amount"],
                'num' => $numall,
                'usedcheck' => "使用",
+               'tantou' => "",
              ];
 
            }
@@ -206,6 +208,7 @@ class HazaishiyousController extends AppController {
                'amount' => $StockEndMaterialnuused[$j]["amount"],
                'num' => $numall,
                'usedcheck' => "未使用",
+               'tantou' => "",
              ];
 
            }

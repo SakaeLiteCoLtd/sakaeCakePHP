@@ -1384,7 +1384,7 @@ class OrderEdisController extends AppController
          }//トランザクション10
 //       }
      }
-     
+
     }
 
     public function keikakucsvpreadd()
@@ -2151,9 +2151,15 @@ class OrderEdisController extends AppController
       $data = $this->request->getData();
 
       $orderEdis0 = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $data['orderEdis_0']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+      $line_code0 = $orderEdis0[0]->line_code;
       $num_order0 = $orderEdis0[0]->num_order;
       $product_code0 = $orderEdis0[0]->product_code;
-      $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'product_code' => $product_code0])->toArray();
+      $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'line_code' => $line_code0,'product_code' => $product_code0])->toArray();
+/*
+      echo "<pre>";
+      print_r($orderEdis);
+      echo "</pre>";
+*/
       for($n=0; $n<=100; $n++){
         if(isset($orderEdis[$n])){
           $num = $n;

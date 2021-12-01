@@ -717,23 +717,23 @@ class KensahyouHeadsController  extends AppController
                $versionmoto = $data['version'] - 1;
 
                for($i=1; $i<=9; $i++){
-                 if(strlen($data["size_".$i]) < 1){
+                 if(strlen($data["size_".$i]) > 1){
                    $updater = "UPDATE kensahyou_head set size_$i ='".$data["size_".$i]."'
                    where product_id ='".$Productcode."'";
                    $connection->execute($updater);
                  }
               }
 
-              for($i=1; $i<=9; $i++){
-                if(strlen($data["upper_".$j]) < 1){
+              for($i=1; $i<=8; $i++){
+                if(strlen($data["upper_".$j]) > 1){
                   $updater = "UPDATE kensahyou_head set upper_$i ='".$data["upper_".$i]."'
                   where product_id ='".$Productcode."'";
                   $connection->execute($updater);
                 }
              }
 
-             for($i=1; $i<=9; $i++){
-               if(strlen($data["lower_".$j]) < 1){
+             for($i=1; $i<=8; $i++){
+               if(strlen($data["lower_".$j]) > 1){
                  $updater = "UPDATE kensahyou_head set lower_$i ='".$data["lower_".$i]."'
                  where product_id ='".$Productcode."'";
                  $connection->execute($updater);
@@ -741,7 +741,7 @@ class KensahyouHeadsController  extends AppController
             }
 
             for($i=10; $i<=11; $i++){
-              if(strlen($data["text_".$i]) < 1){
+              if(strlen($data["text_".$i]) > 1){
                 $updater = "UPDATE kensahyou_head set text_$i ='".$data["text_".$i]."'
                 where product_id ='".$Productcode."'";
                 $connection->execute($updater);

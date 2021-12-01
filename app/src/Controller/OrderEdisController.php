@@ -2391,7 +2391,7 @@ class OrderEdisController extends AppController
         $bunnnou = 0;
         for($n=0; $n<=count($_SESSION['orderEdis'])+100; $n++){
           if(isset($_SESSION['orderEdis'][$n]['id']) && ($_SESSION['orderEdis'][$n]['amount'] > 0)){//amount>0の時
-            $bunnnou = $bunnnou +1;//登録するものの$bunnnouを振り直し
+            $bunnnou = $bunnnou + 1;//登録するものの$bunnnouを振り直し
 
             $arrOrderEdis = $this->OrderEdis->find()->where(['id' => $_SESSION['orderEdis'][$n]['id']])->toArray();
 
@@ -2416,6 +2416,31 @@ class OrderEdisController extends AppController
               $connection = ConnectionManager::get('sakaeMotoDB');
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
+
+//211130追加
+              $delete_flg = 0;
+              $sql = "SELECT bunnou,date_order,num_order FROM order_edi".
+                    " where date_order ='".$mikandate_order."' and num_order = '".$mikannum_order."' and product_id = '".$mikanproduct_code."'
+                     and bunnou = '".$bunnnou."' and delete_flg = '".$delete_flg."'";
+              $connection = ConnectionManager::get('sakaeMotoDB');
+              $order_edi_sonzai_check = $connection->execute($sql)->fetchAll('assoc');
+
+              if(count($order_edi_sonzai_check) > 0){
+
+                $delete_flg = 0;
+                $sql = "SELECT bunnou,date_order,num_order FROM order_edi".
+                      " where date_order ='".$mikandate_order."' and num_order = '".$mikannum_order."' and product_id = '".$mikanproduct_code."'
+                        and delete_flg = '".$delete_flg."' ORDER BY bunnou desc";
+                $connection = ConnectionManager::get('sakaeMotoDB');
+                $order_edi_sonzai_check_count = $connection->execute($sql)->fetchAll('assoc');
+
+                $bunnnou = $order_edi_sonzai_check_count[0]["bunnou"] + 1;
+/*
+                echo "<pre>";
+                print_r("if ".$bunnnou);
+                echo "</pre>";
+*/
+              }
 
               $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."', amount = '".$newamount."', bunnou = '".$bunnnou."' , date_bunnou = '".date('Y-m-d')."' ,
                updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and bunnou = '".$bunnnoumoto."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";//もとのDBも更新
@@ -2521,6 +2546,34 @@ class OrderEdisController extends AppController
               $table->setConnection($connection);
 
               for($k=0; $k<count($arrOrderEdisnew); $k++){
+
+                //211130追加
+                $delete_flg = 0;
+                $sql = "SELECT bunnou,date_order,num_order FROM order_edi".
+                      " where date_order ='".$arrOrderEdisnew[$k]["date_order"]."' and num_order = '".$arrOrderEdisnew[$k]["num_order"]."'
+                       and product_id = '".$arrOrderEdisnew[$k]["product_code"]."'
+                       and bunnou = '".$arrOrderEdisnew[$k]["bunnou"]."' and delete_flg = '".$delete_flg."'";
+                $connection = ConnectionManager::get('sakaeMotoDB');
+                $order_edi_sonzai_check2 = $connection->execute($sql)->fetchAll('assoc');
+
+                if(count($order_edi_sonzai_check2) > 0){
+
+                  $delete_flg = 0;
+                  $sql = "SELECT bunnou,date_order,num_order FROM order_edi".
+                        " where date_order ='".$arrOrderEdisnew[$k]["date_order"]."' and num_order = '".$arrOrderEdisnew[$k]["num_order"]."'
+                         and product_id = '".$arrOrderEdisnew[$k]["product_code"]."'
+                          and delete_flg = '".$delete_flg."' ORDER BY bunnou desc";
+                  $connection = ConnectionManager::get('sakaeMotoDB');
+                  $order_edi_sonzai_check_count = $connection->execute($sql)->fetchAll('assoc');
+
+                  $bunnnou = $order_edi_sonzai_check_count[0]["bunnou"] + 1;
+
+                }else{
+
+                  $bunnnou = $arrOrderEdisnew[$k]["bunnou"];
+
+                }
+
                 $connection->insert('order_edi', [
                     'date_order' => $arrOrderEdisnew[$k]["date_order"],
                     'num_order' => $arrOrderEdisnew[$k]["num_order"],
@@ -2533,7 +2586,7 @@ class OrderEdisController extends AppController
                     'place_line' => $arrOrderEdisnew[$k]["place_line"],
                     'line_code' => $arrOrderEdisnew[$k]["line_code"],
                     'check_denpyou' => $arrOrderEdisnew[$k]["check_denpyou"],
-                    'bunnou' => $arrOrderEdisnew[$k]["bunnou"],
+                    'bunnou' => $bunnnou,
                     'kannou' => $arrOrderEdisnew[$k]["kannou"],
                     'delete_flg' => $arrOrderEdisnew[$k]["delete_flag"],
                     'created_at' => date("Y-m-d H:i:s")
@@ -2575,6 +2628,35 @@ class OrderEdisController extends AppController
                   $table = TableRegistry::get('order_dnp_kannous');
                   $table->setConnection($connection);
 
+                  //211130追加
+                  $delete_flg = 0;
+                  $sql = "SELECT bunnou,date_order,num_order FROM order_dnp_kannous".
+                        " where date_order ='".$mikandate_order."' and num_order = '".$mikannum_order."'
+                         and product_id = '".$mikanproduct_code."' and code = '".$mikanline_code."'
+                         and date_deliver = '".$mikandate_deliver."'
+                         and bunnou = '".$delete_flg."' and delete_flg = '".$delete_flg."'";
+                  $connection = ConnectionManager::get('sakaeMotoDB');
+                  $order_dnp_kannous_sonzai_check = $connection->execute($sql)->fetchAll('assoc');
+
+                  if(count($order_dnp_kannous_sonzai_check) > 0){
+
+                    $delete_flg = 0;
+                    $sql = "SELECT bunnou,date_order,num_order FROM order_dnp_kannous".
+                          " where date_order ='".$mikandate_order."' and num_order = '".$mikannum_order."'
+                          and product_id = '".$mikanproduct_code."' and code = '".$mikanline_code."'
+                          and date_deliver = '".$mikandate_deliver."'
+                          and delete_flg = '".$delete_flg."' ORDER BY bunnou desc";
+                    $connection = ConnectionManager::get('sakaeMotoDB');
+                    $order_dnp_kannous_sonzai_check_count = $connection->execute($sql)->fetchAll('assoc');
+
+                    $bunnnou = $order_dnp_kannous_sonzai_check_count[0]["bunnou"] + 1;
+
+                  }else{
+
+                    $bunnnou = 0;
+
+                  }
+
                     $connection->insert('order_dnp_kannous', [
                         'date_order' => $mikandate_order,
                         'num_order' => $mikannum_order,
@@ -2582,14 +2664,15 @@ class OrderEdisController extends AppController
                         'code' => $mikanline_code,
                         'date_deliver' => $mikandate_deliver,
                         'amount' => $mikanamount,
+                        'bunnou' => $bunnnou,
                         'minoukannou' => 1,
                         'delete_flg' => 0,
                         'created_at' => date("Y-m-d H:i:s")
                     ]);
                   }
+
                   $connection = ConnectionManager::get('default');
                   //旧DBここまで
-
 
                   //minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
                   $orderedi_id = $_SESSION['orderEdis'][0]['id'];

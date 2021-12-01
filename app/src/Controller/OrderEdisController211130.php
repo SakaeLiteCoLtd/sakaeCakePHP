@@ -9,6 +9,9 @@ use Cake\Core\Configure;//トランザクション
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 use App\myClass\EDItouroku\htmlEDItouroku;//myClassフォルダに配置したクラスを使用
 use App\myClass\Productcheck\htmlProductcheck;
+
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 /*
 $htmllogin = new htmlLogin();
 $htmllogin = $htmllogin->htmllogin();
@@ -51,6 +54,16 @@ class OrderEdisController extends AppController
      public function indexmenu()
      {
        //$this->request->session()->destroy();// セッションの破棄
+
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }else{
+         $mess = "";
+         $this->set('mess',$mess);
+       }
+
      }
 
      public function hattyucsv()//発注CSV
@@ -59,6 +72,14 @@ class OrderEdisController extends AppController
        session_start();
        }
        $_SESSION['order_edi_kumitate'] = array();
+
+       $session_names = "Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+       $htmlSessioncheck = new htmlSessioncheck();
+       $arr_session_flag = $htmlSessioncheck->check($session_names);
+       if($arr_session_flag["num"] > 1){//セッション切れの場合
+         return $this->redirect(['action' => 'indexmenu',
+         's' => ['mess' => $arr_session_flag["mess"]]]);
+       }
 
        $orderEdis = $this->OrderEdis->newEntity();
        $this->set('orderEdis',$orderEdis);
@@ -115,15 +136,15 @@ class OrderEdisController extends AppController
     //       }
         }
 
+        $mes = "";
         for($n=0; $n<count($arrFp); $n++){
           if(isset($arrFp[$n])){//$arrFp[$n]が存在する時、対応するcustomer_code等を配列に追加する
             $Product = $this->Products->find()->where(['product_code' => $arrFp[$n]['product_code']])->toArray();
             if(isset($Product[0])){
+              $mes = $mes."";
               $customer_id = $Product[0]->customer_id;
             }else{
-              echo "<pre>";
-              print_r($arrFp[$n]['product_code']."が登録されていません");
-              echo "</pre>";
+              $mes = $mes."製品「".$arrFp[$n]['product_code']."」が登録されていません。新規登録メニューから製品登録してもう一度csvを取込んでください。";
             }
 
             $ProductChokusous = $this->ProductChokusous->find()->where(['product_code' => $arrFp[$n]['product_code'], 'status'=>0])->toArray();
@@ -132,10 +153,15 @@ class OrderEdisController extends AppController
               $arrFp[$n] = array_merge($arrFp[$n],array('place_deliver_code'=>$tyokusou_line_code));
             }
 
-    				$customer_id = $Product[0]->customer_id;
-            $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
-    				$customer_code = $Customer[0]->customer_code;
+            if(isset($Product[0])){
+              $customer_id = $Product[0]->customer_id;
+              $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+              $customer_code = $Customer[0]->customer_code;
+            }else{
+              $customer_code = "";
+            }
             $arrFp[$n] = array_merge($arrFp[$n],array('customer_code'=>$customer_code));
+
 /*
             list($youso1,$place_line,$youso3)=explode("/", $arrFp[$n]['place_line']);
             if(!empty($place_line)){
@@ -165,24 +191,19 @@ class OrderEdisController extends AppController
 
           if(isset($OrderEdi[0])){
             unset($arrFp[$k]);
+          }elseif(strlen($arrFp[$k]['customer_code']) < 1){
+            unset($arrFp[$k]);
           }
 
         }
 
         if(count($arrFp) == 0){
-          echo "<pre>";
-          print_r("同じcsvを読み込んでいないか確認してください");
-          echo "</pre>";
+          $mes = $mes."新規データがありません。同じcsvを読み込んでいないか確認してください";
         }
 
         $arrFp = array_values($arrFp);//添え字の振り直し
         $arrFpold = $arrFp;//添え字の振り直し
-/*
-        echo "<pre>";
-        print_r("登録内容表示");
-        print_r($arrFp);
-        echo "</pre>";
-*/
+
            $orderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrFp);//patchEntitiesで一括登録
            $connection = ConnectionManager::get('default');//トランザクション1
            // トランザクション開始2
@@ -288,7 +309,11 @@ class OrderEdisController extends AppController
 
                }
 
+               if(strlen($mes) > 0){
+                 $mes = $mes."　※その他のデータは登録されました";
+               }else{
                  $mes = "※登録されました";
+               }
                  $this->set('mes',$mes);
                  $connection->commit();// コミット5
 
@@ -321,9 +346,13 @@ class OrderEdisController extends AppController
                    ]);
                  }
 
-
                } else {
-                 $mes = "※登録されませんでした";
+
+                 if(strlen($mes) > 0){
+                   $mes = $mes."　※データが登録されませんでした";
+                 }else{
+                   $mes = "※登録されませんでした";
+                 }
                  $this->set('mes',$mes);
                  $this->Flash->error(__('The data could not be saved. Please, try again.'));
                  throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
@@ -343,6 +372,16 @@ class OrderEdisController extends AppController
       session_start();//セッションの開始
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
  		}
 
  		public function hattyucsvlogin()
@@ -377,6 +416,16 @@ class OrderEdisController extends AppController
      $orderEdis = $this->OrderEdis->newEntity();
      $this->set('orderEdis',$orderEdis);
      $data = $this->request->getData();
+
+     $Data=$this->request->query('s');
+     if(isset($Data["mess"])){
+       $mess = $Data["mess"];
+       $this->set('mess',$mess);
+     }else{
+       $mess = "";
+       $this->set('mess',$mess);
+     }
+
     }
 
     public function dnpcsvlogin()
@@ -408,6 +457,16 @@ class OrderEdisController extends AppController
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexmenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
+      $mes = "";
 
       if ($this->request->is('post')) {
       $orderEdis = $this->OrderEdis->newEntity();
@@ -457,23 +516,39 @@ class OrderEdisController extends AppController
 
         for($n=0; $n<=10000; $n++){
           if(isset($arrEDImotodenpyoudnp[$n])){//$arrEDImotodenpyoudnp[$n]が存在する時、対応するcustomer_code等を配列に追加する
+
             $Product = $this->Products->find()->where(['product_code' => $arrEDImotodenpyoudnp[$n]['product_code']])->toArray();
-    				$customer_id = $Product[0]->customer_id;
-            $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
-    				$customer_code = $Customer[0]->customer_code;
+            if(isset($Product[0])){
+              $mes = $mes."";
+              $customer_id = $Product[0]->customer_id;
+            }else{
+              $mes = $mes."製品「".$arrEDImotodenpyoudnp[$n]['product_code']."」が登録されていません。新規登録メニューから製品登録してもう一度csvを取込んでください。";
+            }
+            if(isset($Product[0])){
+              $customer_id = $Product[0]->customer_id;
+              $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+              $customer_code = $Customer[0]->customer_code;
+            }else{
+              $customer_code = "";
+            }
 
             $arrEDImotodenpyoudnp[$n] = array_merge($arrEDImotodenpyoudnp[$n],array('customer_code'=>$customer_code));
           }else{
             break;
           }
         }
+        $arrEDImotodenpyoudnpnum = count($arrEDImotodenpyoudnp);
+        for($k=0; $k<$arrEDImotodenpyoudnpnum; $k++){//組み立て品登録
+
+          if(strlen($arrEDImotodenpyoudnp[$k]['customer_code']) < 1){
+            unset($arrEDImotodenpyoudnp[$k]);
+          }
+
+        }
+        $arrEDImotodenpyoudnp = array_values($arrEDImotodenpyoudnp);//添え字の振り直し
+
 //ここまでmotoDBへ登録用
-/*
-echo "<pre>";
-print_r("arrEDImotodenpyoudnp");
-print_r($arrEDImotodenpyoudnp);
-echo "</pre>";
-*/
+
   //    for($count = 0; fgets( $fpcount ); $count++ );//motoDBへ登録用を消したら必要
       $arrEDI = array();//空の配列を作る
       $arrDenpyouDnpMinoukannous = array();//空の配列を作る
@@ -508,10 +583,21 @@ echo "</pre>";
 
         for($n=0; $n<=10000; $n++){
           if(isset($arrEDI[$n])){//$arrEDI[$n]が存在する時、対応するcustomer_code等を配列に追加する
+
             $Product = $this->Products->find()->where(['product_code' => $arrEDI[$n]['product_code']])->toArray();
-    				$customer_id = $Product[0]->customer_id;
-            $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
-    				$customer_code = $Customer[0]->customer_code;
+            if(isset($Product[0])){
+              $mes = $mes."";
+              $customer_id = $Product[0]->customer_id;
+            }else{
+              $mes = $mes."製品「".$arrEDI[$n]['product_code']."」が登録されていません。新規登録メニューから製品登録してもう一度csvを取込んでください。";
+            }
+            if(isset($Product[0])){
+              $customer_id = $Product[0]->customer_id;
+              $Customer = $this->Customers->find()->where(['id' => $customer_id])->toArray();
+              $customer_code = $Customer[0]->customer_code;
+            }else{
+              $customer_code = "";
+            }
 
             if(mb_substr($arrEDI[$n]["place_deliver"], 0, 1) === "弊"){
               $place_deliver = str_replace("弊社","",$arrEDI[$n]["place_deliver"]);
@@ -543,14 +629,14 @@ echo "</pre>";
 
           if(isset($OrderEdi[0])){
             unset($arrEDI[$k]);
+          }elseif(strlen($arrEDI[$k]['customer_code']) < 1){
+            unset($arrEDI[$k]);
           }
 
         }
 
         if(count($arrEDI) == 0){
-          echo "<pre>";
-          print_r("同じcsvを読み込んでいないか確認してください");
-          echo "</pre>";
+          $mes = $mes."新規データがありません。同じcsvを読み込んでいないか確認してください";
         }
 
         $arrEDI = array_values($arrEDI);//添え字の振り直し
@@ -559,7 +645,7 @@ echo "</pre>";
       print_r("arrEDI");
       print_r($arrEDI);
       echo "</pre>";
-  */
+*/
   //    $_SESSION['order_edi_kumitate'] = array();//空の配列を作る
 
       $orderEdis = $this->OrderEdis->patchEntities($orderEdis, $arrEDI);//patchEntitiesで一括登録
@@ -683,7 +769,6 @@ echo "</pre>";
 
               }
 
-
 //ここからDenpyouDnpMinoukannousへ登録用
 
             //insert into order_ediする（旧DB）
@@ -735,7 +820,6 @@ echo "</pre>";
                 $place_deliver = $arrEDImotodenpyoudnp[$k]["place_deliver"];
               }
 
-
               $sql = "SELECT num_order FROM denpyou_dnp".//
                     " where num_order ='".$arrEDImotodenpyoudnp[$k]["num_order"]."' and product_id = '".$arrEDImotodenpyoudnp[$k]["product_code"]."'
                      and tourokubi = '".$arrEDImotodenpyoudnp[$k]["date_order"]."'";//
@@ -785,34 +869,62 @@ echo "</pre>";
 
             for($n=0; $n<=10000; $n++){
               if(isset($arrDenpyouDnpMinoukannous[$n])){
-                $OrderEdi = $this->OrderEdis->find()->where(['num_order' => $arrDenpyouDnpMinoukannous[$n]['num_order'], 'line_code' => $arrDenpyouDnpMinoukannous[$n]['code'],
-                 'product_code' => $arrDenpyouDnpMinoukannous[$n]['product_code'], 'date_order' => $arrDenpyouDnpMinoukannous[$n]['tourokubi'], 'date_deliver' => $arrDenpyouDnpMinoukannous[$n]['date_deliver']])->toArray();
-        				$OrderEdi_id = $OrderEdi[0]->id;
 
-                unset($arrDenpyouDnpMinoukannous[$n]['num_order']);
-                unset($arrDenpyouDnpMinoukannous[$n]['code']);
-                unset($arrDenpyouDnpMinoukannous[$n]['date_deliver']);
-                unset($arrDenpyouDnpMinoukannous[$n]['product_code']);
-                unset($arrDenpyouDnpMinoukannous[$n]['tourokubi']);
+                $Product = $this->Products->find()->where(['product_code' => $arrDenpyouDnpMinoukannous[$n]['product_code']])->toArray();
+                if(isset($Product[0])){
+                  $OrderEdi = $this->OrderEdis->find()->where(['num_order' => $arrDenpyouDnpMinoukannous[$n]['num_order'], 'line_code' => $arrDenpyouDnpMinoukannous[$n]['code'],
+                   'product_code' => $arrDenpyouDnpMinoukannous[$n]['product_code'], 'date_order' => $arrDenpyouDnpMinoukannous[$n]['tourokubi'], 'date_deliver' => $arrDenpyouDnpMinoukannous[$n]['date_deliver']])->toArray();
+                   if(isset($OrderEdi[0])){
+                     $OrderEdi_id = $OrderEdi[0]->id;
 
-                $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('order_edi_id'=>$OrderEdi_id));
-                $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('conf_print'=>0));
-                $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('minoukannou'=>1));
-                $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('delete_flag'=>0));
-                $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('created_staff'=>$created_staff));
+                     unset($arrDenpyouDnpMinoukannous[$n]['num_order']);
+                     unset($arrDenpyouDnpMinoukannous[$n]['code']);
+                     unset($arrDenpyouDnpMinoukannous[$n]['date_deliver']);
+                     unset($arrDenpyouDnpMinoukannous[$n]['product_code']);
+                     unset($arrDenpyouDnpMinoukannous[$n]['tourokubi']);
+
+                     $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('order_edi_id'=>$OrderEdi_id));
+                     $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('conf_print'=>0));
+                     $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('minoukannou'=>1));
+                     $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('delete_flag'=>0));
+                     $arrDenpyouDnpMinoukannous[$n] = array_merge($arrDenpyouDnpMinoukannous[$n],array('created_staff'=>$created_staff));
+                   }
+                }else{
+                  unset($arrDenpyouDnpMinoukannous[$n]);
+                }
+
               }else{
                 break;
               }
             }
+            $arrDenpyouDnpMinoukannous = array_values($arrDenpyouDnpMinoukannous);//添え字の振り直し
 /*
             echo "<pre>";
-            print_r("arrDenpyouDnpMinoukannous");
+            print_r("DenpyouDnpMinoukannous1");
+            print_r($arrDenpyouDnpMinoukannous);
+            echo "</pre>";
+*/
+            $arrDenpyouDnpMinoukannousnum = count($arrDenpyouDnpMinoukannous);
+            for($k=0; $k<$arrDenpyouDnpMinoukannousnum; $k++){
+
+              $DenpyouDnpMinoukannouscheck = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDenpyouDnpMinoukannous[$k]['order_edi_id'],
+              'name_order' => $arrDenpyouDnpMinoukannous[$k]['name_order'], 'delete_flag' => $arrDenpyouDnpMinoukannous[$k]['delete_flag']])->toArray();
+
+              if(isset($DenpyouDnpMinoukannouscheck[0])){
+                unset($arrDenpyouDnpMinoukannous[$k]);
+              }
+
+            }
+
+            $arrDenpyouDnpMinoukannous = array_values($arrDenpyouDnpMinoukannous);//添え字の振り直し
+/*
+            echo "<pre>";
+            print_r("DenpyouDnpMinoukannous2");
             print_r($arrDenpyouDnpMinoukannous);
             echo "</pre>";
 */
             $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($denpyouDnpMinoukannous, $arrDenpyouDnpMinoukannous);//patchEntitiesで一括登録
             if ($this->DenpyouDnpMinoukannous->saveMany($denpyouDnpMinoukannous)) {//saveManyで一括登録//ここからDnpTotalAmountsへ登録用
-
 //旧DB
               for($k=0; $k<count($arrDenpyouDnpMinoukannous); $k++){
               $connection = ConnectionManager::get('default');
@@ -867,44 +979,51 @@ echo "</pre>";
 
                  if($k>=2 && !empty($sample['num_order'])){//$sample['num_order']が空でないとき
                    $OrderEdi = $this->OrderEdis->find()->where(['line_code' => $sample['line_code'], 'num_order' => $sample['num_order'], 'product_code' => $sample['product_code'], 'date_order' => $sample['date_order']])->toArray();//同一の注文
-                   $total_amount = $OrderEdi[0]['amount'];
-                   $date_deliver = $OrderEdi[0]['date_deliver'];
-                   ${"arrDnpdouitutyuumon".($k-2)} = array();//空の配列を作る
 
-                     for($n=0; $n<=10000; $n++){
-                       if(isset($OrderEdi[$n])){//同一注文について（一つの場合と複数の場合がある）
-                         if(isset($OrderEdi[$n+1])){//同じ注番のものが既に分納され、複数存在する時・・・amountを合計し、DenpyouDnpMinoukannousのminoukannouを更新する（date_deliverが小さい方を０に）
-                           $total_amount = $total_amount + $OrderEdi[$n+1]['amount'];//amountを合計
-                           $orderedi_id = $OrderEdi[$n]['id'];
-                           $date_deliver = $OrderEdi[$n]['date_deliver'];
-                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['id'] = $orderedi_id;//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
-                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['date_deliver'] = $date_deliver->format('Y-m-d');//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
-                         }else{//同一注文が単一の時
-                           $orderedi_id = $OrderEdi[$n]['id'];
-                           $date_deliver = $OrderEdi[$n]['date_deliver'];
-                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['id'] = $orderedi_id;//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
-                           ${"arrDnpdouitutyuumon".($k-2)}[$n]['date_deliver'] = $date_deliver->format('Y-m-d');//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
+                   if(isset($OrderEdi[0])){
+
+                     $total_amount = $OrderEdi[0]['amount'];
+                     $date_deliver = $OrderEdi[0]['date_deliver'];
+                     ${"arrDnpdouitutyuumon".($k-2)} = array();//空の配列を作る
+
+                       for($n=0; $n<=10000; $n++){
+                         if(isset($OrderEdi[$n])){//同一注文について（一つの場合と複数の場合がある）
+                           if(isset($OrderEdi[$n+1])){//同じ注番のものが既に分納され、複数存在する時・・・amountを合計し、DenpyouDnpMinoukannousのminoukannouを更新する（date_deliverが小さい方を０に）
+                             $total_amount = $total_amount + $OrderEdi[$n+1]['amount'];//amountを合計
+                             $orderedi_id = $OrderEdi[$n]['id'];
+                             $date_deliver = $OrderEdi[$n]['date_deliver'];
+                             ${"arrDnpdouitutyuumon".($k-2)}[$n]['id'] = $orderedi_id;//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
+                             ${"arrDnpdouitutyuumon".($k-2)}[$n]['date_deliver'] = $date_deliver->format('Y-m-d');//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
+                           }else{//同一注文が単一の時
+                             $orderedi_id = $OrderEdi[$n]['id'];
+                             $date_deliver = $OrderEdi[$n]['date_deliver'];
+                             ${"arrDnpdouitutyuumon".($k-2)}[$n]['id'] = $orderedi_id;//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
+                             ${"arrDnpdouitutyuumon".($k-2)}[$n]['date_deliver'] = $date_deliver->format('Y-m-d');//DenpyouDnpMinoukannousのminoukannouを更新するため（date_deliverが小さい方を０に）
+                           }
+                         }else{
+                           break;
                          }
-                       }else{
-                         break;
                        }
-                     }
 
-                      foreach (${"arrDnpdouitutyuumon".($k-2)} as $key => $value) {//同一注文をdate_deliver順に並べ直す
-                          $sort[$key] = $value['date_deliver'];
-                      }
-                      array_multisort( array_map( "strtotime", array_column( ${"arrDnpdouitutyuumon".($k-2)}, "date_deliver" ) ), SORT_ASC, ${"arrDnpdouitutyuumon".($k-2)} ) ;//並び替え
+                        foreach (${"arrDnpdouitutyuumon".($k-2)} as $key => $value) {//同一注文をdate_deliver順に並べ直す
+                            $sort[$key] = $value['date_deliver'];
+                        }
+                        array_multisort( array_map( "strtotime", array_column( ${"arrDnpdouitutyuumon".($k-2)}, "date_deliver" ) ), SORT_ASC, ${"arrDnpdouitutyuumon".($k-2)} ) ;//並び替え
 
-                     $arrDnpdouitutyuumon[] = ${"arrDnpdouitutyuumon".($k-2)};
-                     //以下、DnpTotalAmounts登録用
-                     $arrDnpTotalAmounts[$k-2]['num_order'] = $sample['num_order'];//配列に追加する
-                     $arrDnpTotalAmounts[$k-2]['name_order'] = $sample['name_order'];
-                     $arrDnpTotalAmounts[$k-2]['line_code'] = $sample['line_code'];
-                     $arrDnpTotalAmounts[$k-2]['product_code'] = $sample['product_code'];
-                     $arrDnpTotalAmounts[$k-2]['date_order'] = $sample['date_order'];
-                     $arrDnpTotalAmounts[$k-2]['amount'] = $total_amount;
-                     $arrDnpTotalAmounts[$k-2]['date_deliver'] = $date_deliver->format('Y-m-d');
+                       $arrDnpdouitutyuumon[] = ${"arrDnpdouitutyuumon".($k-2)};
+                       //以下、DnpTotalAmounts登録用
+                       $arrDnpTotalAmounts[$k-2]['num_order'] = $sample['num_order'];//配列に追加する
+                       $arrDnpTotalAmounts[$k-2]['name_order'] = $sample['name_order'];
+                       $arrDnpTotalAmounts[$k-2]['line_code'] = $sample['line_code'];
+                       $arrDnpTotalAmounts[$k-2]['product_code'] = $sample['product_code'];
+                       $arrDnpTotalAmounts[$k-2]['date_order'] = $sample['date_order'];
+                       $arrDnpTotalAmounts[$k-2]['amount'] = $total_amount;
+                       $arrDnpTotalAmounts[$k-2]['date_deliver'] = $date_deliver->format('Y-m-d');
+
+                   }
+
                  }
+
               }
 
               $uniquearrDnpdouitutyuumon = array_unique($arrDnpdouitutyuumon, SORT_REGULAR);//重複削除
@@ -1015,6 +1134,7 @@ echo "</pre>";
               }
 
               //以下、DnpTotalAmountsにもどる
+              $arrDnpTotalAmounts = array_values($arrDnpTotalAmounts);
               for($n=0; $n<=10000; $n++){
                 if(isset($arrDnpTotalAmounts[$n])){
                   $arrDnpTotalAmounts[$n] = array_merge($arrDnpTotalAmounts[$n],array('delete_flag'=>0));
@@ -1024,21 +1144,61 @@ echo "</pre>";
                 }
               }
               $uniquearrDnpTotalAmounts = array_unique($arrDnpTotalAmounts, SORT_REGULAR);//重複削除
+/*
+              echo "<pre>";
+              print_r("dnpTotalAmounts0");
+              print_r($uniquearrDnpTotalAmounts);
+              echo "</pre>";
+*/
+              $uniquearrDnpTotalAmountsnum = count($uniquearrDnpTotalAmounts);
+              for($k=0; $k<$uniquearrDnpTotalAmountsnum; $k++){
 
+                $DnpTotalAmountscheck = $this->DnpTotalAmounts->find()->where([
+                'product_code' => $uniquearrDnpTotalAmounts[$k]['product_code'],
+                'num_order' => $uniquearrDnpTotalAmounts[$k]['num_order'],
+                'name_order' => $uniquearrDnpTotalAmounts[$k]['name_order'],
+                'delete_flag' => $uniquearrDnpTotalAmounts[$k]['delete_flag']])->toArray();
+
+                if(isset($DnpTotalAmountscheck[0])){
+                  unset($uniquearrDnpTotalAmounts[$k]);
+                }
+
+              }
+
+              $uniquearrDnpTotalAmounts = array_values($uniquearrDnpTotalAmounts);//添え字の振り直し
+/*
+              echo "<pre>";
+              print_r("dnpTotalAmounts0");
+              print_r($uniquearrDnpTotalAmounts);
+              echo "</pre>";
+*/
                $dnpTotalAmounts = $this->DnpTotalAmounts->patchEntities($dnpTotalAmounts, $uniquearrDnpTotalAmounts);//patchEntitiesで一括登録
                    if ($this->DnpTotalAmounts->saveMany($dnpTotalAmounts)) {//saveManyで一括登録
-                     $mes = "※登録されました";
+
+                     if(strlen($mes) > 0){
+                       $mes = $mes."　※登録されました";
+                     }else{
+                       $mes = "※登録されました";
+                     }
                      $this->set('mes',$mes);
 
                    } else {
-                     $mes = "※登録されませんでした";
+                     if(strlen($mes) > 0){
+                       $mes = $mes."　※データが登録されませんでした";
+                     }else{
+                       $mes = "※登録されませんでした";
+                     }
                      $this->set('mes',$mes);
                      file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
                      $this->Flash->error(__('The dnpTotalAmounts could not be saved. Please, try again.'));
                      throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
                    }
               } else {
-                $mes = "※登録されませんでした";
+                if(strlen($mes) > 0){
+                  $mes = $mes."　※データが登録されませんでした";
+                }else{
+                  $mes = "※登録されませんでした";
+                }
                 $this->set('mes',$mes);
                 file_put_contents($source_file, mb_convert_encoding(file_get_contents($source_file), 'SJIS', 'UTF-8'));//UTF-8に変換したファイルをSJISに戻す
                 $this->Flash->error(__('This denpyouDnpMinoukannous could not be saved. Please, try again.'));
@@ -1049,9 +1209,17 @@ echo "</pre>";
         } else {
 
           if(count($arrEDI) == 0){
-            $mes = "※登録される新規データはありません。登録済みのcsvを読み込んでいないか確認してください";
+            if(strlen($mes) > 0){
+              $mes = $mes."※登録される新規データはありません。登録済みのcsvを読み込んでいないか確認してください";
+            }else{
+              $mes = "※登録される新規データはありません。登録済みのcsvを読み込んでいないか確認してください";
+            }
           }else{
-            $mes = "※登録されませんでした。ファイル内の製品名や金額等のデータにカンマが含まれていないか確認してください。";
+            if(strlen($mes) > 0){
+              $mes = $mes."※登録されませんでした。ファイル内の製品名や金額等のデータにカンマが含まれていないか確認してください。";
+            }else{
+              $mes = "※登録されませんでした。ファイル内の製品名や金額等のデータにカンマが含まれていないか確認してください。";
+            }
           }
           $this->set('mes',$mes);
 
@@ -1074,6 +1242,14 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexmenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $syoyouKeikakus = $this->SyoyouKeikakus->newEntity();
       $this->set('syoyouKeikakus',$syoyouKeikakus);
@@ -1116,54 +1292,36 @@ echo "</pre>";
          unset($sample['35'],$sample['36'],$sample['37'],$sample['38'],$sample['39'],$sample['40'],$sample['41']);//最後の改行も削除
 
          if($k>=2 && !empty($sample['product_code'])){
+
              $arrSyoyouKeikaku[] = $sample;//配列に追加する
-  //           $this->SyoyouKeikakus->deleteAll(['product_code' => $sample['product_code']]);//格納した品番の所要計画データは一旦削除
 /*
-             if(substr($sample['product_code'],0,1) == "P"){
-               $countP = $countP + 1;
-             }elseif(substr($sample['product_code'],0,1) == "w"){
-               $countW = $countW + 1;
-             }elseif(substr($sample['product_code'],0,1) == "R"){
-               $countR = $countR + 1;
-             }else{
-               $countP = $countP;
-               $countW = $countW;
-               $countR = $countR;
+//ここから211006追加
+             $AssembleProduct = $this->AssembleProducts->find()->where(['product_code' => $sample['product_code'], 'flag' => 0])->toArray();
+
+             if(count($AssembleProduct) > 0){
+
+               for($n=0; $n<count($AssembleProduct); $n++){
+
+                 $child_pid = $AssembleProduct[$n]->child_pid;
+
+                 $arrSyoyouKeikaku[] = [
+                   'date_keikaku' => $sample["date_keikaku"],
+                   'product_code' => $child_pid,
+                   'date_deliver' => $sample["date_deliver"],
+                   'amount' => $sample["amount"] * $AssembleProduct[$n]->inzu,
+                   'num_keikaku' => $sample["num_keikaku"]."_Assemble",
+                   'created_staff' => $sample["created_staff"],
+                   'created_at' => $sample["created_at"],
+                 ];
+
+               }
+
              }
+//ここまで
 */
           }
-      }
-/*
-      if($countP >= 10){//この場合、customer_id=1（customer_code=10001）パナソニック(株)HA社キッチンアプライアンス（事）草津工場の製品をSyoyouKeikakusテーブルから削除
-        $Products_P = $this->Products->find()->where(['customer_id' => '1']);
-        foreach ($Products_P as $value) {
-          $product_code= $value->product_code;
-          $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
-        }
-      }
 
-      if($countW >= 5){//customer_id=2（customer_code=10002）パナソニック(株)HA社ランドリークリーナー（事）静岡工場の製品をSyoyouKeikakusテーブルから削除
-        $Products_W = $this->Products->find()->where(['customer_id' => '2']);
-        foreach ($Products_W as $value) {
-          $product_code= $value->product_code;
-          $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
-        }
       }
-
-      if($countR >= 5){//customer_id=3（customer_code=10003）パナソニック(株)HA社キッチンアプライアンス（事）加東工場の製品をSyoyouKeikakusテーブルから削除
-        $Products_R = $this->Products->find()->where(['customer_id' => '3']);
-        foreach ($Products_R as $value) {
-          $product_code= $value->product_code;
-          $this->SyoyouKeikakus->deleteAll(['product_code' => $product_code]);
-        }
-      }
-*/
-
-//      echo "<pre>";
-//      print_r($arrSyoyouKeikaku);
-//      echo "</pre>";
-
-//         rename($source_file,$source_file."test");
 
          $syoyouKeikakus = $this->SyoyouKeikakus->patchEntities($syoyouKeikakus, $arrSyoyouKeikaku);//patchEntitiesで一括登録
          $connection = ConnectionManager::get('default');//トランザクション1
@@ -1175,10 +1333,6 @@ echo "</pre>";
            for($k=0; $k<count($arrSyoyouKeikaku); $k++){
 
              $SyoyouKeikaku= $this->SyoyouKeikakus->find()->where(['product_code' => $arrSyoyouKeikaku[$k]['product_code']])->toArray();
-
-        //     if(isset($SyoyouKeikaku[0])){
-        //       $this->SyoyouKeikakus->deleteAll(['product_code' => $arrSyoyouKeikaku[$k]['product_code']]);
-        //     }
 
              $this->SyoyouKeikakus->updateAll(
              ['delete_flag' => 1, 'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')],
@@ -1230,14 +1384,24 @@ echo "</pre>";
          }//トランザクション10
 //       }
      }
+
     }
 
     public function keikakucsvpreadd()
     {
       //$this->request->session()->destroy();// セッションの破棄
       session_start();//セッションの開始
-     $orderEdis = $this->OrderEdis->newEntity();
-     $this->set('orderEdis',$orderEdis);
+      $orderEdis = $this->OrderEdis->newEntity();
+      $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
     }
 
     public function keikakucsvlogin()
@@ -1267,7 +1431,14 @@ echo "</pre>";
 
     public function henkoutop()//登録呼出変更のトップ
     {
-      //$this->request->session()->destroy();// セッションの破棄
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
     }
 
     public function henkousentakucustomer()//登録呼出変更のpana,dnp,others選択画面
@@ -1506,6 +1677,16 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkoupanalogin()
@@ -1537,6 +1718,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data['orderEdis']);//配列（更新するカラム）の個数
@@ -1592,6 +1782,16 @@ echo "</pre>";
       $this->set('orderEdis',$orderEdis);
       $session = $this->request->getSession();
       $data = $session->read();
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkoupanabunnnoulogin()
@@ -1623,6 +1823,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data);//配列（更新するカラム）の個数
@@ -1942,9 +2151,15 @@ echo "</pre>";
       $data = $this->request->getData();
 
       $orderEdis0 = $this->OrderEdis->find()->where(['delete_flag' => '0','id' => $data['orderEdis_0']])->toArray();//以下の条件を満たすデータをOrderEdisテーブルから見つける
+      $line_code0 = $orderEdis0[0]->line_code;
       $num_order0 = $orderEdis0[0]->num_order;
       $product_code0 = $orderEdis0[0]->product_code;
-      $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'product_code' => $product_code0])->toArray();
+      $orderEdis = $this->OrderEdis->find()->where(['delete_flag' => '0','num_order' => $num_order0,'line_code' => $line_code0,'product_code' => $product_code0])->toArray();
+/*
+      echo "<pre>";
+      print_r($orderEdis);
+      echo "</pre>";
+*/
       for($n=0; $n<=100; $n++){
         if(isset($orderEdis[$n])){
           $num = $n;
@@ -1988,6 +2203,16 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkoudnplogin()
@@ -2019,6 +2244,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data['orderEdis']);//配列（更新するカラム）の個数
@@ -2080,6 +2314,16 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkoudnpbunnnoulogin()
@@ -2111,6 +2355,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data);//配列（更新するカラム）の個数
@@ -2726,6 +2979,16 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkouotherlogin()
@@ -2757,6 +3020,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data['orderEdis']);//配列（更新するカラム）の個数
@@ -2815,6 +3087,16 @@ echo "</pre>";
 
       $session = $this->request->getSession();
       $data = $session->read();
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function henkouotherbunnnoulogin()
@@ -2846,6 +3128,15 @@ echo "</pre>";
     {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "orderEdis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'henkoutop',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
       $cnt = count($data);//配列（更新するカラム）の個数
@@ -3201,6 +3492,15 @@ echo "</pre>";
         'date_deliver' => $kari_datenouki
       );
 
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function chokusetsupanalogin()
@@ -3236,6 +3536,14 @@ echo "</pre>";
       $_SESSION['ProductGaityu'] = array();
       $_SESSION['order_edi_kumitate'] = array();
       $_SESSION['ProductGaityu_kumitate'] = array();
+
+      $session_names = "order_edi,supplier_date_deliver,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexmenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
@@ -3581,6 +3889,16 @@ echo "</pre>";
         'num_order' => $data["num_order"],
         'delete_flag' => 0
       );
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function chokusetsudnplogin()
@@ -3618,6 +3936,14 @@ echo "</pre>";
       session_start();
       }
       $_SESSION['order_edi_kumitate'] = array();
+
+      $session_names = "order_edi,denpyouDnpMinoukannous,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexmenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
@@ -3863,6 +4189,16 @@ echo "</pre>";
       //$this->request->session()->destroy(); // セッションの破棄
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function denpyouhenkoukensaku()
@@ -4008,6 +4344,16 @@ echo "</pre>";
     {
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function denpyouhenkoulogin()
@@ -4043,6 +4389,14 @@ echo "</pre>";
 
 			$session = $this->request->getSession();
 			$data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+      $session_names = "orderToSuppliers,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'denpyouhattyu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
 			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 /*
@@ -4110,6 +4464,16 @@ echo "</pre>";
       //$this->request->session()->destroy(); // セッションの破棄
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function yobizaikologin()
@@ -4253,13 +4617,13 @@ echo "</pre>";
         $date_deliver = $data["date_deliver{$k}"]['year']."-".$data["date_deliver{$k}"]['month']."-".$data["date_deliver{$k}"]['day'];
         $amount = $data["amount{$k}"];
 
-        $ProductGaityus = $this->ProductGaityus->find()->where(['product_code' => $product_code])->toArray();
+        $ProductGaityus = $this->ProductGaityus->find()->where(['product_code' => $product_code, 'flag_denpyou' => 1,  'status' => 0])->toArray();
         $id_supplier = $ProductGaityus[0]->id_supplier;
 
         $ProductSuppliers = $this->ProductSuppliers->find()->where(['id' => $id_supplier])->toArray();
         $Supplier = $ProductSuppliers[0]->name;
 
-        $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $product_code])->toArray();
+        $ProductGaityu = $this->ProductGaityus->find()->where(['product_code' => $product_code, 'flag_denpyou' => 1,  'status' => 0])->toArray();
         $price = $ProductGaityu[0]->price_shiire;
 
         $k1 = $k+1;
@@ -4287,6 +4651,14 @@ echo "</pre>";
     {
       $OrderYobistockSuppliers = $this->OrderYobistockSuppliers->newEntity();
       $this->set('OrderYobistockSuppliers',$OrderYobistockSuppliers);
+
+      $session_names = "orderyobistock,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'denpyouhattyu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $session = $this->request->getSession();
 			$data = $session->read();//postデータ取得し、$dataと名前を付ける
@@ -4476,6 +4848,15 @@ echo "</pre>";
     {
       $OrderToSuppliers = $this->OrderToSuppliers->newEntity();
       $this->set('OrderToSuppliers',$OrderToSuppliers);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
     }
 
     public function yobidenpyouhenkoulogin()
@@ -4511,6 +4892,14 @@ echo "</pre>";
 
 			$session = $this->request->getSession();
 			$data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+      $session_names = "OrderYobistockSuppliers,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'denpyouhattyu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
 			$staff_id = $this->Auth->user('staff_id');//ログイン中のuserのstaff_idに$staff_idという名前を付ける
 /*

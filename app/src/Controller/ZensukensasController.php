@@ -88,7 +88,7 @@ class ZensukensasController extends AppController
 
 //P2132-93010,,1600,,191219-001,191219  参考
 //P2166-67370,P2166-67470,30,,191223-069,191223  参考
-
+//P0624-45900,,1600,,IN.211208-061,211208
      public function zensukennsatyuu()//開始の時間、スタッフ等を登録
      {
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
@@ -351,7 +351,6 @@ class ZensukensasController extends AppController
          ${"product_name".$n} = $Product[0]->product_name;
          $this->set('product_name'.$n,${"product_name".$n});
        }
-       
      }
 
      public function zensufinishpre()
@@ -416,6 +415,18 @@ class ZensukensasController extends AppController
               ];
 
  			$this->set('arrContRejection',$arrContRejection);
+
+      $CheckLot = $this->CheckLots->find()->where(['product_code' => $product_code, 'lot_num' => $lot_num])->toArray();
+
+      if(isset($CheckLot[0])){
+        $this->set('CheckLot_check',0);
+      }else{
+        $this->set('CheckLot_check',1);
+        $mes = "品番：".$product_code."　ロットナンバー：".$lot_num.
+        "　のロットはcheck_lotsテーブルに登録されていません。<br>責任者に報告してください。";
+        $this->set('mes',$mes);
+      }
+
      }
 
      public function zensufinish()
@@ -617,18 +628,6 @@ class ZensukensasController extends AppController
                ['id'  => $_SESSION['result_zensu_head_id']['result_zensu_head_id']]
              )){
 
-               //insert 旧DB
-               $connection = ConnectionManager::get('sakaeMotoDB');
-               $table = TableRegistry::get('result_zensu_head');
-               $table->setConnection($connection);
-
-               $updater = "UPDATE result_zensu_head set datetime_finish = '".date('Y-m-d H:i:s')."'
-                 where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id']['lot_num']."' and emp_id = '".$staff_code."' and datetime_finish IS NULL";//もとのDBも更新
-               $connection->execute($updater);
-
-               $connection = ConnectionManager::get('default');//新DBに戻る
-               $table->setConnection($connection);
-
                $CheckLot = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num' => $_SESSION['result_zensu_head_id']['lot_num']])->toArray();
 
                if(isset($CheckLot[0])){
@@ -643,6 +642,18 @@ class ZensukensasController extends AppController
                  "　のロットはデータベースに登録されていません。<br>責任者に報告してください。");
                  echo "</pre>";
                }
+
+               //insert 旧DB
+               $connection = ConnectionManager::get('sakaeMotoDB');
+               $table = TableRegistry::get('result_zensu_head');
+               $table->setConnection($connection);
+
+               $updater = "UPDATE result_zensu_head set datetime_finish = '".date('Y-m-d H:i:s')."'
+                 where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id']['lot_num']."' and emp_id = '".$staff_code."' and datetime_finish IS NULL";//もとのDBも更新
+               $connection->execute($updater);
+
+               $connection = ConnectionManager::get('default');//新DBに戻る
+               $table->setConnection($connection);
 
                if($CheckLotflag_used == 0){//更新する必要がないとき
                $mes = "登録されました。";
@@ -672,11 +683,7 @@ class ZensukensasController extends AppController
                      $lot_oomoto = substr($_SESSION['result_zensu_head_id']['lot_num'], 4, 6);
                      $lot_kodomo = substr($_SESSION['result_zensu_head_id']['lot_num'], 0, 9);
                      $lot_num_touroku = substr($_SESSION['result_zensu_head_id']['lot_num'], -3);
-/*
-                     echo "<pre>";
-                     print_r($lot_in);
-                     echo "</pre>";
-*/
+
                      $CheckLotkodomo = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num like' => '%'.$lot_kodomo.'%'])->toArray();//子ロットの仲間全部
                      $CheckLotoya = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num like' => '%'.$lot_oomoto.'%',//親ロットの仲間全部
                      'NOT' => [['lot_num like' => '%'."IN.".'%']]])->toArray();
@@ -693,7 +700,7 @@ class ZensukensasController extends AppController
                      $lot_kodomo_first = substr($arrCheckLotkodomo[0]['lot_num'], -3);
                      $bangou_lot = $lot_num_touroku - ($lot_kodomo_first - 1);//$lot_num_tourokuが同じ$lot_oomotoの中で何番目なのか調べる
 
-                     $LabelInsideout = $this->LabelInsideouts->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code']])->toArray();
+                     $LabelInsideout = $this->LabelInsideouts->find()->where(['delete_flag' => '0', 'product_code' => $_SESSION['result_zensu_head_id']['product_code']])->toArray();
                      $LabelInside_num = $LabelInsideout[0]->num_inside;
 
                      $mod = $bangou_lot/$LabelInside_num;//親ロットは全部で何個か
@@ -707,77 +714,25 @@ class ZensukensasController extends AppController
 
                      $arrCheckLotkodomotati = array();//$lot_kodomoの仲間を全部集める
                      $flag_used_total = 0;
-                     for($m=($bangou_oya_lot*$LabelInside_num - $LabelInside_num); $m<=($bangou_oya_lot*$LabelInside_num - 1); $m++){
-                       $arrCheckLotkodomotati[] = $CheckLotkodomo[$m]->flag_used;
-                       $flag_used_total = $flag_used_total + $CheckLotkodomo[$m]->flag_used;
+
+                     for($m=($bangou_oya_lot*$LabelInside_num - $LabelInside_num + 1); $m<=($bangou_oya_lot*$LabelInside_num); $m++){
+
+                       $lot_count_kodomo = sprintf('%03d', $m);
+                       $CheckLotkodomo_flag_used = $this->CheckLots->find()->where(['delete_flag' => '0', 'product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num like' => $lot_kodomo."-".$lot_count_kodomo])->toArray();//子ロットの仲間全部
+
+                       $arrCheckLotkodomotati[] = $CheckLotkodomo_flag_used[0]->flag_used;
+                       $flag_used_total = $flag_used_total + $CheckLotkodomo_flag_used[0]->flag_used;
                      }
 /*
                      echo "<pre>";
-                     print_r("lot_oomoto--  ");
-                     print_r($lot_oomoto);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("lot_kodomo--  ");
-                     print_r($lot_kodomo);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("lot_num_touroku--  ");
-                     print_r($lot_num_touroku);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("CheckLotId--  ");
-                     print_r($CheckLotId);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("cntkodomo--  ");
-                     print_r($cntkodomo);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("cntoya--  ");
-                     print_r($cntoya);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("lot_kodomo_first--  ");
-                     print_r($lot_kodomo_first);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("bangou_lot--  ");
-                     print_r($bangou_lot);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("bangou_oya_lot--  ");
-                     print_r($bangou_oya_lot);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("LabelInside_num--  ");
-                     print_r($LabelInside_num);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("ini--  ");
-                     print_r($bangou_oya_lot*$LabelInside_num - $LabelInside_num);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("last--  ");
-                     print_r($bangou_oya_lot*$LabelInside_num - 1);
-                     echo "</pre>";
-                     echo "<pre>";
-                     print_r("flag_used_total--  ");
-                     print_r($flag_used_total);
+                     print_r(substr($_SESSION['result_zensu_head_id']['lot_num'], 3, 6)."-".sprintf('%03d', $bangou_oya_lot));
                      echo "</pre>";
 */
                     if($flag_used_total == 0){//子ロットが全部検査済みの場合は親ロットのflag_usedを０に変更
-                      $arrCheckLotoya = array();//空の配列を作る　$lot_oyaの仲間を全部集める
-                      foreach ((array)$CheckLotoya as $key => $value) {//lot_numで並び替え
-                        $sort[$key] = $value['lot_num'];
-                        array_push($arrCheckLotoya, ['id' => $value['id'], 'product_code' => $value['product_code'], 'lot_num' => $value['lot_num'], 'flag_used' => $value['flag_used']]);
-                      }
-                      array_multisort(array_map("strtotime", array_column($arrCheckLotoya, "lot_num" ) ), SORT_ASC, $arrCheckLotoya);
-                //      array_multisort($sort , SORT_ASC, $CheckLotoya);
 
-                       $bangou_arr_oya_lot = $bangou_oya_lot - 1;
                        $this->CheckLots->updateAll(
                         ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
-                        ['id'  => $arrCheckLotoya[$bangou_arr_oya_lot]['id']]);
+                        ['lot_num'  => substr($_SESSION['result_zensu_head_id']['lot_num'], 3, 6)."-".sprintf('%03d', $bangou_oya_lot)]);
 
                         //insert 旧DB
                         $connection = ConnectionManager::get('sakaeMotoDB');

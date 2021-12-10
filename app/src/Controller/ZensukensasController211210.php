@@ -134,9 +134,17 @@ class ZensukensasController extends AppController
          }
        }
 
+       $CountResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code1, 'lot_num' => $lot_num])->toArray();
+       $count_inspection = count($CountResultZensuHead) + 1;
+/*
+       echo "<pre>";
+       print_r("1 count_inspection = ".$count_inspection);
+       echo "</pre>";
+*/
        $arr1 = array();//$product_code1用の配列
        $arr1 = array_merge($arr1,array('product_code'=>$product_code1));
        $arr1 = array_merge($arr1,array('lot_num'=>$lot_num));
+       $arr1 = array_merge($arr1,array('count_inspection'=>$count_inspection));
        $arr1 = array_merge($arr1,array('staff_id'=>$staff_id));
        $arr1 = array_merge($arr1,array('datetime_start'=> date("Y-m-d H:i:s")));
        $arr1 = array_merge($arr1,array('delete_flag'=>0));
@@ -188,14 +196,28 @@ class ZensukensasController extends AppController
        }
 
        if($product_code2 != null){//セット取りの場合
+
+         $CountResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code2, 'lot_num' => $lot_num])->toArray();
+         $count_inspection = count($CountResultZensuHead) + 1;
+/*
+         echo "<pre>";
+         print_r("2 count_inspection = ".$count_inspection);
+         echo "</pre>";
+*/
          $arr2 = array();//$product_code2用の配列
          $arr2 = array_merge($arr2,array('product_code'=>$product_code2));
          $arr2 = array_merge($arr2,array('lot_num'=>$lot_num));
+         $arr2 = array_merge($arr2,array('count_inspection'=>$count_inspection));
          $arr2 = array_merge($arr2,array('staff_id'=>$staff_id));
          $arr2 = array_merge($arr2,array('datetime_start'=> date("Y-m-d H:i:s")));
          $arr2 = array_merge($arr2,array('delete_flag'=>0));
          $arr2 = array_merge($arr2,array('created_staff'=>$staff_id));
          $arr2touroku[] = $arr2;
+/*
+         echo "<pre>";
+         print_r($arr2touroku);
+         echo "</pre>";
+*/
           $ResultZensuHead = $this->ResultZensuHeads->find()->where(['product_code' => $product_code2, 'staff_id' => $staff_id, 'lot_num' => $lot_num, 'datetime_finish IS' => Null])->toArray();
           if(isset($ResultZensuHead[0])){
             $ResultZensuHead = $ResultZensuHead;//既にResultZensuHeadsテーブルにあって、検査済みではない場合（検査中にもう一度検査しようとした場合）
@@ -1172,7 +1194,7 @@ class ZensukensasController extends AppController
       //    $fp = fopen('zensu_csv/zenken_test.csv', 'w');
           $fp = fopen('/home/centosuser/zensu_csv/zenken_test.csv', 'w');
             foreach ($arrichiran_csv as $line) {
-        //      $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
+              $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
               fputcsv($fp, $line);
             }
             fclose($fp);

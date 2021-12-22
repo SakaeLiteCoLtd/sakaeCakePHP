@@ -45,7 +45,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
       <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
       <td colspan="9"><?= h($newversion) ?></td>
       <td colspan="5" nowrap="nowrap"><div align="center"><strong>IMタイプ</strong></div></td>
-      <td colspan="9"><?= $this->Form->input("type_im", ["type"=>"select","empty"=>"選択してください", "options"=>$arrType, 'label'=>false, 'required'=>true]) ?></td>
+      <td colspan="9"><?= $this->Form->input("type_im", ["type"=>"select","empty"=>"選択してください", "options"=>$arrType, "value"=>$type_im, 'label'=>false, 'required'=>true]) ?></td>
     </tr>
     <tr style="border-bottom: solid;border-width: 1px">
       <td colspan="4">&nbsp;</td>
@@ -70,7 +70,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         $upperArray = Array();
         for($i=1; $i<=8; $i++){
         echo '<td colspan="2"><div align="center">';
-        echo '<input name=" upper_' . $i . '" type="text"  value="" size="6"/>';
+        echo "<input name=upper_" . $i . " type='text' size='6' value=${"upper_".$i}>";
         echo '</div></td>';
         }
         echo "<td colspan='2'>\n";
@@ -90,7 +90,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         $lowerArray = Array();
         for($i=1; $i<=8; $i++){
         echo '<td colspan="2"><div align="center">';
-        echo '<input name=" lower_' . $i . '" type="text"  value="" size="6"/>';
+        echo "<input name=lower_" . $i . " type='text' size='6' value=${"lower_".$i}>";
         echo '</div></td>';
         }
         echo "<td colspan='2'>\n";
@@ -109,7 +109,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         $sizeArray = Array();
         for($i=1; $i<=9; $i++){
         echo '<td colspan="2"><div align="center">';
-        echo '<input name=" size_' . $i . '" type="text"  value="" size="6"/>';
+        echo "<input name=size_" . $i . " type='text' size='6' value=${"size_".$i}>";
         echo '</div></td>';
         }
         /*
@@ -138,7 +138,8 @@ $arrtext11 = [
 
     <td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
       <strong style="text-align: left">備考：</strong><br>
-          <textarea name="bik"  cols="120" rows="10"></textarea>
+          <textarea name="bik"  cols="120" rows="10"><?php echo "$bik\n";?>
+          </textarea>
       </td>
     </tr>
    <tr>

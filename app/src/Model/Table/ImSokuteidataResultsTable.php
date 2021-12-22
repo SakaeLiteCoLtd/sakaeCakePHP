@@ -101,7 +101,6 @@ class ImSokuteidataResultsTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['im_sokuteidata_head_id'], 'ImSokuteidataHeads'));
-        $rules->add($rules->existsIn(['im_sokuteidata_head_id'], 'ImSokuteidataHeads'));
 
         return $rules;
     }

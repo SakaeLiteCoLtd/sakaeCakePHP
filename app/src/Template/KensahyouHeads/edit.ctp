@@ -155,7 +155,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
       <strong style="text-align: left">備考：</strong><br>
           <textarea name="bik" cols="120" rows="10">
 <?php
-echo "$bik\n";;
+echo "$bik\n";
 ?>
           </textarea>
       </td>

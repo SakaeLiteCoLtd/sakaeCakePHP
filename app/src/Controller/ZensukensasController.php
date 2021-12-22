@@ -740,7 +740,7 @@ class ZensukensasController extends AppController
                         $table->setConnection($connection);
 
                         $updater = "UPDATE check_lots set flag_used = 0 , updated_at = '".date('Y-m-d H:i:s')."'
-                          where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$arrCheckLotoya[$bangou_arr_oya_lot]['lot_num']."'";//もとのDBも更新
+                          where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".substr($_SESSION['result_zensu_head_id']['lot_num'], 3, 6)."-".sprintf('%03d', $bangou_oya_lot)."'";//もとのDBも更新
                         $connection->execute($updater);
 
                         $connection = ConnectionManager::get('default');//新DBに戻る

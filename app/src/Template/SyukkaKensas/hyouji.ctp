@@ -20,16 +20,8 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
  </table>
  <hr size="5" style="margin: 0.5rem">
 
-	<?php
-  echo $this->Form->create($ImKikakuTaious, ['url' => ['action' => 'imtaioueditconfirm']]);
-  $options2 = [
-    '0' => '新バージョン登録',
-    '1' => '登録内容修正　　'
-  ];
-  $attributes = array('value' => 0)
-	?>
   <fieldset>
-<div align="center"><strong><font color="red">＊入力してください</font></strong></div>
+<div align="center"><strong><font color="red">＊IM対応登録内容表示</font></strong></div>
 <br>
       <table width="1200" border="1" align="center" bordercolor="#000000" style="background-color: #FFFFFF">
           <tr style="border-bottom: solid;border-width: 1px">
@@ -51,12 +43,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           echo "</strong></div></td>\n";
               $resultArray = Array();
               for($i=1; $i<=9; $i++){
-                  echo "<td colspan='2'><div align='center'><select name=kind_kensa_".$i.">\n";
-    //              echo "<name=kind_kensa_".$i." options=$arrKindKensa size='6'/>\n";
-                  foreach ($arrKindKensa as $value){
-                  echo "<option name=kind_kensa_".$i." value=$value>$value</option>";
-                  }
-                  echo "</select></div></td>\n";
+                echo "<td colspan='2'><div align='center'>\n";
+                echo ${"kind_kensa".$i};
+                echo "</div></td>\n";
               }
               echo "<td colspan='2'>\n";
               echo "</td>\n";
@@ -71,7 +60,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                   $resultArray = Array();
                   for($i=1; $i<=9; $i++){
                       echo "<td colspan='2'><div align='center'>\n";
-                      echo "<input type='text' name=size_num_".$i." size='6' value=${"size_num_".$i}>\n";
+                      echo ${"size_num_".$i};
                       echo "</div></td>\n";
                   }
               echo "<td colspan='2'>\n";
@@ -83,12 +72,12 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           ?>
     </table>
     <br>
-          <?php
-          echo $this->Form->hidden('product_code' ,['value'=>$product_code]);
-          echo $this->Form->hidden('newversion' ,['value'=>$newversion]);
-          ?>
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#E6FFFF">
+      <td style="border-style: none;"><div><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+    </tr>
+    </table>
       </fieldset>
-      <center><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')) ?></center>
       <?= $this->Form->end() ?>
 <br>
     <?= $this->Form->end() ?>

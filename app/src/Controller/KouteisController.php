@@ -2756,10 +2756,31 @@ class KouteisController extends AppController {
       	$Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
       	$this->set('Productname',$Productname);//セット
 
-       $KensaProduct = $this->KouteiKensahyouHeads->find()->where(['product_code' => $product_code ,'delete_flag' => '0'])->order(["version"=>"desc"])->toArray();
-       $KensaProductV = $KensaProduct[0]->version;
+       $KouteiKensahyouHead = $this->KouteiKensahyouHeads->find()->where(['product_code' => $product_code ,'delete_flag' => '0'])->order(["version"=>"desc"])->toArray();
+       $KensaProductV = $KouteiKensahyouHead[0]->version;
        $newversion = $KensaProductV + 1;
        $this->set('newversion',$newversion);
+
+       if(isset($KouteiKensahyouHead[0])){
+
+         for($i=1; $i<=9; $i++){//size_1～9までセット
+           ${"size_".$i} = $KouteiKensahyouHead[0]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
+           $this->set('size_'.$i,${"size_".$i});//セット
+         }
+
+         for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
+           ${"upper_".$j} = $KouteiKensahyouHead[0]->{"upper_{$j}"};//KensahyouHeadのupper_1～8まで
+           $this->set('upper_'.$j,${"upper_".$j});//セット
+           ${"lower_".$j} = $KouteiKensahyouHead[0]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
+           $this->set('lower_'.$j,${"lower_".$j});//セット
+         }
+       }
+
+       $bik = $KouteiKensahyouHead[0]->bik;
+       $this->set('bik',$bik);//セット
+
+       $type_im = $KouteiKensahyouHead[0]->type_im;
+       $this->set('type_im',$type_im);//セット
 
        $arrType = ['0' => 'IM6120(1号機)', '1' => 'IM7000(2号機)'];
        $this->set('arrType',$arrType);
@@ -3099,7 +3120,7 @@ class KouteisController extends AppController {
            for($i=1; $i<=9; $i++){
              if(!empty($data["size_".$i])){
                $updater = "UPDATE koutei_kensahyou_head set size_$i ='".$data["size_".$i]."'
-               where product_id ='".$Productcode."' and version ='".$versionmoto."'";
+               where product_id ='".$Productcode."'";
                $connection->execute($updater);
              }
           }
@@ -3107,7 +3128,7 @@ class KouteisController extends AppController {
           for($i=1; $i<=9; $i++){
             if(!empty($data["upper_".$i])){
               $updater = "UPDATE koutei_kensahyou_head set upper_$i ='".$data["upper_".$i]."'
-              where product_id ='".$Productcode."' and version ='".$versionmoto."'";
+              where product_id ='".$Productcode."'";
               $connection->execute($updater);
             }
          }
@@ -3115,7 +3136,7 @@ class KouteisController extends AppController {
          for($i=1; $i<=9; $i++){
            if(!empty($data["lower_".$i])){
              $updater = "UPDATE koutei_kensahyou_head set lower_$i ='".$data["lower_".$i]."'
-             where product_id ='".$Productcode."' and version ='".$versionmoto."'";
+             where product_id ='".$Productcode."'";
              $connection->execute($updater);
            }
         }
@@ -3123,14 +3144,14 @@ class KouteisController extends AppController {
         for($i=10; $i<=11; $i++){
           if(empty($data["text_".$i])){
             $updater = "UPDATE koutei_kensahyou_head set text_$i ='".$data["text_".$i]."'
-            where product_id ='".$Productcode."' and version ='".$versionmoto."'";
+            where product_id ='".$Productcode."'";
             $connection->execute($updater);
           }
        }
 
            $updater = "UPDATE koutei_kensahyou_head set type_im ='".$data['type_im']."',
            bik ='".$data['bik']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$data['updated_staff']."'
-           where product_id ='".$Productcode."' and version ='".$versionmoto."'";
+           where product_id ='".$Productcode."'";
            $connection->execute($updater);
 
            $connection = ConnectionManager::get('default');//新DBに戻る
@@ -3209,6 +3230,44 @@ class KouteisController extends AppController {
            $table = TableRegistry::get('koutei_kensahyou_head');
            $table->setConnection($connection);
 
+           for($i=1; $i<=9; $i++){
+             if(!empty($data["size_".$i])){
+               $updater = "UPDATE koutei_kensahyou_head set size_$i ='".$data["size_".$i]."'
+               where product_id ='".$Productcode."'";
+               $connection->execute($updater);
+             }
+          }
+
+          for($i=1; $i<=9; $i++){
+            if(!empty($data["upper_".$i])){
+              $updater = "UPDATE koutei_kensahyou_head set upper_$i ='".$data["upper_".$i]."'
+              where product_id ='".$Productcode."'";
+              $connection->execute($updater);
+            }
+         }
+
+         for($i=1; $i<=9; $i++){
+           if(!empty($data["lower_".$i])){
+             $updater = "UPDATE koutei_kensahyou_head set lower_$i ='".$data["lower_".$i]."'
+             where product_id ='".$Productcode."'";
+             $connection->execute($updater);
+           }
+        }
+
+        for($i=10; $i<=11; $i++){
+          if(empty($data["text_".$i])){
+            $updater = "UPDATE koutei_kensahyou_head set text_$i ='".$data["text_".$i]."'
+            where product_id ='".$Productcode."'";
+            $connection->execute($updater);
+          }
+       }
+
+           $updater = "UPDATE koutei_kensahyou_head set type_im ='".$data['type_im']."',
+           bik ='".$data['bik']."', updated_at ='".date('Y-m-d H:i:s')."', updated_emp_id ='".$data['updated_staff']."'
+           where product_id ='".$Productcode."'";
+           $connection->execute($updater);
+
+/*
            $delete_flag = 1;
            $versionmoto = $data['version'] - 1;
            $updater = "UPDATE koutei_kensahyou_head set status ='".$delete_flag."'
@@ -3251,7 +3310,7 @@ class KouteisController extends AppController {
                'created_at' => date('Y-m-d H:i:s'),
                'created_emp_id' => $data['updated_staff']
              ]);
-
+*/
              $connection = ConnectionManager::get('default');//新DBに戻る
              $table->setConnection($connection);
 
@@ -3330,9 +3389,8 @@ class KouteisController extends AppController {
           }
 
         }else{
-
           unset($data[$k]);
-          ${"shape_detection_".$k} = 0;
+          ${"shape_detection_".$k} = "";
           $this->set('shape_detection_'.$k,${"shape_detection_".$k});//セット
 
         }

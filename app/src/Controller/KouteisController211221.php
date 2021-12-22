@@ -3311,6 +3311,11 @@ class KouteisController extends AppController {
       $count = count($data);
       for($k=1; $k<=$count; $k++){
 
+        //211130追加
+        if(strlen($data[$k]['shape_detection']) < 1){
+          $data[$k]['shape_detection'] = 0;
+        }
+
         if(!empty($data[$k]["kind_kensa"]) && !empty($data[$k]["im_size_num"])){
 
           $staff_id = $sessiondata['Auth']['User']['staff_id'];//ログイン中のuserのstaff_idに$staff_idという名前を付ける
@@ -3334,11 +3339,7 @@ class KouteisController extends AppController {
       }
 
       $data = array_values($data);
-/*
-      echo "<pre>";
-      print_r($data);
-      echo "</pre>";
-*/
+
           if ($data[0]['status'] == 1) {
 /*
            $KouteiKensahyouHeads = $this->KouteiKensahyouHeads->patchEntity($KouteiKensahyouHeads, $this->request->getData());
@@ -3399,6 +3400,10 @@ class KouteisController extends AppController {
               $updater = "UPDATE koutei_im_kikaku_taiou set status = '".$status."'
               , updated_at = '".date('Y-m-d H:i:s')."' , updated_emp_id = '".$data[0]['created_staff']."'
               where product_id ='".$product_code."' and status ='".$statusmoto."'";
+              $connection->execute($updater);
+
+              //211130追加
+              $updater = "DELETE FROM koutei_im_kikaku_taiou where product_id ='".$product_code."'";
               $connection->execute($updater);
 
               for($k=0; $k<count($data); $k++){

@@ -13,6 +13,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
+          echo $this->Form->create($KensahyouHeads, ['url' => ['action' => 'hyouji']]);
 ?>
 <?php
  use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
@@ -26,13 +27,14 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
  ?>
  </table>
  <hr size="5" style="margin: 0.5rem">
- <table style="margin-bottom:0px" width="750" border="0" align="center" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
-   <tr style="background-color: #E6FFFF">
-     <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/imkensahyou.gif',array('width'=>'115','height'=>'40','url'=>array('action'=>'yobidashicustomer')));?></td>
-     <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/imtype.gif',array('width'=>'115','height'=>'40','url'=>array('action'=>'typeyobidashicustomer')));?></td>
-       <td style="padding: 0.1rem 0.1rem;"><a href="qr/index.php"><?php echo $this->Html->image('Labelimg/imhyouji.gif',array('width'=>'115','height'=>'40','url'=>array('action'=>'hyoujicustomer')));?></td>
-   </tr>
- </table>
+
  <br>
-  <div align="center"><font color="red" size="2"><?= __($mess) ?></font></div>
-  <br>
+
+ <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+   <tr>
+     <td bgcolor="#FFFFCC" style="width: 50px;border-bottom: solid;border-width: 1px">品番</td>
+     <td bgcolor="#FFFFCC" style="border-bottom: solid;border-width: 1px"><?= $this->Form->control('product_code', array('type'=>'text', 'label'=>false, 'autofocus'=>true)) ?></td>
+     <td style="border-style: none"><div align="center"><?= $this->Form->submit(__('検索'), array('name' => 'kakunin')); ?></div></td>
+ 	</tr>
+ </table>
+<br><br>

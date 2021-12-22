@@ -57,6 +57,56 @@ class SyukkaKensasController extends AppController {
 
     }
 
+    public function hyoujicustomer()
+    {
+      $KensahyouHeads = $this->KensahyouHeads->newEntity();
+      $this->set('KensahyouHeads',$KensahyouHeads);
+    }
+
+    public function hyouji()
+    {
+      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+      $product_code = $data['product_code'];//product_idという名前のデータに$product_idと名前を付ける
+
+      $ImKikakuTaiouDatas = $this->ImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => 0])->toArray();
+
+      $this->set('product_code',$product_code);//セット
+      $this->set('Productcode',$product_code);//セット
+
+      for($k=0; $k<10; $k++){
+        $this->set("kind_kensa".$k,"ノギス");
+        $this->set("size_num_".$k,"");
+      }
+
+      for($k=0; $k<count($ImKikakuTaiouDatas); $k++){
+        $this->set("kind_kensa".$ImKikakuTaiouDatas[$k]["kensahyuo_num"],$ImKikakuTaiouDatas[$k]["kind_kensa"]);
+        $this->set("size_num_".$ImKikakuTaiouDatas[$k]["kensahyuo_num"],$ImKikakuTaiouDatas[$k]["size_num"]);
+      }
+
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+      $this->set('Productname',$Productname);//セット
+
+      $arrType = ['0' => 'IM6120(1号機)', '1' => 'IM7000(2号機)'];
+      $this->set('arrType',$arrType);
+
+      $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
+      $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
+      $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
+
+      $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()
+     ->where(['product_code' => $product_code])->toArray();
+
+      $arrKindKensa = array("","ノギス");//配列の初期化
+       foreach ($ImSokuteidataHeads as $value) {//それぞれに対して
+          $arrKindKensa[] = $value->kind_kensa;//配列に追加
+       }
+        $arrKindKensa = array_unique($arrKindKensa);
+
+       $this->set('arrKindKensa',$arrKindKensa);
+
+    }
+
     public function yobidashicustomer()//「出荷検査用呼出」ページトップ
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
@@ -3066,7 +3116,17 @@ class SyukkaKensasController extends AppController {
        $this->set('product_code',$product_code);//セット
        $this->set('Productcode',$product_code);//セット
 
-       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_idを満たすものを$Product
+       $ImKikakuTaiouDatas = $this->ImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => 0])->toArray();
+
+       for($k=0; $k<10; $k++){
+         $this->set("size_num_".$k,"");
+       }
+
+       for($k=0; $k<count($ImKikakuTaiouDatas); $k++){
+         $this->set("size_num_".$ImKikakuTaiouDatas[$k]["kensahyuo_num"],$ImKikakuTaiouDatas[$k]["size_num"]);
+       }
+
+       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
        $Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
        $this->set('Productname',$Productname);//セット
 

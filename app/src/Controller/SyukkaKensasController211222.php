@@ -11,6 +11,10 @@ use Cake\Filesystem\Folder;
 use Cake\Filesystem\File;
 use App\myClass\KensahyouSokuteidata\htmlKensahyouSokuteidata;//myClassフォルダに配置したクラスを使用
 
+use App\myClass\Logins\htmlLogin;
+
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 class SyukkaKensasController extends AppController {
 
       public function initialize()
@@ -41,6 +45,16 @@ class SyukkaKensasController extends AppController {
     {
       $KensahyouHeads = $this->KensahyouHeads->newEntity();
       $this->set('KensahyouHeads',$KensahyouHeads);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
     }
 
     public function yobidashicustomer()//「出荷検査用呼出」ページトップ
@@ -683,80 +697,125 @@ class SyukkaKensasController extends AppController {
     {
       $this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
 
-     $session = $this->request->getSession();
-     $data = $session->read();//postデータ取得し、$dataと名前を付ける
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
     }
 
     public function typeimtaioupreadd()
     {
       $this->set('KouteiKensahyouHeads',$this->KouteiKensahyouHeads->newEntity());
 
-     $session = $this->request->getSession();
-     $data = $session->read();//postデータ取得し、$dataと名前を付ける
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
 
-     $_SESSION['imdatanew'][0] = array(
-       'id' => $_POST['id'],
-       'version' => $_POST['version'],
-       'type_im' => $_POST['type_im']
-     );
+        $session = $this->request->getSession();
+        $data = $session->read();//postデータ取得し、$dataと名前を付ける
+
+        $_SESSION['imdatanew'][0] = array(
+          'id' => $_POST['id'],
+          'version' => $_POST['version'],
+          'type_im' => $_POST['type_im']
+        );
+      }
+
     }
 
    public function imlogin()
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
 
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+       $userdata = $data['username'];
 
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'impreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
          }
-           $user = $this->Auth->identify();
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'imtaioudo']);
-         }
+
        }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'imtaioudo']);
+       }
+     }
    }
 
    public function typeimlogin()
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-       $ary = explode(',', $str);//$strを配列に変換
 
-       $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-       //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-       $this->set('username', $username);
-       $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+       $userdata = $data['username'];
 
-         if(empty($Userdata)){
-           $delete_flag = "";
-         }else{
-           $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-           $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'typeimtaioupreadd',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
          }
-           $user = $this->Auth->identify();
-         if ($user) {
-           $this->Auth->setUser($user);
-           return $this->redirect(['action' => 'typeimtaioudo']);
-         }
+
        }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+       $username = $arraylogindate[0];
+       $delete_flag = $arraylogindate[1];
+       $this->set('username',$username);
+       $this->set('delete_flag',$delete_flag);
+
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'typeimtaioudo']);
+       }
+     }
    }
 
     public function imtaioudo()
     {
       $session = $this->request->getSession();
       $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
+
+      $session_names = "kikakudata,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'yobidashimenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $data = $sessiondata['kikakudata'];
 
       $Product = $this->Products->find()->where(['product_code' => $sessiondata['kikakudata'][1]['product_code']])->toArray();
@@ -851,6 +910,14 @@ class SyukkaKensasController extends AppController {
       $session = $this->request->getSession();
       $data = $session->read();//postデータ取得し、$dataと名前を付ける
 
+      $session_names = "imdatanew,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'yobidashimenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $updated_staff = array('updated_staff'=>$data['Auth']['User']['staff_id']);
       $data["imdatanew"][0] = array_merge($data["imdatanew"][0],$updated_staff);
 
@@ -923,13 +990,13 @@ class SyukkaKensasController extends AppController {
 
               $delete_flag = 1;
               $versionmoto = $data["imdatanew"][0]['version'] - 1;
-              $updater = "UPDATE kensahyou_head set status ='".$delete_flag."'
-              where product_id ='".$product_code."' and version ='".$versionmoto."'";
+              $updater = "DELETE FROM kensahyou_head
+              where product_id ='".$product_code."'";
               $connection->execute($updater);
 
   							$connection->insert('kensahyou_head', [
                   'product_id' => $product_code,
-                  'version' => $data["imdatanew"][0]['version'],
+            //      'version' => $data["imdatanew"][0]['version'],
             //      'type_im' => $data["imdatanew"][0]['type_im'],
                   'size_1' => $KensahyouHeads[0]->size_1,
                   'upper_1' => $KensahyouHeads[0]->upper_1,
@@ -959,7 +1026,7 @@ class SyukkaKensasController extends AppController {
                   'text_10' => $KensahyouHeads[0]->text_10,
                   'text_11' => $KensahyouHeads[0]->text_11,
                   'bik' => $KensahyouHeads[0]->bik,
-                  'status' => 0
+          //        'status' => 0
   							]);
 
                 $connection = ConnectionManager::get('default');//新DBに戻る
@@ -2999,7 +3066,17 @@ class SyukkaKensasController extends AppController {
        $this->set('product_code',$product_code);//セット
        $this->set('Productcode',$product_code);//セット
 
-       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_idを満たすものを$Product
+       $ImKikakuTaiouDatas = $this->ImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => 0])->toArray();
+
+       for($k=0; $k<10; $k++){
+         $this->set("size_num_".$k,"");
+       }
+
+       for($k=0; $k<count($ImKikakuTaiouDatas); $k++){
+         $this->set("size_num_".$ImKikakuTaiouDatas[$k]["kensahyuo_num"],$ImKikakuTaiouDatas[$k]["size_num"]);
+       }
+
+       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
        $Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
        $this->set('Productname',$Productname);//セット
 
@@ -3060,40 +3137,64 @@ class SyukkaKensasController extends AppController {
      {
        $this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
 
-       $session = $this->request->getSession();
-       $data = $session->read();//postデータ取得し、$dataと名前を付ける
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }else{
+         $mess = "";
+         $this->set('mess',$mess);
+       }
      }
 
      public function imtaioueditlogin()
      {
        if ($this->request->is('post')) {
          $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-         $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-         $ary = explode(',', $str);//$strを配列に変換
 
-         $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-         //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-         $this->set('username', $username);
-         $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+         $userdata = $data['username'];
 
-           if(empty($Userdata)){
-             $delete_flag = "";
-           }else{
-             $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-             $this->set('delete_flag',$delete_flag);//登録者の表示のため1行上の$Roleをctpで使えるようにセット
+         if(isset($data['prelogin'])){
+
+           $htmllogin = new htmlLogin();
+           $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+           if($qrcheck > 0){
+             return $this->redirect(['action' => 'imtaioueditpreadd',
+             's' => ['mess' => "QRコードを読み込んでください。"]]);
            }
-             $user = $this->Auth->identify();
-           if ($user) {
-             $this->Auth->setUser($user);
-             return $this->redirect(['action' => 'imtaioueditdo']);
-           }
+
          }
+
+         $htmllogin = new htmlLogin();
+         $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+         $username = $arraylogindate[0];
+         $delete_flag = $arraylogindate[1];
+         $this->set('username',$username);
+         $this->set('delete_flag',$delete_flag);
+
+         $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+         if ($user) {
+           $this->Auth->setUser($user);
+           return $this->redirect(['action' => 'imtaioueditdo']);
+         }
+       }
      }
 
      public function imtaioueditdo()
     {
       $session = $this->request->getSession();
       $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
+
+      $session_names = "kikakudata,kousinn_flag,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'yobidashimenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
 
       $data = $sessiondata['kikakudata'];
       $kousinn_flag = $_SESSION['kousinn_flag']['kousinn_flag'];
@@ -3208,9 +3309,8 @@ class SyukkaKensasController extends AppController {
 
              $statusmoto = 0;
              $status = 1;
-             $updater = "UPDATE im_kikaku_taiou set status = '".$status."'
-             , updated_at = '".date('Y-m-d H:i:s')."' , updated_staff = '".$data[0]['created_staff']."'
-             where product_id ='".$product_code."' and status ='".$statusmoto."'";
+             $updater = "DELETE FROM im_kikaku_taiou
+             where product_id ='".$product_code."'";
              $connection->execute($updater);
 
              //旧DB更新

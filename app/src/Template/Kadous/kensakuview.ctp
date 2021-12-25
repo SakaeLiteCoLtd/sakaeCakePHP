@@ -162,6 +162,7 @@
                 $num = $num + $arrGroupcount[$count];
 
                 $total_loss_time = round((1 - $KadouSeikeis[$num-1]["kadouritsu"]) * 86400 / 60 , 1);
+
 /*
                 $total_loss = 0;
                 for($n=$i; $n<=$num-1; $n++){

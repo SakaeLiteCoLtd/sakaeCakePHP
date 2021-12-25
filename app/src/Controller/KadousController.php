@@ -1231,7 +1231,6 @@ class KadousController extends AppController
 
           $connection = ConnectionManager::get('default');
           $table->setConnection($connection);
-
 /*
           echo "<pre>";
           print_r($k);
@@ -1401,7 +1400,66 @@ class KadousController extends AppController
           $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $arrFinishTimestuika);
         }
 
+        $start_flag = array('start_flag'=>0);
+        $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $start_flag);
+        $finish_flag = array('finish_flag'=>0);
+        $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $finish_flag);
+
+        if($KadouSeikeis[$l]["starting_tm"]->format('H') < 8){
+          $starting_tm = substr($KadouSeikeis[$l]['starting_tm'], 0, 10);
+          $starting_tm = $starting_tm." 08:00:00";
+          $finishing_tm = strtotime($starting_tm);
+          $finish_program = date('Y/m/d H:i:s', strtotime('-1 day', $finishing_tm));
+          $date_seikei = substr($KadouSeikeis[$l]['starting_tm'], 0, 10);
+
+          $arrdate_seikei = array('date_seikei'=>$date_seikei);
+        }else{
+          $date_seikei = substr($KadouSeikeis[$l]['starting_tm'], 0, 10);
+
+          $arrdate_seikei = array('date_seikei'=>$date_seikei);
+        }
+        $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $arrdate_seikei);
+
       }
+
+      for($l=0; $l<$count; $l++){
+
+        if($l == 0){
+
+          $start_flag = array('start_flag'=>1);
+          $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $start_flag);
+
+        }
+        if($l == $count - 1){
+
+          $start_flag = array('finish_flag'=>1);
+          $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $start_flag);
+
+        }
+
+        if($l > 0 && $KadouSeikeis[$l-1]["seikeiki"] != $KadouSeikeis[$l]["seikeiki"]
+        && $KadouSeikeis[$l-1]["date_seikei"] == $KadouSeikeis[$l]["date_seikei"]){//同じ日の違う成形機の場合
+
+          $start_flag = array('start_flag'=>1);
+          $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $start_flag);
+          $finish_flag = array('finish_flag'=>1);
+          $KadouSeikeis[$l-1] = array_merge($KadouSeikeis[$l-1], $finish_flag);
+
+        }elseif($l > 0 && $KadouSeikeis[$l-1]["date_seikei"] != $KadouSeikeis[$l]["date_seikei"]){
+
+          $start_flag = array('start_flag'=>1);
+          $KadouSeikeis[$l] = array_merge($KadouSeikeis[$l], $start_flag);
+          $finish_flag = array('finish_flag'=>1);
+          $KadouSeikeis[$l-1] = array_merge($KadouSeikeis[$l-1], $finish_flag);
+
+        }
+
+      }
+/*
+      echo "<pre>";
+      print_r($KadouSeikeis);
+      echo "</pre>";
+*/
 /*
       echo "<pre>";
       print_r($n." ".$count." ".$countFinishTime);
@@ -1504,7 +1562,23 @@ class KadousController extends AppController
 
                   $start_program = strtotime($starting_tm_program);
                   $finish_program = strtotime($finishing_tm_program);
-                  $diff_program = ($finish_program - $start_program);//生産時間
+
+                  if($KadouSeikeis[$n1]["start_flag"] == 1){//その成形機の最初の場合
+
+                    $starting_tm = substr($KadouSeikeis[$n1]['starting_tm'], 0, 10);
+                    $starting_tm = $starting_tm." 08:00:00";
+                    $start_program = strtotime($starting_tm);
+
+                  }elseif($KadouSeikeis[$n1]["finish_flag"] == 1){//その成形機の最後の場合
+
+                    $starting_tm = substr($KadouSeikeis[$n1]['starting_tm'], 0, 10);
+                    $starting_tm = $starting_tm." 08:00:00";
+                    $finishing_tm = strtotime($starting_tm);
+                    $finish_program = date('Y/m/d H:i:s', strtotime('+1 day', $finishing_tm));
+                    $finish_program = strtotime($finish_program);
+
+                  }
+                  $diff_program = ($finish_program - $start_program);//生産時間//ここは、最初の場合8:00~生産終了時間まで、最後の場合は生産開始～翌8:00まで
                   $riron_shot_amount = round($diff_program/$shot_cycle);//理論ショット数
 
                   $accomp_rate_program = round($KadouSeikeis[$n1]['amount_programming'] / $riron_shot_amount, 3);
@@ -1667,6 +1741,21 @@ class KadousController extends AppController
 
                 $start_program = strtotime($starting_tm_program);
                 $finish_program = strtotime($finishing_tm_program);
+
+                if($KadouSeikeis[$n1]["start_flag"] == 1){//その成形機の最初の場合
+
+                  $starting_tm = substr($KadouSeikeis[$n1]['starting_tm'], 0, 10);
+                  $starting_tm = $starting_tm." 08:00:00";
+                  $start_program = strtotime($starting_tm);
+
+                }elseif($KadouSeikeis[$n1]["finish_flag"] == 1){//その成形機の最後の場合
+
+                  $starting_tm = substr($KadouSeikeis[$n1]['starting_tm'], 0, 10);
+                  $starting_tm = $starting_tm." 08:00:00";
+                  $finishing_tm = strtotime($starting_tm);
+                  $finishing_tm = date('Y/m/d H:i:s', strtotime('+1 day', $finishing_tm));
+
+                }
                 $diff_program = ($finish_program - $start_program);//生産時間
                 $riron_shot_amount = round($diff_program/$shot_cycle);//理論ショット数
 
@@ -1814,6 +1903,21 @@ class KadousController extends AppController
 
                   $start_program = strtotime($starting_tm_program);
                   $finish_program = strtotime($finishing_tm_program);
+
+                  if($KadouSeikeis[$n1]["start_flag"] == 1){//その成形機の最初の場合
+
+                    $starting_tm = substr($KadouSeikeis[$n1]['starting_tm'], 0, 10);
+                    $starting_tm = $starting_tm." 08:00:00";
+                    $start_program = strtotime($starting_tm);
+
+                  }elseif($KadouSeikeis[$n1]["finish_flag"] == 1){//その成形機の最後の場合
+
+                    $starting_tm = substr($KadouSeikeis[$n1]['starting_tm'], 0, 10);
+                    $starting_tm = $starting_tm." 08:00:00";
+                    $finishing_tm = strtotime($starting_tm);
+                    $finishing_tm = date('Y/m/d H:i:s', strtotime('+1 day', $finishing_tm));
+
+                  }
                   $diff_program = ($finish_program - $start_program);//生産時間
                   $riron_shot_amount = round($diff_program/$shot_cycle);//理論ショット数
 
@@ -1966,13 +2070,12 @@ for($n=0; $n<count($KadouSeikeis); $n++){
       $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrtotal_loss_time);
 
       $kadouritsu = round(1 - (($total_loss_time * 60) / 86400), 3);
+      if($kadouritsu < 0){
+        $kadouritsu = 0;
+      }
       $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
       $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkadouritsu);
-/*
-      echo "<pre>";
-      print_r($kadouritsu);
-      echo "</pre>";
-*/
+
       $katagae_time_touroku = $katagae_time * 60 ;
 /*
       echo "<pre>";
@@ -2013,6 +2116,9 @@ for($n=0; $n<count($KadouSeikeis); $n++){
       $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrtotal_loss_time);
 
       $kadouritsu = round(1 - (($total_loss_time * 60) / 86400), 3);
+      if($kadouritsu < 0){
+        $kadouritsu = 0;
+      }
       $arrkadouritsu = array('kadouritsu'=>$kadouritsu);
       $KadouSeikeis[$n] = array_merge($KadouSeikeis[$n], $arrkadouritsu);
 
@@ -2109,7 +2215,9 @@ echo "</pre>";
 //210428        }else{
 
           $kadouritsu = round(1 - (($KadouSeikeis[$countfin-1]['total_loss_time'] * 60) / 86400), 3);
-
+          if($kadouritsu < 0){
+            $kadouritsu = 0;
+          }
 //210428        }
 
         $arrkadouritsu = array('kadouritsu'=>$kadouritsu);

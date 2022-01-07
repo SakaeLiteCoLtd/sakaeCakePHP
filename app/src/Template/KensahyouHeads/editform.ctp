@@ -1,6 +1,5 @@
 <?php
 /**
- * AuthHelper: Authの変数にアクセスできる
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Staff $staff
  */
@@ -21,16 +20,29 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
  </table>
  <hr size="5" style="margin: 0.5rem">
 
-<?= $this->Form->create($kensahyouHead, ['url' => ['controller'=>'SyukkaKensas','action' => 'indexhome']]) ?>
+	<?php
+  echo $this->Form->create($kensahyouHead, ['url' => ['action' => 'editconfirm']]);
+  
+  $username = $this->request->Session()->read('Auth.User.username');
 
-<?php
-          $username = $this->request->Session()->read('Auth.User.username');
-?>
+  header('Expires:-1');
+  header('Cache-Control:');
+  header('Pragma:');
+
+  $arrtext10 = [
+    '' => '',
+    '外観1' => '外観1'
+  ];
+  $arrtext11 = [
+    '' => '',
+    '外観2' => '外観2'
+  ];
+
+	?>
+
+    <fieldset>
 
 <br>
-<legend align="center"><font color="red"><?= __($mes) ?></font></legend>
-<br>
-
 <table width="1200" border="1" align="center" bordercolor="#000000" bgcolor="#FFFFFF" style="background-color: #FFFFFF">
     <tr style="border-bottom: solid;border-width: 1px">
       <td colspan="5" nowrap="nowrap"><div align="center"><strong>部品番号</strong></div></td>
@@ -40,19 +52,18 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
     </tr>
     <tr style="border-bottom: solid;border-width: 1px">
       <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
-      <td colspan="9"><?= h($data['version']) ?></td>
+      <td colspan="9"><?= h($newversion) ?></td>
       <td colspan="5" nowrap="nowrap"><div align="center"><strong>IMタイプ</strong></div></td>
-      <td colspan="9"><?= h($type_im) ?></td>
+      <td colspan="9" nowrap="nowrap"><?= h($type_im_hyouji) ?></td>
     </tr>
 
-    <?php for($j=1; $j<=$data['maisu']; $j++): ?>
+    <?php for($j=1; $j<=$maisu; $j++): ?>
 
     <tr style="border-bottom: solid;border-width: 1px">
       <td colspan="5" nowrap="nowrap"><div align="center"><strong>枚数</strong></div></td>
-      <td colspan="9"><?= h($j." / ".$data['maisu']) ?></td>
+      <td colspan="9"><?= h($j." / ".$maisu) ?></td>
       <td colspan="14" nowrap="nowrap">&nbsp;<input type="hidden" name="version" value="0"/></td>
     </tr>
-    <tr style="border-bottom: solid;border-width: 1px">
 
     <?php if($j == 1): ?>
 
@@ -104,82 +115,114 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
       <?php endif; ?>
 
-    </tr>
     <tr style="border-bottom: solid;border-width: 1px">
       <td width="33" rowspan="3" nowrap="nowrap" colspan="2"><div align="center"><strong>規格</strong></div></td>
       <td width="45" nowrap="nowrap" colspan="2"><div align="center"><strong>上限</strong></div></td>
 
-    <?php
-        $Array = Array();
-        for($k=1; $k<=8; $k++){
-        echo '<td colspan="2"><div align="center">';
-        echo $data['upper_'.$j.$k];
-        echo '</div></td>';
-        }
-        echo "<td colspan='2'>\n";
-        echo "</td>\n";
-        echo "<td colspan='2'>\n";
-        echo "</td>\n";
 
-    ?>
+      <?php
+          $Array = Array();
+          for($k=1; $k<=8; $k++){
+          echo '<td colspan="2"><div align="center">';
+    //      echo $data['upper_'.$j.$k];
+          if(strlen(${"upper_".$j.$k}) > 0){
+            echo "<input type='text' value=${"upper_".$j.$k} name=upper_".$j.$k." size='6'/>";
+          }else{
+            echo "<input type='text' name=upper_".$j.$k." size='6'/>";
+          }
+          echo '</div></td>';
+          }
+          echo "<td colspan='2'>\n";
+          echo "</td>\n";
+          echo "<td colspan='2'>\n";
+          echo "</td>\n";
 
-      <td colspan="2"><div align="center"></div></td>
-      <td rowspan="3" colspan="2">&nbsp;</td>
-    </tr>
-    <tr style="border-bottom: solid;border-width: 1px">
-      <td nowrap="nowrap" colspan="2"><div align="center"><strong>下限</strong></div></td>
+      ?>
 
-    <?php
-        $Array = Array();
-        for($k=1; $k<=8; $k++){
-        echo '<td colspan="2"><div align="center">';
-        echo $data['lower_'.$j.$k];
-        echo '</div></td>';
-        }
-        echo "<td colspan='2'>\n";
-        echo "</td>\n";
-        echo "<td colspan='2'>\n";
-        echo "</td>\n";
+        <td colspan="2"><div align="center"></div></td>
+        <td rowspan="3" colspan="2">&nbsp;</td>
+      </tr>
+      <tr style="border-bottom: solid;border-width: 1px">
+        <td nowrap="nowrap" colspan="2"><div align="center"><strong>下限</strong></div></td>
 
-    ?>
+      <?php
+          $Array = Array();
+          for($k=1; $k<=8; $k++){
+          echo '<td colspan="2"><div align="center">';
+    //      echo $data['lower_'.$j.$k];
+          if(strlen(${"lower_".$j.$k}) > 0){
+            echo "<input type='text' value=${"lower_".$j.$k} name=lower_".$j.$k." size='6'/>";
+          }else{
+            echo "<input type='text' name=lower_".$j.$k." size='6'/>";
+          }
+          echo '</div></td>';
+          }
+          echo "<td colspan='2'>\n";
+          echo "</td>\n";
+          echo "<td colspan='2'>\n";
+          echo "</td>\n";
 
-      <td colspan="2"><div align="center"></div></td>
-    </tr>
-    <tr style="border-bottom: solid;border-width: 1px">
-      <td nowrap="nowrap" colspan="2"><div align="center"><strong>寸法</strong></div></td>
+      ?>
 
-    <?php
-        $Array = Array();
-        for($l=1; $l<=9; $l++){
-        echo '<td colspan="2"><div align="center">';
-        echo $data['size_'.$j.$l];
-        echo '</div></td>';
-        }
-    ?>
+        <td colspan="2"><div align="center"></div></td>
+      </tr>
+      <tr style="border-bottom: solid;border-width: 1px">
+        <td nowrap="nowrap" colspan="2"><div align="center"><strong>寸法</strong></div></td>
 
-    <?php if($j == 1): ?>
-    <td colspan="2"><div align="center"><?= h($data['text_10']) ?></div></td>
-    <td colspan="2"><div align="center"><?= h($data['text_11']) ?></div></td>
-  <?php else: ?>
-    <td colspan="2"></td>
-    <td colspan="2"></td>
-  <?php endif; ?>
+      <?php
+          $Array = Array();
+          for($l=1; $l<=9; $l++){
+          echo '<td colspan="2"><div align="center">';
+  //        echo $data['size_'.$j.$l];
+          if(strlen(${"size_".$j.$l}) > 0){
+            echo "<input type='text' value=${"size_".$j.$l} name=size_".$j.$l." size='6'/>";
+          }else{
+            echo "<input type='text' name=size_".$j.$l." size='6'/>";
+          }
+          echo '</div></td>';
+          }
+      ?>
 
-    </tr>
+      <?php if($j == 1): ?>
+        <td colspan="2"><div align="center"><?= $this->Form->input('text_10', ["type"=>"select", "options"=>$arrtext10, 'label'=>false]); ?></div></td>
+        <td colspan="2"><div align="center"><?= $this->Form->input('text_11', ["type"=>"select", "options"=>$arrtext11, 'label'=>false]); ?></div></td>
+    <?php else: ?>
+      <td colspan="2"></td>
+      <td colspan="2"></td>
+    <?php endif; ?>
 
-  <?php endfor;?>
+      </tr>
+
+    <?php endfor;?>
 
     <td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
       <strong style="text-align: left">備考：</strong><br>
-          <div cols="120" rows="10"><?= h($data['bik']) ?></div>
+          <textarea name="bik" cols="120" rows="10">
+<?php
+echo "$bik\n";
+?>
+          </textarea>
       </td>
     </tr>
    <tr>
 </table>
-<br>
-<table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
-<tr>
-  <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('トップ'), array('name' => 'top')); ?></div></td>
-</tr>
+<table>
+<td style="text-align: left">
+<strong>　*備考の欄内にはソリ・フレ値・外観の検査基準を外観の規格欄内の値と関連付けてください。</strong>
+</td>
 </table>
+
+<?php
+echo $this->Form->hidden('id' ,['value'=>$kensahyouHead->id]);
+echo $this->Form->hidden('version' ,['value'=>$newversion]);
+echo $this->Form->hidden('product_code' ,['value'=>$product_code]);
+echo $this->Form->hidden('type_im' ,['value'=>$type_im]);
+echo $this->Form->hidden('maisu' ,['value'=>$maisu]);
+echo $this->Form->hidden('status' ,['value'=>0]);
+echo $this->Form->hidden('delete_flag' ,['value'=>0]);
+echo $this->Form->hidden('updated_staff');
+?>
+    </fieldset>
+    <center><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')) ?></center>
 <br>
+    <?= $this->Form->end() ?>

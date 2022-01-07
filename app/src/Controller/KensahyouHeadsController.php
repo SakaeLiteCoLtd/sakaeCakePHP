@@ -263,6 +263,9 @@ class KensahyouHeadsController  extends AppController
       $this->set('Productcode',$product_code);//セット
       $this->set('product_code',$product_code);//セット
 
+      $this->set('kensahyouHeads',$this->KensahyouHeads->find()//KensahyouHeadsテーブルから
+    		->where(['delete_flag' => '0','product_code' => $product_code]));//'delete_flag' => '0'、'product_id' => $product_idを満たすデータをkensahyouHeadsにセット
+
         $arrmaisu = ['1' => '１枚（A～H）', '2' => '２枚（A～P）', '3' => '３枚（A～X）'];
   			$this->set('arrmaisu',$arrmaisu);
 
@@ -673,8 +676,6 @@ class KensahyouHeadsController  extends AppController
 
     public function edit($id = null)
     {
-  //    $this->request->session()->destroy(); // セッションの破棄
-
       $kensahyouHead = $this->KensahyouHeads->get($id);
     	$this->set('kensahyouHead', $kensahyouHead);//$kensahyouHeadをctpで使えるようにセット
 
@@ -714,11 +715,110 @@ class KensahyouHeadsController  extends AppController
         $this->set('text_'.$i,${"text_".$i});
      }
 
+     $arrmaisu = ['1' => '１枚（A～H）', '2' => '２枚（A～P）', '3' => '３枚（A～X）'];
+     $this->set('arrmaisu',$arrmaisu);
+
+    }
+
+    public function editform()
+    {
+      $data = $this->request->getData();//postで送られた全データを取得
+
+      $id = $data['id'];
+      $this->set('id',$id);
+
+      $maisu = $data['maisu'];
+      $this->set('maisu',$maisu);
+
+      $kensahyouHead = $this->KensahyouHeads->get($id);
+    	$this->set('kensahyouHead', $kensahyouHead);//$kensahyouHeadをctpで使えるようにセット
+
+    	$product_code = $kensahyouHead['product_code'];//product_idという名前のデータに$product_idと名前を付ける
+      $this->set('product_code',$product_code);//セット
+      $this->set('Productcode',$product_code);//セット
+
+    	$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();//'id' => $product_idを満たすものを$Product
+    	$Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+    	$this->set('Productname',$Productname);//セット
+
+      $KensaProduct = $this->KensahyouHeads->find()->where(['product_code' => $product_code ,'delete_flag' => '0'])->order(["version"=>"desc"])->toArray();
+      $KensaProductV = $KensaProduct[0]->version;
+      if($data["kousinn_flag"] == 0){
+        $newversion = $KensaProductV + 1;
+      }else{
+        $newversion = $KensaProductV;
+      }
+      $this->set('newversion',$newversion);
+
+      $bik = $KensaProduct[0]->bik;
+      $this->set('bik',$bik);
+
+      $arrType = ['0' => 'IM6120(1号機)', '1' => 'IM7000(2号機)'];
+      $this->set('arrType',$arrType);
+
+      $KensahyouHeads = $this->KensahyouHeads->find()->where([
+        'OR' => [['product_code' => $product_code], ['product_code like' => $product_code.'---%']], 'delete_flag' => '0'])->order(["product_code"=>"asc"])->toArray();
+/*
+      echo "<pre>";
+      print_r($KensahyouHeads);
+      echo "</pre>";
+*/
+      for($k=1; $k<=$data['maisu']; $k++){
+
+        for($i=1; $i<=9; $i++){
+          if(isset($KensahyouHeads[$k-1]["size_".$i])){
+            ${"size_".$k.$i} = $KensahyouHeads[$k-1]["size_".$i];
+          }else{
+            ${"size_".$k.$i} = "";
+          }
+          $this->set('size_'.$k.$i,${"size_".$k.$i});
+        }
+
+        for($j=1; $j<=8; $j++){
+
+          if(isset($KensahyouHeads[$k-1]["upper_".$j])){
+            ${"upper_".$k.$j} = $KensahyouHeads[$k-1]["upper_".$j];
+          }else{
+            ${"upper_".$k.$j} = "";
+          }
+          $this->set('upper_'.$k.$j,${"upper_".$k.$j});
+
+          if(isset($KensahyouHeads[$k-1]["lower_".$j])){
+            ${"lower_".$k.$j} = $KensahyouHeads[$k-1]["lower_".$j];
+          }else{
+            ${"lower_".$k.$j} = "";
+          }
+          $this->set('lower_'.$k.$j,${"lower_".$k.$j});
+
+        }
+
+      }
+
+      for($i=10; $i<=11; $i++){
+        ${"text_".$i} = $KensaProduct[0]["text_".$i];
+        $this->set('text_'.$i,${"text_".$i});
+     }
+
+     if($data['type_im'] == 0){
+       $type_im_hyouji = "IM6120(1号機)";
+     }else{
+       $type_im_hyouji = "IM7000(2号機)";
+     }
+     $this->set('type_im_hyouji',$type_im_hyouji);
+     $this->set('type_im',$data['type_im']);
+
     }
 
     public function editconfirm()
    {
      $data = $this->request->getData();//postで送られた全データを取得
+     $this->set('data',$data);
+
+     if(!isset($_SESSION)){
+       session_start();
+     }
+     $_SESSION['updatekensahyouheadsdata'] = array();
+     $_SESSION['updatekensahyouheadsdata'] = $data;
 
      $id = $data['id'];
      $this->set('id',$id);//セット
@@ -736,20 +836,16 @@ class KensahyouHeadsController  extends AppController
      $Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
      $this->set('Productname',$Productname);//セット
 
-     if ($data['delete_flag'] == 1) {
-       $mes = "※削除します";
-       $this->set('mes',$mes);
-     }else{
-       $mes = "※以下のように更新します。";
-       $this->set('mes',$mes);
-     }
+     $mes = "※以下のように更新します。";
+     $this->set('mes',$mes);
 
      if($data['type_im'] == 0){
-       $type_im = "IM6120(1号機)";
+       $type_im_hyouji = "IM6120(1号機)";
      }else{
-       $type_im = "IM7000(2号機)";
+       $type_im_hyouji = "IM7000(2号機)";
      }
-     $this->set('type_im',$type_im);
+     $this->set('type_im_hyouji',$type_im_hyouji);
+     $this->set('type_im',$data['type_im']);
 
    }
 
@@ -813,7 +909,7 @@ class KensahyouHeadsController  extends AppController
        $session = $this->request->getSession();
        $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
 
-       $session_names = "sokuteidata,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+       $session_names = "updatekensahyouheadsdata,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
        $htmlSessioncheck = new htmlSessioncheck();
        $arr_session_flag = $htmlSessioncheck->check($session_names);
        if($arr_session_flag["num"] > 1){//セッション切れの場合
@@ -821,33 +917,22 @@ class KensahyouHeadsController  extends AppController
          's' => ['mess' => $arr_session_flag["mess"]]]);
        }
 
-       $created_staff = array('updated_staff'=>$this->Auth->user('staff_id'));
-       $_SESSION['sokuteidata'] = array_merge($created_staff,$_SESSION['sokuteidata']);
+  //     $created_staff = array('updated_staff'=>$this->Auth->user('staff_id'));
+       $_SESSION['updatekensahyouheadsdata'] = array_merge($created_staff,$_SESSION['updatekensahyouheadsdata']);
 
-       $data = $_SESSION['sokuteidata'];
-       $kousinn_flag = $_SESSION['kousinn_flag']['kousinn_flag'];
-
+       $data = $_SESSION['updatekensahyouheadsdata'];
+       $this->set('data',$data);
+/*
+       echo "<pre>";
+       print_r($data);
+       echo "</pre>";
+*/
        if($data['type_im'] == 0){
          $type_im = "IM6120(1号機)";
        }else{
          $type_im = "IM7000(2号機)";
        }
        $this->set('type_im',$type_im);
-
-       for($i=1; $i<=9; $i++){
-         if(strlen($data["size_".$i]) < 1){
-           $data["size_".$i] = null;
-         }
-     	}
-
-     	for($j=1; $j<=8; $j++){
-         if(strlen($data["upper_".$j]) < 1){
-           $data["upper_".$j] = null;
-         }
-         if(strlen($data["lower_".$j]) < 1){
-           $data["lower_".$j] = null;
-         }
-     	}
 
        for($i=10; $i<=11; $i++){
          if(strlen($data["text_".$i]) < 1){
@@ -856,11 +941,24 @@ class KensahyouHeadsController  extends AppController
      	}
 
      	$Productcode = $data["product_code"];
-     	$this->set('Productcode',$Productcode);//セット
+     	$this->set('Productcode',$Productcode);
       $Product = $this->Products->find()->where(['product_code' => $Productcode])->toArray();
      	$Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
-     	$this->set('Productname',$Productname);//セット
+     	$this->set('Productname',$Productname);
 
+      $updated_staff = $this->Auth->user('staff_id');
+      $updated_at = date('Y-m-d H:i:s');
+
+      $KensahyouHeadsmoto = $this->KensahyouHeads->find()->where([
+        'OR' => [['product_code' => $product_code], ['product_code like' => $product_code.'---%']], 'delete_flag' => '0'])->order(["product_code"=>"asc"])->toArray();
+
+        echo "<pre>";
+        print_r($KensahyouHeadsmoto);
+        echo "</pre>";
+
+//もともとのデータは削除（delete_flag=1）して、新しいデータを登録する
+
+/*
         if ($kousinn_flag == 1) {
 
            $kensahyouHead = $this->KensahyouHeads->patchEntity($kensahyouHead, $this->request->getData());
@@ -1003,6 +1101,7 @@ class KensahyouHeadsController  extends AppController
              'created_staff' => $data['updated_staff']
            ];
 
+
            $kensahyouHead = $this->KensahyouHeads->patchEntity($kensahyouHead, $this->request->getData());
            $connection = ConnectionManager::get('default');//トランザクション1
              // トランザクション開始2
@@ -1083,7 +1182,7 @@ class KensahyouHeadsController  extends AppController
            }//トランザクション10
 
          }
-
+*/
 	 	 }
 
 }

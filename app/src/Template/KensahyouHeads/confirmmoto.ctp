@@ -27,26 +27,61 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             header('Cache-Control:');
             header('Pragma:');
 
-            echo $this->Form->hidden('product_code' ,['value'=>$data['product_code'] ]) ;
-            echo $this->Form->hidden('version' ,['value'=>$data['version'] ]) ;
-            echo $this->Form->hidden('type_im' ,['value'=>$data['type_im'] ]) ;
-            echo $this->Form->hidden('maisu' ,['value'=>$data['maisu'] ]) ;
+            echo $this->Form->hidden('product_code' ,['value'=>$_POST['product_code'] ]) ;
+            echo $this->Form->hidden('version' ,['value'=>$_POST['version'] ]) ;
+            echo $this->Form->hidden('type_im' ,['value'=>$_POST['type_im'] ]) ;
+            echo $this->Form->hidden('maisu' ,['value'=>$_POST['maisu'] ]) ;
 
             $Array = Array();
-
-            for($k=1; $k<=$data['maisu']; $k++){
-              for($i=1; $i<=8; $i++){
-                echo $this->Form->hidden("upper_$k$i" ,['value'=>$data["upper_$k$i"] ]) ;
-                echo $this->Form->hidden("lower_$k$i" ,['value'=>$data["lower_$k$i"] ]) ;
-                echo $this->Form->hidden("size_$k$i" ,['value'=>$data["size_$k$i"] ]) ;
-              }
-              echo $this->Form->hidden("size_$k"."9" ,['value'=>$data["size_$k"."9"] ]) ;
+            for($i=1; $i<=8; $i++){
+              echo $this->Form->hidden("upper_$i" ,['value'=>$_POST["upper_$i"] ]) ;
+              echo $this->Form->hidden("lower_$i" ,['value'=>$_POST["lower_$i"] ]) ;
+              echo $this->Form->hidden("size_$i" ,['value'=>$_POST["size_$i"] ]) ;
             }
 
-            echo $this->Form->hidden("bik" ,['value'=>$data["bik"] ]) ;
-            echo $this->Form->hidden('status' ,['value'=>$data['status'] ]) ;
-            echo $this->Form->hidden('delete_flag' ,['value'=>$data['delete_flag'] ]) ;
+            echo $this->Form->hidden("size_9" ,['value'=>$_POST["size_9"] ]) ;
+            echo $this->Form->hidden("bik" ,['value'=>$_POST["bik"] ]) ;
+            echo $this->Form->hidden('status' ,['value'=>$_POST['status'] ]) ;
+            echo $this->Form->hidden('delete_flag' ,['value'=>$_POST['delete_flag'] ]) ;
             echo $this->Form->hidden('updated_staff' ,['value'=>null ]) ;
+
+            $_SESSION['sokuteidata'] = array(
+              'product_code' => $_POST['product_code'],
+              'version' => $_POST['version'],
+              'type_im' => $_POST['type_im'],
+              'maisu' => $_POST['maisu'],
+              "upper_1" =>$_POST["upper_1"],
+              "upper_2" =>$_POST["upper_2"],
+              "upper_3" =>$_POST["upper_3"],
+              "upper_4" =>$_POST["upper_4"],
+              "upper_5" =>$_POST["upper_5"],
+              "upper_6" =>$_POST["upper_6"],
+              "upper_7" =>$_POST["upper_7"],
+              "upper_8" =>$_POST["upper_8"],
+              "lower_1" =>$_POST["lower_1"],
+              "lower_2" =>$_POST["lower_2"],
+              "lower_3" =>$_POST["lower_3"],
+              "lower_4" =>$_POST["lower_4"],
+              "lower_5" =>$_POST["lower_5"],
+              "lower_6" =>$_POST["lower_6"],
+              "lower_7" =>$_POST["lower_7"],
+              "lower_8" =>$_POST["lower_8"],
+              "size_1" =>$_POST["size_1"],
+              "size_2" =>$_POST["size_2"],
+              "size_3" =>$_POST["size_3"],
+              "size_4" =>$_POST["size_4"],
+              "size_5" =>$_POST["size_5"],
+              "size_6" =>$_POST["size_6"],
+              "size_7" =>$_POST["size_7"],
+              "size_8" =>$_POST["size_8"],
+              "size_9" =>$_POST["size_9"],
+              "text_10" =>$_POST["text_10"],
+              "text_11" =>$_POST["text_11"],
+              "bik" =>$_POST["bik"],
+              "status" =>$_POST["status"],
+              "delete_flag" =>$_POST["delete_flag"],
+              "created_at" =>date('Y-m-d H:i:s')
+            );
 
         ?>
         <br>
@@ -62,22 +97,16 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
-          <td colspan="9"><?= h($data['version']) ?></td>
+          <td colspan="9"><?= h($_POST['version']) ?></td>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>IMタイプ</strong></div></td>
           <td colspan="9"><?= h($type_im) ?></td>
         </tr>
-
-        <?php for($j=1; $j<=$data['maisu']; $j++): ?>
-
         <tr style="border-bottom: solid;border-width: 1px">
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>枚数</strong></div></td>
-          <td colspan="9"><?= h($j." / ".$data['maisu']) ?></td>
+          <td colspan="9"><?= h($this->request->getData('maisu')) ?></td>
           <td colspan="14" nowrap="nowrap">&nbsp;<input type="hidden" name="version" value="0"/></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
-
-        <?php if($j == 1): ?>
-
           <td colspan="4">&nbsp;</td>
           <td width="24" colspan="2"><div align="center"><strong>A</strong></div></td>
           <td width="38" colspan="2"><div align="center"><strong>B</strong></div></td>
@@ -87,45 +116,10 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td width="38" colspan="2"><div align="center"><strong>F</strong></div></td>
           <td width="38" colspan="2"><div align="center"><strong>G</strong></div></td>
           <td width="38" colspan="2"><div align="center"><strong>H</strong></div></td>
-          <td width="60" nowrap="nowrap" colspan="2"><div align="center"><font size="-3"><strong>ソリ・フレ<?= h("(".$j.")") ?></strong></font></div></td>
+          <td width="60" nowrap="nowrap" colspan="2"><div align="center"><font size="-3"><strong>ソリ・フレ</strong></font></div></td>
           <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観１</strong></font></div></td>
           <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観２</strong></font></div></td>
           <td width="51" nowrap="nowrap" colspan="2"><div align="center"><font size="-1"><strong>単重</strong></font></div></td>
-
-          <?php elseif($j == 2): ?>
-
-            <td colspan="4">&nbsp;</td>
-            <td width="24" colspan="2"><div align="center"><strong>I</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>J</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>K</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>L</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>M</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>N</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>O</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>P</strong></div></td>
-            <td width="60" nowrap="nowrap" colspan="2"><div align="center"><font size="-3"><strong>ソリ・フレ<?= h("(".$j.")") ?></strong></font></div></td>
-            <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong></strong></font></div></td>
-            <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong></strong></font></div></td>
-            <td width="51" nowrap="nowrap" colspan="2"><div align="center"><font size="-1"><strong></strong></font></div></td>
-
-          <?php else: ?>
-
-            <td colspan="4">&nbsp;</td>
-            <td width="24" colspan="2"><div align="center"><strong>Q</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>R</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>S</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>T</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>U</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>V</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>W</strong></div></td>
-            <td width="38" colspan="2"><div align="center"><strong>X</strong></div></td>
-            <td width="60" nowrap="nowrap" colspan="2"><div align="center"><font size="-3"><strong>ソリ・フレ<?= h("(".$j.")") ?></strong></font></div></td>
-            <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong></strong></font></div></td>
-            <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong></strong></font></div></td>
-            <td width="51" nowrap="nowrap" colspan="2"><div align="center"><font size="-1"><strong></strong></font></div></td>
-
-          <?php endif; ?>
-
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
           <td width="33" rowspan="3" nowrap="nowrap" colspan="2"><div align="center"><strong>規格</strong></div></td>
@@ -133,9 +127,9 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
         <?php
             $Array = Array();
-            for($k=1; $k<=8; $k++){
+            for($j=1; $j<=8; $j++){
             echo '<td colspan="2"><div align="center">';
-            echo $data['upper_'.$j.$k];
+            echo $this->request->getData("upper_$j") ;
             echo '</div></td>';
             }
             echo "<td colspan='2'>\n";
@@ -155,7 +149,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             $Array = Array();
             for($k=1; $k<=8; $k++){
             echo '<td colspan="2"><div align="center">';
-            echo $data['lower_'.$j.$k];
+            echo $this->request->getData("lower_$k") ;
             echo '</div></td>';
             }
             echo "<td colspan='2'>\n";
@@ -174,26 +168,23 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
             $Array = Array();
             for($l=1; $l<=9; $l++){
             echo '<td colspan="2"><div align="center">';
-            echo $data['size_'.$j.$l];
+            echo $this->request->getData("size_$l") ;
             echo '</div></td>';
             }
-        ?>
+            echo '<td colspan="2"><div align="center">';
+            echo $this->request->getData("text_10") ;
+            echo '</div></td>';
+            echo '<td colspan="2"><div align="center">';
+            echo $this->request->getData("text_11") ;
+            echo '</div></td>';
 
-        <?php if($j == 1): ?>
-        <td colspan="2"><div align="center"><?= h($data['text_10']) ?></div></td>
-        <td colspan="2"><div align="center"><?= h($data['text_11']) ?></div></td>
-      <?php else: ?>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-      <?php endif; ?>
+        ?>
 
         </tr>
 
-      <?php endfor;?>
-
         <td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
           <strong style="text-align: left">備考：</strong><br>
-              <div cols="120" rows="10"><?= h($data['bik']) ?></div>
+              <div cols="120" rows="10"><?= h($this->request->getData('bik')) ?></div>
           </td>
         </tr>
        <tr>

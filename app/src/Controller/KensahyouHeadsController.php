@@ -823,8 +823,8 @@ class KensahyouHeadsController  extends AppController
      $id = $data['id'];
      $this->set('id',$id);//セット
 
-     $product_code = $data['product_code'];//product_idという名前のデータに$product_idと名前を付ける
-     $this->set('product_code',$product_code);//セット
+     $product_code = $data['product_code'];
+     $this->set('product_code',$product_code);
 
      $kensahyouHead = $this->KensahyouHeads->newEntity();//newEntity・テーブルに空の行を作る
      $this->set('kensahyouHead',$kensahyouHead);//セット
@@ -918,7 +918,7 @@ class KensahyouHeadsController  extends AppController
        }
 
   //     $created_staff = array('updated_staff'=>$this->Auth->user('staff_id'));
-       $_SESSION['updatekensahyouheadsdata'] = array_merge($created_staff,$_SESSION['updatekensahyouheadsdata']);
+  //     $_SESSION['updatekensahyouheadsdata'] = array_merge($created_staff,$_SESSION['updatekensahyouheadsdata']);
 
        $data = $_SESSION['updatekensahyouheadsdata'];
        $this->set('data',$data);
@@ -950,13 +950,218 @@ class KensahyouHeadsController  extends AppController
       $updated_at = date('Y-m-d H:i:s');
 
       $KensahyouHeadsmoto = $this->KensahyouHeads->find()->where([
-        'OR' => [['product_code' => $product_code], ['product_code like' => $product_code.'---%']], 'delete_flag' => '0'])->order(["product_code"=>"asc"])->toArray();
+        'OR' => [['product_code' => $Productcode], ['product_code like' => $Productcode.'---%']], 'delete_flag' => '0'])->order(["product_code"=>"asc"])->toArray();
 
         echo "<pre>";
         print_r($KensahyouHeadsmoto);
         echo "</pre>";
 
+        $arrupdatehead = array();
+        for($k=1; $k<=$data['maisu']; $k++){
+
+          if($k == 1){
+            $product_code = $data['product_code'];
+            $text_10 = $data['text_10'];
+            $text_11 = $data['text_11'];
+            $bik = $data['bik'];
+          }else{
+            $product_code = $data['product_code']."---".$k;
+            $text_10 = null;
+            $text_11 = null;
+            $bik = null;
+          }
+
+          $arrupdatehead[] = [
+            "product_code" => $product_code,
+            "version" => $data['version'],
+            "type_im" => $data['type_im'],
+            "maisu" => $data['maisu'],
+            "upper_1" => $data['upper_'.$k."1"],
+            "upper_2" => $data['upper_'.$k."2"],
+            "upper_3" => $data['upper_'.$k."3"],
+            "upper_4" => $data['upper_'.$k."4"],
+            "upper_5" => $data['upper_'.$k."5"],
+            "upper_6" => $data['upper_'.$k."6"],
+            "upper_7" => $data['upper_'.$k."7"],
+            "upper_8" => $data['upper_'.$k."8"],
+            "lower_1" => $data['lower_'.$k."1"],
+            "lower_2" => $data['lower_'.$k."2"],
+            "lower_3" => $data['lower_'.$k."3"],
+            "lower_4" => $data['lower_'.$k."4"],
+            "lower_5" => $data['lower_'.$k."5"],
+            "lower_6" => $data['lower_'.$k."6"],
+            "lower_7" => $data['lower_'.$k."7"],
+            "lower_8" => $data['lower_'.$k."8"],
+            "size_1" => $data['size_'.$k."1"],
+            "size_2" => $data['size_'.$k."2"],
+            "size_3" => $data['size_'.$k."3"],
+            "size_4" => $data['size_'.$k."4"],
+            "size_5" => $data['size_'.$k."5"],
+            "size_6" => $data['size_'.$k."6"],
+            "size_7" => $data['size_'.$k."7"],
+            "size_8" => $data['size_'.$k."8"],
+            "size_9" => $data['size_'.$k."9"],
+            "text_10" => $text_10,
+            "text_11" => $text_11,
+            "bik" => $bik,
+            "created_at" => $updated_at,
+            "created_staff" => $updated_staff,
+            "updated_at" => $updated_at,
+            "updated_staff" => $updated_staff
+          ];
+        }
+
+        echo "<pre>";
+        print_r($arrupdatehead);
+        echo "</pre>";
+
+        $connection = ConnectionManager::get('default');//トランザクション1
+          // トランザクション開始2
+        $connection->begin();//トランザクション3
+        try {//トランザクション4
+
+          for($k=0; $k<count($KensahyouHeadsmoto); $k++){
+
+            if ($this->KensahyouHeads->updateAll(//検査終了時間の更新
+              ['delete_flag' => 1,
+              'updated_at' => date('Y-m-d H:i:s'),
+              'updated_staff' => $updated_staff],
+              ['id'  => $KensahyouHeadsmoto[$k]['id']]
+            )){
+
+              if($k == count($KensahyouHeadsmoto) - 1){
+
+                $kensahyouHead = $this->KensahyouHeads->patchEntities($kensahyouHead, $arrupdatehead);
+                if ($this->KensahyouHeads->saveMany($kensahyouHead)) {//saveできた時
+
+                  $mes = "※更新しました";
+                   $this->set('mes',$mes);
+                   $connection->commit();// コミット5
+
+                 } else {
+                   $mes = "※更新されませんでした";
+                    $this->set('mes',$mes);
+                    $this->Flash->error(__('The product could not be saved. Please, try again.'));
+                    throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+                 }
+
+              }
+
+            } else {
+              $mes = "※更新されませんでした";
+               $this->set('mes',$mes);
+               $this->Flash->error(__('The product could not be saved. Please, try again.'));
+               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+            }
+
+          }
+
+        } catch (Exception $e) {//トランザクション7
+        //ロールバック8
+          $connection->rollback();//トランザクション9
+        }//トランザクション10
+
+/*
 //もともとのデータは削除（delete_flag=1）して、新しいデータを登録する
+      $kensahyouHead = $this->KensahyouHeads->patchEntity($kensahyouHead, $arrupdatehead);
+      $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+        if ($this->KensahyouHeads->updateAll(//検査終了時間の更新
+          ['type_im' => $data['type_im'],
+          'size_1' => $data['size_1'],
+          'upper_1' => $data['upper_1'],
+          'lower_1' => $data['lower_1'],
+          'size_2' => $data['size_2'],
+          'upper_2' => $data['upper_2'],
+          'lower_2' => $data['lower_2'],
+          'size_3' => $data['size_3'],
+          'upper_3' => $data['upper_3'],
+          'lower_3' => $data['lower_3'],
+          'size_4' => $data['size_4'],
+          'upper_4' => $data['upper_4'],
+          'lower_4' => $data['lower_4'],
+          'size_5' => $data['size_5'],
+          'upper_5' => $data['upper_5'],
+          'lower_5' => $data['lower_5'],
+          'size_6' => $data['size_6'],
+          'upper_6' => $data['upper_6'],
+          'lower_6' => $data['lower_6'],
+          'size_7' => $data['size_7'],
+          'upper_7' => $data['upper_7'],
+          'lower_7' => $data['lower_7'],
+          'size_8' => $data['size_8'],
+          'upper_8' => $data['upper_8'],
+          'lower_8' => $data['lower_8'],
+          'size_9' => $data['size_9'],
+          'text_10' => $data['text_10'],
+          'text_11' => $data['text_11'],
+          'bik' => $data['bik'],
+          'updated_at' => date('Y-m-d H:i:s'),
+          'updated_staff' => $data['updated_staff']],
+          ['id'  => $data['id']]
+        )){
+
+          //旧DBに登録
+          $connection = ConnectionManager::get('DB_ikou_test');
+          $table = TableRegistry::get('kensahyou_head');
+          $table->setConnection($connection);
+
+          $versionmoto = $data['version'] - 1;
+
+          for($i=1; $i<=9; $i++){
+            if(strlen($data["size_".$i]) > 1){
+              $updater = "UPDATE kensahyou_head set size_$i ='".$data["size_".$i]."'
+              where product_id ='".$Productcode."'";
+              $connection->execute($updater);
+            }
+         }
+
+         for($i=1; $i<=8; $i++){
+           if(strlen($data["upper_".$j]) > 1){
+             $updater = "UPDATE kensahyou_head set upper_$i ='".$data["upper_".$i]."'
+             where product_id ='".$Productcode."'";
+             $connection->execute($updater);
+           }
+        }
+
+        for($i=1; $i<=8; $i++){
+          if(strlen($data["lower_".$j]) > 1){
+            $updater = "UPDATE kensahyou_head set lower_$i ='".$data["lower_".$i]."'
+            where product_id ='".$Productcode."'";
+            $connection->execute($updater);
+          }
+       }
+
+       for($i=10; $i<=11; $i++){
+         if(strlen($data["text_".$i]) > 1){
+           $updater = "UPDATE kensahyou_head set text_$i ='".$data["text_".$i]."'
+           where product_id ='".$Productcode."'";
+           $connection->execute($updater);
+         }
+      }
+
+          $updater = "UPDATE kensahyou_head set bik ='".$data['bik']."'
+          where product_id ='".$Productcode."'";
+          $connection->execute($updater);
+
+          $connection = ConnectionManager::get('default');//新DBに戻る
+          $table->setConnection($connection);
+
+          $mes = "※更新しました";
+           $this->set('mes',$mes);
+           $connection->commit();// コミット5
+        } else {
+          $mes = "※更新されませんでした";
+           $this->set('mes',$mes);
+           $this->Flash->error(__('The product could not be saved. Please, try again.'));
+           throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+        }
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
 
 /*
         if ($kousinn_flag == 1) {

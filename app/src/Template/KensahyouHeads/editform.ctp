@@ -22,7 +22,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
 	<?php
   echo $this->Form->create($kensahyouHead, ['url' => ['action' => 'editconfirm']]);
-  
+
   $username = $this->request->Session()->read('Auth.User.username');
 
   header('Expires:-1');
@@ -197,11 +197,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 
     <td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
       <strong style="text-align: left">備考：</strong><br>
-          <textarea name="bik" cols="120" rows="10">
-<?php
-echo "$bik\n";
-?>
-          </textarea>
+          <textarea name="bik" cols="120" rows="10"><?php echo $bik ;?></textarea>
       </td>
     </tr>
    <tr>
@@ -223,6 +219,11 @@ echo $this->Form->hidden('delete_flag' ,['value'=>0]);
 echo $this->Form->hidden('updated_staff');
 ?>
     </fieldset>
-    <center><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')) ?></center>
+    <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit('確認', array('name' => 'kakunin')); ?></div></td>
+    </tr>
+    </table>
 <br>
     <?= $this->Form->end() ?>

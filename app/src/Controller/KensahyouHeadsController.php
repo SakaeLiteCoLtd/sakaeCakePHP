@@ -951,11 +951,11 @@ class KensahyouHeadsController  extends AppController
 
       $KensahyouHeadsmoto = $this->KensahyouHeads->find()->where([
         'OR' => [['product_code' => $Productcode], ['product_code like' => $Productcode.'---%']], 'delete_flag' => '0'])->order(["product_code"=>"asc"])->toArray();
-
+/*
         echo "<pre>";
         print_r($KensahyouHeadsmoto);
         echo "</pre>";
-
+*/
         $arrupdatehead = array();
         for($k=1; $k<=$data['maisu']; $k++){
 
@@ -1029,10 +1029,87 @@ class KensahyouHeadsController  extends AppController
               ['id'  => $KensahyouHeadsmoto[$k]['id']]
             )){
 
+              //旧DBに登録
+  						$connection = ConnectionManager::get('DB_ikou_test');
+  						$table = TableRegistry::get('kensahyou_head');
+  						$table->setConnection($connection);
+
+              $updater = "DELETE FROM kensahyou_head
+              where product_id ='".$KensahyouHeadsmoto[$k]['product_code']."'";
+              $connection->execute($updater);
+
+              $connection = ConnectionManager::get('default');//新DBに戻る
+              $table->setConnection($connection);
+
               if($k == count($KensahyouHeadsmoto) - 1){
 
                 $kensahyouHead = $this->KensahyouHeads->patchEntities($kensahyouHead, $arrupdatehead);
                 if ($this->KensahyouHeads->saveMany($kensahyouHead)) {//saveできた時
+
+                  for($k=0; $k<count($arrupdatehead); $k++){
+
+                    //旧DB更新
+                    $connection = ConnectionManager::get('DB_ikou_test');
+                    $table = TableRegistry::get('kensahyou_head');
+                    $table->setConnection($connection);
+
+                    for($i=1; $i<=9; $i++){
+                      if(strlen($arrupdatehead[$k]["size_".$i]) < 1){
+                        $arrupdatehead[$k]["size_".$i] = null;
+                      }
+                    }
+
+                    for($j=1; $j<=8; $j++){
+                      if(strlen($arrupdatehead[$k]["upper_".$j]) < 1){
+                        $arrupdatehead[$k]["upper_".$j] = null;
+                      }
+                      if(strlen($arrupdatehead[$k]["lower_".$j]) < 1){
+                        $arrupdatehead[$k]["lower_".$j] = null;
+                      }
+                    }
+
+                    for($i=10; $i<=11; $i++){
+                      if(strlen($arrupdatehead[$k]["text_".$i]) < 1){
+                        $arrupdatehead[$k]["text_".$i] = null;
+                      }
+                    }
+
+                    $connection->insert('kensahyou_head', [
+                        'product_id' => $arrupdatehead[$k]['product_code'],
+                        'maisu' => $arrupdatehead[$k]['maisu'],
+                        'size_1' => $arrupdatehead[$k]['size_1'],
+                        'upper_1' => $arrupdatehead[$k]['upper_1'],
+                        'lower_1' => $arrupdatehead[$k]['lower_1'],
+                        'size_2' => $arrupdatehead[$k]['size_2'],
+                        'upper_2' => $arrupdatehead[$k]['upper_2'],
+                        'lower_2' => $arrupdatehead[$k]['lower_2'],
+                        'size_3' => $arrupdatehead[$k]['size_3'],
+                        'upper_3' => $arrupdatehead[$k]['upper_3'],
+                        'lower_3' => $arrupdatehead[$k]['lower_3'],
+                        'size_4' => $arrupdatehead[$k]['size_4'],
+                        'upper_4' => $arrupdatehead[$k]['upper_4'],
+                        'lower_4' => $arrupdatehead[$k]['lower_4'],
+                        'size_5' => $arrupdatehead[$k]['size_5'],
+                        'upper_5' => $arrupdatehead[$k]['upper_5'],
+                        'lower_5' => $arrupdatehead[$k]['lower_5'],
+                        'size_6' => $arrupdatehead[$k]['size_6'],
+                        'upper_6' => $arrupdatehead[$k]['upper_6'],
+                        'lower_6' => $arrupdatehead[$k]['lower_6'],
+                        'size_7' => $arrupdatehead[$k]['size_7'],
+                        'upper_7' => $arrupdatehead[$k]['upper_7'],
+                        'lower_7' => $arrupdatehead[$k]['lower_7'],
+                        'size_8' => $arrupdatehead[$k]['size_8'],
+                        'upper_8' => $arrupdatehead[$k]['upper_8'],
+                        'lower_8' => $arrupdatehead[$k]['lower_8'],
+                        'size_9' => $arrupdatehead[$k]['size_9'],
+                        'text_10' => $arrupdatehead[$k]['text_10'],
+                        'text_11' => $arrupdatehead[$k]['text_11'],
+                        'bik' => $arrupdatehead[$k]['bik']
+                    ]);
+
+                  }
+
+                  $connection = ConnectionManager::get('default');
 
                   $mes = "※更新しました";
                    $this->set('mes',$mes);

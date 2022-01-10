@@ -61,6 +61,6 @@ echo $this->Form->hidden('delete_flag' ,['value'=>0]);
 echo $this->Form->hidden('updated_staff');
 ?>
     </fieldset>
-    <center><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')) ?></center>
-<br>
+    <center><?= $this->Form->submit(__('次へ'), array('name' => 'kakunin')) ?></center>
+<br><br><br><br>
     <?= $this->Form->end() ?>

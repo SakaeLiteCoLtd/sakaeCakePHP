@@ -73,8 +73,8 @@ class SyukkaKensasController extends AppController {
       $this->set('product_code',$product_code);//セット
       $this->set('Productcode',$product_code);//セット
 
-      for($k=0; $k<10; $k++){
-        $this->set("kind_kensa".$k,"ノギス");
+      for($k=0; $k<30; $k++){
+        $this->set("kind_kensa".$k,"-");
         $this->set("size_num_".$k,"");
       }
 
@@ -87,15 +87,55 @@ class SyukkaKensasController extends AppController {
       $Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
       $this->set('Productname',$Productname);//セット
 
-      $arrType = ['0' => 'IM6120(1号機)', '1' => 'IM7000(2号機)'];
-      $this->set('arrType',$arrType);
+      $KensahyouHeads = $this->KensahyouHeads->find()->where([
+        'OR' => [['product_code' => $product_code], ['product_code like' => $product_code.'---%']], 'delete_flag' => '0'])->order(["product_code"=>"asc"])->toArray();
 
+        $maisu = count($KensahyouHeads);
+        $this->set('maisu',$maisu);
+
+      for($k=1; $k<=$maisu; $k++){
+
+        for($i=1; $i<=9; $i++){
+          if(isset($KensahyouHeads[$k-1]["size_".$i])){
+            ${"size_".$k.$i} = $KensahyouHeads[$k-1]["size_".$i];
+          }else{
+            ${"size_".$k.$i} = "";
+          }
+          $this->set('size_'.$k.$i,${"size_".$k.$i});
+        }
+
+        for($j=1; $j<=8; $j++){
+
+          if(isset($KensahyouHeads[$k-1]["upper_".$j])){
+            ${"upper_".$k.$j} = $KensahyouHeads[$k-1]["upper_".$j];
+          }else{
+            ${"upper_".$k.$j} = "";
+          }
+          $this->set('upper_'.$k.$j,${"upper_".$k.$j});
+
+          if(isset($KensahyouHeads[$k-1]["lower_".$j])){
+            ${"lower_".$k.$j} = $KensahyouHeads[$k-1]["lower_".$j];
+          }else{
+            ${"lower_".$k.$j} = "";
+          }
+          $this->set('lower_'.$k.$j,${"lower_".$k.$j});
+
+        }
+
+      }
+
+      for($i=10; $i<=11; $i++){
+        ${"text_".$i} = $KensahyouHeads[0]["text_".$i];
+        $this->set('text_'.$i,${"text_".$i});
+     }
+
+/*
       $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
       $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
       $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
-
+*/
       $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()
-     ->where(['product_code' => $product_code])->toArray();
+     ->where(['product_code' => $product_code, 'delete_flag' => '0'])->toArray();
 
       $arrKindKensa = array("","ノギス");//配列の初期化
        foreach ($ImSokuteidataHeads as $value) {//それぞれに対して
@@ -3240,11 +3280,13 @@ class SyukkaKensasController extends AppController {
 
        $ImKikakuTaiouDatas = $this->ImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => 0])->toArray();
 
-       for($k=0; $k<10; $k++){
+       for($k=0; $k<30; $k++){
+         $this->set("kind_kensa_".$k,"-");
          $this->set("size_num_".$k,"");
        }
 
        for($k=0; $k<count($ImKikakuTaiouDatas); $k++){
+         $this->set("kind_kensa_".$ImKikakuTaiouDatas[$k]["kensahyuo_num"],$ImKikakuTaiouDatas[$k]["kind_kensa"]);
          $this->set("size_num_".$ImKikakuTaiouDatas[$k]["kensahyuo_num"],$ImKikakuTaiouDatas[$k]["size_num"]);
        }
 
@@ -3258,16 +3300,67 @@ class SyukkaKensasController extends AppController {
        $arrType = ['0' => 'IM6120(1号機)', '1' => 'IM7000(2号機)'];
        $this->set('arrType',$arrType);
 
+       $KensahyouHeads = $this->KensahyouHeads->find()->where([
+         'OR' => [['product_code' => $product_code], ['product_code like' => $product_code.'---%']], 'delete_flag' => '0'])->order(["product_code"=>"asc"])->toArray();
+
+         $maisu = count($KensahyouHeads);
+         $this->set('maisu',$maisu);
+
+       for($k=1; $k<=$maisu; $k++){
+
+         for($i=1; $i<=9; $i++){
+           if(isset($KensahyouHeads[$k-1]["size_".$i])){
+             ${"size_".$k.$i} = $KensahyouHeads[$k-1]["size_".$i];
+           }else{
+             ${"size_".$k.$i} = "";
+           }
+           $this->set('size_'.$k.$i,${"size_".$k.$i});
+         }
+
+         for($j=1; $j<=8; $j++){
+
+           if(isset($KensahyouHeads[$k-1]["upper_".$j])){
+             ${"upper_".$k.$j} = $KensahyouHeads[$k-1]["upper_".$j];
+           }else{
+             ${"upper_".$k.$j} = "";
+           }
+           $this->set('upper_'.$k.$j,${"upper_".$k.$j});
+
+           if(isset($KensahyouHeads[$k-1]["lower_".$j])){
+             ${"lower_".$k.$j} = $KensahyouHeads[$k-1]["lower_".$j];
+           }else{
+             ${"lower_".$k.$j} = "";
+           }
+           $this->set('lower_'.$k.$j,${"lower_".$k.$j});
+
+         }
+
+       }
+
+       for($i=10; $i<=11; $i++){
+         ${"text_".$i} = $KensahyouHeads[0]["text_".$i];
+         $this->set('text_'.$i,${"text_".$i});
+      }
+
+/*
        $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
        $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
        $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
-
+*/
        $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()
       ->where(['product_code' => $product_code])->toArray();
 
-       $arrKindKensa = array("","ノギス");//配列の初期化
+       $arrKindKensa = array("","ノギス","シグネス");//配列の初期化
         foreach ($ImSokuteidataHeads as $value) {//それぞれに対して
-           $arrKindKensa[] = $value->kind_kensa;//配列に追加
+
+          $kind_kensa_arr = explode("_",$value->kind_kensa);//切り離し
+          if(isset($kind_kensa_arr[1])){
+            $kind_kensa = $kind_kensa_arr[1];
+          }else{
+            $kind_kensa = $value->kind_kensa;
+          }
+
+           $arrKindKensa[] = $kind_kensa;//配列に追加
         }
          $arrKindKensa = array_unique($arrKindKensa);
 

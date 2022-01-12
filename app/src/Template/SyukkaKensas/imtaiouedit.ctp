@@ -172,7 +172,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
                 $num = ($j - 1)*9 + $i;
                 ?>
                 <td colspan='2'><div align='center'>
-                  <?= $this->Form->control('kind_kensa_'.$num, ['options' => $arrKindKensa, 'value'=>array_keys($arrKindKensa, ${"kind_kensa_".$num}), 'label'=>false]) ?>
+                  <?= $this->Form->control('kind_kensa_'.$num, ['options' => $arrKindKensa, 'value'=>${"kind_kensa_".$num}, 'label'=>false]) ?>
                 </div></td>
                 <?php
 /*

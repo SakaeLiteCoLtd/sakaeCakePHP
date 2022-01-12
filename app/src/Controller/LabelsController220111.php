@@ -9,6 +9,8 @@ use Cake\Core\Configure;//トランザクション
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 use App\myClass\Productcheck\htmlProductcheck;
 
+use App\myClass\Sessioncheck\htmlSessioncheck;//myClassフォルダに配置したクラスを使用
+
 /**
  * Roles Controller
  *
@@ -55,7 +57,18 @@ class LabelsController extends AppController
        if(!isset($_SESSION)){//sessionsyuuseituika
        session_start();
        }
+
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }else{
+         $mess = "";
+         $this->set('mess',$mess);
+       }
+
      }
+
      public function indexShinki()
      {
        //$this->request->session()->destroy(); // セッションの破棄
@@ -183,6 +196,15 @@ class LabelsController extends AppController
    {
      $labelTypeProducts = $this->LabelTypeProducts->newEntity();
      $this->set('labelTypeProducts',$labelTypeProducts);
+
+     $session_names = "labellayouts,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+     $htmlSessioncheck = new htmlSessioncheck();
+     $arr_session_flag = $htmlSessioncheck->check($session_names);
+     if($arr_session_flag["num"] > 1){//セッション切れの場合
+       return $this->redirect(['action' => 'indexMenu',
+       's' => ['mess' => $arr_session_flag["mess"]]]);
+     }
+
      $session = $this->request->getSession();
      $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
      $_SESSION['labellayouts'] = array_merge($created_staff,$_SESSION['labellayouts']);
@@ -308,6 +330,15 @@ class LabelsController extends AppController
    {
      $labelElementPlaces = $this->LabelElementPlaces->newEntity();
      $this->set('labelElementPlaces',$labelElementPlaces);
+
+     $session_names = "labelplaces,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+     $htmlSessioncheck = new htmlSessioncheck();
+     $arr_session_flag = $htmlSessioncheck->check($session_names);
+     if($arr_session_flag["num"] > 1){//セッション切れの場合
+       return $this->redirect(['action' => 'indexMenu',
+       's' => ['mess' => $arr_session_flag["mess"]]]);
+     }
+
      $session = $this->request->getSession();
      $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
      $_SESSION['labelplaces'] = array_merge($created_staff,$_SESSION['labelplaces']);
@@ -437,6 +468,15 @@ class LabelsController extends AppController
    {
      $labelNashies = $this->LabelNashies->newEntity();
      $this->set('labelNashies',$labelNashies);
+
+     $session_names = "labelnashis,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+     $htmlSessioncheck = new htmlSessioncheck();
+     $arr_session_flag = $htmlSessioncheck->check($session_names);
+     if($arr_session_flag["num"] > 1){//セッション切れの場合
+       return $this->redirect(['action' => 'indexMenu',
+       's' => ['mess' => $arr_session_flag["mess"]]]);
+     }
+
      $session = $this->request->getSession();
      $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
      $_SESSION['labelnashis'] = array_merge($created_staff,$_SESSION['labelnashis']);
@@ -577,6 +617,15 @@ class LabelsController extends AppController
    {
      $labelSetikkatsues = $this->LabelSetikkatsues->newEntity();
      $this->set('labelSetikkatsues',$labelSetikkatsues);
+
+     $session_names = "labelsetikkatsus,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+     $htmlSessioncheck = new htmlSessioncheck();
+     $arr_session_flag = $htmlSessioncheck->check($session_names);
+     if($arr_session_flag["num"] > 1){//セッション切れの場合
+       return $this->redirect(['action' => 'indexMenu',
+       's' => ['mess' => $arr_session_flag["mess"]]]);
+     }
+
      $session = $this->request->getSession();
      $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
      $_SESSION['labelsetikkatsus'] = array_merge($created_staff,$_SESSION['labelsetikkatsus']);
@@ -709,6 +758,15 @@ class LabelsController extends AppController
    {
      $labelInsideouts = $this->LabelInsideouts->newEntity();
      $this->set('labelInsideouts',$labelInsideouts);
+
+     $session_names = "labelinsideouts,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+     $htmlSessioncheck = new htmlSessioncheck();
+     $arr_session_flag = $htmlSessioncheck->check($session_names);
+     if($arr_session_flag["num"] > 1){//セッション切れの場合
+       return $this->redirect(['action' => 'indexMenu',
+       's' => ['mess' => $arr_session_flag["mess"]]]);
+     }
+
      $session = $this->request->getSession();
      $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
      $_SESSION['labelinsideouts'] = array_merge($created_staff,$_SESSION['labelinsideouts']);
@@ -824,6 +882,15 @@ class LabelsController extends AppController
    {
      $labelElementUnits = $this->LabelElementUnits->newEntity();
      $this->set('labelElementUnits',$labelElementUnits);
+
+     $session_names = "labelunits,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+     $htmlSessioncheck = new htmlSessioncheck();
+     $arr_session_flag = $htmlSessioncheck->check($session_names);
+     if($arr_session_flag["num"] > 1){//セッション切れの場合
+       return $this->redirect(['action' => 'indexMenu',
+       's' => ['mess' => $arr_session_flag["mess"]]]);
+     }
+
      $session = $this->request->getSession();
      $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
      $_SESSION['labelunits'] = array_merge($created_staff,$_SESSION['labelunits']);
@@ -952,6 +1019,15 @@ class LabelsController extends AppController
      $data = $this->request->getData();//postデータを$dataに
 
       if(isset($data['touroku'])){//csv確認おしたとき
+
+        $session_names = "lotdate,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+        $htmlSessioncheck = new htmlSessioncheck();
+        $arr_session_flag = $htmlSessioncheck->check($session_names);
+        if($arr_session_flag["num"] > 1){//セッション切れの場合
+          return $this->redirect(['action' => 'indexMenu',
+          's' => ['mess' => $arr_session_flag["mess"]]]);
+        }
+
         $this->set('touroku',$data['touroku']);
         $session = $this->request->getSession();
         $dateYMDs = $data['dateYMDs'];
@@ -1347,7 +1423,7 @@ class LabelsController extends AppController
 
         }
 
-  //      $fp = fopen('labels/label_ikkatu_200601.csv', 'w');
+  //      $fp = fopen('labels/label_ikkatu_210914.csv', 'w');
         $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
 
         foreach ($arrCsv as $line) {
@@ -1689,34 +1765,53 @@ class LabelsController extends AppController
  {
    $KadouSeikeis = $this->KadouSeikeis->newEntity();
    $this->set('KadouSeikeis',$KadouSeikeis);
+
+   $Data=$this->request->query('s');
+   if(isset($Data["mess"])){
+     $mess = $Data["mess"];
+     $this->set('mess',$mess);
+   }else{
+     $mess = "";
+     $this->set('mess',$mess);
+   }
+
  }
 
  public function kobetuformlogin()//210323
  {
    if ($this->request->is('post')) {
      $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-     $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-     $ary = explode(',', $str);//$strを配列に変換
 
-     $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-     //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-     $this->set('username', $username);
-     $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+     $userdata = $data['username'];
 
-       if(empty($Userdata)){
-         $delete_flag = "";
-       }else{
-         $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-         $this->set('delete_flag',$delete_flag);//登録者の表示のため
+     if(isset($data['prelogin'])){
+
+       $htmllogin = new htmlLogin();
+       $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+       if($qrcheck > 0){
+         return $this->redirect(['action' => 'kobetuformpreadd',
+         's' => ['mess' => "QRコードを読み込んでください。"]]);
        }
-         $user = $this->Auth->identify();
-       if ($user) {
-         $this->Auth->setUser($user);
-         return $this->redirect(['action' => 'kobetuform']);
-       }
+
      }
- }
 
+     $htmllogin = new htmlLogin();
+     $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+     $username = $arraylogindate[0];
+     $delete_flag = $arraylogindate[1];
+     $this->set('username',$username);
+     $this->set('delete_flag',$delete_flag);
+
+     $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+     if ($user) {
+       $this->Auth->setUser($user);
+       return $this->redirect(['action' => 'kobetuform']);
+     }
+   }
+ }
 
   public function kobetuform()//個別成形（時間なし）
   {
@@ -1728,6 +1823,15 @@ class LabelsController extends AppController
      if(isset($data['touroku'])){//csv確認おしたとき
        $this->set('touroku',$data['touroku']);
        $session = $this->request->getSession();
+
+       $session_names = "lotdate,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+       $htmlSessioncheck = new htmlSessioncheck();
+       $arr_session_flag = $htmlSessioncheck->check($session_names);
+       if($arr_session_flag["num"] > 1){//セッション切れの場合
+         return $this->redirect(['action' => 'indexMenu',
+         's' => ['mess' => $arr_session_flag["mess"]]]);
+       }
+
        $arrCsv = array();
          $date = date('Y/m/d H:i:s');
          $datetimeymd = substr($date,0,10);
@@ -2048,7 +2152,7 @@ class LabelsController extends AppController
       print_r($arrCsvtouroku);
       echo "</pre>";
 */
-  //     $fp = fopen('labels/label_kobetu200601.csv', 'w');
+  //     $fp = fopen('labels/label_kobetu210914.csv', 'w');
        $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
        foreach ($arrCsv as $line) {
          $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -2146,36 +2250,56 @@ class LabelsController extends AppController
        $this->set('scheduleKouteis',$scheduleKouteis);
      }
 
-          public function kobetujikanformpreadd()//210323
+          public function kobetujikanformpreadd()
       		{
            $KadouSeikeis = $this->KadouSeikeis->newEntity();
            $this->set('KadouSeikeis',$KadouSeikeis);
+
+           $Data=$this->request->query('s');
+           if(isset($Data["mess"])){
+             $mess = $Data["mess"];
+             $this->set('mess',$mess);
+           }else{
+             $mess = "";
+             $this->set('mess',$mess);
+           }
+
       		}
 
-         public function kobetujikanformlogin()//210323
+         public function kobetujikanformlogin()
          {
-     			if ($this->request->is('post')) {
-     				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-     				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-     				$ary = explode(',', $str);//$strを配列に変換
+           if ($this->request->is('post')) {
+             $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
 
-     				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-     				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-     				$this->set('username', $username);
-     				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+             $userdata = $data['username'];
 
-     					if(empty($Userdata)){
-     						$delete_flag = "";
-     					}else{
-     						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-     						$this->set('delete_flag',$delete_flag);//登録者の表示のため
-     					}
-     						$user = $this->Auth->identify();
-     					if ($user) {
-     						$this->Auth->setUser($user);
-     						return $this->redirect(['action' => 'kobetujikanform']);
-     					}
-     				}
+             if(isset($data['prelogin'])){
+
+               $htmllogin = new htmlLogin();
+               $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+               if($qrcheck > 0){
+                 return $this->redirect(['action' => 'kobetujikanformpreadd',
+                 's' => ['mess' => "QRコードを読み込んでください。"]]);
+               }
+
+             }
+
+             $htmllogin = new htmlLogin();
+             $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+             $username = $arraylogindate[0];
+             $delete_flag = $arraylogindate[1];
+             $this->set('username',$username);
+             $this->set('delete_flag',$delete_flag);
+
+             $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+             if ($user) {
+               $this->Auth->setUser($user);
+               return $this->redirect(['action' => 'kobetujikanform']);
+             }
+           }
      		}
 
 
@@ -2191,6 +2315,15 @@ class LabelsController extends AppController
        echo "</pre>";
 */
         if(isset($data['touroku'])){//csv確認おしたとき
+
+          $session_names = "lotdate,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+          $htmlSessioncheck = new htmlSessioncheck();
+          $arr_session_flag = $htmlSessioncheck->check($session_names);
+          if($arr_session_flag["num"] > 1){//セッション切れの場合
+            return $this->redirect(['action' => 'indexMenu',
+            's' => ['mess' => $arr_session_flag["mess"]]]);
+          }
+
           $this->set('touroku',$data['touroku']);
           $session = $this->request->getSession();
           $arrCsv = array();
@@ -2584,7 +2717,7 @@ class LabelsController extends AppController
 
           }
 
-    //    $fp = fopen('labels/label_kobetu0601.csv', 'w');
+    //    $fp = fopen('labels/label_kobetu210914.csv', 'w');
         $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
           foreach ($arrCsv as $line) {
             $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -2747,6 +2880,14 @@ class LabelsController extends AppController
        $mes = "";
        $this->set('mes',$mes);
 
+       $session_names = "Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+       $htmlSessioncheck = new htmlSessioncheck();
+       $arr_session_flag = $htmlSessioncheck->check($session_names);
+       if($arr_session_flag["num"] > 1){//セッション切れの場合
+         return $this->redirect(['action' => 'indexMenu',
+         's' => ['mess' => $arr_session_flag["mess"]]]);
+       }
+
        if ($this->request->is('post')) {
          $source_file = $_FILES['file']['tmp_name'];
 
@@ -2880,7 +3021,10 @@ class LabelsController extends AppController
               $sample = explode("\t",$line);//$lineを"（スペース）"毎に配列に入れる
               $arrFp[] = $sample;//配列に追加する
               if(isset($arrFp[$k-1][11]) && ($arrFp[$k-1][11] != "")){//product_codeが２つある時
+
                 $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+                $datetime_hakkou = date('Y-m-d H:i',  strtotime($datetime_hakkou));
+
                 for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
                   $renban = $arrFp[$k-1][6] + $m;
                   $lot_num = $arrFp[$k-1][5]."-".sprintf('%03d', $renban);
@@ -2893,8 +3037,8 @@ class LabelsController extends AppController
                     $flag_used = 0;
                   }
 
-                  if(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
-                    $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][6], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
+                  if(strpos($arrFp[$k-1][7],'_') === false){//$arrFp[$k-1][7]に「_」が含まれていない場合
+                    $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
                   }else{
                     $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $arrFp[$k-1][7]];
                   }
@@ -2918,7 +3062,7 @@ class LabelsController extends AppController
                     $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
                     $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
 
-                  }elseif(strpos($arrFp[$k-1][7],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                  }elseif(strpos($arrFp[$k-1][7],'_') === false){//$arrFp[$k-1][7]に「_」が含まれていない場合
 
                     $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][8], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
 
@@ -2930,7 +3074,10 @@ class LabelsController extends AppController
 
                 }
               }else{//product_codeが１つの時
+
                 $datetime_hakkou = $arrFp[$k-1][0]." ".$arrFp[$k-1][1];
+                $datetime_hakkou = date('Y-m-d H:i',  strtotime($datetime_hakkou));
+
                 for ($m=0; $m<=$arrFp[$k-1][3] - 1 ; $m++) {//最後の行まで
                   $renban = $arrFp[$k-1][6] + $m;
                   $lot_num = $arrFp[$k-1][5]."-".sprintf('%03d', $renban);
@@ -2949,7 +3096,7 @@ class LabelsController extends AppController
                     $grade_color = $Materials[0]["grade"]."_".$Materials[0]["color"];
                     $arrLotHazai[] = ['lot_num' => $lot_num, 'hazai' => $grade_color];
 
-                  }elseif(strpos($arrFp[$k-1][6],'_') === false){//$arrFp[$k-1][6]に「_」が含まれていない場合
+                  }elseif(strpos($arrFp[$k-1][7],'_') === false){//$arrFp[$k-1][7]に「_」が含まれていない場合
 
                     $arrLot[] = ['datetime_hakkou' => $datetime_hakkou, 'product_code' => $arrFp[$k-1][7], 'lot_num' => $lot_num, 'amount' => (int)($arrFp[$k-1][9]), 'flag_used' => $flag_used, 'delete_flag' => 0, 'created_staff' => $created_staff];
 
@@ -3020,8 +3167,6 @@ class LabelsController extends AppController
         $CheckLottourokuzumi = $this->CheckLots->find()->where(['datetime_hakkou' => $arrLot[$k]["datetime_hakkou"], 'product_code' => $arrLot[$k]["product_code"], 'lot_num' => $arrLot[$k]["lot_num"], 'amount' => $arrLot[$k]["amount"]])->toArray();
         $count = $count + count($CheckLottourokuzumi);
       }
-
-      $mes = "";
 
       if($count != 0){
         $mes = "※以下のロットは既に登録されています。";
@@ -3162,30 +3307,52 @@ class LabelsController extends AppController
       session_start();
       $checkLots = $this->CheckLots->newEntity();
       $this->set('checkLots',$checkLots);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
  		}
 
  		public function torikomilogin()
  		{
- 			if ($this->request->is('post')) {
- 				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
- 				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
- 				$ary = explode(',', $str);//$strを配列に変換
- 				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
- 				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
- 				$this->set('username', $username);
- 				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
- 					if(empty($Userdata)){
- 						$delete_flag = "";
- 					}else{
- 						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
- 						$this->set('delete_flag',$delete_flag);//登録者の表示のため
- 					}
- 						$user = $this->Auth->identify();
- 					if ($user) {
- 						$this->Auth->setUser($user);
-            return $this->redirect(['action' => 'torikomiselect']);
- 					}
- 				}
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+        $userdata = $data['username'];
+
+        if(isset($data['prelogin'])){
+
+          $htmllogin = new htmlLogin();
+          $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+          if($qrcheck > 0){
+            return $this->redirect(['action' => 'torikomipreadd',
+            's' => ['mess' => "QRコードを読み込んでください。"]]);
+          }
+
+        }
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'torikomiselect']);
+        }
+      }
  		}
 
     public function fushiyouMenu()
@@ -3200,33 +3367,55 @@ class LabelsController extends AppController
       //$this->request->session()->destroy(); // セッションの破棄
       $checkLots = $this->CheckLots->newEntity();
       $this->set('checkLots',$checkLots);
+
+      $Data=$this->request->query('s');
+      if(isset($Data["mess"])){
+        $mess = $Data["mess"];
+        $this->set('mess',$mess);
+      }else{
+        $mess = "";
+        $this->set('mess',$mess);
+      }
+
 		}
 
 		public function fushiyoulogin()
 		{
-			if ($this->request->is('post')) {
-				$data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-				$str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-				$ary = explode(',', $str);//$strを配列に変換
-				$username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-				//※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-				$this->set('username', $username);
-				$Userdata = $this->Users->find()->where(['username' => $username])->toArray();
-					if(empty($Userdata)){
-						$delete_flag = "";
-					}else{
-						$delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-						$this->set('delete_flag',$delete_flag);//登録者の表示のため
-					}
-						$user = $this->Auth->identify();
-					if ($user) {
-						$this->Auth->setUser($user);
-						return $this->redirect(['action' => 'fushiyouform']);
-					}
-				}
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+        $userdata = $data['username'];
+
+        if(isset($data['prelogin'])){
+
+          $htmllogin = new htmlLogin();
+          $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+          if($qrcheck > 0){
+            return $this->redirect(['action' => 'fushiyoupreadd',
+            's' => ['mess' => "QRコードを読み込んでください。"]]);
+          }
+
+        }
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'fushiyouform']);
+        }
+      }
 		}
 
-     public function fushiyouform()//ラベル不使用qr
+     public function fushiyouform()//ラベル不使用qr//SAKAE-15V00,,,,220914-001,
      {
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
@@ -3281,9 +3470,17 @@ class LabelsController extends AppController
      {
        $checkLots = $this->CheckLots->newEntity();
        $this->set('checkLots',$checkLots);
+
+       $session_names = "Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+       $htmlSessioncheck = new htmlSessioncheck();
+       $arr_session_flag = $htmlSessioncheck->check($session_names);
+       if($arr_session_flag["num"] > 1){//セッション切れの場合
+         return $this->redirect(['action' => 'indexMenu',
+         's' => ['mess' => $arr_session_flag["mess"]]]);
+       }
+
        $data = $this->request->getData();
        $maisuu = $data["maisuu"];
-
 
        $CheckLots = $this->CheckLots->find()//以下の条件を満たすデータをCheckLotsテーブルから見つける
          ->where(['product_code' => $data["product_code"], 'lot_num' => $data["lot_num_0"]])->toArray();
@@ -3506,36 +3703,56 @@ class LabelsController extends AppController
 
      }
 
-          public function hasupreadd()//210323
+          public function hasupreadd()
          {
            $KadouSeikeis = $this->KadouSeikeis->newEntity();
            $this->set('KadouSeikeis',$KadouSeikeis);
+
+           $Data=$this->request->query('s');
+           if(isset($Data["mess"])){
+             $mess = $Data["mess"];
+             $this->set('mess',$mess);
+           }else{
+             $mess = "";
+             $this->set('mess',$mess);
+           }
+
          }
 
-         public function hasulogin()//210323
+         public function hasulogin()
          {
            if ($this->request->is('post')) {
              $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-             $str = implode(',', $data);//preadd.ctpで入力したデータをカンマ区切りの文字列にする
-             $ary = explode(',', $str);//$strを配列に変換
 
-             $username = $ary[0];//入力したデータをカンマ区切りの最初のデータを$usernameとする
-             //※staff_codeをusernameに変換？・・・userが一人に決まらないから無理
-             $this->set('username', $username);
-             $Userdata = $this->Users->find()->where(['username' => $username])->toArray();
+             $userdata = $data['username'];
 
-               if(empty($Userdata)){
-                 $delete_flag = "";
-               }else{
-                 $delete_flag = $Userdata[0]->delete_flag;//配列の0番目（0番目しかない）のnameに$Roleと名前を付ける
-                 $this->set('delete_flag',$delete_flag);//登録者の表示のため
+             if(isset($data['prelogin'])){
+
+               $htmllogin = new htmlLogin();
+               $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+               if($qrcheck > 0){
+                 return $this->redirect(['action' => 'hasupreadd',
+                 's' => ['mess' => "QRコードを読み込んでください。"]]);
                }
-                 $user = $this->Auth->identify();
-               if ($user) {
-                 $this->Auth->setUser($user);
-                 return $this->redirect(['action' => 'hasuform']);
-               }
+
              }
+
+             $htmllogin = new htmlLogin();
+             $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+             $username = $arraylogindate[0];
+             $delete_flag = $arraylogindate[1];
+             $this->set('username',$username);
+             $this->set('delete_flag',$delete_flag);
+
+             $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+             if ($user) {
+               $this->Auth->setUser($user);
+               return $this->redirect(['action' => 'hasuform']);
+             }
+           }
          }
 
      public function hasuform()//ラベル発行の端数登録（日程絞り込み画面）
@@ -3668,6 +3885,15 @@ class LabelsController extends AppController
      {
       $orderEdis = $this->OrderEdis->newEntity();
       $this->set('orderEdis',$orderEdis);
+
+      $session_names = "labelhasu,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexMenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $session = $this->request->getSession();
       $data = $session->read();
 
@@ -3736,7 +3962,7 @@ class LabelsController extends AppController
           'line_code' => "", 'date' => $date, 'start_lot' => 1, 'delete_flag' => 0, 'created_staff' => $_SESSION["Auth"]["User"]["staff_id"]];//unit2,line_code1...不要
       }
 
-  //    $fp = fopen('labels/label_hasu_200507.csv', 'w');
+  //    $fp = fopen('labels/label_hasu_210914.csv', 'w');
       $fp = fopen('/home/centosuser/label_csv/label_hakkou.csv', 'w');
       foreach ($arrCsv as $line) {
         $line = mb_convert_encoding($line, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する※文字列に使用、ファイルごとはできない
@@ -3821,26 +4047,37 @@ class LabelsController extends AppController
    {
      if ($this->request->is('post')) {
        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
-       $this->set('data',$data);//セット
-       $userdata = $data['username'];
-       $this->set('userdata',$userdata);//セット
 
-       $htmllogin = new htmlLogin();//クラスを使用
-       $arraylogindate = $htmllogin->htmllogin($userdata);//クラスを使用（$userdataを持っていき、$arraylogindateを持って帰る）
+       $userdata = $data['username'];
+
+       if(isset($data['prelogin'])){
+
+         $htmllogin = new htmlLogin();
+         $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+         if($qrcheck > 0){
+           return $this->redirect(['action' => 'hasulotstafftouroku',
+           's' => ['mess' => "QRコードを読み込んでください。"]]);
+         }
+
+       }
+
+       $htmllogin = new htmlLogin();
+       $arraylogindate = $htmllogin->htmlloginprogram($userdata);
 
        $username = $arraylogindate[0];
        $delete_flag = $arraylogindate[1];
        $this->set('username',$username);
        $this->set('delete_flag',$delete_flag);
 
-       $user = $this->Auth->identify();
+       $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
 
-        if ($user) {
-          $this->Auth->setUser($user);
-          return $this->redirect(['action' => 'hasulotform',//以下のデータを持ってhasulotformに移動
-          's' => ['username' => $username]]);
-        }
-      }
+       if ($user) {
+         $this->Auth->setUser($user);
+         return $this->redirect(['action' => 'hasulotform',
+         's' => ['username' => $username]]);
+       }
+     }
    }
 
       public function hasulotform()
@@ -4150,6 +4387,14 @@ class LabelsController extends AppController
       $session = $this->request->getSession();
       $data = $session->read();
 
+      $session_names = "hyouji,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $htmlSessioncheck = new htmlSessioncheck();
+      $arr_session_flag = $htmlSessioncheck->check($session_names);
+      if($arr_session_flag["num"] > 1){//セッション切れの場合
+        return $this->redirect(['action' => 'indexMenu',
+        's' => ['mess' => $arr_session_flag["mess"]]]);
+      }
+
       $Staff = $_SESSION['hyouji']['Staff'];
       $this->set('Staff',$Staff);
       $product_code1 = $_SESSION['hyouji']['product_code1'];
@@ -4332,7 +4577,7 @@ class LabelsController extends AppController
              }
            }
 
-           ${"arrOrderdouitu".$m} = $this->OrderEdis->find()->where(['date_deliver' => ${"date".$i}, 'product_code' => ${"arrPro_c".$i}[$m], 'delete_flag' => '0'])->toArray();
+           ${"arrOrderdouitu".$m} = $this->OrderEdis->find()->where(['date_deliver' => ${"date".$i}, 'product_code' => ${"arrPro_c".$i}[$m], 'delete_flag' => '0', 'place_deliver_code IS NOT' => '00000'])->toArray();
 
            if(isset(${"arrOrderdouitu".$m}[0])){
              for($n=0; $n<count(${"arrOrderdouitu".$m}); $n++){
@@ -4390,7 +4635,11 @@ class LabelsController extends AppController
            }else{
 
              for($p=0; $p<count(${"arrOrderdouitu".$m}); $p++){
-
+/*
+               echo "<pre>";
+               print_r(${"arrPro_c".$i}[$m]." check_lots=".$amount_c." order_edi=".$amount_o." ".${"arrOrderdouitu".$m}[$p]->place_deliver_code);
+               echo "</pre>";
+*/
                 if(${"arrOrderdouitu".$m}[$p]->place_deliver_code !== "00000"){
 
                   $arrPlaceDelivers = $this->PlaceDelivers->find()->where(['id_from_order' => ${"arrOrderdouitu".$m}[$p]->place_deliver_code])->toArray();

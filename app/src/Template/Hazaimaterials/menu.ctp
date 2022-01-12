@@ -21,8 +21,6 @@
   </tr>
 </table>
 <hr size="5" style="margin: 0.5rem">
-<br>
- <div align="center"><font color="red" size="2"><?= __($mess) ?></font></div>
  <br>
  <legend align="left"><font color="black"><?= __("　　CSV未出力端材原料一覧") ?></font></legend>
  <br>

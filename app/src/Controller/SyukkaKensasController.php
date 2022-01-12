@@ -3350,7 +3350,7 @@ class SyukkaKensasController extends AppController {
        $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()
       ->where(['product_code' => $product_code])->toArray();
 
-       $arrKindKensa = array("","ノギス","シグネス");//配列の初期化
+       $arrKindKensa = array("" => "","ノギス" => "ノギス","シグネス" => "シグネス");//配列の初期化
         foreach ($ImSokuteidataHeads as $value) {//それぞれに対して
 
           $kind_kensa_arr = explode("_",$value->kind_kensa);//切り離し
@@ -3360,7 +3360,7 @@ class SyukkaKensasController extends AppController {
             $kind_kensa = $value->kind_kensa;
           }
 
-           $arrKindKensa[] = $kind_kensa;//配列に追加
+           $arrKindKensa[$kind_kensa] = $kind_kensa;//配列に追加
         }
          $arrKindKensa = array_unique($arrKindKensa);
 
@@ -3373,12 +3373,18 @@ class SyukkaKensasController extends AppController {
        if(!isset($_SESSION)){//sessionsyuuseituika
        session_start();
        }
-       $_SESSION['kikakudata'] = array();
+       $_SESSION['kikakudataedit'] = array();
 
       $data = $this->request->getData();
       $product_code = $data["product_code"];
-
       $this->set('product_code',$product_code);//セット
+      $newversion = $data["newversion"];
+      $this->set('newversion',$newversion);//セット
+      $maisu = $data["maisu"];
+      $this->set('maisu',$maisu);//セット
+
+      $_SESSION['kikakudataedit'] = $data;
+
       $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
       $Productname = $Product[0]->product_name;
       $this->set('Productname',$Productname);//セット
@@ -3390,12 +3396,55 @@ class SyukkaKensasController extends AppController {
        $product_code= $value->product_code;
      }
      $this->set('product_code',$product_code);//セット
-
+/*
      $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
      $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
      $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
-
+*/
       $this->set('entity',$this->ImKikakuTaious->newEntity());//newEntity・テーブルに空の行を作る
+
+      $KensahyouHeads = $this->KensahyouHeads->find()->where([
+        'OR' => [['product_code' => $product_code], ['product_code like' => $product_code.'---%']], 'delete_flag' => '0'])->order(["product_code"=>"asc"])->toArray();
+
+        $maisu = count($KensahyouHeads);
+        $this->set('maisu',$maisu);
+
+      for($k=1; $k<=$maisu; $k++){
+
+        for($i=1; $i<=9; $i++){
+          if(isset($KensahyouHeads[$k-1]["size_".$i])){
+            ${"size_".$k.$i} = $KensahyouHeads[$k-1]["size_".$i];
+          }else{
+            ${"size_".$k.$i} = "";
+          }
+          $this->set('size_'.$k.$i,${"size_".$k.$i});
+        }
+
+        for($j=1; $j<=8; $j++){
+
+          if(isset($KensahyouHeads[$k-1]["upper_".$j])){
+            ${"upper_".$k.$j} = $KensahyouHeads[$k-1]["upper_".$j];
+          }else{
+            ${"upper_".$k.$j} = "";
+          }
+          $this->set('upper_'.$k.$j,${"upper_".$k.$j});
+
+          if(isset($KensahyouHeads[$k-1]["lower_".$j])){
+            ${"lower_".$k.$j} = $KensahyouHeads[$k-1]["lower_".$j];
+          }else{
+            ${"lower_".$k.$j} = "";
+          }
+          $this->set('lower_'.$k.$j,${"lower_".$k.$j});
+
+        }
+
+      }
+
+      for($i=10; $i<=11; $i++){
+        ${"text_".$i} = $KensahyouHeads[0]["text_".$i];
+        $this->set('text_'.$i,${"text_".$i});
+     }
+
      }
 
      public function imtaioueditpreadd()
@@ -3453,7 +3502,7 @@ class SyukkaKensasController extends AppController {
       $session = $this->request->getSession();
       $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
 
-      $session_names = "kikakudata,kousinn_flag,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
+      $session_names = "kikakudataedit,Auth";//データ登録に必要なセッションの名前をカンマでつなぐ
       $htmlSessioncheck = new htmlSessioncheck();
       $arr_session_flag = $htmlSessioncheck->check($session_names);
       if($arr_session_flag["num"] > 1){//セッション切れの場合
@@ -3461,9 +3510,115 @@ class SyukkaKensasController extends AppController {
         's' => ['mess' => $arr_session_flag["mess"]]]);
       }
 
-      $data = $sessiondata['kikakudata'];
-      $kousinn_flag = $_SESSION['kousinn_flag']['kousinn_flag'];
+      $data = $sessiondata['kikakudataedit'];
+/*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+*/
+      $this->set('data',$data);
+      $maisu = $data['maisu'];
+      $this->set('maisu',$maisu);
+      $product_code = $data['product_code'];
+      $this->set('product_code',$product_code);
 
+      $KensahyouHead = $this->KensahyouHeads->find()->where([
+        'OR' => [['product_code' => $product_code], ['product_code like' => $product_code.'---%']], 'delete_flag' => '0'])->order(["product_code"=>"asc"])->toArray();
+
+      for($k=1; $k<=$maisu; $k++){
+
+          $KensahyouHeadver = $KensahyouHead[0]->version+1;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のversionに1を足したものに$KensahyouHeadverと名前を付ける
+          $this->set('KensahyouHeadver',$KensahyouHeadver);//セット
+
+          $KensahyouHeadid = $KensahyouHead[0]->id;//$KensahyouHeadの0番目のデータ（0番目のデータしかない）のidに$KensahyouHeadidと名前を付ける
+          $this->set('KensahyouHeadid',$KensahyouHeadid);//セット
+
+          for($i=1; $i<=9; $i++){//size_1～9までセット
+            ${"size_".$k.$i} = $KensahyouHead[$k - 1]->{"size_{$i}"};//KensahyouHeadのsize_1～9まで
+            $this->set('size_'.$k.$i,${"size_".$k.$i});//セット
+          }
+
+          for($j=1; $j<=8; $j++){//upper_1～8,lowerr_1～8までセット
+            ${"upper_".$k.$j} = $KensahyouHead[$k - 1]->{"upper_{$j}"};//KensahyouHeadのupper_1～8まで
+            $this->set('upper_'.$k.$j,${"upper_".$k.$j});//セット
+            ${"lower_".$k.$j} = $KensahyouHead[$k - 1]->{"lower_{$j}"};//KensahyouHeadのlowerr_1～8まで
+            $this->set('lower_'.$k.$j,${"lower_".$k.$j});//セット
+          }
+
+          for($i=10; $i<=11; $i++){
+            ${"text_".$i} = $KensahyouHead[0]["text_".$i];
+            $this->set('text_'.$i,${"text_".$i});
+         }
+
+      }
+
+      $tourokudata = array();
+      $num_toutoku = 0;
+      $num = 0;
+      for($j=1; $j<=$data["maisu"]; $j++){
+
+        for($i=1; $i<=9; $i++){
+
+          $num_toutoku = ($j - 1)*9 + $i;
+
+          $kind_kensa_arr = explode("_",$data["kind_kensa_{$num_toutoku}"]);//切り離し
+          if(isset($kind_kensa_arr[1])){
+            $kind_kensa = $kind_kensa_arr[1];
+          }else{
+            $kind_kensa = $data["kind_kensa_{$num_toutoku}"];
+          }
+
+          $num = $num + 1;
+          $tourokudata[] = [
+            'product_code' => $data['product_code'],
+            'kensahyuo_num' => $num,
+            "kind_kensa" => $kind_kensa,
+            "size_num" => $data["size_num_{$num_toutoku}"],
+          ];
+        }
+
+      }
+
+      $Product = $this->Products->find()->where(['product_code' => $data['product_code']])->toArray();
+      $product_code = $Product[0]->product_code;
+      $this->set('product_code',$product_code);//セット
+      $Productname = $Product[0]->product_name;
+      $this->set('Productname',$Productname);//セット
+
+      $Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
+        'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
+      ]);
+      foreach ($Products as $value) {//$Productsそれぞれに対し
+       $product_code= $value->product_code;
+     }
+     $this->set('product_code',$product_code);//セット
+
+     $ImKikakuTaiou = $this->ImKikakuTaious->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
+     $this->set('ImKikakuTaiou',$ImKikakuTaiou);//セット
+
+     $count = count($tourokudata);
+     for($k=0; $k<$count; $k++){
+
+       if(!empty($tourokudata[$k]["kind_kensa"]) && !empty($tourokudata[$k]["size_num"])){
+
+         $k = $k;
+         $staff_id = $sessiondata['Auth']['User']['staff_id'];//ログイン中のuserのstaff_idに$staff_idという名前を付ける
+         $tourokudata[$k]['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
+         $tourokudata[$k]['created_at'] = date('Y-m-d H:i:s');
+
+       }else{
+         unset($tourokudata[$k]);
+       }
+
+     }
+
+     $tourokudata = array_values($tourokudata);
+     /*
+     echo "<pre>";
+     print_r($tourokudata);
+     echo "</pre>";
+*/
+/***
       $Product = $this->Products->find()->where(['product_code' => $sessiondata['kikakudata'][1]['product_code']])->toArray();
       $product_code = $Product[0]->product_code;
       $this->set('product_code',$product_code);//セット
@@ -3503,49 +3658,9 @@ class SyukkaKensasController extends AppController {
      }
 
      $data = array_values($data);
-/*
-     echo "<pre>";
-     print_r($data);
-     echo "</pre>";
-*/
-         if ($kousinn_flag == 5) {
 
-/*
-           $ImKikakuTaiou = $this->ImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => '0'])->toArray();
+     *///
 
-           for($k=0; $k<count($ImKikakuTaiou); $k++){
-
-             ${"id".$k} = $ImKikakuTaiou[$k]->id;
-
-             $this->ImKikakuTaious->updateAll(
-               ['status' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data[0]['created_staff']],
-               ['id'  => ${"id".$k}]
-             );
-
-           }
-
-           //旧DB更新
-           $connection = ConnectionManager::get('DB_ikou_test');
-           $table = TableRegistry::get('im_kikaku_taiou');
-           $table->setConnection($connection);
-
-           for($k=0; $k<count($data); $k++){
-             $connection->insert('im_kikaku_taiou', [
-               'product_id' => $data[$k]["product_code"],
-               'kensahyou_size' => $data[$k]["kensahyuo_num"],
-               'kind_kensa' => $data[$k]["kind_kensa"],
-               'im_size_num' => $data[$k]["size_num"]
-             ]);
-           }
-           $connection = ConnectionManager::get('default');
-
-           $mes = "※下記のように更新されました";
-           $this->set('mes',$mes);
-           $connection->commit();// コミット5
-*/
-        }else{
-
-          $KensahyouHeads = $this->ImKikakuTaious->patchEntity($ImKikakuTaious, $this->request->getData());
           $connection = ConnectionManager::get('default');//トランザクション1
             // トランザクション開始2
           $connection->begin();//トランザクション3
@@ -3558,13 +3673,13 @@ class SyukkaKensasController extends AppController {
               ${"id".$k} = $ImKikakuTaiou[$k]->id;
 
               $this->ImKikakuTaious->updateAll(
-                ['status' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $data[0]['created_staff']],
+                ['status' => 1, 'updated_at' => date('Y-m-d H:i:s'), 'updated_staff' => $staff_id],
                 ['id'  => ${"id".$k}]
               );
 
             }
 
-             $ImKikakuTaious = $this->ImKikakuTaious->patchEntities($this->ImKikakuTaious->newEntity(), $data);
+             $ImKikakuTaious = $this->ImKikakuTaious->patchEntities($this->ImKikakuTaious->newEntity(), $tourokudata);
              $this->ImKikakuTaious->saveMany($ImKikakuTaious);
 
              //旧DB更新
@@ -3583,12 +3698,12 @@ class SyukkaKensasController extends AppController {
              $table = TableRegistry::get('im_kikaku_taiou');
              $table->setConnection($connection);
 
-             for($k=0; $k<count($data); $k++){
+             for($k=0; $k<count($tourokudata); $k++){
                $connection->insert('im_kikaku_taiou', [
-                 'product_id' => $data[$k]["product_code"],
-                 'kensahyou_size' => $data[$k]["kensahyuo_num"],
-                 'kind_kensa' => $data[$k]["kind_kensa"],
-                 'im_size_num' => $data[$k]["size_num"]
+                 'product_id' => $tourokudata[$k]["product_code"],
+                 'kensahyou_size' => $tourokudata[$k]["kensahyuo_num"],
+                 'kind_kensa' => $tourokudata[$k]["kind_kensa"],
+                 'im_size_num' => $tourokudata[$k]["size_num"]
                ]);
              }
              $connection = ConnectionManager::get('default');
@@ -3602,9 +3717,6 @@ class SyukkaKensasController extends AppController {
             $connection->rollback();//トランザクション9
           }//トランザクション10
 
-        }
-
     }
-
 
 }

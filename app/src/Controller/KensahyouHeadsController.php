@@ -276,6 +276,9 @@ class KensahyouHeadsController  extends AppController
 
     public function form()
     {
+
+  //    echo Configure::version();
+
       $data = $this->request->getData();
       $product_code = $data["product_code"];
     	$this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット

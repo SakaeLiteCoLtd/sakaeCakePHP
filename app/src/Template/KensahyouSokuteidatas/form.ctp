@@ -17,7 +17,7 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
           header('Pragma:');
 
           echo $this->Form->hidden('product_code' ,['value'=>$product_code ]) ;
-          echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'confirm']]);
+          echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'form']]);
 
           $ImSokuteidataHead = $this->ImSokuteidataHeads->find()->where(['lot_num' => $lot_num])->toArray();
 
@@ -79,7 +79,7 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
         echo "</strong></div></td>\n";
         $kensaArray = Array();
         for($i=1; $i<=9; $i++){
-          echo "<td colspan='2'><div align='center'>\n";
+          echo "<td colspan='2'><div align='center' style='font-size: 9pt'>\n";
           echo ${"ImKikakuid_".$i};
           echo "</div></td>\n";
         }
@@ -154,8 +154,10 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
 </table>
         <?php
         echo $this->Form->hidden('kensahyou_heads_id' ,['value'=>$KensahyouHeadid]);
-  //      echo $this->Form->hidden('lot_num' ,['value'=>$this->request->getData('lot_num')]);
-        echo $this->Form->hidden('product_code' ,['value'=>$product_code]) ;
+        echo $this->Form->hidden('lot_num_torikomi' ,['value'=>$lot_num_torikomi]);
+        echo $this->Form->hidden('product_code1' ,['value'=>$product_code]);
+        echo $this->Form->hidden('product_name1' ,['value'=>$Productname]);
+        echo $this->Form->hidden('product_code' ,['value'=>$product_code]);
         echo $this->Form->hidden('delete_flag' ,['value'=>0]);
         echo $this->Form->hidden('created_staff', ['value'=>$staff_id]);
         echo $this->Form->hidden('updated_staff');
@@ -164,7 +166,7 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
     </fieldset>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
-      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('確認'), array('name' => 'kakunin')); ?></div></td>
+      <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('次へ'), array('name' => 'next')); ?></div></td>
     </tr>
   </table>
 <br>

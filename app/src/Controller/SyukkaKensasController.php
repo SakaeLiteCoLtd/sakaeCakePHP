@@ -3618,49 +3618,6 @@ class SyukkaKensasController extends AppController {
      print_r($tourokudata);
      echo "</pre>";
 */
-/***
-      $Product = $this->Products->find()->where(['product_code' => $sessiondata['kikakudata'][1]['product_code']])->toArray();
-      $product_code = $Product[0]->product_code;
-      $this->set('product_code',$product_code);//セット
-      $Productname = $Product[0]->product_name;
-      $this->set('Productname',$Productname);//セット
-
-      $Products = $this->Products->find('all',[//Productsテーブルから'product_code =' => $product_codeとなるものを見つける
-        'conditions' => ['product_code =' => $product_code]//条件'product_code =' => $product_code
-      ]);
-      foreach ($Products as $value) {//$Productsそれぞれに対し
-       $product_code= $value->product_code;
-     }
-     $this->set('product_code',$product_code);//セット
-
-     $htmlKensahyouSokuteidata = new htmlKensahyouSokuteidata();//src/myClass/KensahyouSokuteidata/htmlKensahyouSokuteidata.phpを使う　newオブジェクトを生成
-     $htmlKensahyouHeader = $htmlKensahyouSokuteidata->htmlHeaderKensahyouSokuteidata($product_code);//
-     $this->set('htmlKensahyouHeader',$htmlKensahyouHeader);//セット
-
-     $ImKikakuTaious = $this->ImKikakuTaious->newEntity();//空のカラムに$KensahyouSokuteidataと名前を付け、次の行でctpで使えるようにセット
-     $this->set('ImKikakuTaious',$ImKikakuTaious);//セット
-
-     $count = count($data);
-     for($k=1; $k<=$count; $k++){
-
-       if(!empty($data[$k]["kind_kensa"]) && !empty($data[$k]["size_num"])){
-
-         $staff_id = $sessiondata['Auth']['User']['staff_id'];//ログイン中のuserのstaff_idに$staff_idという名前を付ける
-         $data[$k]['created_staff'] = $staff_id;//$userのcreated_staffを$staff_idにする
-         $data[$k]['created_at'] = date('Y-m-d H:i:s');
-
-       }else{
-
-         unset($data[$k]);
-
-       }
-
-     }
-
-     $data = array_values($data);
-
-     *///
-
           $connection = ConnectionManager::get('default');//トランザクション1
             // トランザクション開始2
           $connection->begin();//トランザクション3

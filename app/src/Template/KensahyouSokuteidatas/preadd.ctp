@@ -37,6 +37,7 @@ if($gaikancount > 0){
 <?= $this->Form->control('kensahyou_heads_id', array('type'=>'hidden', 'value'=>$_POST["kensahyou_heads_id"], 'label'=>false)) ?>
 <?= $this->Form->control('product_code', array('type'=>'hidden', 'value'=>$_POST["product_code"], 'label'=>false)) ?>
 <?= $this->Form->control('lot_num', array('type'=>'hidden', 'value'=>$_POST["lot_num"], 'label'=>false)) ?>
+<?= $this->Form->control('maisu', array('type'=>'hidden', 'value'=>$_POST["maisu"], 'label'=>false)) ?>
 <?= $this->Form->control('manu_date', array('type'=>'hidden', 'value'=>$_POST["manu_date"], 'label'=>false)) ?>
 <?= $this->Form->control('inspec_date', array('type'=>'hidden', 'value'=>$_POST["inspec_date"], 'label'=>false)) ?>
 <?= $this->Form->control('delete_flag', array('type'=>'hidden', 'value'=>$_POST["delete_flag"], 'label'=>false)) ?>
@@ -46,15 +47,13 @@ if($gaikancount > 0){
 <?php for($n=1; $n<=8; $n++): ?>
 
   <?= $this->Form->control('cavi_num_'.$n, array('type'=>'hidden', 'value'=>$n, 'label'=>false)) ?>
-  <?= $this->Form->control('result_size_'.$n.'_1', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_1"], 'label'=>false)) ?>
-  <?= $this->Form->control('result_size_'.$n.'_2', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_2"], 'label'=>false)) ?>
-  <?= $this->Form->control('result_size_'.$n.'_3', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_3"], 'label'=>false)) ?>
-  <?= $this->Form->control('result_size_'.$n.'_4', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_4"], 'label'=>false)) ?>
-  <?= $this->Form->control('result_size_'.$n.'_5', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_5"], 'label'=>false)) ?>
-  <?= $this->Form->control('result_size_'.$n.'_6', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_6"], 'label'=>false)) ?>
-  <?= $this->Form->control('result_size_'.$n.'_7', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_7"], 'label'=>false)) ?>
-  <?= $this->Form->control('result_size_'.$n.'_8', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_8"], 'label'=>false)) ?>
-  <?= $this->Form->control('result_size_'.$n.'_9', array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_9"], 'label'=>false)) ?>
+
+  <?php for($m=1; $m<=9*$_POST["maisu"]; $m++): ?>
+
+  <?= $this->Form->control('result_size_'.$n.'_'.$m, array('type'=>'hidden', 'value'=>$_POST["result_size_{$n}_{$m}"], 'label'=>false)) ?>
+
+<?php endfor;?>
+
   <?= $this->Form->control('result_weight_'.$n, array('type'=>'hidden', 'value'=>$_POST["result_weight_{$n}"], 'label'=>false)) ?>
   <?= $this->Form->control('situation_dist1_'.$n, array('type'=>'hidden', 'value'=>$_POST["situation_dist1_{$n}"], 'label'=>false)) ?>
   <?= $this->Form->control('situation_dist2_'.$n, array('type'=>'hidden', 'value'=>$_POST["situation_dist2_{$n}"], 'label'=>false)) ?>

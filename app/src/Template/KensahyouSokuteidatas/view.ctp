@@ -13,7 +13,7 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
           header('Expires:-1');
           header('Cache-Control:');
           header('Pragma:');
-          echo $this->Form->create($kensahyouSokuteidatas, ['url' => ['action' => 'index']]);
+          echo $this->Form->create($KensahyouSokuteidatas, ['url' => ['action' => 'index']]);
 ?>
 <?php
  use App\myClass\Syukkakensa\htmlSyukkakensamenu;//myClassフォルダに配置したクラスを使用
@@ -51,52 +51,300 @@ $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//ken
           <td colspan="9"><?= h($KensahyouHead_inspec_date); ?></td>
         </tr>
 
-<?php
-     echo $htmlKensahyouHeader;
-?>
-            <?php
-            echo "<tr style='border-bottom: solid;border-width: 1px'><td nowrap='nowrap' colspan='4'><div align='center'><strong>\n";
-            echo "検査種類";
-            echo "</strong></div></td>\n";
-            $kensaArray = Array();
-            for($i=1; $i<=9; $i++){
+        <?php for($j=1; $j<=$maisu; $j++): ?>
 
-              echo "<td colspan='2'><div align='center'>\n";
-              echo ${"ImKikakuid_".$i};
-              echo "</div></td>\n";
+          <?php if($j > 1): ?>
+            <tr style="border-bottom: solid;border-width: 1px">
+              <td colspan="28" nowrap="nowrap"><div align="center"></div></td>
+            </tr>
+          <?php else: ?>
+          <?php endif; ?>
 
-            //        echo "<td colspan='2'><div align='center'>\n";
-            //        echo "ノギス";
-            //        echo "</strong></div></td>\n";
+        <tr style="border-bottom: solid;border-width: 1px">
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>枚数</strong></div></td>
+          <td colspan="9"><?= h($j." / ".$maisu) ?></td>
+          <td colspan="14" nowrap="nowrap">&nbsp;<input type="hidden" name="version" value="0"/></td>
+        </tr>
+        <tr style="border-bottom: solid;border-width: 1px">
+
+        <?php if($j == 1): ?>
+
+          <td colspan="4">&nbsp;</td>
+          <td width="24" colspan="2"><div align="center"><strong>A</strong></div></td>
+          <td width="38" colspan="2"><div align="center"><strong>B</strong></div></td>
+          <td width="38" colspan="2"><div align="center"><strong>C</strong></div></td>
+          <td width="38" colspan="2"><div align="center"><strong>D</strong></div></td>
+          <td width="38" colspan="2"><div align="center"><strong>E</strong></div></td>
+          <td width="38" colspan="2"><div align="center"><strong>F</strong></div></td>
+          <td width="38" colspan="2"><div align="center"><strong>G</strong></div></td>
+          <td width="38" colspan="2"><div align="center"><strong>H</strong></div></td>
+          <td width="60" nowrap="nowrap" colspan="2"><div align="center"><font size="-3"><strong>ソリ・フレ<?= h("(".$j.")") ?></strong></font></div></td>
+          <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観１</strong></font></div></td>
+          <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観２</strong></font></div></td>
+          <td width="51" nowrap="nowrap" colspan="2"><div align="center"><font size="-1"><strong>単重</strong></font></div></td>
+
+          <?php elseif($j == 2): ?>
+
+            <td colspan="4">&nbsp;</td>
+            <td width="24" colspan="2"><div align="center"><strong>I</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>J</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>K</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>L</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>M</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>N</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>O</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>P</strong></div></td>
+            <td width="60" nowrap="nowrap" colspan="2"><div align="center"><font size="-3"><strong>ソリ・フレ<?= h("(".$j.")") ?></strong></font></div></td>
+            <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong></strong></font></div></td>
+            <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong></strong></font></div></td>
+            <td width="51" nowrap="nowrap" colspan="2"><div align="center"><font size="-1"><strong></strong></font></div></td>
+
+          <?php else: ?>
+
+            <td colspan="4">&nbsp;</td>
+            <td width="24" colspan="2"><div align="center"><strong>Q</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>R</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>S</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>T</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>U</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>V</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>W</strong></div></td>
+            <td width="38" colspan="2"><div align="center"><strong>X</strong></div></td>
+            <td width="60" nowrap="nowrap" colspan="2"><div align="center"><font size="-3"><strong>ソリ・フレ<?= h("(".$j.")") ?></strong></font></div></td>
+            <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong></strong></font></div></td>
+            <td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong></strong></font></div></td>
+            <td width="51" nowrap="nowrap" colspan="2"><div align="center"><font size="-1"><strong></strong></font></div></td>
+
+          <?php endif; ?>
+
+        </tr>
+        <tr style="border-bottom: solid;border-width: 1px">
+          <td width="33" rowspan="3" nowrap="nowrap" colspan="2"><div align="center"><strong>規格</strong></div></td>
+          <td width="45" nowrap="nowrap" colspan="2"><div align="center"><strong>上限</strong></div></td>
+
+        <?php
+            $Array = Array();
+            for($k=1; $k<=8; $k++){
+              $num_size = ($j - 1)*9 + $k;
+
+            echo '<td colspan="2"><div align="center">';
+            echo ${"upper_".$num_size};
+            echo '</div></td>';
             }
             echo "<td colspan='2'>\n";
             echo "</td>\n";
             echo "<td colspan='2'>\n";
             echo "</td>\n";
+
+        ?>
+
+          <td colspan="2"><div align="center"></div></td>
+          <td rowspan="3" colspan="2">&nbsp;</td>
+        </tr>
+        <tr style="border-bottom: solid;border-width: 1px">
+          <td nowrap="nowrap" colspan="2"><div align="center"><strong>下限</strong></div></td>
+
+        <?php
+            $Array = Array();
+            for($k=1; $k<=8; $k++){
+              $num_size = ($j - 1)*9 + $k;
+            echo '<td colspan="2"><div align="center">';
+            echo ${"lower_".$num_size};
+            echo '</div></td>';
+            }
             echo "<td colspan='2'>\n";
             echo "</td>\n";
-            ?>
+            echo "<td colspan='2'>\n";
+            echo "</td>\n";
 
-            <?php foreach ($kensahyouSokuteidatas as $KensahyouSokuteidata): ?>
-                <tr style='background-color: #FFFFFF;border-bottom: solid;border-width: 1px'><td nowrap="nowrap" colspan="4"><div align="center"><strong><?= h($KensahyouSokuteidata->cavi_num) ?></strong></div></td>
-                <?php
-                      for($r=1; $r<=9; $r++){
-                          echo '<td colspan="2" style="background-color: #FFFFFF;border-bottom: solid;border-width: 1px"><div align="center">';
-                          echo $KensahyouSokuteidata->{"result_size_{$r}"} ;
-                          echo '</div></td>';
-                      }
-                ?>
-                <td colspan='2'><div align="center"><?= h($KensahyouSokuteidata->situation_dist1) ?></div></td>
-                <td colspan='2'><div align="center"><?= h($KensahyouSokuteidata->situation_dist2) ?></div></td>
-                <td colspan='2'><div align="center"><?= h($KensahyouSokuteidata->result_weight) ?></div></td>
-            <?php endforeach; ?>
+        ?>
+
+          <td colspan="2"><div align="center"></div></td>
         </tr>
-        <td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
-          <strong style="text-align: left">備考：</strong><br>
-              <div cols="120" rows="10"><?= h($KensahyouHeadbik) ?></div>
-          </td>
+        <tr style="border-bottom: solid;border-width: 1px">
+          <td nowrap="nowrap" colspan="2"><div align="center"><strong>寸法</strong></div></td>
+
+        <?php
+            $Array = Array();
+            for($l=1; $l<=9; $l++){
+              $num_size = ($j - 1)*9 + $l;
+
+            echo '<td colspan="2"><div align="center">';
+            echo ${"size_".$num_size};
+            echo '</div></td>';
+            }
+        ?>
+
+        <?php if($j == 1): ?>
+        <td colspan="2"><div align="center"><?= h($text_10) ?></div></td>
+        <td colspan="2"><div align="center"><?= h($text_11) ?></div></td>
+       <?php else: ?>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+       <?php endif; ?>
+
+       </tr>
+
+       <?php
+       echo "<tr style='border-bottom: solid;border-width: 1px'><td nowrap='nowrap' colspan='4'><div align='center'><strong>\n";
+       echo "検査種類";
+       echo "</strong></div></td>\n";
+       $kensaArray = Array();
+       for($i=1; $i<=9; $i++){
+         $num_size = ($j - 1)*9 + $i;
+
+         echo "<td colspan='2'><div align='center' style='font-size: 9pt'>\n";
+         echo ${"ImKikakuid_".$num_size};
+         echo "</div></td>\n";
+       }
+       echo "<td colspan='2'>\n";
+       echo "</td>\n";
+       echo "<td colspan='2'>\n";
+       echo "</td>\n";
+       echo "<td colspan='2'>\n";
+       echo "</td>\n";
+
+       ?>
+
+       <?php if($j == 1): ?>
+
+         <?php
+             $lowerArraygyou = Array();
+             for($q=1; $q<=8; $q++){
+               echo '<tr style="border-bottom: solid;border-width: 1px"><td nowrap="nowrap" colspan="4"><div align="center"><strong>';
+               echo $q;
+               echo '</strong></div></td>';
+
+               $lowerArray = Array();
+               for($r=1; $r<=8; $r++){
+                   if((int)${"result_size_".$q."_".$r} <= (int)${"size_".$r}+(int)${"upper_".$r} && (int)${"result_size_".$q."_".$r} >= (int)${"size_".$r}+(int)${"lower_".$r}){
+                   echo '<td colspan="2"><div align="center">';
+                   echo ${"result_size_".$q."_".$r};
+                   echo '</div></td>';
+                   } else {
+                   echo '<td colspan="2"><div align="center"><font color="red">';
+                   echo ${"result_size_".$q."_".$r};
+                   echo '</div></td>';
+                   }
+               }
+                 echo "<td colspan='2'><div align='center'>\n";
+                 echo ${"result_size_".$q."_9"};
+                 echo "</td>\n";
+
+                 if(${"situation_dist1_".$q} == "OK"){
+                   echo "<td colspan='2'><div align='center'>\n";
+                   echo ${"situation_dist1_".$q};
+                   echo "</td>\n";
+                 } else {
+                 echo '<td colspan="2"><div align="center"><font color="red">';
+                 echo ${"situation_dist1_".$q};
+                 echo '</div></td>';
+                 }
+
+                 if(${"situation_dist2_".$q} == "OK"){
+                   echo "<td colspan='2'><div align='center'>\n";
+                   echo ${"situation_dist2_".$q};
+                   echo "</td>\n";
+                 } else {
+                 echo '<td colspan="2"><div align="center"><font color="red">';
+                 echo ${"situation_dist2_".$q};
+                 echo '</div></td>';
+                 }
+
+                 echo '<td colspan="2"><div align="center">';
+                 echo ${"result_weight_".$q};
+                 echo '</div></td>';
+
+             }
+         ?>
+
+       <?php elseif($j == 2): ?>
+
+           <?php
+               $lowerArraygyou = Array();
+               for($q=1; $q<=8; $q++){
+                 echo '<tr style="border-bottom: solid;border-width: 1px"><td nowrap="nowrap" colspan="4"><div align="center"><strong>';
+                 echo $q;
+                 echo '</strong></div></td>';
+
+                 $lowerArray = Array();
+                 for($r=10; $r<=17; $r++){
+                     if((int)${"result_size_".$q."_".$r} <= (int)${"size_".$r}+(int)${"upper_".$r}
+                      && (int)${"result_size_".$q."_".$r} >= (int)${"size_".$r}+(int)${"lower_".$r}){
+                     echo '<td colspan="2"><div align="center">';
+                     echo ${"result_size_".$q."_".$r};
+                     echo '</div></td>';
+                     } else {
+                     echo '<td colspan="2"><div align="center"><font color="red">';
+                     echo ${"result_size_".$q."_".$r};
+                     echo '</div></td>';
+                     }
+                 }
+                   echo "<td colspan='2'><div align='center'>\n";
+                   echo ${"result_size_".$q."_18"};
+                   echo "</td>\n";
+
+                   echo '<td colspan="2"><div align="center">';
+                   echo '</div></td>';
+                   echo '<td colspan="2"><div align="center">';
+                   echo '</div></td>';
+                   echo '<td colspan="2"><div align="center">';
+                   echo '</div></td>';
+
+               }
+           ?>
+
+         <?php elseif($j == 3): ?>
+
+             <?php
+                 $lowerArraygyou = Array();
+                 for($q=1; $q<=8; $q++){
+                   echo '<tr style="border-bottom: solid;border-width: 1px"><td nowrap="nowrap" colspan="4"><div align="center"><strong>';
+                   echo $q;
+                   echo '</strong></div></td>';
+
+                   $lowerArray = Array();
+                   for($r=19; $r<=26; $r++){
+                       if((int)${"result_size_".$q."_".$r} <= (int)${"size_".$r}+(int)${"upper_".$r} && (int)${"result_size_".$q."_".$r} >= (int)${"size_".$r}+(int)${"lower_".$r}){
+                       echo '<td colspan="2"><div align="center">';
+                       echo ${"result_size_".$q."_".$r};
+                       echo '</div></td>';
+                       } else {
+                       echo '<td colspan="2"><div align="center"><font color="red">';
+                       echo ${"result_size_".$q."_".$r};
+                       echo '</div></td>';
+                       }
+                   }
+                     echo "<td colspan='2'><div align='center'>\n";
+                     echo ${"result_size_".$q."_27"};
+                     echo "</td>\n";
+
+                     echo '<td colspan="2"><div align="center">';
+                     echo '</div></td>';
+                     echo '<td colspan="2"><div align="center">';
+                     echo '</div></td>';
+                     echo '<td colspan="2"><div align="center">';
+                     echo '</div></td>';
+
+                 }
+             ?>
+
+           <?php else: ?>
+
+       <?php endif; ?>
+
         </tr>
-    </table>
+
+       <?php endfor;?>
+
+       </tr>
+       <td height="120" colspan="28" style="vertical-align: top; border-bottom: solid;border-width: 1px;text-align: left">
+         <strong style="text-align: left">備考：</strong><br>
+             <?= h($KensahyouHeadbik) ?>
+         </td>
+       </tr>
+       <tr>
+       </table>
 <br>
 
 </fieldset>

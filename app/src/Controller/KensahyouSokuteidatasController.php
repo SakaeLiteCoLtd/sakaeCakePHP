@@ -869,6 +869,9 @@ class KensahyouSokuteidatasController  extends AppController
         $this->set('lot_num_new',$lot_num_new);//セット
       }
 
+      $mess = "";
+      $this->set('mess',$mess);
+
       for($i=1; $i<=27; $i++){
         ${"ImKikakuid_".$i} = "ノギス";
         $this->set('ImKikakuid_'.$i,${"ImKikakuid_".$i});
@@ -1055,20 +1058,83 @@ for($k=0; $k<count($arrImSokuteidataResult); $k++){
               $this->set('result_weight_'.$j,${"result_weight_".$j});
             }
 
-          $num = $data['num'] + 1;
-          $this->set('num',$num);//セット
-
-          if($data["num"] == $data["maisu"]){
-
-            if(!isset($_SESSION)){
-              session_start();
+//ここから入力チェック
+            $size_count = 0;
+            $count_minus = ($data["num"] - 1)*9 + 1;
+            for($m=1; $m<=8; $m++){//上から何個入力されているか
+              if(strlen($data["result_size_{$m}_{$count_minus}"]) > 0){
+                $size_count = $size_count + 1;
+              }
             }
-            $_SESSION['formkensahyousokuteidatas'] = array();
-            $_SESSION['formkensahyousokuteidatas'] = $data;
 
-            return $this->redirect(['action' => 'confirm']);
+            $count_left = 0;
+            for($k=$count_minus; $k<=$count; $k++){
+              $count_left = $count_left + 1;
+              for($j=1; $j<=$size_count; $j++){
+                if(strlen(${"size_".$k}) > 0){
+                  if(strlen($data["result_size_{$j}_{$k}"]) == 0){
+                    $mess = $mess."左から".$count_left."番目、上から".$j."番目に入力漏れがあります<br>";
+                  }
+                }
+              }
+            }
 
-          }
+            if($data["num"] == 1){
+              for($j=1; $j<=$size_count; $j++){
+                if(strlen($data["result_weight_{$j}"]) == 0){
+                  $mess = $mess."単重データの上から".$j."番目に入力漏れがあります<br>";
+                }
+                if($text_10 == "外観1" && strlen($data["situation_dist1_{$j}"]) == 0){
+                  $mess = $mess."外観１データの上から".$j."番目に入力漏れがあります<br>";
+                }
+                if($text_11 == "外観1" && strlen($data["situation_dist2_{$j}"]) == 0){
+                  $mess = $mess."外観２データの上から".$j."番目に入力漏れがあります<br>";
+                }
+              }
+            }
+
+            $dotcheck = 0;
+            for($n=1; $n<=8; $n++){
+
+              for($l=1; $l<=9; $l++){
+                $m = ($data["num"] - 1)*9 + $l;
+
+                $dot1 = substr($data["result_size_{$n}_{$m}"], 0, 1);
+                $dot2 = substr($data["result_size_{$n}_{$m}"], -1, 1);
+
+                if($dot1 == "." || $dot2 == "."){
+                  $dotcheck = $dotcheck + 1;
+                  $mess = $mess."左から".$m."番目、上から".$n."番目のデータの「.」の位置を確認してください。<br>";
+                }
+
+              }
+
+            }
+            $this->set('mess',$mess);
+
+            if(strlen($mess) > 0){//入力ミスがある場合
+
+              $num = $data['num'];
+              $this->set('num',$num);//セット
+
+            }else{//入力ミスがない場合
+
+              $num = $data['num'] + 1;
+              $this->set('num',$num);//セット
+
+              if($data["num"] == $data["maisu"]){
+
+                if(!isset($_SESSION)){
+                  session_start();
+                }
+                $_SESSION['formkensahyousokuteidatas'] = array();
+                $_SESSION['formkensahyousokuteidatas'] = $data;
+
+                return $this->redirect(['action' => 'confirm']);
+
+              }
+
+            }
 
         }elseif(isset($data["signess"])){
 

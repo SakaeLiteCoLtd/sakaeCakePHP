@@ -46,8 +46,8 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
           <td colspan="9" nowrap="nowrap"><?= h($Productname) ?></td>
         </tr>
         <tr style="border-bottom: solid;border-width: 1px">
-          <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
-          <td colspan="9"><?= h($KensahyouHeadver) ?></td>
+          <td colspan="5" nowrap="nowrap"><div align="center"><strong>バージョン</strong></div></td>
+          <td colspan="9"><?= h($KensahyouHeadver-1) ?></td>
           <td colspan="5" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
 
           <?php if($num == 1): ?>
@@ -230,8 +230,10 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
                     echo "<td colspan='2'><div align='center'>\n";
                   if(isset(${"ImSokuteidata_result_".$num_size."_".$j})){//もしも
                     echo "<input type='text' pattern='^[0-9.]+$' title='半角数字で入力して下さい。' name=result_size_".$j."_".$num_size." value=${"ImSokuteidata_result_".$num_size."_".$j} size='6'/>\n";
+                  } elseif(isset(${"result_size_".$j."_".$num_size}) && strlen(${"result_size_".$j."_".$num_size}) > 0) {
+                    echo "<input type='text' pattern='^[0-9.]+$' title='半角数字で入力して下さい。' name=result_size_".$j."_".$num_size." value=${"result_size_".$j."_".$num_size}>\n";
                   } else {
-                    echo "<input type='text' pattern='^[0-9.]+$' title='半角数字で入力して下さい。' name=result_size_".$j."_".$num_size." value='' size='6'/>\n";
+                    echo "<input type='text' pattern='^[0-9.]+$' title='半角数字で入力して下さい。' name=result_size_".$j."_".$num_size." value=''>\n";
                   }
                     echo "</div></td>\n";
                 }
@@ -239,11 +241,24 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
                 if($num == 1){
 
                   if($text_10 == "外観1"){
-                    echo "<td colspan='2'><div align='center'><select name=situation_dist1_".$j.">\n";
-                    foreach ($arrhantei as $value){
-                    echo "<option value=$value>$value</option>";
+
+                    if(isset(${"situation_dist1_".$j}) && strlen(${"situation_dist1_".$j}) > 0){
+
+                      ?>
+                      <td colspan='2'><div align='center'>
+                        <?= $this->Form->control('situation_dist1_'.$j, ['options' => $arrhantei, 'value'=>${"situation_dist1_".$j}, 'label'=>false]) ?>
+                      </div></td>
+                      <?php
+
+                    }else{
+
+                      echo "<td colspan='2'><div align='center'><select name=situation_dist1_".$j.">\n";
+                      foreach ($arrhantei as $value){
+                      echo "<option value=$value>$value</option>";
+                      }
+                      echo "</select></div></td>\n";
+
                     }
-                    echo "</select></div></td>\n";
 
                   }else{
                     echo "<td colspan='2'><div align='center'><hidden>\n";
@@ -252,11 +267,24 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
                   }
 
                   if($text_11 == "外観2"){
-                    echo "<td colspan='2'><div align='center'><select name=situation_dist2_".$j.">\n";
-                    foreach ($arrhantei as $value){
-                    echo "<option value=$value>$value</option>";
+
+                    if(isset(${"situation_dist2_".$j}) && strlen(${"situation_dist2_".$j}) > 0){
+
+                      ?>
+                      <td colspan='2'><div align='center'>
+                        <?= $this->Form->control('situation_dist2_'.$j, ['options' => $arrhantei, 'value'=>${"situation_dist2_".$j}, 'label'=>false]) ?>
+                      </div></td>
+                      <?php
+
+                    }else{
+
+                      echo "<td colspan='2'><div align='center'><select name=situation_dist2_".$j.">\n";
+                      foreach ($arrhantei as $value){
+                      echo "<option value=$value>$value</option>";
+                      }
+                      echo "</select></div></td>\n";
+
                     }
-                    echo "</select></div></td>\n";
 
                   }else{
                     echo "<td colspan='2'><div align='center'><hidden>\n";
@@ -265,7 +293,11 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
                   }
 
                       echo "<td colspan='2'>\n";
-                      echo "<input type='text' pattern='^[0-9.]+$' title='半角数字で入力して下さい。' name=result_weight_".$j." value='' size='6'/>\n";
+                      if(isset(${"result_weight_".$j}) && strlen(${"result_weight_".$j}) > 0){//もしも
+                        echo "<input type='text' pattern='^[0-9.]+$' title='半角数字で入力して下さい。' name=result_weight_".$j." value='${"result_weight_".$j}'>\n";
+                      } else {
+                        echo "<input type='text' pattern='^[0-9.]+$' title='半角数字で入力して下さい。' name=result_weight_".$j." value='' size='6'/>\n";
+                      }
                       echo "</td>\n";
 
                 }else{
@@ -309,13 +341,17 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
         echo $this->Form->hidden('kadouseikeiId' ,['value'=>$kadouseikeiId]);
         ?>
     </fieldset>
+    <br>
+    <legend align="center"><font color="red"><?= __($mess) ?></font></legend>
+   <br>
     <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
     <tr>
       <td style="border-style: none;"><div align="center"><?= $this->Form->submit('戻る', ['onclick' => 'history.back()', 'type' => 'button']); ?></div></td>
       <td style="border-style: none;"><div align="center"><?= $this->Form->submit(__('次へ'), array('name' => 'next')); ?></div></td>
     </tr>
   </table>
-<br>
+  <br>
+  <br>
 
 <?php if($num > 1): ?>
 

@@ -79,9 +79,6 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
           <td class="actions">
               <a><?= $this->Html->link(__('編集'), ['action' => 'edit', $kensahyouHead->id]) ?></a>
           </td>
-          <td class="actions">
-              <a><?= $this->Html->link(__('削除'), ['action' => 'edit', $kensahyouHead->id]) ?></a>
-          </td>
         </tr>
     </table>
 

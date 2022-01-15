@@ -175,13 +175,13 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
 <table width="1400" border="1" align="center" bordercolor="#000000" bgcolor="#FFFFFF" style="background-color: #FFFFFF">
     <tr style="border-bottom: solid;border-width: 1px">
       <td colspan="5" nowrap="nowrap"><div align="center"><strong>部品番号</strong></div></td>
-      <td colspan="9" nowrap="nowrap"><?= h($this->request->getData('product_code')) ?></td>
+      <td colspan="9" nowrap="nowrap"><?= h($product_code) ?></td>
       <td colspan="5" nowrap="nowrap"><div align="center"><strong>部品名</strong></div></td>
       <td colspan="9" nowrap="nowrap"><?= h($Productname) ?></td>
     </tr>
     <tr style="border-bottom: solid;border-width: 1px">
-      <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
-      <td colspan="9"><?= h($KensahyouHeadver) ?></td>
+      <td colspan="5" nowrap="nowrap"><div align="center"><strong>バージョン</strong></div></td>
+      <td colspan="9"><?= h($KensahyouHeadver-1) ?></td>
       <td colspan="5" nowrap="nowrap"><div align="center"><strong>ロット番号</strong></div></td>
       <td colspan="9"><?= h($lot_num) ?></td>
     </tr>

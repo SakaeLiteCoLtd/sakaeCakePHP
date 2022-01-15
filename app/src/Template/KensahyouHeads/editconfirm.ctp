@@ -64,7 +64,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
       <td colspan="5" nowrap="nowrap"><div align="center"><strong>新規バージョン</strong></div></td>
       <td colspan="9"><?= h($data['version']) ?></td>
       <td colspan="5" nowrap="nowrap"><div align="center"><strong>IMタイプ</strong></div></td>
-      <td colspan="9"><?= h($type_im) ?></td>
+      <td colspan="9"><?= h($type_im_hyouji) ?></td>
     </tr>
 
     <?php for($j=1; $j<=$data['maisu']; $j++): ?>

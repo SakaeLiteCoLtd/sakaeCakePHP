@@ -21,7 +21,7 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
  <hr size="5" style="margin: 0.5rem">
 
   <fieldset>
-<div align="center"><strong><font color="red">＊IM対応登録内容表示</font></strong></div>
+<div align="center"><strong><font color="red">※IM対応登録内容表示</font></strong></div>
 <br>
       <table width="1200" border="1" align="center" bordercolor="#000000" style="background-color: #FFFFFF">
           <tr style="border-bottom: solid;border-width: 1px">

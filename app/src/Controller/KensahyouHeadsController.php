@@ -28,6 +28,8 @@ class KensahyouHeadsController  extends AppController
        $this->Products = TableRegistry::get('products');//productsテーブルを使う
        $this->Customers = TableRegistry::get('customers');
        $this->KensahyouSokuteidatas = TableRegistry::get('kensahyouSokuteidatas');//productsテーブルを使う
+       $this->ImKikakuTaious = TableRegistry::get('imKikakuTaious');//ImKikakuTaiousテーブルを使う
+       $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//imSokuteidataHeadsテーブルを使う
      }
 
      public function yobidashicustomer()//「出荷検査用呼出」ページトップ
@@ -1142,5 +1144,307 @@ class KensahyouHeadsController  extends AppController
         }//トランザクション10
 
 	 	 }
+
+     public function deleteconfirm($id = null)
+     {
+       $kensahyouHead = $this->KensahyouHeads->get($id);
+     	$this->set('kensahyouHead', $kensahyouHead);//$kensahyouHeadをctpで使えるようにセット
+
+     	$product_code = $kensahyouHead['product_code'];//product_idという名前のデータに$product_idと名前を付ける
+     	$this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
+
+      if(!isset($_SESSION)){
+        session_start();
+      }
+      $_SESSION['deletekensahyouheadsdata'] = array();
+      $_SESSION['deletekensahyouheadsdata'] = $product_code;
+
+      $ImKikakuTaiouDatas = $this->ImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => 0])->toArray();
+
+      $this->set('product_code',$product_code);//セット
+      $this->set('Productcode',$product_code);//セット
+
+      for($k=0; $k<30; $k++){
+        $this->set("kind_kensa".$k,"-");
+        $this->set("size_num_".$k,"");
+      }
+
+      for($k=0; $k<count($ImKikakuTaiouDatas); $k++){
+        $this->set("kind_kensa".$ImKikakuTaiouDatas[$k]["kensahyuo_num"],$ImKikakuTaiouDatas[$k]["kind_kensa"]);
+        $this->set("size_num_".$ImKikakuTaiouDatas[$k]["kensahyuo_num"],$ImKikakuTaiouDatas[$k]["size_num"]);
+      }
+
+      $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+      $Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+      $this->set('Productname',$Productname);//セット
+
+      $KensahyouHeads = $this->KensahyouHeads->find()->where([
+        'OR' => [['product_code' => $product_code], ['product_code like' => $product_code.'---%']], 'delete_flag' => '0'])->order(["product_code"=>"asc"])->toArray();
+
+        $maisu = count($KensahyouHeads);
+        $this->set('maisu',$maisu);
+
+      for($k=1; $k<=$maisu; $k++){
+
+        for($i=1; $i<=9; $i++){
+          if(isset($KensahyouHeads[$k-1]["size_".$i])){
+            ${"size_".$k.$i} = $KensahyouHeads[$k-1]["size_".$i];
+          }else{
+            ${"size_".$k.$i} = "";
+          }
+          $this->set('size_'.$k.$i,${"size_".$k.$i});
+        }
+
+        for($j=1; $j<=8; $j++){
+
+          if(isset($KensahyouHeads[$k-1]["upper_".$j])){
+            ${"upper_".$k.$j} = $KensahyouHeads[$k-1]["upper_".$j];
+          }else{
+            ${"upper_".$k.$j} = "";
+          }
+          $this->set('upper_'.$k.$j,${"upper_".$k.$j});
+
+          if(isset($KensahyouHeads[$k-1]["lower_".$j])){
+            ${"lower_".$k.$j} = $KensahyouHeads[$k-1]["lower_".$j];
+          }else{
+            ${"lower_".$k.$j} = "";
+          }
+          $this->set('lower_'.$k.$j,${"lower_".$k.$j});
+
+        }
+
+      }
+
+      for($i=10; $i<=11; $i++){
+        ${"text_".$i} = $KensahyouHeads[0]["text_".$i];
+        $this->set('text_'.$i,${"text_".$i});
+     }
+
+      $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()
+     ->where(['product_code' => $product_code, 'delete_flag' => '0'])->toArray();
+
+      $arrKindKensa = array("","ノギス");//配列の初期化
+       foreach ($ImSokuteidataHeads as $value) {//それぞれに対して
+          $arrKindKensa[] = $value->kind_kensa;//配列に追加
+       }
+        $arrKindKensa = array_unique($arrKindKensa);
+
+       $this->set('arrKindKensa',$arrKindKensa);
+
+     }
+
+     public function deletepreadd()
+     {
+       $kensahyouHead = $this->KensahyouHeads->newEntity();//newEntity・テーブルに空の行を作る
+     	$this->set('kensahyouHead',$kensahyouHead);//セット
+
+       $Data=$this->request->query('s');
+       if(isset($Data["mess"])){
+         $mess = $Data["mess"];
+         $this->set('mess',$mess);
+       }else{
+         $mess = "";
+         $this->set('mess',$mess);
+       }
+     }
+
+    public function deletelogin()
+    {
+      if ($this->request->is('post')) {
+        $data = $this->request->getData();//postデータ取得し、$dataと名前を付ける
+
+        $userdata = $data['username'];
+
+        if(isset($data['prelogin'])){
+
+          $htmllogin = new htmlLogin();
+          $qrcheck = $htmllogin->qrcheckprogram($userdata);
+
+          if($qrcheck > 0){
+            return $this->redirect(['action' => 'deletepreadd',
+            's' => ['mess' => "QRコードを読み込んでください。"]]);
+          }
+
+        }
+
+        $htmllogin = new htmlLogin();
+        $arraylogindate = $htmllogin->htmlloginprogram($userdata);
+
+        $username = $arraylogindate[0];
+        $delete_flag = $arraylogindate[1];
+        $this->set('username',$username);
+        $this->set('delete_flag',$delete_flag);
+
+        $user = $this->Auth->identify();//$delete_flag = 0だとログインできない
+
+        if ($user) {
+          $this->Auth->setUser($user);
+          return $this->redirect(['action' => 'deletedo']);
+        }
+      }
+    }
+
+    public function deletedo()
+    {
+      $session = $this->request->getSession();
+      $sessiondata = $session->read();//postデータ取得し、$dataと名前を付ける
+
+      $product_code = $_SESSION['deletekensahyouheadsdata'];
+      $this->set('product_code',$product_code);//$product_codeをctpで使用できるようセット
+
+     $ImKikakuTaiouDatas = $this->ImKikakuTaious->find()->where(['product_code' => $product_code, 'status' => 0])->toArray();
+
+     $this->set('product_code',$product_code);//セット
+     $this->set('Productcode',$product_code);//セット
+
+     for($k=0; $k<30; $k++){
+       $this->set("kind_kensa".$k,"-");
+       $this->set("size_num_".$k,"");
+     }
+
+     for($k=0; $k<count($ImKikakuTaiouDatas); $k++){
+       $this->set("kind_kensa".$ImKikakuTaiouDatas[$k]["kensahyuo_num"],$ImKikakuTaiouDatas[$k]["kind_kensa"]);
+       $this->set("size_num_".$ImKikakuTaiouDatas[$k]["kensahyuo_num"],$ImKikakuTaiouDatas[$k]["size_num"]);
+     }
+
+     $Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
+     $Productname = $Product[0]->product_name;//$Productのproduct_nameに$Productnameと名前を付ける
+     $this->set('Productname',$Productname);//セット
+
+     $KensahyouHeads = $this->KensahyouHeads->find()->where([
+       'OR' => [['product_code' => $product_code], ['product_code like' => $product_code.'---%']], 'delete_flag' => '0'])->order(["product_code"=>"asc"])->toArray();
+
+       $maisu = count($KensahyouHeads);
+       $this->set('maisu',$maisu);
+
+     for($k=1; $k<=$maisu; $k++){
+
+       for($i=1; $i<=9; $i++){
+         if(isset($KensahyouHeads[$k-1]["size_".$i])){
+           ${"size_".$k.$i} = $KensahyouHeads[$k-1]["size_".$i];
+         }else{
+           ${"size_".$k.$i} = "";
+         }
+         $this->set('size_'.$k.$i,${"size_".$k.$i});
+       }
+
+       for($j=1; $j<=8; $j++){
+
+         if(isset($KensahyouHeads[$k-1]["upper_".$j])){
+           ${"upper_".$k.$j} = $KensahyouHeads[$k-1]["upper_".$j];
+         }else{
+           ${"upper_".$k.$j} = "";
+         }
+         $this->set('upper_'.$k.$j,${"upper_".$k.$j});
+
+         if(isset($KensahyouHeads[$k-1]["lower_".$j])){
+           ${"lower_".$k.$j} = $KensahyouHeads[$k-1]["lower_".$j];
+         }else{
+           ${"lower_".$k.$j} = "";
+         }
+         $this->set('lower_'.$k.$j,${"lower_".$k.$j});
+
+       }
+
+     }
+
+     for($i=10; $i<=11; $i++){
+       ${"text_".$i} = $KensahyouHeads[0]["text_".$i];
+       $this->set('text_'.$i,${"text_".$i});
+    }
+
+     $ImSokuteidataHeads = $this->ImSokuteidataHeads->find()
+    ->where(['product_code' => $product_code, 'delete_flag' => '0'])->toArray();
+
+     $arrKindKensa = array("","ノギス");//配列の初期化
+      foreach ($ImSokuteidataHeads as $value) {//それぞれに対して
+         $arrKindKensa[] = $value->kind_kensa;//配列に追加
+      }
+       $arrKindKensa = array_unique($arrKindKensa);
+
+      $this->set('arrKindKensa',$arrKindKensa);
+
+      $updated_staff = $this->Auth->user('staff_id');
+      $updated_at = date('Y-m-d H:i:s');
+/*
+      echo "<pre>";
+      print_r($KensahyouHeads);
+      echo "</pre>";
+*/
+      $connection = ConnectionManager::get('default');//トランザクション1
+        // トランザクション開始2
+      $connection->begin();//トランザクション3
+      try {//トランザクション4
+
+        for($k=0; $k<count($KensahyouHeads); $k++){
+
+          if ($this->KensahyouHeads->updateAll(
+            ['delete_flag' => 1,
+            'updated_at' => $updated_at,
+            'updated_staff' => $updated_staff],
+            ['id'  => $KensahyouHeads[$k]['id']]
+          )){
+
+            if($k == 0){//imtaiouも削除
+
+              for($m=0; $m<count($ImKikakuTaiouDatas); $m++){
+
+                $this->ImKikakuTaious->updateAll(
+                  ['status' => 1,
+                  'updated_at' => $updated_at,
+                  'updated_staff' => $updated_staff],
+                  ['id'  => $ImKikakuTaiouDatas[$m]['id']]
+                );
+              }
+
+              //旧DBに登録
+              $connection = ConnectionManager::get('DB_ikou_test');
+              $table = TableRegistry::get('im_kikaku_taiou');
+              $table->setConnection($connection);
+
+              $updater = "DELETE FROM im_kikaku_taiou
+              where product_id ='".$ImKikakuTaiouDatas[0]['product_code']."'";
+              $connection->execute($updater);
+
+              $connection = ConnectionManager::get('default');//新DBに戻る
+              $table->setConnection($connection);
+
+            }
+
+            //旧DBに登録
+            $connection = ConnectionManager::get('DB_ikou_test');
+            $table = TableRegistry::get('kensahyou_head');
+            $table->setConnection($connection);
+
+            $updater = "DELETE FROM kensahyou_head
+            where product_id ='".$KensahyouHeads[$k]['product_code']."'";
+            $connection->execute($updater);
+
+            $connection = ConnectionManager::get('default');//新DBに戻る
+            $table->setConnection($connection);
+
+            if($k == count($KensahyouHeads) - 1){
+
+              $mes = "※以下のデータを削除しました";
+               $this->set('mes',$mes);
+               $connection->commit();// コミット5
+
+             }
+
+          }else {
+           $mes = "※削除されませんでした";
+            $this->set('mes',$mes);
+            $this->Flash->error(__('The product could not be saved. Please, try again.'));
+            throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
+         }
+
+      }
+
+      } catch (Exception $e) {//トランザクション7
+      //ロールバック8
+        $connection->rollback();//トランザクション9
+      }//トランザクション10
+
+    }
 
 }

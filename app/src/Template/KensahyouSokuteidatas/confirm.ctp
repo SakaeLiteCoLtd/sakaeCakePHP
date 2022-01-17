@@ -16,141 +16,6 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
               header('Pragma:');
 
               echo $this->Form->create($kensahyouSokuteidata, ['url' => ['action' => 'preadd']]);
-
-              $dotcheck = 0;
-              $mess = "";
-              /*
-    //          $session = $this->request->getSession();
-    //          $_SESSION['sokuteidata'] = array();
-              $dotcheck = 0;
-              $result_weight_total = 0;
-              $result_weight_count = 0;
-              $nyuuryokucount = 0;
-              $mess = "";
-              $nyuuryokucountcheck = 0;
-              $gaikancount = 0;
-
-              for($n=1; $n<=8; $n++){
-                $nyuuryokucount = 0;
-                $gyou_check = 0;
-                $size_count = 0;
-                      $resultArray = Array();
-                        $result_weight = $_POST["result_weight_{$n}"];
-
-                        $_SESSION['sokuteidata'][$n] = array(
-                          'kensahyou_heads_id' => $KensahyouHeadid,
-                          'product_code' => $product_code,
-                          'lot_num' => $lot_num,
-                          'manu_date' => $manu_date,
-                          'inspec_date' => $inspec_date,
-                          'cavi_num' => $n,
-                          'delete_flag' => $delete_flag,
-                          'updated_staff' => $updated_staff,
-
-                          "result_size_1" => $_POST["result_size_{$n}_1"],
-                          "result_size_2" => $_POST["result_size_{$n}_2"],
-                          "result_size_3" => $_POST["result_size_{$n}_3"],
-                          "result_size_4" => $_POST["result_size_{$n}_4"],
-                          "result_size_5" => $_POST["result_size_{$n}_5"],
-                          "result_size_6" => $_POST["result_size_{$n}_6"],
-                          "result_size_7" => $_POST["result_size_{$n}_7"],
-                          "result_size_8" => $_POST["result_size_{$n}_8"],
-                          "result_size_9" => $_POST["result_size_{$n}_9"],
-
-                          'result_weight' => $_POST["result_weight_{$n}"],
-                          'situation_dist1' => $_POST["situation_dist1_{$n}"],
-                          'situation_dist2' => $_POST["situation_dist2_{$n}"],
-                        );
-
-                        for($m=1; $m<=9; $m++){
-
-                          $dot1 = substr($_POST["result_size_{$n}_{$m}"], 0, 1);
-                          $dot2 = substr($_POST["result_size_{$n}_{$m}"], -1, 1);
-
-                          if($dot1 == "." || $dot2 == "."){
-                            $dotcheck = $dotcheck + 1;
-                          }
-                        }
-
-                        for($m=1; $m<=8; $m++){
-
-                          if(strlen($_POST["result_size_{$n}_{$m}"]) > 0){
-                            $gyou_check = 1;
-                            $size_count = $size_count + 1;
-                            $nyuuryokucount = $nyuuryokucount + 1;
-                          }
-
-                        }
-
-                        if($gyou_check == 1 && $size_count != $count_size){
-                          $mess = $mess.$n."行目の測定データの個数が合いません。入力忘れ、余分な入力がないか確認してください。<br>";
-                        }
-
-                        if(strlen($_POST["result_size_{$n}_9"]) > 0){
-                          $nyuuryokucount = $nyuuryokucount + 1;
-                        }
-
-                        if($gyou_check == 1 && $count_sori == 1 && strlen($_POST["result_size_{$n}_9"]) < 1){
-                          $mess = $mess.$n."行目のソリ・フレがありません。入力漏れがないか確認してください。<br>";
-                        }
-
-                        if($_POST["situation_dist1_{$n}"] == "OK" || $_POST["situation_dist1_{$n}"] == "out"){
-                          $nyuuryokucount = $nyuuryokucount + 1;
-                        }
-
-                        if($gyou_check == 1 && $count_text_10 == 1 && $_POST["situation_dist1_{$n}"] == ""){
-                          $mess = $mess.$n."行目の外観１が選択されていません。漏れがないか確認してください。<br>";
-                        }
-
-                        if($_POST["situation_dist2_{$n}"] == "OK" || $_POST["situation_dist2_{$n}"] == "out"){
-                          $nyuuryokucount = $nyuuryokucount + 1;
-                        }
-
-                        if($gyou_check == 1 && $count_text_11 == 1 && $_POST["situation_dist2_{$n}"] == ""){
-                          $mess = $mess.$n."行目の外観２が選択されていません。漏れがないか確認してください。<br>";
-                        }
-
-                        if(strlen($_POST["result_weight_{$n}"]) > 0){
-
-                          $dot1 = substr($_POST["result_weight_{$n}"], 0, 1);
-                          $dot2 = substr($_POST["result_weight_{$n}"], -1, 1);
-
-                          if($dot1 == "." || $dot2 == "."){
-                            $dotcheck = $dotcheck + 1;
-                          }else{
-                            $result_weight_total = $result_weight_total + $_POST["result_weight_{$n}"];
-                            $result_weight_count = $result_weight_count + 1;
-                            $nyuuryokucount = $nyuuryokucount + 1;
-                          }
-
-                        }
-
-                        if($gyou_check == 1 && strlen($_POST["result_weight_{$n}"]) < 1){
-                          $mess = $mess.$n."行目の単重がありません。入力漏れがないか確認してください。<br>";
-                        }
-
-                        if($nyuuryokucount > 0 && $nyuuryokucount != $count_total){
-                          $nyuuryokucountcheck = $nyuuryokucountcheck + 1;
-                        }
-
-                        if($_POST["situation_dist1_{$n}"] == "out"){
-                          $gaikancount = $gaikancount + 1;
-                        }
-                        if($_POST["situation_dist2_{$n}"] == "out"){
-                          $gaikancount = $gaikancount + 1;
-                        }
-
-              }
-
-              if($result_weight_count == 0){
-                $result_weight_ave = 0;
-                $result_weight_20 = 0;
-              }else{
-                $result_weight_ave = round($result_weight_total / $result_weight_count, 3);
-                $result_weight_20 = round($result_weight_ave * 0.2, 3);
-              }
-
-*/
 ?>
 
 <?php
@@ -166,8 +31,10 @@ $this->Products = TableRegistry::get('products');//productsテーブルを使う
  </table>
  <hr size="5" style="margin: 0.5rem">
 
- <br>
- <legend align="left"><font color="red"><?= __($mess) ?></font></legend>
+ <?php
+   $red_check = 0;
+ ?>
+
 <br>
 <div align="center"><strong><font color="red">＊下記のように登録します</font></strong></div>
 <br>
@@ -363,6 +230,9 @@ echo "</td>\n";
             echo ${"result_size_".$q."_".$r};
             echo '</div></td>';
             } else {
+              if(strlen(${"result_size_".$q."_".$r}) > 0){
+                $red_check = $red_check + 1;
+              }
             echo '<td colspan="2"><div align="center"><font color="red">';
             echo ${"result_size_".$q."_".$r};
             echo '</div></td>';
@@ -415,6 +285,9 @@ echo "</td>\n";
               echo ${"result_size_".$q."_".$r};
               echo '</div></td>';
               } else {
+                if(strlen(${"result_size_".$q."_".$r}) > 0){
+                  $red_check = $red_check + 1;
+                }
               echo '<td colspan="2"><div align="center"><font color="red">';
               echo ${"result_size_".$q."_".$r};
               echo '</div></td>';
@@ -452,6 +325,9 @@ echo "</td>\n";
                 echo ${"result_size_".$q."_".$r};
                 echo '</div></td>';
                 } else {
+                  if(strlen(${"result_size_".$q."_".$r}) > 0){
+                    $red_check = $red_check + 1;
+                  }
                 echo '<td colspan="2"><div align="center"><font color="red">';
                 echo ${"result_size_".$q."_".$r};
                 echo '</div></td>';
@@ -524,6 +400,10 @@ echo "</td>\n";
 <?php endfor;?>
 
 <br>
+<?php if($red_check > 0): ?>
+  <legend align="center"><font color="red"><?= __("赤文字部分が規格から外れています。入力ミスの場合は「戻る」ボタンで修正してください。入力ミスでない場合はそのまま続けてください。") ?></font></legend>
+<?php else: ?>
+<?php endif; ?>
 <br>
 <table align="center" border="2" bordercolor="#E6FFFF" cellpadding="0" cellspacing="0">
 <tr>

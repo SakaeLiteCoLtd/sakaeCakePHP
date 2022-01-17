@@ -34,6 +34,7 @@ class KensahyouSokuteidatasController  extends AppController
       $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');//Usersテーブルを使う
       $this->KadouSeikeis = TableRegistry::get('kadouSeikeis');//KadouSeikeisテーブルを使う
       $this->KariKadouSeikeis = TableRegistry::get('kariKadouSeikeis');
+      $this->Katakouzous = TableRegistry::get('katakouzous');
      }
 
      public function yobidashicustomer()//「出荷検査用呼出」ページトップ
@@ -1137,14 +1138,106 @@ for($k=0; $k<count($arrImSokuteidataResult); $k++){
             }
 
         }elseif(isset($data["signess"])){
-
+          //シグネスの現れるのは上から「パナの場合・・・torisu=1,2,4は5こ、torisu=8は8こ、DNPの場合・・・torisu=1は5、torisu=2,4は4、torisu=8は8」
           $num = $data['num'];
           $this->set('num',$num);//セット
+
+          $count = $data["num"]*9;
+          $count_minus = ($data["num"] - 1)*9 + 1;
+          for($k=1; $k<=$count; $k++){
+
+            for($j=1; $j<=8; $j++){
+              ${"result_size_".$j."_".$k} = $data['result_size_'.$j."_".$k];
+              $this->set('result_size_'.$j."_".$k,${"result_size_".$j."_".$k});
+            }
+
+          }
+
+          for($j=1; $j<=8; $j++){
+            ${"situation_dist1_".$j} = $data['situation_dist1_'.$j];
+            $this->set('situation_dist1_'.$j,${"situation_dist1_".$j});
+            ${"situation_dist2_".$j} = $data['situation_dist2_'.$j];
+            $this->set('situation_dist2_'.$j,${"situation_dist2_".$j});
+            ${"result_weight_".$j} = $data['result_weight_'.$j];
+            $this->set('result_weight_'.$j,${"result_weight_".$j});
+          }
 /*
           echo "<pre>";
           print_r("signess");
           echo "</pre>";
 */
+          $arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
+  				->where(['products.status' => 0, 'product_code' => $product_code])->toArray();
+
+          if(isset($arrProducts[0])){
+            if(substr($arrProducts[0]["customer"]["customer_code"], 0, 3) == "100"){
+
+              $arrKatakouzous = $this->Katakouzous->find()
+              ->where(['delete_flag' => 0, 'product_code' => $product_code])->toArray();
+
+              if(isset($arrKatakouzous[0])){
+                $torisu = $arrKatakouzous[0]["torisu"];
+                if($torisu == 1 || $torisu == 2 || $torisu == 4){
+                  for($k=$count_minus; $k<=$count; $k++){
+                    if(${"ImKikakuid_".$k} == "シグネス"){
+                      for($j=1; $j<=5; $j++){
+                        ${"result_size_".$j."_".$k} = $data['result_size_1_'.$k];
+                        $this->set('result_size_'.$j."_".$k,${"result_size_".$j."_".$k});
+                      }
+                    }
+                  }
+                }elseif($torisu == 8){
+                  for($k=$count_minus; $k<=$count; $k++){
+                    if(${"ImKikakuid_".$k} == "シグネス"){
+                      for($j=1; $j<=8; $j++){
+                        ${"result_size_".$j."_".$k} = $data['result_size_1_'.$k];
+                        $this->set('result_size_'.$j."_".$k,${"result_size_".$j."_".$k});
+                      }
+                    }
+                  }
+                }
+              }
+
+            }elseif(substr($arrProducts[0]["customer"]["customer_code"], 0, 3) == "200"){
+
+              $arrKatakouzous = $this->Katakouzous->find()
+              ->where(['delete_flag' => 0, 'product_code' => $product_code])->toArray();
+              if(isset($arrKatakouzous[0])){
+                $torisu = $arrKatakouzous[0]["torisu"];
+                if($torisu == 1){
+                  for($k=$count_minus; $k<=$count; $k++){
+                    if(${"ImKikakuid_".$k} == "シグネス"){
+                      for($j=1; $j<=5; $j++){
+                        ${"result_size_".$j."_".$k} = $data['result_size_1_'.$k];
+                        $this->set('result_size_'.$j."_".$k,${"result_size_".$j."_".$k});
+                      }
+                    }
+                  }
+                }elseif($torisu == 2 || $torisu == 4){
+                  for($k=$count_minus; $k<=$count; $k++){
+                    if(${"ImKikakuid_".$k} == "シグネス"){
+                      for($j=1; $j<=4; $j++){
+                        ${"result_size_".$j."_".$k} = $data['result_size_1_'.$k];
+                        $this->set('result_size_'.$j."_".$k,${"result_size_".$j."_".$k});
+                      }
+                    }
+                  }
+                }elseif($torisu == 8){
+                  for($k=$count_minus; $k<=$count; $k++){
+                    if(${"ImKikakuid_".$k} == "シグネス"){
+                      for($j=1; $j<=8; $j++){
+                        ${"result_size_".$j."_".$k} = $data['result_size_1_'.$k];
+                        $this->set('result_size_'.$j."_".$k,${"result_size_".$j."_".$k});
+                      }
+                    }
+                  }
+                }
+              }
+
+            }
+
+          }
+
         }else{//この画面に最初に来た時
 
           $num = 1;

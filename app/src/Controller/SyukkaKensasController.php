@@ -1008,14 +1008,21 @@ class SyukkaKensasController extends AppController {
 
       $tourokudata = array();
       $num = 0;
+      $numsigness = 0;
       for($j=1; $j<=$data["maisu"]; $j++){
 
         for($i=1; $i<=9; $i++){
           $kind_kensa_arr = explode("_",$data["kind_kensa_{$j}{$i}"]);//切り離し
           if(isset($kind_kensa_arr[1])){
             $kind_kensa = $kind_kensa_arr[1];
+            $size_num = $data["size_num_{$j}{$i}"];
           }else{
             $kind_kensa = $data["kind_kensa_{$j}{$i}"];
+            $size_num = $data["size_num_{$j}{$i}"];
+          }
+          if($kind_kensa == "シグネス"){
+            $numsigness = $numsigness + 1;
+            $size_num = $numsigness;
           }
 
           $num = $num + 1;
@@ -1023,7 +1030,7 @@ class SyukkaKensasController extends AppController {
             'product_code' => $data['product_code'],
             'kensahyuo_num' => $num,
             "kind_kensa" => $kind_kensa,
-            "size_num" => $data["size_num_{$j}{$i}"],
+            "size_num" => $size_num,
           ];
         }
 
@@ -1072,7 +1079,6 @@ class SyukkaKensasController extends AppController {
      print_r($tourokudata);
      echo "</pre>";
 */
-
       if ($this->request->is('get')) {//getなら登録
         $ImKikakuTaiou = $this->ImKikakuTaious->patchEntities($ImKikakuTaiou, $tourokudata);
         $connection = ConnectionManager::get('default');//トランザクション1

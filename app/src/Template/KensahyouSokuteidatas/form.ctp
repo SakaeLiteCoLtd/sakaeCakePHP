@@ -110,9 +110,9 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
 <td width="38" colspan="2"><div align="center"><strong>G</strong></div></td>
 <td width="38" colspan="2"><div align="center"><strong>H</strong></div></td>
 <td width="60" nowrap="nowrap" colspan="2"><div align="center"><font size="-3"><strong>ソリ・フレ(1)</strong></font></div></td>
-<td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観１</strong></font></div></td>
-<td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観２</strong></font></div></td>
-<td width="51" nowrap="nowrap" colspan="2"><div align="center"><font size="-1"><strong>単重</strong></font></div></td>
+<td style="width:120px" colspan='2'><div align='center'><font size='-1'><strong>外観１</strong></font></div></td>
+<td style="width:120px" colspan='2'><div align='center'><font size='-1'><strong>外観２</strong></font></div></td>
+<td style="width:120px" nowrap="nowrap" colspan="2"><div align="center"><font size="-1"><strong>単重</strong></font></div></td>
 
 </tr>
 <tr style="border-bottom: solid;border-width: 1px">
@@ -433,10 +433,10 @@ $this->ImSokuteidataHeads = TableRegistry::get('imSokuteidataHeads');//ImKikakuT
 <td width="38" colspan="2"><div align="center"><strong>F</strong></div></td>
 <td width="38" colspan="2"><div align="center"><strong>G</strong></div></td>
 <td width="38" colspan="2"><div align="center"><strong>H</strong></div></td>
-<td width="60" nowrap="nowrap" colspan="2"><div align="center"><font size="-3"><strong>ソリ・フレ<?= h("(".$num.")") ?></strong></font></div></td>
-<td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観１</strong></font></div></td>
-<td width='60' nowrap='nowrap' colspan='2'><div align='center'><font size='-1'><strong>外観２</strong></font></div></td>
-<td width="51" nowrap="nowrap" colspan="2"><div align="center"><font size="-1"><strong>単重</strong></font></div></td>
+<td width="60" colspan="2"><div align="center"><font size="-3"><strong>ソリ・フレ<?= h("(".$num.")") ?></strong></font></div></td>
+<td style="width:120px" colspan='2'><div align='center'><font size='-1'><strong>外観１</strong></font></div></td>
+<td style="width:120px" colspan='2'><div align='center'><font size='-1'><strong>外観２</strong></font></div></td>
+<td width="51" colspan="2"><div align="center"><font size="-1"><strong>単重</strong></font></div></td>
 <?php elseif($num == 2): ?>
 <td colspan="4">&nbsp;</td>
 <td width="24" colspan="2"><div align="center"><strong>I</strong></div></td>

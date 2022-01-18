@@ -3041,7 +3041,7 @@ class KouteisController extends AppController {
       $type_im = "IM7000(2号機)";
     }
     $this->set('type_im',$type_im);
-
+/*
     for($i=1; $i<=9; $i++){
       if(empty($data["size_".$i])){
         $data["size_".$i] = null;
@@ -3061,6 +3061,27 @@ class KouteisController extends AppController {
       if(empty($data["text_".$i])){
         $data["text_".$i] = null;
       }
+   }
+*/
+   for($i=1; $i<=9; $i++){
+     if(strlen($data["size_".$i]) < 1){
+       $data["size_".$i] = null;
+     }
+   }
+
+   for($j=1; $j<=8; $j++){
+     if(strlen($data["upper_".$j]) < 1){
+       $data["upper_".$j] = null;
+     }
+     if(strlen($data["lower_".$j]) < 1){
+       $data["lower_".$j] = null;
+     }
+   }
+
+   for($i=10; $i<=11; $i++){
+     if(strlen($data["text_".$i]) < 1){
+       $data["text_".$i] = null;
+     }
    }
 
    $Productcode = $data["product_code"];
@@ -3118,23 +3139,26 @@ class KouteisController extends AppController {
            $versionmoto = $data['version'] - 1;
 
            for($i=1; $i<=9; $i++){
-             if(!empty($data["size_".$i])){
+             if(strlen($data["size_".$i]) > 0){
+        //     if(!empty($data["size_".$i])){
                $updater = "UPDATE koutei_kensahyou_head set size_$i ='".$data["size_".$i]."'
                where product_id ='".$Productcode."'";
                $connection->execute($updater);
              }
           }
 
-          for($i=1; $i<=9; $i++){
-            if(!empty($data["upper_".$i])){
+          for($i=1; $i<=8; $i++){
+            if(strlen($data["upper_".$i]) > 0){
+      //      if(!empty($data["upper_".$i])){
               $updater = "UPDATE koutei_kensahyou_head set upper_$i ='".$data["upper_".$i]."'
               where product_id ='".$Productcode."'";
               $connection->execute($updater);
             }
          }
 
-         for($i=1; $i<=9; $i++){
-           if(!empty($data["lower_".$i])){
+         for($i=1; $i<=8; $i++){
+           if(strlen($data["lower_".$i]) > 0){
+    //       if(!empty($data["lower_".$i])){
              $updater = "UPDATE koutei_kensahyou_head set lower_$i ='".$data["lower_".$i]."'
              where product_id ='".$Productcode."'";
              $connection->execute($updater);
@@ -3142,7 +3166,8 @@ class KouteisController extends AppController {
         }
 
         for($i=10; $i<=11; $i++){
-          if(empty($data["text_".$i])){
+          if(strlen($data["text_".$i]) > 0){
+  //        if(empty($data["text_".$i])){
             $updater = "UPDATE koutei_kensahyou_head set text_$i ='".$data["text_".$i]."'
             where product_id ='".$Productcode."'";
             $connection->execute($updater);
@@ -3231,23 +3256,26 @@ class KouteisController extends AppController {
            $table->setConnection($connection);
 
            for($i=1; $i<=9; $i++){
-             if(!empty($data["size_".$i])){
+             if(strlen($data["size_".$i]) > 0){
+      //       if(!empty($data["size_".$i])){
                $updater = "UPDATE koutei_kensahyou_head set size_$i ='".$data["size_".$i]."'
                where product_id ='".$Productcode."'";
                $connection->execute($updater);
              }
           }
 
-          for($i=1; $i<=9; $i++){
-            if(!empty($data["upper_".$i])){
+          for($i=1; $i<=8; $i++){
+            if(strlen($data["upper_".$i]) > 0){
+    //        if(!empty($data["upper_".$i])){
               $updater = "UPDATE koutei_kensahyou_head set upper_$i ='".$data["upper_".$i]."'
               where product_id ='".$Productcode."'";
               $connection->execute($updater);
             }
          }
 
-         for($i=1; $i<=9; $i++){
-           if(!empty($data["lower_".$i])){
+         for($i=1; $i<=8; $i++){
+           if(strlen($data["lower_".$i]) > 0){
+    //       if(!empty($data["lower_".$i])){
              $updater = "UPDATE koutei_kensahyou_head set lower_$i ='".$data["lower_".$i]."'
              where product_id ='".$Productcode."'";
              $connection->execute($updater);
@@ -3255,7 +3283,8 @@ class KouteisController extends AppController {
         }
 
         for($i=10; $i<=11; $i++){
-          if(empty($data["text_".$i])){
+          if(strlen($data["text_".$i]) > 0){
+    //      if(empty($data["text_".$i])){
             $updater = "UPDATE koutei_kensahyou_head set text_$i ='".$data["text_".$i]."'
             where product_id ='".$Productcode."'";
             $connection->execute($updater);
@@ -3267,50 +3296,6 @@ class KouteisController extends AppController {
            where product_id ='".$Productcode."'";
            $connection->execute($updater);
 
-/*
-           $delete_flag = 1;
-           $versionmoto = $data['version'] - 1;
-           $updater = "UPDATE koutei_kensahyou_head set status ='".$delete_flag."'
-           where product_id ='".$Productcode."' and version ='".$versionmoto."'";
-           $connection->execute($updater);
-
-             $connection->insert('koutei_kensahyou_head', [
-               'product_id' => $Productcode,
-               'version' => $data['version'],
-               'type_im' => $data['type_im'],
-               'size_1' => $data['size_1'],
-               'upper_1' => $data['upper_1'],
-               'lower_1' => $data['lower_1'],
-               'size_2' => $data['size_2'],
-               'upper_2' => $data['upper_2'],
-               'lower_2' => $data['lower_2'],
-               'size_3' => $data['size_3'],
-               'upper_3' => $data['upper_3'],
-               'lower_3' => $data['lower_3'],
-               'size_4' => $data['size_4'],
-               'upper_4' => $data['upper_4'],
-               'lower_4' => $data['lower_4'],
-               'size_5' => $data['size_5'],
-               'upper_5' => $data['upper_5'],
-               'lower_5' => $data['lower_5'],
-               'size_6' => $data['size_6'],
-               'upper_6' => $data['upper_6'],
-               'lower_6' => $data['lower_6'],
-               'size_7' => $data['size_7'],
-               'upper_7' => $data['upper_7'],
-               'lower_7' => $data['lower_7'],
-               'size_8' => $data['size_8'],
-               'upper_8' => $data['upper_8'],
-               'lower_8' => $data['lower_8'],
-               'size_9' => $data['size_9'],
-               'text_10' => $data['text_10'],
-               'text_11' => $data['text_11'],
-               'bik' => $data['bik'],
-               'status' => 0,
-               'created_at' => date('Y-m-d H:i:s'),
-               'created_emp_id' => $data['updated_staff']
-             ]);
-*/
              $connection = ConnectionManager::get('default');//新DBに戻る
              $table->setConnection($connection);
 

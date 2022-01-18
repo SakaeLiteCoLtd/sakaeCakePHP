@@ -215,7 +215,7 @@ echo "</td>\n";
 
         $lowerArray = Array();
         for($r=1; $r<=8; $r++){
-            if((int)${"result_size_".$q."_".$r} <= (int)${"size_".$r}+(int)${"upper_".$r} && (int)${"result_size_".$q."_".$r} >= (int)${"size_".$r}+(int)${"lower_".$r}){
+            if((float)${"result_size_".$q."_".$r} <= (float)${"size_".$r}+(float)${"upper_".$r} && (float)${"result_size_".$q."_".$r} >= (float)${"size_".$r}+(float)${"lower_".$r}){
             echo '<td colspan="2"><div align="center">';
             echo ${"result_size_".$q."_".$r};
             echo '</div></td>';
@@ -267,7 +267,7 @@ echo "</td>\n";
 
           $lowerArray = Array();
           for($r=10; $r<=17; $r++){
-              if((int)${"result_size_".$q."_".$r} <= (int)${"size_".$r}+(int)${"upper_".$r} && (int)${"result_size_".$q."_".$r} >= (int)${"size_".$r}+(int)${"lower_".$r}){
+              if((float)${"result_size_".$q."_".$r} <= (float)${"size_".$r}+(float)${"upper_".$r} && (float)${"result_size_".$q."_".$r} >= (float)${"size_".$r}+(float)${"lower_".$r}){
               echo '<td colspan="2"><div align="center">';
               echo ${"result_size_".$q."_".$r};
               echo '</div></td>';
@@ -304,7 +304,7 @@ echo "</td>\n";
 
             $lowerArray = Array();
             for($r=19; $r<=26; $r++){
-                if((int)${"result_size_".$q."_".$r} <= (int)${"size_".$r}+(int)${"upper_".$r} && (int)${"result_size_".$q."_".$r} >= (int)${"size_".$r}+(int)${"lower_".$r}){
+                if((float)${"result_size_".$q."_".$r} <= (float)${"size_".$r}+(float)${"upper_".$r} && (float)${"result_size_".$q."_".$r} >= (float)${"size_".$r}+(float)${"lower_".$r}){
                 echo '<td colspan="2"><div align="center">';
                 echo ${"result_size_".$q."_".$r};
                 echo '</div></td>';

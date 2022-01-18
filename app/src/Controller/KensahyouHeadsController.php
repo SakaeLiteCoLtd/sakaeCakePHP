@@ -595,7 +595,7 @@ class KensahyouHeadsController  extends AppController
             for($k=0; $k<$data['maisu']; $k++){
 
               //旧DB更新
-              $connection = ConnectionManager::get('DB_ikou_test');
+              $connection = ConnectionManager::get('sakaeMotoDB');
               $table = TableRegistry::get('kensahyou_head');
               $table->setConnection($connection);
 
@@ -1035,7 +1035,7 @@ class KensahyouHeadsController  extends AppController
             )){
 
               //旧DBに登録
-  						$connection = ConnectionManager::get('DB_ikou_test');
+  						$connection = ConnectionManager::get('sakaeMotoDB');
   						$table = TableRegistry::get('kensahyou_head');
   						$table->setConnection($connection);
 
@@ -1054,7 +1054,7 @@ class KensahyouHeadsController  extends AppController
                   for($k=0; $k<count($arrupdatehead); $k++){
 
                     //旧DB更新
-                    $connection = ConnectionManager::get('DB_ikou_test');
+                    $connection = ConnectionManager::get('sakaeMotoDB');
                     $table = TableRegistry::get('kensahyou_head');
                     $table->setConnection($connection);
 
@@ -1398,7 +1398,7 @@ class KensahyouHeadsController  extends AppController
               }
 
               //旧DBに登録
-              $connection = ConnectionManager::get('DB_ikou_test');
+              $connection = ConnectionManager::get('sakaeMotoDB');
               $table = TableRegistry::get('im_kikaku_taiou');
               $table->setConnection($connection);
 
@@ -1412,7 +1412,7 @@ class KensahyouHeadsController  extends AppController
             }
 
             //旧DBに登録
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('kensahyou_head');
             $table->setConnection($connection);
 

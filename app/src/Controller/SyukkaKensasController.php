@@ -1088,7 +1088,7 @@ class SyukkaKensasController extends AppController {
             if ($this->ImKikakuTaious->saveMany($ImKikakuTaiou)) {//saveManyで一括登録
 
             //旧DB更新
-            $connection = ConnectionManager::get('DB_ikou_test');
+            $connection = ConnectionManager::get('sakaeMotoDB');
             $table = TableRegistry::get('im_kikaku_taiou');
             $table->setConnection($connection);
 
@@ -1202,7 +1202,7 @@ class SyukkaKensasController extends AppController {
               $KensahyouHeads = $this->KensahyouHeads->find()->where(['id' => $data["imdatanew"][0]['id']])->toArray();
 
               //旧DBに登録
-  						$connection = ConnectionManager::get('DB_ikou_test');
+  						$connection = ConnectionManager::get('sakaeMotoDB');
   						$table = TableRegistry::get('kensahyou_head');
   						$table->setConnection($connection);
 
@@ -1276,7 +1276,7 @@ class SyukkaKensasController extends AppController {
 
       $today = date("Y-m-d");
 /*
-      $connection = ConnectionManager::get('DB_ikou_test');//旧DBを参照
+      $connection = ConnectionManager::get('sakaeMotoDB');//旧DBを参照
       $table = TableRegistry::get('schedule_koutei');
       $table->setConnection($connection);
 //今日以降のスケジュールのデータを旧DBから引っ張り出す
@@ -1355,7 +1355,7 @@ class SyukkaKensasController extends AppController {
    						)){
 
     							//旧DBに単価登録
-    							$connection = ConnectionManager::get('DB_ikou_test');
+    							$connection = ConnectionManager::get('sakaeMotoDB');
     							$table = TableRegistry::get('kadou_seikei');
     							$table->setConnection($connection);
 
@@ -1411,7 +1411,7 @@ class SyukkaKensasController extends AppController {
             )){
 
                 //旧DB
-                $connection = ConnectionManager::get('DB_ikou_test');
+                $connection = ConnectionManager::get('sakaeMotoDB');
                 $table = TableRegistry::get('schedule_koutei');
                 $table->setConnection($connection);
 
@@ -1515,7 +1515,7 @@ class SyukkaKensasController extends AppController {
             )){
 
                 //旧DBに単価登録
-                $connection = ConnectionManager::get('DB_ikou_test');
+                $connection = ConnectionManager::get('sakaeMotoDB');
                 $table = TableRegistry::get('kadou_seikei');
                 $table->setConnection($connection);
 
@@ -1620,7 +1620,7 @@ class SyukkaKensasController extends AppController {
               ['id'  => $KariKadouSeikeiData[$j]["id"]]
             )){
 
-                $connection = ConnectionManager::get('DB_ikou_test');
+                $connection = ConnectionManager::get('sakaeMotoDB');
                 $table = TableRegistry::get('kari_kadou_seikei');
                 $table->setConnection($connection);
 
@@ -1675,7 +1675,7 @@ class SyukkaKensasController extends AppController {
                 ['id'  => $KariKadouSeikeiData[$j]["id"]]
               )){
 
-                  $connection = ConnectionManager::get('DB_ikou_test');
+                  $connection = ConnectionManager::get('sakaeMotoDB');
                   $table = TableRegistry::get('kari_kadou_seikei');
                   $table->setConnection($connection);
 
@@ -1857,7 +1857,7 @@ class SyukkaKensasController extends AppController {
                                     try {//トランザクション4
                                       if ($this->ImSokuteidataHeads->saveMany($imSokuteidataHeads)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                        $connection = ConnectionManager::get('DB_ikou_test');
+                                        $connection = ConnectionManager::get('sakaeMotoDB');
                                         $table = TableRegistry::get('im_sokuteidata_head');
                                         $table->setConnection($connection);
 
@@ -1906,7 +1906,7 @@ class SyukkaKensasController extends AppController {
                                           $imKikakus = $this->ImKikakus->patchEntities($imKikakus, $arrIm_kikaku);
                                              if ($this->ImKikakus->saveMany($imKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $table = TableRegistry::get('im_kikaku');
                                                $table->setConnection($connection);
 
@@ -1914,7 +1914,7 @@ class SyukkaKensasController extends AppController {
                                                " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                 and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                  order by id desc limit 1";
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                for($k=0; $k<count($arrIm_kikaku); $k++){
@@ -1973,7 +1973,7 @@ class SyukkaKensasController extends AppController {
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->patchEntities($imSokuteidataResults, $arrIm_Result);
                                                   if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
 
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $table = TableRegistry::get('im_sokuteidata_result');
                                                     $table->setConnection($connection);
 
@@ -1981,7 +1981,7 @@ class SyukkaKensasController extends AppController {
                                                     " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                      and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                       order by id desc limit 1";
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                     for($k=0; $k<count($arrIm_Result); $k++){
@@ -2307,7 +2307,7 @@ class SyukkaKensasController extends AppController {
                                     try {//トランザクション4
                                       if ($this->ImSokuteidataHeads->saveMany($imSokuteidataHeads)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                        $connection = ConnectionManager::get('DB_ikou_test');
+                                        $connection = ConnectionManager::get('sakaeMotoDB');
                                         $table = TableRegistry::get('im_sokuteidata_head');
                                         $table->setConnection($connection);
 
@@ -2363,7 +2363,7 @@ class SyukkaKensasController extends AppController {
                                           $imKikakus = $this->ImKikakus->patchEntities($imKikakus, $arrIm_kikaku);
                                              if ($this->ImKikakus->saveMany($imKikakus)) {//ImKikakusをsaveできた時（saveManyで一括登録）
 
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $table = TableRegistry::get('im_kikaku');
                                                $table->setConnection($connection);
 
@@ -2371,7 +2371,7 @@ class SyukkaKensasController extends AppController {
                                                " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                 and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                 order by id desc limit 1";
-                                               $connection = ConnectionManager::get('DB_ikou_test');
+                                               $connection = ConnectionManager::get('sakaeMotoDB');
                                                $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                for($k=0; $k<count($arrIm_kikaku); $k++){
@@ -2423,7 +2423,7 @@ class SyukkaKensasController extends AppController {
                                                   $imSokuteidataResults = $this->ImSokuteidataResults->patchEntities($imSokuteidataResults, $arrIm_Result);
                                                   if ($this->ImSokuteidataResults->saveMany($imSokuteidataResults)) {//ImSokuteidataResultsをsaveできた時（saveManyで一括登録）
 
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $table = TableRegistry::get('im_sokuteidata_result');
                                                     $table->setConnection($connection);
 
@@ -2431,7 +2431,7 @@ class SyukkaKensasController extends AppController {
                                                     " where product_id = '".$arrIm_head[0]["product_code"]."' and kind_kensa = '".$arrIm_head[0]["kind_kensa"]."'
                                                      and inspec_date = '".$arrIm_head[0]["inspec_date"]."' and lot_num = '".$arrIm_head[0]["lot_num"]."'
                                                       order by id desc limit 1";
-                                                    $connection = ConnectionManager::get('DB_ikou_test');
+                                                    $connection = ConnectionManager::get('sakaeMotoDB');
                                                     $im_sokuteidata_head_id = $connection->execute($sql)->fetchAll('assoc');
 
                                                     for($k=0; $k<count($arrIm_Result); $k++){
@@ -3116,7 +3116,7 @@ class SyukkaKensasController extends AppController {
          try {//トランザクション4
              if ($this->KensahyouSokuteidatas->saveMany($kensahyouSokuteidata)) {//saveManyで一括登録
 
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('kensahyou_sokuteidata_result');
                $table->setConnection($connection);
 
@@ -3183,7 +3183,7 @@ class SyukkaKensasController extends AppController {
                $ScheduleKouteidatetime = $ScheduleKouteiData[0]->datetime->format('Y-m-d H:i:s');
                $ScheduleKouteiseikeiki = $ScheduleKouteiData[0]->seikeiki;
 
-               $connection = ConnectionManager::get('DB_ikou_test');
+               $connection = ConnectionManager::get('sakaeMotoDB');
                $table = TableRegistry::get('schedule_koutei');
                $table->setConnection($connection);
 
@@ -3211,7 +3211,7 @@ class SyukkaKensasController extends AppController {
                  $KariKadouSeikeiseikeiki_code = $KariKadouSeikeisData[0]->seikeiki_code;
                  $KariKadouSeikeiproduct_code = $KariKadouSeikeisData[0]->product_code;
 
-                 $connection = ConnectionManager::get('DB_ikou_test');
+                 $connection = ConnectionManager::get('sakaeMotoDB');
                  $table = TableRegistry::get('kari_kadou_seikei');
                  $table->setConnection($connection);
 
@@ -3237,7 +3237,7 @@ class SyukkaKensasController extends AppController {
                  ['id'   => $_SESSION['kadouseikeiId'] ]
                  );
 
-                 $connection = ConnectionManager::get('DB_ikou_test');
+                 $connection = ConnectionManager::get('sakaeMotoDB');
                  $table = TableRegistry::get('kadou_seikei');
                  $table->setConnection($connection);
 
@@ -3646,7 +3646,7 @@ class SyukkaKensasController extends AppController {
              $this->ImKikakuTaious->saveMany($ImKikakuTaious);
 
              //旧DB更新
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('im_kikaku_taiou');
              $table->setConnection($connection);
 
@@ -3657,7 +3657,7 @@ class SyukkaKensasController extends AppController {
              $connection->execute($updater);
 
              //旧DB更新
-             $connection = ConnectionManager::get('DB_ikou_test');
+             $connection = ConnectionManager::get('sakaeMotoDB');
              $table = TableRegistry::get('im_kikaku_taiou');
              $table->setConnection($connection);
 

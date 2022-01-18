@@ -1846,7 +1846,7 @@ for($k=0; $k<count($arrImSokuteidataResult); $k++){
     		try {//トランザクション4
     				if ($this->KensahyouSokuteidatas->saveMany($kensahyouSokuteidata)) {//saveManyで一括登録
 
-              $connection = ConnectionManager::get('DB_ikou_test');
+              $connection = ConnectionManager::get('sakaeMotoDB');
               $table = TableRegistry::get('kensahyou_sokuteidata_result');
               $table->setConnection($connection);
 
@@ -1911,7 +1911,7 @@ for($k=0; $k<count($arrImSokuteidataResult); $k++){
                 $ScheduleKouteidatetime = $ScheduleKouteiData[0]->datetime->format('Y-m-d H:i:s');
                 $ScheduleKouteiseikeiki = $ScheduleKouteiData[0]->seikeiki;
 
-                $connection = ConnectionManager::get('DB_ikou_test');
+                $connection = ConnectionManager::get('sakaeMotoDB');
                 $table = TableRegistry::get('schedule_koutei');
                 $table->setConnection($connection);
 
@@ -1939,7 +1939,7 @@ for($k=0; $k<count($arrImSokuteidataResult); $k++){
                   $KariKadouSeikeiseikeiki_code = $KariKadouSeikeisData[0]->seikeiki_code;
                   $KariKadouSeikeiproduct_code = $KariKadouSeikeisData[0]->product_code;
 
-                  $connection = ConnectionManager::get('DB_ikou_test');
+                  $connection = ConnectionManager::get('sakaeMotoDB');
                   $table = TableRegistry::get('kari_kadou_seikei');
                   $table->setConnection($connection);
 
@@ -1965,7 +1965,7 @@ for($k=0; $k<count($arrImSokuteidataResult); $k++){
                   ['id' => $kousin_id]
                   );
 
-                  $connection = ConnectionManager::get('DB_ikou_test');
+                  $connection = ConnectionManager::get('sakaeMotoDB');
                   $table = TableRegistry::get('kadou_seikei');
                   $table->setConnection($connection);
 

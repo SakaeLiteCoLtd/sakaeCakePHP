@@ -9,6 +9,7 @@ use Cake\Core\Configure;//トランザクション
 use App\myClass\Logins\htmlLogin;//myClassフォルダに配置したクラスを使用
 use App\myClass\Productcheck\htmlProductcheck;
 
+
 class ZensukensasController extends AppController
 {
      public function initialize()

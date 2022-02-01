@@ -50,9 +50,6 @@ Router::mapResources('Apidatas');
 
 Router::extensions(['json', 'xml']);//apiのため追加
 
-//Router::scope('/', function ($routes) {//apiのため追加//不要
-//    $routes->resources('Apidatas');
-//}
 
 Router::scope('/', function (RouteBuilder $routes) {
     /**

@@ -42,8 +42,10 @@ return [
     'App' => [
         'namespace' => 'App',
         'encoding' => env('APP_ENCODING', 'UTF-8'),
-        'defaultLocale' => env('APP_DEFAULT_LOCALE', 'en_US'),
-        'defaultTimezone' => env('APP_DEFAULT_TIMEZONE', 'UTC'),
+        //    'defaultLocale' => env('APP_DEFAULT_LOCALE', 'en_US'),
+      	'defaultLocale' => env('APP_DEFAULT_LOCALE', 'ja_JP'),
+        //    'defaultTimezone' => env('APP_DEFAULT_TIMEZONE', 'UTC'),
+      	'defaultTimezone' => env('APP_DEFAULT_TIMEZONE', 'Asia/Tokyo'),
         'base' => false,
         'dir' => 'src',
         'webroot' => 'webroot',
@@ -248,31 +250,25 @@ return [
             'className' => 'Cake\Database\Connection',
             'driver' => 'Cake\Database\Driver\Mysql',
             'persistent' => false,
-            'host' => 'localhost',
+            'host' => env('DATABASE_HOST', 'localhost'),
             /*
              * CakePHP will use the default DB port based on the driver selected
              * MySQL on MAMP uses port 8889, MAMP users will want to uncomment
              * the following line and set the port accordingly
              */
-//            'port' => '3306',
-            'port' => '13306',
-            'username' => 'root',
-            'password' => 'secret',
-            'database' => 'qa_app',
+            //'port' => 'non_standard_port_number',
+            'username' => env('DATABASE_USER', 'my_app'),
+            'password' => env('DATABASE_PASS', 'secret'),
+            'database' => env('DATABASE_NAME', 'my_app'),
             /*
              * You do not need to set this flag to use full utf-8 encoding (internal default since CakePHP 3.6).
              */
-            'encoding' => 'utf8',
-            'timezone' => 'Asia/Tokyo',
-            'flags' => [],
-            'cacheMetadata' => true,
-            'log' => false,
-/*            //'encoding' => 'utf8mb4',
+            //'encoding' => 'utf8mb4',
             'timezone' => 'UTC',
             'flags' => [],
             'cacheMetadata' => true,
-            'log' => false,
-*/
+            'log' => true,//エラーログはきだし
+
             /**
              * Set identifier quoting to true if you are using reserved words or
              * special characters in your table or column names. Enabling this
@@ -298,6 +294,124 @@ return [
         /**
          * The test connection is used during the test suite.
          */
+//ここから２
+//https://qiita.com/n0bisuke/items/bd86dd3a79cd7cbcd92e参照
+//mysql -u root -p
+//use mysql;
+//select user,host from mysql.user;
+//grant all privileges on sakaedb.* to root@"192.168.253.253" identified by 'vC4rD8jA2' with grant option;
+
+'default2' => [
+    'className' => 'Cake\Database\Connection',
+    'driver' => 'Cake\Database\Driver\Mysql',
+    'persistent' => false,
+    'host' => '192.168.4.246',
+    'port' => '3306',
+    'username' => 'root',
+    'password' => 'vC4rD8jA2',
+    'database' => 'sakaedb',
+    'timezone' => '+09:00',
+    'flags' => [],
+    'cacheMetadata' => true,
+    'log' => true,
+    'quoteIdentifiers' => false,
+    'url' => env('DATABASE_URL', null),
+],
+
+
+         'DB_sakae' => [
+             'className' => 'Cake\Database\Connection',
+             'driver' => 'Cake\Database\Driver\Mysql',
+             'persistent' => false,
+             'host' => '192.168.4.246',
+             'port' => '3306',
+             'username' => 'root',
+             'password' => 'vC4rD8jA2',
+        //     'database' => 'sakaedb',
+             'database' => 'ikoustockDB',
+             'timezone' => '+09:00',
+             'flags' => [],
+             'cacheMetadata' => true,
+             'log' => true,
+             'quoteIdentifiers' => false,
+             'url' => env('DATABASE_URL', null),
+         ],
+//ここまで２
+
+          'DB_ikou_test' => [
+              'className' => 'Cake\Database\Connection',
+              'driver' => 'Cake\Database\Driver\Mysql',
+              'persistent' => false,
+              'host' => '192.168.4.246',
+              'port' => '3306',
+              'username' => 'root',
+              'password' => 'vC4rD8jA2',
+              'database' => 'ikoustockDB',
+              'timezone' => '+09:00',
+              'flags' => [],
+              'cacheMetadata' => true,
+              'log' => true,
+              'quoteIdentifiers' => false,
+              'url' => env('DATABASE_URL', null),
+          ],
+
+          'DB_ikou' => [
+              'className' => 'Cake\Database\Connection',
+              'driver' => 'Cake\Database\Driver\Mysql',
+              'persistent' => false,
+              'host' => '192.168.4.1',
+              'port' => '3306',
+              'username' => 'root',
+              'password' => 'atsuc',
+          //       'database' => 'sakaedb',
+              'database' => 'ikoustockdb',
+              'timezone' => '+09:00',
+              'flags' => [],
+              'cacheMetadata' => true,
+              'log' => true,
+              'quoteIdentifiers' => false,
+              'url' => env('DATABASE_URL', null),
+          ],
+
+//ここから３
+        'sakaeMotoDB' => [//DB_ikou_test
+          'className' => 'Cake\Database\Connection',
+          'driver' => 'Cake\Database\Driver\Mysql',
+          'persistent' => false,
+    //      'host' => '192.168.4.1',
+          'port' => '3306',
+          'username' => 'root',
+    //      'password' => 'atsuc',
+    //      'database' => 'ikoustockdb',
+    //      'database' => 'atsuc718',
+          'timezone' => '+09:00',
+          'flags' => [],
+          'cacheMetadata' => true,
+          'log' => true,
+          'quoteIdentifiers' => false,
+          'url' => env('DATABASE_URL', null),
+      ],
+//ここまで３
+
+//ここから４
+        'big_DB' => [//DB_ikou_test
+          'className' => 'Cake\Database\Connection',
+          'driver' => 'Cake\Database\Driver\Mysql',
+          'persistent' => false,
+          'host' => '192.168.4.247',
+          'port' => '3306',
+          'username' => 'root',
+          'password' => 'kT1iY7cF2',
+          'database' => 'bigdatabase',
+          'timezone' => '+09:00',
+          'flags' => [],
+          'cacheMetadata' => true,
+          'log' => true,
+          'quoteIdentifiers' => false,
+          'url' => env('DATABASE_URL', null),
+      ],
+//ここまで４
+
         'test' => [
             'className' => 'Cake\Database\Connection',
             'driver' => 'Cake\Database\Driver\Mysql',
@@ -308,7 +422,7 @@ return [
             'password' => 'secret',
             'database' => 'test_myapp',
             //'encoding' => 'utf8mb4',
-            'timezone' => 'UTC',
+            'timezone' => '+09:00',
             'cacheMetadata' => true,
             'quoteIdentifiers' => false,
             'log' => false,
@@ -387,6 +501,10 @@ return [
      * To use database sessions, load the SQL file located at config/schema/sessions.sql
      */
     'Session' => [
-        'defaults' => 'php',
+      'timezone' => '+09:00',
+  //    'defaults' => 'database',
+      'defaults' => 'php',
+      'timezone' => '+09:00',
+      'timeout'=>30//タイムアウト（分）
     ],
 ];

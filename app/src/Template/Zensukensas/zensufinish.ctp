@@ -66,6 +66,7 @@
     <td width='163'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">内容</strong></td>
     <td width='163'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">数量</strong></td>
     <td width='463'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">不良の説明</strong></td>
+    <td width='50'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">破棄</strong></td>
   </tr>
 
   <?php for($i=0; $i<=$tuika; $i++): ?>
@@ -73,6 +74,7 @@
     <td bgcolor="#FFFFCC"><?= $this->Form->input('cont'.$i, ["type"=>"select", "empty"=>"選択してください", "options"=>$arrContRejection, 'label'=>false]); ?></td>
     <td bgcolor="#FFFFCC"><?= $this->Form->input('amount'.$i, ["type"=>"text", 'label'=>false]); ?></td>
     <td bgcolor="#FFFFCC"><?= $this->Form->input('bik'.$i, ["type"=>"text", 'label'=>false]); ?></td>
+    <td bgcolor="#FFFFCC"><?= $this->Form->input('disposal_flag'.$i, ["type"=>"checkbox", 'label'=>false]); ?></td>
   </tr>
   <?= $this->Form->control('num', array('type'=>'hidden', 'value'=>$i, 'label'=>false)) ?>
   <?php endfor;?>

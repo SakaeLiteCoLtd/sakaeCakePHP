@@ -487,7 +487,6 @@ class ApirironzaikosController extends AppController
 			$dateminusstr = strtotime($dateminus);
 
 			if($urlarr[4] == "m-zaiko0-1.xml"){
-	//			$dateminussta = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-m-d');
 				$dateminussta = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-m-d');
 				$dateminusstaminus = date('Y-m-d', strtotime('-2 day', $dateminusstr));
 				$dateminusfin = date('Y-m-d', strtotime('+7 day', $dateminusstr));
@@ -497,14 +496,7 @@ class ApirironzaikosController extends AppController
 				$dateminusfin = date('Y-m-d', strtotime('+14 day', $dateminusstr));
 				$dateminusstr = strtotime($dateminussta);
 			}
-/*
-			echo "<pre>";
-			print_r($dateminusstaminus);
-			echo "</pre>";
-			echo "<pre>";
-			print_r($dateminusfin);
-			echo "</pre>";
-*/
+
 			$arryaermonth = explode("-",$dateminussta);
 			$yaermonth = $arryaermonth[0]."-".$arryaermonth[1];
 
@@ -523,11 +515,6 @@ class ApirironzaikosController extends AppController
 			$dateendnext = date('Y-m-d', strtotime('+31 day', $datestartstr));//kodouseikeisで使用
 
 //$arrProductsmotoスタート
-/*
-echo "<pre>";
-print_r($dateminus);
-echo "</pre>";
-*/
 				$StockProducts = $this->MinusRironStockProducts->find()//MinusRironStockProductsテーブルで、date_riron_stockから1週間以内（１～２週間以内）にマイナスになる品番を絞り込み
 				->where(['date_riron_stock' => $dateminus, 'date_minus >=' => $dateminusstaminus, 'date_minus <=' => $dateminusfin])
 				->order(["date_minus"=>"ASC"])->toArray();
@@ -567,12 +554,16 @@ echo "</pre>";
 //$arrProductsmoto完成
 /*
 echo "<pre>";
-print_r($arrProductsmotominus);
+print_r($datestart);
+echo "</pre>";
+echo "<pre>";
+print_r($dateend);
 echo "</pre>";
 */
 //$arrResultZensuHeadsmotoスタート
 
 		$arrResultZensuHeadsmoto = array();
+
 		for($j=0; $j<count($arrProductsmoto); $j++){
 
 			$ResultZensuHeadsdatas = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
@@ -590,18 +581,7 @@ echo "</pre>";
 			}
 
 		}
-/*
-		$product_code_moto = array();//ここから配列の並び変え
-		$datetime_finish_moto = array();
-		foreach ($arrResultZensuHeadsmoto as $key => $value) {
-			 $product_code[$key] = $value['product_code'];
-			 $datetime_finish[$key] = $value["datetime_finish"];
-		 }
 
-		 if(isset($datetime_finish)){
-			 array_multisort($product_code, array_map("strtotime", $datetime_finish), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-		 }
-*/
 		$countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);//210729in
 
 	 //同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
@@ -632,6 +612,7 @@ echo "</pre>";
 //$arrResultZensuHeadsmoto完成
 /*
 echo "<pre>";
+print_r("arrResultZensuHeadsmoto");
 print_r($arrResultZensuHeadsmoto);
 echo "</pre>";
 */
@@ -663,28 +644,17 @@ echo "</pre>";
 
 							$arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
 							$arrAssembleProducts = array_values($arrAssembleProducts);
-/*
-							$product_code = array();
-							$kensabi = array();
-							foreach ($arrAssembleProducts as $key => $value) {
-  							 $product_code[$key] = $value['product_code'];
-  							 $kensabi[$key] = $value["kensabi"];
-  						 }
 
-							 if(isset($kensabi)){
-								 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
-							 }
-*/
 						}
 
 					}
 
 				}
 
-
 //$arrAssembleProducts完成
 /*
 echo "<pre>";
+print_r("arrAssembleProducts");
 print_r($arrAssembleProducts);
 echo "</pre>";
 */
@@ -861,19 +831,6 @@ echo "</pre>";
 				$arrStockProducts = array_unique($arrStockProducts, SORT_REGULAR);
 				$arrStockProducts = array_values($arrStockProducts);
 
-/*
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_stock_array = array();
-				foreach($arrStockProducts as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_stock_array[$key] = $row["date_stock"];
-				}
-
-				if(count($arrStockProducts) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProducts);
-				}
-*/
 //$StockProducts完成
 /*
 echo "<pre>";
@@ -883,6 +840,7 @@ echo "<pre>";
 print_r($StockProducts);
 echo "</pre>";
 */
+
 //$SyoyouKeikakusスタート
 				$todaySyoyouKeikakus = date('Y-m-d');
 				$this->SyoyouKeikakus->deleteAll(['date_deliver <' => $todaySyoyouKeikakus]);//当日の前日までの所要計画のデータは削除する
@@ -907,8 +865,6 @@ echo "</pre>";
 						}
 
 					}
-
-
 
 				}
 
@@ -945,19 +901,7 @@ echo "</pre>";
 					}
 
 				}
-/*
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrSyoyouKeikakus as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
 
-				if(count($arrSyoyouKeikakus) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrSyoyouKeikakus);
-				}
-*/
 //$SyoyouKeikakus完成
 /*
 echo "<pre>";
@@ -966,8 +910,10 @@ echo "</pre>";
 */
 //$arrSeisansスタート
 
-				$daystart = $datestart." 08:00:00";
-				$dayfin = $dateendnext." 07:59:59";
+				$daystart = $date1." 08:00:00";//211007修正追加
+		//		$daystart = $datestart." 08:00:00";//211007修正削除
+				$dayfin = $datenext1." 07:59:59";//211007修正追加
+		//		$dayfin = $dateendnext." 07:59:59";//211007修正削除
 
 				$KadouSeikeis = array();
 				for($j=0; $j<count($arrProductsmotominus); $j++){
@@ -1053,29 +999,14 @@ echo "</pre>";
 
 					$arrSeisans = array_unique($arrSeisans, SORT_REGULAR);
 					$arrSeisans = array_values($arrSeisans);
-
 /*
-					//並べかえ
-					$tmp_product_array2 = array();
-					$tmp_dateseikei_array = array();
-					foreach($arrSeisans as $key => $row ) {
-						$tmp_product_array2[$key] = $row["product_code"];
-						$tmp_dateseikei_array[$key] = $row["dateseikei"];
-					}
-
-					if(count($arrSeisans) > 0){
-						array_multisort($tmp_product_array2, $tmp_dateseikei_array, SORT_ASC, SORT_NUMERIC, $arrSeisans);
-					}
+					echo "<pre>";
+					print_r("arrSeisans");
+					print_r($arrSeisans);
+					echo "</pre>";
 */
 //$arrSeisans完成
-/*
-echo "<pre>";
-print_r($arrProductsmotominus);
-echo "</pre>";
-echo "<pre>";
-print_r($arrSeisans);
-echo "</pre>";
-*/
+
 			$this->set([
 				'OrderEdis' => $arrOrderEdis,
 				'StockProducts' => $arrStockProducts,

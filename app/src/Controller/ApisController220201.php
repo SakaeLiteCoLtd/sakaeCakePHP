@@ -41,11 +41,7 @@ class ApisController extends AppController
 			$urlarr = explode("/",$data);//切り離し
 			$dayarr = explode(".",$urlarr[4]);//切り離し
 			$day = $dayarr[0];
-			/*
-			echo "<pre>";
-			print_r($daya);
-			echo "</pre>";
-*/
+
 			$date1d = $day." 08:00:00";
 			$date1d0 = strtotime($date1d);
 			$date1d0 = date('Y-m-d', strtotime('+1 day', $date1d0));
@@ -87,13 +83,7 @@ class ApisController extends AppController
 			 ];
 
 			}
-/*
-			$this->set([
-				'sample_list1' => $arrScheduleKoutei_csv,
-				'sample_list2' => array("id" => "aaa"),
-				'_serialize' => ['sample_list1', 'sample_list2']
-			]);
-*/
+
 			$this->set([
 					'sample_list' => $arrScheduleKoutei_csv,
 					'_serialize' => ['sample_list']
@@ -131,7 +121,6 @@ class ApisController extends AppController
         }
 
 				array_multisort(array_map( "strtotime", $tmp_day ), SORT_ASC, $tmp_seikeiki, SORT_ASC, $ScheduleKouteis);
-		//		array_multisort($tmp_seikeiki, SORT_ASC, $ScheduleKouteis);
 
 				$time = $ScheduleKouteis[0]->datetime->format('H:i');
 
@@ -143,7 +132,6 @@ class ApisController extends AppController
 				$Product = $this->Products->find()->where(['product_code' => $ScheduleKouteis[$k]["product_code"]])->toArray();
 				if(isset($Product[0])){
 					$product_name = $Product[0]->product_name;
-		 //			$product_name = mb_convert_encoding($Product[0]->product_name, 'SJIS-win', 'UTF-8');//UTF-8の文字列をSJIS-winに変更する
 				}else{
 					$product_name = "";
 				}
@@ -175,11 +163,6 @@ class ApisController extends AppController
 			$urlarr = explode("/",$data);//切り離し
 			$dayarr = explode(".",$urlarr[4]);//切り離し
 			$day = $dayarr[0];
-			/*
-			echo "<pre>";
-			print_r($daya);
-			echo "</pre>";
-*/
 
 			$date1d = $day." 08:00:00";
 			$date1d0 = strtotime($date1d);
@@ -225,13 +208,7 @@ class ApisController extends AppController
 			 ];
 
 			}
-/*
-			$this->set([
-				'sample_list1' => $arrScheduleKoutei_csv,
-				'sample_list2' => array("id" => "aaa"),
-				'_serialize' => ['sample_list1', 'sample_list2']
-			]);
-*/
+
 			$this->set([
 					'sample_list' => $arrScheduleKoutei_csv,
 					'_serialize' => ['sample_list']
@@ -341,7 +318,12 @@ class ApisController extends AppController
 				$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
 				$dateback = strtotime($dateback1);
 				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
-
+/*
+				echo "<pre>";
+				print_r($dateback1);
+				print_r($datebacklast);
+				echo "</pre>";
+*/
 				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 				->where(['products.status' => 0, 'primary_p' => 1,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])->toArray();
@@ -409,13 +391,11 @@ class ApisController extends AppController
 					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
 				 }
 
-
 				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);//210729in
 
 				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
 
-		//			for($m=$l+1; $m<count($arrResultZensuHeadsmoto); $m++){
 					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
 
 						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
@@ -571,9 +551,10 @@ class ApisController extends AppController
 //arrOrderEdisここまで
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し（先月末のデータ）
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+	//			->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+				->where(['date_stock' => $datebacklast,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
-				->order(["date_stock"=>"ASC"])->toArray();
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
@@ -976,8 +957,9 @@ echo "</pre>";
 				//arrOrderEdisここまで
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
-				->order(["date_stock"=>"ASC"])->toArray();
+		//		->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
+				->where(['date_stock' => $datebacklast])
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
@@ -1376,9 +1358,10 @@ echo "</pre>";
 				//arrOrderEdisここまで
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+	//			->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+				->where(['date_stock' => $datebacklast,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
-				->order(["date_stock"=>"ASC"])->toArray();
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
@@ -1778,9 +1761,10 @@ echo "</pre>";
 				}
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+	//			->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+				->where(['date_stock' => $datebacklast,
 				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
-				->order(["date_stock"=>"ASC"])->toArray();
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
@@ -2176,8 +2160,9 @@ echo "</pre>";
 				}
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
-				->order(["date_stock"=>"ASC"])->toArray();
+		//		->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
+				->where(['date_stock' => $datebacklast])
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
@@ -2570,8 +2555,9 @@ echo "</pre>";
 				}
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
-				->order(["date_stock"=>"ASC"])->toArray();
+	//			->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
+				->where(['date_stock' => $datebacklast])
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
@@ -2972,8 +2958,9 @@ echo "</pre>";
 				}
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
-				->order(["date_stock"=>"ASC"])->toArray();
+		//		->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
+				->where(['date_stock' => $datebacklast])
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
@@ -3372,9 +3359,10 @@ echo "</pre>";
 				}
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+	//			->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+				->where(['date_stock' => $datebacklast,
 				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
-				->order(["date_stock"=>"ASC"])->toArray();
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
@@ -3775,9 +3763,10 @@ echo "</pre>";
 				}
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+		//		->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+				->where(['date_stock' => $datebacklast,
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
-				->order(["date_stock"=>"ASC"])->toArray();
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
@@ -4178,9 +4167,10 @@ echo "</pre>";
 				}
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+	//			->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+				->where(['date_stock' => $datebacklast,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
-				->order(["date_stock"=>"ASC"])->toArray();
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
@@ -4581,8 +4571,9 @@ echo "</pre>";
 				}
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
-				->order(["date_stock"=>"ASC"])->toArray();
+		//		->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
+				->where(['date_stock' => $datebacklast])
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
@@ -4980,9 +4971,10 @@ echo "</pre>";
 				}
 
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+		//		->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
+				->where(['date_stock' => $datebacklast,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
-				->order(["date_stock"=>"ASC"])->toArray();
+				->order(["date_stock"=>"DESC"])->toArray();
 
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){

@@ -458,7 +458,7 @@ class ApidenpyouchecksController extends AppController
 
 		}
 
-		//http://localhost:5000/Apidenpyouchecks/kensahyousokutei/api/87621.xml
+		//http://localhost:5000/Apidenpyouchecks/kensahyousokutei/api/191646.xml
 		public function kensahyousokutei()
 		{
 			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK

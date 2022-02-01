@@ -487,7 +487,6 @@ class ApirironzaikosController extends AppController
 			$dateminusstr = strtotime($dateminus);
 
 			if($urlarr[4] == "m-zaiko0-1.xml"){
-	//			$dateminussta = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-m-d');
 				$dateminussta = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-m-d');
 				$dateminusstaminus = date('Y-m-d', strtotime('-2 day', $dateminusstr));
 				$dateminusfin = date('Y-m-d', strtotime('+7 day', $dateminusstr));
@@ -497,14 +496,7 @@ class ApirironzaikosController extends AppController
 				$dateminusfin = date('Y-m-d', strtotime('+14 day', $dateminusstr));
 				$dateminusstr = strtotime($dateminussta);
 			}
-/*
-			echo "<pre>";
-			print_r($dateminusstaminus);
-			echo "</pre>";
-			echo "<pre>";
-			print_r($dateminusfin);
-			echo "</pre>";
-*/
+
 			$arryaermonth = explode("-",$dateminussta);
 			$yaermonth = $arryaermonth[0]."-".$arryaermonth[1];
 
@@ -526,11 +518,7 @@ class ApirironzaikosController extends AppController
 				$StockProducts = $this->MinusRironStockProducts->find()//MinusRironStockProductsテーブルで、date_riron_stockから1週間以内（１～２週間以内）にマイナスになる品番を絞り込み
 				->where(['date_riron_stock' => $dateminus, 'date_minus >=' => $dateminusstaminus, 'date_minus <=' => $dateminusfin])
 				->order(["date_minus"=>"ASC"])->toArray();
-/*
-				echo "<pre>";
-				print_r($StockProducts);
-				echo "</pre>";
-*/
+
 					$arrProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -559,15 +547,6 @@ class ApirironzaikosController extends AppController
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
 				$arrProductsmotominus = $arrProductsmoto;
 
-//$arrProductsmoto完成
-/*
-echo "<pre>";
-print_r($datestart);
-echo "</pre>";
-echo "<pre>";
-print_r($dateend);
-echo "</pre>";
-*/
 //$arrResultZensuHeadsmotoスタート
 
 		$arrResultZensuHeadsmoto = array();
@@ -590,12 +569,11 @@ echo "</pre>";
 
 		}
 
-		$countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);//210729in
+		$countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
 
 	 //同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
 	 for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
 
-//			for($m=$l+1; $m<count($arrResultZensuHeadsmoto); $m++){
 		 for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
 
 			 if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
@@ -618,12 +596,6 @@ echo "</pre>";
 		}
 
 //$arrResultZensuHeadsmoto完成
-/*
-echo "<pre>";
-print_r("arrResultZensuHeadsmoto");
-print_r($arrResultZensuHeadsmoto);
-echo "</pre>";
-*/
 //$arrAssembleProductsスタート
 
 				$arrAssembleProducts = array();//ここから組立品
@@ -660,12 +632,6 @@ echo "</pre>";
 				}
 
 //$arrAssembleProducts完成
-/*
-echo "<pre>";
-print_r("arrAssembleProducts");
-print_r($arrAssembleProducts);
-echo "</pre>";
-*/
 //$arrOrderEdisスタート
 
 				$OrderEdis = array();
@@ -727,19 +693,7 @@ echo "</pre>";
 		            'date_deliver' => $OrderEdis[$k]["date_deliver"],
 		            'amount' => $OrderEdis[$k]["amount"],
 		            'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 		         ];
-
-		         for($l=0; $l<count($arrProductsmoto); $l++){
-
-		           if($arrProductsmoto[$l]["product_code"] === $OrderEdis[$k]["product_code"]){
-
-		     //        unset($arrProductsmoto[$l]);
-		      //       $arrProductsmoto = array_values($arrProductsmoto);
-
-		           }
-
-		        }
 
 		      }
 
@@ -755,12 +709,12 @@ echo "</pre>";
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
 
-				$countmax = count($arrOrderEdis);//210729in
+				$countmax = count($arrOrderEdis);
 
 		    //同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
 		    for($l=0; $l<count($arrOrderEdis); $l++){
 
-		      for($m=$l+1; $m<$countmax; $m++){//210729in
+		      for($m=$l+1; $m<$countmax; $m++){
 
 		        if(isset($arrOrderEdis[$m]["product_code"])){
 
@@ -783,17 +737,7 @@ echo "</pre>";
 
 		    }
 
-		//    $arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
-
 //$arrOrderEdis完成
-/*
-echo "<pre>";
-print_r(count($arrOrderEdis));
-echo "</pre>";
-echo "<pre>";
-print_r($arrOrderEdis);
-echo "</pre>";
-*/
 //$StockProductsスタート
 
 			$StockProducts = array();
@@ -840,16 +784,8 @@ echo "</pre>";
 				$arrStockProducts = array_values($arrStockProducts);
 
 //$StockProducts完成
-/*
-echo "<pre>";
-print_r(count($StockProducts));
-echo "</pre>";
-echo "<pre>";
-print_r($StockProducts);
-echo "</pre>";
-*/
-
 //$SyoyouKeikakusスタート
+
 				$todaySyoyouKeikakus = date('Y-m-d');
 				$this->SyoyouKeikakus->deleteAll(['date_deliver <' => $todaySyoyouKeikakus]);//当日の前日までの所要計画のデータは削除する
 
@@ -911,17 +847,10 @@ echo "</pre>";
 				}
 
 //$SyoyouKeikakus完成
-/*
-echo "<pre>";
-print_r($arrSyoyouKeikakus);
-echo "</pre>";
-*/
 //$arrSeisansスタート
 
-				$daystart = $date1." 08:00:00";//211007修正追加
-		//		$daystart = $datestart." 08:00:00";//211007修正削除
-				$dayfin = $datenext1." 07:59:59";//211007修正追加
-		//		$dayfin = $dateendnext." 07:59:59";//211007修正削除
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
 
 				$KadouSeikeis = array();
 				for($j=0; $j<count($arrProductsmotominus); $j++){
@@ -1007,21 +936,9 @@ echo "</pre>";
 
 					$arrSeisans = array_unique($arrSeisans, SORT_REGULAR);
 					$arrSeisans = array_values($arrSeisans);
-/*
-					echo "<pre>";
-					print_r("arrSeisans");
-					print_r($arrSeisans);
-					echo "</pre>";
-*/
+
 //$arrSeisans完成
-/*
-echo "<pre>";
-print_r($arrProductsmotominus);
-echo "</pre>";
-echo "<pre>";
-print_r($arrSeisans);
-echo "</pre>";
-*/
+
 			$this->set([
 				'OrderEdis' => $arrOrderEdis,
 				'StockProducts' => $arrStockProducts,

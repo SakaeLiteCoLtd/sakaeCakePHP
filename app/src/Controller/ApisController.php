@@ -325,49 +325,14 @@ class ApisController extends AppController
 				$_SESSION['zaikoarrProducts'] = $arrProducts;
 
 				$apizaikoprogram = new apizaikoprogram();
-				$arrProductsmoto = $apizaikoprogram->classProductsmoto($date16);//データの並び替えクラスを使用
+				$arrProductsmoto = $apizaikoprogram->classProductsmoto($date16);
 
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -428,35 +393,18 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
 
@@ -583,44 +531,9 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -683,35 +596,18 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
 
@@ -837,44 +733,9 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -937,35 +798,18 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
 
@@ -1096,44 +940,9 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -1196,35 +1005,18 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
 
@@ -1353,44 +1145,9 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -1453,35 +1210,18 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
 
@@ -1606,44 +1346,9 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -1706,35 +1411,18 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
 
@@ -1860,44 +1548,9 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -1959,35 +1612,18 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
 
@@ -2116,44 +1752,9 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -2216,35 +1817,18 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
 
@@ -2374,44 +1958,9 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -2474,35 +2023,18 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
 
@@ -2632,44 +2164,9 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -2732,35 +2229,18 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
 
@@ -2890,44 +2370,9 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -2990,35 +2435,18 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
 
@@ -3144,44 +2572,9 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoarrProducts');//指定のセッションを削除
 
-				$arrAssembleProducts = array();//ここから組立品
-				$ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-				->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
-				->order(["datetime_finish"=>"DESC"])->toArray();
-
-				$arrResultZensuHeadsmoto = array();
-				for($k=0; $k<count($ResultZensuHeads); $k++){
-					$arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
-						'product_code' => $ResultZensuHeads[$k]["product_code"],
-						'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
-						'count' => 1
-				 ];
-				}
-
-				$product_code_moto = array();//ここから配列の並び変え
-				$datetime_finish_moto = array();
-				foreach ($arrResultZensuHeadsmoto as $key => $value) {
-					 $product_code[$key] = $value['product_code'];
-					 $datetime_finish[$key] = $value["datetime_finish"];
-				 }
-				 if(isset($datetime_finish)){
-					 array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
-				 }
-				 $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-				//同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-					for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-						if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-							if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-								$count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-								$arrResultZensuHeadsmoto[$l]["count"] = $count;
-								unset($arrResultZensuHeadsmoto[$m]);
-							}
-						}
-					}
-					$arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-				}
+				$date1_datenext1 = $date1."_".$datenext1;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//arrResultZensuHeadsmoto呼出クラスを使用
 
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
@@ -3243,38 +2636,21 @@ class ApisController extends AppController
 					}
 				}
 
-				$countmax = count($arrOrderEdis);
-				//同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
-				for($l=0; $l<count($arrOrderEdis); $l++){
-					for($m=$l+1; $m<$countmax; $m++){
-						if(isset($arrOrderEdis[$m]["product_code"])){
-							if($arrOrderEdis[$l]["product_code"] == $arrOrderEdis[$m]["product_code"] && $arrOrderEdis[$l]["date_deliver"] == $arrOrderEdis[$m]["date_deliver"]){
-								$amount = $arrOrderEdis[$l]["amount"] + $arrOrderEdis[$m]["amount"];
-								$denpyoumaisu = $arrOrderEdis[$l]["denpyoumaisu"] + $arrOrderEdis[$m]["denpyoumaisu"];
-								$arrOrderEdis[$l]["amount"] = $amount;
-								$arrOrderEdis[$l]["denpyoumaisu"] = $denpyoumaisu;
-								unset($arrOrderEdis[$m]);
-							}
-						}
-					}
-					$arrOrderEdis = array_values($arrOrderEdis);
+				if(!isset($_SESSION)){
+				session_start();
 				}
-				$arrOrderEdis = array_merge($arrOrderEdis, $arrProductsmoto);
+				$_SESSION['zaikoarrProductsmoto'] = array();
+				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
 
-				//並べかえ
-				$tmp_product_array = array();
-				$tmp_date_deliver_array = array();
-				foreach($arrOrderEdis as $key => $row ) {
-					$tmp_product_array[$key] = $row["product_code"];
-					$tmp_date_deliver_array[$key] = $row["date_deliver"];
-				}
+				$arrOrderEdismoto = $arrOrderEdis;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
 
-				if(count($arrOrderEdis) > 0){
-					array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdis);
-				}
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei

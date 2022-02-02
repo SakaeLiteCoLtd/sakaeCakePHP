@@ -61,6 +61,94 @@ class apizaikoprogram extends AppController
 
   }
 
+  public function classResultZensuHeads($date1_datenext1)
+ {
+   $arrdate1_datenext1 = explode("_",$date1_datenext1);
+   $date1 = $arrdate1_datenext1[0];
+   $datenext1 = $arrdate1_datenext1[1];
+
+   $arrAssembleProducts = array();//ここから組立品
+   $ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
+   ->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
+   ->order(["datetime_finish"=>"DESC"])->toArray();
+
+   $arrResultZensuHeadsmoto = array();
+   for($k=0; $k<count($ResultZensuHeads); $k++){
+     $arrResultZensuHeadsmoto[] = [//重複も含めて全て配列に追加
+       'product_code' => $ResultZensuHeads[$k]["product_code"],
+       'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),
+       'count' => 1
+    ];
+   }
+
+   $product_code_moto = array();//ここから配列の並び変え
+   $datetime_finish_moto = array();
+   foreach ($arrResultZensuHeadsmoto as $key => $value) {
+      $product_code[$key] = $value['product_code'];
+      $datetime_finish[$key] = $value["datetime_finish"];
+    }
+    if(isset($datetime_finish)){
+      array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
+    }
+    $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
+
+   //同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
+   for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
+     for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
+       if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
+         if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
+           $count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
+           $arrResultZensuHeadsmoto[$l]["count"] = $count;
+           unset($arrResultZensuHeadsmoto[$m]);
+         }
+       }
+     }
+     $arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
+   }
+
+   return $arrResultZensuHeadsmoto;
+
+ }
+
+ public function classOrderEdis($arrOrderEdismoto)//arrOrderEdisの並び替え
+ {
+   $arrProductsmoto = $_SESSION['zaikoarrProductsmoto'];
+
+   $countmax = count($arrOrderEdismoto);
+   //同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
+   for($l=0; $l<count($arrOrderEdismoto); $l++){
+     for($m=$l+1; $m<$countmax; $m++){
+       if(isset($arrOrderEdismoto[$m]["product_code"])){
+         if($arrOrderEdismoto[$l]["product_code"] == $arrOrderEdismoto[$m]["product_code"] && $arrOrderEdismoto[$l]["date_deliver"] == $arrOrderEdismoto[$m]["date_deliver"]){
+           $amount = $arrOrderEdismoto[$l]["amount"] + $arrOrderEdismoto[$m]["amount"];
+           $denpyoumaisu = $arrOrderEdismoto[$l]["denpyoumaisu"] + $arrOrderEdismoto[$m]["denpyoumaisu"];
+           $arrOrderEdismoto[$l]["amount"] = $amount;
+           $arrOrderEdismoto[$l]["denpyoumaisu"] = $denpyoumaisu;
+           unset($arrOrderEdismoto[$m]);
+         }
+       }
+     }
+     $arrOrderEdismoto = array_values($arrOrderEdismoto);
+   }
+   $arrOrderEdismoto = array_merge($arrOrderEdismoto, $arrProductsmoto);
+
+   //並べかえ
+   $tmp_product_array = array();
+   $tmp_date_deliver_array = array();
+   foreach($arrOrderEdismoto as $key => $row ) {
+     $tmp_product_array[$key] = $row["product_code"];
+     $tmp_date_deliver_array[$key] = $row["date_deliver"];
+   }
+
+   if(count($arrOrderEdismoto) > 0){
+     array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdismoto);
+   }
+
+   $arrOrderEdis = $arrOrderEdismoto;
+
+    return $arrOrderEdis;
+ }
+
   public function classStockProducts($arrStockProductsmoto)//StockProductsの並び替え
   {
     $tmp_product_array = array();

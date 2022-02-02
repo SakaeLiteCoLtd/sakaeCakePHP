@@ -28,7 +28,14 @@ class ZensukensasController extends AppController
 
      public function indexmenu()
      {
-       //$this->request->session()->destroy();// セッションの破棄
+       if(!isset($_SESSION)){//sessionsyuuseituika
+       session_start();
+       }
+       $session = $this->request->getSession();
+
+       echo "<pre>";
+       print_r($_SESSION);
+       echo "</pre>";
      }
 
      public function indexsubmenu()

@@ -66,7 +66,8 @@
   <tr style="border-bottom: solid;border-width: 1px">
     <td width='163'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">内容</strong></td>
     <td width='163'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">数量</strong></td>
-    <td width='463'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">不良の説明</strong></td>
+    <td width='413'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">不良の説明</strong></td>
+    <td width='50'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">廃棄</strong></td>
   </tr>
 
   <?php for($i=0; $i<=$tuika; $i++): ?>
@@ -78,6 +79,7 @@
     <td width="263"  bgcolor="#FFFFCC" style="font-size: 12pt;"><?= h($cont) ?></td>
     <td width="263"  bgcolor="#FFFFCC" style="font-size: 12pt;"><?= h($data['amount'.$i]) ?></td>
     <td width="263"  bgcolor="#FFFFCC" style="font-size: 12pt;"><?= h($data['bik'.$i]) ?></td>
+    <td width="50"  bgcolor="#FFFFCC"><style="font-size: 12pt; color:black"><?= h(${'diposal_display'.$i}) ?></td>
   </tr>
   <?= $this->Form->control('num', array('type'=>'hidden', 'value'=>$i, 'label'=>false)) ?>
   <?php endfor;?>

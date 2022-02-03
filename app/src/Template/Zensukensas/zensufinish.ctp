@@ -65,8 +65,8 @@
   <tr style="border-bottom: solid;border-width: 1px">
     <td width='163'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">内容</strong></td>
     <td width='163'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">数量</strong></td>
-    <td width='463'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">不良の説明</strong></td>
-    <td width='50'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">破棄</strong></td>
+    <td width='413'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">不良の説明</strong></td>
+    <td width='50'  bgcolor="#FFFFCC"><strong style="font-size: 13pt; color:blue">廃棄</strong></td>
   </tr>
 
   <?php for($i=0; $i<=$tuika; $i++): ?>

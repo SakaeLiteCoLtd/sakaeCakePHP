@@ -13,6 +13,7 @@
 ?>
 
 <?=$this->Form->create($checkLots, ['url' => ['action' => 'kensakuview']]) ?>
+
 <?php
  use App\myClass\Labelmenus\htmlLabelmenu;//myClassフォルダに配置したクラスを使用
  $htmlLabelmenu = new htmlLabelmenu();

@@ -25,6 +25,30 @@ class apizaikoprogram extends AppController
         $this->LabelSetikkatsues = TableRegistry::get('labelSetikkatsues');
     }
 
+    public function classProductsmototarget($date16)//ターゲット日以降
+   {
+     $arrProducts = $_SESSION['zaikoarrProductstarget'];
+
+     $arrProductsmoto = array();//対象の製品全部の器を作っておく（OrderEdisに存在しないものも表示するため）
+     for($k=0; $k<count($arrProducts); $k++){
+
+       $arrProductsmoto[] = [
+         'date_order' => "",
+         'num_order' => "",
+         'product_code' => $arrProducts[$k]["product_code"],
+         'product_name' => $arrProducts[$k]["product_name"],
+         'price' => "",
+         'date_deliver' => "",
+         'amount' => "",
+         'denpyoumaisu' => ""
+      ];
+
+     }
+
+     return $arrProductsmoto;
+
+   }
+
    public function classProductsmoto($date16)
   {
     $arrProducts = $_SESSION['zaikoarrProducts'];
@@ -68,7 +92,7 @@ class apizaikoprogram extends AppController
    $datenext1 = $arrdate1_datenext1[1];
 
    $arrAssembleProducts = array();//ここから組立品
-   $ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
+   $ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを配列として出しておく（ループで取り出すと時間がかかる）
    ->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
    ->order(["datetime_finish"=>"DESC"])->toArray();
 
@@ -88,7 +112,7 @@ class apizaikoprogram extends AppController
       $datetime_finish[$key] = $value["datetime_finish"];
     }
     if(isset($datetime_finish)){
-      array_multisort($product_code, array_map( "strtotime", $datetime_finish ), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
+      array_multisort($product_code, array_map("strtotime", $datetime_finish), SORT_ASC, SORT_NUMERIC, $arrResultZensuHeadsmoto);
     }
     $countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
 
@@ -141,7 +165,7 @@ class apizaikoprogram extends AppController
    }
 
    if(count($arrOrderEdismoto) > 0){
-     array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_deliver_array ), SORT_ASC, SORT_NUMERIC, $arrOrderEdismoto);
+     array_multisort($tmp_product_array, array_map("strtotime", $tmp_date_deliver_array), SORT_ASC, SORT_NUMERIC, $arrOrderEdismoto);
    }
 
    $arrOrderEdis = $arrOrderEdismoto;
@@ -159,7 +183,7 @@ class apizaikoprogram extends AppController
     }
 
     if(count($arrStockProductsmoto) > 0){
-      array_multisort($tmp_product_array, array_map( "strtotime", $tmp_date_stock_array ), SORT_ASC, SORT_NUMERIC, $arrStockProductsmoto);
+      array_multisort($tmp_product_array, array_map("strtotime", $tmp_date_stock_array), SORT_ASC, SORT_NUMERIC, $arrStockProductsmoto);
     }
 
     $arrStockProducts = $arrStockProductsmoto;
@@ -203,7 +227,7 @@ class apizaikoprogram extends AppController
      return $arrSeisans;
   }
 
-  public function classSeisanskadou($k)//並べかえ
+  public function classSeisanskadou($k)
   {
     $KadouSeikeis = $_SESSION['zaikoKadouSeikeis'];
     $arrSeisans = $_SESSION['zaikoarrSeisans'];
@@ -213,7 +237,7 @@ class apizaikoprogram extends AppController
     $starting_tm = substr($KadouSeikeis[$k]['starting_tm'], 0, 10);
     $dateseikei = strtotime(substr($KadouSeikeis[$k]['starting_tm'], 10));
 
-    if($dateseikei < strtotime(" 08:00:00")){
+    if($dateseikei < strtotime(" 08:00:00")){//8時未満であれば前日の成形
       $starting_tm = strtotime($starting_tm);
       $nippouday = date('Y/m/d', strtotime('-1 day', $starting_tm));
     }else{
@@ -233,6 +257,7 @@ class apizaikoprogram extends AppController
       'torisu' => $torisu
    ];
 
+//セット取りの場合はもう一方も配列に追加
    $LabelSetikkatsu1 = $this->LabelSetikkatsues->find()->where(['product_id1' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
    $LabelSetikkatsu2 = $this->LabelSetikkatsues->find()->where(['product_id2' => $KadouSeikeis[$k]['product_code'], 'kind_set_assemble' => 0])->toArray();
 

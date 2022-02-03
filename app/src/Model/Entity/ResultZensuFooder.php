@@ -37,6 +37,7 @@ class ResultZensuFooder extends Entity
         'cont_rejection_id' => true,
         'amount' => true,
         'bik' => true,
+        'disposal_flag' => true,
         'delete_flag' => true,
         'created_at' => true,
         'created_staff' => true,

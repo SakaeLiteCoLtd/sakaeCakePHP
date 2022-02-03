@@ -8,6 +8,7 @@ use Cake\Core\Exception\Exception;//トランザクション
 use Cake\Core\Configure;//トランザクション
 
 use App\myClass\Apifind\htmlApifind;//myClassフォルダに配置したクラスを使用
+use App\myClass\Apizaiko\apizaikoprogram;//myClassフォルダに配置したクラスを使用
 
 use Cake\Utility\Xml;//xmlのファイルを読み込みために必要
 use Cake\Utility\Text;
@@ -38,6 +39,8 @@ class ApizaikocyouController extends AppController
 		 $this->NonKadouSeikeis = TableRegistry::get('nonKadouSeikeis');
 		}
 
+//http://192.168.4.246/Apizaikocyou/zaikocyou/api/2021-1-16_primary.xml
+//http://localhost:5000/Apizaikocyou/zaikocyou/api/2021-1-16_primary.xml
 		public function zaikocyou()
 		{
 			$data = Router::reverse($this->request, false);//urlを取得
@@ -59,147 +62,85 @@ class ApizaikocyouController extends AppController
 
 			$date1 = $yaermonth."-1";//選択した日程の月の初日
 			$date1st = strtotime($date1);
-			$datenext1 = date('Y-m-d', strtotime('+30 day', $date1st));
-			$datelast = strtotime($datenext1);
-			$datelast = date('Y-m-d', strtotime('-1 day', $datelast));
-			$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日//stockProductsに使用
-			$dateback = strtotime($dateback1);
-			$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日//stockProductsに使用
 
 			$datestart = $dayarr[0];
 			$datestartstr = strtotime($datestart);
 			$dateend = date('Y-m-d', strtotime('+31 day', $datestartstr));
 			$dateendnext = date('Y-m-d', strtotime('+32 day', $datestartstr));//kodouseikeisで使用
+			$date16 = $yaermonth."-16";
 
 			$todaySyoyouKeikakus = date('Y-m-d');
 			$this->SyoyouKeikakus->deleteAll(['date_deliver <' => $todaySyoyouKeikakus]);//当日の前日までの所要計画のデータは削除する
-/*
-			echo "<pre>";
-			print_r($date1);
-			echo "</pre>";
-			echo "<pre>";
-			print_r($datenext1);
-			echo "</pre>";
-			echo "<pre>";
-			print_r($datestart);
-			echo "</pre>";
-			echo "<pre>";
-			print_r($dateend);
-			echo "</pre>";
-*/
+
 			//http://192.168.4.246/Apizaikocyou/zaikocyou/api/2020-12-3_primary.xml
 			//http://localhost:5000/Apizaikocyou/zaikocyou/api/2020-12-13_primary.xml
-
 			if($sheet === "primary"){
 
 //$arrProductsmotoスタート
-/*
-echo "<pre>";
-print_r("1".date('Y-m-d H:i:s'));
-echo "</pre>";
-*/
+
 				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 				->where(['products.status' => 0, 'primary_p' => 1,
-				'OR' => [['product_code like' => 'P%']]])->toArray();
-	//			'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])->toArray();
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+				->toArray();
 
 				if(!isset($_SESSION)){
 				session_start();
 				}
-				$_SESSION['classarrProducts'] = array();
-				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
+				$_SESSION['zaikoarrProductstarget'] = array();
+				$_SESSION['zaikoarrProductstarget'] = $arrProducts;//クラスで使用するためセッションとして定義する
 
-				//OrderEdisクラス使用
-				$htmlApifind = new htmlApifind();//クラスを使用
-				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
+				$apizaikoprogram = new apizaikoprogram();
+				$arrProductsmoto = $apizaikoprogram->classProductsmototarget($date16);
+
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrProductstarget');//指定のセッションを削除
 
 //$arrProductsmoto完成
-/*
-echo "<pre>";
-print_r("2".date('Y-m-d H:i:s'));
-echo "</pre>";
-*/
 //$arrResultZensuHeadsmotoスタート
 
-				$_SESSION['classarrdatestart'] = array();
-				$_SESSION['classarrdatestart'] = $datestart;
-
-				$htmlApifind = new htmlApifind();//クラスを使用
-				$arrResultZensuHeadsmoto = $htmlApifind->ResultZensuHeadsmoto($dateend);//クラスを使用
+				$date1_datenext1 = $datestart."_".$dateend;
+				$apizaikoprogram = new apizaikoprogram();
+				$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//ResultZensuHeadsからデータを取得
 
 //$arrResultZensuHeadsmoto完成
-/*
-echo "<pre>";
-print_r("3".date('Y-m-d H:i:s'));
-echo "</pre>";
-*/
 //$arrAssembleProductsスタート
 
-				$arrAssembleProducts = array();//ここから組立品
-				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
+for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//arrResultZensuHeadsmotoに対して
 
-					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
+	$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
-					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立
+	if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
 
-						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
-						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'delete_flag' => 0,
-//						'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
-						'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
-						->toArray();
+		$OrderEdisAssemble = $this->OrderEdis->find()//primaryに該当する、かつ'product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]であるOrderEdis呼び出し
+		->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'delete_flag' => 0,
+		'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
+		->toArray();
 
-						if(isset($OrderEdisAssemble[0])){
+		if(isset($OrderEdisAssemble[0])){
 
-							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
-							$irisu = $Konpou[0]->irisu;//製品の入数を取得
+			$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
+			$irisu = $Konpou[0]->irisu;//製品の入数を取得
+			$amount = $irisu * $arrResultZensuHeadsmoto[$l]["count"];//入数をかけてamountを取得
+			 $arrAssembleProducts[] = [//配列$arrAssembleProductsに追加
+				 'product_code' => $arrResultZensuHeadsmoto[$l]["product_code"],
+				 'kensabi' => $arrResultZensuHeadsmoto[$l]["datetime_finish"],
+				 'amount' => $amount
+			];
 
-							$amount = $irisu * $arrResultZensuHeadsmoto[$l]["count"];//入数をかけてamountを取得
+		}
 
-							 $arrAssembleProducts[] = [//配列$arrAssembleProductsに追加
-								 'product_code' => $arrResultZensuHeadsmoto[$l]["product_code"],
-								 'kensabi' => $arrResultZensuHeadsmoto[$l]["datetime_finish"],
-								 'amount' => $amount
-							];
+	}
 
-							$arrAssembleProducts = array_unique($arrAssembleProducts, SORT_REGULAR);
-							$arrAssembleProducts = array_values($arrAssembleProducts);
-
-							$product_code = array();
-							$kensabi = array();
-							foreach ($arrAssembleProducts as $key => $value) {
-  							 $product_code[$key] = $value['product_code'];
-  							 $kensabi[$key] = $value["kensabi"];
-  						 }
-
-							 if(isset($kensabi)){
-								 array_multisort($product_code, array_map( "strtotime", $kensabi ), SORT_ASC, SORT_NUMERIC, $arrAssembleProducts);
-							 }
-
-						}
-
-					}
-
-				}
+}
 
 //$arrAssembleProducts完成
-/*
-echo "<pre>";
-print_r("4 ".date('Y-m-d H:i:s'));
-echo "</pre>";
-*/
 //$arrOrderEdisスタート
 
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し//主要シートの絞込み
 				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
-	//			'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
-				'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_deliver"=>"ASC"])->toArray();
-/*
-echo "<pre>";
-print_r("41 ".date('Y-m-d H:i:s'));
-echo "</pre>";
-*/
+
 				$arrOrderEdis = array();//注文呼び出し
 		    for($k=0; $k<count($OrderEdis); $k++){
 
@@ -210,13 +151,7 @@ echo "</pre>";
 		        $product_name = $Product[0]->product_name;
 
 		        $riron_check = 0;
-/*210223
-		        $date16 = $yaermonth."-16";
-		        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-		        if(isset($RironStockProducts[0])){
-		          $riron_check = 1;
-		        }
-*/
+
 		          $arrOrderEdis[] = [
 		            'date_order' => $OrderEdis[$k]["date_order"],
 		            'num_order' => $OrderEdis[$k]["num_order"],
@@ -226,7 +161,6 @@ echo "</pre>";
 		            'date_deliver' => $OrderEdis[$k]["date_deliver"],
 		            'amount' => $OrderEdis[$k]["amount"],
 		            'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 		         ];
 
 		         for($l=0; $l<count($arrProductsmoto); $l++){
@@ -243,11 +177,7 @@ echo "</pre>";
 		      }
 
 		    }
-/*
-echo "<pre>";
-print_r("42 ".date('Y-m-d H:i:s'));
-echo "</pre>";
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -257,30 +187,19 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrOrderEdis = $htmlApifind->OrderEdis($date16);//クラスを使用
 
 //$arrOrderEdis完成
-
 //$StockProductsスタート
 
-				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し//210216更新
+				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day,
-				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
-	//			'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
-				'OR' => [['product_code like' => 'P%']]])
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
-					'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -315,13 +234,11 @@ echo "</pre>";
 					}
 
 //$StockProducts完成
-
 //$SyoyouKeikakusスタート
 
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
-	//			'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
 				->order(["date_deliver"=>"ASC"])->toArray();
 
 				$arrSyoyouKeikakus = array();
@@ -371,7 +288,6 @@ echo "</pre>";
 				}
 
 //$SyoyouKeikakus完成
-
 //$arrSeisansスタート
 
 				$daystart = $datestart." 08:00:00";
@@ -379,8 +295,8 @@ echo "</pre>";
 
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
-			//	'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
-				'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
+				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+//						'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
 				->order(["starting_tm"=>"ASC"])->toArray();
 
 					$arrSeisans = array();
@@ -444,13 +360,9 @@ echo "</pre>";
 
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 					->where(['date_work >=' => $datestart, 'date_work <=' => $dateendnext, 'outsource_code !=' => 22,
-					'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
+					'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])//productsの絞込み　primary
+//						'OR' => [['product_code like' => 'P%']]])//productsの絞込み　primary
 					->order(["date_work"=>"ASC"])->toArray();
-/*
-					echo "<pre>";
-					print_r($datestart." ".$dateendnext);
-					echo "</pre>";
-*/
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 
 						$Product = $this->Products->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
@@ -483,11 +395,6 @@ echo "</pre>";
 					}
 
 //$arrSeisans完成
-/*
-echo "<pre>";
-print_r("8".date('Y-m-d H:i:s'));
-echo "</pre>";
-*/
 
 			}elseif($sheet === "primary_dnp"){
 
@@ -502,7 +409,6 @@ echo "</pre>";
 				}
 				$_SESSION['classarrProducts'] = array();
 				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -585,15 +491,6 @@ echo "</pre>";
 
 						$product_name = $Product[0]->product_name;
 
-						$riron_check = 0;
-						/*210223
-								        $date16 = $yaermonth."-16";
-								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-								        if(isset($RironStockProducts[0])){
-								          $riron_check = 1;
-								        }
-						*/
-
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -603,7 +500,6 @@ echo "</pre>";
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
 								'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -630,27 +526,19 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrOrderEdis = $htmlApifind->OrderEdis($date16);//クラスを使用
 
 				//$arrOrderEdis完成
-
 				//$StockProductsスタート
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 				$arrStockProducts = array();
 				for($k=0; $k<count($StockProducts); $k++){
 
@@ -865,7 +753,6 @@ echo "</pre>";
 				}
 				$_SESSION['classarrProducts'] = array();
 				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -947,15 +834,7 @@ echo "</pre>";
 					if(isset($Product[0])){
 
 						$product_name = $Product[0]->product_name;
-
-						$riron_check = 0;
-						/*210223
-								        $date16 = $yaermonth."-16";
-								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-								        if(isset($RironStockProducts[0])){
-								          $riron_check = 1;
-								        }
-						*/
+	//					$riron_check = 0;
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -993,7 +872,6 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -1008,14 +886,7 @@ echo "</pre>";
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
-					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 				$arrStockProducts = array();
 				for($k=0; $k<count($StockProducts); $k++){
 
@@ -1226,7 +1097,6 @@ echo "</pre>";
 				}
 				$_SESSION['classarrProducts'] = array();
 				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
 
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
@@ -1309,13 +1179,6 @@ echo "</pre>";
 						$product_name = $Product[0]->product_name;
 
 						$riron_check = 0;
-						/*210223
-								        $date16 = $yaermonth."-16";
-								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-								        if(isset($RironStockProducts[0])){
-								          $riron_check = 1;
-								        }
-						*/
 
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
@@ -1326,7 +1189,6 @@ echo "</pre>";
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
 								'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -1353,7 +1215,6 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -1368,14 +1229,7 @@ echo "</pre>";
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
-					'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 				$arrStockProducts = array();
 				for($k=0; $k<count($StockProducts); $k++){
 
@@ -1586,7 +1440,6 @@ echo "</pre>";
 				}
 				$_SESSION['classarrProducts'] = array();
 				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
 
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
@@ -1668,15 +1521,6 @@ echo "</pre>";
 
 						$product_name = $Product[0]->product_name;
 
-						$riron_check = 0;
-						/*210223
-								        $date16 = $yaermonth."-16";
-								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-								        if(isset($RironStockProducts[0])){
-								          $riron_check = 1;
-								        }
-						*/
-
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -1686,7 +1530,6 @@ echo "</pre>";
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
 								'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -1713,7 +1556,6 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -1725,15 +1567,8 @@ echo "</pre>";
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
-				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -1943,7 +1778,6 @@ echo "</pre>";
 				}
 				$_SESSION['classarrProducts'] = array();
 				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
 
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
@@ -2025,15 +1859,6 @@ echo "</pre>";
 
 						$product_name = $Product[0]->product_name;
 
-						$riron_check = 0;
-						/*210223
-								        $date16 = $yaermonth."-16";
-								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-								        if(isset($RironStockProducts[0])){
-								          $riron_check = 1;
-								        }
-						*/
-
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -2043,7 +1868,6 @@ echo "</pre>";
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
 								'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -2070,7 +1894,6 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -2084,13 +1907,7 @@ echo "</pre>";
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -2301,7 +2118,6 @@ echo "</pre>";
 				}
 				$_SESSION['classarrProducts'] = array();
 				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
 
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
@@ -2381,15 +2197,6 @@ echo "</pre>";
 
 						$product_name = $Product[0]->product_name;
 
-						$riron_check = 0;
-						/*210223
-								        $date16 = $yaermonth."-16";
-								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-								        if(isset($RironStockProducts[0])){
-								          $riron_check = 1;
-								        }
-						*/
-
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -2399,7 +2206,6 @@ echo "</pre>";
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
 								'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -2426,7 +2232,6 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -2438,15 +2243,8 @@ echo "</pre>";
 
 				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
-				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -2661,7 +2459,6 @@ echo "</pre>";
 				}
 				$_SESSION['classarrProducts'] = array();
 				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
 
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
@@ -2743,15 +2540,6 @@ echo "</pre>";
 
 						$product_name = $Product[0]->product_name;
 
-						$riron_check = 0;
-						/*210223
-								        $date16 = $yaermonth."-16";
-								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-								        if(isset($RironStockProducts[0])){
-								          $riron_check = 1;
-								        }
-						*/
-
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -2761,7 +2549,6 @@ echo "</pre>";
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
 								'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -2788,7 +2575,6 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -2803,14 +2589,7 @@ echo "</pre>";
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
-					'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -3022,7 +2801,6 @@ echo "</pre>";
 				}
 				$_SESSION['classarrProducts'] = array();
 				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
 
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
@@ -3104,15 +2882,6 @@ echo "</pre>";
 
 						$product_name = $Product[0]->product_name;
 
-						$riron_check = 0;
-						/*210223
-								        $date16 = $yaermonth."-16";
-								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-								        if(isset($RironStockProducts[0])){
-								          $riron_check = 1;
-								        }
-						*/
-
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -3122,7 +2891,6 @@ echo "</pre>";
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
 								'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -3149,7 +2917,6 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -3164,14 +2931,7 @@ echo "</pre>";
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
-					'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -3383,7 +3143,6 @@ echo "</pre>";
 				}
 				$_SESSION['classarrProducts'] = array();
 				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
 
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
@@ -3465,15 +3224,6 @@ echo "</pre>";
 
 						$product_name = $Product[0]->product_name;
 
-						$riron_check = 0;
-						/*210223
-								        $date16 = $yaermonth."-16";
-								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-								        if(isset($RironStockProducts[0])){
-								          $riron_check = 1;
-								        }
-						*/
-
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -3483,7 +3233,6 @@ echo "</pre>";
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
 								'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -3510,7 +3259,6 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -3525,14 +3273,7 @@ echo "</pre>";
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
-					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -3744,7 +3485,6 @@ echo "</pre>";
 				}
 				$_SESSION['classarrProducts'] = array();
 				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
 
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
@@ -3826,15 +3566,6 @@ echo "</pre>";
 
 						$product_name = $Product[0]->product_name;
 
-						$riron_check = 0;
-						/*210223
-								        $date16 = $yaermonth."-16";
-								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-								        if(isset($RironStockProducts[0])){
-								          $riron_check = 1;
-								        }
-						*/
-
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -3844,7 +3575,6 @@ echo "</pre>";
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
 								'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -3871,7 +3601,6 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -3885,13 +3614,7 @@ echo "</pre>";
 				->where(['date_culc >=' => $day, 'date_culc <=' => $day])
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend])
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast])
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 
@@ -4101,7 +3824,6 @@ echo "</pre>";
 				}
 				$_SESSION['classarrProducts'] = array();
 				$_SESSION['classarrProducts'] = $arrProducts;
-				$date16 = $yaermonth."-16";
 
 				$htmlApifind = new htmlApifind();//クラスを使用
 				$arrProductsmoto = $htmlApifind->Productsmoto($date16);//クラスを使用
@@ -4183,15 +3905,6 @@ echo "</pre>";
 
 						$product_name = $Product[0]->product_name;
 
-						$riron_check = 0;
-						/*210223
-								        $date16 = $yaermonth."-16";
-								        $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'date_culc' => $date16])->toArray();
-								        if(isset($RironStockProducts[0])){
-								          $riron_check = 1;
-								        }
-						*/
-
 							$arrOrderEdis[] = [
 								'date_order' => $OrderEdis[$k]["date_order"],
 								'num_order' => $OrderEdis[$k]["num_order"],
@@ -4201,7 +3914,6 @@ echo "</pre>";
 								'date_deliver' => $OrderEdis[$k]["date_deliver"],
 								'amount' => $OrderEdis[$k]["amount"],
 								'denpyoumaisu' => 1
-		       //     'riron_zaiko_check' => $riron_check
 						 ];
 
 						 for($l=0; $l<count($arrProductsmoto); $l++){
@@ -4228,7 +3940,6 @@ echo "</pre>";
 				$_SESSION['classOrderEdis'] = $OrderEdis;
 				$_SESSION['classarrOrderEdis'] = array();
 				$_SESSION['classarrOrderEdis'] = $arrOrderEdis;
-				$date16 = $yaermonth."-16";
 
 				//OrderEdisクラス使用
 				$htmlApifind = new htmlApifind();//クラスを使用
@@ -4243,14 +3954,7 @@ echo "</pre>";
 				//->where(['date_culc >=' => $day, 'date_culc <=' => $dateend,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_culc"=>"ASC"])->toArray();
-/*
-				if(count($StockProducts) < 1){
-					$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-					->where(['date_stock >=' => $dateback1, 'date_stock <=' => $datebacklast,
-					'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
-					->order(["date_stock"=>"ASC"])->toArray();
-				}
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 

@@ -79,6 +79,12 @@ class ResultZensuFoodersTable extends Table
     //        ->requirePresence('bik', 'create')
             ->allowEmpty('bik');
 
+    //廃棄フラグ追加
+        $validator
+            ->integer('disposal_flag')
+            ->requirePresence('disposal_flag', 'create')
+            ->notEmpty('disposal_flag');
+
         $validator
             ->integer('delete_flag')
             ->requirePresence('delete_flag', 'create')

@@ -166,13 +166,7 @@ class htmlApifind extends AppController
        for($k=0; $k<count($arrProducts); $k++){
 
          $riron_check = 0;
-/*//210223
-         $date16 = $yaermonth."-16";
-         $RironStockProducts = $this->RironStockProducts->find()->where(['product_code' => $arrProducts[$k]["product_code"], 'date_culc' => $date16])->toArray();
-         if(isset($RironStockProducts[0])){
-           $riron_check = 1;
-         }
-*/
+
          $arrProductsmoto[] = [
            'date_order' => "",
            'num_order' => "",
@@ -195,13 +189,14 @@ class htmlApifind extends AppController
     {
       $datestart = $_SESSION['classarrdatestart'];
 
+
+
       $ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
       ->where(['datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
       ->order(["datetime_finish"=>"DESC"])->toArray();
 
       $arrResultZensuHeadsmoto = array();
       for($k=0; $k<count($ResultZensuHeads); $k++){
-
         $arrResultZensuHeadsmoto[] = [
           'product_code' => $ResultZensuHeads[$k]["product_code"],
           'datetime_finish' => $ResultZensuHeads[$k]["datetime_finish"]->format('Y-m-d'),

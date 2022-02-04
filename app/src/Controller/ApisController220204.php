@@ -318,351 +318,6 @@ class ApisController extends AppController
 				->where(['products.status' => 0, 'primary_p' => 1,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])->toArray();//primaryに該当するproductを取得する
 
-				$OrderEdis = $this->OrderEdis->find()//primaryに該当するOrderEdis呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//primaryに該当する月末在庫呼び出し（先月末のデータ）
-				->where(['date_stock' => $datebacklast,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//primaryに該当する所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//primaryに該当する生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//primaryに該当する仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
-				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}elseif($sheet === "primary_dnp"){
-
-				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'primary_p' => 1,
-				'OR' => [['customer_code like' => '2%']]])->toArray();
-
-				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['customer_code like' => '2%']]])//productsの絞込みprimary_dnp
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock' => $datebacklast])
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}elseif($sheet === "primary_w"){
-
-				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'primary_p' => 1, 'customer_code' => '10002',
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])->toArray();
-
-				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock' => $datebacklast,
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}elseif($sheet === "primary_h"){
-
-				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'customer_code' => '10002',
-				'OR' => [['product_code like' => 'H%']]])->toArray();
-
-				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
-				'OR' => [['product_code like' => 'H%']]])//productsの絞込みprimary_h
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock' => $datebacklast,
-				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
-				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
-				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}elseif($sheet === "reizouko"){
-
-				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'customer_code' => '10005'])->toArray();
-
-				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['customer_code' => '10005']]])//productsの絞込みreizouko
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock' => $datebacklast])
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}elseif($sheet === "uwawaku"){
-
-				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'customer_code' => '10003'])->toArray();
-
-				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['customer_code' => '10003']]])//productsの絞込みuwawaku
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock' => $datebacklast])
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}elseif($sheet === "other"){
-
-				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0,
-				'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])->toArray();
-
-				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock' => $datebacklast])
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}elseif($sheet === "p0"){
-
-				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'customer_code' => '10001',
-				'OR' => [['product_code like' => 'P0%']]])->toArray();
-
-				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10001',
-				'OR' => [['product_code like' => 'P0%']]])//productsの絞込みp0
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock' => $datebacklast,
-				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
-				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
-				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}elseif($sheet === "p1"){
-
-				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'customer_code' => '10001',
-				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])->toArray();
-
-				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10001',
-				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock' => $datebacklast,
-				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
-				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
-				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}elseif($sheet === "w"){
-
-				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'customer_code' => '10002',
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])->toArray();
-
-				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock' => $datebacklast,
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
-				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}elseif($sheet === "dnp"){
-
-				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0, 'customer_code like' => '2%'//, 'primary_p' => 0
-				])->toArray();
-
-				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['customer_code like' => '2%']]])//productsの絞込みdnp
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock' => $datebacklast])
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}elseif($sheet === "sinsei"){
-
-				$arrProducts = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
-				->where(['products.status' => 0,
-				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])->toArray();
-
-				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
-				->where(['date_stock' => $datebacklast,
-				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
-				->order(["date_stock"=>"DESC"])->toArray();
-
-				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
-				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
-				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
-				->order(["date_deliver"=>"ASC"])->toArray();
-
-				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
-				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
-				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
-				->order(["starting_tm"=>"ASC"])->toArray();
-
-				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
-				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
-				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
-				->order(["date_work"=>"ASC"])->toArray();
-
-			}
-
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -686,8 +341,6 @@ class ApisController extends AppController
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
-//ここも場合分け
 
 						$OrderEdisAssemble = $this->OrderEdis->find()//primaryに該当する、かつ'product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]であるOrderEdis呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'delete_flag' => 0,
@@ -713,19 +366,17 @@ class ApisController extends AppController
 
 //arrAssembleProductsここまで
 //ここからarrOrderEdis
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//primaryに該当するOrderEdis呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
 
 				for($k=0; $k<count($OrderEdis); $k++){
-
-					//ここも場合分け
 
 					$Product = $this->Products->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
 
@@ -775,19 +426,15 @@ class ApisController extends AppController
 
 //arrOrderEdisここまで
 //ここからarrStockProducts
-/*
+
 				$StockProducts = $this->StockProducts->find()//primaryに該当する月末在庫呼び出し（先月末のデータ）
 				->where(['date_stock' => $datebacklast,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
-
-						//ここも場合分け
-
 						$Product = $this->Products->find()->where(['product_code' => $StockProducts[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
-
 						if(isset($Product[0])){//'primary_p' => 1（primaryに該当する場合）
 							$arrStockProducts[] = [
 								'product_code' => $StockProducts[$k]["product_code"],
@@ -802,19 +449,15 @@ class ApisController extends AppController
 
 //arrStockProductsここまで
 //ここからarrSyoyouKeikakus
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//primaryに該当する所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
-
-					//ここも場合分け
-
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
-
 					if(isset($Product[0])){//'primary_p' => 1（primaryに該当する場合）
 						$arrSyoyouKeikakus[] = [
 							'product_code' => $SyoyouKeikakus[$k]["product_code"],
@@ -841,12 +484,12 @@ class ApisController extends AppController
 
 //arrSyoyouKeikakusここまで
 //ここからarrSeisans
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//primaryに該当する生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
 				'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -855,11 +498,7 @@ class ApisController extends AppController
 				$_SESSION['zaikoarrSeisans'] = array();
 
 					for($k=0; $k<count($KadouSeikeis); $k++){
-
-						//ここも場合分け
-
 						$Product = $this->Products->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
-
 						if(isset($Product[0])){//'primary_p' => 1（primaryに該当する場合）
 							$_SESSION['zaikoarrSeisans'] = $arrSeisans;
 							$apizaikoprogram = new apizaikoprogram();
@@ -870,16 +509,15 @@ class ApisController extends AppController
 					$session = $this->request->getSession();
 					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//primaryに該当する仕入れ数の呼出
 					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
 					->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 
 						$Product = $this->Products->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
-
 						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'outsource_handy_id' => $StockInoutWorklogs[$k]["outsource_code"], 'status' => 0, 'delete_flag' => 0])->toArray();
 
 						if(isset($Product[0]) && !isset($NonKadouSeikeis[0])){//primaryに該当するかつNonKadouSeikeisではない場合
@@ -924,12 +562,10 @@ class ApisController extends AppController
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 						'OR' => [['customer_code like' => '2%']]])//productsの絞込みprimary_dnp
 						->order(["date_deliver"=>"ASC"])->toArray();
-
 						if(isset($OrderEdisAssemble[0])){
 							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
 							$irisu = $Konpou[0]->irisu;//製品の入数を取得
@@ -944,12 +580,12 @@ class ApisController extends AppController
 				}
 
 //arrAssembleProductsここまで
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['customer_code like' => '2%']]])//productsの絞込みprimary_dnp
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
@@ -998,11 +634,11 @@ class ApisController extends AppController
 				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/*
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast])
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -1020,11 +656,11 @@ class ApisController extends AppController
 					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替えクラスを使用
 
 //arrStockProductsここまで
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
@@ -1053,11 +689,11 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);
 
 //arrSyoyouKeikakusここまで
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -1078,11 +714,11 @@ class ApisController extends AppController
 					$session = $this->request->getSession();
 					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code like' => '2%'])->toArray();//productsの絞込みprimary_dnp
@@ -1128,12 +764,10 @@ class ApisController extends AppController
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
 						'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 						->order(["date_deliver"=>"ASC"])->toArray();
-
 						if(isset($OrderEdisAssemble[0])){
 							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
 							$irisu = $Konpou[0]->irisu;//製品の入数を取得
@@ -1148,21 +782,19 @@ class ApisController extends AppController
 				}
 
 //arrAssembleProductsここまで
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
 
 				for($k=0; $k<count($OrderEdis); $k++){
-
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_w
-
 					if(isset($Product[0])){
 						$product_name = $Product[0]->product_name;
 						$riron_check = 0;
@@ -1204,12 +836,12 @@ class ApisController extends AppController
 				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/*
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -1228,12 +860,12 @@ class ApisController extends AppController
 					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替えクラスを使用
 
 //arrStockProductsここまで
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0, 'primary_p' => 1])->toArray();//productsの絞込み　primary
@@ -1262,12 +894,12 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);
 
 //arrSyoyouKeikakusここまで
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -1288,12 +920,12 @@ class ApisController extends AppController
 					$session = $this->request->getSession();
 					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みprimary_w
 					->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'primary_p' => 1, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_w
@@ -1339,12 +971,10 @@ class ApisController extends AppController
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
 						'OR' => [['product_code like' => 'H%']]])//productsの絞込みprimary_h
 						->order(["date_deliver"=>"ASC"])->toArray();
-
 						if(isset($OrderEdisAssemble[0])){
 							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
 							$irisu = $Konpou[0]->irisu;//製品の入数を取得
@@ -1359,21 +989,19 @@ class ApisController extends AppController
 				}
 
 //arrAssembleProductsここまで
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
 				'OR' => [['product_code like' => 'H%']]])//productsの絞込みprimary_h
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
 
 				for($k=0; $k<count($OrderEdis); $k++){
-
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_h
-
 					if(isset($Product[0])){
 						$product_name = $Product[0]->product_name;
 						$riron_check = 0;
@@ -1415,12 +1043,12 @@ class ApisController extends AppController
 				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/*
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast,
 				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -1438,12 +1066,12 @@ class ApisController extends AppController
 					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替えクラスを使用
 
 //arrStockProductsここまで
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込み　primary
@@ -1472,12 +1100,12 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);
 
 //arrSyoyouKeikakusここまで
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
 				'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -1498,12 +1126,12 @@ class ApisController extends AppController
 					$session = $this->request->getSession();
 					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => ['product_code like' => 'H%']])//productsの絞込みprimary_h
 					->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みprimary_h
@@ -1548,12 +1176,10 @@ class ApisController extends AppController
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 						'OR' => [['customer_code' => '10005']]])//productsの絞込みreizouko
 						->order(["date_deliver"=>"ASC"])->toArray();
-
 						if(isset($OrderEdisAssemble[0])){
 							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
 							$irisu = $Konpou[0]->irisu;//製品の入数を取得
@@ -1568,21 +1194,19 @@ class ApisController extends AppController
 				}
 
 //arrAssembleProductsここまで
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['customer_code' => '10005']]])//productsの絞込みreizouko
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
 
 				for($k=0; $k<count($OrderEdis); $k++){
-
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10005'])->toArray();//productsの絞込みreizouko
-
 					if(isset($Product[0])){
 						$product_name = $Product[0]->product_name;
 						$riron_check = 0;
@@ -1624,11 +1248,11 @@ class ApisController extends AppController
 				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/*
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast])
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -1646,11 +1270,11 @@ class ApisController extends AppController
 					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替えクラスを使用
 
 //arrStockProductsここまで
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込み　primary
@@ -1679,11 +1303,11 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);
 
 //arrSyoyouKeikakusここまで
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -1704,11 +1328,11 @@ class ApisController extends AppController
 					$session = $this->request->getSession();
 					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10005'])->toArray();//productsの絞込みreizouko
@@ -1753,12 +1377,10 @@ class ApisController extends AppController
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 						'OR' => [['customer_code' => '10003']]])//productsの絞込みuwawaku
 						->order(["date_deliver"=>"ASC"])->toArray();
-
 						if(isset($OrderEdisAssemble[0])){
 							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
 							$irisu = $Konpou[0]->irisu;//製品の入数を取得
@@ -1773,21 +1395,19 @@ class ApisController extends AppController
 				}
 
 //arrAssembleProductsここまで
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['customer_code' => '10003']]])//productsの絞込みuwawaku
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
 
 				for($k=0; $k<count($OrderEdis); $k++){
-
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10003'])->toArray();//productsの絞込みuwawaku
-
 					if(isset($Product[0])){
 						$product_name = $Product[0]->product_name;
 						$riron_check = 0;
@@ -1829,11 +1449,11 @@ class ApisController extends AppController
 				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/*
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast])
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -1851,11 +1471,11 @@ class ApisController extends AppController
 					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替えクラスを使用
 
 //arrStockProductsここまで
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込み　primary
@@ -1884,11 +1504,11 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);
 
 //arrSyoyouKeikakusここまで
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -1909,11 +1529,11 @@ class ApisController extends AppController
 					$session = $this->request->getSession();
 					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10003'])->toArray();//productsの絞込みuwawaku
@@ -1959,11 +1579,9 @@ class ApisController extends AppController
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
 						->order(["date_deliver"=>"ASC"])->toArray();
-
 						if(isset($OrderEdisAssemble[0])){
 							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
 							$irisu = $Konpou[0]->irisu;//製品の入数を取得
@@ -1978,21 +1596,19 @@ class ApisController extends AppController
 				}
 
 //arrAssembleProductsここまで
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
 
 				for($k=0; $k<count($OrderEdis); $k++){
-
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
 					->toArray();//productsの絞込みother
-
 					if(isset($Product[0])){
 						$product_name = $Product[0]->product_name;
 						$riron_check = 0;
@@ -2034,11 +1650,11 @@ class ApisController extends AppController
 				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/*
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast])
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -2057,11 +1673,11 @@ class ApisController extends AppController
 					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替えクラスを使用
 
 //arrStockProductsここまで
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込み　primary
@@ -2090,11 +1706,11 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);
 
 //arrSyoyouKeikakusここまで
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -2116,11 +1732,11 @@ class ApisController extends AppController
 					$session = $this->request->getSession();
 					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'AND' => [['customer_code not like' => '1%'], ['customer_code not like' => '2%']]])//productsの絞込みother
@@ -2167,12 +1783,10 @@ class ApisController extends AppController
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'delete_flag' => 0, 'customer_code' => '10001',
 						'OR' => [['product_code like' => 'P0%']]])//productsの絞込みp0
 						->order(["date_deliver"=>"ASC"])->toArray();
-
 						if(isset($OrderEdisAssemble[0])){
 							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
 							$irisu = $Konpou[0]->irisu;//製品の入数を取得
@@ -2187,21 +1801,19 @@ class ApisController extends AppController
 				}
 
 //arrAssembleProductsここまで
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10001',
 				'OR' => [['product_code like' => 'P0%']]])//productsの絞込みp0
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
 
 				for($k=0; $k<count($OrderEdis); $k++){
-
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
-
 					if(isset($Product[0])){
 						$product_name = $Product[0]->product_name;
 						$riron_check = 0;
@@ -2243,12 +1855,12 @@ class ApisController extends AppController
 				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/*
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast,
 				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -2266,12 +1878,12 @@ class ApisController extends AppController
 					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替えクラスを使用
 
 //arrStockProductsここまで
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込み　primary
@@ -2300,12 +1912,12 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);
 
 //arrSyoyouKeikakusここまで
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
 				'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -2326,12 +1938,12 @@ class ApisController extends AppController
 					$session = $this->request->getSession();
 					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => ['product_code like' => 'P0%']])//productsの絞込みp0
 					->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp0
@@ -2377,12 +1989,10 @@ class ApisController extends AppController
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10001',
 						'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 						->order(["date_deliver"=>"ASC"])->toArray();
-
 						if(isset($OrderEdisAssemble[0])){
 							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
 							$irisu = $Konpou[0]->irisu;//製品の入数を取得
@@ -2397,21 +2007,19 @@ class ApisController extends AppController
 				}
 
 //arrAssembleProductsここまで
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10001',
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
 
 				for($k=0; $k<count($OrderEdis); $k++){
-
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp1
-
 					if(isset($Product[0])){
 						$product_name = $Product[0]->product_name;
 						$riron_check = 0;
@@ -2453,12 +2061,12 @@ class ApisController extends AppController
 				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/*
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast,
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -2476,12 +2084,12 @@ class ApisController extends AppController
 					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替えクラスを使用
 
 //arrStockProductsここまで
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込み　primary
@@ -2510,12 +2118,12 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);
 
 //arrSyoyouKeikakusここまで
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
 				'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -2536,12 +2144,12 @@ class ApisController extends AppController
 					$session = $this->request->getSession();
 					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'P1%'], ['product_code like' => 'P2%']]])//productsの絞込みp1
 					->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10001'])->toArray();//productsの絞込みp1
@@ -2587,12 +2195,10 @@ class ApisController extends AppController
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
 						'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 						->order(["date_deliver"=>"ASC"])->toArray();
-
 						if(isset($OrderEdisAssemble[0])){
 							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
 							$irisu = $Konpou[0]->irisu;//製品の入数を取得
@@ -2607,21 +2213,19 @@ class ApisController extends AppController
 				}
 
 //arrAssembleProductsここまで
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0, 'customer_code' => '10002',
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
 
 				for($k=0; $k<count($OrderEdis); $k++){
-
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
-
 					if(isset($Product[0])){
 						$product_name = $Product[0]->product_name;
 						$riron_check = 0;
@@ -2663,12 +2267,12 @@ class ApisController extends AppController
 				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/*
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -2686,12 +2290,12 @@ class ApisController extends AppController
 					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替えクラスを使用
 
 //arrStockProductsここまで
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込み　primary
@@ -2720,12 +2324,12 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);
 
 //arrSyoyouKeikakusここまで
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
 				'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -2746,12 +2350,12 @@ class ApisController extends AppController
 					$session = $this->request->getSession();
 					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 					'OR' => [['product_code like' => 'W%'], ['product_code like' => 'AW%']]])//productsの絞込みw
 					->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code' => '10002'])->toArray();//productsの絞込みw
@@ -2797,12 +2401,10 @@ class ApisController extends AppController
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 						'OR' => [['customer_code like' => '2%']]])//productsの絞込みdnp
 						->order(["date_deliver"=>"ASC"])->toArray();
-
 						if(isset($OrderEdisAssemble[0])){
 							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
 							$irisu = $Konpou[0]->irisu;//製品の入数を取得
@@ -2817,21 +2419,19 @@ class ApisController extends AppController
 				}
 
 //arrAssembleProductsここまで
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['customer_code like' => '2%']]])//productsの絞込みdnp
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
 
 				for($k=0; $k<count($OrderEdis); $k++){
-
 					$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 					->where(['product_code' => $OrderEdis[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
-
 					if(isset($Product[0])){
 						$product_name = $Product[0]->product_name;
 						$riron_check = 0;
@@ -2873,11 +2473,11 @@ class ApisController extends AppController
 				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/*
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast])
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
@@ -2895,11 +2495,11 @@ class ApisController extends AppController
 					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替えクラスを使用
 
 //arrStockProductsここまで
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0])
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込み　primary
@@ -2928,11 +2528,11 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);
 
 //arrSyoyouKeikakusここまで
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin])
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -2953,11 +2553,11 @@ class ApisController extends AppController
 					$session = $this->request->getSession();
 					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22])
 					->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 						$Product = $this->Products->find()->contain(["Customers"])//ProductsテーブルとCustomersテーブルを関連付ける
 						->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'products.status' => 0, 'customer_code like' => '2%'])->toArray();//productsの絞込みdnp
@@ -3003,12 +2603,10 @@ class ApisController extends AppController
 				for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){//重複を削除したarrResultZensuHeadsmotoに対して
 					$AssembleProducts = $this->AssembleProducts->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'self_assemble' => 1, 'status_self_assemble' => 0])->toArray();
 					if(isset($AssembleProducts[0])){//AssembleProductsが存在する場合//組立品の場合
-
 						$OrderEdisAssemble = $this->OrderEdis->find()//注文呼び出し
 						->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"], 'date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 						'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 						->order(["date_deliver"=>"ASC"])->toArray();
-
 						if(isset($OrderEdisAssemble[0])){
 							$Konpou = $this->Konpous->find()->where(['product_code' => $arrResultZensuHeadsmoto[$l]["product_code"]])->toArray();
 							$irisu = $Konpou[0]->irisu;//製品の入数を取得
@@ -3023,20 +2621,18 @@ class ApisController extends AppController
 				}
 
 //arrAssembleProductsここまで
-/*
+
 				$OrderEdis = $this->OrderEdis->find()//注文呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrOrderEdis = array();
 				$RironStockProducts = $this->RironStockProducts->find()->select('product_code')
 				->where(['date_culc' => $date16])->toArray();
 
 				for($k=0; $k<count($OrderEdis); $k++){
-
 					$Product = $this->Products->find()->where(['product_code' => $OrderEdis[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込みsinsei
-
 					if(isset($Product[0])){
 						$product_name = $Product[0]->product_name;
 						$riron_check = 0;
@@ -3078,12 +2674,12 @@ class ApisController extends AppController
 				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
 
 //arrOrderEdisここまで
-/*
+
 				$StockProducts = $this->StockProducts->find()//月末在庫呼び出し
 				->where(['date_stock' => $datebacklast,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_stock"=>"DESC"])->toArray();
-*/
+
 					$arrStockProducts = array();
 					for($k=0; $k<count($StockProducts); $k++){
 						$Product = $this->Products->find()->where(['product_code' => $StockProducts[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込みsinsei
@@ -3100,12 +2696,12 @@ class ApisController extends AppController
 					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替えクラスを使用
 
 //arrStockProductsここまで
-/*
+
 				$SyoyouKeikakus = $this->SyoyouKeikakus->find()//所要計画呼び出し
 				->where(['date_deliver >=' => $date1, 'date_deliver <=' => $datelast, 'delete_flag' => 0,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_deliver"=>"ASC"])->toArray();
-*/
+
 				$arrSyoyouKeikakus = array();
 				for($k=0; $k<count($SyoyouKeikakus); $k++){
 					$Product = $this->Products->find()->where(['product_code' => $SyoyouKeikakus[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込み　primary
@@ -3134,12 +2730,12 @@ class ApisController extends AppController
 				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);
 
 //arrSyoyouKeikakusここまで
-/*
+
 				$KadouSeikeis = $this->KadouSeikeis->find()//生産数呼び出し
 				->where(['starting_tm >=' => $daystart, 'starting_tm <=' => $dayfin,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["starting_tm"=>"ASC"])->toArray();
-*/
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
@@ -3159,12 +2755,12 @@ class ApisController extends AppController
 				$session = $this->request->getSession();
 				$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
 				$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
+
 				$StockInoutWorklogs = $this->StockInoutWorklogs->find()//仕入れ数の呼出
 				->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
 				'OR' => [['product_code like' => 'W0602%'], ['product_code like' => 'P160K%'], ['product_code like' => 'P12%']]])//productsの絞込みsinsei
 				->order(["date_work"=>"ASC"])->toArray();
-*/
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 						$Product = $this->Products->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'status' => 0])->toArray();//productsの絞込みsinsei
 						$NonKadouSeikeis = $this->NonKadouSeikeis->find()->where(['product_code' => $StockInoutWorklogs[$k]["product_code"], 'outsource_handy_id' => $StockInoutWorklogs[$k]["outsource_code"], 'status' => 0, 'delete_flag' => 0])->toArray();

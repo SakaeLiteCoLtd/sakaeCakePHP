@@ -93,7 +93,7 @@ class apizaikoprogram extends AppController
 
    $arrAssembleProducts = array();//ここから組立品
    $ResultZensuHeads = $this->ResultZensuHeads->find()//組立品の元データを配列として出しておく（ループで取り出すと時間がかかる）
-   ->where(['datetime_finish >=' => $date1." 00:00:00", 'datetime_finish <' => $datenext1." 00:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
+   ->where(['datetime_finish >=' => $date1." 08:00:00", 'datetime_finish <' => $datenext1." 08:00:00", 'count_inspection' => 1, 'delete_flag' => 0])
    ->order(["datetime_finish"=>"DESC"])->toArray();
 
    $arrResultZensuHeadsmoto = array();

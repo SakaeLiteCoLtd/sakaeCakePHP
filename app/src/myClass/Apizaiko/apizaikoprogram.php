@@ -25,7 +25,7 @@ class apizaikoprogram extends AppController
         $this->LabelSetikkatsues = TableRegistry::get('labelSetikkatsues');
     }
 
-    public function classProductsmototarget($date16)//ターゲット日以降
+    public function classProductsmototarget()//ターゲット日以降
    {
      $arrProducts = $_SESSION['zaikoarrProductstarget'];
 
@@ -40,7 +40,8 @@ class apizaikoprogram extends AppController
          'price' => "",
          'date_deliver' => "",
          'amount' => "",
-         'denpyoumaisu' => ""
+         'denpyoumaisu' => "",
+         'riron_zaiko_check' => 0
       ];
 
      }
@@ -49,9 +50,10 @@ class apizaikoprogram extends AppController
 
    }
 
-   public function classProductsmoto($date16)
+   public function classProductsmoto($sheet_date)
   {
-    $arrProducts = $_SESSION['zaikoarrProducts'];
+    $date16 = $_SESSION['date16'.$sheet_date];
+    $arrProducts = $_SESSION['zaikoarrProducts'.$sheet_date];
 
     $arrProductsmoto = array();//対象の製品全部の器を作っておく（OrderEdisに存在しないものも表示するため）
 
@@ -134,9 +136,10 @@ class apizaikoprogram extends AppController
 
  }
 
- public function classOrderEdis($arrOrderEdismoto)//arrOrderEdisの並び替え
+ public function classOrderEdis($sheet_date)//arrOrderEdisの並び替え
  {
-   $arrProductsmoto = $_SESSION['zaikoarrProductsmoto'];
+   $arrProductsmoto = $_SESSION['zaikoarrProductsmoto'.$sheet_date];
+   $arrOrderEdismoto = $_SESSION['zaikoarrOrderEdismoto'.$sheet_date];
 
    $countmax = count($arrOrderEdismoto);
    //同一のproduct_code、date_deliverの注文は一つにまとめ、amountとdenpyoumaisuを更新
@@ -173,8 +176,10 @@ class apizaikoprogram extends AppController
     return $arrOrderEdis;
  }
 
-  public function classStockProducts($arrStockProductsmoto)//StockProductsの並び替え
+  public function classStockProducts($sheet_date)//StockProductsの並び替え
   {
+    $arrStockProductsmoto = $_SESSION['zaikoarrStockProductsmoto'.$sheet_date];
+
     $tmp_product_array = array();
     $tmp_date_stock_array = array();
     foreach($arrStockProductsmoto as $key => $row ) {
@@ -191,8 +196,10 @@ class apizaikoprogram extends AppController
      return $arrStockProducts;
   }
 
-  public function classSyoyouKeikakus($arrSyoyouKeikakusmoto)//並べかえ
+  public function classSyoyouKeikakus($sheet_date)//並べかえ
   {
+    $arrSyoyouKeikakusmoto = $_SESSION['zaikoarrSyoyouKeikakusmoto'.$sheet_date];
+
     $tmp_product_array = array();
     $tmp_date_deliver_array = array();
     foreach($arrSyoyouKeikakusmoto as $key => $row ) {
@@ -209,8 +216,10 @@ class apizaikoprogram extends AppController
      return $arrSyoyouKeikakus;
   }
 
-  public function classSeisans($arrSeisansmoto)//並べかえ
+  public function classSeisans($sheet_date)//並べかえ
   {
+    $arrSeisansmoto = $_SESSION['zaikoarrSeisansmoto'.$sheet_date];
+
     $tmp_product_array2 = array();
     $tmp_dateseikei_array = array();
     foreach($arrSeisansmoto as $key => $row ) {
@@ -227,10 +236,14 @@ class apizaikoprogram extends AppController
      return $arrSeisans;
   }
 
-  public function classSeisanskadou($k)
+  public function classSeisanskadou($num_sheet_date)
   {
-    $KadouSeikeis = $_SESSION['zaikoKadouSeikeis'];
-    $arrSeisans = $_SESSION['zaikoarrSeisans'];
+    $arrnum_sheet_date = explode("~",$num_sheet_date);
+    $k = $arrnum_sheet_date[0];
+    $sheet_date = $arrnum_sheet_date[1];
+
+    $KadouSeikeis = $_SESSION['zaikoKadouSeikeis'.$sheet_date];
+    $arrSeisans = $_SESSION['zaikoarrSeisans'.$sheet_date];
 
     $Katakouzous = $this->Katakouzous->find()->where(['product_code' => $KadouSeikeis[$k]["product_code"]])->toArray();
 

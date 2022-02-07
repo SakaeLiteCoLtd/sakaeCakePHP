@@ -276,6 +276,7 @@ class ApisController extends AppController
 
 		//http://192.168.4.246/Apis/zaikocyou/api/2020-10_primary.xml
 		//http://localhost:5000/Apis/zaikocyou/api/2020-10_primary.xml
+		//http://localhost:5000/Apis/zaikocyou/api/2021-10-15_primary.xml
 		public function zaikocyou()
 		{
 			$data = Router::reverse($this->request, false);//urlを取得
@@ -293,24 +294,52 @@ class ApisController extends AppController
 			$todaySyoyouKeikakus = date('Y-m-d');
 			$this->SyoyouKeikakus->deleteAll(['date_deliver <' => $todaySyoyouKeikakus]);//当日の前日までの所要計画のデータは削除する
 
-			$date1 = $day."-1";//選択した月の初日
-			$date1st = strtotime($date1);
-			$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
-			$datelast = strtotime($datenext1);
-			$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
-			$dateback1 = date('Y-m-d', strtotime('-1 month', $date1st));//選択した月の前の月の初日
-			$dateback = strtotime($dateback1);
-			$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
-			$date16 = $day."-16";
+			$arrday = explode("-",$day);
+/*
+			echo "<pre>";
+			print_r(count($arrday));
+			echo "</pre>";
+*/
+			if(count($arrday) == 2){//「在庫表示」ボタン
 
-			$daystart = $date1." 08:00:00";
-			$dayfin = $datenext1." 07:59:59";
+				$date1 = $day."-1";//選択した月の初日
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+1 month', $date1st));//選択した月の次の月の初日
+				$datelast = strtotime($datenext1);
+				$datelast = date('Y-m-d', strtotime('-1 day', $datelast));//選択した月の最後の日
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した月の前の月の最後の日
+				$date16 = $day."-16";
+
+				$daystart = $date1." 08:00:00";
+				$dayfin = $datenext1." 07:59:59";
+
+			}else{//「ターゲット日以降」ボタン
+
+				$arryaermonth = explode("-",$dayarr[0]);
+				$yaermonth = $arryaermonth[0]."-".$arryaermonth[1];
+
+				$datestartstr = strtotime($day);
+
+				$date1 = $day;//選択した日程
+				$date1st = strtotime($date1);
+				$datenext1 = date('Y-m-d', strtotime('+31 day', $datestartstr));//選択した日の31日後
+				$datelast = strtotime($datenext1);
+				$dateendnext = date('Y-m-d', strtotime('+32 day', $datestartstr));//選択した日の32日後
+				$datebacklast = date('Y-m-d', strtotime('-1 day', $date1st));//選択した日の前日
+				$date16 = $yaermonth."-16";
+
+				$daystart = $day." 08:00:00";
+				$dayfin = $dateendnext." 07:59:59";
+
+			}
 
 			$arrOrderEdis = array();
 			$arrStockProducts = array();
 			$arrAssembleProducts = array();
 			$arrSyoyouKeikakus = array();
 			$arrSeisans = array();
+
+			$sheet_date = $sheet."_".$day;//配列名のかぶりを防ぐため
 
 			if($sheet === "primary"){
 
@@ -663,17 +692,27 @@ class ApisController extends AppController
 
 			}
 
+			if(count($arrday) == 3){//ターゲット日以降の場合
+				$StockProducts = $this->RironStockProducts->find()//月末在庫呼び出し
+				->where(['date_culc' => $day])
+				->order(["date_culc"=>"ASC"])->toArray();
+			}
+
 				if(!isset($_SESSION)){
 				session_start();
 				}
-				$_SESSION['zaikoarrProducts'] = array();
-				$_SESSION['zaikoarrProducts'] = $arrProducts;//クラスで使用するためセッションとして定義する
+				$_SESSION['date16'.$sheet_date] = array();
+				$_SESSION['date16'.$sheet_date] = $date16;
+
+				$_SESSION['zaikoarrProducts'.$sheet_date] = array();
+				$_SESSION['zaikoarrProducts'.$sheet_date] = $arrProducts;//クラスで使用するためセッションとして定義する
 
 				$apizaikoprogram = new apizaikoprogram();
-				$arrProductsmoto = $apizaikoprogram->classProductsmoto($date16);//RironStockProductsに登録されているかチェック
+				$arrProductsmoto = $apizaikoprogram->classProductsmoto($sheet_date);//RironStockProductsに登録されているかチェック
 
 				$session = $this->request->getSession();
-				$session->delete('zaikoarrProducts');//指定のセッションを削除
+				$session->delete('date16'.$sheet_date);//指定のセッションを削除
+				$session->delete('zaikoarrProducts'.$sheet_date);//指定のセッションを削除
 
 //ここからarrAssembleProducts
 
@@ -895,15 +934,17 @@ class ApisController extends AppController
 				if(!isset($_SESSION)){
 				session_start();
 				}
-				$_SESSION['zaikoarrProductsmoto'] = array();
-				$_SESSION['zaikoarrProductsmoto'] = $arrProductsmoto;
+				$_SESSION['zaikoarrProductsmoto'.$sheet_date] = array();
+				$_SESSION['zaikoarrProductsmoto'.$sheet_date] = $arrProductsmoto;
+				$_SESSION['zaikoarrOrderEdismoto'.$sheet_date] = array();
+				$_SESSION['zaikoarrOrderEdismoto'.$sheet_date] = $arrOrderEdis;
 
-				$arrOrderEdismoto = $arrOrderEdis;
 				$apizaikoprogram = new apizaikoprogram();
-				$arrOrderEdis = $apizaikoprogram->classOrderEdis($arrOrderEdismoto);//arrOrderEdisの作成用クラス
+				$arrOrderEdis = $apizaikoprogram->classOrderEdis($sheet_date);//arrOrderEdisの作成用クラス
 
 				$session = $this->request->getSession();
-				$session->delete('zaikoarrProductsmoto');//指定のセッションを削除
+				$session->delete('zaikoarrProductsmoto'.$sheet_date);//指定のセッションを削除
+				$session->delete('zaikoarrOrderEdismoto'.$sheet_date);//指定のセッションを削除
 
 //arrOrderEdisここまで
 //ここからarrStockProducts
@@ -981,9 +1022,18 @@ class ApisController extends AppController
 						 ];
 						}
 					}
-					$arrStockProductsmoto = $arrStockProducts;
+
+					if(!isset($_SESSION)){
+					session_start();
+					}
+					$_SESSION['zaikoarrStockProductsmoto'.$sheet_date] = array();
+					$_SESSION['zaikoarrStockProductsmoto'.$sheet_date] = $arrStockProducts;
+
 					$apizaikoprogram = new apizaikoprogram();
-					$arrStockProducts = $apizaikoprogram->classStockProducts($arrStockProductsmoto);//データの並び替え
+					$arrStockProducts = $apizaikoprogram->classStockProducts($sheet_date);//データの並び替え
+
+					$session = $this->request->getSession();
+					$session->delete('zaikoarrStockProductsmoto'.$sheet_date);//指定のセッションを削除
 
 //arrStockProductsここまで
 //ここからarrSyoyouKeikakus
@@ -1022,9 +1072,17 @@ class ApisController extends AppController
 					}
 				}
 
-				$arrSyoyouKeikakusmoto = $arrSyoyouKeikakus;
+				if(!isset($_SESSION)){
+				session_start();
+				}
+				$_SESSION['zaikoarrSyoyouKeikakusmoto'.$sheet_date] = array();
+				$_SESSION['zaikoarrSyoyouKeikakusmoto'.$sheet_date] = $arrSyoyouKeikakus;
+
 				$apizaikoprogram = new apizaikoprogram();
-				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($arrSyoyouKeikakusmoto);//データの並び替え
+				$arrSyoyouKeikakus = $apizaikoprogram->classSyoyouKeikakus($sheet_date);//データの並び替え
+
+				$session = $this->request->getSession();
+				$session->delete('zaikoarrSyoyouKeikakusmoto'.$sheet_date);//指定のセッションを削除
 
 //arrSyoyouKeikakusここまで
 //ここからarrSeisans
@@ -1032,9 +1090,9 @@ class ApisController extends AppController
 				if(!isset($_SESSION)){
 				session_start();
 				}
-				$_SESSION['zaikoKadouSeikeis'] = array();
-				$_SESSION['zaikoKadouSeikeis'] = $KadouSeikeis;
-				$_SESSION['zaikoarrSeisans'] = array();
+				$_SESSION['zaikoKadouSeikeis'.$sheet_date] = array();
+				$_SESSION['zaikoKadouSeikeis'.$sheet_date] = $KadouSeikeis;
+				$_SESSION['zaikoarrSeisans'.$sheet_date] = array();
 
 					for($k=0; $k<count($KadouSeikeis); $k++){
 
@@ -1101,21 +1159,17 @@ class ApisController extends AppController
 						}
 
 						if(isset($Product[0])){//'primary_p' => 1（primaryに該当する場合）
-							$_SESSION['zaikoarrSeisans'] = $arrSeisans;
+							$_SESSION['zaikoarrSeisans'.$sheet_date] = $arrSeisans;
 							$apizaikoprogram = new apizaikoprogram();
-							$arrSeisans = $apizaikoprogram->classSeisanskadou($k);//arrSeisans配列にデータを追加
+							$num_sheet_date = $k."~".$sheet_date;
+							$arrSeisans = $apizaikoprogram->classSeisanskadou($num_sheet_date);//arrSeisans配列にデータを追加
 						}
 					}
 
 					$session = $this->request->getSession();
-					$session->delete('zaikoKadouSeikeis');//指定のセッションを削除
-					$session->delete('zaikoarrSeisans');//指定のセッションを削除
-/*
-					$StockInoutWorklogs = $this->StockInoutWorklogs->find()//primaryに該当する仕入れ数の呼出
-					->where(['date_work >=' => $date1, 'date_work <=' => $datenext1, 'outsource_code !=' => 22,
-					'OR' => [['product_code like' => 'P%'], ['product_code like' => 'AR%']]])
-					->order(["date_work"=>"ASC"])->toArray();
-*/
+					$session->delete('zaikoKadouSeikeis'.$sheet_date);//指定のセッションを削除
+					$session->delete('zaikoarrSeisans'.$sheet_date);//指定のセッションを削除
+
 					for($k=0; $k<count($StockInoutWorklogs); $k++){
 
 						//シートごとに場合分け
@@ -1193,38 +1247,24 @@ class ApisController extends AppController
 
 					}
 
-					$arrSeisansmoto = $arrSeisans;
+					if(!isset($_SESSION)){
+					session_start();
+					}
+					$_SESSION['zaikoarrSeisansmoto'.$sheet_date] = array();
+					$_SESSION['zaikoarrSeisansmoto'.$sheet_date] = $arrSeisans;
+
 					$apizaikoprogram = new apizaikoprogram();
-					$arrSeisans = $apizaikoprogram->classSeisans($arrSeisansmoto);//データの並び替え
+					$arrSeisans = $apizaikoprogram->classSeisans($sheet_date);//データの並び替え
+
+					$session = $this->request->getSession();
+					$session->delete('zaikoarrSeisansmoto'.$sheet_date);//指定のセッションを削除
 
 //arrSeisansここまで
-
-/*//内容表示テスト
-				$arrOrderEdis2 = array();
-				$arrStockProducts2 = array();
-				$arrAssembleProducts2 = array();
-				$arrSyoyouKeikakus2 = array();
-				$arrSeisans2 = array();
-
-				for($k=0; $k<10; $k++){
-					if(isset($arrOrderEdis[$k])){
-						$arrOrderEdis2[] = $arrOrderEdis[$k];
-					}
-					if(isset($arrStockProducts[$k])){
-						$arrStockProducts2[] = $arrStockProducts[$k];
-					}
-					if(isset($arrAssembleProducts[$k])){
-						$arrAssembleProducts2[] = $arrAssembleProducts[$k];
-					}
-					if(isset($arrSyoyouKeikakus[$k])){
-						$arrSyoyouKeikakus2[] = $arrSyoyouKeikakus[$k];
-					}
-					if(isset($arrSeisans[$k])){
-						$arrSeisans2[] = $arrSeisans[$k];
-					}
-				}
+/*
+echo "<pre>";
+print_r($_SESSION);
+echo "</pre>";
 */
-
 			$this->set([
 				'OrderEdis' => $arrOrderEdis,
 				'StockProducts' => $arrStockProducts,

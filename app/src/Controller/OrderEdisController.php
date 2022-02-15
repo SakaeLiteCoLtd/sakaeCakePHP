@@ -919,7 +919,7 @@ class OrderEdisController extends AppController
             $arrDenpyouDnpMinoukannous = array_values($arrDenpyouDnpMinoukannous);//添え字の振り直し
 /*
             echo "<pre>";
-            print_r("DenpyouDnpMinoukannous2");
+            print_r("DenpyouDnpMinoukannous");
             print_r($arrDenpyouDnpMinoukannous);
             echo "</pre>";
 */
@@ -1157,6 +1157,7 @@ class OrderEdisController extends AppController
                 'product_code' => $uniquearrDnpTotalAmounts[$k]['product_code'],
                 'num_order' => $uniquearrDnpTotalAmounts[$k]['num_order'],
                 'name_order' => $uniquearrDnpTotalAmounts[$k]['name_order'],
+                'line_code' => $uniquearrDnpTotalAmounts[$k]['line_code'],
                 'delete_flag' => $uniquearrDnpTotalAmounts[$k]['delete_flag']])->toArray();
 
                 if(isset($DnpTotalAmountscheck[0])){

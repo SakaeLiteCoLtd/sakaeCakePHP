@@ -22,10 +22,47 @@ class GenryousController extends AppController
 		 $this->ScheduleKouteis = TableRegistry::get('scheduleKouteis');
 		 $this->Products = TableRegistry::get('products');
 		 $this->Customers = TableRegistry::get('customers');
+		 $this->ShotdataSensors = TableRegistry::get('shotdataSensors');
 		}
 
 		public function menu()
     {
+
+			$connection = ConnectionManager::get('big_DB');//big_DB参照
+
+			$datetime = "2022-02-15 15:36:00";
+			$ShotdataSensors = $this->ShotdataSensors->find()->where(['datetime' => "2022-02-15 15:36:00"])->toArray();
+
+	    $connection = ConnectionManager::get('default');//default参照
+
+			echo "<pre>";
+      print_r($ShotdataSensors);
+      echo "</pre>";
+
+/*
+			$connection = ConnectionManager::get('big_DB');//big_DB参照
+
+			$datetime = "2022-02-15 15:36:00";
+			$sql = "SELECT datetime,seikeiki,product_code,shot_cycle,flag_start_finish
+	    FROM shotdata_sensors".
+	    " where datetime = '".$datetime."' order by datetime asc";
+
+			$connection = ConnectionManager::get('default');//default参照
+
+			echo "<pre>";
+      print_r($ShotdataSensors);
+      echo "</pre>";
+*/
+/*
+			$this->ShotdataSensors = TableRegistry::get('shotdata_sensors');
+			$ShotdataSensors = $this->ShotdataSensors->find()->where(['datetime' => "2022-02-15 15:36:00"])->toArray();
+
+			echo "<pre>";
+      print_r($ShotdataSensors);
+      echo "</pre>";
+
+			$connection = ConnectionManager::get('default');//新DBに戻る
+*/
 
 //			echo phpinfo();
 

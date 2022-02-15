@@ -147,7 +147,7 @@ class apizaikoprogram extends AppController
      for($m=$l+1; $m<$countmax; $m++){
        if(isset($arrOrderEdismoto[$m]["product_code"])){
          if($arrOrderEdismoto[$l]["product_code"] == $arrOrderEdismoto[$m]["product_code"] && $arrOrderEdismoto[$l]["date_deliver"] == $arrOrderEdismoto[$m]["date_deliver"]){
-           $amount = $arrOrderEdismoto[$l]["amount"] + $arrOrderEdismoto[$m]["amount"];
+           $amount = (int)$arrOrderEdismoto[$l]["amount"] + (int)$arrOrderEdismoto[$m]["amount"];
            $denpyoumaisu = $arrOrderEdismoto[$l]["denpyoumaisu"] + $arrOrderEdismoto[$m]["denpyoumaisu"];
            $arrOrderEdismoto[$l]["amount"] = $amount;
            $arrOrderEdismoto[$l]["denpyoumaisu"] = $denpyoumaisu;

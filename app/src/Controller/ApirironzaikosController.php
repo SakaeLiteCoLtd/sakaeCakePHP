@@ -12,6 +12,8 @@ use Cake\Utility\Text;
 use Cake\Routing\Router;//urlの取得
 use Cake\Http\Client;//httpの読取に必要
 
+use App\myClass\Apizaiko\apizaikoprogram;//myClassフォルダに配置したクラスを使用
+
 class ApirironzaikosController extends AppController
 	{
 
@@ -390,10 +392,12 @@ class ApirironzaikosController extends AppController
 			$dateminusstr = strtotime($dateminus);
 
 			if($urlarr[4] == "m-zaiko0-1.xml"){
+				$sheet_date = "m-zaiko0-1";
 				$dateminussta = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-m-d');
 				$dateminusstaminus = date('Y-m-d', strtotime('-2 day', $dateminusstr));
 				$dateminusfin = date('Y-m-d', strtotime('+7 day', $dateminusstr));
 			}else{
+				$sheet_date = "m-zaiko1-2";
 				$dateminussta = $MinusRironStockProducts[0]['date_riron_stock']->format('Y-m-d');
 				$dateminusstaminus = date('Y-m-d', strtotime('+8 day', $dateminusstr));
 				$dateminusfin = date('Y-m-d', strtotime('+14 day', $dateminusstr));
@@ -444,34 +448,9 @@ class ApirironzaikosController extends AppController
 
 //$arrResultZensuHeadsmotoスタート
 
-		$arrResultZensuHeadsmoto = array();
-		for($j=0; $j<count($arrProductsmoto); $j++){
-			$ResultZensuHeadsdatas = $this->ResultZensuHeads->find()//組立品の元データを出しておく（ループで取り出すと時間がかかる）
-			->where(['product_code' => $arrProductsmoto[$j]["product_code"], 'datetime_finish >=' => $datestart." 00:00:00", 'datetime_finish <' => $dateend." 00:00:00"])
-			->order(["datetime_finish"=>"DESC"])->toArray();
-			for($k=0; $k<count($ResultZensuHeadsdatas); $k++){
-				$arrResultZensuHeadsmoto[] = [
-					'product_code' => $ResultZensuHeadsdatas[$k]["product_code"],
-					'datetime_finish' => $ResultZensuHeadsdatas[$k]["datetime_finish"]->format('Y-m-d'),
-					'count' => 1
-			 ];
-			}
-		}
-		$countZensuHeadsmotomax = count($arrResultZensuHeadsmoto);
-
-	 //同一の$arrResultZensuHeadsmotoは一つにまとめ、countを更新
-	 for($l=0; $l<count($arrResultZensuHeadsmoto); $l++){
-		 for($m=$l+1; $m<$countZensuHeadsmotomax; $m++){
-			 if(isset($arrResultZensuHeadsmoto[$m]["product_code"])){
-				 if($arrResultZensuHeadsmoto[$l]["product_code"] == $arrResultZensuHeadsmoto[$m]["product_code"] && $arrResultZensuHeadsmoto[$l]["datetime_finish"] == $arrResultZensuHeadsmoto[$m]["datetime_finish"]){
-					 $count = $arrResultZensuHeadsmoto[$l]["count"] + $arrResultZensuHeadsmoto[$m]["count"];
-					 $arrResultZensuHeadsmoto[$l]["count"] = $count;
-					 unset($arrResultZensuHeadsmoto[$m]);
-				 }
-			 }
-		 }
-		 $arrResultZensuHeadsmoto = array_values($arrResultZensuHeadsmoto);
-		}
+		$date1_datenext1 = $datestart."_".$dateend;
+		$apizaikoprogram = new apizaikoprogram();
+		$arrResultZensuHeadsmoto = $apizaikoprogram->classResultZensuHeads($date1_datenext1);//ResultZensuHeadsからデータを取得
 
 //$arrResultZensuHeadsmoto完成
 //$arrAssembleProductsスタート
@@ -504,7 +483,8 @@ class ApirironzaikosController extends AppController
 				$OrderEdis = array();
 				for($j=0; $j<count($arrProductsmoto); $j++){
 					$OrderEdisdata = $this->OrderEdis->find()
-					->where(['product_code' => $arrProductsmoto[$j]["product_code"], 'date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0])->order(["date_deliver"=>"ASC"])->toArray();
+					->where(['product_code' => $arrProductsmoto[$j]["product_code"], 'date_deliver >=' => $datestart, 'date_deliver <=' => $dateend, 'delete_flag' => 0])
+					->order(["date_deliver"=>"ASC"])->toArray();
 					if(isset($OrderEdisdata[0])){
 						for($k=0; $k<count($OrderEdisdata); $k++){
 							$OrderEdis[] = [

@@ -2278,7 +2278,10 @@ class OrderEdisController extends AppController
             $table = TableRegistry::get('order_edi');
             $table->setConnection($connection);
 
-            $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' , updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";
+            $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."' ,
+             updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."'
+              and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."'
+               and line_code = '".$mikanline_code."'";
             $connection->execute($updater);
 
             $table = TableRegistry::get('order_dnp_kannous');
@@ -2368,7 +2371,11 @@ class OrderEdisController extends AppController
       $data = $session->read();
       $cnt = count($data);//配列（更新するカラム）の個数
       $p = 0;
-
+/*
+      echo "<pre>";
+      print_r($_SESSION['orderEdis']);
+      echo "</pre>";
+*/
       for($n=0; $n<=count($_SESSION['orderEdis'])+1; $n++){
         if(isset($_SESSION['orderEdis'][$n])){//$_SESSION['orderEdis'][$n]に$created_staffを追加
           $created_staff = array('created_staff'=>$this->Auth->user('staff_id'));
@@ -2390,11 +2397,13 @@ class OrderEdisController extends AppController
         $arrDenpyouDnpMinoukannousnew = array();
         $bunnnou = 0;
         for($n=0; $n<=count($_SESSION['orderEdis'])+100; $n++){
+
           if(isset($_SESSION['orderEdis'][$n]['id']) && ($_SESSION['orderEdis'][$n]['amount'] > 0)){//amount>0の時
             $bunnnou = $bunnnou + 1;//登録するものの$bunnnouを振り直し
 
             $arrOrderEdis = $this->OrderEdis->find()->where(['id' => $_SESSION['orderEdis'][$n]['id']])->toArray();
 
+            $amountmoto = $arrOrderEdis[0]->amount;
             $bunnnoumoto = $arrOrderEdis[0]->bunnou;
             $date_delivermoto = $arrOrderEdis[0]->date_deliver;
 
@@ -2417,7 +2426,6 @@ class OrderEdisController extends AppController
               $table = TableRegistry::get('order_edi');
               $table->setConnection($connection);
 
-//211130追加
               $delete_flg = 0;
               $sql = "SELECT bunnou,date_order,num_order FROM order_edi".
                     " where date_order ='".$mikandate_order."' and num_order = '".$mikannum_order."' and product_id = '".$mikanproduct_code."'
@@ -2435,22 +2443,26 @@ class OrderEdisController extends AppController
                 $order_edi_sonzai_check_count = $connection->execute($sql)->fetchAll('assoc');
 
                 $bunnnou = $order_edi_sonzai_check_count[0]["bunnou"] + 1;
-/*
-                echo "<pre>";
-                print_r("if ".$bunnnou);
-                echo "</pre>";
-*/
+
               }
 
-              $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."', amount = '".$newamount."', bunnou = '".$bunnnou."' , date_bunnou = '".date('Y-m-d')."' ,
-               updated_at = '".date('Y-m-d H:i:s')."' where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and bunnou = '".$bunnnoumoto."' and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";//もとのDBも更新
+              $updater = "UPDATE order_edi set date_deliver = '".$newdate_deliver."',
+               amount = '".$newamount."', bunnou = '".$bunnnou."' , date_bunnou = '".date('Y-m-d')."' ,
+               updated_at = '".date('Y-m-d H:i:s')."'
+                where product_id ='".$mikanproduct_code."'
+                and num_order = '".$mikannum_order."' and date_deliver = '".$date_delivermoto."'
+                 and amount = '".$amountmoto."'
+                 and date_order = '".$mikandate_order."' and line_code = '".$mikanline_code."'";//もとのDBも更新
               $connection->execute($updater);
 
               $table = TableRegistry::get('order_dnp_kannous');
               $table->setConnection($connection);
 
-              $updater = "UPDATE order_dnp_kannous set updated_at = '".date('Y-m-d H:i:s')."', amount = $newamount, date_deliver = '".$newdate_deliver."'
-              where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."' and date_order = '".$mikandate_order."' and code = '".$mikanline_code."' and date_deliver = '".$date_delivermoto."'";//もとのDBも更新
+              $updater = "UPDATE order_dnp_kannous set updated_at = '".date('Y-m-d H:i:s')."',
+               amount = '".$newamount."', bunnou = '".$bunnnou."', date_deliver = '".$newdate_deliver."'
+                where product_id ='".$mikanproduct_code."' and num_order = '".$mikannum_order."'
+                 and date_order = '".$mikandate_order."' and code = '".$mikanline_code."'
+                  and amount = '".$amountmoto."' and date_deliver = '".$date_delivermoto."'";//もとのDBも更新
               $connection->execute($updater);
 
               $connection = ConnectionManager::get('default');
@@ -2464,7 +2476,9 @@ class OrderEdisController extends AppController
               $this->Flash->error(__('The data could not be saved. Please, try again.'));
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
+
           }elseif(isset($_SESSION['orderEdis'][$n]['id'])){//amount=0 or nullの時//minoukannouテーブルも更新（'delete_flag' => 1 にする）
+
             if ($this->OrderEdis->updateAll(['date_deliver' => $_SESSION['orderEdis'][$n]['date_deliver'] ,'amount' => 0
             ,'bunnou' => 0 ,'date_bunnou' => date('Y-m-d') ,'delete_flag' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
             ,['id' => $_SESSION['orderEdis'][$n]['id']])) {
@@ -2523,7 +2537,9 @@ class OrderEdisController extends AppController
               $this->Flash->error(__('The data could not be saved. Please, try again.'));
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
             }
+
           }elseif(isset($_SESSION['orderEdis'][$n])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
+
             $bunnnou = $bunnnou +1;//$bunnnouを振り直し
             $bunnou = array('bunnou'=>$bunnnou);
             $_SESSION['orderEdis'][$n] = array_merge($_SESSION['orderEdis'][$n],$bunnou);
@@ -2533,7 +2549,9 @@ class OrderEdisController extends AppController
             $num_order = $_SESSION['orderEdis'][$n]['num_order'];
             $product_code = $_SESSION['orderEdis'][$n]['product_code'];
             $line_code = $_SESSION['orderEdis'][$n]['line_code'];
+
           }elseif(isset($arrOrderEdisnew[0])){//新しいデータをorderediテーブルに保存する場合（複数ある可能性あり）
+
             $OrderEdis = $this->OrderEdis->patchEntities($this->OrderEdis->newEntity(), $arrOrderEdisnew);//$arrOrderEdisnewを登録
             if ($this->OrderEdis->saveMany($OrderEdis)) {//minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
 
@@ -2602,11 +2620,7 @@ class OrderEdisController extends AppController
                   $arrorderEdiId = array('order_edi_id'=>$orderEdiId);
                   $arrDenpyouDnpMinoukannousnew[$m] = array_merge($arrDenpyouDnpMinoukannousnew[$m],$arrorderEdiId);
                 }else{
-/*
-                  echo "<pre>";
-                  print_r($arrDenpyouDnpMinoukannousnew);
-                  echo "</pre>";
-*/
+
                   $denpyouDnpMinoukannous = $this->DenpyouDnpMinoukannous->patchEntities($this->DenpyouDnpMinoukannous->newEntity(), $arrDenpyouDnpMinoukannousnew);//patchEntitiesで一括登録
                   $this->DenpyouDnpMinoukannous->saveMany($denpyouDnpMinoukannous);//saveManyで一括登録
 
@@ -2628,7 +2642,6 @@ class OrderEdisController extends AppController
                   $table = TableRegistry::get('order_dnp_kannous');
                   $table->setConnection($connection);
 
-                  //211130追加
                   $delete_flg = 0;
                   $sql = "SELECT bunnou,date_order,num_order FROM order_dnp_kannous".
                         " where date_order ='".$mikandate_order."' and num_order = '".$mikannum_order."'
@@ -2706,7 +2719,7 @@ class OrderEdisController extends AppController
                       $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
                       $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 0 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
                       ,['id' => $denpyouDnpMinoukannouId]);
-
+/*
                       //ここから、旧DBへの登録用
                       $order_edi_id = $arrDnpdouitutyuumonSort[0][$m]['id'];
                       $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
@@ -2728,13 +2741,13 @@ class OrderEdisController extends AppController
 
                       $connection = ConnectionManager::get('default');
                       //ここまで
-
+*/
                     }else{
                       $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
                       $denpyouDnpMinoukannouId = $denpyouDnpMinoukannou[0]->id;
                       $this->DenpyouDnpMinoukannous->updateAll(['minoukannou' => 1 ,'updated_at' => date('Y-m-d H:i:s'),'updated_staff' => $this->Auth->user('staff_id')]
                       ,['id' => $denpyouDnpMinoukannouId]);
-
+/*
                       //ここから、旧DBへの登録用
                       $order_edi_id = $arrDnpdouitutyuumonSort[0][$m]['id'];
                       $OrderEdi = $this->OrderEdis->find()->where(['id' => $order_edi_id])->toArray();//同一の注文
@@ -2756,6 +2769,7 @@ class OrderEdisController extends AppController
 
                       $connection = ConnectionManager::get('default');
                       //ここまで
+                      */
                     }
                   }
                   break;
@@ -2773,6 +2787,7 @@ class OrderEdisController extends AppController
               throw new Exception(Configure::read("M.ERROR.INVALID"));//失敗6
               break;
             }
+
           }else{//分納追加はせずに納期や数量を変更した場合//minoukannouテーブルのdate_deliverが一番遅いやつのminoukannouだけ1にする
 
             //minoukannouテーブルにも保存するかつ、同じやつを引っ張り出してdate_deliverが一番遅いやつのminoukannouだけ1にする
@@ -2800,11 +2815,7 @@ class OrderEdisController extends AppController
             }
             array_multisort( array_map( "strtotime", array_column( $arrDnpdouitutyuumon, "date_deliver" ) ), SORT_ASC, $arrDnpdouitutyuumon ) ;//時間で並び替え
             $arrDnpdouitutyuumonSort[] = $arrDnpdouitutyuumon;
-/*
-            echo "<pre>";
-            print_r($arrDnpdouitutyuumonSort);
-            echo "</pre>";
-*/
+
             for($m=0; $m<count($arrDnpdouitutyuumonSort[0]); $m++){
               if($m< (count($arrDnpdouitutyuumonSort[0])-1) ){
                 $denpyouDnpMinoukannou = $this->DenpyouDnpMinoukannous->find()->where(['order_edi_id' => $arrDnpdouitutyuumonSort[0][$m]['id']])->toArray();
@@ -2871,6 +2882,7 @@ class OrderEdisController extends AppController
       //ロールバック8
         $connection->rollback();//トランザクション9
       }//トランザクション10
+
     }
 
 

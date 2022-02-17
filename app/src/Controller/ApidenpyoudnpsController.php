@@ -25,7 +25,7 @@ class ApidenpyoudnpsController extends AppController
 		 $this->Konpous = TableRegistry::get('konpous');
 		}
 
-		public function sessioncheck()//http://localhost:5000/Apidenpyoudnps/sessioncheck/api/2021-11-1.xml
+		public function dnpyobidashi()//http://localhost:5000/Apidenpyoudnps/dnpyobidashi/api/2021-11-1.xml
 		{
 			$data = Router::reverse($this->request, false);//urlを取得
 			$urlarr = explode("/",$data);//切り離し
@@ -54,8 +54,8 @@ class ApidenpyoudnpsController extends AppController
 					 'amount' => $DenpyouDnpMinoukannous[$k]["order_edi"]["amount"],
 					 'date_deliver' => $DenpyouDnpMinoukannous[$k]["order_edi"]["date_deliver"]->format('Y/m/d'),
 					 'minoukannou' => $DenpyouDnpMinoukannous[$k]["minoukannou"],
-					 'irisu' => $irisu,
-					 'num' => $num
+					 'irisu' => $irisu
+	//				 'num' => $num
 				];
 
 			}

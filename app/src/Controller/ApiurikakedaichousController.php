@@ -200,7 +200,7 @@ class ApiurikakedaichousController extends AppController
 			$arrOrderSpecials[] = [
 				'name' => $name,
 				'date_deliver' => $OrderSpecials[$k]->date_deliver->format('Y-m-d'),
-				'num_order' => $OrderSpecials[$k]["num_order"],
+				'num_order' => "S".$OrderSpecials[$k]["num_order"],
 				'order_name' => $OrderSpecials[$k]["order_name"],
 				'amount' => $OrderSpecials[$k]["amount"],
 				'price' => $OrderSpecials[$k]["price"],

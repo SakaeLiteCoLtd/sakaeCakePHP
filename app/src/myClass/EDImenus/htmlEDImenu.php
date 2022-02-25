@@ -64,11 +64,11 @@ class htmlEDImenu extends AppController
                  "</a></td>\n".
                  "<td style='padding: 0.1rem 0.1rem;'>\n".
 
-                 "<a href='http://192.168.4.1/edi/form_order_another_ryousan.php'><img src='/img/Labelimg/another_ryousan.gif' width='85' height='36' alt='menu_kensaku' border='0' />\n".
+        //         "<a href='http://192.168.4.1/edi/form_order_another_ryousan.php'><img src='/img/Labelimg/another_ryousan.gif' width='85' height='36' alt='menu_kensaku' border='0' />\n".
 
 //量産品以外（新）
-//                 "</a><td style='padding: 0.1rem 0.1rem;'><a href='/Orderothers/menu'>\n".
-//                 "<img src='/img/Labelimg/another_ryousan.gif' width=85 height=36>\n".
+                 "</a><td style='padding: 0.1rem 0.1rem;'><a href='/Orderothers/menu'>\n".
+                 "<img src='/img/Labelimg/another_ryousan.gif' width=85 height=36>\n".
 
                  "</a>\n";
 

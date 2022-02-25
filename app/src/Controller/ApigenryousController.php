@@ -66,9 +66,11 @@ class ApigenryousController extends AppController
 			]);
 		}
 
+		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/start.xml
 		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/20210208_02_AP03B_N_200_2021-2-8_2_1001.xml
 		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/20210208_02_AP03B_N_200_2021-2-8_2_1001.xml
 		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/20210208_02_AP03B_N_200_2021-2-8_2_1001.xml
+		//http://localhost:5000/Apigenryous/vbagenryouinsert/api/end.xml
 		public function vbagenryouinsert()
 		{
 			$data = Router::reverse($this->request, false);//文字化けする後で2回変換すると日本語OK
@@ -303,12 +305,12 @@ class ApigenryousController extends AppController
 				try {//トランザクション4
 
 					if ($this->OrderMaterials->saveMany($OrderMaterials)) {
-
+/*20220224コメントアウト
 						if(isset($_SESSION['specialvba'][0])){
 							$OrderSpecials = $this->OrderSpecials->patchEntities($this->OrderSpecials->newEntity(), $_SESSION['specialvba']);
 							$this->OrderSpecials->saveMany($OrderSpecials);
 						}
-
+*/
 						$connection->commit();// コミット5
 		//				$this->request->session()->destroy(); // セッションの破棄
 						$_SESSION['specialvba'] = array();

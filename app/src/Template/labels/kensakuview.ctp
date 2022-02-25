@@ -34,9 +34,14 @@
             <tr style="border-bottom: solid;border-width: 1px">
                 <td width="150" colspan="20" nowrap="nowrap"><?= h($checkLot[$i]["product_code"]) ?></td>
                 <?php
+                /*
                   $product_code = $checkLot[$i]["product_code"];
               		$Product = $this->Products->find()->where(['product_code' => $product_code])->toArray();
               		$product_name = $Product[0]->product_name;
+*/
+
+                  $product_name = $checkLot[$i]["product"]["product_name"];
+
                 ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($product_name) ?></td>
                 <td width="150" colspan="20" nowrap="nowrap"><?= h($checkLot[$i]["lot_num"]) ?></td>
@@ -44,6 +49,7 @@
             <?php
             //flag_usedの数=name_lot_flag_usedsのidとなるname_lot_flag_usedsのnameを表示する
             //$checkLot->flag_deliverがnullでないとき、「flag_deliver（の日付）納品済み」とする
+
               $f_used = $checkLot[$i]["flag_used"];
               $flag_deliver = $checkLot[$i]["flag_deliver"];
               if($flag_deliver != null){
@@ -51,9 +57,20 @@
               }elseif($f_used == 0){
                 $flag_used = "検査済み";
               }else{
-                $NameLotFlagUsed = $this->NameLotFlagUseds->find()->where(['id' => $f_used])->toArray();
-                $flag_used = $NameLotFlagUsed[0]->name;
+
+            //    $NameLotFlagUsed = $this->NameLotFlagUseds->find()->where(['id' => $f_used])->toArray();
+            //    $flag_used = $NameLotFlagUsed[0]->name;
+
+                for($n=0; $n<count($arrNameLotFlagUseds); $n++){
+                  if($f_used == $arrNameLotFlagUseds[$n]["id"]){
+                    $flag_used = $arrNameLotFlagUseds[$n]->name;
+                    break;
+                  }
+                }
+
               }
+
+
             ?>
                 <td width="200" colspan="20" nowrap="nowrap"><?= h($flag_used) ?></td>
             </tr>

@@ -68,8 +68,13 @@ class ApidenpyoudnpsController extends AppController
   			 'Denpyoudnp' => $arrDenpyoudnp,
   			 '_serialize' => ['Denpyoudnp']
   		 ]);
-
 		}
 
+		public function dnpyobidashitest()//http://localhost:5000/Apidenpyoudnps/dnpyobidashitest/api/2021-11-1.xml
+		{
+			echo "<pre>";
+			print_r(phpinfo());
+			echo "</pre>";
+		}
 
 	}

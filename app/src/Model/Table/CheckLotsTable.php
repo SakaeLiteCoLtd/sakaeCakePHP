@@ -37,11 +37,14 @@ class CheckLotsTable extends Table
         $this->setTable('check_lots');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
-/*
-        $this->belongsTo('PlaceDelivers', [
-            'foreignKey' => 'place_deliver_id'
+
+//https://qiita.com/chiyoyo/items/7cd4ddf5c8c5c7b99eb7　//id以外のカラムで結合OK
+
+        $this->belongsTo('Products', [
+          'bindingKey' => 'product_code',
+          'foreignKey' => 'product_code'
         ]);
-*/
+
         $this->addBehavior('Timestamp', [
           'events' => [
             'Model.beforeSave' => [

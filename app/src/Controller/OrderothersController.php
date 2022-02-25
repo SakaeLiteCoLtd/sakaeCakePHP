@@ -542,7 +542,6 @@ class OrderothersController extends AppController
         return $this->redirect(['action' => 'menu',
         's' => ['mess' => $arr_session_flag["mess"]]]);
       }
-
 /*
       echo "<pre>";
       print_r($data);
@@ -597,8 +596,15 @@ class OrderothersController extends AppController
              $table = TableRegistry::get('order_special');
              $table->setConnection($connection);
 
+             $zero = 0;
+             $sql = "SELECT id FROM order_special".
+                   " where date_order ='".$date_ordermoto."' and num_order = '".$num_ordermoto."' and cs_id = '".$cs_idmoto."'
+                    and date_deliver ='".$date_delivermoto."' and delete_flag ='".$zero."'";
+             $connection = ConnectionManager::get('sakaeMotoDB');
+             $order_special_id_moto = $connection->execute($sql)->fetchAll('assoc');
+
              $updater = "UPDATE order_special set delete_flag = '".$data["orderothersedit"]["check"]."' , updated_at = '".date('Y-m-d H:i:s')."'
-              where date_order ='".$date_ordermoto."' and num_order = '".$num_ordermoto."' and cs_id = '".$cs_idmoto."' and date_deliver = '".$date_delivermoto."'";
+              where id = '".$order_special_id_moto[0]['id']."'";
              $connection->execute($updater);
              $connection = ConnectionManager::get('default');
 
@@ -635,7 +641,15 @@ class OrderothersController extends AppController
              $table = TableRegistry::get('order_special');
              $table->setConnection($connection);
 
-             $updater = "UPDATE order_special set date_order = '".$data["orderothersedit"]["date_order"]."' ,
+             $zero = 0;
+             $sql = "SELECT id FROM order_special".
+                   " where date_order ='".$date_ordermoto."' and num_order = '".$num_ordermoto."' and cs_id = '".$cs_idmoto."'
+                    and date_deliver ='".$date_delivermoto."' and delete_flag ='".$zero."'";
+             $connection = ConnectionManager::get('sakaeMotoDB');
+             $order_special_id_moto = $connection->execute($sql)->fetchAll('assoc');
+
+             $updater = "UPDATE order_special set
+             date_order = '".$data["orderothersedit"]["date_order"]."' ,
              num_order = '".$data["orderothersedit"]["num_order"]."' ,
              order_name = '".$data["orderothersedit"]["order_name"]."' ,
              price = '".$data["orderothersedit"]["price"]."' ,
@@ -644,7 +658,7 @@ class OrderothersController extends AppController
              cs_id = '".$data["orderothersedit"]["cs_id"]."' ,
              kannou = '".$data["orderothersedit"]["kannou"]."' ,
              updated_at = '".date('Y-m-d H:i:s')."'
-             where date_order ='".$date_ordermoto."' and num_order = '".$num_ordermoto."' and cs_id = '".$cs_idmoto."' and date_deliver = '".$date_delivermoto."'";
+             where id ='".$order_special_id_moto[0]['id']."'";
              $connection->execute($updater);
              $connection = ConnectionManager::get('default');
 

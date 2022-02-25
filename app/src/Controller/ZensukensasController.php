@@ -857,6 +857,10 @@ class ZensukensasController extends AppController
        $this->set('ResultZensuHeads',$ResultZensuHeads);
        $data = $this->request->getData();
 
+       echo "<pre>";
+       print_r("start ".date('Y-m-d H:i:s'));
+       echo "</pre>";
+
        $product_code = $data['product'];
        $this->set('product_code',$product_code);
        $staff_moto = $data['staff'];
@@ -938,6 +942,10 @@ class ZensukensasController extends AppController
           'ResultZensuHeads.product_code', 'ResultZensuHeads.lot_num',  'ResultZensuHeads.staff_id',
            'ResultZensuHeads.datetime_start', 'ResultZensuHeads.datetime_finish', 'ResultZensuHeads.delete_flag'])
          ->where(['ResultZensuHeads.delete_flag' => '0','datetime_start >=' => $datesta, 'datetime_start <=' => $datefin])->toArray();
+
+         echo "<pre>";
+         print_r("a ".date('Y-m-d H:i:s'));
+         echo "</pre>";
 
         if(isset($ResultZensuHeads[0])){
 
@@ -1040,6 +1048,18 @@ class ZensukensasController extends AppController
 
        }
 
+       echo "<pre>";
+       print_r("b ".date('Y-m-d H:i:s'));
+       echo "</pre>";
+
+       echo "<pre>";
+       print_r(count($ResultZensuHeads));
+       echo "</pre>";
+       /*
+       echo "<pre>";
+       print_r($ResultZensuHeads[0]);
+       echo "</pre>";
+*/
        //セットする
        $arrichiran =  array();
 
@@ -1121,6 +1141,10 @@ class ZensukensasController extends AppController
 
         }
 
+        echo "<pre>";
+        print_r("c ".date('Y-m-d H:i:s'));
+        echo "</pre>";
+
         $this->set('arrichiran',$arrichiran);
 
       if(isset($data['product_sort'])){//並び変え
@@ -1154,6 +1178,10 @@ class ZensukensasController extends AppController
         $this->set('arrichiran',$arrichiran);
 
       }
+
+      echo "<pre>";
+      print_r("finish ".date('Y-m-d H:i:s'));
+      echo "</pre>";
 
       if(isset($data['csv'])){//csv出力
       //    $fp = fopen('zensu_csv/zenken_test.csv', 'w');

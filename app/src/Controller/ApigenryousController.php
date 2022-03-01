@@ -305,7 +305,7 @@ class ApigenryousController extends AppController
 				try {//トランザクション4
 
 					if ($this->OrderMaterials->saveMany($OrderMaterials)) {
-/*20220224コメントアウト
+/*20220224コメントアウトOrderSpecialsは売り側
 						if(isset($_SESSION['specialvba'][0])){
 							$OrderSpecials = $this->OrderSpecials->patchEntities($this->OrderSpecials->newEntity(), $_SESSION['specialvba']);
 							$this->OrderSpecials->saveMany($OrderSpecials);

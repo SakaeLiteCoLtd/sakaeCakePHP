@@ -27,7 +27,7 @@ class GenryousController extends AppController
 
 		public function menu()
     {
-
+/*
 			$connection = ConnectionManager::get('big_DB');//big_DB参照
 
 			$datetime = "2022-02-15 15:36:00";
@@ -38,7 +38,7 @@ class GenryousController extends AppController
 			echo "<pre>";
       print_r($ShotdataSensors);
       echo "</pre>";
-
+*/
 /*
 			$connection = ConnectionManager::get('big_DB');//big_DB参照
 

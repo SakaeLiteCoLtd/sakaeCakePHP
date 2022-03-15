@@ -27,18 +27,22 @@ class GenryousController extends AppController
 
 		public function menu()
     {
-/*
+
+			//ここはbig_DBへの切り替えテストです。
+
 			$connection = ConnectionManager::get('big_DB');//big_DB参照
 
 			$datetime = "2022-02-15 15:36:00";
-			$ShotdataSensors = $this->ShotdataSensors->find()->where(['datetime' => "2022-02-15 15:36:00"])->toArray();
+
+			$ShotdataSensors = $this->ShotdataSensors->find()//ShotdataSensorsTable.phpも変更が必要
+			->where(['datetime' => "2022-02-15 15:36:00"])->toArray();
 
 	    $connection = ConnectionManager::get('default');//default参照
 
 			echo "<pre>";
       print_r($ShotdataSensors);
       echo "</pre>";
-*/
+
 /*
 			$connection = ConnectionManager::get('big_DB');//big_DB参照
 

@@ -100,6 +100,7 @@
 <?= $this->Form->control('staff_id', array('type'=>'hidden', 'value'=>$staff_id, 'label'=>false)) ?>
 <?= $this->Form->control('result_zensu_head_id', array('type'=>'hidden', 'value'=>$result_zensu_head_id, 'label'=>false)) ?>
 <?= $this->Form->control('datetime_finish', array('type'=>'hidden', 'value'=>date('Y-m-d h:m:s'), 'label'=>false)) ?>
+<?= $this->Form->control('datetime', array('type'=>'hidden', 'value'=>$datetime, 'label'=>false)) ?>
 
 <br><br><br><br><br><br><br><br><br><br>
 

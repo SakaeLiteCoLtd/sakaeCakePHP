@@ -2027,7 +2027,8 @@ class OrderEdisController extends AppController
         if(empty($product_code)){//product_codeの入力がないとき
           $product_code = "no";
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける
-            ->where(['delete_flag' => '0', 'customer_code' => '20001', 'date_deliver >=' => $date_sta, 'date_deliver <=' => $date_fin,'product_code like' => '%'.$Pro.'%']
+            ->where(['delete_flag' => '0', 'customer_code' => '20001', 'date_deliver >=' => $date_sta,
+             'date_deliver <=' => $date_fin,'product_code like' => '%'.$Pro.'%']
             ));//対象の製品を絞り込む
         }else{//product_codeの入力があるとき
           $this->set('orderEdis',$this->OrderEdis->find()//以下の条件を満たすデータをOrderEdisテーブルから見つける

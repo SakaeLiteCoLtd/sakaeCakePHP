@@ -522,9 +522,13 @@ class ZensukensasController extends AppController
 
        $staffData = $this->Staffs->find()->where(['id' => $staff_id])->toArray();
        $staff_code = $staffData[0]->staff_code;
-/*
-       echo "<pre>";
-       print_r($staff_code);
+
+       $datetime = date('Y-m-d H:i:s');
+       $this->set('datetime',$datetime);
+
+/*       
+       echo "<pre>";  
+       print_r($datetime);
        echo "</pre>";
 */
 
@@ -539,23 +543,23 @@ class ZensukensasController extends AppController
              " where product_id ='".$product_code."' and lot_num = '".$lot_num."' and emp_id = '".$staff_code."' and datetime_finish IS NULL";
        $connection = ConnectionManager::get('sakaeMotoDB');
        $result_zensu_head_id_moto = $connection->execute($sql)->fetchAll('assoc');
-/*
-       echo "<pre>";
-       print_r($result_zensu_head_id_moto[0]['id']);
-       echo "</pre>";
-*/
+
+      // echo "<pre>";
+      // print_r($result_zensu_head_id_moto[0]['id']);
+      // echo "</pre>";
+
        $connection = ConnectionManager::get('default');//新DBに戻る
        $table->setConnection($connection);
 
        if(!isset($_SESSION)){//sessionsyuuseituika
        session_start();
        }
-       $_SESSION['zensufooder'] = array();
-       $_SESSION['zensuhead'] = array();
-       $_SESSION['result_zensu_head_id'] = array();
+       $_SESSION['zensufooder'.$staff_id.$datetime] = array();
+       $_SESSION['zensuhead'.$staff_id.$datetime] = array();
+       $_SESSION['result_zensu_head_id'.$staff_id.$datetime] = array();
 
        for($n=0; $n<=$tuika; $n++){
-         $_SESSION['zensufooder'][$n] = array(
+         $_SESSION['zensufooder'.$staff_id.$datetime][$n] = array(
            'result_zensu_head_id' => $result_zensu_head_id,
            'cont_rejection_id' => $data["cont{$n}"],
            'amount' => $data["amount{$n}"],
@@ -565,11 +569,11 @@ class ZensukensasController extends AppController
            'created_staff' => $staff_id
          );
         }
-        $_SESSION['zensuhead'] = array(
+        $_SESSION['zensuhead'.$staff_id.$datetime] = array(
           'datetime_finish' => date('Y-m-d H:i:s'),
           'updated_staff' => $staff_id
         );
-        $_SESSION['result_zensu_head_id'] = array(
+        $_SESSION['result_zensu_head_id'.$staff_id.$datetime] = array(
           'product_code' => $product_code,
           'lot_num' => $lot_num,
           'result_zensu_head_id' => $result_zensu_head_id,
@@ -577,7 +581,7 @@ class ZensukensasController extends AppController
         );
 /*
         echo "<pre>";
-        print_r($_SESSION['zensufooder']);
+        print_r($_SESSION['zensuhead'.$staff_id.$datetime]);
         echo "</pre>";
 */
      }
@@ -592,6 +596,14 @@ class ZensukensasController extends AppController
        print_r($_SESSION['zensufooder']);
        echo "</pre>";
 */
+       $getData = $this->request->getData();
+       $staff_id = $getData['staff_id'];
+       $datetime = $getData['datetime'];
+/*
+       echo "<pre>";  
+       print_r($_SESSION["zensuhead".$staff_id.$datetime]);
+       echo "</pre>";
+*/
        $ResultZensuHeads = $this->ResultZensuHeads->newEntity();
        $this->set('ResultZensuHeads',$ResultZensuHeads);
        $ResultZensuFooders = $this->ResultZensuFooders->newEntity();
@@ -599,15 +611,15 @@ class ZensukensasController extends AppController
        $CheckLots = $this->CheckLots->newEntity();
        $this->set('CheckLots',$CheckLots);
 
-       if(!isset($_SESSION["zensuhead"])){
+       if(!isset($_SESSION["zensuhead".$staff_id.$datetime])){
          return $this->redirect(['action' => 'zensuendstaff',
          's' => ['mess' => "ログアウトされました。この画面からやり直してください。"]]);
        }
 
-       $staffData = $this->Staffs->find()->where(['id' =>  $_SESSION['zensuhead']['updated_staff']])->toArray();
+       $staffData = $this->Staffs->find()->where(['id' =>  $_SESSION['zensuhead'.$staff_id.$datetime]['updated_staff']])->toArray();
        $staff_code = $staffData[0]->staff_code;
 
-       $ResultZensuFooders = $this->ResultZensuFooders->patchEntities($ResultZensuFooders, $_SESSION['zensufooder']);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
+       $ResultZensuFooders = $this->ResultZensuFooders->patchEntities($ResultZensuFooders, $_SESSION['zensufooder'.$staff_id.$datetime]);//patchEntitiesで一括登録…https://qiita.com/tsukabo/items/f9dd1bc0b9a4795fb66a
        $connection = ConnectionManager::get('default');//トランザクション1
        // トランザクション開始2
        $connection->begin();//トランザクション3
@@ -619,12 +631,12 @@ class ZensukensasController extends AppController
              $table = TableRegistry::get('result_zensu_fooder');
              $table->setConnection($connection);
 
-             for($k=0; $k<count($_SESSION['zensufooder']); $k++){
+             for($k=0; $k<count($_SESSION['zensufooder'.$staff_id.$datetime]); $k++){
                $connection->insert('result_zensu_fooder', [
-                   'result_zensu_head_id' => $_SESSION['result_zensu_head_id']["result_zensu_head_id_moto"],
-                   'cont_rejection_id' => $_SESSION['zensufooder'][$k]["cont_rejection_id"],
-                   'amount' => $_SESSION['zensufooder'][$k]["amount"],
-                   'bik' => $_SESSION['zensufooder'][$k]["bik"],
+                   'result_zensu_head_id' => $_SESSION['result_zensu_head_id'.$staff_id.$datetime]["result_zensu_head_id_moto"],
+                   'cont_rejection_id' => $_SESSION['zensufooder'.$staff_id.$datetime][$k]["cont_rejection_id"],
+                   'amount' => $_SESSION['zensufooder'.$staff_id.$datetime][$k]["amount"],
+                   'bik' => $_SESSION['zensufooder'.$staff_id.$datetime][$k]["bik"],
                    'datetime_finish' => date("Y-m-d H:i:s")
                ]);
              }
@@ -633,11 +645,11 @@ class ZensukensasController extends AppController
              $table->setConnection($connection);
 
              if ($this->ResultZensuHeads->updateAll(//検査終了時間の更新
-               ['datetime_finish' => $_SESSION['zensuhead']['datetime_finish'], 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
-               ['id'  => $_SESSION['result_zensu_head_id']['result_zensu_head_id']]
+               ['datetime_finish' => $_SESSION['zensuhead'.$staff_id.$datetime]['datetime_finish'], 'updated_staff' => $_SESSION['zensuhead'.$staff_id.$datetime]['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
+               ['id'  => $_SESSION['result_zensu_head_id'.$staff_id.$datetime]['result_zensu_head_id']]
              )){
 
-               $CheckLot = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num' => $_SESSION['result_zensu_head_id']['lot_num']])->toArray();
+               $CheckLot = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id'.$staff_id.$datetime]['product_code'], 'lot_num' => $_SESSION['result_zensu_head_id'.$staff_id.$datetime]['lot_num']])->toArray();
 
                if(isset($CheckLot[0])){
                  $CheckLotId = $CheckLot[0]->id;
@@ -647,7 +659,7 @@ class ZensukensasController extends AppController
                  $CheckLotflag_used = 0;
                  echo "<pre>";
                  print_r("check_lotsテーブルに存在しないデータが登録されました。　<br>品番：".
-                 $_SESSION['result_zensu_head_id']['product_code']."　ロットナンバー：".$_SESSION['result_zensu_head_id']['lot_num'].
+                 $_SESSION['result_zensu_head_id'.$staff_id.$datetime]['product_code']."　ロットナンバー：".$_SESSION['result_zensu_head_id'.$staff_id.$datetime]['lot_num'].
                  "　のロットはデータベースに登録されていません。<br>責任者に報告してください。");
                  echo "</pre>";
                }
@@ -658,7 +670,7 @@ class ZensukensasController extends AppController
                $table->setConnection($connection);
 
                $updater = "UPDATE result_zensu_head set datetime_finish = '".date('Y-m-d H:i:s')."'
-                 where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id']['lot_num']."' and emp_id = '".$staff_code."' and datetime_finish IS NULL";//もとのDBも更新
+                 where product_id ='".$_SESSION['result_zensu_head_id'.$staff_id.$datetime]['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id'.$staff_id.$datetime]['lot_num']."' and emp_id = '".$staff_code."' and datetime_finish IS NULL";//もとのDBも更新
                $connection->execute($updater);
 
                $connection = ConnectionManager::get('default');//新DBに戻る
@@ -670,7 +682,7 @@ class ZensukensasController extends AppController
                  $connection->commit();// コミット5
                }else{//check_lotsの更新
                  if ($this->CheckLots->updateAll(
-                   ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
+                   ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead'.$staff_id.$datetime]['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
                    ['id'  => $CheckLotId]
                  )){
 
@@ -680,46 +692,32 @@ class ZensukensasController extends AppController
                    $table->setConnection($connection);
 
                    $updater = "UPDATE check_lots set flag_used = 0, updated_at = '".date('Y-m-d H:i:s')."'
-                     where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id']['lot_num']."'";//もとのDBも更新
+                     where product_id ='".$_SESSION['result_zensu_head_id'.$staff_id.$datetime]['product_code']."' and lot_num = '".$_SESSION['result_zensu_head_id'.$staff_id.$datetime]['lot_num']."'";//もとのDBも更新
                    $connection->execute($updater);
 
                    $connection = ConnectionManager::get('default');//新DBに戻る
                    $table->setConnection($connection);
 
                    //INだった場合親ロットの'flag_used' => 0にするかどうかをチェックする。
-                   $lot_in = substr($_SESSION['result_zensu_head_id']['lot_num'], 0, 3);
+                   $lot_in = substr($_SESSION['result_zensu_head_id'.$staff_id.$datetime]['lot_num'], 0, 3);
                    if($lot_in == "IN."){
-                     $lot_oomoto = substr($_SESSION['result_zensu_head_id']['lot_num'], 4, 6);
-                     $lot_kodomo = substr($_SESSION['result_zensu_head_id']['lot_num'], 0, 9);
-                     $lot_num_touroku = substr($_SESSION['result_zensu_head_id']['lot_num'], -3);
+                     $lot_oomoto = substr($_SESSION['result_zensu_head_id'.$staff_id.$datetime]['lot_num'], 4, 6);
+                     $lot_kodomo = substr($_SESSION['result_zensu_head_id'.$staff_id.$datetime]['lot_num'], 0, 9);
+                     $lot_num_touroku = substr($_SESSION['result_zensu_head_id'.$staff_id.$datetime]['lot_num'], -3);
 
-                     $CheckLotkodomo = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num like' => '%'.$lot_kodomo.'%'])->toArray();//子ロットの仲間全部
-                     $CheckLotoya = $this->CheckLots->find()->where(['product_code' => $_SESSION['result_zensu_head_id']['product_code'], 'lot_num like' => '%'.$lot_oomoto.'%',//親ロットの仲間全部
-                     'NOT' => [['lot_num like' => '%'."IN.".'%']]])->toArray();
-                     $cntkodomo = count($CheckLotkodomo);//子ロットの仲間の個数
-                     $cntoya = count($CheckLotoya);//親ロットの仲間の個数
-
-                     $arrCheckLotkodomo = array();//空の配列を作る　$lot_kodomoの仲間を全部集める
-                     foreach ((array)$CheckLotkodomo as $key => $value) {//lot_numで並び替え
-                       $sort[$key] = $value['lot_num'];
-                       array_push($arrCheckLotkodomo, ['id' => $value['id'], 'product_code' => $value['product_code'], 'lot_num' => $value['lot_num'], 'flag_used' => $value['flag_used']]);
-                     }
-                  //   array_multisort(array_map("strtotime", array_column( $arrCheckLotkodomo, "lot_num" ) ), SORT_ASC, $arrCheckLotkodomo);
-                     array_multisort($sort , SORT_ASC, $arrCheckLotkodomo);
-                     $lot_kodomo_first = substr($arrCheckLotkodomo[0]['lot_num'], -3);
-                     $bangou_lot = $lot_num_touroku - ($lot_kodomo_first - 1);//$lot_num_tourokuが同じ$lot_oomotoの中で何番目なのか調べる
-
-                     $LabelInsideout = $this->LabelInsideouts->find()->where(['delete_flag' => '0', 'product_code' => $_SESSION['result_zensu_head_id']['product_code']])->toArray();
+                     $LabelInsideout = $this->LabelInsideouts->find()->where(['delete_flag' => '0', 'product_code' => $_SESSION['result_zensu_head_id'.$staff_id.$datetime]['product_code']])->toArray();
                      $LabelInside_num = $LabelInsideout[0]->num_inside;
 
-                     $mod = $bangou_lot/$LabelInside_num;//親ロットは全部で何個か
+                     //該当の親ロット特定start
+                     $mod = $lot_num_touroku/$LabelInside_num;
                      $mod_int = floor($mod);//整数部分
 
                      if(($mod_int - $mod) == 0){//割り切れた時
-                       $bangou_oya_lot = $mod_int;//親ロットは$mod_int番目
+                       $bangou_oya_lot = $mod_int;//親ロットは$mod_int
                      }else{//割り切れなかったとき
-                       $bangou_oya_lot = $mod_int + 1;//親ロットは$mod_int + 1番目か
+                       $bangou_oya_lot = $mod_int + 1;//親ロットは$mod_int + 1
                      }
+                     //該当の親ロット特定end
 
                      $arrCheckLotkodomotati = array();//$lot_kodomoの仲間を全部集める
                      $flag_used_total = 0;
@@ -727,13 +725,11 @@ class ZensukensasController extends AppController
                      for($m=($bangou_oya_lot*$LabelInside_num - $LabelInside_num + 1); $m<=($bangou_oya_lot*$LabelInside_num); $m++){
 
                        $lot_count_kodomo = sprintf('%03d', $m);
-                       $CheckLotkodomo_flag_used = $this->CheckLots->find()
-                       ->where(['delete_flag' => '0', 'product_code' => $_SESSION['result_zensu_head_id']['product_code'],
-                        'lot_num' => $lot_kodomo."-".$lot_count_kodomo])->toArray();//子ロットの仲間全部
 
+                       $CheckLotkodomo_flag_used = $this->CheckLots->find()->where(['delete_flag' => '0', 'product_code' => $_SESSION['result_zensu_head_id'.$staff_id.$datetime]['product_code'], 'lot_num' => $lot_kodomo."-".$lot_count_kodomo])->toArray();//子ロットの仲間全部
+                       
                        $arrCheckLotkodomotati[] = $CheckLotkodomo_flag_used[0]->flag_used;
                        $flag_used_total = $flag_used_total + $CheckLotkodomo_flag_used[0]->flag_used;
-
                      }
 /*
                      echo "<pre>";
@@ -743,8 +739,8 @@ class ZensukensasController extends AppController
                     if($flag_used_total == 0){//子ロットが全部検査済みの場合は親ロットのflag_usedを０に変更
 
                        $this->CheckLots->updateAll(
-                        ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead']['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
-                        ['lot_num'  => substr($_SESSION['result_zensu_head_id']['lot_num'], 3, 6)."-".sprintf('%03d', $bangou_oya_lot)]);
+                        ['flag_used' => 0, 'created_at' => $CheckLotcreated_at, 'updated_staff' => $_SESSION['zensuhead'.$staff_id.$datetime]['updated_staff'], 'updated_at' => date('Y-m-d H:i:s')],
+                        ['lot_num'  => substr($_SESSION['result_zensu_head_id'.$staff_id.$datetime]['lot_num'], 3, 6)."-".sprintf('%03d', $bangou_oya_lot)]);
 
                         //insert 旧DB
                         $connection = ConnectionManager::get('sakaeMotoDB');
@@ -752,7 +748,7 @@ class ZensukensasController extends AppController
                         $table->setConnection($connection);
 
                         $updater = "UPDATE check_lots set flag_used = 0 , updated_at = '".date('Y-m-d H:i:s')."'
-                          where product_id ='".$_SESSION['result_zensu_head_id']['product_code']."' and lot_num = '".substr($_SESSION['result_zensu_head_id']['lot_num'], 3, 6)."-".sprintf('%03d', $bangou_oya_lot)."'";//もとのDBも更新
+                          where product_id ='".$_SESSION['result_zensu_head_id'.$staff_id.$datetime]['product_code']."' and lot_num = '".substr($_SESSION['result_zensu_head_id'.$staff_id.$datetime]['lot_num'], 3, 6)."-".sprintf('%03d', $bangou_oya_lot)."'";//もとのDBも更新
                         $connection->execute($updater);
 
                         $connection = ConnectionManager::get('default');//新DBに戻る
@@ -860,10 +856,6 @@ class ZensukensasController extends AppController
        $this->set('ResultZensuHeads',$ResultZensuHeads);
        $data = $this->request->getData();
 
-       echo "<pre>";
-       print_r("start ".date('Y-m-d H:i:s'));
-       echo "</pre>";
-
        $product_code = $data['product'];
        $this->set('product_code',$product_code);
        $staff_moto = $data['staff'];
@@ -945,10 +937,6 @@ class ZensukensasController extends AppController
           'ResultZensuHeads.product_code', 'ResultZensuHeads.lot_num',  'ResultZensuHeads.staff_id',
            'ResultZensuHeads.datetime_start', 'ResultZensuHeads.datetime_finish', 'ResultZensuHeads.delete_flag'])
          ->where(['ResultZensuHeads.delete_flag' => '0','datetime_start >=' => $datesta, 'datetime_start <=' => $datefin])->toArray();
-
-         echo "<pre>";
-         print_r("a ".date('Y-m-d H:i:s'));
-         echo "</pre>";
 
         if(isset($ResultZensuHeads[0])){
 
@@ -1051,18 +1039,6 @@ class ZensukensasController extends AppController
 
        }
 
-       echo "<pre>";
-       print_r("b ".date('Y-m-d H:i:s'));
-       echo "</pre>";
-
-       echo "<pre>";
-       print_r(count($ResultZensuHeads));
-       echo "</pre>";
-       /*
-       echo "<pre>";
-       print_r($ResultZensuHeads[0]);
-       echo "</pre>";
-*/
        //セットする
        $arrichiran =  array();
 
@@ -1144,10 +1120,6 @@ class ZensukensasController extends AppController
 
         }
 
-        echo "<pre>";
-        print_r("c ".date('Y-m-d H:i:s'));
-        echo "</pre>";
-
         $this->set('arrichiran',$arrichiran);
 
       if(isset($data['product_sort'])){//並び変え
@@ -1181,10 +1153,6 @@ class ZensukensasController extends AppController
         $this->set('arrichiran',$arrichiran);
 
       }
-
-      echo "<pre>";
-      print_r("finish ".date('Y-m-d H:i:s'));
-      echo "</pre>";
 
       if(isset($data['csv'])){//csv出力
       //    $fp = fopen('zensu_csv/zenken_test.csv', 'w');

@@ -125,7 +125,8 @@ class StockProductsController extends AppController
          $product_code = $Products[$k]["product_code"];
          $customer_id = $Products[$k]["customer_id"];
 
-				 if(((0 === strpos($product_code, "P2")) && ($customer_id == 1)) || ((0 === strpos($product_code, "P3")) && ($customer_id == 1)) || ((0 === strpos($product_code, "P4")) && ($customer_id == 1))){
+				 if(((0 === strpos($product_code, "P2")) && ($customer_id == 1)) || ((0 === strpos($product_code, "P3"))
+				  && ($customer_id == 1)) || ((0 === strpos($product_code, "P4")) && ($customer_id == 1))){
 					 //if(0 !== strpos($product_code, "P0") && 0 !== strpos($product_code, "P1") && 0 !== strpos($product_code, "W") && 0 !== strpos($product_code, "H") && 0 !== strpos($product_code, "RE") && ($customer_id == 1)){
              $arrProduct[] = ["product_code" => $product_code, "product_name" => $Products[$k]["product_name"]];
          }
